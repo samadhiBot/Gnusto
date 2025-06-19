@@ -10,12 +10,10 @@ struct ThiefTests {
     func testThiefStealsValuableItems() async throws {
         // Given
         let game = Zork1()
-        let mockIO = await MockIOHandler()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
             activeDaemons: [.thiefTheftDaemon], // Activate the daemon from start
-            parser: StandardParser(),
-            ioHandler: mockIO
+            parser: StandardParser()
         )
 
         // Position player in round room with thief and give player a valuable item
@@ -58,11 +56,9 @@ struct ThiefTests {
     func testExamineThief() async throws {
         // Given
         let game = Zork1()
-        let mockIO = await MockIOHandler()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: StandardParser(),
-            ioHandler: mockIO
+            parser: StandardParser()
         )
 
         try await engine.apply(
@@ -89,11 +85,9 @@ struct ThiefTests {
     func testGiveValuableItemToThief() async throws {
         // Given
         let game = Zork1()
-        let mockIO = await MockIOHandler()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: StandardParser(),
-            ioHandler: mockIO
+            parser: StandardParser()
         )
 
         try await engine.apply(
@@ -129,11 +123,9 @@ struct ThiefTests {
     func testThiefRefusesNonValuableItems() async throws {
         // Given
         let game = Zork1()
-        let mockIO = await MockIOHandler()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: StandardParser(),
-            ioHandler: mockIO
+            parser: StandardParser()
         )
 
         try await engine.movePlayer(to: .location(.roundRoom))
@@ -166,11 +158,9 @@ struct ThiefTests {
     func testAttackThief() async throws {
         // Given
         let game = Zork1()
-        let mockIO = await MockIOHandler()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: StandardParser(),
-            ioHandler: mockIO
+            parser: StandardParser()
         )
 
         try await engine.movePlayer(to: .location(.roundRoom))
@@ -195,11 +185,9 @@ struct ThiefTests {
     func testTellThief() async throws {
         // Given
         let game = Zork1()
-        let mockIO = await MockIOHandler()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: StandardParser(),
-            ioHandler: mockIO
+            parser: StandardParser()
         )
 
         try await engine.movePlayer(to: .location(.roundRoom))
@@ -223,11 +211,9 @@ struct ThiefTests {
     func testCannotTakeThief() async throws {
         // Given
         let game = Zork1()
-        let mockIO = await MockIOHandler()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: StandardParser(),
-            ioHandler: mockIO
+            parser: StandardParser()
         )
 
         try await engine.movePlayer(to: .location(.roundRoom))
@@ -251,11 +237,9 @@ struct ThiefTests {
     func testExamineStilettoInThiefsPossession() async throws {
         // Given
         let game = Zork1()
-        let mockIO = await MockIOHandler()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: StandardParser(),
-            ioHandler: mockIO
+            parser: StandardParser()
         )
 
         try await engine.movePlayer(to: .location(.roundRoom))
@@ -279,11 +263,9 @@ struct ThiefTests {
     func testExamineLargeBag() async throws {
         // Given
         let game = Zork1()
-        let mockIO = await MockIOHandler()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: StandardParser(),
-            ioHandler: mockIO
+            parser: StandardParser()
         )
 
         try await engine.apply(
@@ -309,11 +291,9 @@ struct ThiefTests {
     func testCannotTakeStilettoWhileThiefPresent() async throws {
         // Given
         let game = Zork1()
-        let mockIO = await MockIOHandler()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: StandardParser(),
-            ioHandler: mockIO
+            parser: StandardParser()
         )
 
         try await engine.apply(
@@ -341,11 +321,9 @@ struct ThiefTests {
     func testThiefPrioritizesHighValueItems() async throws {
         // Given
         let game = Zork1()
-        let mockIO = await MockIOHandler()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: StandardParser(),
-            ioHandler: mockIO
+            parser: StandardParser()
         )
 
         try await engine.apply(
@@ -390,11 +368,9 @@ struct ThiefTests {
     func testThiefMovementDaemon() async throws {
         // Given
         let game = Zork1()
-        let mockIO = await MockIOHandler()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: StandardParser(),
-            ioHandler: mockIO
+            parser: StandardParser()
         )
 
         try await engine.apply(
@@ -432,11 +408,9 @@ struct ThiefTests {
     func testThiefMovementMessages() async throws {
         // Given
         let game = Zork1()
-        let mockIO = await MockIOHandler()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: StandardParser(),
-            ioHandler: mockIO
+            parser: StandardParser()
         )
 
         try await engine.apply(
@@ -464,11 +438,9 @@ struct ThiefTests {
     func testEnhancedCombatWithWeapons() async throws {
         // Given
         let game = Zork1()
-        let mockIO = await MockIOHandler()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: StandardParser(),
-            ioHandler: mockIO
+            parser: StandardParser()
         )
 
         try await engine.apply(
@@ -498,11 +470,9 @@ struct ThiefTests {
     func testCombatVictoryDropsPossessions() async throws {
         // Given
         let game = Zork1()
-        let mockIO = await MockIOHandler()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: StandardParser(),
-            ioHandler: mockIO
+            parser: StandardParser()
         )
 
         try await engine.apply(
@@ -534,11 +504,9 @@ struct ThiefTests {
     func testTreasureScoringIntegration() async throws {
         // Given
         let game = Zork1()
-        let mockIO = await MockIOHandler()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: StandardParser(),
-            ioHandler: mockIO
+            parser: StandardParser()
         )
 
         let initialScore = await engine.playerScore
@@ -563,11 +531,9 @@ struct ThiefTests {
     func testThiefRefusesOwnPossessions() async throws {
         // Given
         let game = Zork1()
-        let mockIO = await MockIOHandler()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: StandardParser(),
-            ioHandler: mockIO
+            parser: StandardParser()
         )
 
         try await engine.apply(
@@ -600,11 +566,9 @@ struct ThiefTests {
     func testSophisticatedTheftMechanics() async throws {
         // Given
         let game = Zork1()
-        let mockIO = await MockIOHandler()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: StandardParser(),
-            ioHandler: mockIO
+            parser: StandardParser()
         )
 
         try await engine.apply(
@@ -645,11 +609,9 @@ struct ThiefTests {
     func testThiefCombatOutcomeVariations() async throws {
         // Given
         let game = Zork1()
-        let mockIO = await MockIOHandler()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: StandardParser(),
-            ioHandler: mockIO
+            parser: StandardParser()
         )
 
         try await engine.apply(

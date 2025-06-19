@@ -27,12 +27,10 @@ struct TurnOffActionHandlerTests {
             locations: [room],
             items: [lamp]
         )
-        let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: mockParser,
-            ioHandler: mockIO
+            parser: mockParser
         )
 
         let command = Command(
@@ -73,12 +71,10 @@ struct TurnOffActionHandlerTests {
             locations: [room],
             items: [book]
         )
-        let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: mockParser,
-            ioHandler: mockIO
+            parser: mockParser
         )
 
         let command = Command(
@@ -109,12 +105,10 @@ struct TurnOffActionHandlerTests {
             player: Player(in: "room"),
             locations: [room]
         )
-        let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: mockParser,
-            ioHandler: mockIO
+            parser: mockParser
         )
 
         let command = Command(
@@ -148,12 +142,10 @@ struct TurnOffActionHandlerTests {
             .size(10),
         )
         let game = MinimalGame(items: [lamp])
-        let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: mockParser,
-            ioHandler: mockIO
+            parser: mockParser
         )
         let command = Command(
             verb: .turnOff,
@@ -194,12 +186,10 @@ struct TurnOffActionHandlerTests {
             locations: [darkRoom],
             items: [lamp]
         )
-        let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: mockParser,
-            ioHandler: mockIO
+            parser: mockParser
         )
 
         let initiallyLit = await engine.scopeResolver.isLocationLit(locationID: darkRoom.id)
@@ -241,12 +231,10 @@ struct TurnOffActionHandlerTests {
             .size(10)
         )
         let game = MinimalGame(items: [lamp])
-        let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: mockParser,
-            ioHandler: mockIO
+            parser: mockParser
         )
 
         let command = Command(
@@ -283,12 +271,10 @@ struct TurnOffActionHandlerTests {
             .size(10)
         )
         let game = MinimalGame(items: [lamp])
-        let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: mockParser,
-            ioHandler: mockIO
+            parser: mockParser
         )
         let command = Command(
             verb: .turnOff,
@@ -325,12 +311,10 @@ struct TurnOffActionHandlerTests {
             .size(10)
         )
         let game = MinimalGame(items: [lamp])
-        let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: mockParser,
-            ioHandler: mockIO
+            parser: mockParser
         )
         let command = Command(
             verb: .turnOff,
@@ -369,13 +353,11 @@ struct TurnOffActionHandlerTests {
             locations: [darkRoom],
             items: [lamp]
         )
-        let mockIO = await MockIOHandler()
         // Use the real parser to test alias resolution
         let parser = StandardParser()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: parser,
-            ioHandler: mockIO
+            parser: parser
         )
 
         // Act
@@ -425,10 +407,9 @@ struct TurnOffActionHandlerTests {
             locations: [darkRoom],
             items: [lamp]
         )
-        let mockIO = await MockIOHandler()
         // Use the real parser to test alias resolution
         let parser = StandardParser()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
             parser: parser, // Use StandardParser
             ioHandler: mockIO

@@ -18,12 +18,10 @@ struct WearActionHandlerTests {
             .isTakable
         )
         let game = MinimalGame(items: [cloak])
-        let mockIO = await MockIOHandler()
         var mockParser = MockParser()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: mockParser,
-            ioHandler: mockIO
+            parser: mockParser
         )
 
         let command = Command(
@@ -70,8 +68,7 @@ struct WearActionHandlerTests {
 
     @Test("Wear fails if item not held")
     func testWearItemNotHeld() async throws {
-        let game = MinimalGame()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
             parser: MockParser(),
             ioHandler: await MockIOHandler()
@@ -103,7 +100,7 @@ struct WearActionHandlerTests {
             .isTakable
         )
         let game = MinimalGame(items: [rock])
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
             parser: MockParser(),
             ioHandler: await MockIOHandler()
@@ -137,7 +134,7 @@ struct WearActionHandlerTests {
             .isWorn
         )
         let game = MinimalGame(items: [cloak])
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
             parser: MockParser(),
             ioHandler: await MockIOHandler()
@@ -162,8 +159,7 @@ struct WearActionHandlerTests {
 
     @Test("Wear fails with no direct object")
     func testWearNoObject() async throws {
-        let game = MinimalGame()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
             parser: MockParser(),
             ioHandler: await MockIOHandler()
@@ -193,9 +189,8 @@ struct WearActionHandlerTests {
         let boots = Item(id: "boots", .name("boots"), .in(.player), .isWearable)
         
         let game = MinimalGame(items: [cloak, boots])
-        let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
         
         // Act: Execute "wear all"
         let command = Command(
@@ -223,9 +218,8 @@ struct WearActionHandlerTests {
         let boots = Item(id: "boots", .name("boots"), .in(.player), .isWearable)
         
         let game = MinimalGame(items: [cloak, boots])
-        let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
         
         // Act: Execute "wear cloak and boots"
         let command = Command(
@@ -253,9 +247,8 @@ struct WearActionHandlerTests {
         let rock = Item(id: "rock", .name("rock"), .in(.player)) // Not wearable
         
         let game = MinimalGame(items: [cloak, rock])
-        let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
         
         // Act: Execute "wear all"
         let command = Command(
@@ -282,9 +275,8 @@ struct WearActionHandlerTests {
         let rock = Item(id: "rock", .name("rock"), .in(.player)) // Not wearable
         
         let game = MinimalGame(items: [rock])
-        let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
         
         // Act: Execute "wear all"
         let command = Command(
@@ -306,9 +298,8 @@ struct WearActionHandlerTests {
         let boots = Item(id: "boots", .name("boots"), .in(.player), .isWearable)
         
         let game = MinimalGame(items: [cloak, boots])
-        let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
         
         // Act: Execute "wear all"
         let command = Command(

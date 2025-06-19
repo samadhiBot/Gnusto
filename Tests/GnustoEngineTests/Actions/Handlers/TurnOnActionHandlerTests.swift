@@ -19,12 +19,10 @@ struct TurnOnActionHandlerTests {
             .isTakable,
         )
         let game = MinimalGame(items: [lamp])
-        let mockIO = await MockIOHandler()
         let parser = StandardParser()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: parser,
-            ioHandler: mockIO
+            parser: parser
         )
 
         let parseResult = parser.parse(
@@ -68,12 +66,10 @@ struct TurnOnActionHandlerTests {
             locations: [darkRoom],
             items: [lamp]
         )
-        let mockIO = await MockIOHandler()
         let parser = StandardParser()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: parser,
-            ioHandler: mockIO
+            parser: parser
         )
 
         // Verify room is dark initially
@@ -125,12 +121,10 @@ struct TurnOnActionHandlerTests {
             .isTakable,
         )
         let game = MinimalGame(items: [lamp])
-        let mockIO = await MockIOHandler()
         let parser = StandardParser()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: parser,
-            ioHandler: mockIO
+            parser: parser
         )
 
         let command = Command(
@@ -166,12 +160,10 @@ struct TurnOnActionHandlerTests {
             .isTakable,
         )
         let game = MinimalGame(items: [lamp])
-        let mockIO = await MockIOHandler()
         let parser = StandardParser()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: parser,
-            ioHandler: mockIO
+            parser: parser
         )
 
         let command = Command(
@@ -207,12 +199,10 @@ struct TurnOnActionHandlerTests {
             .isTakable,
         )
         let game = MinimalGame(items: [lamp])
-        let mockIO = await MockIOHandler()
         let parser = StandardParser()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: parser,
-            ioHandler: mockIO
+            parser: parser
         )
 
         let command = Command(
@@ -253,12 +243,10 @@ struct TurnOnActionHandlerTests {
             locations: [darkRoom],
             items: [radio]
         )
-        let mockIO = await MockIOHandler()
         let parser = StandardParser()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: parser,
-            ioHandler: mockIO
+            parser: parser
         )
 
         let command = Command(
@@ -297,12 +285,10 @@ struct TurnOnActionHandlerTests {
             .isTakable,
         )
         let game = MinimalGame(items: [lamp])
-        let mockIO = await MockIOHandler()
         let parser = StandardParser()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: parser,
-            ioHandler: mockIO
+            parser: parser
         )
 
         let parseResult = parser.parse(
@@ -353,12 +339,10 @@ struct TurnOnActionHandlerTests {
             locations: [litRoom],
             items: [lamp, sword]
         )
-        let mockIO = await MockIOHandler()
         let parser = StandardParser()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: parser,
-            ioHandler: mockIO
+            parser: parser
         )
 
         // Verify room is lit initially (so turning on lamp shouldn't trigger description)
@@ -420,12 +404,10 @@ struct TurnOnActionHandlerTests {
             locations: [livingRoom],
             items: [lamp, sword]
         )
-        let mockIO = await MockIOHandler()
         let parser = StandardParser()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: parser,
-            ioHandler: mockIO
+            parser: parser
         )
 
         // Check initial state

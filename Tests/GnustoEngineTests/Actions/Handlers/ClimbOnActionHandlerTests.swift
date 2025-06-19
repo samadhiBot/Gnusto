@@ -16,12 +16,10 @@ struct ClimbOnActionHandlerTests {
             .isTakable
         )
         let game = MinimalGame(items: [chair])
-        let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: mockParser,
-            ioHandler: mockIO
+            parser: mockParser
         )
 
         let command = Command(
@@ -82,11 +80,9 @@ struct ClimbOnActionHandlerTests {
             .isTakable
         )
         let game = MinimalGame(items: [chair])
-        let mockIO = await MockIOHandler()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: MockParser(),
-            ioHandler: mockIO
+            parser: MockParser()
         )
 
         let command = Command(
@@ -107,12 +103,9 @@ struct ClimbOnActionHandlerTests {
 
     @Test("Climb on fails with no indirect object")
     func testClimbOnFailsWithNoObject() async throws {
-        let game = MinimalGame()
-        let mockIO = await MockIOHandler()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: MockParser(),
-            ioHandler: mockIO
+            parser: MockParser()
         )
 
         let command = Command(
@@ -132,12 +125,9 @@ struct ClimbOnActionHandlerTests {
 
     @Test("Climb on fails with non-item target")
     func testClimbOnFailsWithNonItemTarget() async throws {
-        let game = MinimalGame()
-        let mockIO = await MockIOHandler()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: MockParser(),
-            ioHandler: mockIO
+            parser: MockParser()
         )
 
         let command = Command(
@@ -172,11 +162,9 @@ struct ClimbOnActionHandlerTests {
             .isTakable
         )
         let game = MinimalGame(items: [box, ladder])
-        let mockIO = await MockIOHandler()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: MockParser(),
-            ioHandler: mockIO
+            parser: MockParser()
         )
 
         let command = Command(
@@ -204,12 +192,10 @@ struct ClimbOnActionHandlerTests {
             .isTakable
         )
         let game = MinimalGame(items: [rope])
-        let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: mockParser,
-            ioHandler: mockIO
+            parser: mockParser
         )
 
         let command = Command(
@@ -235,12 +221,10 @@ struct ClimbOnActionHandlerTests {
             // Not takable - immovable
         )
         let game = MinimalGame(items: [tree])
-        let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: mockParser,
-            ioHandler: mockIO
+            parser: mockParser
         )
 
         let command = Command(
@@ -273,12 +257,10 @@ struct ClimbOnActionHandlerTests {
             .isTakable
         )
         let game = MinimalGame(items: [table, stool])
-        let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: mockParser,
-            ioHandler: mockIO
+            parser: mockParser
         )
 
         let command = Command(

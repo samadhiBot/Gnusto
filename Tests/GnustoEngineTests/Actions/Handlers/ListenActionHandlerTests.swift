@@ -10,14 +10,11 @@ struct ListenActionHandlerTests {
     // MARK: - Setup Helper
 
     private func createTestEngine() async -> GameEngine {
-        let game = MinimalGame()
-        let mockIO = await MockIOHandler()
         let mockParser = MockParser()
 
         return await GameEngine.test(
             blueprint: game,
-            parser: mockParser,
-            ioHandler: mockIO
+            parser: mockParser
         )
     }
 
@@ -171,12 +168,10 @@ struct ListenActionHandlerTests {
         )
 
         let game = MinimalGame(locations: [location1, location2])
-        let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: mockParser,
-            ioHandler: mockIO
+            parser: mockParser
         )
 
         let command = Command(
@@ -261,12 +256,10 @@ struct ListenActionHandlerTests {
             player: player,
             locations: [darkLocation]
         )
-        let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: mockParser,
-            ioHandler: mockIO
+            parser: mockParser
         )
 
         let command = Command(
@@ -292,12 +285,10 @@ struct ListenActionHandlerTests {
         )
 
         let game = MinimalGame(items: [noisyItem])
-        let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: mockParser,
-            ioHandler: mockIO
+            parser: mockParser
         )
 
         let command = Command(

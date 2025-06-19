@@ -10,10 +10,8 @@ struct SqueezeActionHandlerTests {
     @Test("Squeeze validates missing direct object")
     func testSqueezeValidatesMissingDirectObject() async throws {
         // Given
-        let game = MinimalGame()
-        let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
 
         let command = Command(verb: .squeeze, rawInput: "squeeze")
         let context = ActionContext(command: command, engine: engine)
@@ -36,9 +34,8 @@ struct SqueezeActionHandlerTests {
         )
 
         let game = MinimalGame(items: [sponge])
-        let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
 
         let command = Command(verb: .squeeze, directObject: .item("sponge"), rawInput: "squeeze sponge")
         let context = ActionContext(command: command, engine: engine)
@@ -62,9 +59,8 @@ struct SqueezeActionHandlerTests {
         )
 
         let game = MinimalGame(items: [tube])
-        let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
 
         let command = Command(verb: .squeeze, directObject: .item("tube"), rawInput: "squeeze tube")
         let context = ActionContext(command: command, engine: engine)
@@ -88,9 +84,8 @@ struct SqueezeActionHandlerTests {
         )
 
         let game = MinimalGame(items: [bottle])
-        let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
 
         let command = Command(verb: .squeeze, directObject: .item("bottle"), rawInput: "squeeze bottle")
         let context = ActionContext(command: command, engine: engine)
@@ -114,9 +109,8 @@ struct SqueezeActionHandlerTests {
         )
 
         let game = MinimalGame(items: [pillow])
-        let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
 
         let command = Command(verb: .squeeze, directObject: .item("pillow"), rawInput: "squeeze pillow")
         let context = ActionContext(command: command, engine: engine)
@@ -139,9 +133,8 @@ struct SqueezeActionHandlerTests {
         )
 
         let game = MinimalGame(items: [cushion])
-        let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
 
         let command = Command(verb: .squeeze, directObject: .item("cushion"), rawInput: "squeeze cushion")
         let context = ActionContext(command: command, engine: engine)
@@ -164,9 +157,8 @@ struct SqueezeActionHandlerTests {
         )
 
         let game = MinimalGame(items: [rock])
-        let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
 
         let command = Command(verb: .squeeze, directObject: .item("rock"), rawInput: "squeeze rock")
         let context = ActionContext(command: command, engine: engine)
@@ -190,9 +182,8 @@ struct SqueezeActionHandlerTests {
         )
 
         let game = MinimalGame(items: [sponge])
-        let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
 
         let command = Command(verb: .squeeze, directObject: .item("sponge"), rawInput: "squeeze sponge")
         let context = ActionContext(command: command, engine: engine)
@@ -224,9 +215,8 @@ struct SqueezeActionHandlerTests {
         )
 
         let game = MinimalGame(items: [tube])
-        let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
 
         let command = Command(verb: .squeeze, directObject: .item("tube"), rawInput: "squeeze tube")
 

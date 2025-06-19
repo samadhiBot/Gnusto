@@ -10,13 +10,10 @@ struct BreatheActionHandlerTests {
     @Test("Breathe validates no direct object allowed")
     func testBreatheValidatesNoDirectObjectAllowed() async throws {
         // Given
-        let game = MinimalGame()
-        let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: mockParser,
-            ioHandler: mockIO
+            parser: mockParser
         )
 
         let command = Command(
@@ -35,13 +32,10 @@ struct BreatheActionHandlerTests {
     @Test("Breathe validates no indirect object allowed")
     func testBreatheValidatesNoIndirectObjectAllowed() async throws {
         // Given
-        let game = MinimalGame()
-        let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: mockParser,
-            ioHandler: mockIO
+            parser: mockParser
         )
 
         let command = Command(
@@ -60,12 +54,9 @@ struct BreatheActionHandlerTests {
     @Test("Breathe succeeds with basic command")
     func testBreatheSucceedsWithBasicCommand() async throws {
         // Given
-        let game = MinimalGame()
-        let mockIO = await MockIOHandler()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: StandardParser(),
-            ioHandler: mockIO
+            parser: StandardParser()
         )
 
         // When
@@ -82,12 +73,9 @@ struct BreatheActionHandlerTests {
     @Test("Breathe integration test")
     func testBreatheIntegrationTest() async throws {
         // Given
-        let game = MinimalGame()
-        let mockIO = await MockIOHandler()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: StandardParser(),
-            ioHandler: mockIO
+            parser: StandardParser()
         )
 
         // When
@@ -112,13 +100,10 @@ struct BreatheActionHandlerTests {
     @Test("Breathe validation passes with no objects")
     func testBreatheValidationPassesWithNoObjects() async throws {
         // Given
-        let game = MinimalGame()
-        let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: mockParser,
-            ioHandler: mockIO
+            parser: mockParser
         )
 
         let command = Command(

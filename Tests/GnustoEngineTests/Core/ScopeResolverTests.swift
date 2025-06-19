@@ -5,13 +5,10 @@ import Testing
 struct ScopeResolverTests {
     @Test("Location is lit if inherentlyLit property is present")
     func testIsLitInherentlyLit() async throws {
-        let game = MinimalGame()
-        let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: mockParser,
-            ioHandler: mockIO
+            parser: mockParser
         )
         let resolver = await engine.scopeResolver
 
@@ -22,12 +19,10 @@ struct ScopeResolverTests {
     func testIsLitDarkNoSource() async throws {
         let darkRoom = Location(id: .startRoom)
         let game = MinimalGame(locations: [darkRoom])
-        let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: mockParser,
-            ioHandler: mockIO
+            parser: mockParser
         )
         let resolver = await engine.scopeResolver
 
@@ -44,12 +39,10 @@ struct ScopeResolverTests {
             .isTakable
         )
         let game = MinimalGame(items: [activeLamp])
-        let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: mockParser,
-            ioHandler: mockIO
+            parser: mockParser
         )
         let resolver = await engine.scopeResolver
 
@@ -74,12 +67,10 @@ struct ScopeResolverTests {
             locations: [darkRoom],
             items: [inactiveLamp]
         )
-        let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: mockParser,
-            ioHandler: mockIO
+            parser: mockParser
         )
         let resolver = await engine.scopeResolver
 
@@ -95,12 +86,10 @@ struct ScopeResolverTests {
             .isOn
         )
         let game = MinimalGame(items: [activeLamp])
-        let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: mockParser,
-            ioHandler: mockIO
+            parser: mockParser
         )
         let resolver = await engine.scopeResolver
 
@@ -124,12 +113,10 @@ struct ScopeResolverTests {
             locations: [darkRoom],
             items: [inactiveLamp]
         )
-        let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: mockParser,
-            ioHandler: mockIO
+            parser: mockParser
         )
         let resolver = await engine.scopeResolver
 
@@ -146,12 +133,10 @@ struct ScopeResolverTests {
             .isTakable
         )
         let game = MinimalGame(items: [activeLamp])
-        let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: mockParser,
-            ioHandler: mockIO
+            parser: mockParser
         )
         let resolver = await engine.scopeResolver
 
@@ -161,12 +146,10 @@ struct ScopeResolverTests {
     @Test("Location is dark if location ID does not exist")
     func testIsLitNonExistentLocation() async throws {
         let game = MinimalGame(locations: [])
-        let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: mockParser,
-            ioHandler: mockIO
+            parser: mockParser
         )
         let resolver = await engine.scopeResolver
 
@@ -187,12 +170,10 @@ struct ScopeResolverTests {
             .isInvisible
         )
         let game = MinimalGame(items: [visibleItem, invisibleItem])
-        let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: mockParser,
-            ioHandler: mockIO
+            parser: mockParser
         )
         let resolver = await engine.scopeResolver
 
@@ -218,12 +199,10 @@ struct ScopeResolverTests {
             .isInvisible
         )
         let game = MinimalGame(items: [visibleItem, sceneryItem, invisibleItem])
-        let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: mockParser,
-            ioHandler: mockIO
+            parser: mockParser
         )
         let resolver = await engine.scopeResolver
 
@@ -262,12 +241,10 @@ struct ScopeResolverTests {
             locations: [darkRoom],
             items: [item]
         )
-        let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: mockParser,
-            ioHandler: mockIO
+            parser: mockParser
         )
         let resolver = await engine.scopeResolver
 
@@ -297,12 +274,10 @@ struct ScopeResolverTests {
             .isInvisible
         )
         let game = MinimalGame(items: [activeLamp, visibleItem, invisibleItem])
-        let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: mockParser,
-            ioHandler: mockIO
+            parser: mockParser
         )
         let resolver = await engine.scopeResolver
 
@@ -329,12 +304,10 @@ struct ScopeResolverTests {
             .isInvisible
         )
         let game = MinimalGame(items: [activeLamp, visibleItem, invisibleItem])
-        let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: mockParser,
-            ioHandler: mockIO
+            parser: mockParser
         )
         let resolver = await engine.scopeResolver
 
@@ -345,13 +318,10 @@ struct ScopeResolverTests {
 
     @Test("No items visible if location ID does not exist")
     func testVisibleItemsNonExistentLocation() async throws {
-        let game = MinimalGame()
-        let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: mockParser,
-            ioHandler: mockIO
+            parser: mockParser
         )
         let resolver = await engine.scopeResolver
 
@@ -400,12 +370,10 @@ struct ScopeResolverTests {
             .isTakable
         )
         let game = MinimalGame(items: [inventoryItem])
-        let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: mockParser,
-            ioHandler: mockIO
+            parser: mockParser
         )
         let resolver = await engine.scopeResolver
 
@@ -421,12 +389,10 @@ struct ScopeResolverTests {
             .in(.location(.startRoom))
         )
         let game = MinimalGame(items: [locationItem])
-        let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: mockParser,
-            ioHandler: mockIO
+            parser: mockParser
         )
         let resolver = await engine.scopeResolver
 
@@ -452,12 +418,10 @@ struct ScopeResolverTests {
             locations: [darkRoom],
             items: [locationItem]
         )
-        let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: mockParser,
-            ioHandler: mockIO
+            parser: mockParser
         )
         let resolver = await engine.scopeResolver
 
@@ -480,12 +444,10 @@ struct ScopeResolverTests {
             .in(.item(openBox.id))
         )
         let game = MinimalGame(items: [openBox, itemInBox])
-        let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: mockParser,
-            ioHandler: mockIO
+            parser: mockParser
         )
         let resolver = await engine.scopeResolver
 
@@ -507,12 +469,10 @@ struct ScopeResolverTests {
             .in(.item(closedBox.id))
         )
         let game = MinimalGame(items: [closedBox, itemInBox])
-        let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: mockParser,
-            ioHandler: mockIO
+            parser: mockParser
         )
         let resolver = await engine.scopeResolver
 
@@ -537,12 +497,10 @@ struct ScopeResolverTests {
             .in(.item(transparentBox.id))
         )
         let game = MinimalGame(items: [transparentBox, itemInBox])
-        let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: mockParser,
-            ioHandler: mockIO
+            parser: mockParser
         )
         let resolver = await engine.scopeResolver
 
@@ -565,12 +523,10 @@ struct ScopeResolverTests {
             .in(.item(openBox.id))
         )
         let game = MinimalGame(items: [openBox, itemInBox])
-        let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: mockParser,
-            ioHandler: mockIO
+            parser: mockParser
         )
         let resolver = await engine.scopeResolver
 
@@ -592,12 +548,10 @@ struct ScopeResolverTests {
             .in(.item(closedBox.id))
         )
         let game = MinimalGame(items: [closedBox, itemInBox])
-        let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: mockParser,
-            ioHandler: mockIO
+            parser: mockParser
         )
         let resolver = await engine.scopeResolver
 
@@ -622,12 +576,10 @@ struct ScopeResolverTests {
             .in(.item(transparentBox.id))
         )
         let game = MinimalGame(items: [transparentBox, itemInBox])
-        let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: mockParser,
-            ioHandler: mockIO
+            parser: mockParser
         )
         let resolver = await engine.scopeResolver
 
@@ -659,12 +611,10 @@ struct ScopeResolverTests {
             locations: [darkRoom],
             items: [openBox, itemInBox]
         )
-        let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: mockParser,
-            ioHandler: mockIO
+            parser: mockParser
         )
         let resolver = await engine.scopeResolver
 
@@ -694,12 +644,10 @@ struct ScopeResolverTests {
             locations: [darkRoom],
             items: [inactiveLamp, item]
         )
-        let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: mockParser,
-            ioHandler: mockIO
+            parser: mockParser
         )
         let resolver = await engine.scopeResolver
 
@@ -716,12 +664,10 @@ struct ScopeResolverTests {
             .omitDescription
         )
         let game = MinimalGame(items: [sceneryItem])
-        let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: mockParser,
-            ioHandler: mockIO
+            parser: mockParser
         )
         let resolver = await engine.scopeResolver
 

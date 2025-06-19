@@ -24,9 +24,8 @@ struct MultipleObjectTests {
         )
         
         let game = MinimalGame(items: [sword, lantern])
-        let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
         
         // Act: Execute "examine all"
         let command = Command(
@@ -61,9 +60,8 @@ struct MultipleObjectTests {
         )
         
         let game = MinimalGame(items: [sword, lantern])
-        let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
         
         // Act: Execute "examine sword and lantern"
         let command = Command(
@@ -104,9 +102,8 @@ struct MultipleObjectTests {
         )
         
         let game = MinimalGame(items: [coin, gem, merchant])
-        let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
         
         // Act: Execute "give all to merchant"
         let command = Command(
@@ -149,9 +146,8 @@ struct MultipleObjectTests {
         )
         
         let game = MinimalGame(items: [coin, gem, merchant])
-        let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
         
         // Act: Execute "give coin and gem to merchant"
         let command = Command(
@@ -197,9 +193,8 @@ struct MultipleObjectTests {
         )
         
         let game = MinimalGame(items: [coin, gem, box])
-        let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
         
         // Act: Execute "put all in box"
         let command = Command(
@@ -243,9 +238,8 @@ struct MultipleObjectTests {
         )
         
         let game = MinimalGame(items: [coin, gem, box])
-        let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
         
         // Act: Execute "put coin and gem in box"
         let command = Command(
@@ -284,9 +278,8 @@ struct MultipleObjectTests {
         )
         
         let game = MinimalGame(items: [button, lever])
-        let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
         
         // Act: Execute "push all"
         let command = Command(
@@ -316,9 +309,8 @@ struct MultipleObjectTests {
         )
         
         let game = MinimalGame(items: [button, lever])
-        let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
         
         // Act: Execute "push button and lever"
         let command = Command(
@@ -350,9 +342,8 @@ struct MultipleObjectTests {
         )
         
         let game = MinimalGame(items: [sword, lantern])
-        let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
         
         // Act: Try "open sword and lantern" (OPEN doesn't support multiple objects)
         let command = Command(
@@ -371,9 +362,8 @@ struct MultipleObjectTests {
     @Test("ALL with no applicable items handles gracefully")
     func testAllWithNoApplicableItems() async throws {
         let game = MinimalGame(items: [])
-        let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
         
         // Act: Execute "take all" when there's nothing to take
         let command = Command(

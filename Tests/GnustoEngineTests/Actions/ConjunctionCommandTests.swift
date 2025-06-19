@@ -55,7 +55,6 @@ struct ConjunctionCommandTests {
         
         let player = Player(in: .startRoom, carryingCapacity: 20)
         let game = MinimalGame(player: player, items: [sword, lantern, book, coin, gem])
-        let mockIO = await MockIOHandler()
         let mockParser = MockParser()
         return await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
     }
@@ -242,9 +241,8 @@ struct ConjunctionCommandTests {
         
         let player = Player(in: .startRoom, carryingCapacity: 20)
         let game = MinimalGame(player: player, items: [sword, statue])
-        let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
         
         // Create a command with one held and one not held item
         let command = Command(

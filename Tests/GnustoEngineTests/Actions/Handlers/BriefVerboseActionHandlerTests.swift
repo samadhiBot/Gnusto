@@ -10,12 +10,9 @@ struct BriefVerboseActionHandlerTests {
     @Test("Brief sets brief mode")
     func testBriefSetsBriefMode() async throws {
         // Given
-        let game = MinimalGame()
-        let mockIO = await MockIOHandler()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: MockParser(),
-            ioHandler: mockIO
+            parser: MockParser()
         )
 
         let command = Command(verb: .brief, rawInput: "brief")
@@ -37,12 +34,9 @@ struct BriefVerboseActionHandlerTests {
     @Test("Brief clears verbose mode if set")
     func testBriefClearsVerboseMode() async throws {
         // Given
-        let game = MinimalGame()
-        let mockIO = await MockIOHandler()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: MockParser(),
-            ioHandler: mockIO
+            parser: MockParser()
         )
 
         // First set verbose mode
@@ -67,12 +61,9 @@ struct BriefVerboseActionHandlerTests {
     @Test("Verbose sets verbose mode")
     func testVerboseSetVerboseMode() async throws {
         // Given
-        let game = MinimalGame()
-        let mockIO = await MockIOHandler()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: MockParser(),
-            ioHandler: mockIO
+            parser: MockParser()
         )
 
         let command = Command(verb: .verbose, rawInput: "verbose")
@@ -94,12 +85,9 @@ struct BriefVerboseActionHandlerTests {
     @Test("Verbose clears brief mode if set")
     func testVerboseClearsBriefMode() async throws {
         // Given
-        let game = MinimalGame()
-        let mockIO = await MockIOHandler()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: MockParser(),
-            ioHandler: mockIO
+            parser: MockParser()
         )
 
         // First set brief mode
@@ -124,12 +112,9 @@ struct BriefVerboseActionHandlerTests {
     @Test("Brief and verbose require no validation")
     func testBriefVerboseRequireNoValidation() async throws {
         // Given
-        let game = MinimalGame()
-        let mockIO = await MockIOHandler()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: MockParser(),
-            ioHandler: mockIO
+            parser: MockParser()
         )
 
         let briefCommand = Command(verb: .brief, rawInput: "brief")

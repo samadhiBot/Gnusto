@@ -10,13 +10,10 @@ struct SystemCommandActionHandlerTests {
     @Test("RESTART command quits the game with confirmation message")
     func testRestartQuitsGame() async throws {
         // Given
-        let game = MinimalGame()
-        let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: mockParser,
-            ioHandler: mockIO
+            parser: mockParser
         )
 
         let handler = RestartActionHandler()
@@ -37,13 +34,10 @@ struct SystemCommandActionHandlerTests {
     @Test("RESTART requires no validation")
     func testRestartValidation() async throws {
         // Given
-        let game = MinimalGame()
-        let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: mockParser,
-            ioHandler: mockIO
+            parser: mockParser
         )
 
         let handler = RestartActionHandler()
@@ -59,13 +53,10 @@ struct SystemCommandActionHandlerTests {
     @Test("SCRIPT command starts transcript recording")
     func testScriptStartsRecording() async throws {
         // Given
-        let game = MinimalGame()
-        let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: mockParser,
-            ioHandler: mockIO
+            parser: mockParser
         )
 
         let handler = ScriptActionHandler()
@@ -95,13 +86,10 @@ struct SystemCommandActionHandlerTests {
     @Test("SCRIPT validation fails when already scripting")
     func testScriptValidationFailsWhenAlreadyScripting() async throws {
         // Given
-        let game = MinimalGame()
-        let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: mockParser,
-            ioHandler: mockIO
+            parser: mockParser
         )
 
         // Set scripting flag to true
@@ -130,13 +118,10 @@ struct SystemCommandActionHandlerTests {
     @Test("UNSCRIPT command stops transcript recording")
     func testUnscriptStopsRecording() async throws {
         // Given
-        let game = MinimalGame()
-        let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: mockParser,
-            ioHandler: mockIO
+            parser: mockParser
         )
 
         // Set scripting flag to true first
@@ -167,13 +152,10 @@ struct SystemCommandActionHandlerTests {
     @Test("UNSCRIPT validation fails when not scripting")
     func testUnscriptValidationFailsWhenNotScripting() async throws {
         // Given
-        let game = MinimalGame()
-        let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: mockParser,
-            ioHandler: mockIO
+            parser: mockParser
         )
 
         // Ensure scripting is not active
@@ -201,13 +183,10 @@ struct SystemCommandActionHandlerTests {
     @Test("SCRIPT and UNSCRIPT work together correctly")
     func testScriptUnscriptIntegration() async throws {
         // Given
-        let game = MinimalGame()
-        let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: mockParser,
-            ioHandler: mockIO
+            parser: mockParser
         )
 
         let scriptHandler = ScriptActionHandler()

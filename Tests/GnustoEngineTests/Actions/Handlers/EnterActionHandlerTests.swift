@@ -10,13 +10,10 @@ struct EnterActionHandlerTests {
     @Test("Enter validates missing direct object with no enterable items")
     func testEnterValidatesMissingDirectObjectWithNoEnterableItems() async throws {
         // Given
-        let game = MinimalGame()
-        let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: mockParser,
-            ioHandler: mockIO
+            parser: mockParser
         )
 
         let command = Command(
@@ -34,13 +31,10 @@ struct EnterActionHandlerTests {
     @Test("Enter validates non-item direct object")
     func testEnterValidatesNonItemDirectObject() async throws {
         // Given
-        let game = MinimalGame()
-        let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: mockParser,
-            ioHandler: mockIO
+            parser: mockParser
         )
 
         let command = Command(
@@ -67,12 +61,10 @@ struct EnterActionHandlerTests {
         )
 
         let game = MinimalGame(items: [booth])
-        let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: mockParser,
-            ioHandler: mockIO
+            parser: mockParser
         )
 
         let command = Command(
@@ -98,12 +90,10 @@ struct EnterActionHandlerTests {
         )
 
         let game = MinimalGame(items: [rock])
-        let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: mockParser,
-            ioHandler: mockIO
+            parser: mockParser
         )
 
         let command = Command(
@@ -130,12 +120,10 @@ struct EnterActionHandlerTests {
         )
 
         let game = MinimalGame(items: [booth])
-        let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: mockParser,
-            ioHandler: mockIO
+            parser: mockParser
         )
 
         let command = Command(

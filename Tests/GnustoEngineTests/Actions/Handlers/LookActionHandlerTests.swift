@@ -66,12 +66,10 @@ struct LookActionHandlerTests {
             locations: [litRoom],
             items: [item1, item2, item3, item4]
         )
-        let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: mockParser,
-            ioHandler: mockIO
+            parser: mockParser
         )
         #expect(await engine.gameState.changeHistory.isEmpty)
 
@@ -130,12 +128,10 @@ struct LookActionHandlerTests {
             locations: [litRoom],
             items: [item4, item3, item2, item1] // Include all 4 items, in reverse order
         )
-        let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: mockParser,
-            ioHandler: mockIO
+            parser: mockParser
         )
         #expect(await engine.gameState.changeHistory.isEmpty)
 
@@ -181,12 +177,10 @@ struct LookActionHandlerTests {
             locations: [darkRoom],
             items: [item1]
         )
-        let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: mockParser,
-            ioHandler: mockIO
+            parser: mockParser
         )
         #expect(await engine.gameState.changeHistory.isEmpty)
 
@@ -233,12 +227,10 @@ struct LookActionHandlerTests {
             locations: [darkRoom],
             items: [activeLamp, item1]
         )
-        let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: mockParser,
-            ioHandler: mockIO
+            parser: mockParser
         )
         #expect(await engine.gameState.changeHistory.isEmpty)
 
@@ -279,8 +271,7 @@ struct LookActionHandlerTests {
             player: Player(in: "litRoom"),
             locations: [litRoom]
         )
-        let mockIO = await MockIOHandler()
-        let engine = await GameEngine.test(blueprint: game, parser: MockParser(), ioHandler: mockIO)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game, parser: MockParser(), ioHandler: mockIO)
 
         let command = Command(
             verb: .look,
@@ -330,12 +321,10 @@ struct LookActionHandlerTests {
             ]
         )
 
-        let mockIO = await MockIOHandler()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
             globalState: [specialFlag: true],
-            parser: MockParser(),
-            ioHandler: mockIO
+            parser: MockParser()
         )
 
         let command = Command(
@@ -392,12 +381,10 @@ struct LookActionHandlerTests {
         let initialAttributes = item.attributes
 
         let game = MinimalGame(items: [item])
-        let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: mockParser,
-            ioHandler: mockIO
+            parser: mockParser
         )
         #expect(try await engine.item("rock").hasFlag(.isTouched) == false)
         #expect(await engine.gameState.changeHistory.isEmpty)
@@ -437,12 +424,10 @@ struct LookActionHandlerTests {
         let initialAttributes = item.attributes
 
         let game = MinimalGame(items: [item])
-        let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: mockParser,
-            ioHandler: mockIO
+            parser: mockParser
         )
         #expect(try await engine.item("pebble").hasFlag(.isTouched) == false)
         #expect(await engine.gameState.changeHistory.isEmpty)
@@ -484,12 +469,10 @@ struct LookActionHandlerTests {
         let initialAttributes = item.attributes
 
         let game = MinimalGame(items: [item])
-        let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: mockParser,
-            ioHandler: mockIO
+            parser: mockParser
         )
         #expect(try await engine.item("stone").hasFlag(.isTouched) == true)
         #expect(await engine.gameState.changeHistory.isEmpty)
@@ -550,12 +533,10 @@ struct LookActionHandlerTests {
         let initialAttributes = box.attributes
 
         let game = MinimalGame(items: [box, coin])
-        let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: mockParser,
-            ioHandler: mockIO
+            parser: mockParser
         )
         #expect(try await engine.item("box").hasFlag(.isTouched) == false)
         #expect(await engine.gameState.changeHistory.isEmpty)
@@ -606,12 +587,10 @@ struct LookActionHandlerTests {
         let initialAttributes = box.attributes
 
         let game = MinimalGame(items: [box, coin])
-        let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: mockParser,
-            ioHandler: mockIO
+            parser: mockParser
         )
         #expect(try await engine.item("box").hasFlag(.isTouched) == false)
         #expect(try await engine.item("box").attributes["isOpen"] == nil)
@@ -663,12 +642,10 @@ struct LookActionHandlerTests {
         let initialAttributes = jar.attributes
 
         let game = MinimalGame(items: [jar, fly])
-        let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: mockParser,
-            ioHandler: mockIO
+            parser: mockParser
         )
         #expect(try await engine.item("jar").hasFlag(.isTouched) == false)
         #expect(try await engine.item("jar").attributes["isOpen"] == nil)
@@ -726,12 +703,10 @@ struct LookActionHandlerTests {
         let initialAttributes = table.attributes
 
         let game = MinimalGame(items: [table, book, candle])
-        let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: mockParser,
-            ioHandler: mockIO
+            parser: mockParser
         )
         #expect(try await engine.item("table").hasFlag(.isTouched) == false)
         #expect(await engine.gameState.changeHistory.isEmpty)
@@ -786,12 +761,10 @@ struct LookActionHandlerTests {
             locations: [room1, room2],
             items: [artifact]
         )
-        let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: mockParser,
-            ioHandler: mockIO
+            parser: mockParser
         )
         #expect(try await engine.item("artifact") == artifact)
         let reachableItems = await engine.scopeResolver.itemsReachableByPlayer()
@@ -841,12 +814,10 @@ struct LookActionHandlerTests {
             locations: [office],
             items: [desk]
         )
-        let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: mockParser,
-            ioHandler: mockIO
+            parser: mockParser
         )
         let initialItemState = try await engine.item(itemID)
         #expect(initialItemState.attributes[.isTouched] != true)
@@ -889,12 +860,10 @@ struct LookActionHandlerTests {
             .in(.player)
         )
         let game = MinimalGame(items: [note])
-        let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: mockParser,
-            ioHandler: mockIO
+            parser: mockParser
         )
         let initialItemState = try await engine.item(itemID)
         #expect(initialItemState.attributes[.isTouched] != true)
@@ -927,13 +896,10 @@ struct LookActionHandlerTests {
 
     @Test("LOOK AT non-existent item")
     func testLookAtNonExistentItem() async throws {
-        let game = MinimalGame()
-        let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: mockParser,
-            ioHandler: mockIO
+            parser: mockParser
         )
 
         let command = Command(
@@ -953,12 +919,10 @@ struct LookActionHandlerTests {
     func testLookAtItemNotInScope() async throws {
         let item = Item(id: "artifact", .name("ancient artifact"), .in(.nowhere))
         let game = MinimalGame(items: [item])
-        let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: mockParser,
-            ioHandler: mockIO
+            parser: mockParser
         )
 
         let command = Command(

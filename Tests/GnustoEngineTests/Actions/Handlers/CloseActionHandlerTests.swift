@@ -18,12 +18,10 @@ struct CloseActionHandlerTests {
             .isOpen // Start open
         )
         let game = MinimalGame(items: [box])
-        let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: mockParser,
-            ioHandler: mockIO
+            parser: mockParser
         )
 
         let command = Command(
@@ -82,12 +80,10 @@ struct CloseActionHandlerTests {
             // Starts closed by default (no .isOpen)
         )
         let game = MinimalGame(items: [box])
-        let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: mockParser,
-            ioHandler: mockIO
+            parser: mockParser
         )
 
         let command = Command(
@@ -116,7 +112,7 @@ struct CloseActionHandlerTests {
             // isContainer/isOpenable are false by default
         )
         let game = MinimalGame(items: [rock])
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
             parser: MockParser(),
             ioHandler: await MockIOHandler()
@@ -150,7 +146,7 @@ struct CloseActionHandlerTests {
             .isOpen // Start open
         )
         let game = MinimalGame(items: [box])
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
             parser: MockParser(),
             ioHandler: await MockIOHandler()
@@ -176,8 +172,7 @@ struct CloseActionHandlerTests {
 
     @Test("Close fails with no direct object")
     func testCloseFailsWithNoObject() async throws {
-        let game = MinimalGame()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
             parser: MockParser(),
             ioHandler: await MockIOHandler()

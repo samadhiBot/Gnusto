@@ -16,12 +16,10 @@ struct LookUnderActionHandlerTests {
             .isSurface
         )
         let game = MinimalGame(items: [table])
-        let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: mockParser,
-            ioHandler: mockIO
+            parser: mockParser
         )
 
         let command = Command(
@@ -71,7 +69,7 @@ struct LookUnderActionHandlerTests {
             .isSurface
         )
         let game = MinimalGame(items: [table])
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
             parser: MockParser(),
             ioHandler: await MockIOHandler()
@@ -97,12 +95,9 @@ struct LookUnderActionHandlerTests {
 
     @Test("Look under fails with no indirect object")
     func testLookUnderFailsWithNoObject() async throws {
-        let game = MinimalGame()
-        let mockIO = await MockIOHandler()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: MockParser(),
-            ioHandler: mockIO
+            parser: MockParser()
         )
 
         let command = Command(
@@ -123,12 +118,9 @@ struct LookUnderActionHandlerTests {
 
     @Test("Look under fails with non-item target")
     func testLookUnderFailsWithNonItemTarget() async throws {
-        let game = MinimalGame()
-        let mockIO = await MockIOHandler()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: MockParser(),
-            ioHandler: mockIO
+            parser: MockParser()
         )
 
         let command = Command(
@@ -163,11 +155,9 @@ struct LookUnderActionHandlerTests {
             .isTakable
         )
         let game = MinimalGame(items: [box, carpet])
-        let mockIO = await MockIOHandler()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: MockParser(),
-            ioHandler: mockIO
+            parser: MockParser()
         )
 
         let command = Command(
@@ -195,12 +185,10 @@ struct LookUnderActionHandlerTests {
             .isTakable
         )
         let game = MinimalGame(items: [mat])
-        let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: mockParser,
-            ioHandler: mockIO
+            parser: mockParser
         )
 
         let command = Command(
@@ -237,12 +225,10 @@ struct LookUnderActionHandlerTests {
             .isTakable
         )
         let game = MinimalGame(items: [table, book])
-        let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: mockParser,
-            ioHandler: mockIO
+            parser: mockParser
         )
 
         let command = Command(

@@ -10,10 +10,8 @@ struct ShakeActionHandlerTests {
     @Test("Shake validates missing direct object")
     func testShakeValidatesMissingDirectObject() async throws {
         // Given
-        let game = MinimalGame()
-        let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
 
         let command = Command(verb: .shake, rawInput: "shake")
         let context = ActionContext(command: command, engine: engine)
@@ -36,9 +34,8 @@ struct ShakeActionHandlerTests {
         )
 
         let game = MinimalGame(items: [box])
-        let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
 
         let command = Command(verb: .shake, directObject: .item("box"), rawInput: "shake box")
         let context = ActionContext(command: command, engine: engine)
@@ -62,9 +59,8 @@ struct ShakeActionHandlerTests {
         )
 
         let game = MinimalGame(items: [bottle])
-        let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
 
         let command = Command(verb: .shake, directObject: .item("bottle"), rawInput: "shake bottle")
         let context = ActionContext(command: command, engine: engine)
@@ -88,9 +84,8 @@ struct ShakeActionHandlerTests {
         )
 
         let game = MinimalGame(items: [vial])
-        let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
 
         let command = Command(verb: .shake, directObject: .item("vial"), rawInput: "shake vial")
         let context = ActionContext(command: command, engine: engine)
@@ -112,9 +107,8 @@ struct ShakeActionHandlerTests {
         )
 
         let game = MinimalGame(items: [wall])
-        let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
 
         let command = Command(verb: .shake, directObject: .item("wall"), rawInput: "shake wall")
         let context = ActionContext(command: command, engine: engine)
@@ -137,9 +131,8 @@ struct ShakeActionHandlerTests {
         )
 
         let game = MinimalGame(items: [book])
-        let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
 
         let command = Command(verb: .shake, directObject: .item("book"), rawInput: "shake book")
         let context = ActionContext(command: command, engine: engine)
@@ -163,9 +156,8 @@ struct ShakeActionHandlerTests {
         )
 
         let game = MinimalGame(items: [jar])
-        let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
 
         let command = Command(verb: .shake, directObject: .item("jar"), rawInput: "shake jar")
         let context = ActionContext(command: command, engine: engine)
@@ -197,9 +189,8 @@ struct ShakeActionHandlerTests {
         )
 
         let game = MinimalGame(items: [container])
-        let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
 
         let command = Command(verb: .shake, directObject: .item("container"), rawInput: "shake container")
 

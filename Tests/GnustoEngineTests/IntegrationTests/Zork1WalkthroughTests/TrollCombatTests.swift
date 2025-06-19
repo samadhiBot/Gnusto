@@ -9,7 +9,7 @@ func testTrollBlocksMovement() async throws {
     // Given
     let game = Zork1()
     let mockIO = await MockIOHandler()
-    let engine = await GameEngine.test(
+    let (engine, mockIO) = await GameEngine.test(
         blueprint: game,
         parser: StandardParser(),
         ioHandler: mockIO
@@ -39,7 +39,7 @@ func testTrollAllowsMovementWhenDead() async throws {
     // Given
     let game = Zork1()
     let mockIO = await MockIOHandler()
-    let engine = await GameEngine.test(
+    let (engine, mockIO) = await GameEngine.test(
         blueprint: game,
         parser: StandardParser(),
         ioHandler: mockIO
@@ -70,7 +70,7 @@ func testGivingWeaponToTroll() async throws {
     // Given
     let game = Zork1()
     let mockIO = await MockIOHandler()
-    let engine = await GameEngine.test(
+    let (engine, mockIO) = await GameEngine.test(
         blueprint: game,
         parser: StandardParser(),
         ioHandler: mockIO
@@ -113,7 +113,7 @@ func testGivingWeaponToTroll() async throws {
 func testWeaponEffectivenessEvaluation() async throws {
     // Given
     let game = Zork1()
-    let engine = await GameEngine.test(
+    let (engine, mockIO) = await GameEngine.test(
         blueprint: game,
         parser: StandardParser(),
         ioHandler: MockIOHandler()
@@ -137,7 +137,7 @@ func testWeaponEffectivenessEvaluation() async throws {
 func testCombatOutcomePatterns() async throws {
     // Given
     let game = Zork1()
-    let engine = await GameEngine.test(
+    let (engine, mockIO) = await GameEngine.test(
         blueprint: game,
         parser: StandardParser(),
         ioHandler: MockIOHandler()
@@ -185,7 +185,7 @@ func testCombatOutcomePatterns() async throws {
 func testTrollCombatResponses() async throws {
     // Given
     let game = Zork1()
-    let engine = await GameEngine.test(
+    let (engine, mockIO) = await GameEngine.test(
         blueprint: game,
         parser: StandardParser(),
         ioHandler: MockIOHandler()

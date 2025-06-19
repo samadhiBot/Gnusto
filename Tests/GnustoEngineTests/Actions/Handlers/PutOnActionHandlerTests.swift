@@ -93,12 +93,10 @@ struct PutOnActionHandlerTests {
         let initialTableAttributes = initialTable.attributes
 
         let game = MinimalGame(items: [initialBook, initialTable])
-        let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: mockParser,
-            ioHandler: mockIO
+            parser: mockParser
         )
         #expect(await engine.gameState.changeHistory.isEmpty)
 
@@ -149,12 +147,10 @@ struct PutOnActionHandlerTests {
             .isSurface
         )
         let game = MinimalGame(items: [table])
-        let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: mockParser,
-            ioHandler: mockIO
+            parser: mockParser
         )
         #expect(await engine.gameState.changeHistory.isEmpty)
 
@@ -185,12 +181,10 @@ struct PutOnActionHandlerTests {
             .in(.player)
         )
         let game = MinimalGame(items: [book])
-        let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: mockParser,
-            ioHandler: mockIO
+            parser: mockParser
         )
         #expect(await engine.gameState.changeHistory.isEmpty)
 
@@ -227,12 +221,10 @@ struct PutOnActionHandlerTests {
             .isSurface
         )
         let game = MinimalGame(items: [book, table])
-        let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: mockParser,
-            ioHandler: mockIO
+            parser: mockParser
         )
         #expect(await engine.gameState.changeHistory.isEmpty)
 
@@ -280,12 +272,10 @@ struct PutOnActionHandlerTests {
             .inherentlyLit
         )
         let game = MinimalGame(locations: [room1, room2], items: [book, table])
-        let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: mockParser,
-            ioHandler: mockIO
+            parser: mockParser
         )
         #expect(await engine.gameState.changeHistory.isEmpty)
 
@@ -323,12 +313,10 @@ struct PutOnActionHandlerTests {
             .isContainer // Not a surface
         )
         let game = MinimalGame(items: [book, box])
-        let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: mockParser,
-            ioHandler: mockIO
+            parser: mockParser
         )
         #expect(await engine.gameState.changeHistory.isEmpty)
 
@@ -361,12 +349,10 @@ struct PutOnActionHandlerTests {
             .isSurface,
         )
         let game = MinimalGame(items: [table])
-        let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: mockParser,
-            ioHandler: mockIO
+            parser: mockParser
         )
         #expect(await engine.gameState.changeHistory.isEmpty)
 
@@ -406,12 +392,10 @@ struct PutOnActionHandlerTests {
             .isSurface // Table is also a surface
         )
         let game = MinimalGame(items: [tray, table])
-        let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: mockParser,
-            ioHandler: mockIO
+            parser: mockParser
         )
         #expect(await engine.gameState.changeHistory.isEmpty)
 

@@ -10,14 +10,11 @@ struct QuitActionHandlerTests {
     // MARK: - Setup Helper
     
     private func createTestEngine() async -> GameEngine {
-        let game = MinimalGame()
-        let mockIO = await MockIOHandler()
         let mockParser = MockParser()
         
         return await GameEngine.test(
             blueprint: game,
-            parser: mockParser,
-            ioHandler: mockIO
+            parser: mockParser
         )
     }
 

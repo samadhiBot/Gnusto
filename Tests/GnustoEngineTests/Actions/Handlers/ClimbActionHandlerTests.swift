@@ -10,12 +10,9 @@ struct ClimbActionHandlerTests {
 
     @Test("Climb with no object asks what to climb")
     func testClimbNoObject() async throws {
-        let game = MinimalGame()
-        let mockIO = await MockIOHandler()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: MockParser(),
-            ioHandler: mockIO
+            parser: MockParser()
         )
 
         let command = Command(verb: .climb, rawInput: "climb")
@@ -69,11 +66,9 @@ struct ClimbActionHandlerTests {
             items: [stairs]
         )
 
-        let mockIO = await MockIOHandler()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: MockParser(),
-            ioHandler: mockIO
+            parser: MockParser()
         )
 
         let command = Command(
@@ -129,11 +124,9 @@ struct ClimbActionHandlerTests {
             items: [ladder]
         )
 
-        let mockIO = await MockIOHandler()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: MockParser(),
-            ioHandler: mockIO
+            parser: MockParser()
         )
 
         let command = Command(
@@ -182,11 +175,9 @@ struct ClimbActionHandlerTests {
             items: [rope]
         )
 
-        let mockIO = await MockIOHandler()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: MockParser(),
-            ioHandler: mockIO
+            parser: MockParser()
         )
 
         let command = Command(
@@ -229,11 +220,9 @@ struct ClimbActionHandlerTests {
             items: [stairs]
         )
 
-        let mockIO = await MockIOHandler()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: MockParser(),
-            ioHandler: mockIO
+            parser: MockParser()
         )
 
         let command = Command(
@@ -274,11 +263,9 @@ struct ClimbActionHandlerTests {
             items: [pluralStairs]
         )
 
-        let mockIO = await MockIOHandler()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: MockParser(),
-            ioHandler: mockIO
+            parser: MockParser()
         )
 
         let command = Command(
@@ -309,11 +296,9 @@ struct ClimbActionHandlerTests {
         )
 
         let game = MinimalGame(items: [tree])
-        let mockIO = await MockIOHandler()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: MockParser(),
-            ioHandler: mockIO
+            parser: MockParser()
         )
 
         let command = Command(
@@ -347,11 +332,9 @@ struct ClimbActionHandlerTests {
         )
 
         let game = MinimalGame(items: [table])
-        let mockIO = await MockIOHandler()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: MockParser(),
-            ioHandler: mockIO
+            parser: MockParser()
         )
 
         let command = Command(
@@ -381,11 +364,9 @@ struct ClimbActionHandlerTests {
         )
 
         let game = MinimalGame(items: [distantTree])
-        let mockIO = await MockIOHandler()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: MockParser(),
-            ioHandler: mockIO
+            parser: MockParser()
         )
 
         let command = Command(
@@ -409,12 +390,9 @@ struct ClimbActionHandlerTests {
 
     @Test("Climb nonexistent item fails validation")
     func testClimbNonexistentItem() async throws {
-        let game = MinimalGame()
-        let mockIO = await MockIOHandler()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: MockParser(),
-            ioHandler: mockIO
+            parser: MockParser()
         )
 
         let command = Command(
@@ -438,12 +416,9 @@ struct ClimbActionHandlerTests {
 
     @Test("Climb non-item entity")
     func testClimbNonItemEntity() async throws {
-        let game = MinimalGame()
-        let mockIO = await MockIOHandler()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: MockParser(),
-            ioHandler: mockIO
+            parser: MockParser()
         )
 
         let command = Command(
@@ -500,11 +475,9 @@ struct ClimbActionHandlerTests {
             items: [stairs]
         )
 
-        let mockIO = await MockIOHandler()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: MockParser(),
-            ioHandler: mockIO
+            parser: MockParser()
         )
 
         let command = Command(
@@ -546,11 +519,9 @@ struct ClimbActionHandlerTests {
             items: [stairs]
         )
 
-        let mockIO = await MockIOHandler()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: MockParser(),
-            ioHandler: mockIO
+            parser: MockParser()
         )
 
         let command = Command(
@@ -605,11 +576,9 @@ struct ClimbActionHandlerTests {
             items: [stairs]
         )
 
-        let mockIO = await MockIOHandler()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: MockParser(),
-            ioHandler: mockIO
+            parser: MockParser()
         )
 
         let command = Command(verb: .climb, directObject: .item("stairs"), rawInput: "climb stairs")
@@ -678,11 +647,9 @@ struct ClimbActionHandlerTests {
             items: [stairs]
         )
 
-        let mockIO = await MockIOHandler()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: MockParser(),
-            ioHandler: mockIO
+            parser: MockParser()
         )
 
         let command = Command(verb: .climb, directObject: .item("stairs"), rawInput: "climb stairs")

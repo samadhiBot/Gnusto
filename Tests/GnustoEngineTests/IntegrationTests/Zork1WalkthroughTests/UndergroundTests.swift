@@ -11,10 +11,9 @@ struct UndergroundTests {
             Moves.enterUnderground,
             "north"
         )
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: Zork1(),
-            parser: StandardParser(),
-            ioHandler: mockIO
+            parser: StandardParser()
         )
         await engine.run()
 
@@ -54,10 +53,9 @@ struct UndergroundTests {
             "hit the troll with the lantern",
             "head west"
         )
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: Zork1(),
-            parser: StandardParser(),
-            ioHandler: mockIO
+            parser: StandardParser()
         )
         await engine.run()
 

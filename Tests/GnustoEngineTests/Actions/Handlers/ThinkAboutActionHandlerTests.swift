@@ -10,14 +10,11 @@ struct ThinkAboutActionHandlerTests {
     // MARK: - Setup Helper
     
     private func createTestEngine() async -> GameEngine {
-        let game = MinimalGame()
-        let mockIO = await MockIOHandler()
         let mockParser = MockParser()
         
         return await GameEngine.test(
             blueprint: game,
-            parser: mockParser,
-            ioHandler: mockIO
+            parser: mockParser
         )
     }
 
@@ -75,12 +72,10 @@ struct ThinkAboutActionHandlerTests {
         )
         
         let game = MinimalGame(items: [testItem])
-        let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: mockParser,
-            ioHandler: mockIO
+            parser: mockParser
         )
 
         let command = Command(
@@ -152,12 +147,10 @@ struct ThinkAboutActionHandlerTests {
         )
         
         let game = MinimalGame(items: [testItem])
-        let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: mockParser,
-            ioHandler: mockIO
+            parser: mockParser
         )
 
         let command = Command(
@@ -207,12 +200,10 @@ struct ThinkAboutActionHandlerTests {
         )
         
         let game = MinimalGame(items: [testItem])
-        let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: mockParser,
-            ioHandler: mockIO
+            parser: mockParser
         )
 
         let command = Command(
@@ -270,12 +261,10 @@ struct ThinkAboutActionHandlerTests {
         )
         
         let game = MinimalGame(items: [testItem])
-        let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: mockParser,
-            ioHandler: mockIO
+            parser: mockParser
         )
 
         // Verify item is not initially touched
@@ -307,12 +296,10 @@ struct ThinkAboutActionHandlerTests {
         )
         
         let game = MinimalGame(items: [testItem])
-        let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: mockParser,
-            ioHandler: mockIO
+            parser: mockParser
         )
 
         let command = Command(
@@ -380,12 +367,10 @@ struct ThinkAboutActionHandlerTests {
             locations: [darkLocation],
             items: [testItem]
         )
-        let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: mockParser,
-            ioHandler: mockIO
+            parser: mockParser
         )
 
         let command = Command(
@@ -416,12 +401,10 @@ struct ThinkAboutActionHandlerTests {
         )
         
         let game = MinimalGame(items: [testItem])
-        let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: mockParser,
-            ioHandler: mockIO
+            parser: mockParser
         )
 
         let command = Command(
@@ -455,12 +438,10 @@ struct ThinkAboutActionHandlerTests {
         )
         
         let game = MinimalGame(items: [unreachableItem])
-        let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: mockParser,
-            ioHandler: mockIO
+            parser: mockParser
         )
 
         let command = Command(
@@ -494,12 +475,10 @@ struct ThinkAboutActionHandlerTests {
         )
         
         let game = MinimalGame(items: [testItem])
-        let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: mockParser,
-            ioHandler: mockIO
+            parser: mockParser
         )
 
         let command = Command(

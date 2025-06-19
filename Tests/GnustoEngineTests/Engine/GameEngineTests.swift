@@ -26,12 +26,10 @@ struct GameEngineTests {
             player: Player(in: darkRoom.id),
             locations: [darkRoom]
         )
-        let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: mockParser,
-            ioHandler: mockIO
+            parser: mockParser
         )
 
         // Configure Mock IO to provide one input then stop
@@ -73,17 +71,15 @@ struct GameEngineTests {
 
     @Test("Engine Handles Parse Error")
     func testEngineHandlesParseError() async throws {
-        let mockIO = await MockIOHandler()
         var mockParser = MockParser()
 
         // Configure parser to always return an error
         let parseError = ParseError.unknownVerb("xyzzy")
         mockParser.defaultParseResult = .failure(parseError)
 
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: MinimalGame(),
-            parser: mockParser,
-            ioHandler: mockIO
+            parser: mockParser
         )
 
         // Configure IO for one failed command then quit
@@ -162,7 +158,6 @@ struct GameEngineTests {
             customActionHandlers: [.take: mockTakeHandler]
         )
 
-        let mockIO = await MockIOHandler()
         var mockParser = MockParser()
         let takeCommand = Command(
             verb: .take,
@@ -177,10 +172,9 @@ struct GameEngineTests {
             return .failure(.unknownVerb(input))
         }
 
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: mockParser,
-            ioHandler: mockIO
+            parser: mockParser
         )
 
         // Make pebble non-takable in this test's state
@@ -266,7 +260,6 @@ struct GameEngineTests {
             customActionHandlers: [.look: mockLookHandler]
         )
 
-        let mockIO = await MockIOHandler()
         var mockParser = MockParser()
         let lookCommand = Command(verb: .look, rawInput: "look")
         let takePebbleCommand = Command(
@@ -283,10 +276,9 @@ struct GameEngineTests {
             return .failure(.unknownVerb(input))
         }
 
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: mockParser,
-            ioHandler: mockIO
+            parser: mockParser
         )
 
         await mockIO.enqueueInput("look", "take pebble", "quit")
@@ -339,7 +331,6 @@ struct GameEngineTests {
             ]
         )
 
-        let mockIO = await MockIOHandler()
         var mockParser = MockParser()
 
         let lookCommand = Command(
@@ -362,10 +353,9 @@ struct GameEngineTests {
             }
         }
 
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: mockParser,
-            ioHandler: mockIO
+            parser: mockParser
         )
 
         // Configure IO for the command sequence
@@ -413,7 +403,6 @@ struct GameEngineTests {
 
     @Test("Engine Exits Gracefully on Quit Command")
     func testEngineExitsGracefullyOnQuitCommand() async throws {
-        let mockIO = await MockIOHandler()
         var mockParser = MockParser()
         let quitCommand = Command(verb: .quit, rawInput: "quit")
 
@@ -423,10 +412,9 @@ struct GameEngineTests {
             return .failure(.unknownVerb(input))
         }
 
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: MinimalGame(),
-            parser: mockParser,
-            ioHandler: mockIO
+            parser: mockParser
         )
 
         await mockIO.enqueueInput("quit")
@@ -447,13 +435,10 @@ struct GameEngineTests {
 
     @Test("Engine Handles Nil Input (EOF) Gracefully")
     func testEngineHandlesNilInputGracefully() async throws {
-        let game = MinimalGame()
-        let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: mockParser,
-            ioHandler: mockIO
+            parser: mockParser
         )
 
         // Act
@@ -520,7 +505,6 @@ struct GameEngineTests {
             ]
         )
 
-        let mockIO = await MockIOHandler()
         var mockParser = MockParser()
 
         // Configure the MockParser
@@ -546,10 +530,9 @@ struct GameEngineTests {
         #expect(game.items.find(.startItem)?.hasFlag(.isTakable) == true)
         #expect(game.items.find(.startItem)?.parent == .location(.startRoom))
 
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: mockParser,
-            ioHandler: mockIO
+            parser: mockParser
         )
         #expect(await engine.items(in: .player).isEmpty)
 
@@ -682,7 +665,6 @@ struct GameEngineTests {
             ]
         )
 
-        let mockIO = await MockIOHandler()
         var mockParser = MockParser()
         let activateCommand = Command(
             verb: "activate",
@@ -696,10 +678,9 @@ struct GameEngineTests {
             return .failure(.unknownVerb(input))
         }
 
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: mockParser,
-            ioHandler: mockIO
+            parser: mockParser
         )
 
         // Ensure initial state
@@ -791,7 +772,6 @@ struct GameEngineTests {
 
     @Test("Fuse executes after correct number of turns")
     func testFuseExecution() async throws {
-        let mockIO = await MockIOHandler()
         let mockParser = MockParser()
         let stateHolder = TestStateHolder()
         let fuseDef = Fuse(initialTurns: 2) { gameEngineParameter in
@@ -810,11 +790,10 @@ struct GameEngineTests {
             fuses: ["testFuse": fuseDef]
         )
 
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
             activeFuses: ["testFuse": 2], // Start with 2 turns remaining
-            parser: mockParser,
-            ioHandler: mockIO
+            parser: mockParser
         )
 
         // Act: Simulate 3 turns to trigger the fuse (turn 1: countdown to 1, turn 2: countdown to 0 and trigger)
@@ -827,7 +806,6 @@ struct GameEngineTests {
 
     @Test("Daemon executes at correct frequency")
     func testDaemonExecutionFrequency() async throws {
-        let mockIO = await MockIOHandler()
         let mockParser = MockParser()
         let stateHolder = TestStateHolder()
 
@@ -842,11 +820,10 @@ struct GameEngineTests {
         let game = MinimalGame(
             daemons: ["testDaemon": testDaemonDef]
         )
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
             activeDaemons: ["testDaemon"], // Start daemon immediately
-            parser: mockParser,
-            ioHandler: mockIO
+            parser: mockParser
         )
 
         // Act: Run engine for 7 turns to test daemon frequency (every 3 turns)
@@ -861,7 +838,6 @@ struct GameEngineTests {
 
     @Test("Fuse and Daemon Interaction")
     func testFuseAndDaemonInteraction() async throws {
-        let mockIO = await MockIOHandler()
         let mockParser = MockParser()
         let stateHolder = TestStateHolder()
 
@@ -880,12 +856,11 @@ struct GameEngineTests {
             daemons: ["testDaemon": testDaemon]
         )
 
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
             activeFuses: ["testFuse": 3], // Start fuse with 3 turns
             activeDaemons: ["testDaemon"], // Start daemon immediately
-            parser: mockParser,
-            ioHandler: mockIO
+            parser: mockParser
         )
 
         // Act: Run for 6 turns
@@ -1537,9 +1512,8 @@ struct GameEngineTests {
             customActionHandlers: [testVerb: mockHandler]
         )
 
-        let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
 
         // Create the command to trigger the mock handler
         let testCommand = Command(verb: testVerb, rawInput: "testapply")
@@ -1560,7 +1534,7 @@ struct GameEngineTests {
 
     @Test("applyPronounChange updates game state correctly")
     func testApplyPronounChange_Success() async throws {
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: MinimalGame(),
             parser: MockParser(),
             ioHandler: await MockIOHandler()
@@ -1602,7 +1576,7 @@ struct GameEngineTests {
             id: "testItem",
             .name("Test Item")
         )
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: MinimalGame(items: [item]),
             parser: MockParser(),
             ioHandler: await MockIOHandler()
@@ -1622,7 +1596,7 @@ struct GameEngineTests {
     func testUpdatePronounsMultiple() async throws {
         let item1 = Item(id: "item1", .name("Item One"))
         let item2 = Item(id: "item2", .name("Item Two"))
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: MinimalGame(items: [item1, item2]),
             parser: MockParser(),
             ioHandler: await MockIOHandler()
@@ -1643,7 +1617,7 @@ struct GameEngineTests {
         let item1 = Item(id: "item1", .name("Item One"))
         let item2 = Item(id: "item2", .name("Item Two"))
         let item3 = Item(id: "item3", .name("Item Three"))
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: MinimalGame(items: [item1, item2, item3]),
             parser: MockParser(),
             ioHandler: await MockIOHandler()
@@ -1713,7 +1687,6 @@ extension GameEngineTests {
         commandToParse: Command
     ) async throws -> String {
         var mockParser = MockParser()
-        let mockIO = await MockIOHandler()
 
         mockParser.parseHandler = { input, _, _ in
             if input == commandInput { return .success(commandToParse) }
@@ -1721,10 +1694,9 @@ extension GameEngineTests {
             return .failure(.unknownVerb(input))
         }
 
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: blueprint,
-            parser: mockParser,
-            ioHandler: mockIO
+            parser: mockParser
         )
 
         await mockIO.enqueueInput(commandInput, "quit")

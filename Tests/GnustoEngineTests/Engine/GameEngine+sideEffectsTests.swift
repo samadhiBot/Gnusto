@@ -66,12 +66,10 @@ struct GameEngineSideEffectsTests {
                 anotherDaemonID: anotherDaemon
             ]
         )
-        let mockIO = await MockIOHandler()
         let mockParser = MockParser()
         return await GameEngine.test(
             blueprint: gameBlueprint,
-            parser: mockParser,
-            ioHandler: mockIO
+            parser: mockParser
         )
     }
 

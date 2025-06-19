@@ -9,12 +9,9 @@ struct HelpActionHandlerTests {
     @Test("Help displays help text")
     func testHelpDisplaysHelpText() async throws {
         // Given
-        let game = MinimalGame()
-        let mockIO = await MockIOHandler()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: MockParser(),
-            ioHandler: mockIO
+            parser: MockParser()
         )
 
         let command = Command(verb: .help, rawInput: "help")
@@ -38,12 +35,9 @@ struct HelpActionHandlerTests {
     @Test("Help requires no validation")
     func testHelpRequiresNoValidation() async throws {
         // Given
-        let game = MinimalGame()
-        let mockIO = await MockIOHandler()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: MockParser(),
-            ioHandler: mockIO
+            parser: MockParser()
         )
 
         let command = Command(verb: .help, rawInput: "help")

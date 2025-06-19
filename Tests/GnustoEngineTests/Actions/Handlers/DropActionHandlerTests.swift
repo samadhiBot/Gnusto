@@ -19,12 +19,10 @@ struct DropActionHandlerTests {
         let initialWorn = testItem.hasFlag(.isWorn)
 
         let game = MinimalGame(items: [testItem])
-        let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: mockParser,
-            ioHandler: mockIO
+            parser: mockParser
         )
         let finalLocation = await engine.playerLocationID
 
@@ -64,13 +62,10 @@ struct DropActionHandlerTests {
     @Test("Drop fails with no direct object")
     func testDropFailsWithNoObject() async throws {
         // Arrange
-        let game = MinimalGame()
-        let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: mockParser,
-            ioHandler: mockIO
+            parser: mockParser
         )
 
         let command = Command(
@@ -97,12 +92,10 @@ struct DropActionHandlerTests {
         )
 
         let game = MinimalGame(items: [testItem])
-        let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: mockParser,
-            ioHandler: mockIO
+            parser: mockParser
         )
 
         #expect(try await engine.item("key").parent == .location(.startRoom))
@@ -145,12 +138,10 @@ struct DropActionHandlerTests {
         let initialWorn = testItem.hasFlag(.isWorn)
 
         let game = MinimalGame(items: [testItem])
-        let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: mockParser,
-            ioHandler: mockIO
+            parser: mockParser
         )
         let finalLocation = await engine.playerLocationID
 
@@ -199,12 +190,10 @@ struct DropActionHandlerTests {
             .omitDescription
         )
         let game = MinimalGame(items: [testItem])
-        let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            parser: mockParser,
-            ioHandler: mockIO
+            parser: mockParser
         )
 
         let command = Command(

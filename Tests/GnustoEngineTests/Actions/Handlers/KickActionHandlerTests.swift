@@ -10,10 +10,8 @@ struct KickActionHandlerTests {
     @Test("Kick validates missing direct object")
     func testKickValidatesMissingDirectObject() async throws {
         // Given
-        let game = MinimalGame()
-        let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
 
         let command = Command(verb: .kick, rawInput: "kick")
         let context = ActionContext(command: command, engine: engine)
@@ -27,10 +25,8 @@ struct KickActionHandlerTests {
     @Test("Kick validates item not found")
     func testKickValidatesItemNotFound() async throws {
         // Given
-        let game = MinimalGame()
-        let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
 
         let command = Command(verb: .kick, directObject: .item("nonexistent"), rawInput: "kick nonexistent")
         let context = ActionContext(command: command, engine: engine)
@@ -51,9 +47,8 @@ struct KickActionHandlerTests {
         )
 
         let game = MinimalGame(items: [distantRock])
-        let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
 
         let command = Command(verb: .kick, directObject: .item("distant_rock"), rawInput: "kick distant rock")
         let context = ActionContext(command: command, engine: engine)
@@ -75,9 +70,8 @@ struct KickActionHandlerTests {
         )
 
         let game = MinimalGame(items: [goblin])
-        let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
 
         let command = Command(verb: .kick, directObject: .item("goblin"), rawInput: "kick goblin")
         let context = ActionContext(command: command, engine: engine)
@@ -100,9 +94,8 @@ struct KickActionHandlerTests {
         )
 
         let game = MinimalGame(items: [ball])
-        let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
 
         let command = Command(verb: .kick, directObject: .item("ball"), rawInput: "kick ball")
         let context = ActionContext(command: command, engine: engine)
@@ -124,9 +117,8 @@ struct KickActionHandlerTests {
         )
 
         let game = MinimalGame(items: [wall])
-        let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
 
         let command = Command(verb: .kick, directObject: .item("wall"), rawInput: "kick wall")
         let context = ActionContext(command: command, engine: engine)
@@ -148,9 +140,8 @@ struct KickActionHandlerTests {
         )
 
         let game = MinimalGame(items: [rock])
-        let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
 
         let command = Command(verb: .kick, directObject: .item("rock"), rawInput: "kick rock")
         let context = ActionContext(command: command, engine: engine)
@@ -181,9 +172,8 @@ struct KickActionHandlerTests {
         )
 
         let game = MinimalGame(items: [box])
-        let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
 
         let command = Command(verb: .kick, directObject: .item("box"), rawInput: "kick box")
 
