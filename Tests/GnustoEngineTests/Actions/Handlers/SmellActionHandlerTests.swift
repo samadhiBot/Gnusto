@@ -14,7 +14,7 @@ struct SmellActionHandlerTests {
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
 
-        return await GameEngine(
+        return await GameEngine.test(
             blueprint: game,
             parser: mockParser,
             ioHandler: mockIO
@@ -54,7 +54,7 @@ struct SmellActionHandlerTests {
         let game = MinimalGame(items: [testItem])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine(
+        let engine = await GameEngine.test(
             blueprint: game,
             parser: mockParser,
             ioHandler: mockIO
@@ -110,7 +110,7 @@ struct SmellActionHandlerTests {
         let game = MinimalGame(items: [testItem])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine(
+        let engine = await GameEngine.test(
             blueprint: game,
             parser: mockParser,
             ioHandler: mockIO
@@ -182,7 +182,7 @@ struct SmellActionHandlerTests {
         let game = MinimalGame(items: [testItem])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine(
+        let engine = await GameEngine.test(
             blueprint: game,
             parser: mockParser,
             ioHandler: mockIO
@@ -249,7 +249,7 @@ struct SmellActionHandlerTests {
         let game = MinimalGame(locations: [location1, location2])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine(
+        let engine = await GameEngine.test(
             blueprint: game,
             parser: mockParser,
             ioHandler: mockIO
@@ -292,7 +292,7 @@ struct SmellActionHandlerTests {
         let game = MinimalGame(items: [testItem])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine(
+        let engine = await GameEngine.test(
             blueprint: game,
             parser: mockParser,
             ioHandler: mockIO
@@ -349,7 +349,7 @@ struct SmellActionHandlerTests {
         let game = MinimalGame(items: [testItem])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine(
+        let engine = await GameEngine.test(
             blueprint: game,
             parser: mockParser,
             ioHandler: mockIO
@@ -385,7 +385,7 @@ struct SmellActionHandlerTests {
         )
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine(
+        let engine = await GameEngine.test(
             blueprint: game,
             parser: mockParser,
             ioHandler: mockIO

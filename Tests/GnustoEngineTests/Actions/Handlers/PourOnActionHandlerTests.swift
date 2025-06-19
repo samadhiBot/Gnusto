@@ -13,7 +13,7 @@ struct PourOnActionHandlerTests {
         let game = MinimalGame()
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine(blueprint: game, parser: mockParser, ioHandler: mockIO)
+        let engine = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
 
         let command = Command(verb: .pourOn, rawInput: "pour")
         let context = ActionContext(command: command, engine: engine)
@@ -37,7 +37,7 @@ struct PourOnActionHandlerTests {
         let game = MinimalGame(items: [water])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine(blueprint: game, parser: mockParser, ioHandler: mockIO)
+        let engine = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
 
         let command = Command(verb: .pourOn, directObject: .item("water"), rawInput: "pour water")
         let context = ActionContext(command: command, engine: engine)
@@ -68,7 +68,7 @@ struct PourOnActionHandlerTests {
         let game = MinimalGame(items: [water, torch])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine(blueprint: game, parser: mockParser, ioHandler: mockIO)
+        let engine = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
 
         let command = Command(
             verb: .pourOn,
@@ -104,7 +104,7 @@ struct PourOnActionHandlerTests {
         let game = MinimalGame(items: [water, flower])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine(blueprint: game, parser: mockParser, ioHandler: mockIO)
+        let engine = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
 
         let command = Command(
             verb: .pourOn,

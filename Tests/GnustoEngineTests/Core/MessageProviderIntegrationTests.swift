@@ -42,7 +42,7 @@ struct MessageProviderIntegrationTests {
         let mockIO = await MockIOHandler()
         var mockParser = MockParser()
 
-        let engine = await GameEngine(
+        let engine = await GameEngine.test(
             blueprint: game,
             parser: mockParser,
             ioHandler: mockIO

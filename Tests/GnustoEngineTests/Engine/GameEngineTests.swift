@@ -28,7 +28,7 @@ struct GameEngineTests {
         )
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine(
+        let engine = await GameEngine.test(
             blueprint: game,
             parser: mockParser,
             ioHandler: mockIO
@@ -80,7 +80,7 @@ struct GameEngineTests {
         let parseError = ParseError.unknownVerb("xyzzy")
         mockParser.defaultParseResult = .failure(parseError)
 
-        let engine = await GameEngine(
+        let engine = await GameEngine.test(
             blueprint: MinimalGame(),
             parser: mockParser,
             ioHandler: mockIO
@@ -177,7 +177,7 @@ struct GameEngineTests {
             return .failure(.unknownVerb(input))
         }
 
-        let engine = await GameEngine(
+        let engine = await GameEngine.test(
             blueprint: game,
             parser: mockParser,
             ioHandler: mockIO
@@ -283,7 +283,7 @@ struct GameEngineTests {
             return .failure(.unknownVerb(input))
         }
 
-        let engine = await GameEngine(
+        let engine = await GameEngine.test(
             blueprint: game,
             parser: mockParser,
             ioHandler: mockIO
@@ -362,7 +362,7 @@ struct GameEngineTests {
             }
         }
 
-        let engine = await GameEngine(
+        let engine = await GameEngine.test(
             blueprint: game,
             parser: mockParser,
             ioHandler: mockIO
@@ -423,7 +423,7 @@ struct GameEngineTests {
             return .failure(.unknownVerb(input))
         }
 
-        let engine = await GameEngine(
+        let engine = await GameEngine.test(
             blueprint: MinimalGame(),
             parser: mockParser,
             ioHandler: mockIO
@@ -450,7 +450,7 @@ struct GameEngineTests {
         let game = MinimalGame()
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine(
+        let engine = await GameEngine.test(
             blueprint: game,
             parser: mockParser,
             ioHandler: mockIO
@@ -546,7 +546,7 @@ struct GameEngineTests {
         #expect(game.items.find(.startItem)?.hasFlag(.isTakable) == true)
         #expect(game.items.find(.startItem)?.parent == .location(.startRoom))
 
-        let engine = await GameEngine(
+        let engine = await GameEngine.test(
             blueprint: game,
             parser: mockParser,
             ioHandler: mockIO
@@ -696,7 +696,7 @@ struct GameEngineTests {
             return .failure(.unknownVerb(input))
         }
 
-        let engine = await GameEngine(
+        let engine = await GameEngine.test(
             blueprint: game,
             parser: mockParser,
             ioHandler: mockIO
@@ -810,7 +810,7 @@ struct GameEngineTests {
             fuses: ["testFuse": fuseDef]
         )
 
-        let engine = await GameEngine(
+        let engine = await GameEngine.test(
             blueprint: game,
             activeFuses: ["testFuse": 2], // Start with 2 turns remaining
             parser: mockParser,
@@ -842,7 +842,7 @@ struct GameEngineTests {
         let game = MinimalGame(
             daemons: ["testDaemon": testDaemonDef]
         )
-        let engine = await GameEngine(
+        let engine = await GameEngine.test(
             blueprint: game,
             activeDaemons: ["testDaemon"], // Start daemon immediately
             parser: mockParser,
@@ -880,7 +880,7 @@ struct GameEngineTests {
             daemons: ["testDaemon": testDaemon]
         )
 
-        let engine = await GameEngine(
+        let engine = await GameEngine.test(
             blueprint: game,
             activeFuses: ["testFuse": 3], // Start fuse with 3 turns
             activeDaemons: ["testDaemon"], // Start daemon immediately
@@ -1539,7 +1539,7 @@ struct GameEngineTests {
 
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine(blueprint: game, parser: mockParser, ioHandler: mockIO)
+        let engine = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
 
         // Create the command to trigger the mock handler
         let testCommand = Command(verb: testVerb, rawInput: "testapply")
@@ -1560,7 +1560,7 @@ struct GameEngineTests {
 
     @Test("applyPronounChange updates game state correctly")
     func testApplyPronounChange_Success() async throws {
-        let engine = await GameEngine(
+        let engine = await GameEngine.test(
             blueprint: MinimalGame(),
             parser: MockParser(),
             ioHandler: await MockIOHandler()
@@ -1602,7 +1602,7 @@ struct GameEngineTests {
             id: "testItem",
             .name("Test Item")
         )
-        let engine = await GameEngine(
+        let engine = await GameEngine.test(
             blueprint: MinimalGame(items: [item]),
             parser: MockParser(),
             ioHandler: await MockIOHandler()
@@ -1622,7 +1622,7 @@ struct GameEngineTests {
     func testUpdatePronounsMultiple() async throws {
         let item1 = Item(id: "item1", .name("Item One"))
         let item2 = Item(id: "item2", .name("Item Two"))
-        let engine = await GameEngine(
+        let engine = await GameEngine.test(
             blueprint: MinimalGame(items: [item1, item2]),
             parser: MockParser(),
             ioHandler: await MockIOHandler()
@@ -1643,7 +1643,7 @@ struct GameEngineTests {
         let item1 = Item(id: "item1", .name("Item One"))
         let item2 = Item(id: "item2", .name("Item Two"))
         let item3 = Item(id: "item3", .name("Item Three"))
-        let engine = await GameEngine(
+        let engine = await GameEngine.test(
             blueprint: MinimalGame(items: [item1, item2, item3]),
             parser: MockParser(),
             ioHandler: await MockIOHandler()
@@ -1721,7 +1721,7 @@ extension GameEngineTests {
             return .failure(.unknownVerb(input))
         }
 
-        let engine = await GameEngine(
+        let engine = await GameEngine.test(
             blueprint: blueprint,
             parser: mockParser,
             ioHandler: mockIO

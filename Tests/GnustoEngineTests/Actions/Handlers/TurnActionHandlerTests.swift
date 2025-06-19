@@ -13,7 +13,7 @@ struct TurnActionHandlerTests {
         let game = MinimalGame()
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine(blueprint: game, parser: mockParser, ioHandler: mockIO)
+        let engine = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
 
         let command = Command(verb: .turn, rawInput: "turn")
         let context = ActionContext(command: command, engine: engine)
@@ -37,7 +37,7 @@ struct TurnActionHandlerTests {
         let game = MinimalGame(items: [dial])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine(blueprint: game, parser: mockParser, ioHandler: mockIO)
+        let engine = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
 
         let command = Command(verb: .turn, directObject: .item("dial"), rawInput: "turn dial")
         let context = ActionContext(command: command, engine: engine)
@@ -62,7 +62,7 @@ struct TurnActionHandlerTests {
         let game = MinimalGame(items: [knob])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine(blueprint: game, parser: mockParser, ioHandler: mockIO)
+        let engine = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
 
         let command = Command(verb: .turn, directObject: .item("knob"), rawInput: "turn knob")
         let context = ActionContext(command: command, engine: engine)
@@ -87,7 +87,7 @@ struct TurnActionHandlerTests {
         let game = MinimalGame(items: [wheel])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine(blueprint: game, parser: mockParser, ioHandler: mockIO)
+        let engine = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
 
         let command = Command(verb: .turn, directObject: .item("wheel"), rawInput: "turn wheel")
         let context = ActionContext(command: command, engine: engine)
@@ -112,7 +112,7 @@ struct TurnActionHandlerTests {
         let game = MinimalGame(items: [handle])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine(blueprint: game, parser: mockParser, ioHandler: mockIO)
+        let engine = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
 
         let command = Command(verb: .turn, directObject: .item("handle"), rawInput: "turn handle")
         let context = ActionContext(command: command, engine: engine)
@@ -138,7 +138,7 @@ struct TurnActionHandlerTests {
         let game = MinimalGame(items: [key])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine(blueprint: game, parser: mockParser, ioHandler: mockIO)
+        let engine = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
 
         let command = Command(verb: .turn, directObject: .item("key"), rawInput: "turn key")
         let context = ActionContext(command: command, engine: engine)
@@ -163,7 +163,7 @@ struct TurnActionHandlerTests {
         let game = MinimalGame(items: [cat])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine(blueprint: game, parser: mockParser, ioHandler: mockIO)
+        let engine = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
 
         let command = Command(verb: .turn, directObject: .item("cat"), rawInput: "turn cat")
         let context = ActionContext(command: command, engine: engine)
@@ -188,7 +188,7 @@ struct TurnActionHandlerTests {
         let game = MinimalGame(items: [book])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine(blueprint: game, parser: mockParser, ioHandler: mockIO)
+        let engine = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
 
         let command = Command(verb: .turn, directObject: .item("book"), rawInput: "turn book")
         let context = ActionContext(command: command, engine: engine)
@@ -213,7 +213,7 @@ struct TurnActionHandlerTests {
         let game = MinimalGame(items: [dial])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine(blueprint: game, parser: mockParser, ioHandler: mockIO)
+        let engine = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
 
         let command = Command(verb: .turn, directObject: .item("dial"), rawInput: "turn dial")
 

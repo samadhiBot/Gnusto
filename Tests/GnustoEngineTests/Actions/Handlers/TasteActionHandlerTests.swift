@@ -14,7 +14,7 @@ struct TasteActionHandlerTests {
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
         
-        return await GameEngine(
+        return await GameEngine.test(
             blueprint: game,
             parser: mockParser,
             ioHandler: mockIO
@@ -36,7 +36,7 @@ struct TasteActionHandlerTests {
         let game = MinimalGame(items: [testItem])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine(
+        let engine = await GameEngine.test(
             blueprint: game,
             parser: mockParser,
             ioHandler: mockIO
@@ -114,7 +114,7 @@ struct TasteActionHandlerTests {
         let game = MinimalGame(items: [testItem])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine(
+        let engine = await GameEngine.test(
             blueprint: game,
             parser: mockParser,
             ioHandler: mockIO
@@ -147,7 +147,7 @@ struct TasteActionHandlerTests {
         let game = MinimalGame(items: [testItem])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine(
+        let engine = await GameEngine.test(
             blueprint: game,
             parser: mockParser,
             ioHandler: mockIO
@@ -185,7 +185,7 @@ struct TasteActionHandlerTests {
         let game = MinimalGame(items: [testItem])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine(
+        let engine = await GameEngine.test(
             blueprint: game,
             parser: mockParser,
             ioHandler: mockIO
@@ -227,7 +227,7 @@ struct TasteActionHandlerTests {
         let game = MinimalGame(items: [testItem])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine(
+        let engine = await GameEngine.test(
             blueprint: game,
             parser: mockParser,
             ioHandler: mockIO
@@ -258,7 +258,7 @@ struct TasteActionHandlerTests {
         let game = MinimalGame(items: [testItem])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine(
+        let engine = await GameEngine.test(
             blueprint: game,
             parser: mockParser,
             ioHandler: mockIO
@@ -299,7 +299,7 @@ struct TasteActionHandlerTests {
         let game = MinimalGame(items: [testItem])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine(
+        let engine = await GameEngine.test(
             blueprint: game,
             parser: mockParser,
             ioHandler: mockIO
@@ -344,7 +344,7 @@ struct TasteActionHandlerTests {
         )
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine(
+        let engine = await GameEngine.test(
             blueprint: game,
             parser: mockParser,
             ioHandler: mockIO
@@ -377,7 +377,7 @@ struct TasteActionHandlerTests {
         let game = MinimalGame(items: [testItem])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine(
+        let engine = await GameEngine.test(
             blueprint: game,
             parser: mockParser,
             ioHandler: mockIO
@@ -426,7 +426,7 @@ struct TasteActionHandlerTests {
         let game = MinimalGame(items: [liquidItem, solidItem])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine(
+        let engine = await GameEngine.test(
             blueprint: game,
             parser: mockParser,
             ioHandler: mockIO

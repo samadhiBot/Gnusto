@@ -13,7 +13,7 @@ struct EatActionHandlerTests {
         let game = MinimalGame()
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine(blueprint: game, parser: mockParser, ioHandler: mockIO)
+        let engine = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
 
         let command = Command(verb: .eat, rawInput: "eat")
         let context = ActionContext(command: command, engine: engine)
@@ -30,7 +30,7 @@ struct EatActionHandlerTests {
         let game = MinimalGame()
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine(blueprint: game, parser: mockParser, ioHandler: mockIO)
+        let engine = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
 
         let command = Command(verb: .eat, directObject: .item("nonexistent"), rawInput: "eat nonexistent")
         let context = ActionContext(command: command, engine: engine)
@@ -54,7 +54,7 @@ struct EatActionHandlerTests {
         let game = MinimalGame(items: [distantApple])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine(blueprint: game, parser: mockParser, ioHandler: mockIO)
+        let engine = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
 
         let command = Command(verb: .eat, directObject: .item("distant_apple"), rawInput: "eat distant apple")
         let context = ActionContext(command: command, engine: engine)
@@ -78,7 +78,7 @@ struct EatActionHandlerTests {
         let game = MinimalGame(items: [apple])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine(blueprint: game, parser: mockParser, ioHandler: mockIO)
+        let engine = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
 
         let command = Command(verb: .eat, directObject: .item("apple"), rawInput: "eat apple")
         let context = ActionContext(command: command, engine: engine)
@@ -102,7 +102,7 @@ struct EatActionHandlerTests {
         let game = MinimalGame(items: [rock])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine(blueprint: game, parser: mockParser, ioHandler: mockIO)
+        let engine = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
 
         let command = Command(verb: .eat, directObject: .item("rock"), rawInput: "eat rock")
         let context = ActionContext(command: command, engine: engine)
@@ -135,7 +135,7 @@ struct EatActionHandlerTests {
         let game = MinimalGame(items: [lunchBox, sandwich])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine(blueprint: game, parser: mockParser, ioHandler: mockIO)
+        let engine = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
 
         let command = Command(verb: .eat, directObject: .item("lunch_box"), rawInput: "eat lunch box")
         let context = ActionContext(command: command, engine: engine)
@@ -168,7 +168,7 @@ struct EatActionHandlerTests {
         let game = MinimalGame(items: [emptyBox, water])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine(blueprint: game, parser: mockParser, ioHandler: mockIO)
+        let engine = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
 
         let command = Command(verb: .eat, directObject: .item("empty_box"), rawInput: "eat empty box")
         let context = ActionContext(command: command, engine: engine)
@@ -193,7 +193,7 @@ struct EatActionHandlerTests {
         let game = MinimalGame(items: [apple])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine(blueprint: game, parser: mockParser, ioHandler: mockIO)
+        let engine = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
 
         let command = Command(verb: .eat, directObject: .item("apple"), rawInput: "eat apple")
         let context = ActionContext(command: command, engine: engine)

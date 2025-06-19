@@ -9,7 +9,6 @@ public struct MinimalGame: GameBlueprint {
     public let maximumScore = 10
 
     public var player: Player
-    public var randomNumberGenerator: FixedRandomNumberGenerator
     public var items: [Item]
     public var locations: [Location]
     public var customActionHandlers: [VerbID: ActionHandler]
@@ -23,9 +22,6 @@ public struct MinimalGame: GameBlueprint {
 
     public init(
         player: Player = Player(in: LocationID("startRoom")),
-        randomNumberGenerator: FixedRandomNumberGenerator = FixedRandomNumberGenerator(
-            values: [0.1, 0.9, 0.3, 0.7, 0.5, 0.6, 0.4, 0.8, 0.2, 1.0]
-        ),
         locations: [Location] = [
             Location(
                 id: .startRoom,
@@ -52,7 +48,6 @@ public struct MinimalGame: GameBlueprint {
         messageProvider: MessageProvider? = nil
     ) {
         self.player = player
-        self.randomNumberGenerator = randomNumberGenerator
         self.items = items
         self.locations = locations
         self.customActionHandlers = customActionHandlers
@@ -63,7 +58,7 @@ public struct MinimalGame: GameBlueprint {
         self.itemComputers = itemComputers
         self.locationComputers = locationComputers
         self.messageProvider = messageProvider ?? MessageProvider(
-            randomNumberGenerator: randomNumberGenerator
+            randomNumberGenerator: SeededGenerator()
         )
     }
 }

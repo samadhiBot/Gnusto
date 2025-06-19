@@ -95,7 +95,7 @@ struct PutOnActionHandlerTests {
         let game = MinimalGame(items: [initialBook, initialTable])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine(
+        let engine = await GameEngine.test(
             blueprint: game,
             parser: mockParser,
             ioHandler: mockIO
@@ -151,7 +151,7 @@ struct PutOnActionHandlerTests {
         let game = MinimalGame(items: [table])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine(
+        let engine = await GameEngine.test(
             blueprint: game,
             parser: mockParser,
             ioHandler: mockIO
@@ -187,7 +187,7 @@ struct PutOnActionHandlerTests {
         let game = MinimalGame(items: [book])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine(
+        let engine = await GameEngine.test(
             blueprint: game,
             parser: mockParser,
             ioHandler: mockIO
@@ -229,7 +229,7 @@ struct PutOnActionHandlerTests {
         let game = MinimalGame(items: [book, table])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine(
+        let engine = await GameEngine.test(
             blueprint: game,
             parser: mockParser,
             ioHandler: mockIO
@@ -282,7 +282,7 @@ struct PutOnActionHandlerTests {
         let game = MinimalGame(locations: [room1, room2], items: [book, table])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine(
+        let engine = await GameEngine.test(
             blueprint: game,
             parser: mockParser,
             ioHandler: mockIO
@@ -325,7 +325,7 @@ struct PutOnActionHandlerTests {
         let game = MinimalGame(items: [book, box])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine(
+        let engine = await GameEngine.test(
             blueprint: game,
             parser: mockParser,
             ioHandler: mockIO
@@ -363,7 +363,7 @@ struct PutOnActionHandlerTests {
         let game = MinimalGame(items: [table])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine(
+        let engine = await GameEngine.test(
             blueprint: game,
             parser: mockParser,
             ioHandler: mockIO
@@ -408,7 +408,7 @@ struct PutOnActionHandlerTests {
         let game = MinimalGame(items: [tray, table])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine(
+        let engine = await GameEngine.test(
             blueprint: game,
             parser: mockParser,
             ioHandler: mockIO

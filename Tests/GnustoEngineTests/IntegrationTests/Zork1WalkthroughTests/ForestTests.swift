@@ -18,7 +18,7 @@ struct ForestTests {
             "look",
             "examine grating"
         )
-        let engine = await GameEngine(
+        let engine = await GameEngine.test(
             blueprint: Zork1(),
             parser: StandardParser(),
             ioHandler: mockIO

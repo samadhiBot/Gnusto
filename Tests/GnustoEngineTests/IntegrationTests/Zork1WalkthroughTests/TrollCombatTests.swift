@@ -9,7 +9,7 @@ func testTrollBlocksMovement() async throws {
     // Given
     let game = Zork1()
     let mockIO = await MockIOHandler()
-    let engine = await GameEngine(
+    let engine = await GameEngine.test(
         blueprint: game,
         parser: StandardParser(),
         ioHandler: mockIO
@@ -39,7 +39,7 @@ func testTrollAllowsMovementWhenDead() async throws {
     // Given
     let game = Zork1()
     let mockIO = await MockIOHandler()
-    let engine = await GameEngine(
+    let engine = await GameEngine.test(
         blueprint: game,
         parser: StandardParser(),
         ioHandler: mockIO
@@ -70,7 +70,7 @@ func testGivingWeaponToTroll() async throws {
     // Given
     let game = Zork1()
     let mockIO = await MockIOHandler()
-    let engine = await GameEngine(
+    let engine = await GameEngine.test(
         blueprint: game,
         parser: StandardParser(),
         ioHandler: mockIO
@@ -113,16 +113,19 @@ func testGivingWeaponToTroll() async throws {
 func testWeaponEffectivenessEvaluation() async throws {
     // Given
     let game = Zork1()
-    let engine = await GameEngine(
+    let engine = await GameEngine.test(
         blueprint: game,
         parser: StandardParser(),
         ioHandler: MockIOHandler()
     )
+    let sword = try await engine.item(.sword)
+    let knife = try await engine.item(.knife)
+    let advertisement = try await engine.item(.advertisement)
 
     // When - test different weapon types
-    let swordEffective = await engine.isEffectiveWeapon(.sword)
-    let knifeEffective = await engine.isEffectiveWeapon(.knife)
-    let leafEffective = await engine.isEffectiveWeapon(.advertisement)
+    let swordEffective = await engine.isEffectiveWeapon(sword)
+    let knifeEffective = await engine.isEffectiveWeapon(knife)
+    let leafEffective = await engine.isEffectiveWeapon(advertisement)
 
     // Then
     #expect(swordEffective == true, "Sword should be an effective weapon")
@@ -134,12 +137,11 @@ func testWeaponEffectivenessEvaluation() async throws {
 func testCombatOutcomePatterns() async throws {
     // Given
     let game = Zork1()
-    let engine = await GameEngine(
+    let engine = await GameEngine.test(
         blueprint: game,
         parser: StandardParser(),
         ioHandler: MockIOHandler()
     )
-
     let command = Command(
         verb: .attack,
         directObject: .item(.troll),
@@ -152,6 +154,7 @@ func testCombatOutcomePatterns() async throws {
     var outcomes: [CombatOutcome] = []
     for _ in 0..<50 {
         if let outcome = try await Troll.evaluateWeaponAttack(engine: engine, command: command) {
+            print("🎾", outcome)
             outcomes.append(outcome)
         }
     }
@@ -182,7 +185,7 @@ func testCombatOutcomePatterns() async throws {
 func testTrollCombatResponses() async throws {
     // Given
     let game = Zork1()
-    let engine = await GameEngine(
+    let engine = await GameEngine.test(
         blueprint: game,
         parser: StandardParser(),
         ioHandler: MockIOHandler()

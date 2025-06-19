@@ -34,7 +34,7 @@ struct DebugActionHandlerTests {
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
         
-        return await GameEngine(
+        return await GameEngine.test(
             blueprint: game,
             parser: mockParser,
             ioHandler: mockIO
@@ -456,7 +456,7 @@ struct DebugActionHandlerTests {
         let game = MinimalGame(items: [complexItem])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine(
+        let engine = await GameEngine.test(
             blueprint: game,
             parser: mockParser,
             ioHandler: mockIO
@@ -497,7 +497,7 @@ struct DebugActionHandlerTests {
         let game = MinimalGame(locations: [complexLocation])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine(
+        let engine = await GameEngine.test(
             blueprint: game,
             parser: mockParser,
             ioHandler: mockIO

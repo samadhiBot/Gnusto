@@ -21,7 +21,7 @@ struct TurnOnActionHandlerTests {
         let game = MinimalGame(items: [lamp])
         let mockIO = await MockIOHandler()
         let parser = StandardParser()
-        let engine = await GameEngine(
+        let engine = await GameEngine.test(
             blueprint: game,
             parser: parser,
             ioHandler: mockIO
@@ -70,7 +70,7 @@ struct TurnOnActionHandlerTests {
         )
         let mockIO = await MockIOHandler()
         let parser = StandardParser()
-        let engine = await GameEngine(
+        let engine = await GameEngine.test(
             blueprint: game,
             parser: parser,
             ioHandler: mockIO
@@ -127,7 +127,7 @@ struct TurnOnActionHandlerTests {
         let game = MinimalGame(items: [lamp])
         let mockIO = await MockIOHandler()
         let parser = StandardParser()
-        let engine = await GameEngine(
+        let engine = await GameEngine.test(
             blueprint: game,
             parser: parser,
             ioHandler: mockIO
@@ -168,7 +168,7 @@ struct TurnOnActionHandlerTests {
         let game = MinimalGame(items: [lamp])
         let mockIO = await MockIOHandler()
         let parser = StandardParser()
-        let engine = await GameEngine(
+        let engine = await GameEngine.test(
             blueprint: game,
             parser: parser,
             ioHandler: mockIO
@@ -209,7 +209,7 @@ struct TurnOnActionHandlerTests {
         let game = MinimalGame(items: [lamp])
         let mockIO = await MockIOHandler()
         let parser = StandardParser()
-        let engine = await GameEngine(
+        let engine = await GameEngine.test(
             blueprint: game,
             parser: parser,
             ioHandler: mockIO
@@ -255,7 +255,7 @@ struct TurnOnActionHandlerTests {
         )
         let mockIO = await MockIOHandler()
         let parser = StandardParser()
-        let engine = await GameEngine(
+        let engine = await GameEngine.test(
             blueprint: game,
             parser: parser,
             ioHandler: mockIO
@@ -299,7 +299,7 @@ struct TurnOnActionHandlerTests {
         let game = MinimalGame(items: [lamp])
         let mockIO = await MockIOHandler()
         let parser = StandardParser()
-        let engine = await GameEngine(
+        let engine = await GameEngine.test(
             blueprint: game,
             parser: parser,
             ioHandler: mockIO
@@ -355,7 +355,7 @@ struct TurnOnActionHandlerTests {
         )
         let mockIO = await MockIOHandler()
         let parser = StandardParser()
-        let engine = await GameEngine(
+        let engine = await GameEngine.test(
             blueprint: game,
             parser: parser,
             ioHandler: mockIO
@@ -422,7 +422,7 @@ struct TurnOnActionHandlerTests {
         )
         let mockIO = await MockIOHandler()
         let parser = StandardParser()
-        let engine = await GameEngine(
+        let engine = await GameEngine.test(
             blueprint: game,
             parser: parser,
             ioHandler: mockIO

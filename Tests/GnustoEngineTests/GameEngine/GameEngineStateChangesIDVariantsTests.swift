@@ -19,7 +19,7 @@ struct GameEngineStateChangesIDVariantsTests {
         )
         let game = MinimalGame(items: [item])
         let mockIO = await MockIOHandler()
-        let engine = await GameEngine(blueprint: game, parser: MockParser(), ioHandler: mockIO)
+        let engine = await GameEngine.test(blueprint: game, parser: MockParser(), ioHandler: mockIO)
 
         // When
         let change = try await engine.clearFlag(.testItemFlag, on: item.id)
@@ -41,7 +41,7 @@ struct GameEngineStateChangesIDVariantsTests {
         )
         let game = MinimalGame(items: [item])
         let mockIO = await MockIOHandler()
-        let engine = await GameEngine(blueprint: game, parser: MockParser(), ioHandler: mockIO)
+        let engine = await GameEngine.test(blueprint: game, parser: MockParser(), ioHandler: mockIO)
 
         // When
         let change = try await engine.clearFlag(.testItemFlag, on: item.id)
@@ -55,7 +55,7 @@ struct GameEngineStateChangesIDVariantsTests {
         // Given
         let game = MinimalGame()
         let mockIO = await MockIOHandler()
-        let engine = await GameEngine(blueprint: game, parser: MockParser(), ioHandler: mockIO)
+        let engine = await GameEngine.test(blueprint: game, parser: MockParser(), ioHandler: mockIO)
 
         // When
         let nilItemID: ItemID? = nil
@@ -71,7 +71,7 @@ struct GameEngineStateChangesIDVariantsTests {
         // Given
         let game = MinimalGame()
         let mockIO = await MockIOHandler()
-        let engine = await GameEngine(blueprint: game, parser: MockParser(), ioHandler: mockIO)
+        let engine = await GameEngine.test(blueprint: game, parser: MockParser(), ioHandler: mockIO)
 
         // When/Then
         await #expect(throws: ActionResponse.self) {
@@ -89,7 +89,7 @@ struct GameEngineStateChangesIDVariantsTests {
         )
         let game = MinimalGame(items: [item])
         let mockIO = await MockIOHandler()
-        let engine = await GameEngine(blueprint: game, parser: MockParser(), ioHandler: mockIO)
+        let engine = await GameEngine.test(blueprint: game, parser: MockParser(), ioHandler: mockIO)
 
         // When
         let change = try await engine.move(item.id, to: .player)
@@ -106,7 +106,7 @@ struct GameEngineStateChangesIDVariantsTests {
         // Given
         let game = MinimalGame()
         let mockIO = await MockIOHandler()
-        let engine = await GameEngine(blueprint: game, parser: MockParser(), ioHandler: mockIO)
+        let engine = await GameEngine.test(blueprint: game, parser: MockParser(), ioHandler: mockIO)
 
         // When/Then
         await #expect(throws: ActionResponse.self) {
@@ -123,7 +123,7 @@ struct GameEngineStateChangesIDVariantsTests {
         )
         let game = MinimalGame(items: [item])
         let mockIO = await MockIOHandler()
-        let engine = await GameEngine(blueprint: game, parser: MockParser(), ioHandler: mockIO)
+        let engine = await GameEngine.test(blueprint: game, parser: MockParser(), ioHandler: mockIO)
 
         // When
         let change = try await engine.setAttribute(.testItemCounter, on: item.id, to: .int(42))
@@ -144,7 +144,7 @@ struct GameEngineStateChangesIDVariantsTests {
         )
         let game = MinimalGame(items: [item])
         let mockIO = await MockIOHandler()
-        let engine = await GameEngine(blueprint: game, parser: MockParser(), ioHandler: mockIO)
+        let engine = await GameEngine.test(blueprint: game, parser: MockParser(), ioHandler: mockIO)
 
         // When
         let change = try await engine.setAttribute(.testItemFlag, on: item.id, to: true)
@@ -165,7 +165,7 @@ struct GameEngineStateChangesIDVariantsTests {
         )
         let game = MinimalGame(items: [item])
         let mockIO = await MockIOHandler()
-        let engine = await GameEngine(blueprint: game, parser: MockParser(), ioHandler: mockIO)
+        let engine = await GameEngine.test(blueprint: game, parser: MockParser(), ioHandler: mockIO)
 
         // When
         let change = try await engine.setFlag(.testItemFlag, on: item.id)
@@ -180,7 +180,7 @@ struct GameEngineStateChangesIDVariantsTests {
         // Given
         let game = MinimalGame()
         let mockIO = await MockIOHandler()
-        let engine = await GameEngine(blueprint: game, parser: MockParser(), ioHandler: mockIO)
+        let engine = await GameEngine.test(blueprint: game, parser: MockParser(), ioHandler: mockIO)
 
         // When
         let nilItemID: ItemID? = nil
@@ -200,7 +200,7 @@ struct GameEngineStateChangesIDVariantsTests {
         )
         let game = MinimalGame(items: [item])
         let mockIO = await MockIOHandler()
-        let engine = await GameEngine(blueprint: game, parser: MockParser(), ioHandler: mockIO)
+        let engine = await GameEngine.test(blueprint: game, parser: MockParser(), ioHandler: mockIO)
 
         // When
         let change = try await engine.setDescription(on: item.id, to: "New description")
@@ -222,7 +222,7 @@ struct GameEngineStateChangesIDVariantsTests {
         )
         let game = MinimalGame(locations: [location])
         let mockIO = await MockIOHandler()
-        let engine = await GameEngine(blueprint: game, parser: MockParser(), ioHandler: mockIO)
+        let engine = await GameEngine.test(blueprint: game, parser: MockParser(), ioHandler: mockIO)
 
         // When
         let change = try await engine.clearFlag(.testLocationFlag, on: LocationID("testLocation"))
@@ -240,7 +240,7 @@ struct GameEngineStateChangesIDVariantsTests {
         // Given
         let game = MinimalGame()
         let mockIO = await MockIOHandler()
-        let engine = await GameEngine(blueprint: game, parser: MockParser(), ioHandler: mockIO)
+        let engine = await GameEngine.test(blueprint: game, parser: MockParser(), ioHandler: mockIO)
 
         // When/Then
         await #expect(throws: ActionResponse.self) {
@@ -257,7 +257,7 @@ struct GameEngineStateChangesIDVariantsTests {
         )
         let game = MinimalGame(locations: [location])
         let mockIO = await MockIOHandler()
-        let engine = await GameEngine(blueprint: game, parser: MockParser(), ioHandler: mockIO)
+        let engine = await GameEngine.test(blueprint: game, parser: MockParser(), ioHandler: mockIO)
 
         // When
         let change = try await engine.setFlag(.testLocationFlag, on: LocationID("testLocation"))
@@ -279,7 +279,7 @@ struct GameEngineStateChangesIDVariantsTests {
         )
         let game = MinimalGame(locations: [location])
         let mockIO = await MockIOHandler()
-        let engine = await GameEngine(
+        let engine = await GameEngine.test(
             blueprint: game,
             parser: MockParser(),
             ioHandler: mockIO
@@ -308,7 +308,7 @@ struct GameEngineStateChangesIDVariantsTests {
         )
         let game = MinimalGame(locations: [location])
         let mockIO = await MockIOHandler()
-        let engine = await GameEngine(blueprint: game, parser: MockParser(), ioHandler: mockIO)
+        let engine = await GameEngine.test(blueprint: game, parser: MockParser(), ioHandler: mockIO)
 
         // When
         let change = try await engine.setDescription(on: LocationID("testLocation"), to: "New description")
@@ -325,7 +325,7 @@ struct GameEngineStateChangesIDVariantsTests {
         // Given
         let game = MinimalGame()
         let mockIO = await MockIOHandler()
-        let engine = await GameEngine(blueprint: game, parser: MockParser(), ioHandler: mockIO)
+        let engine = await GameEngine.test(blueprint: game, parser: MockParser(), ioHandler: mockIO)
         let nonexistentID: ItemID = "nonexistent"
 
         // When/Then - Test all variants that should throw
@@ -359,7 +359,7 @@ struct GameEngineStateChangesIDVariantsTests {
         // Given
         let game = MinimalGame()
         let mockIO = await MockIOHandler()
-        let engine = await GameEngine(blueprint: game, parser: MockParser(), ioHandler: mockIO)
+        let engine = await GameEngine.test(blueprint: game, parser: MockParser(), ioHandler: mockIO)
         let nonexistentID: ItemID = "nonexistent"
 
         // When/Then - Test all variants that should throw

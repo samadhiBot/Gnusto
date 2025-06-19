@@ -28,7 +28,7 @@ struct DynamicPropertyTests {
             items: [testItem]
         )
         let mockIO = await MockIOHandler()
-        let engine = await GameEngine(
+        let engine = await GameEngine.test(
             blueprint: game,
             parser: MockParser(),
             ioHandler: mockIO
@@ -89,7 +89,7 @@ struct DynamicPropertyTests {
             ]
         )
         let mockIO = await MockIOHandler()
-        let engine = await GameEngine(
+        let engine = await GameEngine.test(
             blueprint: game,
             parser: MockParser(),
             ioHandler: mockIO
@@ -121,7 +121,7 @@ struct DynamicPropertyTests {
             ]
         )
         let mockIO = await MockIOHandler()
-        let engine = await GameEngine(
+        let engine = await GameEngine.test(
             blueprint: game,
             parser: MockParser(),
             ioHandler: mockIO
@@ -165,7 +165,7 @@ struct DynamicPropertyTests {
         )
 
         let mockIO = await MockIOHandler()
-        let engine = await GameEngine(
+        let engine = await GameEngine.test(
             blueprint: game,
             parser: MockParser(),
             ioHandler: mockIO
@@ -210,7 +210,7 @@ struct DynamicPropertyTests {
         )
 
         let mockIO = await MockIOHandler()
-        let engine = await GameEngine(
+        let engine = await GameEngine.test(
             blueprint: game,
             parser: MockParser(),
             ioHandler: mockIO
@@ -252,7 +252,7 @@ struct DynamicPropertyTests {
             ]
         )
         let mockIO = await MockIOHandler()
-        let engine = await GameEngine(
+        let engine = await GameEngine.test(
             blueprint: game,
             parser: MockParser(),
             ioHandler: mockIO
@@ -284,7 +284,7 @@ struct DynamicPropertyTests {
             items: [testItem]
         )
         let mockIO = await MockIOHandler()
-        let engine = await GameEngine(
+        let engine = await GameEngine.test(
             blueprint: game,
             parser: MockParser(),
             ioHandler: mockIO
@@ -309,7 +309,7 @@ struct DynamicPropertyTests {
             locations: [testLocation]
         )
         let mockIO = await MockIOHandler()
-        let engine = await GameEngine(
+        let engine = await GameEngine.test(
             blueprint: game,
             parser: MockParser(),
             ioHandler: mockIO

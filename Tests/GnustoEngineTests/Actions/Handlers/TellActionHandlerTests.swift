@@ -11,7 +11,7 @@ struct TellActionHandlerTests {
         // Given
         let game = MinimalGame()
         let mockIO = await MockIOHandler()
-        let engine = await GameEngine(
+        let engine = await GameEngine.test(
             blueprint: game,
             parser: MockParser(),
             ioHandler: mockIO
@@ -36,7 +36,7 @@ struct TellActionHandlerTests {
         )
         let game = MinimalGame(items: [character])
         let mockIO = await MockIOHandler()
-        let engine = await GameEngine(
+        let engine = await GameEngine.test(
             blueprint: game,
             parser: MockParser(),
             ioHandler: mockIO
@@ -61,7 +61,7 @@ struct TellActionHandlerTests {
         let rock = Item(id: "rock", .name("rock"))
         let game = MinimalGame(items: [rock])
         let mockIO = await MockIOHandler()
-        let engine = await GameEngine(
+        let engine = await GameEngine.test(
             blueprint: game,
             parser: MockParser(),
             ioHandler: mockIO
@@ -97,7 +97,7 @@ struct TellActionHandlerTests {
         )
         let game = MinimalGame(items: [wizard, crystal])
         let mockIO = await MockIOHandler()
-        let engine = await GameEngine(
+        let engine = await GameEngine.test(
             blueprint: game,
             parser: MockParser(),
             ioHandler: mockIO
@@ -131,7 +131,7 @@ struct TellActionHandlerTests {
         )
         let game = MinimalGame(items: [wizard])
         let mockIO = await MockIOHandler()
-        let engine = await GameEngine(
+        let engine = await GameEngine.test(
             blueprint: game,
             parser: MockParser(),
             ioHandler: mockIO
@@ -164,7 +164,7 @@ struct TellActionHandlerTests {
         )
         let game = MinimalGame(items: [wizard])
         let mockIO = await MockIOHandler()
-        let engine = await GameEngine(
+        let engine = await GameEngine.test(
             blueprint: game,
             parser: MockParser(),
             ioHandler: mockIO
@@ -197,7 +197,7 @@ struct TellActionHandlerTests {
         )
         let game = MinimalGame(items: [wizard])
         let mockIO = await MockIOHandler()
-        let engine = await GameEngine(
+        let engine = await GameEngine.test(
             blueprint: game,
             parser: MockParser(),
             ioHandler: mockIO

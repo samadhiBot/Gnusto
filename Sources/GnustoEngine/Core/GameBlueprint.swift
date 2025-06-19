@@ -166,24 +166,6 @@ public protocol GameBlueprint: Sendable {
     /// }
     /// ```
     var messageProvider: MessageProvider { get }
-
-    /// A random number generator used throughout the game for various randomization needs.
-    ///
-    /// This generator is used for determining random events, NPC behaviors, game mechanics,
-    /// and other probabilistic elements. The default implementation uses the system's
-    /// random number generator.
-    ///
-    /// For testing purposes, you can provide a custom implementation that returns
-    /// predetermined values to ensure consistent test results.
-    ///
-    /// Example:
-    /// ```swift
-    /// var randomNumberGenerator: any RandomNumberGenerator {
-    ///     // For testing: return a fixed value generator
-    ///     FixedRandomNumberGenerator(value: 0.5)
-    /// }
-    /// ```
-    var randomNumberGenerator: any RandomNumberGenerator { get }
 }
 
 // MARK: - Default implementations
@@ -227,9 +209,5 @@ extension GameBlueprint {
 
     public var messageProvider: MessageProvider {
         MessageProvider()
-    }
-
-    public var randomNumberGenerator: any RandomNumberGenerator {
-        SystemRandomNumberGenerator()
     }
 }

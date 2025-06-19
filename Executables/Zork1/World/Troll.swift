@@ -99,22 +99,17 @@ enum Troll {
     }
 }
 
-// MARK: - Troll Command Handling
+// MARK: - Give/Drop Handling
 
 extension Troll {
-    // MARK: - Fighting System Implementation (Simplified)
-
-    // This demonstrates the core troll behavior from ZIL without full character mode system
-
-    // MARK: - Give/Drop Handling
-
     private static func handleTrollGiveOrDrop(
         engine: GameEngine,
         command: Command
     ) async throws -> ActionResult? {
-        guard case .item(let itemID) = command.directObject else { return nil }
-
-        let itemName = try await engine.item(itemID).name
+        guard case .item(let itemID) = command.directObject else {
+            return nil
+        }
+        let item = try await engine.item(itemID)
 
         // Handle giving/throwing the axe to the troll
         let isPlayerHoldingAxe = await engine.playerIsHolding(.axe)
@@ -130,19 +125,19 @@ extension Troll {
         // Handle giving/throwing the troll or axe itself
         if itemID == .troll || itemID == .axe {
             return ActionResult(
-                "You would have to get the \(itemName) first, and that seems unlikely."
+                "You would have to get the \(item.name) first, and that seems unlikely."
             )
         }
 
         // Handle other objects
         let baseMessage = if command.verb == .drop {
-            "The troll, who is remarkably coordinated, catches the \(itemName)"
+            "The troll, who is remarkably coordinated, catches the \(item.name)"
         } else {
             "The troll, who is not overly proud, graciously accepts the gift"
         }
 
         // Handle weapons using engine helper
-        if await engine.isEffectiveWeapon(itemID) {
+        if await engine.isEffectiveWeapon(item) {
             let outcome = await engine.randomPercentage()
             return if outcome <= 20 {
                 ActionResult(
@@ -158,7 +153,7 @@ extension Troll {
                 ActionResult(
                     """
                     \(baseMessage) and, being for the moment sated, throws it back.
-                    Fortunately, the troll has poor control, and the \(itemName)
+                    Fortunately, the troll has poor control, and the \(item.name)
                     falls to the floor. He does not look pleased.
                     """,
                     try await engine.move(itemID, to: .location(.trollRoom)),
@@ -186,7 +181,9 @@ extension Troll {
         engine: GameEngine,
         command: Command
     ) async throws -> CombatOutcome? {
-        guard case .item(let weapon) = command.indirectObject else { return nil }
+        guard let weapon = try await engine.indirectObject(in: command) else {
+            return nil
+        }
         let isEffectiveWeapon = await engine.isEffectiveWeapon(weapon)
         let outcome = await engine.randomPercentage()
         return switch (isEffectiveWeapon, outcome) {
@@ -197,7 +194,7 @@ extension Troll {
         case (true, _):
             .defeat("The troll's axe finds its mark. You are defeated!")
         case (false, _):
-            .ineffective("Your \(weapon) proves ineffective against the troll.")
+            .ineffective("Your \(weapon.name) proves ineffective against the troll.")
         }
     }
 

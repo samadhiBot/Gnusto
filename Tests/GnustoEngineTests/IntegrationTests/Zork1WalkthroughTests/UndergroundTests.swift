@@ -11,7 +11,7 @@ struct UndergroundTests {
             Moves.enterUnderground,
             "north"
         )
-        let engine = await GameEngine(
+        let engine = await GameEngine.test(
             blueprint: Zork1(),
             parser: StandardParser(),
             ioHandler: mockIO
@@ -51,9 +51,10 @@ struct UndergroundTests {
             "take the troll",
             "attack the troll",
             "stab the troll with the sword",
+            "hit the troll with the lantern",
             "head west"
         )
-        let engine = await GameEngine(
+        let engine = await GameEngine.test(
             blueprint: Zork1(),
             parser: StandardParser(),
             ioHandler: mockIO
@@ -108,11 +109,6 @@ struct UndergroundTests {
             Your sword is glowing very brightly.
 
             > stab the troll with the sword
-            The troll succumbs to your superior weaponry!
-
-            Almost as soon as the troll breathes his last breath, a cloud
-            of sinister black fog envelops him, and when the fog lifts, the
-            carcass has disappeared.
 
             > head west
             — Maze —

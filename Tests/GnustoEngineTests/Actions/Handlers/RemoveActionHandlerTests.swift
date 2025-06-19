@@ -18,7 +18,7 @@ struct RemoveActionHandlerTests {
         )
         let game = MinimalGame(items: [cloak])
         let mockIO = await MockIOHandler()
-        let engine = await GameEngine(
+        let engine = await GameEngine.test(
             blueprint: game,
             parser: StandardParser(),
             ioHandler: mockIO
@@ -80,7 +80,7 @@ struct RemoveActionHandlerTests {
             .isWearable
         )
         let game = MinimalGame(items: [cloak])
-        let engine = await GameEngine(
+        let engine = await GameEngine.test(
             blueprint: game,
             parser: MockParser(),
             ioHandler: await MockIOHandler()
@@ -107,7 +107,7 @@ struct RemoveActionHandlerTests {
     @Test("Remove fails if item not held")
     func testRemoveItemNotHeld() async throws {
         let game = MinimalGame()  // Cloak doesn’t exist here
-        let engine = await GameEngine(
+        let engine = await GameEngine.test(
             blueprint: game,
             parser: MockParser(),
             ioHandler: await MockIOHandler()
@@ -134,7 +134,7 @@ struct RemoveActionHandlerTests {
     @Test("Remove fails with no direct object")
     func testRemoveNoObject() async throws {
         let game = MinimalGame()
-        let engine = await GameEngine(
+        let engine = await GameEngine.test(
             blueprint: game,
             parser: MockParser(),
             ioHandler: await MockIOHandler()
@@ -169,7 +169,7 @@ struct RemoveActionHandlerTests {
             .isWorn
         )
         let game = MinimalGame(items: [amulet])
-        let engine = await GameEngine(
+        let engine = await GameEngine.test(
             blueprint: game,
             parser: MockParser(),
             ioHandler: await MockIOHandler()
@@ -203,7 +203,7 @@ struct RemoveActionHandlerTests {
         let game = MinimalGame(items: [cloak, boots])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine(blueprint: game, parser: mockParser, ioHandler: mockIO)
+        let engine = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
 
         // Act: Execute "remove all"
         let command = Command(
@@ -237,7 +237,7 @@ struct RemoveActionHandlerTests {
         let game = MinimalGame(items: [cloak, boots])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine(blueprint: game, parser: mockParser, ioHandler: mockIO)
+        let engine = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
 
         // Act: Execute "remove cloak and boots"
         let command = Command(
@@ -267,7 +267,7 @@ struct RemoveActionHandlerTests {
         let game = MinimalGame(items: [cloak, boots])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine(blueprint: game, parser: mockParser, ioHandler: mockIO)
+        let engine = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
 
         // Act: Execute "remove all"
         let command = Command(
@@ -296,7 +296,7 @@ struct RemoveActionHandlerTests {
         let game = MinimalGame(items: [boots])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine(blueprint: game, parser: mockParser, ioHandler: mockIO)
+        let engine = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
 
         // Act: Execute "remove all"
         let command = Command(
@@ -322,7 +322,7 @@ struct RemoveActionHandlerTests {
         let game = MinimalGame(items: [cloak, amulet])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine(blueprint: game, parser: mockParser, ioHandler: mockIO)
+        let engine = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
 
         // Act: Execute "remove all"
         let command = Command(

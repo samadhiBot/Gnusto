@@ -12,7 +12,7 @@ struct SaveRestoreActionHandlerTests {
         // Given
         let game = MinimalGame()
         let mockIO = await MockIOHandler()
-        let engine = await GameEngine(
+        let engine = await GameEngine.test(
             blueprint: game,
             parser: MockParser(),
             ioHandler: mockIO
@@ -37,7 +37,7 @@ struct SaveRestoreActionHandlerTests {
         // Given
         let game = MinimalGame()
         let mockIO = await MockIOHandler()
-        let engine = await GameEngine(
+        let engine = await GameEngine.test(
             blueprint: game,
             parser: MockParser(),
             ioHandler: mockIO
@@ -62,7 +62,7 @@ struct SaveRestoreActionHandlerTests {
         // Given
         let game = MinimalGame()
         let mockIO = await MockIOHandler()
-        let engine = await GameEngine(
+        let engine = await GameEngine.test(
             blueprint: game,
             parser: MockParser(),
             ioHandler: mockIO

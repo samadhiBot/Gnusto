@@ -13,7 +13,7 @@ struct KnockActionHandlerTests {
         let game = MinimalGame()
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine(blueprint: game, parser: mockParser, ioHandler: mockIO)
+        let engine = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
 
         let command = Command(verb: .knock, rawInput: "knock")
         let context = ActionContext(command: command, engine: engine)
@@ -37,7 +37,7 @@ struct KnockActionHandlerTests {
         let game = MinimalGame(items: [door])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine(blueprint: game, parser: mockParser, ioHandler: mockIO)
+        let engine = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
 
         let command = Command(verb: .knock, directObject: .item("door"), rawInput: "knock door")
 
@@ -61,7 +61,7 @@ struct KnockActionHandlerTests {
         let game = MinimalGame(items: [wall])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine(blueprint: game, parser: mockParser, ioHandler: mockIO)
+        let engine = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
 
         let command = Command(verb: .knock, directObject: .item("wall"), rawInput: "knock wall")
 
@@ -86,7 +86,7 @@ struct KnockActionHandlerTests {
         let game = MinimalGame(items: [chest])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine(blueprint: game, parser: mockParser, ioHandler: mockIO)
+        let engine = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
 
         let command = Command(verb: .knock, directObject: .item("chest"), rawInput: "knock chest")
 
@@ -112,7 +112,7 @@ struct KnockActionHandlerTests {
         let game = MinimalGame(items: [door])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine(blueprint: game, parser: mockParser, ioHandler: mockIO)
+        let engine = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
 
         let command = Command(verb: .knock, directObject: .item("door"), rawInput: "knock door")
 

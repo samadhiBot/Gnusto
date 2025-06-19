@@ -107,14 +107,12 @@ extension GameEngine {
 
     /// Checks if an item can be used as an effective weapon against a target.
     /// Returns true if the item has the weapon flag or is a recognized combat tool.
-    public func isEffectiveWeapon(_ itemID: ItemID) -> Bool {
-        guard let targetItem = try? item(itemID) else { return false }
-        return targetItem.hasFlag(.isWeapon) || targetItem.hasFlag(.isTool)
+    public func isEffectiveWeapon(_ item: Item) -> Bool {
+        item.hasFlag(.isWeapon) || item.hasFlag(.isTool)
     }
 
     /// Determines if a character is currently in combat state.
-    public func isInCombat(_ itemID: ItemID) -> Bool {
-        guard let targetItem = try? item(itemID) else { return false }
-        return targetItem.hasFlag(.isFighting) && targetItem.hasFlag(.isCharacter)
+    public func isInCombat(_ item: Item) -> Bool {
+        item.hasFlag(.isFighting) && item.hasFlag(.isCharacter)
     }
 }

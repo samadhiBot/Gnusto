@@ -8,7 +8,7 @@ struct BurnActionHandlerTests {
         let game = MinimalGame()
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine(
+        let engine = await GameEngine.test(
             blueprint: game,
             parser: mockParser,
             ioHandler: mockIO
@@ -51,9 +51,9 @@ struct BurnActionHandlerTests {
         )
 
         // Act
-        await engine.execute(command: command)
-        await engine.execute(command: command)
-        await engine.execute(command: command)
+        try await engine.execute("burn pebble")
+        try await engine.execute("burn pebble")
+        try await engine.execute("burn pebble")
 
         // Assert
         let output = await mockIO.flush()

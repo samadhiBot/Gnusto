@@ -13,9 +13,17 @@ struct BreatheActionHandlerTests {
         let game = MinimalGame()
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine(blueprint: game, parser: mockParser, ioHandler: mockIO)
+        let engine = await GameEngine.test(
+            blueprint: game,
+            parser: mockParser,
+            ioHandler: mockIO
+        )
 
-        let command = Command(verb: .breathe, directObject: .item("something"), rawInput: "breathe something")
+        let command = Command(
+            verb: .breathe,
+            directObject: .item("something"),
+            rawInput: "breathe something"
+        )
         let context = ActionContext(command: command, engine: engine)
 
         // When / Then
@@ -30,7 +38,11 @@ struct BreatheActionHandlerTests {
         let game = MinimalGame()
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine(blueprint: game, parser: mockParser, ioHandler: mockIO)
+        let engine = await GameEngine.test(
+            blueprint: game,
+            parser: mockParser,
+            ioHandler: mockIO
+        )
 
         let command = Command(
             verb: .breathe,
@@ -50,20 +62,21 @@ struct BreatheActionHandlerTests {
         // Given
         let game = MinimalGame()
         let mockIO = await MockIOHandler()
-        let mockParser = MockParser()
-        let engine = await GameEngine(blueprint: game, parser: mockParser, ioHandler: mockIO)
-
-        let command = Command(verb: .breathe, rawInput: "breathe")
-        let context = ActionContext(command: command, engine: engine)
+        let engine = await GameEngine.test(
+            blueprint: game,
+            parser: StandardParser(),
+            ioHandler: mockIO
+        )
 
         // When
-        let result = try await handler.process(context: context)
+        try await engine.execute("breathe")
 
         // Then
-        expectNoDifference(
-            result.message,
-            "You inhale deeply, briefly grateful for the invention of oxygen."
-        )
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            You take a breath, noting that it’s roughly the same as the
+            last one.
+            """)
     }
 
     @Test("Breathe integration test")
@@ -71,26 +84,28 @@ struct BreatheActionHandlerTests {
         // Given
         let game = MinimalGame()
         let mockIO = await MockIOHandler()
-        let mockParser = MockParser()
-        let engine = await GameEngine(blueprint: game, parser: mockParser, ioHandler: mockIO)
-
-        let command = Command(verb: .breathe, rawInput: "breathe")
+        let engine = await GameEngine.test(
+            blueprint: game,
+            parser: StandardParser(),
+            ioHandler: mockIO
+        )
 
         // When
-        await engine.execute(command: command)
-        await engine.execute(command: command)
-        await engine.execute(command: command)
+        try await engine.execute("breathe")
+        try await engine.execute("breathe")
+        try await engine.execute("breathe")
 
         // Then
         let output = await mockIO.flush()
         expectNoDifference(output, """
-            You inhale deeply, briefly grateful for the invention of
-            oxygen.
+            You take a breath, noting that it’s roughly the same as the
+            last one.
 
-            You were already doing that, but also you continue to breathe.
+            You take a breath, noting that it’s roughly the same as the
+            last one.
 
-            You breathe in life’s very essence, which tastes faintly of
-            confusion.
+            You take a tentative breath, unsure whether the atmosphere is
+            still working.
             """)
     }
 
@@ -100,9 +115,16 @@ struct BreatheActionHandlerTests {
         let game = MinimalGame()
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine(blueprint: game, parser: mockParser, ioHandler: mockIO)
+        let engine = await GameEngine.test(
+            blueprint: game,
+            parser: mockParser,
+            ioHandler: mockIO
+        )
 
-        let command = Command(verb: .breathe, rawInput: "breathe")
+        let command = Command(
+            verb: .breathe,
+            rawInput: "breathe"
+        )
         let context = ActionContext(command: command, engine: engine)
 
         // When / Then - Should not throw

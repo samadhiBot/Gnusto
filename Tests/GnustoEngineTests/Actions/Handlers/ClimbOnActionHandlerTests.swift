@@ -18,7 +18,7 @@ struct ClimbOnActionHandlerTests {
         let game = MinimalGame(items: [chair])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine(
+        let engine = await GameEngine.test(
             blueprint: game,
             parser: mockParser,
             ioHandler: mockIO
@@ -83,7 +83,7 @@ struct ClimbOnActionHandlerTests {
         )
         let game = MinimalGame(items: [chair])
         let mockIO = await MockIOHandler()
-        let engine = await GameEngine(
+        let engine = await GameEngine.test(
             blueprint: game,
             parser: MockParser(),
             ioHandler: mockIO
@@ -109,7 +109,7 @@ struct ClimbOnActionHandlerTests {
     func testClimbOnFailsWithNoObject() async throws {
         let game = MinimalGame()
         let mockIO = await MockIOHandler()
-        let engine = await GameEngine(
+        let engine = await GameEngine.test(
             blueprint: game,
             parser: MockParser(),
             ioHandler: mockIO
@@ -134,7 +134,7 @@ struct ClimbOnActionHandlerTests {
     func testClimbOnFailsWithNonItemTarget() async throws {
         let game = MinimalGame()
         let mockIO = await MockIOHandler()
-        let engine = await GameEngine(
+        let engine = await GameEngine.test(
             blueprint: game,
             parser: MockParser(),
             ioHandler: mockIO
@@ -173,7 +173,7 @@ struct ClimbOnActionHandlerTests {
         )
         let game = MinimalGame(items: [box, ladder])
         let mockIO = await MockIOHandler()
-        let engine = await GameEngine(
+        let engine = await GameEngine.test(
             blueprint: game,
             parser: MockParser(),
             ioHandler: mockIO
@@ -206,7 +206,7 @@ struct ClimbOnActionHandlerTests {
         let game = MinimalGame(items: [rope])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine(
+        let engine = await GameEngine.test(
             blueprint: game,
             parser: mockParser,
             ioHandler: mockIO
@@ -237,7 +237,7 @@ struct ClimbOnActionHandlerTests {
         let game = MinimalGame(items: [tree])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine(
+        let engine = await GameEngine.test(
             blueprint: game,
             parser: mockParser,
             ioHandler: mockIO
@@ -275,7 +275,7 @@ struct ClimbOnActionHandlerTests {
         let game = MinimalGame(items: [table, stool])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine(
+        let engine = await GameEngine.test(
             blueprint: game,
             parser: mockParser,
             ioHandler: mockIO

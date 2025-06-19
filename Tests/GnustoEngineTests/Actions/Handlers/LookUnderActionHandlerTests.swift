@@ -18,7 +18,7 @@ struct LookUnderActionHandlerTests {
         let game = MinimalGame(items: [table])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine(
+        let engine = await GameEngine.test(
             blueprint: game,
             parser: mockParser,
             ioHandler: mockIO
@@ -71,7 +71,7 @@ struct LookUnderActionHandlerTests {
             .isSurface
         )
         let game = MinimalGame(items: [table])
-        let engine = await GameEngine(
+        let engine = await GameEngine.test(
             blueprint: game,
             parser: MockParser(),
             ioHandler: await MockIOHandler()
@@ -99,7 +99,7 @@ struct LookUnderActionHandlerTests {
     func testLookUnderFailsWithNoObject() async throws {
         let game = MinimalGame()
         let mockIO = await MockIOHandler()
-        let engine = await GameEngine(
+        let engine = await GameEngine.test(
             blueprint: game,
             parser: MockParser(),
             ioHandler: mockIO
@@ -125,7 +125,7 @@ struct LookUnderActionHandlerTests {
     func testLookUnderFailsWithNonItemTarget() async throws {
         let game = MinimalGame()
         let mockIO = await MockIOHandler()
-        let engine = await GameEngine(
+        let engine = await GameEngine.test(
             blueprint: game,
             parser: MockParser(),
             ioHandler: mockIO
@@ -164,7 +164,7 @@ struct LookUnderActionHandlerTests {
         )
         let game = MinimalGame(items: [box, carpet])
         let mockIO = await MockIOHandler()
-        let engine = await GameEngine(
+        let engine = await GameEngine.test(
             blueprint: game,
             parser: MockParser(),
             ioHandler: mockIO
@@ -197,7 +197,7 @@ struct LookUnderActionHandlerTests {
         let game = MinimalGame(items: [mat])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine(
+        let engine = await GameEngine.test(
             blueprint: game,
             parser: mockParser,
             ioHandler: mockIO
@@ -239,7 +239,7 @@ struct LookUnderActionHandlerTests {
         let game = MinimalGame(items: [table, book])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine(
+        let engine = await GameEngine.test(
             blueprint: game,
             parser: mockParser,
             ioHandler: mockIO

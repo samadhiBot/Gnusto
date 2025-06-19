@@ -15,7 +15,7 @@ struct OutsideHouseTests {
             "take all",
             "inventory",
         )
-        let engine = await GameEngine(
+        let engine = await GameEngine.test(
             blueprint: Zork1(),
             parser: StandardParser(),
             ioHandler: mockIO
@@ -61,7 +61,7 @@ struct OutsideHouseTests {
             "take boards",
             "look at the house",
         )
-        let engine = await GameEngine(
+        let engine = await GameEngine.test(
             blueprint: Zork1(),
             parser: StandardParser(),
             ioHandler: mockIO
@@ -118,7 +118,7 @@ struct OutsideHouseTests {
             "south",
             "take the boards",
         )
-        let engine = await GameEngine(
+        let engine = await GameEngine.test(
             blueprint: Zork1(),
             parser: StandardParser(),
             ioHandler: mockIO
@@ -188,7 +188,7 @@ struct OutsideHouseTests {
             "take knife",
             "inventory"
         )
-        let engine = await GameEngine(
+        let engine = await GameEngine.test(
             blueprint: Zork1(),
             parser: StandardParser(),
             ioHandler: mockIO
@@ -276,7 +276,7 @@ struct OutsideHouseTests {
             "examine bottle",
             "inventory"
         )
-        let engine = await GameEngine(
+        let engine = await GameEngine.test(
             blueprint: Zork1(),
             parser: StandardParser(),
             ioHandler: mockIO

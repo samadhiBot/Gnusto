@@ -13,7 +13,7 @@ struct TieActionHandlerTests {
         let game = MinimalGame()
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine(blueprint: game, parser: mockParser, ioHandler: mockIO)
+        let engine = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
 
         let command = Command(verb: .tie, rawInput: "tie")
         let context = ActionContext(command: command, engine: engine)
@@ -38,7 +38,7 @@ struct TieActionHandlerTests {
         let game = MinimalGame(items: [rope])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine(blueprint: game, parser: mockParser, ioHandler: mockIO)
+        let engine = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
 
         let command = Command(verb: .tie, directObject: .item("rope"), rawInput: "tie rope")
         let context = ActionContext(command: command, engine: engine)
@@ -64,7 +64,7 @@ struct TieActionHandlerTests {
         let game = MinimalGame(items: [cord])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine(blueprint: game, parser: mockParser, ioHandler: mockIO)
+        let engine = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
 
         let command = Command(verb: .tie, directObject: .item("cord"), rawInput: "tie cord")
 

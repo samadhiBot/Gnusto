@@ -235,6 +235,20 @@ extension GameEngine {
         (try await attribute(attributeID, of: itemID)) == true
     }
 
+    public func directObject(in command: Command) throws -> Item? {
+        guard case .item(let itemID) = command.directObject else {
+            return nil
+        }
+        return try item(itemID)
+    }
+
+    public func indirectObject(in command: Command) throws -> Item? {
+        guard case .item(let itemID) = command.indirectObject else {
+            return nil
+        }
+        return try item(itemID)
+    }
+
     /// Retrieves an immutable copy of a specific item from the current game state.
     ///
     /// - Parameter id: The `ItemID` of the item to retrieve.

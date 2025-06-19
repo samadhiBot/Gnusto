@@ -142,14 +142,15 @@ public actor GameEngine: Sendable {
         activeDaemons: Set<DaemonID> = [],
         globalState: [GlobalID: StateValue] = [:],
         parser: Parser,
-        ioHandler: IOHandler
+        ioHandler: IOHandler,
+        randomNumberGenerator: any RandomNumberGenerator = SystemRandomNumberGenerator()
     ) async {
         self.daemons = blueprint.daemons
         self.fuses = blueprint.fuses
         self.introduction = blueprint.introduction
         self.maximumScore = blueprint.maximumScore
         self.messageProvider = blueprint.messageProvider
-        self.randomNumberGenerator = blueprint.randomNumberGenerator
+        self.randomNumberGenerator = randomNumberGenerator
         self.release = blueprint.release
         self.storyTitle = blueprint.storyTitle
 
@@ -198,7 +199,7 @@ public actor GameEngine: Sendable {
         self.locationEventHandlers = blueprint.locationEventHandlers
 
         #if DEBUG
-            self.actionHandlers[.debug] = DebugActionHandler()
+        self.actionHandlers[.debug] = DebugActionHandler()
         #endif
     }
 }

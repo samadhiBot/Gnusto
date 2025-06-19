@@ -39,7 +39,7 @@ struct InflateActionHandlerTests {
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
 
-        let engine = await GameEngine(
+        let engine = await GameEngine.test(
             blueprint: game,
             parser: mockParser,
             ioHandler: mockIO

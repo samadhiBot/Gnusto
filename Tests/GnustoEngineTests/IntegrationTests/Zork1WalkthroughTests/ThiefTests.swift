@@ -11,7 +11,7 @@ struct ThiefTests {
         // Given
         let game = Zork1()
         let mockIO = await MockIOHandler()
-        let engine = await GameEngine(
+        let engine = await GameEngine.test(
             blueprint: game,
             activeDaemons: [.thiefTheftDaemon], // Activate the daemon from start
             parser: StandardParser(),
@@ -59,7 +59,7 @@ struct ThiefTests {
         // Given
         let game = Zork1()
         let mockIO = await MockIOHandler()
-        let engine = await GameEngine(
+        let engine = await GameEngine.test(
             blueprint: game,
             parser: StandardParser(),
             ioHandler: mockIO
@@ -90,7 +90,7 @@ struct ThiefTests {
         // Given
         let game = Zork1()
         let mockIO = await MockIOHandler()
-        let engine = await GameEngine(
+        let engine = await GameEngine.test(
             blueprint: game,
             parser: StandardParser(),
             ioHandler: mockIO
@@ -130,7 +130,7 @@ struct ThiefTests {
         // Given
         let game = Zork1()
         let mockIO = await MockIOHandler()
-        let engine = await GameEngine(
+        let engine = await GameEngine.test(
             blueprint: game,
             parser: StandardParser(),
             ioHandler: mockIO
@@ -167,7 +167,7 @@ struct ThiefTests {
         // Given
         let game = Zork1()
         let mockIO = await MockIOHandler()
-        let engine = await GameEngine(
+        let engine = await GameEngine.test(
             blueprint: game,
             parser: StandardParser(),
             ioHandler: mockIO
@@ -196,7 +196,7 @@ struct ThiefTests {
         // Given
         let game = Zork1()
         let mockIO = await MockIOHandler()
-        let engine = await GameEngine(
+        let engine = await GameEngine.test(
             blueprint: game,
             parser: StandardParser(),
             ioHandler: mockIO
@@ -224,7 +224,7 @@ struct ThiefTests {
         // Given
         let game = Zork1()
         let mockIO = await MockIOHandler()
-        let engine = await GameEngine(
+        let engine = await GameEngine.test(
             blueprint: game,
             parser: StandardParser(),
             ioHandler: mockIO
@@ -252,7 +252,7 @@ struct ThiefTests {
         // Given
         let game = Zork1()
         let mockIO = await MockIOHandler()
-        let engine = await GameEngine(
+        let engine = await GameEngine.test(
             blueprint: game,
             parser: StandardParser(),
             ioHandler: mockIO
@@ -280,7 +280,7 @@ struct ThiefTests {
         // Given
         let game = Zork1()
         let mockIO = await MockIOHandler()
-        let engine = await GameEngine(
+        let engine = await GameEngine.test(
             blueprint: game,
             parser: StandardParser(),
             ioHandler: mockIO
@@ -310,7 +310,7 @@ struct ThiefTests {
         // Given
         let game = Zork1()
         let mockIO = await MockIOHandler()
-        let engine = await GameEngine(
+        let engine = await GameEngine.test(
             blueprint: game,
             parser: StandardParser(),
             ioHandler: mockIO
@@ -342,7 +342,7 @@ struct ThiefTests {
         // Given
         let game = Zork1()
         let mockIO = await MockIOHandler()
-        let engine = await GameEngine(
+        let engine = await GameEngine.test(
             blueprint: game,
             parser: StandardParser(),
             ioHandler: mockIO
@@ -391,7 +391,7 @@ struct ThiefTests {
         // Given
         let game = Zork1()
         let mockIO = await MockIOHandler()
-        let engine = await GameEngine(
+        let engine = await GameEngine.test(
             blueprint: game,
             parser: StandardParser(),
             ioHandler: mockIO
@@ -433,7 +433,7 @@ struct ThiefTests {
         // Given
         let game = Zork1()
         let mockIO = await MockIOHandler()
-        let engine = await GameEngine(
+        let engine = await GameEngine.test(
             blueprint: game,
             parser: StandardParser(),
             ioHandler: mockIO
@@ -465,7 +465,7 @@ struct ThiefTests {
         // Given
         let game = Zork1()
         let mockIO = await MockIOHandler()
-        let engine = await GameEngine(
+        let engine = await GameEngine.test(
             blueprint: game,
             parser: StandardParser(),
             ioHandler: mockIO
@@ -499,7 +499,7 @@ struct ThiefTests {
         // Given
         let game = Zork1()
         let mockIO = await MockIOHandler()
-        let engine = await GameEngine(
+        let engine = await GameEngine.test(
             blueprint: game,
             parser: StandardParser(),
             ioHandler: mockIO
@@ -535,7 +535,7 @@ struct ThiefTests {
         // Given
         let game = Zork1()
         let mockIO = await MockIOHandler()
-        let engine = await GameEngine(
+        let engine = await GameEngine.test(
             blueprint: game,
             parser: StandardParser(),
             ioHandler: mockIO
@@ -564,7 +564,7 @@ struct ThiefTests {
         // Given
         let game = Zork1()
         let mockIO = await MockIOHandler()
-        let engine = await GameEngine(
+        let engine = await GameEngine.test(
             blueprint: game,
             parser: StandardParser(),
             ioHandler: mockIO
@@ -601,7 +601,7 @@ struct ThiefTests {
         // Given
         let game = Zork1()
         let mockIO = await MockIOHandler()
-        let engine = await GameEngine(
+        let engine = await GameEngine.test(
             blueprint: game,
             parser: StandardParser(),
             ioHandler: mockIO
@@ -646,7 +646,7 @@ struct ThiefTests {
         // Given
         let game = Zork1()
         let mockIO = await MockIOHandler()
-        let engine = await GameEngine(
+        let engine = await GameEngine.test(
             blueprint: game,
             parser: StandardParser(),
             ioHandler: mockIO

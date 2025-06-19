@@ -18,7 +18,7 @@ struct RaiseActionHandlerTests {
         let game = MinimalGame(items: [book])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine(
+        let engine = await GameEngine.test(
             blueprint: game,
             parser: mockParser,
             ioHandler: mockIO
@@ -72,7 +72,7 @@ struct RaiseActionHandlerTests {
         )
         let game = MinimalGame(items: [book])
         let mockIO = await MockIOHandler()
-        let engine = await GameEngine(
+        let engine = await GameEngine.test(
             blueprint: game,
             parser: MockParser(),
             ioHandler: mockIO
@@ -100,7 +100,7 @@ struct RaiseActionHandlerTests {
     func testRaiseFailsWithNoObject() async throws {
         let game = MinimalGame()
         let mockIO = await MockIOHandler()
-        let engine = await GameEngine(
+        let engine = await GameEngine.test(
             blueprint: game,
             parser: MockParser(),
             ioHandler: mockIO
@@ -125,7 +125,7 @@ struct RaiseActionHandlerTests {
     func testRaiseFailsWithNonItemTarget() async throws {
         let game = MinimalGame()
         let mockIO = await MockIOHandler()
-        let engine = await GameEngine(
+        let engine = await GameEngine.test(
             blueprint: game,
             parser: MockParser(),
             ioHandler: mockIO
@@ -164,7 +164,7 @@ struct RaiseActionHandlerTests {
         )
         let game = MinimalGame(items: [box, book])
         let mockIO = await MockIOHandler()
-        let engine = await GameEngine(
+        let engine = await GameEngine.test(
             blueprint: game,
             parser: MockParser(),
             ioHandler: mockIO
@@ -197,7 +197,7 @@ struct RaiseActionHandlerTests {
         let game = MinimalGame(items: [coin])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine(
+        let engine = await GameEngine.test(
             blueprint: game,
             parser: mockParser,
             ioHandler: mockIO
