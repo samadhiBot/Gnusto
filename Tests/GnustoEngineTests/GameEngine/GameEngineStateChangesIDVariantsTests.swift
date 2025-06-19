@@ -1,6 +1,7 @@
 import CustomDump
 import Foundation
 import Testing
+
 @testable import GnustoEngine
 
 /// Tests for the ItemID and LocationID variants of StateChange factory methods.
@@ -17,7 +18,7 @@ struct GameEngineStateChangesIDVariantsTests {
             .name("Test Item"),
             .testItemAttrFlag
         )
-        let game = MinimalGame(items: [item])
+        let game = MinimalGame(items: item)
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         // When
@@ -38,7 +39,7 @@ struct GameEngineStateChangesIDVariantsTests {
             id: "testItem",
             .name("Test Item")
         )
-        let game = MinimalGame(items: [item])
+        let game = MinimalGame(items: item)
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         // When
@@ -81,7 +82,7 @@ struct GameEngineStateChangesIDVariantsTests {
             .name("Test Item"),
             .in(.location("startLocation"))
         )
-        let game = MinimalGame(items: [item])
+        let game = MinimalGame(items: item)
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         // When
@@ -112,7 +113,7 @@ struct GameEngineStateChangesIDVariantsTests {
             id: "testItem",
             .name("Test Item")
         )
-        let game = MinimalGame(items: [item])
+        let game = MinimalGame(items: item)
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         // When
@@ -132,7 +133,7 @@ struct GameEngineStateChangesIDVariantsTests {
             id: "testItem",
             .name("Test Item")
         )
-        let game = MinimalGame(items: [item])
+        let game = MinimalGame(items: item)
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         // When
@@ -152,7 +153,7 @@ struct GameEngineStateChangesIDVariantsTests {
             id: "testItem",
             .name("Test Item")
         )
-        let game = MinimalGame(items: [item])
+        let game = MinimalGame(items: item)
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         // When
@@ -184,7 +185,7 @@ struct GameEngineStateChangesIDVariantsTests {
             id: "testItem",
             .name("Test Item")
         )
-        let game = MinimalGame(items: [item])
+        let game = MinimalGame(items: item)
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         // When
@@ -286,7 +287,8 @@ struct GameEngineStateChangesIDVariantsTests {
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         // When
-        let change = try await engine.setDescription(on: LocationID("testLocation"), to: "New description")
+        let change = try await engine.setDescription(
+            on: LocationID("testLocation"), to: "New description")
 
         // Then
         #expect(change != nil)
@@ -315,11 +317,13 @@ struct GameEngineStateChangesIDVariantsTests {
         }
 
         await #expect(throws: ActionResponse.self) {
-            try await engine.setAttribute(ItemAttributeID("testItemCounter"), on: nonexistentID, to: 42)
+            try await engine.setAttribute(
+                ItemAttributeID("testItemCounter"), on: nonexistentID, to: 42)
         }
 
         await #expect(throws: ActionResponse.self) {
-            try await engine.setAttribute(ItemAttributeID("testName"), on: nonexistentID, to: "test")
+            try await engine.setAttribute(
+                ItemAttributeID("testName"), on: nonexistentID, to: "test")
         }
 
         await #expect(throws: ActionResponse.self) {
@@ -343,11 +347,13 @@ struct GameEngineStateChangesIDVariantsTests {
         }
 
         await #expect(throws: ActionResponse.self) {
-            try await engine.setAttribute(ItemAttributeID("testItemCounter"), on: nonexistentID, to: 42)
+            try await engine.setAttribute(
+                ItemAttributeID("testItemCounter"), on: nonexistentID, to: 42)
         }
 
         await #expect(throws: ActionResponse.self) {
-            try await engine.setAttribute(ItemAttributeID("testName"), on: nonexistentID, to: "test")
+            try await engine.setAttribute(
+                ItemAttributeID("testName"), on: nonexistentID, to: "test")
         }
 
         await #expect(throws: ActionResponse.self) {
@@ -356,24 +362,25 @@ struct GameEngineStateChangesIDVariantsTests {
     }
 }
 
-private extension ItemID {
-    static let item = ItemID(rawValue: "item")
+extension ItemID {
+    fileprivate static let item = ItemID(rawValue: "item")
 }
 
-private extension ItemAttributeID {
-    static let testItemFlag = ItemAttributeID("testItemFlag")
-    static let testItemCounter = ItemAttributeID("testItemCounter")
+extension ItemAttributeID {
+    fileprivate static let testItemFlag = ItemAttributeID("testItemFlag")
+    fileprivate static let testItemCounter = ItemAttributeID("testItemCounter")
 }
 
-private extension LocationAttributeID {
-    static let testLocationFlag = LocationAttributeID("testLocationFlag")
-    static let testLocationCounter = LocationAttributeID("testLocationCounter")
+extension LocationAttributeID {
+    fileprivate static let testLocationFlag = LocationAttributeID("testLocationFlag")
+    fileprivate static let testLocationCounter = LocationAttributeID("testLocationCounter")
 }
 
-private extension ItemAttribute {
-    static let testItemAttrFlag = ItemAttribute(id: .testItemFlag, rawValue: true)
+extension ItemAttribute {
+    fileprivate static let testItemAttrFlag = ItemAttribute(id: .testItemFlag, rawValue: true)
 }
 
-private extension LocationAttribute {
-    static let testLocationAttrFlag = LocationAttribute(id: .testLocationFlag, rawValue: true)
+extension LocationAttribute {
+    fileprivate static let testLocationAttrFlag = LocationAttribute(
+        id: .testLocationFlag, rawValue: true)
 }

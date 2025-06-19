@@ -34,7 +34,7 @@ struct KissActionHandlerTests {
             .isCharacter
         )
 
-        let game = MinimalGame(items: [princess])
+        let game = MinimalGame(items: princess)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
@@ -48,7 +48,9 @@ struct KissActionHandlerTests {
 
         // Assert
         let output = await mockIO.flush()
-        expectNoDifference(output, """
+        expectNoDifference(
+            output,
+            """
             The beautiful princess doesn’t seem particularly receptive to
             your affections.
             """)
@@ -63,7 +65,7 @@ struct KissActionHandlerTests {
             .in(.location(.startRoom))
         )
 
-        let game = MinimalGame(items: [mirror])
+        let game = MinimalGame(items: mirror)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
@@ -77,7 +79,9 @@ struct KissActionHandlerTests {
 
         // Assert
         let output = await mockIO.flush()
-        expectNoDifference(output, """
+        expectNoDifference(
+            output,
+            """
             You give the polished mirror a quick kiss, which fails to
             reveal anything significant.
             """)
@@ -92,7 +96,7 @@ struct KissActionHandlerTests {
             .in(.location(.startRoom))
         )
 
-        let game = MinimalGame(items: [mirror])
+        let game = MinimalGame(items: mirror)
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(
@@ -110,9 +114,8 @@ struct KissActionHandlerTests {
 
         // Should have touched the item
         let hasTouchedChange = result.changes.contains(where: { change in
-            change.entityID == .item("mirror") &&
-            change.attribute == .itemAttribute(.isTouched) &&
-            change.newValue == true
+            change.entityID == .item("mirror") && change.attribute == .itemAttribute(.isTouched)
+                && change.newValue == true
         })
         #expect(hasTouchedChange)
     }

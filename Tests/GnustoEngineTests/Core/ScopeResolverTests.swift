@@ -1,4 +1,5 @@
 import Testing
+
 @testable import GnustoEngine
 
 @Suite("ScopeResolver Tests")
@@ -30,7 +31,7 @@ struct ScopeResolverTests {
             .isOn,
             .isTakable
         )
-        let game = MinimalGame(items: [activeLamp])
+        let game = MinimalGame(items: activeLamp)
         let (engine, _) = await GameEngine.test(blueprint: game)
         let resolver = await engine.scopeResolver
 
@@ -69,7 +70,7 @@ struct ScopeResolverTests {
             .isLightSource,
             .isOn
         )
-        let game = MinimalGame(items: [activeLamp])
+        let game = MinimalGame(items: activeLamp)
         let (engine, _) = await GameEngine.test(blueprint: game)
         let resolver = await engine.scopeResolver
 
@@ -99,7 +100,9 @@ struct ScopeResolverTests {
         await #expect(resolver.isLocationLit(locationID: darkRoom.id) == false)
     }
 
-    @Test("Location is lit if inherentlyLit and player holds active light (inherentlyLit takes precedence)")
+    @Test(
+        "Location is lit if inherentlyLit and player holds active light (inherentlyLit takes precedence)"
+    )
     func testIsLitInherentlyLitWithPlayerLight() async throws {
         let activeLamp = Item(
             id: "lamp",
@@ -108,7 +111,7 @@ struct ScopeResolverTests {
             .isOn,
             .isTakable
         )
-        let game = MinimalGame(items: [activeLamp])
+        let game = MinimalGame(items: activeLamp)
         let (engine, _) = await GameEngine.test(blueprint: game)
         let resolver = await engine.scopeResolver
 
@@ -137,7 +140,7 @@ struct ScopeResolverTests {
             .in(.location(.startRoom)),
             .isInvisible
         )
-        let game = MinimalGame(items: [visibleItem, invisibleItem])
+        let game = MinimalGame(items: visibleItem, invisibleItem)
         let (engine, _) = await GameEngine.test(blueprint: game)
         let resolver = await engine.scopeResolver
 
@@ -162,7 +165,7 @@ struct ScopeResolverTests {
             .in(.location(.startRoom)),
             .isInvisible
         )
-        let game = MinimalGame(items: [visibleItem, sceneryItem, invisibleItem])
+        let game = MinimalGame(items: visibleItem, sceneryItem, invisibleItem)
         let (engine, _) = await GameEngine.test(blueprint: game)
         let resolver = await engine.scopeResolver
 
@@ -229,7 +232,7 @@ struct ScopeResolverTests {
             .in(.location(.startRoom)),
             .isInvisible
         )
-        let game = MinimalGame(items: [activeLamp, visibleItem, invisibleItem])
+        let game = MinimalGame(items: activeLamp, visibleItem, invisibleItem)
         let (engine, _) = await GameEngine.test(blueprint: game)
         let resolver = await engine.scopeResolver
 
@@ -255,7 +258,7 @@ struct ScopeResolverTests {
             .in(.location(.startRoom)),
             .isInvisible
         )
-        let game = MinimalGame(items: [activeLamp, visibleItem, invisibleItem])
+        let game = MinimalGame(items: activeLamp, visibleItem, invisibleItem)
         let (engine, _) = await GameEngine.test(blueprint: game)
         let resolver = await engine.scopeResolver
 
@@ -313,7 +316,7 @@ struct ScopeResolverTests {
             .in(.player),
             .isTakable
         )
-        let game = MinimalGame(items: [inventoryItem])
+        let game = MinimalGame(items: inventoryItem)
         let (engine, _) = await GameEngine.test(blueprint: game)
         let resolver = await engine.scopeResolver
 
@@ -328,7 +331,7 @@ struct ScopeResolverTests {
             .name("Location Item"),
             .in(.location(.startRoom))
         )
-        let game = MinimalGame(items: [locationItem])
+        let game = MinimalGame(items: locationItem)
         let (engine, _) = await GameEngine.test(blueprint: game)
         let resolver = await engine.scopeResolver
 
@@ -375,7 +378,7 @@ struct ScopeResolverTests {
             .name("item in box"),
             .in(.item(openBox.id))
         )
-        let game = MinimalGame(items: [openBox, itemInBox])
+        let game = MinimalGame(items: openBox, itemInBox)
         let (engine, _) = await GameEngine.test(blueprint: game)
         let resolver = await engine.scopeResolver
 
@@ -396,7 +399,7 @@ struct ScopeResolverTests {
             .name("item in box"),
             .in(.item(closedBox.id))
         )
-        let game = MinimalGame(items: [closedBox, itemInBox])
+        let game = MinimalGame(items: closedBox, itemInBox)
         let (engine, _) = await GameEngine.test(blueprint: game)
         let resolver = await engine.scopeResolver
 
@@ -420,7 +423,7 @@ struct ScopeResolverTests {
             .name("item in box"),
             .in(.item(transparentBox.id))
         )
-        let game = MinimalGame(items: [transparentBox, itemInBox])
+        let game = MinimalGame(items: transparentBox, itemInBox)
         let (engine, _) = await GameEngine.test(blueprint: game)
         let resolver = await engine.scopeResolver
 
@@ -442,7 +445,7 @@ struct ScopeResolverTests {
             .name("item in box"),
             .in(.item(openBox.id))
         )
-        let game = MinimalGame(items: [openBox, itemInBox])
+        let game = MinimalGame(items: openBox, itemInBox)
         let (engine, _) = await GameEngine.test(blueprint: game)
         let resolver = await engine.scopeResolver
 
@@ -463,7 +466,7 @@ struct ScopeResolverTests {
             .name("item in box"),
             .in(.item(closedBox.id))
         )
-        let game = MinimalGame(items: [closedBox, itemInBox])
+        let game = MinimalGame(items: closedBox, itemInBox)
         let (engine, _) = await GameEngine.test(blueprint: game)
         let resolver = await engine.scopeResolver
 
@@ -487,7 +490,7 @@ struct ScopeResolverTests {
             .name("item in box"),
             .in(.item(transparentBox.id))
         )
-        let game = MinimalGame(items: [transparentBox, itemInBox])
+        let game = MinimalGame(items: transparentBox, itemInBox)
         let (engine, _) = await GameEngine.test(blueprint: game)
         let resolver = await engine.scopeResolver
 
@@ -523,7 +526,7 @@ struct ScopeResolverTests {
         let resolver = await engine.scopeResolver
 
         let reachable = await resolver.itemsReachableByPlayer()
-        #expect(reachable.isEmpty) // Neither box nor item inside should be reachable in dark
+        #expect(reachable.isEmpty)  // Neither box nor item inside should be reachable in dark
     }
 
     @Test("No items visible in room lit by inactive light")
@@ -563,7 +566,7 @@ struct ScopeResolverTests {
             .in(.location(.startRoom)),
             .omitDescription
         )
-        let game = MinimalGame(items: [sceneryItem])
+        let game = MinimalGame(items: sceneryItem)
         let (engine, _) = await GameEngine.test(blueprint: game)
         let resolver = await engine.scopeResolver
 

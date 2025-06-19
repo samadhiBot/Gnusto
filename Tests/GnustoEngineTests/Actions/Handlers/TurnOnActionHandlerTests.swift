@@ -1,5 +1,6 @@
+import CustomDump  // For diffing complex types
 import Testing
-import CustomDump // For diffing complex types
+
 @testable import GnustoEngine
 
 @Suite("TurnOnActionHandler Tests")
@@ -18,7 +19,7 @@ struct TurnOnActionHandlerTests {
             .isLightSource,
             .isTakable,
         )
-        let game = MinimalGame(items: [lamp])
+        let game = MinimalGame(items: lamp)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let parseResult = await engine.parser.parse(
@@ -84,7 +85,9 @@ struct TurnOnActionHandlerTests {
 
         let output = await mockIO.flush()
         // Assert: Only expect the direct handler message
-        expectNoDifference(output, """
+        expectNoDifference(
+            output,
+            """
             The brass lantern is now on. You can see your surroundings now.
 
             — Dark Room —
@@ -112,7 +115,7 @@ struct TurnOnActionHandlerTests {
             .isOn,
             .isTakable,
         )
-        let game = MinimalGame(items: [lamp])
+        let game = MinimalGame(items: lamp)
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(
@@ -133,8 +136,8 @@ struct TurnOnActionHandlerTests {
 
         // Verify item state didn’t change unexpectedly - should NOT be touched if validation fails
         let finalItemState = try await engine.item("lamp")
-        #expect(finalItemState.hasFlag(.isOn) == true) // Should still be on
-        #expect(finalItemState.hasFlag(.isTouched) == false) // Should NOT be touched
+        #expect(finalItemState.hasFlag(.isOn) == true)  // Should still be on
+        #expect(finalItemState.hasFlag(.isTouched) == false)  // Should NOT be touched
     }
 
     @Test("Try to turn on non-device item")
@@ -147,7 +150,7 @@ struct TurnOnActionHandlerTests {
             .in(.player),
             .isTakable,
         )
-        let game = MinimalGame(items: [lamp])
+        let game = MinimalGame(items: lamp)
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(
@@ -167,8 +170,8 @@ struct TurnOnActionHandlerTests {
         }
 
         let finalItemState = try await engine.item("lamp")
-        #expect(finalItemState.hasFlag(.isOn) == false) // Should not gain .on
-        #expect(finalItemState.hasFlag(.isTouched) == false) // Should NOT be touched
+        #expect(finalItemState.hasFlag(.isOn) == false)  // Should not gain .on
+        #expect(finalItemState.hasFlag(.isTouched) == false)  // Should NOT be touched
     }
 
     @Test("Try to turn on item not accessible")
@@ -178,11 +181,11 @@ struct TurnOnActionHandlerTests {
             id: "lamp",
             .name("brass lantern"),
             .description("A brass lantern."),
-            .in(.nowhere), // Not accessible
+            .in(.nowhere),  // Not accessible
             .isLightSource,
             .isTakable,
         )
-        let game = MinimalGame(items: [lamp])
+        let game = MinimalGame(items: lamp)
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(
@@ -260,7 +263,7 @@ struct TurnOnActionHandlerTests {
             .isLightSource,
             .isTakable,
         )
-        let game = MinimalGame(items: [lamp])
+        let game = MinimalGame(items: lamp)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let parseResult = await engine.parser.parse(
@@ -289,13 +292,13 @@ struct TurnOnActionHandlerTests {
             id: "livingRoom",
             .name("Living Room"),
             .description("A cozy living room."),
-            .inherentlyLit // Room is already lit
+            .inherentlyLit  // Room is already lit
         )
         let lamp = Item(
             id: "lamp",
             .name("brass lantern"),
             .description("A brass lantern."),
-            .in(.location(litRoom.id)), // Lamp is in the room
+            .in(.location(litRoom.id)),  // Lamp is in the room
             .isDevice,
             .isLightSource,
             .isTakable
@@ -318,8 +321,9 @@ struct TurnOnActionHandlerTests {
         #expect(initiallyLit == true, "Room should be lit initially")
 
         // First, take the lamp
-        await engine.execute(command: Command(verb: .take, directObject: .item("lamp"), rawInput: "take lamp"))
-        _ = await mockIO.flush() // Clear the "Taken." message
+        await engine.execute(
+            command: Command(verb: .take, directObject: .item("lamp"), rawInput: "take lamp"))
+        _ = await mockIO.flush()  // Clear the "Taken." message
 
         // Act: Turn on the lamp in the already-lit room
         let command = Command(verb: .turnOn, directObject: .item("lamp"), rawInput: "turn on lamp")
@@ -345,7 +349,8 @@ struct TurnOnActionHandlerTests {
         let livingRoom = Location(
             id: "livingRoom",
             .name("Living Room"),
-            .description("""
+            .description(
+                """
                 You are in the living room. There is a doorway to the east, a wooden door with
                 strange gothic lettering to the west, which appears to be nailed shut, a trophy case,
                 and a large oriental rug in the center of the room.
@@ -379,15 +384,17 @@ struct TurnOnActionHandlerTests {
         print("🔍 Initially lit: \(initiallyLit)")
 
         // Take the lamp first
-        await engine.execute(command: Command(verb: .take, directObject: .item("lamp"), rawInput: "take lamp"))
-        _ = await mockIO.flush() // Clear the "Taken." message
+        await engine.execute(
+            command: Command(verb: .take, directObject: .item("lamp"), rawInput: "take lamp"))
+        _ = await mockIO.flush()  // Clear the "Taken." message
 
         // Check state after taking lamp
         let afterTakingLamp = await engine.playerLocationIsLit()
         print("🔍 After taking lamp: \(afterTakingLamp)")
 
         // Turn on the lamp
-        await engine.execute(command: Command(verb: .turnOn, directObject: .item("lamp"), rawInput: "turn on lamp"))
+        await engine.execute(
+            command: Command(verb: .turnOn, directObject: .item("lamp"), rawInput: "turn on lamp"))
 
         // Check final state
         let afterTurningOnLamp = await engine.playerLocationIsLit()
@@ -402,6 +409,8 @@ struct TurnOnActionHandlerTests {
         #expect(initiallyLit == afterTurningOnLamp, "Lighting state should not change")
 
         // The output should only contain the turn-on message
-        #expect(output == "The brass lantern is now on.", "Should only show turn-on message, no room description")
+        #expect(
+            output == "The brass lantern is now on.",
+            "Should only show turn-on message, no room description")
     }
 }

@@ -1,5 +1,6 @@
 import CustomDump
 import Testing
+
 @testable import GnustoEngine
 
 @Suite("TellActionHandler Tests")
@@ -28,7 +29,7 @@ struct TellActionHandlerTests {
             .name("old wizard"),
             .isCharacter
         )
-        let game = MinimalGame(items: [character])
+        let game = MinimalGame(items: character)
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(
@@ -48,7 +49,7 @@ struct TellActionHandlerTests {
     func testTellRequiresCharacter() async throws {
         // Given
         let rock = Item(id: "rock", .name("rock"))
-        let game = MinimalGame(items: [rock])
+        let game = MinimalGame(items: rock)
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(
@@ -60,7 +61,9 @@ struct TellActionHandlerTests {
         let context = ActionContext(command: command, engine: engine)
 
         // When/Then
-        await #expect(throws: ActionResponse.prerequisiteNotMet("You can't tell the rock about anything.")) {
+        await #expect(
+            throws: ActionResponse.prerequisiteNotMet("You can't tell the rock about anything.")
+        ) {
             try await handler.validate(context: context)
         }
     }
@@ -79,7 +82,7 @@ struct TellActionHandlerTests {
             .name("magic crystal"),
             .in(.location(.startRoom))
         )
-        let game = MinimalGame(items: [wizard, crystal])
+        let game = MinimalGame(items: wizard, crystal)
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(
@@ -95,8 +98,9 @@ struct TellActionHandlerTests {
         let result = try await handler.process(context: context)
 
         // Then
-        #expect(result.message == "Old wizard listens politely to what you say about magic crystal.")
-        #expect(result.changes.count == 2) // touched flag + pronoun update
+        #expect(
+            result.message == "Old wizard listens politely to what you say about magic crystal.")
+        #expect(result.changes.count == 2)  // touched flag + pronoun update
     }
 
     @Test("Tell character about player")
@@ -108,7 +112,7 @@ struct TellActionHandlerTests {
             .in(.location(.startRoom)),
             .isCharacter
         )
-        let game = MinimalGame(items: [wizard])
+        let game = MinimalGame(items: wizard)
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(
@@ -136,7 +140,7 @@ struct TellActionHandlerTests {
             .in(.location(.startRoom)),
             .isCharacter
         )
-        let game = MinimalGame(items: [wizard])
+        let game = MinimalGame(items: wizard)
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(
@@ -164,7 +168,7 @@ struct TellActionHandlerTests {
             .in(.nowhere),
             .isCharacter
         )
-        let game = MinimalGame(items: [wizard])
+        let game = MinimalGame(items: wizard)
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(

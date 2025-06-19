@@ -49,10 +49,10 @@ struct EnterActionHandlerTests {
             id: "booth",
             .name("phone booth"),
             .isEnterable,
-            .in(.nowhere) // Not accessible
+            .in(.nowhere)  // Not accessible
         )
 
-        let game = MinimalGame(items: [booth])
+        let game = MinimalGame(items: booth)
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(
@@ -74,10 +74,10 @@ struct EnterActionHandlerTests {
         let rock = Item(
             id: "rock",
             .name("large rock"),
-            .in(.location(.startRoom)) // Accessible but not enterable
+            .in(.location(.startRoom))  // Accessible but not enterable
         )
 
-        let game = MinimalGame(items: [rock])
+        let game = MinimalGame(items: rock)
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(
@@ -88,7 +88,8 @@ struct EnterActionHandlerTests {
         let context = ActionContext(command: command, engine: engine)
 
         // When/Then
-        await #expect(throws: ActionResponse.prerequisiteNotMet("You can't enter the large rock.")) {
+        await #expect(throws: ActionResponse.prerequisiteNotMet("You can't enter the large rock."))
+        {
             try await handler.validate(context: context)
         }
     }
@@ -103,7 +104,7 @@ struct EnterActionHandlerTests {
             .in(.location(.startRoom))
         )
 
-        let game = MinimalGame(items: [booth])
+        let game = MinimalGame(items: booth)
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(
@@ -118,6 +119,6 @@ struct EnterActionHandlerTests {
 
         // Then
         #expect(result.message == "You enter the phone booth.")
-        #expect(result.changes.count >= 1) // Should have touch/pronoun updates
+        #expect(result.changes.count >= 1)  // Should have touch/pronoun updates
     }
 }

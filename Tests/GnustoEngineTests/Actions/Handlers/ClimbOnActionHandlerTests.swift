@@ -15,7 +15,7 @@ struct ClimbOnActionHandlerTests {
             .in(.location(.startRoom)),
             .isTakable
         )
-        let game = MinimalGame(items: [chair])
+        let game = MinimalGame(items: chair)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
@@ -42,29 +42,31 @@ struct ClimbOnActionHandlerTests {
 
         // Assert changes
         let changeHistory = await engine.gameState.changeHistory
-        expectNoDifference(changeHistory, [
-            StateChange(
-                entityID: .item(
-                    ItemID(rawValue: "chair")
+        expectNoDifference(
+            changeHistory,
+            [
+                StateChange(
+                    entityID: .item(
+                        ItemID(rawValue: "chair")
+                    ),
+                    attribute: .itemAttribute(
+                        ItemAttributeID(rawValue: "isTouched")
+                    ),
+                    newValue: true
                 ),
-                attribute: .itemAttribute(
-                    ItemAttributeID(rawValue: "isTouched")
+                StateChange(
+                    entityID: .global,
+                    attribute: .pronounReference(pronoun: "it"),
+                    newValue: .entityReferenceSet(
+                        Set([
+                            .item(
+                                ItemID(rawValue: "chair")
+                            )
+                        ])
+                    )
                 ),
-                newValue: true
-            ),
-            StateChange(
-                entityID: .global,
-                attribute: .pronounReference(pronoun: "it"),
-                newValue: .entityReferenceSet(
-                    Set([
-                        .item(
-                            ItemID(rawValue: "chair")
-                        )
-                    ])
-                )
-            )
 
-        ])
+            ])
     }
 
     @Test("Climb on fails if item not accessible")
@@ -75,7 +77,7 @@ struct ClimbOnActionHandlerTests {
             .in(.nowhere),
             .isTakable
         )
-        let game = MinimalGame(items: [chair])
+        let game = MinimalGame(items: chair)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
@@ -143,7 +145,7 @@ struct ClimbOnActionHandlerTests {
             .in(.item("box")),
             .isTakable
         )
-        let game = MinimalGame(items: [box, ladder])
+        let game = MinimalGame(items: box, ladder)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
@@ -170,7 +172,7 @@ struct ClimbOnActionHandlerTests {
             .in(.player),
             .isTakable
         )
-        let game = MinimalGame(items: [rope])
+        let game = MinimalGame(items: rope)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
@@ -195,7 +197,7 @@ struct ClimbOnActionHandlerTests {
             .in(.location(.startRoom))
             // Not takable - immovable
         )
-        let game = MinimalGame(items: [tree])
+        let game = MinimalGame(items: tree)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
@@ -227,7 +229,7 @@ struct ClimbOnActionHandlerTests {
             .in(.item("table")),
             .isTakable
         )
-        let game = MinimalGame(items: [table, stool])
+        let game = MinimalGame(items: table, stool)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(

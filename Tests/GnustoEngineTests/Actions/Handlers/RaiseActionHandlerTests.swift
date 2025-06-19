@@ -15,7 +15,7 @@ struct RaiseActionHandlerTests {
             .in(.location(.startRoom)),
             .isTakable
         )
-        let game = MinimalGame(items: [book])
+        let game = MinimalGame(items: book)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
@@ -42,18 +42,20 @@ struct RaiseActionHandlerTests {
 
         // Assert Change History
         let changeHistory = await engine.gameState.changeHistory
-        expectNoDifference(changeHistory, [
-            StateChange(
-                entityID: .item(book.id),
-                attribute: .itemAttribute(.isTouched),
-                newValue: true
-            ),
-            StateChange(
-                entityID: .global,
-                attribute: .pronounReference(pronoun: "it"),
-                newValue: .entityReferenceSet([.item(book.id)])
-            ),
-        ])
+        expectNoDifference(
+            changeHistory,
+            [
+                StateChange(
+                    entityID: .item(book.id),
+                    attribute: .itemAttribute(.isTouched),
+                    newValue: true
+                ),
+                StateChange(
+                    entityID: .global,
+                    attribute: .pronounReference(pronoun: "it"),
+                    newValue: .entityReferenceSet([.item(book.id)])
+                ),
+            ])
     }
 
     @Test("Raise fails if item not accessible")
@@ -64,7 +66,7 @@ struct RaiseActionHandlerTests {
             .in(.nowhere),
             .isTakable
         )
-        let game = MinimalGame(items: [book])
+        let game = MinimalGame(items: book)
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(
@@ -139,7 +141,7 @@ struct RaiseActionHandlerTests {
             .in(.item("box")),
             .isTakable
         )
-        let game = MinimalGame(items: [box, book])
+        let game = MinimalGame(items: box, book)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
@@ -166,7 +168,7 @@ struct RaiseActionHandlerTests {
             .in(.player),
             .isTakable
         )
-        let game = MinimalGame(items: [coin])
+        let game = MinimalGame(items: coin)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(

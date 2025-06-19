@@ -14,8 +14,8 @@ struct TouchActionHandlerTests {
             id: "rock",
             .name("smooth rock"),
             .in(.player)
-        ) // Not necessarily takable
-        let game = MinimalGame(items: [rock])
+        )  // Not necessarily takable
+        let game = MinimalGame(items: rock)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
@@ -43,7 +43,7 @@ struct TouchActionHandlerTests {
             .in(.player),
             .isTakable
         )
-        let game = MinimalGame(items: [key])
+        let game = MinimalGame(items: key)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
@@ -91,7 +91,7 @@ struct TouchActionHandlerTests {
             .name("jade figurine"),
             .in(.nowhere)
         )
-        let game = MinimalGame(items: [figurine])
+        let game = MinimalGame(items: figurine)
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(
@@ -126,7 +126,7 @@ struct TouchActionHandlerTests {
             .name("ruby gem"),
             .in(.item("box"))
         )
-        let game = MinimalGame(items: [box, gem])
+        let game = MinimalGame(items: box, gem)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
@@ -159,7 +159,7 @@ struct TouchActionHandlerTests {
             .name("dusty book"),
             .in(.item("table"))
         )
-        let game = MinimalGame(items: [table, book])
+        let game = MinimalGame(items: table, book)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
@@ -185,17 +185,17 @@ struct TouchActionHandlerTests {
             id: "chest",
             .name("locked chest"),
             .in(.location(.startRoom)),
-            .isContainer // Closed by default
+            .isContainer  // Closed by default
         )
         let coin = Item(
             id: "coin",
             .name("gold coin"),
             .in(.item("chest"))
         )
-        let game = MinimalGame(items: [chest, coin])
+        let game = MinimalGame(items: chest, coin)
         let (engine, _) = await GameEngine.test(blueprint: game)
 
-        #expect(chest.attributes[.isOpen] == nil) // Verify closed
+        #expect(chest.attributes[.isOpen] == nil)  // Verify closed
 
         let command = Command(
             verb: .touch,

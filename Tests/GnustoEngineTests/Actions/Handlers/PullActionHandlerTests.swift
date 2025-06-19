@@ -17,7 +17,7 @@ struct PullActionHandlerTests {
             .in(.location(.startRoom))
         )
 
-        let game = MinimalGame(items: [rope])
+        let game = MinimalGame(items: rope)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
@@ -47,7 +47,7 @@ struct PullActionHandlerTests {
             // Note: not pullable
         )
 
-        let game = MinimalGame(items: [rock])
+        let game = MinimalGame(items: rock)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(

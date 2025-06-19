@@ -1,5 +1,6 @@
 import CustomDump
 import Testing
+
 @testable import GnustoEngine
 
 @Suite("ClimbActionHandler Tests")
@@ -53,7 +54,7 @@ struct ClimbActionHandlerTests {
             .name("stairs"),
             .synonyms("staircase", "stairway", "steps"),
             .isClimbable,
-            .in(.nowhere) // Global item
+            .in(.nowhere)  // Global item
         )
 
         let player = Player(in: "kitchen")
@@ -108,7 +109,7 @@ struct ClimbActionHandlerTests {
             .synonyms("ladder"),
             .adjectives("wooden", "rickety"),
             .isClimbable,
-            .in(.nowhere) // Global item
+            .in(.nowhere)  // Global item
         )
 
         let player = Player(in: "top")
@@ -142,7 +143,7 @@ struct ClimbActionHandlerTests {
             .name("Middle"),
             .exits([
                 .up: .to("top", via: "rope"),
-                .down: .to("bottom", via: "rope")
+                .down: .to("bottom", via: "rope"),
             ]),
             .inherentlyLit,
             .localGlobals("rope")
@@ -156,7 +157,7 @@ struct ClimbActionHandlerTests {
             .name("rope"),
             .synonyms("rope", "hemp", "coil"),
             .isClimbable,
-            .in(.nowhere) // Global item
+            .in(.nowhere)  // Global item
         )
 
         let player = Player(in: "middle")
@@ -198,7 +199,7 @@ struct ClimbActionHandlerTests {
             id: "stairs",
             .name("stairs"),
             .isClimbable,
-            .in(.nowhere) // Global item
+            .in(.nowhere)  // Global item
         )
 
         let player = Player(in: "room")
@@ -277,7 +278,7 @@ struct ClimbActionHandlerTests {
             .in(.location(.startRoom))
         )
 
-        let game = MinimalGame(items: [tree])
+        let game = MinimalGame(items: tree)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
@@ -310,7 +311,7 @@ struct ClimbActionHandlerTests {
             // No .isClimbable flag
         )
 
-        let game = MinimalGame(items: [table])
+        let game = MinimalGame(items: table)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
@@ -336,10 +337,10 @@ struct ClimbActionHandlerTests {
             id: "tree",
             .name("distant tree"),
             .isClimbable,
-            .in(.location("distantPlace")) // Not in player's location
+            .in(.location("distantPlace"))  // Not in player's location
         )
 
-        let game = MinimalGame(items: [distantTree])
+        let game = MinimalGame(items: distantTree)
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(
@@ -390,7 +391,7 @@ struct ClimbActionHandlerTests {
 
         let command = Command(
             verb: .climb,
-            directObject: .player, // Try to climb the player
+            directObject: .player,  // Try to climb the player
             rawInput: "climb me"
         )
         let context = ActionContext(
@@ -559,7 +560,9 @@ struct ClimbActionHandlerTests {
         let output = await mockIO.flush()
 
         // Assert: Output contains both transition and darkness messages
-        expectNoDifference(output, """
+        expectNoDifference(
+            output,
+            """
             You are plunged into darkness.
 
             It is pitch black. You can’t see a thing.

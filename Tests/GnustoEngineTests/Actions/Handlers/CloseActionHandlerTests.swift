@@ -15,9 +15,9 @@ struct CloseActionHandlerTests {
             .in(.location(.startRoom)),
             .isContainer,
             .isOpenable,
-            .isOpen // Start open
+            .isOpen  // Start open
         )
-        let game = MinimalGame(items: [box])
+        let game = MinimalGame(items: box)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
@@ -45,24 +45,26 @@ struct CloseActionHandlerTests {
 
         // Assert Change History
         let changeHistory = await engine.gameState.changeHistory
-        expectNoDifference(changeHistory, [
-            StateChange(
-                entityID: .item(box.id),
-                attribute: .itemAttribute(.isOpen),
-                oldValue: true, // Assume it was open before closing
-                newValue: false
-            ),
-            StateChange(
-                entityID: .item(box.id),
-                attribute: .itemAttribute(.isTouched),
-                newValue: true,
-            ),
-            StateChange(
-                entityID: .global,
-                attribute: .pronounReference(pronoun: "it"),
-                newValue: .entityReferenceSet([.item(box.id)])
-            ),
-        ])
+        expectNoDifference(
+            changeHistory,
+            [
+                StateChange(
+                    entityID: .item(box.id),
+                    attribute: .itemAttribute(.isOpen),
+                    oldValue: true,  // Assume it was open before closing
+                    newValue: false
+                ),
+                StateChange(
+                    entityID: .item(box.id),
+                    attribute: .itemAttribute(.isTouched),
+                    newValue: true,
+                ),
+                StateChange(
+                    entityID: .global,
+                    attribute: .pronounReference(pronoun: "it"),
+                    newValue: .entityReferenceSet([.item(box.id)])
+                ),
+            ])
     }
 
     @Test("Close fails if already closed")
@@ -75,7 +77,7 @@ struct CloseActionHandlerTests {
             .isOpenable
             // Starts closed by default (no .isOpen)
         )
-        let game = MinimalGame(items: [box])
+        let game = MinimalGame(items: box)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
@@ -103,7 +105,7 @@ struct CloseActionHandlerTests {
             .in(.location(.startRoom))
             // isContainer/isOpenable are false by default
         )
-        let game = MinimalGame(items: [rock])
+        let game = MinimalGame(items: rock)
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(
@@ -131,9 +133,9 @@ struct CloseActionHandlerTests {
             .name("wooden box"),
             .in(.nowhere),
             .isOpenable,
-            .isOpen // Start open
+            .isOpen  // Start open
         )
-        let game = MinimalGame(items: [box])
+        let game = MinimalGame(items: box)
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(

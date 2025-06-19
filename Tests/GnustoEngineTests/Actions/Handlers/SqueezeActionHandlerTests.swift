@@ -32,10 +32,11 @@ struct SqueezeActionHandlerTests {
             .isSponge
         )
 
-        let game = MinimalGame(items: [sponge])
+        let game = MinimalGame(items: sponge)
         let (engine, _) = await GameEngine.test(blueprint: game)
 
-        let command = Command(verb: .squeeze, directObject: .item("sponge"), rawInput: "squeeze sponge")
+        let command = Command(
+            verb: .squeeze, directObject: .item("sponge"), rawInput: "squeeze sponge")
         let context = ActionContext(command: command, engine: engine)
 
         // When
@@ -56,7 +57,7 @@ struct SqueezeActionHandlerTests {
             .isLiquidContainer
         )
 
-        let game = MinimalGame(items: [tube])
+        let game = MinimalGame(items: tube)
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(verb: .squeeze, directObject: .item("tube"), rawInput: "squeeze tube")
@@ -66,7 +67,9 @@ struct SqueezeActionHandlerTests {
         let result = try await handler.process(context: context)
 
         // Then
-        #expect(result.message!.contains("You squeeze the toothpaste tube and some of its contents ooze out."))
+        #expect(
+            result.message!.contains(
+                "You squeeze the toothpaste tube and some of its contents ooze out."))
     }
 
     @Test("Squeeze bottle shows ooze message")
@@ -80,17 +83,20 @@ struct SqueezeActionHandlerTests {
             .isLiquidContainer
         )
 
-        let game = MinimalGame(items: [bottle])
+        let game = MinimalGame(items: bottle)
         let (engine, _) = await GameEngine.test(blueprint: game)
 
-        let command = Command(verb: .squeeze, directObject: .item("bottle"), rawInput: "squeeze bottle")
+        let command = Command(
+            verb: .squeeze, directObject: .item("bottle"), rawInput: "squeeze bottle")
         let context = ActionContext(command: command, engine: engine)
 
         // When
         let result = try await handler.process(context: context)
 
         // Then
-        #expect(result.message!.contains("You squeeze the plastic bottle and some of its contents ooze out."))
+        #expect(
+            result.message!.contains(
+                "You squeeze the plastic bottle and some of its contents ooze out."))
     }
 
     @Test("Squeeze pillow shows soft message")
@@ -104,17 +110,19 @@ struct SqueezeActionHandlerTests {
             .isSoft
         )
 
-        let game = MinimalGame(items: [pillow])
+        let game = MinimalGame(items: pillow)
         let (engine, _) = await GameEngine.test(blueprint: game)
 
-        let command = Command(verb: .squeeze, directObject: .item("pillow"), rawInput: "squeeze pillow")
+        let command = Command(
+            verb: .squeeze, directObject: .item("pillow"), rawInput: "squeeze pillow")
         let context = ActionContext(command: command, engine: engine)
 
         // When
         let result = try await handler.process(context: context)
 
         // Then
-        #expect(result.message!.contains("You squeeze the soft pillow. It feels soft and yielding."))
+        #expect(
+            result.message!.contains("You squeeze the soft pillow. It feels soft and yielding."))
     }
 
     @Test("Squeeze cushion shows soft message")
@@ -127,17 +135,20 @@ struct SqueezeActionHandlerTests {
             .isTakable
         )
 
-        let game = MinimalGame(items: [cushion])
+        let game = MinimalGame(items: cushion)
         let (engine, _) = await GameEngine.test(blueprint: game)
 
-        let command = Command(verb: .squeeze, directObject: .item("cushion"), rawInput: "squeeze cushion")
+        let command = Command(
+            verb: .squeeze, directObject: .item("cushion"), rawInput: "squeeze cushion")
         let context = ActionContext(command: command, engine: engine)
 
         // When
         let result = try await handler.process(context: context)
 
         // Then
-        #expect(result.message!.contains("You squeeze the cushion as hard as you can, but it doesn't give."))
+        #expect(
+            result.message!.contains(
+                "You squeeze the cushion as hard as you can, but it doesn't give."))
     }
 
     @Test("Squeeze hard object shows appropriate message")
@@ -150,7 +161,7 @@ struct SqueezeActionHandlerTests {
             .isTakable
         )
 
-        let game = MinimalGame(items: [rock])
+        let game = MinimalGame(items: rock)
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(verb: .squeeze, directObject: .item("rock"), rawInput: "squeeze rock")
@@ -160,7 +171,9 @@ struct SqueezeActionHandlerTests {
         let result = try await handler.process(context: context)
 
         // Then
-        #expect(result.message!.contains("You squeeze the hard rock as hard as you can, but it doesn't give."))
+        #expect(
+            result.message!.contains(
+                "You squeeze the hard rock as hard as you can, but it doesn't give."))
     }
 
     @Test("Squeeze updates state correctly")
@@ -174,10 +187,11 @@ struct SqueezeActionHandlerTests {
             .isSponge
         )
 
-        let game = MinimalGame(items: [sponge])
+        let game = MinimalGame(items: sponge)
         let (engine, _) = await GameEngine.test(blueprint: game)
 
-        let command = Command(verb: .squeeze, directObject: .item("sponge"), rawInput: "squeeze sponge")
+        let command = Command(
+            verb: .squeeze, directObject: .item("sponge"), rawInput: "squeeze sponge")
         let context = ActionContext(command: command, engine: engine)
 
         // When
@@ -188,9 +202,8 @@ struct SqueezeActionHandlerTests {
 
         // Should have touched the item
         let hasTouchedChange = result.changes.contains(where: { change in
-            change.entityID == .item("sponge") &&
-            change.attribute == .itemAttribute(.isTouched) &&
-            change.newValue == true
+            change.entityID == .item("sponge") && change.attribute == .itemAttribute(.isTouched)
+                && change.newValue == true
         })
         #expect(hasTouchedChange)
     }
@@ -206,7 +219,7 @@ struct SqueezeActionHandlerTests {
             .isLiquidContainer
         )
 
-        let game = MinimalGame(items: [tube])
+        let game = MinimalGame(items: tube)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(verb: .squeeze, directObject: .item("tube"), rawInput: "squeeze tube")

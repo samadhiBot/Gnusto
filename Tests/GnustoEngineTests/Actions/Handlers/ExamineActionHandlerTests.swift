@@ -13,7 +13,7 @@ struct ExamineActionHandlerTests {
             .description("A smooth, grey pebble."),
             .in(.player)
         )
-        let game = MinimalGame(items: [item])
+        let game = MinimalGame(items: item)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
         let initialItemState = try await engine.item(itemID)
         #expect(initialItemState.attributes[.isTouched] != true)
@@ -48,7 +48,7 @@ struct ExamineActionHandlerTests {
             .description("A small, tarnished silver locket."),
             .in(.player)
         )
-        let game = MinimalGame(items: [item])
+        let game = MinimalGame(items: item)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
         let initialItemState = try await engine.item(itemID)
         #expect(initialItemState.attributes[.isTouched] != true)
@@ -391,7 +391,7 @@ struct ExamineActionHandlerTests {
 
         let initialAttributes = kitchenTable.attributes
 
-        let game = MinimalGame(items: [kitchenTable, bottle, brownSack])
+        let game = MinimalGame(items: kitchenTable, bottle, brownSack)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
@@ -412,7 +412,8 @@ struct ExamineActionHandlerTests {
         #expect(finalItemState.hasFlag(.isTouched) == true, "Surface should be marked touched")
 
         // Assert Change History
-        let expectedChanges = expectedExamineChanges(itemID: "kitchenTable", initialAttributes: initialAttributes)
+        let expectedChanges = expectedExamineChanges(
+            itemID: "kitchenTable", initialAttributes: initialAttributes)
         let changeHistory = await engine.gameState.changeHistory
         expectNoDifference(changeHistory, expectedChanges)
     }
@@ -430,7 +431,7 @@ struct ExamineActionHandlerTests {
 
         let initialAttributes = kitchenTable.attributes
 
-        let game = MinimalGame(items: [kitchenTable])
+        let game = MinimalGame(items: kitchenTable)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
@@ -451,7 +452,8 @@ struct ExamineActionHandlerTests {
         #expect(finalItemState.hasFlag(.isTouched) == true, "Surface should be marked touched")
 
         // Assert Change History
-        let expectedChanges = expectedExamineChanges(itemID: "kitchenTable", initialAttributes: initialAttributes)
+        let expectedChanges = expectedExamineChanges(
+            itemID: "kitchenTable", initialAttributes: initialAttributes)
         let changeHistory = await engine.gameState.changeHistory
         expectNoDifference(changeHistory, expectedChanges)
     }
@@ -486,7 +488,7 @@ struct ExamineActionHandlerTests {
 
         let initialAttributes = kitchenTable.attributes
 
-        let game = MinimalGame(items: [kitchenTable, bottle, brownSack])
+        let game = MinimalGame(items: kitchenTable, bottle, brownSack)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
@@ -500,7 +502,9 @@ struct ExamineActionHandlerTests {
 
         // Assert: Should show custom description followed by surface contents
         let output = await mockIO.flush()
-        expectNoDifference(output, """
+        expectNoDifference(
+            output,
+            """
             A sturdy wooden table with scratches from years of use. On the
             kitchen table are a glass bottle and a brown sack.
             """)
@@ -510,7 +514,8 @@ struct ExamineActionHandlerTests {
         #expect(finalItemState.hasFlag(.isTouched) == true, "Surface should be marked touched")
 
         // Assert Change History
-        let expectedChanges = expectedExamineChanges(itemID: "kitchenTable", initialAttributes: initialAttributes)
+        let expectedChanges = expectedExamineChanges(
+            itemID: "kitchenTable", initialAttributes: initialAttributes)
         let changeHistory = await engine.gameState.changeHistory
         expectNoDifference(changeHistory, expectedChanges)
     }
@@ -554,7 +559,7 @@ struct ExamineActionHandlerTests {
 
         let initialAttributes = kitchenTable.attributes
 
-        let game = MinimalGame(items: [kitchenTable, bottle, water, brownSack])
+        let game = MinimalGame(items: kitchenTable, bottle, water, brownSack)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
@@ -568,7 +573,9 @@ struct ExamineActionHandlerTests {
 
         // Assert: Should skip generic description and show only enhanced item descriptions
         let output = await mockIO.flush()
-        expectNoDifference(output, """
+        expectNoDifference(
+            output,
+            """
             A bottle is sitting on the table. The glass bottle contains a
             quantity of water. On the table is an elongated brown sack,
             smelling of hot peppers.
@@ -579,7 +586,8 @@ struct ExamineActionHandlerTests {
         #expect(finalItemState.hasFlag(.isTouched) == true, "Surface should be marked touched")
 
         // Assert Change History
-        let expectedChanges = expectedExamineChanges(itemID: "kitchenTable", initialAttributes: initialAttributes)
+        let expectedChanges = expectedExamineChanges(
+            itemID: "kitchenTable", initialAttributes: initialAttributes)
         let changeHistory = await engine.gameState.changeHistory
         expectNoDifference(changeHistory, expectedChanges)
     }
@@ -628,7 +636,7 @@ struct ExamineActionHandlerTests {
 
         let initialAttributes = kitchenTable.attributes
 
-        let game = MinimalGame(items: [kitchenTable, bottle, water, brownSack])
+        let game = MinimalGame(items: kitchenTable, bottle, water, brownSack)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
         #expect(try await engine.item("kitchenTable").hasFlag(.isTouched) == false)
         #expect(await engine.gameState.changeHistory.isEmpty)
@@ -646,7 +654,9 @@ struct ExamineActionHandlerTests {
         let output = await mockIO.flush()
 
         // Assert: Should show enhanced surface description
-        expectNoDifference(output, """
+        expectNoDifference(
+            output,
+            """
             A bottle is sitting on the table. The glass bottle contains a
             quantity of water. On the table is an elongated brown sack,
             smelling of hot peppers.
@@ -657,7 +667,8 @@ struct ExamineActionHandlerTests {
         #expect(finalItemState.hasFlag(.isTouched) == true, "Surface should be marked touched")
 
         // Assert Change History
-        let expectedChanges = expectedExamineChanges(itemID: "kitchenTable", initialAttributes: initialAttributes)
+        let expectedChanges = expectedExamineChanges(
+            itemID: "kitchenTable", initialAttributes: initialAttributes)
         let changeHistory = await engine.gameState.changeHistory
         expectNoDifference(changeHistory, expectedChanges)
     }
@@ -691,8 +702,8 @@ extension ExamineActionHandlerTests {
                 attribute: .pronounReference(pronoun: "it"),
                 // Old value might be nil or another item, for simplicity in test we assume nil or different
                 // A more robust test might capture the actual old pronoun state.
-                oldValue: nil, // Assuming it wasn’t set or was different
-                newValue: .entityReferenceSet([.item(itemID)]) // Use .entityReferenceSet
+                oldValue: nil,  // Assuming it wasn’t set or was different
+                newValue: .entityReferenceSet([.item(itemID)])  // Use .entityReferenceSet
             )
         )
         return changes

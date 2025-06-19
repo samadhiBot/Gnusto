@@ -30,10 +30,11 @@ struct RubActionHandlerTests {
             .in(.nowhere)
         )
 
-        let game = MinimalGame(items: [distantSphere])
+        let game = MinimalGame(items: distantSphere)
         let (engine, _) = await GameEngine.test(blueprint: game)
 
-        let command = Command(verb: .rub, directObject: .item("distant_sphere"), rawInput: "rub distant sphere")
+        let command = Command(
+            verb: .rub, directObject: .item("distant_sphere"), rawInput: "rub distant sphere")
         let context = ActionContext(command: command, engine: engine)
 
         // When / Then
@@ -52,7 +53,7 @@ struct RubActionHandlerTests {
             .isCharacter
         )
 
-        let game = MinimalGame(items: [cat])
+        let game = MinimalGame(items: cat)
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(verb: .rub, directObject: .item("cat"), rawInput: "rub cat")
@@ -75,7 +76,7 @@ struct RubActionHandlerTests {
             .isTakable
         )
 
-        let game = MinimalGame(items: [mirror])
+        let game = MinimalGame(items: mirror)
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(verb: .rub, directObject: .item("mirror"), rawInput: "rub mirror")
@@ -99,7 +100,7 @@ struct RubActionHandlerTests {
             .isLightSource
         )
 
-        let game = MinimalGame(items: [lamp])
+        let game = MinimalGame(items: lamp)
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(verb: .rub, directObject: .item("lamp"), rawInput: "rub lamp")
@@ -109,7 +110,9 @@ struct RubActionHandlerTests {
         let result = try await handler.process(context: context)
 
         // Then
-        #expect(result.message!.contains("Rubbing the brass lamp doesn't seem to do anything. No djinn appears."))
+        #expect(
+            result.message!.contains(
+                "Rubbing the brass lamp doesn't seem to do anything. No djinn appears."))
     }
 
     @Test("Rub lantern shows djinn message")
@@ -123,7 +126,7 @@ struct RubActionHandlerTests {
             .isLightSource
         )
 
-        let game = MinimalGame(items: [lantern])
+        let game = MinimalGame(items: lantern)
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(verb: .rub, directObject: .item("lantern"), rawInput: "rub lantern")
@@ -133,7 +136,9 @@ struct RubActionHandlerTests {
         let result = try await handler.process(context: context)
 
         // Then
-        #expect(result.message!.contains("Rubbing the old lantern doesn't seem to do anything. No djinn appears."))
+        #expect(
+            result.message!.contains(
+                "Rubbing the old lantern doesn't seem to do anything. No djinn appears."))
     }
 
     @Test("Rub takable object shows smooth touch message")
@@ -146,7 +151,7 @@ struct RubActionHandlerTests {
             .isTakable
         )
 
-        let game = MinimalGame(items: [stone])
+        let game = MinimalGame(items: stone)
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(verb: .rub, directObject: .item("stone"), rawInput: "rub stone")
@@ -168,7 +173,7 @@ struct RubActionHandlerTests {
             .in(.location(.startRoom))
         )
 
-        let game = MinimalGame(items: [wall])
+        let game = MinimalGame(items: wall)
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(verb: .rub, directObject: .item("wall"), rawInput: "rub wall")
@@ -178,7 +183,8 @@ struct RubActionHandlerTests {
         let result = try await handler.process(context: context)
 
         // Then
-        #expect(result.message!.contains("You rub the stone wall, but nothing interesting happens."))
+        #expect(
+            result.message!.contains("You rub the stone wall, but nothing interesting happens."))
     }
 
     @Test("Rub updates state correctly")
@@ -191,7 +197,7 @@ struct RubActionHandlerTests {
             .isTakable
         )
 
-        let game = MinimalGame(items: [orb])
+        let game = MinimalGame(items: orb)
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(verb: .rub, directObject: .item("orb"), rawInput: "rub orb")
@@ -205,9 +211,8 @@ struct RubActionHandlerTests {
 
         // Should have touched the item
         let hasTouchedChange = result.changes.contains(where: { change in
-            change.entityID == .item("orb") &&
-            change.attribute == .itemAttribute(.isTouched) &&
-            change.newValue == true
+            change.entityID == .item("orb") && change.attribute == .itemAttribute(.isTouched)
+                && change.newValue == true
         })
         #expect(hasTouchedChange)
     }
@@ -222,7 +227,7 @@ struct RubActionHandlerTests {
             .isTakable
         )
 
-        let game = MinimalGame(items: [crystal])
+        let game = MinimalGame(items: crystal)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(verb: .rub, directObject: .item("crystal"), rawInput: "rub crystal")

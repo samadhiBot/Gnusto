@@ -1,5 +1,6 @@
-import Testing
 import CustomDump
+import Testing
+
 @testable import GnustoEngine
 
 @Suite("TurnOffActionHandler Tests")
@@ -38,7 +39,9 @@ struct TurnOffActionHandlerTests {
         await engine.execute(command: command)
 
         let output = await mockIO.flush()
-        expectNoDifference(output, """
+        expectNoDifference(
+            output,
+            """
             The lamp is now off. You are plunged into darkness.
 
             It is pitch black. You can’t see a thing.
@@ -129,7 +132,7 @@ struct TurnOffActionHandlerTests {
             .isTakable,
             .size(10),
         )
-        let game = MinimalGame(items: [lamp])
+        let game = MinimalGame(items: lamp)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
         let command = Command(
             verb: .turnOff,
@@ -188,7 +191,9 @@ struct TurnOffActionHandlerTests {
         #expect(finalItemState.hasFlag(.isTouched) == true)
 
         let output = await mockIO.flush()
-        expectNoDifference(output, """
+        expectNoDifference(
+            output,
+            """
             The brass lantern is now off. You are plunged into darkness.
 
             It is pitch black. You can’t see a thing.
@@ -210,7 +215,7 @@ struct TurnOffActionHandlerTests {
             .isTakable,
             .size(10)
         )
-        let game = MinimalGame(items: [lamp])
+        let game = MinimalGame(items: lamp)
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(
@@ -246,7 +251,7 @@ struct TurnOffActionHandlerTests {
             .isOn,
             .size(10)
         )
-        let game = MinimalGame(items: [lamp])
+        let game = MinimalGame(items: lamp)
         let (engine, _) = await GameEngine.test(blueprint: game)
         let command = Command(
             verb: .turnOff,
@@ -282,7 +287,7 @@ struct TurnOffActionHandlerTests {
             .isOn,
             .size(10)
         )
-        let game = MinimalGame(items: [lamp])
+        let game = MinimalGame(items: lamp)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
         let command = Command(
             verb: .turnOff,
@@ -333,7 +338,7 @@ struct TurnOffActionHandlerTests {
             vocabulary: await engine.gameState.vocabulary,
             gameState: await engine.gameState
         )
-        let command = try parseResult.get() // Get the parsed command
+        let command = try parseResult.get()  // Get the parsed command
 
         // Execute the parsed command
         await engine.execute(command: command)
@@ -344,7 +349,9 @@ struct TurnOffActionHandlerTests {
         #expect(finalItemState.hasFlag(.isTouched) == true)
 
         let output = await mockIO.flush()
-        expectNoDifference(output, """
+        expectNoDifference(
+            output,
+            """
             The brass lantern is now off. You are plunged into darkness.
 
             It is pitch black. You can’t see a thing.
@@ -385,7 +392,7 @@ struct TurnOffActionHandlerTests {
             vocabulary: await engine.gameState.vocabulary,
             gameState: await engine.gameState
         )
-        let command = try parseResult.get() // Get the parsed command
+        let command = try parseResult.get()  // Get the parsed command
 
         // Execute the parsed command
         await engine.execute(command: command)
@@ -396,7 +403,9 @@ struct TurnOffActionHandlerTests {
         #expect(finalItemState.hasFlag(.isTouched) == true)
 
         let output = await mockIO.flush()
-        expectNoDifference(output, """
+        expectNoDifference(
+            output,
+            """
             The brass lantern is now off. You are plunged into darkness.
 
             It is pitch black. You can’t see a thing.

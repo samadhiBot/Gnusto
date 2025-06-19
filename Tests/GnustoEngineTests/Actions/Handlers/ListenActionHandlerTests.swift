@@ -44,8 +44,8 @@ struct ListenActionHandlerTests {
 
         // Verify result
         #expect(result.message == "You hear nothing unusual.")
-        #expect(result.changes.isEmpty) // LISTEN should not modify state
-        #expect(result.effects.isEmpty) // LISTEN should not have side effects
+        #expect(result.changes.isEmpty)  // LISTEN should not modify state
+        #expect(result.effects.isEmpty)  // LISTEN should not have side effects
     }
 
     @Test("LISTEN validation always succeeds")
@@ -261,7 +261,7 @@ struct ListenActionHandlerTests {
             .in(.location(.startRoom))
         )
 
-        let game = MinimalGame(items: [noisyItem])
+        let game = MinimalGame(items: noisyItem)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(

@@ -36,7 +36,7 @@ struct SmellActionHandlerTests {
             .in(.player)
         )
 
-        let game = MinimalGame(items: [testItem])
+        let game = MinimalGame(items: testItem)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
@@ -86,7 +86,7 @@ struct SmellActionHandlerTests {
             .in(.player)
         )
 
-        let game = MinimalGame(items: [testItem])
+        let game = MinimalGame(items: testItem)
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(
@@ -138,8 +138,8 @@ struct SmellActionHandlerTests {
 
         // Verify result
         #expect(result.message == "You smell nothing unusual.")
-        #expect(result.changes.isEmpty) // SMELL should not modify state
-        #expect(result.effects.isEmpty) // SMELL should not have side effects
+        #expect(result.changes.isEmpty)  // SMELL should not modify state
+        #expect(result.effects.isEmpty)  // SMELL should not have side effects
     }
 
     @Test("SMELL produces correct ActionResult for item")
@@ -152,7 +152,7 @@ struct SmellActionHandlerTests {
             .in(.player)
         )
 
-        let game = MinimalGame(items: [testItem])
+        let game = MinimalGame(items: testItem)
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(
@@ -170,8 +170,8 @@ struct SmellActionHandlerTests {
 
         // Verify result
         #expect(result.message == "That smells about average.")
-        #expect(result.changes.isEmpty) // SMELL should not modify state
-        #expect(result.effects.isEmpty) // SMELL should not have side effects
+        #expect(result.changes.isEmpty)  // SMELL should not modify state
+        #expect(result.effects.isEmpty)  // SMELL should not have side effects
     }
 
     @Test("SMELL does not affect game state")
@@ -250,7 +250,7 @@ struct SmellActionHandlerTests {
             .in(.location(.startRoom))
         )
 
-        let game = MinimalGame(items: [testItem])
+        let game = MinimalGame(items: testItem)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
@@ -300,7 +300,7 @@ struct SmellActionHandlerTests {
             .in(.player)
         )
 
-        let game = MinimalGame(items: [testItem])
+        let game = MinimalGame(items: testItem)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(

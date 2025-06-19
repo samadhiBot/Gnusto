@@ -17,7 +17,7 @@ struct PressActionHandlerTests {
             .in(.location(.startRoom))
         )
 
-        let game = MinimalGame(items: [button])
+        let game = MinimalGame(items: button)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
@@ -47,7 +47,7 @@ struct PressActionHandlerTests {
             // Note: not pressable
         )
 
-        let game = MinimalGame(items: [rock])
+        let game = MinimalGame(items: rock)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(

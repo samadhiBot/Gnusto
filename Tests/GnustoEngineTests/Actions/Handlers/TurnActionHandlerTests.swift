@@ -31,7 +31,7 @@ struct TurnActionHandlerTests {
             .isDial
         )
 
-        let game = MinimalGame(items: [dial])
+        let game = MinimalGame(items: dial)
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(verb: .turn, directObject: .item("dial"), rawInput: "turn dial")
@@ -54,7 +54,7 @@ struct TurnActionHandlerTests {
             .isKnob
         )
 
-        let game = MinimalGame(items: [knob])
+        let game = MinimalGame(items: knob)
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(verb: .turn, directObject: .item("knob"), rawInput: "turn knob")
@@ -77,7 +77,7 @@ struct TurnActionHandlerTests {
             .isWheel
         )
 
-        let game = MinimalGame(items: [wheel])
+        let game = MinimalGame(items: wheel)
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(verb: .turn, directObject: .item("wheel"), rawInput: "turn wheel")
@@ -100,7 +100,7 @@ struct TurnActionHandlerTests {
             .isHandle
         )
 
-        let game = MinimalGame(items: [handle])
+        let game = MinimalGame(items: handle)
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(verb: .turn, directObject: .item("handle"), rawInput: "turn handle")
@@ -110,7 +110,8 @@ struct TurnActionHandlerTests {
         let result = try await handler.process(context: context)
 
         // Then
-        #expect(result.message!.contains("You turn the door handle. It moves with a grinding sound."))
+        #expect(
+            result.message!.contains("You turn the door handle. It moves with a grinding sound."))
     }
 
     @Test("Turn key shows guidance message")
@@ -124,7 +125,7 @@ struct TurnActionHandlerTests {
             .isKey
         )
 
-        let game = MinimalGame(items: [key])
+        let game = MinimalGame(items: key)
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(verb: .turn, directObject: .item("key"), rawInput: "turn key")
@@ -134,7 +135,9 @@ struct TurnActionHandlerTests {
         let result = try await handler.process(context: context)
 
         // Then
-        #expect(result.message!.contains("You can't just turn the brass key by itself. You need to use it with something."))
+        #expect(
+            result.message!.contains(
+                "You can't just turn the brass key by itself. You need to use it with something."))
     }
 
     @Test("Turn character shows prevention message")
@@ -147,7 +150,7 @@ struct TurnActionHandlerTests {
             .isCharacter
         )
 
-        let game = MinimalGame(items: [cat])
+        let game = MinimalGame(items: cat)
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(verb: .turn, directObject: .item("cat"), rawInput: "turn cat")
@@ -170,7 +173,7 @@ struct TurnActionHandlerTests {
             .isTakable
         )
 
-        let game = MinimalGame(items: [book])
+        let game = MinimalGame(items: book)
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(verb: .turn, directObject: .item("book"), rawInput: "turn book")
@@ -180,7 +183,9 @@ struct TurnActionHandlerTests {
         let result = try await handler.process(context: context)
 
         // Then
-        #expect(result.message!.contains("You turn the old book around in your hands, but nothing happens."))
+        #expect(
+            result.message!.contains(
+                "You turn the old book around in your hands, but nothing happens."))
     }
 
     @Test("Turn integration test")
@@ -193,7 +198,7 @@ struct TurnActionHandlerTests {
             .isDial
         )
 
-        let game = MinimalGame(items: [dial])
+        let game = MinimalGame(items: dial)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(verb: .turn, directObject: .item("dial"), rawInput: "turn dial")

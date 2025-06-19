@@ -15,7 +15,7 @@ struct LookUnderActionHandlerTests {
             .in(.location(.startRoom)),
             .isSurface
         )
-        let game = MinimalGame(items: [table])
+        let game = MinimalGame(items: table)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
@@ -42,18 +42,20 @@ struct LookUnderActionHandlerTests {
 
         // Assert Change History
         let changeHistory = await engine.gameState.changeHistory
-        expectNoDifference(changeHistory, [
-            StateChange(
-                entityID: .item(table.id),
-                attribute: .itemAttribute(.isTouched),
-                newValue: true
-            ),
-            StateChange(
-                entityID: .global,
-                attribute: .pronounReference(pronoun: "it"),
-                newValue: .entityReferenceSet([.item(table.id)])
-            ),
-        ])
+        expectNoDifference(
+            changeHistory,
+            [
+                StateChange(
+                    entityID: .item(table.id),
+                    attribute: .itemAttribute(.isTouched),
+                    newValue: true
+                ),
+                StateChange(
+                    entityID: .global,
+                    attribute: .pronounReference(pronoun: "it"),
+                    newValue: .entityReferenceSet([.item(table.id)])
+                ),
+            ])
     }
 
     @Test("Look under fails if item not accessible")
@@ -64,7 +66,7 @@ struct LookUnderActionHandlerTests {
             .in(.nowhere),
             .isSurface
         )
-        let game = MinimalGame(items: [table])
+        let game = MinimalGame(items: table)
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(
@@ -140,7 +142,7 @@ struct LookUnderActionHandlerTests {
             .in(.item("box")),
             .isTakable
         )
-        let game = MinimalGame(items: [box, carpet])
+        let game = MinimalGame(items: box, carpet)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
@@ -167,7 +169,7 @@ struct LookUnderActionHandlerTests {
             .in(.player),
             .isTakable
         )
-        let game = MinimalGame(items: [mat])
+        let game = MinimalGame(items: mat)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
@@ -203,7 +205,7 @@ struct LookUnderActionHandlerTests {
             .in(.item("table")),
             .isTakable
         )
-        let game = MinimalGame(items: [table, book])
+        let game = MinimalGame(items: table, book)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(

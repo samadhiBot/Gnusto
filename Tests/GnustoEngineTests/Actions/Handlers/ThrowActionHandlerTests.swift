@@ -30,7 +30,7 @@ struct ThrowActionHandlerTests {
             .in(.location(.startRoom))
         )
 
-        let game = MinimalGame(items: [rock])
+        let game = MinimalGame(items: rock)
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(verb: .throwItem, directObject: .item("rock"), rawInput: "throw rock")
@@ -51,7 +51,7 @@ struct ThrowActionHandlerTests {
             .in(.player)
         )
 
-        let game = MinimalGame(items: [ball])
+        let game = MinimalGame(items: ball)
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(
@@ -83,7 +83,7 @@ struct ThrowActionHandlerTests {
             .in(.location("faraway"))
         )
 
-        let game = MinimalGame(items: [ball, distantTarget])
+        let game = MinimalGame(items: ball, distantTarget)
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(
@@ -109,7 +109,7 @@ struct ThrowActionHandlerTests {
             .in(.player)
         )
 
-        let game = MinimalGame(items: [ball])
+        let game = MinimalGame(items: ball)
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(verb: .throwItem, directObject: .item("ball"), rawInput: "throw ball")
@@ -134,7 +134,7 @@ struct ThrowActionHandlerTests {
             .in(.location(.startRoom))
         )
 
-        let game = MinimalGame(items: [ball, target])
+        let game = MinimalGame(items: ball, target)
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(
@@ -158,7 +158,7 @@ struct ThrowActionHandlerTests {
             .in(.player)
         )
 
-        let game = MinimalGame(items: [ball])
+        let game = MinimalGame(items: ball)
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(verb: .throwItem, directObject: .item("ball"), rawInput: "throw ball")
@@ -186,7 +186,7 @@ struct ThrowActionHandlerTests {
             .in(.location(.startRoom))
         )
 
-        let game = MinimalGame(items: [ball, wall])
+        let game = MinimalGame(items: ball, wall)
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(
@@ -201,7 +201,8 @@ struct ThrowActionHandlerTests {
         let result = try await handler.process(context: context)
 
         // Then
-        #expect(result.message!.contains("You throw the ball at the wall. It bounces off harmlessly."))
+        #expect(
+            result.message!.contains("You throw the ball at the wall. It bounces off harmlessly."))
     }
 
     @Test("Throw item at character")
@@ -220,7 +221,7 @@ struct ThrowActionHandlerTests {
             .isCharacter
         )
 
-        let game = MinimalGame(items: [ball, troll])
+        let game = MinimalGame(items: ball, troll)
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(
@@ -255,7 +256,7 @@ struct ThrowActionHandlerTests {
             .isCharacter
         )
 
-        let game = MinimalGame(items: [knife, goblin])
+        let game = MinimalGame(items: knife, goblin)
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(
@@ -301,7 +302,7 @@ struct ThrowActionHandlerTests {
             .in(.player)
         )
 
-        let game = MinimalGame(items: [ball])
+        let game = MinimalGame(items: ball)
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(verb: .throwItem, directObject: .item("ball"), rawInput: "throw ball")

@@ -53,7 +53,7 @@ struct DrinkActionHandlerTests {
         )
 
         let (engine, _) = await GameEngine.test(
-            blueprint: MinimalGame(items: [distantWater])
+            blueprint: MinimalGame(items: distantWater)
         )
 
         let command = Command(
@@ -80,7 +80,7 @@ struct DrinkActionHandlerTests {
         )
 
         let (engine, _) = await GameEngine.test(
-            blueprint: MinimalGame(items: [water])
+            blueprint: MinimalGame(items: water)
         )
 
         let command = Command(
@@ -107,7 +107,7 @@ struct DrinkActionHandlerTests {
         )
 
         let (engine, _) = await GameEngine.test(
-            blueprint: MinimalGame(items: [rock])
+            blueprint: MinimalGame(items: rock)
         )
 
         let command = Command(
@@ -144,7 +144,7 @@ struct DrinkActionHandlerTests {
         )
 
         let (engine, _) = await GameEngine.test(
-            blueprint: MinimalGame(items: [bottle, wine])
+            blueprint: MinimalGame(items: bottle, wine)
         )
 
         let command = Command(
@@ -180,7 +180,7 @@ struct DrinkActionHandlerTests {
         )
 
         let (engine, _) = await GameEngine.test(
-            blueprint: MinimalGame(items: [closedBottle, juice])
+            blueprint: MinimalGame(items: closedBottle, juice)
         )
 
         let command = Command(
@@ -208,7 +208,7 @@ struct DrinkActionHandlerTests {
         )
 
         let (engine, _) = await GameEngine.test(
-            blueprint: MinimalGame(items: [water])
+            blueprint: MinimalGame(items: water)
         )
 
         let command = Command(

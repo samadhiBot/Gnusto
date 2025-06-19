@@ -18,8 +18,8 @@ struct TasteActionHandlerTests {
             .isTakable,
             .in(.player)
         )
-        
-        let game = MinimalGame(items: [testItem])
+
+        let game = MinimalGame(items: testItem)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
@@ -90,8 +90,8 @@ struct TasteActionHandlerTests {
             .isTakable,
             .in(.player)
         )
-        
-        let game = MinimalGame(items: [testItem])
+
+        let game = MinimalGame(items: testItem)
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(
@@ -117,8 +117,8 @@ struct TasteActionHandlerTests {
             .isTakable,
             .in(.player)
         )
-        
-        let game = MinimalGame(items: [testItem])
+
+        let game = MinimalGame(items: testItem)
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(
@@ -130,14 +130,14 @@ struct TasteActionHandlerTests {
             command: command,
             engine: engine
         )
-        
+
         // Process the command directly
         let result = try await handler.process(context: context)
-        
+
         // Verify result
         #expect(result.message == "That tastes about average.")
-        #expect(result.changes.isEmpty) // TASTE should not modify state
-        #expect(result.effects.isEmpty) // TASTE should not have side effects
+        #expect(result.changes.isEmpty)  // TASTE should not modify state
+        #expect(result.effects.isEmpty)  // TASTE should not have side effects
     }
 
     @Test("TASTE does not affect game state")
@@ -149,8 +149,8 @@ struct TasteActionHandlerTests {
             .isTakable,
             .in(.player)
         )
-        
-        let game = MinimalGame(items: [testItem])
+
+        let game = MinimalGame(items: testItem)
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         // Capture initial state
@@ -158,7 +158,7 @@ struct TasteActionHandlerTests {
         let initialScore = initialState.player.score
         let initialMoves = initialState.player.moves
         let initialLocation = initialState.player.currentLocationID
-        
+
         let command = Command(
             verb: .taste,
             directObject: .item("cookie"),
@@ -185,8 +185,8 @@ struct TasteActionHandlerTests {
             .isTakable,
             .in(.location(.startRoom))
         )
-        
-        let game = MinimalGame(items: [testItem])
+
+        let game = MinimalGame(items: testItem)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
@@ -210,8 +210,8 @@ struct TasteActionHandlerTests {
             .isTakable,
             .in(.player)
         )
-        
-        let game = MinimalGame(items: [testItem])
+
+        let game = MinimalGame(items: testItem)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
@@ -223,10 +223,10 @@ struct TasteActionHandlerTests {
         // Execute TASTE multiple times
         await engine.execute(command: command)
         let firstOutput = await mockIO.flush()
-        
+
         await engine.execute(command: command)
         let secondOutput = await mockIO.flush()
-        
+
         await engine.execute(command: command)
         let thirdOutput = await mockIO.flush()
 
@@ -245,8 +245,8 @@ struct TasteActionHandlerTests {
             .isTakable,
             .in(.player)
         )
-        
-        let game = MinimalGame(items: [testItem])
+
+        let game = MinimalGame(items: testItem)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
@@ -271,7 +271,7 @@ struct TasteActionHandlerTests {
             .description("A completely dark pantry.")
             // No .inherentlyLit, so it should be dark
         )
-        
+
         let testItem = Item(
             id: "spice",
             .name("mysterious spice"),
@@ -279,7 +279,7 @@ struct TasteActionHandlerTests {
             .isTakable,
             .in(.player)
         )
-        
+
         let player = Player(in: "dark_pantry")
         let game = MinimalGame(
             player: player,
@@ -311,8 +311,8 @@ struct TasteActionHandlerTests {
             .isTakable,
             .in(.player)
         )
-        
-        let game = MinimalGame(items: [testItem])
+
+        let game = MinimalGame(items: testItem)
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(
@@ -324,13 +324,13 @@ struct TasteActionHandlerTests {
             command: command,
             engine: engine
         )
-        
+
         // Validate
         try await handler.validate(context: context)
-        
+
         // Process
         let result = try await handler.process(context: context)
-        
+
         // Verify complete workflow
         #expect(result.message == "That tastes about average.")
         #expect(result.changes.isEmpty)
@@ -346,7 +346,7 @@ struct TasteActionHandlerTests {
             .isTakable,
             .in(.player)
         )
-        
+
         let solidItem = Item(
             id: "rock",
             .name("smooth rock"),
@@ -354,8 +354,8 @@ struct TasteActionHandlerTests {
             .isTakable,
             .in(.player)
         )
-        
-        let game = MinimalGame(items: [liquidItem, solidItem])
+
+        let game = MinimalGame(items: liquidItem, solidItem)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // Test tasting liquid
@@ -378,4 +378,4 @@ struct TasteActionHandlerTests {
         let rockOutput = await mockIO.flush()
         expectNoDifference(rockOutput, "That tastes about average.")
     }
-} 
+}

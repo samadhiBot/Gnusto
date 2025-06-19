@@ -31,7 +31,7 @@ struct PourOnActionHandlerTests {
             .isDrinkable
         )
 
-        let game = MinimalGame(items: [water])
+        let game = MinimalGame(items: water)
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(verb: .pourOn, directObject: .item("water"), rawInput: "pour water")
@@ -60,7 +60,7 @@ struct PourOnActionHandlerTests {
             .isLit
         )
 
-        let game = MinimalGame(items: [water, torch])
+        let game = MinimalGame(items: water, torch)
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(
@@ -75,7 +75,10 @@ struct PourOnActionHandlerTests {
         let result = try await handler.process(context: context)
 
         // Then
-        #expect(result.message!.contains("You pour the water on the torch. The flames are extinguished with a hissing sound."))
+        #expect(
+            result.message!.contains(
+                "You pour the water on the torch. The flames are extinguished with a hissing sound."
+            ))
     }
 
     @Test("Pour integration test")
@@ -94,7 +97,7 @@ struct PourOnActionHandlerTests {
             .isPlant
         )
 
-        let game = MinimalGame(items: [water, flower])
+        let game = MinimalGame(items: water, flower)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(

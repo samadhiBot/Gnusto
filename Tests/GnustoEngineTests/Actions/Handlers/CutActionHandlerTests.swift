@@ -26,7 +26,8 @@ struct CutActionHandlerTests {
         // Given
         let (engine, _) = await GameEngine.test()
 
-        let command = Command(verb: .cut, directObject: .item("nonexistent"), rawInput: "cut nonexistent")
+        let command = Command(
+            verb: .cut, directObject: .item("nonexistent"), rawInput: "cut nonexistent")
         let context = ActionContext(command: command, engine: engine)
 
         // When / Then
@@ -44,10 +45,11 @@ struct CutActionHandlerTests {
             .in(.nowhere)
         )
 
-        let game = MinimalGame(items: [distantRope])
+        let game = MinimalGame(items: distantRope)
         let (engine, _) = await GameEngine.test(blueprint: game)
 
-        let command = Command(verb: .cut, directObject: .item("distant_rope"), rawInput: "cut distant rope")
+        let command = Command(
+            verb: .cut, directObject: .item("distant_rope"), rawInput: "cut distant rope")
         let context = ActionContext(command: command, engine: engine)
 
         // When / Then
@@ -72,7 +74,7 @@ struct CutActionHandlerTests {
             .isWeapon
         )
 
-        let game = MinimalGame(items: [rope, knife])
+        let game = MinimalGame(items: rope, knife)
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(
@@ -105,7 +107,7 @@ struct CutActionHandlerTests {
             .isWeapon
         )
 
-        let game = MinimalGame(items: [rope, knife])
+        let game = MinimalGame(items: rope, knife)
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(
@@ -139,7 +141,7 @@ struct CutActionHandlerTests {
             .isTool
         )
 
-        let game = MinimalGame(items: [rope, scissors])
+        let game = MinimalGame(items: rope, scissors)
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(
@@ -173,7 +175,7 @@ struct CutActionHandlerTests {
             .isWeapon
         )
 
-        let game = MinimalGame(items: [rope, knife])
+        let game = MinimalGame(items: rope, knife)
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(verb: .cut, directObject: .item("rope"), rawInput: "cut rope")
@@ -201,7 +203,7 @@ struct CutActionHandlerTests {
             .in(.player)
         )
 
-        let game = MinimalGame(items: [rope, lamp])
+        let game = MinimalGame(items: rope, lamp)
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(verb: .cut, directObject: .item("rope"), rawInput: "cut rope")
@@ -230,7 +232,7 @@ struct CutActionHandlerTests {
             .isWeapon
         )
 
-        let game = MinimalGame(items: [rope, knife])
+        let game = MinimalGame(items: rope, knife)
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(

@@ -16,7 +16,7 @@ struct MoveActionHandlerTests {
             .in(.location(.startRoom))
         )
 
-        let game = MinimalGame(items: [leaves])
+        let game = MinimalGame(items: leaves)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
@@ -62,10 +62,10 @@ struct MoveActionHandlerTests {
         let leaves = Item(
             id: "leaves",
             .name("pile of leaves"),
-            .in(.nowhere) // Not reachable
+            .in(.nowhere)  // Not reachable
         )
 
-        let game = MinimalGame(items: [leaves])
+        let game = MinimalGame(items: leaves)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
@@ -110,7 +110,7 @@ struct MoveActionHandlerTests {
             .in(.player)
         )
 
-        let game = MinimalGame(items: [key])
+        let game = MinimalGame(items: key)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
@@ -146,7 +146,7 @@ struct MoveActionHandlerTests {
             .isOpen
         )
 
-        let game = MinimalGame(items: [key, box])
+        let game = MinimalGame(items: key, box)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
@@ -178,10 +178,10 @@ struct MoveActionHandlerTests {
             id: "box",
             .name("wooden box"),
             .in(.location(.startRoom)),
-            .isContainer // Not open
+            .isContainer  // Not open
         )
 
-        let game = MinimalGame(items: [key, box])
+        let game = MinimalGame(items: key, box)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(

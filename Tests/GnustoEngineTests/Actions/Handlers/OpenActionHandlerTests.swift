@@ -17,7 +17,7 @@ struct OpenActionHandlerTests {
             StateChange(
                 entityID: .item(itemID),
                 attribute: .itemAttribute(.isOpen),
-                oldValue: initialAttributes?[.isOpen], // Check initial state
+                oldValue: initialAttributes?[.isOpen],  // Check initial state
                 newValue: true,
             )
         )
@@ -39,7 +39,7 @@ struct OpenActionHandlerTests {
             StateChange(
                 entityID: .global,
                 attribute: .pronounReference(pronoun: "it"),
-                oldValue: nil, // Assume no prior "it" for simplicity
+                oldValue: nil,  // Assume no prior "it" for simplicity
                 newValue: .entityReferenceSet([.item(itemID)])
             )
         )
@@ -59,7 +59,7 @@ struct OpenActionHandlerTests {
             // Starts closed (no .isOpen attribute)
         )
 
-        let game = MinimalGame(items: [closedBox])
+        let game = MinimalGame(items: closedBox)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // Initial state check
@@ -105,10 +105,10 @@ struct OpenActionHandlerTests {
             .in(.location(.startRoom)),
             .isContainer,
             .isOpenable,
-            .isTouched // Already touched
+            .isTouched  // Already touched
         )
 
-        let game = MinimalGame(items: [closedBox])
+        let game = MinimalGame(items: closedBox)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // Initial state check
@@ -131,9 +131,10 @@ struct OpenActionHandlerTests {
         expectNoDifference(output, "You open the wooden box.")
 
         // Assert Change History
-        let expectedChanges = expectedOpenChanges(itemID: "box", initialAttributes: initialBoxState.attributes)
+        let expectedChanges = expectedOpenChanges(
+            itemID: "box", initialAttributes: initialBoxState.attributes)
         // Should not include .isTouched change as it was already true
-        #expect(expectedChanges.count == 2) // isOpen + pronoun
+        #expect(expectedChanges.count == 2)  // isOpen + pronoun
         let changeHistory = await engine.gameState.changeHistory
         expectNoDifference(changeHistory, expectedChanges)
 
@@ -172,7 +173,7 @@ struct OpenActionHandlerTests {
             .isOpenable
             // Don’t need .isOpen here, it's not reachable anyway
         )
-        let game = MinimalGame(items: [box])
+        let game = MinimalGame(items: box)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
         let command = Command(
             verb: .open,
@@ -199,9 +200,9 @@ struct OpenActionHandlerTests {
             id: "rock",
             .name("heavy rock"),
             .in(.location(.startRoom))
-        ) // No .openable
+        )  // No .openable
 
-        let game = MinimalGame(items: [rock])
+        let game = MinimalGame(items: rock)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
@@ -230,10 +231,10 @@ struct OpenActionHandlerTests {
             .in(.location(.startRoom)),
             .isContainer,
             .isOpenable,
-            .isOpen // Already open
+            .isOpen  // Already open
         )
 
-        let game = MinimalGame(items: [openBox])
+        let game = MinimalGame(items: openBox)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
@@ -262,10 +263,10 @@ struct OpenActionHandlerTests {
             .in(.location(.startRoom)),
             .isContainer,
             .isOpenable,
-            .isLocked // Locked
-        ) // Locked
+            .isLocked  // Locked
+        )  // Locked
 
-        let game = MinimalGame(items: [lockedChest])
+        let game = MinimalGame(items: lockedChest)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(

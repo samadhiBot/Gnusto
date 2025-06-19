@@ -44,7 +44,7 @@ struct PutOnActionHandlerTests {
                 StateChange(
                     entityID: .item(itemToPutID),
                     attribute: .itemAttribute(.isTouched),
-                        newValue: true,
+                    newValue: true,
                 )
             )
         }
@@ -55,7 +55,7 @@ struct PutOnActionHandlerTests {
                 StateChange(
                     entityID: .item(surfaceID),
                     attribute: .itemAttribute(.isTouched),
-                        newValue: true,
+                    newValue: true,
                 )
             )
         }
@@ -63,7 +63,7 @@ struct PutOnActionHandlerTests {
         // Change 4: Pronoun "it"
         changes.append(
             StateChange(
-                entityID: .global, // Pronoun is global
+                entityID: .global,  // Pronoun is global
                 attribute: .pronounReference(pronoun: "it"),
                 newValue: .entityReferenceSet([.item(itemToPutID)])
             )
@@ -92,7 +92,7 @@ struct PutOnActionHandlerTests {
         let initialBookAttributes = initialBook.attributes
         let initialTableAttributes = initialTable.attributes
 
-        let game = MinimalGame(items: [initialBook, initialTable])
+        let game = MinimalGame(items: initialBook, initialTable)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
         #expect(await engine.gameState.changeHistory.isEmpty)
 
@@ -142,7 +142,7 @@ struct PutOnActionHandlerTests {
             .in(.location(.startRoom)),
             .isSurface
         )
-        let game = MinimalGame(items: [table])
+        let game = MinimalGame(items: table)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
         #expect(await engine.gameState.changeHistory.isEmpty)
 
@@ -151,7 +151,7 @@ struct PutOnActionHandlerTests {
             indirectObject: .item("table"),
             preposition: "on",
             rawInput: "put on table"
-        ) // No DO
+        )  // No DO
 
         // Act
         await engine.execute(command: command)
@@ -172,7 +172,7 @@ struct PutOnActionHandlerTests {
             .name("book"),
             .in(.player)
         )
-        let game = MinimalGame(items: [book])
+        let game = MinimalGame(items: book)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
         #expect(await engine.gameState.changeHistory.isEmpty)
 
@@ -181,7 +181,7 @@ struct PutOnActionHandlerTests {
             directObject: .item("book"),
             preposition: "on",
             rawInput: "put book on"
-        ) // No IO
+        )  // No IO
 
         // Act
         await engine.execute(command: command)
@@ -208,7 +208,7 @@ struct PutOnActionHandlerTests {
             .in(.location(.startRoom)),
             .isSurface
         )
-        let game = MinimalGame(items: [book, table])
+        let game = MinimalGame(items: book, table)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
         #expect(await engine.gameState.changeHistory.isEmpty)
 
@@ -290,9 +290,9 @@ struct PutOnActionHandlerTests {
             id: "box",
             .name("box"),
             .in(.location(.startRoom)),
-            .isContainer // Not a surface
+            .isContainer  // Not a surface
         )
-        let game = MinimalGame(items: [book, box])
+        let game = MinimalGame(items: book, box)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
         #expect(await engine.gameState.changeHistory.isEmpty)
 
@@ -324,7 +324,7 @@ struct PutOnActionHandlerTests {
             .in(.player),
             .isSurface,
         )
-        let game = MinimalGame(items: [table])
+        let game = MinimalGame(items: table)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
         #expect(await engine.gameState.changeHistory.isEmpty)
 
@@ -361,9 +361,9 @@ struct PutOnActionHandlerTests {
             id: "table",
             .name("table"),
             .in(.item("tray")),
-            .isSurface // Table is also a surface
+            .isSurface  // Table is also a surface
         )
-        let game = MinimalGame(items: [tray, table])
+        let game = MinimalGame(items: tray, table)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
         #expect(await engine.gameState.changeHistory.isEmpty)
 
@@ -381,7 +381,9 @@ struct PutOnActionHandlerTests {
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, """
+        expectNoDifference(
+            output,
+            """
             You can’t put the silver tray on the table because the table is
             on the silver tray.
             """)

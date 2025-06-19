@@ -26,7 +26,8 @@ struct KickActionHandlerTests {
         // Given
         let (engine, _) = await GameEngine.test()
 
-        let command = Command(verb: .kick, directObject: .item("nonexistent"), rawInput: "kick nonexistent")
+        let command = Command(
+            verb: .kick, directObject: .item("nonexistent"), rawInput: "kick nonexistent")
         let context = ActionContext(command: command, engine: engine)
 
         // When / Then
@@ -44,10 +45,11 @@ struct KickActionHandlerTests {
             .in(.nowhere)
         )
 
-        let game = MinimalGame(items: [distantRock])
+        let game = MinimalGame(items: distantRock)
         let (engine, _) = await GameEngine.test(blueprint: game)
 
-        let command = Command(verb: .kick, directObject: .item("distant_rock"), rawInput: "kick distant rock")
+        let command = Command(
+            verb: .kick, directObject: .item("distant_rock"), rawInput: "kick distant rock")
         let context = ActionContext(command: command, engine: engine)
 
         // When / Then
@@ -66,7 +68,7 @@ struct KickActionHandlerTests {
             .isCharacter
         )
 
-        let game = MinimalGame(items: [goblin])
+        let game = MinimalGame(items: goblin)
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(verb: .kick, directObject: .item("goblin"), rawInput: "kick goblin")
@@ -89,7 +91,7 @@ struct KickActionHandlerTests {
             .isTakable
         )
 
-        let game = MinimalGame(items: [ball])
+        let game = MinimalGame(items: ball)
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(verb: .kick, directObject: .item("ball"), rawInput: "kick ball")
@@ -111,7 +113,7 @@ struct KickActionHandlerTests {
             .in(.location(.startRoom))
         )
 
-        let game = MinimalGame(items: [wall])
+        let game = MinimalGame(items: wall)
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(verb: .kick, directObject: .item("wall"), rawInput: "kick wall")
@@ -133,7 +135,7 @@ struct KickActionHandlerTests {
             .in(.location(.startRoom))
         )
 
-        let game = MinimalGame(items: [rock])
+        let game = MinimalGame(items: rock)
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(verb: .kick, directObject: .item("rock"), rawInput: "kick rock")
@@ -147,9 +149,8 @@ struct KickActionHandlerTests {
 
         // Should have touched the item
         let hasTouchedChange = result.changes.contains(where: { change in
-            change.entityID == .item("rock") &&
-            change.attribute == .itemAttribute(.isTouched) &&
-            change.newValue == true
+            change.entityID == .item("rock") && change.attribute == .itemAttribute(.isTouched)
+                && change.newValue == true
         })
         #expect(hasTouchedChange)
     }
@@ -164,7 +165,7 @@ struct KickActionHandlerTests {
             .isTakable
         )
 
-        let game = MinimalGame(items: [box])
+        let game = MinimalGame(items: box)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(verb: .kick, directObject: .item("box"), rawInput: "kick box")

@@ -32,7 +32,7 @@ struct ShakeActionHandlerTests {
             .isTakable
         )
 
-        let game = MinimalGame(items: [box])
+        let game = MinimalGame(items: box)
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(verb: .shake, directObject: .item("box"), rawInput: "shake box")
@@ -42,7 +42,9 @@ struct ShakeActionHandlerTests {
         let result = try await handler.process(context: context)
 
         // Then
-        #expect(result.message!.contains("You shake the wooden box and hear something rattling inside."))
+        #expect(
+            result.message!.contains("You shake the wooden box and hear something rattling inside.")
+        )
     }
 
     @Test("Shake bottle shows slosh message")
@@ -56,7 +58,7 @@ struct ShakeActionHandlerTests {
             .isLiquidContainer
         )
 
-        let game = MinimalGame(items: [bottle])
+        let game = MinimalGame(items: bottle)
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(verb: .shake, directObject: .item("bottle"), rawInput: "shake bottle")
@@ -66,7 +68,8 @@ struct ShakeActionHandlerTests {
         let result = try await handler.process(context: context)
 
         // Then
-        #expect(result.message!.contains("You shake the glass bottle and hear liquid sloshing inside."))
+        #expect(
+            result.message!.contains("You shake the glass bottle and hear liquid sloshing inside."))
     }
 
     @Test("Shake vial shows slosh message")
@@ -80,7 +83,7 @@ struct ShakeActionHandlerTests {
             .isLiquidContainer
         )
 
-        let game = MinimalGame(items: [vial])
+        let game = MinimalGame(items: vial)
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(verb: .shake, directObject: .item("vial"), rawInput: "shake vial")
@@ -90,7 +93,8 @@ struct ShakeActionHandlerTests {
         let result = try await handler.process(context: context)
 
         // Then
-        #expect(result.message!.contains("You shake the small vial and hear liquid sloshing inside."))
+        #expect(
+            result.message!.contains("You shake the small vial and hear liquid sloshing inside."))
     }
 
     @Test("Shake fixed object shows different message")
@@ -102,7 +106,7 @@ struct ShakeActionHandlerTests {
             .in(.location(.startRoom))
         )
 
-        let game = MinimalGame(items: [wall])
+        let game = MinimalGame(items: wall)
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(verb: .shake, directObject: .item("wall"), rawInput: "shake wall")
@@ -125,7 +129,7 @@ struct ShakeActionHandlerTests {
             .isTakable
         )
 
-        let game = MinimalGame(items: [book])
+        let game = MinimalGame(items: book)
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(verb: .shake, directObject: .item("book"), rawInput: "shake book")
@@ -149,7 +153,7 @@ struct ShakeActionHandlerTests {
             .isTakable
         )
 
-        let game = MinimalGame(items: [jar])
+        let game = MinimalGame(items: jar)
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(verb: .shake, directObject: .item("jar"), rawInput: "shake jar")
@@ -163,9 +167,8 @@ struct ShakeActionHandlerTests {
 
         // Should have touched the item
         let hasTouchedChange = result.changes.contains(where: { change in
-            change.entityID == .item("jar") &&
-            change.attribute == .itemAttribute(.isTouched) &&
-            change.newValue == true
+            change.entityID == .item("jar") && change.attribute == .itemAttribute(.isTouched)
+                && change.newValue == true
         })
         #expect(hasTouchedChange)
     }
@@ -181,10 +184,11 @@ struct ShakeActionHandlerTests {
             .isTakable
         )
 
-        let game = MinimalGame(items: [container])
+        let game = MinimalGame(items: container)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        let command = Command(verb: .shake, directObject: .item("container"), rawInput: "shake container")
+        let command = Command(
+            verb: .shake, directObject: .item("container"), rawInput: "shake container")
 
         // When
         await engine.execute(command: command)

@@ -16,7 +16,7 @@ struct RemoveActionHandlerTests {
             .isWearable,
             .isWorn
         )
-        let game = MinimalGame(items: [cloak])
+        let game = MinimalGame(items: cloak)
         let (engine, mockIO) = await GameEngine.test(
             blueprint: game
         )
@@ -76,7 +76,7 @@ struct RemoveActionHandlerTests {
             .isTakable,
             .isWearable
         )
-        let game = MinimalGame(items: [cloak])
+        let game = MinimalGame(items: cloak)
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(
@@ -152,7 +152,7 @@ struct RemoveActionHandlerTests {
             .isWearable,
             .isWorn
         )
-        let game = MinimalGame(items: [amulet])
+        let game = MinimalGame(items: amulet)
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(
@@ -180,7 +180,7 @@ struct RemoveActionHandlerTests {
         let cloak = Item(id: "cloak", .name("cloak"), .in(.player), .isWearable, .isWorn)
         let boots = Item(id: "boots", .name("boots"), .in(.player), .isWearable, .isWorn)
 
-        let game = MinimalGame(items: [cloak, boots])
+        let game = MinimalGame(items: cloak, boots)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // Act: Execute "remove all"
@@ -212,7 +212,7 @@ struct RemoveActionHandlerTests {
         let cloak = Item(id: "cloak", .name("cloak"), .in(.player), .isWearable, .isWorn)
         let boots = Item(id: "boots", .name("boots"), .in(.player), .isWearable, .isWorn)
 
-        let game = MinimalGame(items: [cloak, boots])
+        let game = MinimalGame(items: cloak, boots)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // Act: Execute "remove cloak and boots"
@@ -240,7 +240,7 @@ struct RemoveActionHandlerTests {
         let cloak = Item(id: "cloak", .name("cloak"), .in(.player), .isWearable, .isWorn)
         let boots = Item(id: "boots", .name("boots"), .in(.player), .isWearable)  // Not worn
 
-        let game = MinimalGame(items: [cloak, boots])
+        let game = MinimalGame(items: cloak, boots)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // Act: Execute "remove all"
@@ -267,7 +267,7 @@ struct RemoveActionHandlerTests {
     func testRemoveAllWithNoWornItems() async throws {
         let boots = Item(id: "boots", .name("boots"), .in(.player), .isWearable)  // Not worn
 
-        let game = MinimalGame(items: [boots])
+        let game = MinimalGame(items: boots)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // Act: Execute "remove all"
@@ -291,7 +291,7 @@ struct RemoveActionHandlerTests {
             id: "amulet", .name("cursed amulet"), .in(.player), .isWearable, .isWorn,
             .omitDescription)
 
-        let game = MinimalGame(items: [cloak, amulet])
+        let game = MinimalGame(items: cloak, amulet)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // Act: Execute "remove all"

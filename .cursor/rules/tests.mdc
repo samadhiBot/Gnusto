@@ -63,7 +63,7 @@ func testExamineSimpleObjectHeld() async throws {
         parent: .player
     )
 
-    let game = MinimalGame(items: [key])
+    let game = MinimalGame(items: key)
     let mockIO = await MockIOHandler()
     let mockParser = MockParser()
     let engine = GameEngine(

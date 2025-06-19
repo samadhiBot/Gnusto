@@ -52,7 +52,7 @@ struct AttackActionHandlerTests {
             .isCharacter
         )
 
-        let game = MinimalGame(items: [distantGoblin])
+        let game = MinimalGame(items: distantGoblin)
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(
@@ -85,7 +85,7 @@ struct AttackActionHandlerTests {
             .isWeapon
         )
 
-        let game = MinimalGame(items: [goblin, sword])
+        let game = MinimalGame(items: goblin, sword)
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(
@@ -111,7 +111,7 @@ struct AttackActionHandlerTests {
             .in(.location(.startRoom))
         )
 
-        let game = MinimalGame(items: [rock])
+        let game = MinimalGame(items: rock)
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(
@@ -138,7 +138,7 @@ struct AttackActionHandlerTests {
             .isCharacter
         )
 
-        let game = MinimalGame(items: [goblin])
+        let game = MinimalGame(items: goblin)
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(
@@ -152,7 +152,8 @@ struct AttackActionHandlerTests {
         let result = try await handler.process(context: context)
 
         // Then
-        #expect(result.message!.contains("Trying to attack a goblin with your bare hands is suicidal."))
+        #expect(
+            result.message!.contains("Trying to attack a goblin with your bare hands is suicidal."))
     }
 
     @Test("Attack character with weapon")
@@ -172,7 +173,7 @@ struct AttackActionHandlerTests {
             .isWeapon
         )
 
-        let game = MinimalGame(items: [goblin, sword])
+        let game = MinimalGame(items: goblin, sword)
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(
@@ -206,7 +207,7 @@ struct AttackActionHandlerTests {
             .in(.player)
         )
 
-        let game = MinimalGame(items: [goblin, lamp])
+        let game = MinimalGame(items: goblin, lamp)
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(
@@ -234,7 +235,7 @@ struct AttackActionHandlerTests {
             .isCharacter
         )
 
-        let game = MinimalGame(items: [goblin])
+        let game = MinimalGame(items: goblin)
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(

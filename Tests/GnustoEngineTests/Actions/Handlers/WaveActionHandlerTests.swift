@@ -30,10 +30,11 @@ struct WaveActionHandlerTests {
             .in(.nowhere)
         )
 
-        let game = MinimalGame(items: [distantWand])
+        let game = MinimalGame(items: distantWand)
         let (engine, _) = await GameEngine.test(blueprint: game)
 
-        let command = Command(verb: .wave, directObject: .item("distant_wand"), rawInput: "wave distant wand")
+        let command = Command(
+            verb: .wave, directObject: .item("distant_wand"), rawInput: "wave distant wand")
         let context = ActionContext(command: command, engine: engine)
 
         // When / Then
@@ -53,7 +54,7 @@ struct WaveActionHandlerTests {
             .isWand
         )
 
-        let game = MinimalGame(items: [wand])
+        let game = MinimalGame(items: wand)
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(verb: .wave, directObject: .item("wand"), rawInput: "wave wand")
@@ -63,7 +64,9 @@ struct WaveActionHandlerTests {
         let result = try await handler.process(context: context)
 
         // Then
-        #expect(result.message!.contains("You wave the magic wand dramatically, but nothing magical happens."))
+        #expect(
+            result.message!.contains(
+                "You wave the magic wand dramatically, but nothing magical happens."))
     }
 
     @Test("Wave staff shows magical message")
@@ -77,7 +80,7 @@ struct WaveActionHandlerTests {
             .isStaff
         )
 
-        let game = MinimalGame(items: [staff])
+        let game = MinimalGame(items: staff)
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(verb: .wave, directObject: .item("staff"), rawInput: "wave staff")
@@ -87,7 +90,9 @@ struct WaveActionHandlerTests {
         let result = try await handler.process(context: context)
 
         // Then
-        #expect(result.message!.contains("You wave the wooden staff dramatically, but nothing magical happens."))
+        #expect(
+            result.message!.contains(
+                "You wave the wooden staff dramatically, but nothing magical happens."))
     }
 
     @Test("Wave sword shows brandish message")
@@ -101,7 +106,7 @@ struct WaveActionHandlerTests {
             .isWeapon
         )
 
-        let game = MinimalGame(items: [sword])
+        let game = MinimalGame(items: sword)
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(verb: .wave, directObject: .item("sword"), rawInput: "wave sword")
@@ -125,7 +130,7 @@ struct WaveActionHandlerTests {
             .isWeapon
         )
 
-        let game = MinimalGame(items: [blade])
+        let game = MinimalGame(items: blade)
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(verb: .wave, directObject: .item("blade"), rawInput: "wave blade")
@@ -149,7 +154,7 @@ struct WaveActionHandlerTests {
             .isFlag
         )
 
-        let game = MinimalGame(items: [flag])
+        let game = MinimalGame(items: flag)
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(verb: .wave, directObject: .item("flag"), rawInput: "wave flag")
@@ -159,7 +164,9 @@ struct WaveActionHandlerTests {
         let result = try await handler.process(context: context)
 
         // Then
-        #expect(result.message!.contains("You wave the red flag around. It's not particularly impressive."))
+        #expect(
+            result.message!.contains(
+                "You wave the red flag around. It's not particularly impressive."))
     }
 
     @Test("Wave fixed object shows different message")
@@ -171,7 +178,7 @@ struct WaveActionHandlerTests {
             .in(.location(.startRoom))
         )
 
-        let game = MinimalGame(items: [tree])
+        let game = MinimalGame(items: tree)
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(verb: .wave, directObject: .item("tree"), rawInput: "wave tree")
@@ -181,7 +188,10 @@ struct WaveActionHandlerTests {
         let result = try await handler.process(context: context)
 
         // Then
-        #expect(result.message!.contains("You can't wave the large tree around - it's not something you can pick up and wave."))
+        #expect(
+            result.message!.contains(
+                "You can't wave the large tree around - it's not something you can pick up and wave."
+            ))
     }
 
     @Test("Wave updates state correctly")
@@ -194,7 +204,7 @@ struct WaveActionHandlerTests {
             .isTakable
         )
 
-        let game = MinimalGame(items: [wand])
+        let game = MinimalGame(items: wand)
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(verb: .wave, directObject: .item("wand"), rawInput: "wave wand")
@@ -208,9 +218,8 @@ struct WaveActionHandlerTests {
 
         // Should have touched the item
         let hasTouchedChange = result.changes.contains(where: { change in
-            change.entityID == .item("wand") &&
-            change.attribute == .itemAttribute(.isTouched) &&
-            change.newValue == true
+            change.entityID == .item("wand") && change.attribute == .itemAttribute(.isTouched)
+                && change.newValue == true
         })
         #expect(hasTouchedChange)
     }
@@ -226,7 +235,7 @@ struct WaveActionHandlerTests {
             .isStaff
         )
 
-        let game = MinimalGame(items: [staff])
+        let game = MinimalGame(items: staff)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(verb: .wave, directObject: .item("staff"), rawInput: "wave staff")

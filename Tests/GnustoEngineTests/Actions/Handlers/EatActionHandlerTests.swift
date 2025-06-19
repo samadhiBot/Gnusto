@@ -26,7 +26,8 @@ struct EatActionHandlerTests {
         // Given
         let (engine, _) = await GameEngine.test()
 
-        let command = Command(verb: .eat, directObject: .item("nonexistent"), rawInput: "eat nonexistent")
+        let command = Command(
+            verb: .eat, directObject: .item("nonexistent"), rawInput: "eat nonexistent")
         let context = ActionContext(command: command, engine: engine)
 
         // When / Then
@@ -45,10 +46,11 @@ struct EatActionHandlerTests {
             .isEdible
         )
 
-        let game = MinimalGame(items: [distantApple])
+        let game = MinimalGame(items: distantApple)
         let (engine, _) = await GameEngine.test(blueprint: game)
 
-        let command = Command(verb: .eat, directObject: .item("distant_apple"), rawInput: "eat distant apple")
+        let command = Command(
+            verb: .eat, directObject: .item("distant_apple"), rawInput: "eat distant apple")
         let context = ActionContext(command: command, engine: engine)
 
         // When / Then
@@ -67,7 +69,7 @@ struct EatActionHandlerTests {
             .isEdible
         )
 
-        let game = MinimalGame(items: [apple])
+        let game = MinimalGame(items: apple)
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(verb: .eat, directObject: .item("apple"), rawInput: "eat apple")
@@ -89,7 +91,7 @@ struct EatActionHandlerTests {
             .in(.location(.startRoom))
         )
 
-        let game = MinimalGame(items: [rock])
+        let game = MinimalGame(items: rock)
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(verb: .eat, directObject: .item("rock"), rawInput: "eat rock")
@@ -120,10 +122,11 @@ struct EatActionHandlerTests {
             .isEdible
         )
 
-        let game = MinimalGame(items: [lunchBox, sandwich])
+        let game = MinimalGame(items: lunchBox, sandwich)
         let (engine, _) = await GameEngine.test(blueprint: game)
 
-        let command = Command(verb: .eat, directObject: .item("lunch_box"), rawInput: "eat lunch box")
+        let command = Command(
+            verb: .eat, directObject: .item("lunch_box"), rawInput: "eat lunch box")
         let context = ActionContext(command: command, engine: engine)
 
         // When
@@ -151,10 +154,11 @@ struct EatActionHandlerTests {
             .isDrinkable
         )
 
-        let game = MinimalGame(items: [emptyBox, water])
+        let game = MinimalGame(items: emptyBox, water)
         let (engine, _) = await GameEngine.test(blueprint: game)
 
-        let command = Command(verb: .eat, directObject: .item("empty_box"), rawInput: "eat empty box")
+        let command = Command(
+            verb: .eat, directObject: .item("empty_box"), rawInput: "eat empty box")
         let context = ActionContext(command: command, engine: engine)
 
         // When
@@ -174,7 +178,7 @@ struct EatActionHandlerTests {
             .isEdible
         )
 
-        let game = MinimalGame(items: [apple])
+        let game = MinimalGame(items: apple)
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(verb: .eat, directObject: .item("apple"), rawInput: "eat apple")

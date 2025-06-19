@@ -21,11 +21,11 @@ struct UnlockActionHandlerTests {
         let initialKey = Item(
             id: "key",
             .name("small key"),
-            .in(.player), // Key is held
+            .in(.player),  // Key is held
             .isTakable,
         )
 
-        let game = MinimalGame(items: [initialBox, initialKey])
+        let game = MinimalGame(items: initialBox, initialKey)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // Check initial state
@@ -78,7 +78,7 @@ struct UnlockActionHandlerTests {
             .in(.player),
             .isTakable,
         )
-        let game = MinimalGame(items: [key])
+        let game = MinimalGame(items: key)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
         #expect(await engine.gameState.changeHistory.isEmpty)
 
@@ -86,7 +86,7 @@ struct UnlockActionHandlerTests {
             verb: .unlock,
             indirectObject: .item("key"),
             rawInput: "unlock with key"
-        ) // No direct object
+        )  // No direct object
 
         // Act
         await engine.execute(command: command)
@@ -111,7 +111,7 @@ struct UnlockActionHandlerTests {
             .isLocked,
             .lockKey("key"),
         )
-        let game = MinimalGame(items: [box])
+        let game = MinimalGame(items: box)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
         #expect(await engine.gameState.changeHistory.isEmpty)
 
@@ -119,7 +119,7 @@ struct UnlockActionHandlerTests {
             verb: .unlock,
             directObject: .item("box"),
             rawInput: "unlock box"
-        ) // No indirect object
+        )  // No indirect object
 
         // Act
         await engine.execute(command: command)
@@ -150,7 +150,7 @@ struct UnlockActionHandlerTests {
             .in(.location(.startRoom)),
             .isTakable,
         )
-        let game = MinimalGame(items: [box, key])
+        let game = MinimalGame(items: box, key)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
         #expect(await engine.gameState.changeHistory.isEmpty)
 
@@ -194,12 +194,12 @@ struct UnlockActionHandlerTests {
             id: .startRoom,
             .name("Start"),
             .inherentlyLit
-        ) // Correct parameter name
+        )  // Correct parameter name
         let room2 = Location(
             id: "otherRoom",
             .name("Other"),
             .inherentlyLit
-        ) // Correct parameter name
+        )  // Correct parameter name
         let game = MinimalGame(locations: [room1, room2], items: [box, key])
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
         #expect(await engine.gameState.changeHistory.isEmpty)
@@ -228,13 +228,13 @@ struct UnlockActionHandlerTests {
         let pebble = Item(
             id: "pebble",
             .in(.location(.startRoom))
-        ) // Not lockable
+        )  // Not lockable
         let key = Item(
             id: "key",
             .in(.player),
             .isTakable
         )
-        let game = MinimalGame(items: [pebble, key])
+        let game = MinimalGame(items: pebble, key)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
         #expect(await engine.gameState.changeHistory.isEmpty)
 
@@ -250,7 +250,7 @@ struct UnlockActionHandlerTests {
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "You can’t unlock the pebble.") // Uses ActionResponse.itemNotUnlockable message
+        expectNoDifference(output, "You can’t unlock the pebble.")  // Uses ActionResponse.itemNotUnlockable message
 
         // Assert No State Change
         #expect(await engine.gameState.changeHistory.isEmpty)
@@ -270,10 +270,10 @@ struct UnlockActionHandlerTests {
         let wrongKey = Item(
             id: "wrongkey",
             .name("bent key"),
-            .in(.player), // Player holds this
+            .in(.player),  // Player holds this
             .isTakable,
         )
-        let game = MinimalGame(items: [box, wrongKey])
+        let game = MinimalGame(items: box, wrongKey)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
         #expect(await engine.gameState.changeHistory.isEmpty)
 
@@ -302,7 +302,7 @@ struct UnlockActionHandlerTests {
             id: "box",
             .in(.location(.startRoom)),
             .isContainer,
-            .isLockable, // Start unlocked
+            .isLockable,  // Start unlocked
             .lockKey("key"),
         )
         let key = Item(
@@ -310,7 +310,7 @@ struct UnlockActionHandlerTests {
             .in(.player),
             .isTakable
         )
-        let game = MinimalGame(items: [box, key])
+        let game = MinimalGame(items: box, key)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
         let initialBoxSnapshot = try await engine.item("box")
         #expect(initialBoxSnapshot.hasFlag(.isLocked) == false)
@@ -363,7 +363,7 @@ extension UnlockActionHandlerTests {
                 StateChange(
                     entityID: .item(targetItemID),
                     attribute: .itemAttribute(.isTouched),
-                        newValue: true,
+                    newValue: true,
                 )
             )
         }
@@ -374,7 +374,7 @@ extension UnlockActionHandlerTests {
                 StateChange(
                     entityID: .item(keyItemID),
                     attribute: .itemAttribute(.isTouched),
-                        newValue: true,
+                    newValue: true,
                 )
             )
         }

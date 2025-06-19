@@ -17,7 +17,7 @@ struct ReadActionHandlerTests {
             .isReadable
         )
 
-        let game = MinimalGame(items: [book])
+        let game = MinimalGame(items: book)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
@@ -111,7 +111,7 @@ struct ReadActionHandlerTests {
             .isReadable
         )
 
-        let game = MinimalGame(items: [scroll])
+        let game = MinimalGame(items: scroll)
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         let handler = ReadActionHandler()
@@ -141,7 +141,7 @@ struct ReadActionHandlerTests {
             .in(.location(.startRoom))
         )
 
-        let game = MinimalGame(items: [rock])
+        let game = MinimalGame(items: rock)
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         let handler = ReadActionHandler()
@@ -218,7 +218,7 @@ struct ReadActionHandlerTests {
             .isReadable
         )
 
-        let game = MinimalGame(items: [blankPaper])
+        let game = MinimalGame(items: blankPaper)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
@@ -289,7 +289,7 @@ struct ReadActionHandlerTests {
             .isReadable
         )
 
-        let game = MinimalGame(items: [scroll])
+        let game = MinimalGame(items: scroll)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
         #expect(try await engine.item("scroll").hasFlag(.isTouched) == false)
 
@@ -322,7 +322,7 @@ struct ReadActionHandlerTests {
             .isReadable
         )
 
-        let game = MinimalGame(items: [note])
+        let game = MinimalGame(items: note)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
         #expect(try await engine.item("note").hasFlag(.isTouched) == false)
 
@@ -354,7 +354,7 @@ struct ReadActionHandlerTests {
             .isReadable
         )
 
-        let game = MinimalGame(items: [tablet])
+        let game = MinimalGame(items: tablet)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
         #expect(try await engine.item("tablet").hasFlag(.isTouched) == false)
 
@@ -386,7 +386,7 @@ struct ReadActionHandlerTests {
             .readText("Secrets within."),
             .isReadable
         )
-        let game = MinimalGame(items: [book])
+        let game = MinimalGame(items: book)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
         let command = Command(
             verb: .read,
@@ -410,7 +410,7 @@ struct ReadActionHandlerTests {
             .name("plain rock"),
             .in(.location(.startRoom))
         )
-        let game = MinimalGame(items: [rock])
+        let game = MinimalGame(items: rock)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
         let command = Command(
             verb: .read,
@@ -441,7 +441,8 @@ struct ReadActionHandlerTests {
             .readText("Can’t read this."),
             .isReadable
         )
-        let game = MinimalGame(player: Player(in: darkRoom.id), locations: [darkRoom], items: [scroll])
+        let game = MinimalGame(
+            player: Player(in: darkRoom.id), locations: [darkRoom], items: [scroll])
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
         let command = Command(
             verb: .read,
@@ -475,7 +476,8 @@ struct ReadActionHandlerTests {
             .isOn
         )
 
-        let game = MinimalGame(player: Player(in: darkRoom.id), locations: [darkRoom], items: [glowingTablet])
+        let game = MinimalGame(
+            player: Player(in: darkRoom.id), locations: [darkRoom], items: [glowingTablet])
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
         #expect(try await engine.item("tablet").hasFlag(.isTouched) == false)
 
@@ -533,7 +535,7 @@ struct ReadActionHandlerTests {
             .isReadable
         )
 
-        let game = MinimalGame(items: [box, note])
+        let game = MinimalGame(items: box, note)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
         let command = Command(
             verb: .read,
@@ -571,7 +573,7 @@ struct ReadActionHandlerTests {
             .isReadable
         )
 
-        let game = MinimalGame(items: [chest, letter])
+        let game = MinimalGame(items: chest, letter)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
         let command = Command(
             verb: .read,
@@ -609,7 +611,7 @@ struct ReadActionHandlerTests {
             .isReadable
         )
 
-        let game = MinimalGame(items: [lockedBox, secret])
+        let game = MinimalGame(items: lockedBox, secret)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
         let command = Command(
             verb: .read,

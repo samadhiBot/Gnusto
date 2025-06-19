@@ -41,7 +41,9 @@ struct GameEngineTests {
 
         // Verify initial location description was printed
         let output = await mockIO.flush()
-        expectNoDifference(output, """
+        expectNoDifference(
+            output,
+            """
             Minimal Game
 
             Welcome to the Minimal Game!
@@ -58,7 +60,7 @@ struct GameEngineTests {
         #expect(statuses.count == 1)
         #expect(statuses.first?.roomName == "Pitch Black Room")
         #expect(statuses.first?.score == 0)
-        #expect(statuses.first?.turns == 0) // Turn counter not incremented yet
+        #expect(statuses.first?.turns == 0)  // Turn counter not incremented yet
 
         // Verify teardown was called
         let teardownCount = await mockIO.teardownCallCount
@@ -93,7 +95,9 @@ struct GameEngineTests {
 
         // Check that the specific error message was printed
         let output = await mockIO.flush()
-        expectNoDifference(output, """
+        expectNoDifference(
+            output,
+            """
             Minimal Game
 
             Welcome to the Minimal Game!
@@ -116,19 +120,21 @@ struct GameEngineTests {
 
         // Check change history only contains 1st room visit and move increment
         let changeHistory = await engine.changeHistory()
-        expectNoDifference(changeHistory, [
-            StateChange(
-                entityID: .location(.startRoom),
-                attribute: .locationAttribute(.isVisited),
-                newValue: true
-            ),
-            StateChange(
-                entityID: .player,
-                attribute: .playerMoves,
-                oldValue: 0,
-                newValue: 1
-            ),
-        ])
+        expectNoDifference(
+            changeHistory,
+            [
+                StateChange(
+                    entityID: .location(.startRoom),
+                    attribute: .locationAttribute(.isVisited),
+                    newValue: true
+                ),
+                StateChange(
+                    entityID: .player,
+                    attribute: .playerMoves,
+                    oldValue: 0,
+                    newValue: 1
+                ),
+            ])
     }
 
     @Test("Engine Handles Action Error")
@@ -164,7 +170,7 @@ struct GameEngineTests {
         // Configure parser to succeed
         mockParser.parseHandler = { input, _, _ in
             if input == "take pebble" { return .success(takeCommand) }
-            if input == "quit" { return .failure(.emptyInput) } // Simulate quit needs a verb
+            if input == "quit" { return .failure(.emptyInput) }  // Simulate quit needs a verb
             return .failure(.unknownVerb(input))
         }
 
@@ -187,7 +193,9 @@ struct GameEngineTests {
 
         // Check that the specific action error message was printed
         let output = await mockIO.flush()
-        expectNoDifference(output, """
+        expectNoDifference(
+            output,
+            """
             Minimal Game
 
             Welcome to the Minimal Game!
@@ -217,18 +225,21 @@ struct GameEngineTests {
 
         // Check change history only contains 1st room visit and move increment
         let changeHistory = await engine.changeHistory()
-        expectNoDifference(changeHistory, [
-            StateChange(
-                entityID: .location(.startRoom),
-                attribute: .locationAttribute(.isVisited),
-                newValue: true,
-            ), StateChange(
-                entityID: .player,
-                attribute: .playerMoves,
-                oldValue: 0,
-                newValue: 1
-            ),
-        ])
+        expectNoDifference(
+            changeHistory,
+            [
+                StateChange(
+                    entityID: .location(.startRoom),
+                    attribute: .locationAttribute(.isVisited),
+                    newValue: true,
+                ),
+                StateChange(
+                    entityID: .player,
+                    attribute: .playerMoves,
+                    oldValue: 0,
+                    newValue: 1
+                ),
+            ])
     }
 
     @Test("Engine Processes Successful Command")
@@ -244,7 +255,7 @@ struct GameEngineTests {
         let pebble = Item(
             id: "startItem",
             .name("pebble"),
-            .in(.location(startRoom.id)), // pebble in room
+            .in(.location(startRoom.id)),  // pebble in room
             .isTakable
         )
         let game = MinimalGame(
@@ -265,7 +276,7 @@ struct GameEngineTests {
         mockParser.parseHandler = { input, _, _ in
             if input == "look" { return .success(lookCommand) }
             if input == "take pebble" { return .success(takePebbleCommand) }
-            if input == "quit" { return .failure(.emptyInput) } // Simulate quit needs a verb
+            if input == "quit" { return .failure(.emptyInput) }  // Simulate quit needs a verb
             return .failure(.unknownVerb(input))
         }
 
@@ -317,7 +328,7 @@ struct GameEngineTests {
             items: [pebble],
             customActionHandlers: [
                 .look: mockLookHandler,
-                .take: mockTakeHandler
+                .take: mockTakeHandler,
             ]
         )
 
@@ -338,7 +349,7 @@ struct GameEngineTests {
             switch input {
             case "look": return .success(lookCommand)
             case "take pebble": return .success(takePebbleCommand)
-            case "quit": return .failure(.emptyInput) // Simulate quit needs a verb
+            case "quit": return .failure(.emptyInput)  // Simulate quit needs a verb
             default: return .failure(.unknownVerb(input))
             }
         }
@@ -368,7 +379,7 @@ struct GameEngineTests {
         #expect(lookCommandReceived?.verb == "look")
         let takeCommandReceived = await mockTakeHandler.getLastCommandReceived()
         #expect(takeCommandReceived?.verb == "take")
-            #expect(takeCommandReceived?.directObject == .item("startItem"))
+        #expect(takeCommandReceived?.directObject == .item("startItem"))
 
         // Check turn counter reflects two successful commands
         let finalMoves = await engine.playerMoves
@@ -376,7 +387,7 @@ struct GameEngineTests {
 
         // Check status line was updated for each turn (initial + 2 turns)
         let statuses = await mockIO.recordedStatusLines
-        #expect(statuses.count == 3) // Initial state + 2 turns
+        #expect(statuses.count == 3)  // Initial state + 2 turns
 
         guard statuses.count == 3 else {
             Issue.record("Missing status lines")
@@ -417,7 +428,9 @@ struct GameEngineTests {
 
         // Ensure game loop exited (e.g., by checking turns or a flag if IO doesn't stop it)
         let finalMoves = await engine.playerMoves
-        #expect(finalMoves == 0, "Quit command should not increment moves if it's the first command and handled cleanly")
+        #expect(
+            finalMoves == 0,
+            "Quit command should not increment moves if it's the first command and handled cleanly")
     }
 
     @Test("Engine Handles Nil Input (EOF) Gracefully")
@@ -436,7 +449,9 @@ struct GameEngineTests {
 
         // Verify initial output occurred (room desc, status, prompt)
         let output = await mockIO.flush()
-        expectNoDifference(output, """
+        expectNoDifference(
+            output,
+            """
             Minimal Game
 
             Welcome to the Minimal Game!
@@ -484,7 +499,7 @@ struct GameEngineTests {
             items: [pebble],
             customActionHandlers: [
                 // Only mock inventory
-                .inventory: mockInventoryHandler,
+                .inventory: mockInventoryHandler
             ]
         )
 
@@ -530,10 +545,13 @@ struct GameEngineTests {
 
         // Verify the final state using safe engine accessors
         let finalPebbleSnapshot = try await engine.item("startItem")
-        #expect(finalPebbleSnapshot.parent == .player, "Pebble snapshot should show parent as player")
+        #expect(
+            finalPebbleSnapshot.parent == .player, "Pebble snapshot should show parent as player")
 
         let finalInventorySnapshots = await engine.items(in: .player)
-        #expect(finalInventorySnapshots.contains { $0.id == "startItem" }, "Player inventory snapshots should contain pebble")
+        #expect(
+            finalInventorySnapshots.contains { $0.id == "startItem" },
+            "Player inventory snapshots should contain pebble")
 
         let finalRoomSnapshots = await engine.items(in: .location(.startRoom))
         #expect(finalRoomSnapshots.isEmpty == true, "Start room snapshots should be empty")
@@ -544,14 +562,16 @@ struct GameEngineTests {
 
         // Check status lines were updated
         let statuses = await mockIO.recordedStatusLines
-        #expect(statuses.count == 3) // Initial + take + inventory
+        #expect(statuses.count == 3)  // Initial + take + inventory
         #expect(statuses[0].turns == 0)
         #expect(statuses[1].turns == 1)
         #expect(statuses[2].turns == 2)
 
-         // Verify output included "Taken."
+        // Verify output included "Taken."
         let output = await mockIO.flush()
-        expectNoDifference(output, """
+        expectNoDifference(
+            output,
+            """
             Minimal Game
 
             Welcome to the Minimal Game!
@@ -619,7 +639,7 @@ struct GameEngineTests {
         }
 
         let testItemID = ItemID("lamp")
-        let testFlagKey = GlobalID("lampLit") // Use GlobalID type
+        let testFlagKey = GlobalID("lampLit")  // Use GlobalID type
         let lamp = Item(
             id: testItemID,
             .name("brass lamp"),
@@ -630,7 +650,7 @@ struct GameEngineTests {
         let mockActionHandler = MockMultiChangeHandler(
             itemIDToModify: testItemID,
             flagToSet: testFlagKey.rawValue
-        ) // Pass rawValue if handler needs string
+        )  // Pass rawValue if handler needs string
         let startRoom = Location(
             id: .startRoom,
             .name("Start Room"),
@@ -689,8 +709,7 @@ struct GameEngineTests {
         // Check for Player moves increment change
         #expect(
             history.contains { change in
-                change.attribute == .playerMoves &&
-                change.newValue == .int(1)
+                change.attribute == .playerMoves && change.newValue == .int(1)
             },
             "History should contain playerMoves increment to 1"
         )
@@ -699,8 +718,9 @@ struct GameEngineTests {
         #expect(
             history.contains { change in
                 guard change.entityID == .item(testItemID),
-                      case .itemAttribute(let prop) = change.attribute,
-                      change.newValue == true else { return false }
+                    case .itemAttribute(let prop) = change.attribute,
+                    change.newValue == true
+                else { return false }
                 return prop == .isTouched || prop == .isOn
             },
             "History should contain item property change adding .on and .touched"
@@ -709,9 +729,8 @@ struct GameEngineTests {
         // Check for Flag change
         #expect(
             history.contains { change in
-                change.entityID == .global &&
-                    change.attribute == .setFlag(testFlagKey) &&
-                    change.newValue == true
+                change.entityID == .global && change.attribute == .setFlag(testFlagKey)
+                    && change.newValue == true
             },
             "History should contain flag change to true for \(testFlagKey)"
         )
@@ -724,7 +743,9 @@ struct GameEngineTests {
 
         // Check output message
         let output = await mockIO.flush()
-        expectNoDifference(output, """
+        expectNoDifference(
+            output,
+            """
             Minimal Game
 
             Welcome to the Minimal Game!
@@ -761,19 +782,19 @@ struct GameEngineTests {
             return ActionResult("Fuse triggered!")
         }
 
-                // Initialize game with fuse definition and start fuse
+        // Initialize game with fuse definition and start fuse
         let game = MinimalGame(
             fuses: ["testFuse": fuseDef]
         )
 
         let (engine, _) = await GameEngine.test(
             blueprint: game,
-            activeFuses: ["testFuse": 2], // Start with 2 turns remaining
+            activeFuses: ["testFuse": 2],  // Start with 2 turns remaining
         )
 
         // Act: Simulate 3 turns to trigger the fuse (turn 1: countdown to 1, turn 2: countdown to 0 and trigger)
-        try await engine.tickClock() // Turn 1: fuse goes from 2 to 1
-        try await engine.tickClock() // Turn 2: fuse goes from 1 to 0 and triggers
+        try await engine.tickClock()  // Turn 1: fuse goes from 2 to 1
+        try await engine.tickClock()  // Turn 2: fuse goes from 1 to 0 and triggers
 
         // Assert: Fuse should have triggered
         #expect(await stateHolder.getFlag() == true)
@@ -796,7 +817,7 @@ struct GameEngineTests {
         )
         let (engine, _) = await GameEngine.test(
             blueprint: game,
-            activeDaemons: ["testDaemon"], // Start daemon immediately
+            activeDaemons: ["testDaemon"],  // Start daemon immediately
         )
 
         // Act: Run engine for 7 turns to test daemon frequency (every 3 turns)
@@ -830,8 +851,8 @@ struct GameEngineTests {
 
         let (engine, _) = await GameEngine.test(
             blueprint: game,
-            activeFuses: ["testFuse": 3], // Start fuse with 3 turns
-            activeDaemons: ["testDaemon"], // Start daemon immediately
+            activeFuses: ["testFuse": 3],  // Start fuse with 3 turns
+            activeDaemons: ["testDaemon"],  // Start daemon immediately
         )
 
         // Act: Run for 6 turns
@@ -1047,14 +1068,15 @@ struct GameEngineTests {
         )
         let player = Player(
             in: .startRoom,
-            carryingCapacity: 10 // Set low capacity
+            carryingCapacity: 10  // Set low capacity
         )
         let startRoom = Location(
             id: .startRoom,
             .name("Start Room"),
             .inherentlyLit
         )
-        let game = MinimalGame(player: player, locations: [startRoom], items: [itemHeld, itemToTake])
+        let game = MinimalGame(
+            player: player, locations: [startRoom], items: [itemHeld, itemToTake])
 
         let command = Command(
             verb: .take,
@@ -1415,7 +1437,8 @@ struct GameEngineTests {
             .inherentlyLit
         )
         let player = Player(in: .startRoom)
-        let game = MinimalGame(player: player, locations: [startRoom], items: [container, wrongKey])
+        let game = MinimalGame(
+            player: player, locations: [startRoom], items: [container, wrongKey])
 
         let command = Command(
             verb: .unlock,
@@ -1455,9 +1478,9 @@ struct GameEngineTests {
             StateChange(
                 entityID: .item(itemID),
                 attribute: .itemAttribute(.isTouched),
-                oldValue: nil, // Assuming not touched initially
+                oldValue: nil,  // Assuming not touched initially
                 newValue: true,
-            )
+            ),
         ]
 
         // Define the ActionResult to be returned by the mock handler
@@ -1469,9 +1492,10 @@ struct GameEngineTests {
         // Create a mock handler that returns the ActionResult
         struct MockResultHandler: ActionHandler {
             let result: ActionResult
-            func validate(context: ActionContext) async throws { /* No validation needed */ }
+            func validate(context: ActionContext) async throws { /* No validation needed */  }
             func process(context: ActionContext) async throws -> ActionResult { result }
-            func postProcess(context: ActionContext, result: ActionResult) async throws { /* No post-processing needed */ }
+            func postProcess(context: ActionContext, result: ActionResult) async throws
+            { /* No post-processing needed */  }
         }
 
         let testVerb = VerbID("testapply")
@@ -1525,18 +1549,20 @@ struct GameEngineTests {
 
         // Check change history
         let history = await engine.gameState.changeHistory
-        expectNoDifference(history, [
-            StateChange(
-                entityID: .item(.startItem),
-                attribute: .itemAttribute(.isTouched),
-                newValue: true
-            ),
-            StateChange(
-                entityID: .global,
-                attribute: .pronounReference(pronoun: "it"),
-                newValue: .entityReferenceSet([.item(.startItem)])
-            )
-        ])
+        expectNoDifference(
+            history,
+            [
+                StateChange(
+                    entityID: .item(.startItem),
+                    attribute: .itemAttribute(.isTouched),
+                    newValue: true
+                ),
+                StateChange(
+                    entityID: .global,
+                    attribute: .pronounReference(pronoun: "it"),
+                    newValue: .entityReferenceSet([.item(.startItem)])
+                ),
+            ])
     }
 
     // Test for GameEngine.updatePronouns
@@ -1547,18 +1573,19 @@ struct GameEngineTests {
             .name("Test Item")
         )
         let (engine, _) = await GameEngine.test(
-            blueprint: MinimalGame(items: [item]),
+            blueprint: MinimalGame(items: item),
             parser: MockParser(),
             ioHandler: await MockIOHandler()
         )
 
         let stateChange = await engine.updatePronouns(to: item)
         #expect(
-            stateChange == StateChange(
-                entityID: .global,
-                attribute: .pronounReference(pronoun: "it"),
-                newValue: .entityReferenceSet([.item(item.id)])
-            )
+            stateChange
+                == StateChange(
+                    entityID: .global,
+                    attribute: .pronounReference(pronoun: "it"),
+                    newValue: .entityReferenceSet([.item(item.id)])
+                )
         )
     }
 
@@ -1567,18 +1594,19 @@ struct GameEngineTests {
         let item1 = Item(id: "item1", .name("Item One"))
         let item2 = Item(id: "item2", .name("Item Two"))
         let (engine, _) = await GameEngine.test(
-            blueprint: MinimalGame(items: [item1, item2]),
+            blueprint: MinimalGame(items: item1, item2),
             parser: MockParser(),
             ioHandler: await MockIOHandler()
         )
 
         let change = await engine.updatePronouns(to: item1, item2)
         #expect(
-            change == StateChange(
-                entityID: .global,
-                attribute: .pronounReference(pronoun: "them"),
-                newValue: .entityReferenceSet([.item(item1.id), .item(item2.id)])
-            )
+            change
+                == StateChange(
+                    entityID: .global,
+                    attribute: .pronounReference(pronoun: "them"),
+                    newValue: .entityReferenceSet([.item(item1.id), .item(item2.id)])
+                )
         )
     }
 
@@ -1588,7 +1616,7 @@ struct GameEngineTests {
         let item2 = Item(id: "item2", .name("Item Two"))
         let item3 = Item(id: "item3", .name("Item Three"))
         let (engine, _) = await GameEngine.test(
-            blueprint: MinimalGame(items: [item1, item2, item3]),
+            blueprint: MinimalGame(items: item1, item2, item3),
             parser: MockParser(),
             ioHandler: await MockIOHandler()
         )
@@ -1610,11 +1638,12 @@ struct GameEngineTests {
         }
         #expect(itChange != nil)
         #expect(
-            itChange == StateChange(
-                entityID: .global,
-                attribute: .pronounReference(pronoun: "it"),
-                newValue: .entityReferenceSet([.item(item3.id)])
-            )
+            itChange
+                == StateChange(
+                    entityID: .global,
+                    attribute: .pronounReference(pronoun: "it"),
+                    newValue: .entityReferenceSet([.item(item3.id)])
+                )
         )
 
         // Check "them" change (should refer to all items)
@@ -1626,11 +1655,14 @@ struct GameEngineTests {
         }
         #expect(themChange != nil)
         #expect(
-            themChange == StateChange(
-                entityID: .global,
-                attribute: .pronounReference(pronoun: "them"),
-                newValue: .entityReferenceSet([.item(item1.id), .item(item2.id), .item(item3.id)])
-            )
+            themChange
+                == StateChange(
+                    entityID: .global,
+                    attribute: .pronounReference(pronoun: "them"),
+                    newValue: .entityReferenceSet([
+                        .item(item1.id), .item(item2.id), .item(item3.id),
+                    ])
+                )
         )
     }
 }
@@ -1672,7 +1704,7 @@ extension GameEngineTests {
         await mockIO.enqueueInput(commandInput, "quit")
         await engine.run()
         let outputCalls = await mockIO.recordedOutput
-        var commandOutput = "" // Default to empty string
+        var commandOutput = ""  // Default to empty string
         var promptEncountered = false
         for call in outputCalls {
             // Capture the first non-input, non-status line *after* the input prompt for the command
@@ -1682,7 +1714,7 @@ extension GameEngineTests {
             }
             if promptEncountered && call.style != .input && call.style != .statusLine {
                 commandOutput = call.text
-                break // Found the command's response
+                break  // Found the command's response
             }
         }
         return commandOutput.trimmingCharacters(in: .whitespacesAndNewlines)

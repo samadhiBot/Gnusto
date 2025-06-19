@@ -20,16 +20,16 @@ struct LockActionHandlerTests {
         let initialKey = Item(
             id: "key",
             .name("small key"),
-            .in(.player), // Key is held
+            .in(.player),  // Key is held
             .isTakable
         )
 
-        let game = MinimalGame(items: [initialBox, initialKey])
+        let game = MinimalGame(items: initialBox, initialKey)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // Check initial state
         let initialBoxSnapshot = try await engine.item("box")
-        #expect(initialBoxSnapshot.hasFlag(.isLocked) == false) // Qualified
+        #expect(initialBoxSnapshot.hasFlag(.isLocked) == false)  // Qualified
         let initialKeySnapshot = try await engine.item("key")
 
         #expect(await engine.gameState.changeHistory.isEmpty)
@@ -77,7 +77,7 @@ struct LockActionHandlerTests {
             .in(.player),
             .isTakable
         )
-        let game = MinimalGame(items: [key])
+        let game = MinimalGame(items: key)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
         #expect(await engine.gameState.changeHistory.isEmpty)
 
@@ -85,7 +85,7 @@ struct LockActionHandlerTests {
             verb: .lock,
             indirectObject: .item("key"),
             rawInput: "lock with key"
-        ) // No direct object
+        )  // No direct object
 
         // Act
         await engine.execute(command: command)
@@ -109,7 +109,7 @@ struct LockActionHandlerTests {
             .isContainer,
             .isLockable
         )
-        let game = MinimalGame(items: [box])
+        let game = MinimalGame(items: box)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
         #expect(await engine.gameState.changeHistory.isEmpty)
 
@@ -117,7 +117,7 @@ struct LockActionHandlerTests {
             verb: .lock,
             directObject: .item("box"),
             rawInput: "lock box"
-        ) // No indirect object
+        )  // No indirect object
 
         // Act
         await engine.execute(command: command)
@@ -144,10 +144,10 @@ struct LockActionHandlerTests {
         let key = Item(
             id: "key",
             .name("key"),
-            .in(.location(.startRoom)), // Key also in room
+            .in(.location(.startRoom)),  // Key also in room
             .isTakable
         )
-        let game = MinimalGame(items: [box, key])
+        let game = MinimalGame(items: box, key)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
         #expect(await engine.gameState.changeHistory.isEmpty)
 
@@ -224,13 +224,13 @@ struct LockActionHandlerTests {
         let pebble = Item(
             id: "pebble",
             .in(.location(.startRoom))
-        ) // Not lockable
+        )  // Not lockable
         let key = Item(
             id: "key",
             .in(.player),
             .isTakable
         )
-        let game = MinimalGame(items: [pebble, key])
+        let game = MinimalGame(items: pebble, key)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
         #expect(await engine.gameState.changeHistory.isEmpty)
 
@@ -246,7 +246,7 @@ struct LockActionHandlerTests {
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "You can’t lock the pebble.") // Uses ActionResponse.itemNotLockable message
+        expectNoDifference(output, "You can’t lock the pebble.")  // Uses ActionResponse.itemNotLockable message
 
         // Assert No State Change
         #expect(await engine.gameState.changeHistory.isEmpty)
@@ -266,10 +266,10 @@ struct LockActionHandlerTests {
         let wrongKey = Item(
             id: "wrongkey",
             .name("bent key"),
-            .in(.player), // Player holds this
+            .in(.player),  // Player holds this
             .isTakable
         )
-        let game = MinimalGame(items: [box, wrongKey])
+        let game = MinimalGame(items: box, wrongKey)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
         #expect(await engine.gameState.changeHistory.isEmpty)
 
@@ -301,7 +301,7 @@ struct LockActionHandlerTests {
             .lockKey("key"),
             .isContainer,
             .isLockable,
-            .isLocked // Start locked
+            .isLocked  // Start locked
         )
         let key = Item(
             id: "key",
@@ -309,10 +309,10 @@ struct LockActionHandlerTests {
             .in(.player),
             .isTakable
         )
-        let game = MinimalGame(items: [box, key])
+        let game = MinimalGame(items: box, key)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
         let initialBoxSnapshot = try await engine.item("box")
-        #expect(initialBoxSnapshot.hasFlag(.isLocked) == true) // Qualified
+        #expect(initialBoxSnapshot.hasFlag(.isLocked) == true)  // Qualified
         #expect(await engine.gameState.changeHistory.isEmpty)
 
         let command = Command(
@@ -383,7 +383,7 @@ extension LockActionHandlerTests {
             StateChange(
                 entityID: .global,
                 attribute: .pronounReference(pronoun: "it"),
-                oldValue: nil, // Simplified for test
+                oldValue: nil,  // Simplified for test
                 newValue: .entityReferenceSet([.item(targetItemID)])
             )
         )

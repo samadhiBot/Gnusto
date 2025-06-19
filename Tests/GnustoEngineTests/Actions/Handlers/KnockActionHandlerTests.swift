@@ -31,7 +31,7 @@ struct KnockActionHandlerTests {
             .isDoor
         )
 
-        let game = MinimalGame(items: [door])
+        let game = MinimalGame(items: door)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(verb: .knock, directObject: .item("door"), rawInput: "knock door")
@@ -53,7 +53,7 @@ struct KnockActionHandlerTests {
             .in(.location(.startRoom))
         )
 
-        let game = MinimalGame(items: [wall])
+        let game = MinimalGame(items: wall)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(verb: .knock, directObject: .item("wall"), rawInput: "knock wall")
@@ -76,7 +76,7 @@ struct KnockActionHandlerTests {
             .isContainer
         )
 
-        let game = MinimalGame(items: [chest])
+        let game = MinimalGame(items: chest)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(verb: .knock, directObject: .item("chest"), rawInput: "knock chest")
@@ -100,7 +100,7 @@ struct KnockActionHandlerTests {
             .isOpen
         )
 
-        let game = MinimalGame(items: [door])
+        let game = MinimalGame(items: door)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(verb: .knock, directObject: .item("door"), rawInput: "knock door")

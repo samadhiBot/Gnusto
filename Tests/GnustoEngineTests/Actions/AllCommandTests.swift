@@ -5,7 +5,7 @@ import Testing
 
 @Suite("ALL Command Tests")
 struct AllCommandTests {
-    
+
     @Test("TAKE ALL with multiple takable items")
     func testTakeAllMultipleItems() async throws {
         // Arrange: Multiple takable items in the room
@@ -30,14 +30,14 @@ struct AllCommandTests {
             .isTakable,
             .size(3)
         )
-        
+
         let player = Player(in: .startRoom, carryingCapacity: 20)
         let game = MinimalGame(player: player, items: [key, coin, lamp])
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .take,
-            directObjects: [.item("coin"), .item("key"), .item("lamp")], // Sorted by name
+            directObjects: [.item("coin"), .item("key"), .item("lamp")],  // Sorted by name
             isAllCommand: true,
             rawInput: "take all"
         )
@@ -49,7 +49,7 @@ struct AllCommandTests {
         let finalKeyState = try await engine.item("key")
         let finalCoinState = try await engine.item("coin")
         let finalLampState = try await engine.item("lamp")
-        
+
         #expect(finalKeyState.parent == .player)
         #expect(finalCoinState.parent == .player)
         #expect(finalLampState.parent == .player)
@@ -71,13 +71,13 @@ struct AllCommandTests {
             .in(.location(.startRoom))
             // No .isTakable flag
         )
-        
-        let game = MinimalGame(items: [scenery])
+
+        let game = MinimalGame(items: scenery)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .take,
-            directObjects: [], // Empty because no valid objects found
+            directObjects: [],  // Empty because no valid objects found
             isAllCommand: true,
             rawInput: "take all"
         )
@@ -116,14 +116,14 @@ struct AllCommandTests {
             .isTakable,
             .size(1)
         )
-        
+
         let player = Player(in: .startRoom, carryingCapacity: 20)
         let game = MinimalGame(player: player, items: [key, wall, coin])
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .take,
-            directObjects: [.item("coin"), .item("key")], // Only takable items
+            directObjects: [.item("coin"), .item("key")],  // Only takable items
             isAllCommand: true,
             rawInput: "take all"
         )
@@ -135,10 +135,10 @@ struct AllCommandTests {
         let finalKeyState = try await engine.item("key")
         let finalCoinState = try await engine.item("coin")
         let finalWallState = try await engine.item("wall")
-        
+
         #expect(finalKeyState.parent == .player)
         #expect(finalCoinState.parent == .player)
-        #expect(finalWallState.parent == .location(.startRoom)) // Wall stays
+        #expect(finalWallState.parent == .location(.startRoom))  // Wall stays
 
         // Assert: Appropriate message
         let output = await mockIO.flush()
@@ -167,16 +167,16 @@ struct AllCommandTests {
             .name("heavy boulder"),
             .in(.location(.startRoom)),
             .isTakable,
-            .size(10) // Too heavy
+            .size(10)  // Too heavy
         )
-        
-        let player = Player(in: .startRoom, carryingCapacity: 6) // Can only carry key + coin
+
+        let player = Player(in: .startRoom, carryingCapacity: 6)  // Can only carry key + coin
         let game = MinimalGame(player: player, items: [key, coin, boulder])
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .take,
-            directObjects: [.item("coin"), .item("key")], // Boulder filtered out by capacity
+            directObjects: [.item("coin"), .item("key")],  // Boulder filtered out by capacity
             isAllCommand: true,
             rawInput: "take all"
         )
@@ -188,10 +188,10 @@ struct AllCommandTests {
         let finalKeyState = try await engine.item("key")
         let finalCoinState = try await engine.item("coin")
         let finalBoulderState = try await engine.item("boulder")
-        
+
         #expect(finalKeyState.parent == .player)
         #expect(finalCoinState.parent == .player)
-        #expect(finalBoulderState.parent == .location(.startRoom)) // Boulder stays
+        #expect(finalBoulderState.parent == .location(.startRoom))  // Boulder stays
 
         // Assert: Appropriate message
         let output = await mockIO.flush()
@@ -222,13 +222,13 @@ struct AllCommandTests {
             .isTakable,
             .size(3)
         )
-        
-        let game = MinimalGame(items: [key, coin, lamp])
+
+        let game = MinimalGame(items: key, coin, lamp)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .drop,
-            directObjects: [.item("coin"), .item("key"), .item("lamp")], // Sorted by name
+            directObjects: [.item("coin"), .item("key"), .item("lamp")],  // Sorted by name
             isAllCommand: true,
             rawInput: "drop all"
         )
@@ -240,7 +240,7 @@ struct AllCommandTests {
         let finalKeyState = try await engine.item("key")
         let finalCoinState = try await engine.item("coin")
         let finalLampState = try await engine.item("lamp")
-        
+
         #expect(finalKeyState.parent == .location(.startRoom))
         #expect(finalCoinState.parent == .location(.startRoom))
         #expect(finalLampState.parent == .location(.startRoom))
@@ -251,11 +251,12 @@ struct AllCommandTests {
 
         // Assert: Pronouns updated to last item
         #expect(await engine.getPronounReference(pronoun: "it") == [.item("lamp")])
-        #expect(await engine.getPronounReference(pronoun: "them") == [
-            .item("lamp"),
-            .item("key"),
-            .item("coin"),
-        ])
+        #expect(
+            await engine.getPronounReference(pronoun: "them") == [
+                .item("lamp"),
+                .item("key"),
+                .item("coin"),
+            ])
     }
 
     @Test("DROP ALL with no held items")
@@ -265,7 +266,7 @@ struct AllCommandTests {
 
         let command = Command(
             verb: .drop,
-            directObjects: [], // Empty because player holds nothing
+            directObjects: [],  // Empty because player holds nothing
             isAllCommand: true,
             rawInput: "drop all"
         )
@@ -291,7 +292,7 @@ struct AllCommandTests {
             .isTakable,
             .size(2)
         )
-        
+
         let player = Player(in: .startRoom, carryingCapacity: 20)
         let game = MinimalGame(player: player, items: [key])
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
@@ -325,8 +326,8 @@ struct AllCommandTests {
             .isTakable,
             .size(2)
         )
-        
-        let game = MinimalGame(items: [key])
+
+        let game = MinimalGame(items: key)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
@@ -365,14 +366,14 @@ struct AllCommandTests {
             .isTakable,
             .size(2)
         )
-        
+
         let player = Player(in: .startRoom, carryingCapacity: 20)
         let game = MinimalGame(player: player, items: [heldKey, roomKey])
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .take,
-            directObjects: [.item("roomKey")], // Only room key should be in the list
+            directObjects: [.item("roomKey")],  // Only room key should be in the list
             isAllCommand: true,
             rawInput: "take all"
         )
@@ -383,12 +384,12 @@ struct AllCommandTests {
         // Assert: Only room key is taken (held key skipped)
         let finalHeldKeyState = try await engine.item("heldKey")
         let finalRoomKeyState = try await engine.item("roomKey")
-        
-        #expect(finalHeldKeyState.parent == .player) // Still held
-        #expect(finalRoomKeyState.parent == .player) // Now taken
+
+        #expect(finalHeldKeyState.parent == .player)  // Still held
+        #expect(finalRoomKeyState.parent == .player)  // Now taken
 
         // Assert: Message only mentions newly taken item
         let output = await mockIO.flush()
         #expect(output == "You take the brass key.")
     }
-} 
+}

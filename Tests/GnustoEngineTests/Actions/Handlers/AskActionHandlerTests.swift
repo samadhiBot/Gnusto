@@ -1,5 +1,6 @@
 import CustomDump
 import Testing
+
 @testable import GnustoEngine
 
 @Suite("AskActionHandler Tests")
@@ -30,7 +31,7 @@ struct AskActionHandlerTests {
             .name("old wizard"),
             .isCharacter
         )
-        let game = MinimalGame(items: [character])
+        let game = MinimalGame(items: character)
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(
@@ -52,7 +53,7 @@ struct AskActionHandlerTests {
     func testAskRequiresCharacter() async throws {
         // Given
         let rock = Item(id: "rock", .name("rock"))
-        let game = MinimalGame(items: [rock])
+        let game = MinimalGame(items: rock)
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(
@@ -85,7 +86,7 @@ struct AskActionHandlerTests {
             .name("magic crystal"),
             .in(.location(.startRoom))
         )
-        let game = MinimalGame(items: [wizard, crystal])
+        let game = MinimalGame(items: wizard, crystal)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
@@ -115,7 +116,7 @@ struct AskActionHandlerTests {
             .in(.location(.startRoom)),
             .isCharacter
         )
-        let game = MinimalGame(items: [wizard])
+        let game = MinimalGame(items: wizard)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
@@ -142,7 +143,7 @@ struct AskActionHandlerTests {
             .in(.location(.startRoom)),
             .isCharacter
         )
-        let game = MinimalGame(items: [wizard])
+        let game = MinimalGame(items: wizard)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
@@ -169,7 +170,7 @@ struct AskActionHandlerTests {
             .in(.nowhere),
             .isCharacter
         )
-        let game = MinimalGame(items: [wizard])
+        let game = MinimalGame(items: wizard)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(

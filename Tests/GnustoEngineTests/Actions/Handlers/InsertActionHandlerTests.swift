@@ -52,7 +52,7 @@ struct InsertActionHandlerTests {
         let initialItemAttributes = initialCoin.attributes
         let initialContainerAttributes = initialBox.attributes
 
-        let game = MinimalGame(items: [initialCoin, initialBox])
+        let game = MinimalGame(items: initialCoin, initialBox)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
         #expect(await engine.gameState.changeHistory.isEmpty)
 
@@ -104,7 +104,7 @@ struct InsertActionHandlerTests {
             .isOpen,
             .isContainer,
         )
-        let game = MinimalGame(items: [box])
+        let game = MinimalGame(items: box)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
         #expect(await engine.gameState.changeHistory.isEmpty)
 
@@ -113,7 +113,7 @@ struct InsertActionHandlerTests {
             indirectObject: .item("openBox"),
             preposition: "in",
             rawInput: "put in open box"
-        ) // No DO
+        )  // No DO
 
         // Act
         await engine.execute(command: command)
@@ -135,7 +135,7 @@ struct InsertActionHandlerTests {
             .in(.player),
             .isTakable,
         )
-        let game = MinimalGame(items: [coin])
+        let game = MinimalGame(items: coin)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
         #expect(await engine.gameState.changeHistory.isEmpty)
 
@@ -144,7 +144,7 @@ struct InsertActionHandlerTests {
             directObject: .item("coin"),
             preposition: "in",
             rawInput: "put coin in"
-        ) // No IO
+        )  // No IO
 
         // Act
         await engine.execute(command: command)
@@ -174,7 +174,7 @@ struct InsertActionHandlerTests {
             .isContainer,
             .isOpenable,
         )
-        let game = MinimalGame(items: [coin, box])
+        let game = MinimalGame(items: coin, box)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
         #expect(await engine.gameState.changeHistory.isEmpty)
 
@@ -214,7 +214,7 @@ struct InsertActionHandlerTests {
             .isOpenable,
             .isOpen,
         )
-        let game = MinimalGame(items: [coin, box])
+        let game = MinimalGame(items: coin, box)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
         #expect(await engine.gameState.changeHistory.isEmpty)
 
@@ -252,7 +252,7 @@ struct InsertActionHandlerTests {
             .in(.location(.startRoom)),
             .isOpenable
         )
-        let game = MinimalGame(items: [coin, statue])
+        let game = MinimalGame(items: coin, statue)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
         #expect(await engine.gameState.changeHistory.isEmpty)
 
@@ -289,8 +289,8 @@ struct InsertActionHandlerTests {
             .in(.location(.startRoom)),
             .isContainer,
             .isOpenable,
-        ) // Closed
-        let game = MinimalGame(items: [coin, box])
+        )  // Closed
+        let game = MinimalGame(items: coin, box)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
         #expect(await engine.gameState.changeHistory.isEmpty)
 
@@ -322,7 +322,7 @@ struct InsertActionHandlerTests {
             .in(.player),
             .isOpen,
         )
-        let game = MinimalGame(items: [box])
+        let game = MinimalGame(items: box)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
         #expect(await engine.gameState.changeHistory.isEmpty)
 
@@ -362,7 +362,7 @@ struct InsertActionHandlerTests {
             .isContainer,
             .isOpen,
         )
-        let game = MinimalGame(items: [bag, box])
+        let game = MinimalGame(items: bag, box)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
         #expect(await engine.gameState.changeHistory.isEmpty)
 
@@ -380,7 +380,9 @@ struct InsertActionHandlerTests {
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, """
+        expectNoDifference(
+            output,
+            """
             You can’t put the bag in the box, because the box is inside the
             bag!
             """)
@@ -413,7 +415,7 @@ struct InsertActionHandlerTests {
             .isOpen,
             .capacity(10),
         )
-        let game = MinimalGame(items: [coin, box, existingItem])
+        let game = MinimalGame(items: coin, box, existingItem)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // Initial state check - Calculate manually
@@ -437,7 +439,7 @@ struct InsertActionHandlerTests {
         expectNoDifference(output, "The gold coin won’t fit in the nearly full box.")
 
         // Assert No State Change
-        #expect(try await engine.item("coin").parent == .player) // Coin still held
+        #expect(try await engine.item("coin").parent == .player)  // Coin still held
         #expect(await engine.gameState.changeHistory.isEmpty)
     }
 
@@ -468,7 +470,7 @@ struct InsertActionHandlerTests {
         let initialCoinAttributes = initialCoin.attributes
         let initialBoxAttributes = initialBox.attributes
 
-        let game = MinimalGame(items: [initialCoin, initialBox, existingItem])
+        let game = MinimalGame(items: initialCoin, initialBox, existingItem)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // Initial state check - Calculate manually
@@ -489,14 +491,14 @@ struct InsertActionHandlerTests {
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "You put the gold coin in the half-full box.") // Success message
+        expectNoDifference(output, "You put the gold coin in the half-full box.")  // Success message
 
         // Assert Final State
-        #expect(try await engine.item("coin").parent == .item("exactBox")) // Coin is in box
-                                                                        // Final state check - Calculate manually
+        #expect(try await engine.item("coin").parent == .item("exactBox"))  // Coin is in box
+        // Final state check - Calculate manually
         let itemsInsideFinal = await engine.items(in: .item("exactBox"))
         let finalLoad = itemsInsideFinal.reduce(0) { $0 + $1.size }
-        #expect(finalLoad == 10) // Box is now full
+        #expect(finalLoad == 10)  // Box is now full
 
         // Assert Change History (should include parent change, touched flags, pronoun)
         let expectedChanges = expectedInsertChanges(
@@ -524,13 +526,13 @@ struct InsertActionHandlerTests {
             .in(.location(.startRoom)),
             .isContainer,
             .isOpenable,
-            .isOpen // Starts open
+            .isOpen  // Starts open
         )
         let room = Location(
             id: .startRoom,
             .name("Room"),
             .inherentlyLit
-        ) // Assuming lit for test
+        )  // Assuming lit for test
 
         let game = MinimalGame(locations: [room], items: [itemToInsert, container])
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
@@ -804,7 +806,7 @@ struct InsertActionHandlerTests {
         expectNoDifference(output, "The small key won’t fit in the wooden box.")
 
         // Assert No State Change
-        #expect(try await engine.item("key").parent == .player) // Key still held
+        #expect(try await engine.item("key").parent == .player)  // Key still held
         #expect(await engine.gameState.changeHistory.isEmpty)
     }
 
@@ -853,7 +855,7 @@ struct InsertActionHandlerTests {
         expectNoDifference(output, "The large key won’t fit in the small box.")
 
         // Assert No State Change
-        #expect(try await engine.item("key").parent == .player) // Key still held
+        #expect(try await engine.item("key").parent == .player)  // Key still held
         #expect(await engine.gameState.changeHistory.isEmpty)
     }
 
@@ -880,7 +882,7 @@ struct InsertActionHandlerTests {
             .isTakable
         )
 
-        let game = MinimalGame(items: [outerBox, innerBox, coin])
+        let game = MinimalGame(items: outerBox, innerBox, coin)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
         return (engine, mockIO)
     }
@@ -978,8 +980,8 @@ struct InsertActionHandlerTests {
             .isOpenable,
             .isOpen,
         )
-        let game = MinimalGame(items: [bag])
-        let (engine, mockIO) = await GameEngine.test(blueprint: game) // Initialize engine
+        let game = MinimalGame(items: bag)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)  // Initialize engine
         #expect(await engine.gameState.changeHistory.isEmpty)
 
         let command = Command(
@@ -998,7 +1000,7 @@ struct InsertActionHandlerTests {
         expectNoDifference(output, "You can’t put something inside itself.")
 
         // Assert No State Change
-        #expect(await engine.gameState.changeHistory.isEmpty) // Use engine instance
+        #expect(await engine.gameState.changeHistory.isEmpty)  // Use engine instance
     }
 
     @Test("Insert into nested container that contains itself indirectly (A in B, put B in A)")
@@ -1007,25 +1009,25 @@ struct InsertActionHandlerTests {
         // Command: Put Box B (itemToInsert) into Box A (containerItem).
         // Expected Error: "You can’t put Box B in Box A, because Box A is in Box B!"
 
-        let boxA = Item( // This is containerItem (Y)
+        let boxA = Item(  // This is containerItem (Y)
             id: "boxA",
             .name("box A"),
-            .in(.item("boxB")), // Box A is INSIDE Box B
-            .isContainer, // Technically, for it to be a target container, it needs this
+            .in(.item("boxB")),  // Box A is INSIDE Box B
+            .isContainer,  // Technically, for it to be a target container, it needs this
             .isOpen,
-            .isTakable, // So it can be a parent, but also a target for insertion
+            .isTakable,  // So it can be a parent, but also a target for insertion
         )
-        let boxB = Item( // This is itemToInsert (X)
+        let boxB = Item(  // This is itemToInsert (X)
             id: "boxB",
             .name("box B"),
-            .in(.player), // Held by player
+            .in(.player),  // Held by player
             .isContainer,
             .isOpen,
             .isOpenable,
-            .isTakable, // Player is holding it
+            .isTakable,  // Player is holding it
         )
 
-        let game = MinimalGame(items: [boxA, boxB])
+        let game = MinimalGame(items: boxA, boxB)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
@@ -1041,7 +1043,9 @@ struct InsertActionHandlerTests {
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, """
+        expectNoDifference(
+            output,
+            """
             You can’t put the box B in the box A, because the box A is
             inside the box B!
             """)
@@ -1061,33 +1065,33 @@ struct InsertActionHandlerTests {
         // Command: Put Box C (itemToInsert) into Box A (containerItem).
         // Expected: "You can’t put Box C in Box A, because Box A is in Box C!"
 
-        let boxA = Item( // This is containerItem (Y)
+        let boxA = Item(  // This is containerItem (Y)
             id: "boxA",
             .name("box A"),
-            .in(.item("boxB")), // A is in B
+            .in(.item("boxB")),  // A is in B
             .isTakable,
-            .isContainer, // Target for insertion
+            .isContainer,  // Target for insertion
             .isOpen
         )
         let boxB = Item(
             id: "boxB",
             .name("box B"),
-            .in(.item("boxC")), // B is in C
+            .in(.item("boxC")),  // B is in C
             .isContainer,
             .isOpenable,
             .isOpen,
         )
-        let boxC = Item( // This is itemToInsert (X)
+        let boxC = Item(  // This is itemToInsert (X)
             id: "boxC",
             .name("box C"),
-            .in(.player), // Held by player
+            .in(.player),  // Held by player
             .isContainer,
             .isOpenable,
             .isOpen,
             .isTakable,
         )
 
-        let game = MinimalGame(items: [boxA, boxB, boxC])
+        let game = MinimalGame(items: boxA, boxB, boxC)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
@@ -1103,7 +1107,9 @@ struct InsertActionHandlerTests {
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, """
+        expectNoDifference(
+            output,
+            """
             You can’t put the box C in the box A, because the box A is
             inside the box C!
             """)
@@ -1137,8 +1143,9 @@ struct InsertActionHandlerTests {
             .isContainer,
             .isOpenable,
         )
-        let game = MinimalGame(items: [coin, box])
-        let (engine, _) = await GameEngine.test(blueprint: game, parser: MockParser(), ioHandler: await MockIOHandler()) // Use instance engine
+        let game = MinimalGame(items: coin, box)
+        let (engine, _) = await GameEngine.test(
+            blueprint: game, parser: MockParser(), ioHandler: await MockIOHandler())  // Use instance engine
         let command = Command(
             verb: .insert,
             directObject: .item("coin"),
@@ -1148,7 +1155,7 @@ struct InsertActionHandlerTests {
         )
 
         // Act & Assert Error
-        await #expect(throws: ActionResponse.itemNotHeld("coin")) { // Correct error type
+        await #expect(throws: ActionResponse.itemNotHeld("coin")) {  // Correct error type
             try await handler.validate(
                 context: ActionContext(
                     command: command,
@@ -1156,7 +1163,7 @@ struct InsertActionHandlerTests {
                 )
             )
         }
-        #expect(await engine.gameState.changeHistory.isEmpty) // Use instance engine
+        #expect(await engine.gameState.changeHistory.isEmpty)  // Use instance engine
     }
 
     @Test("Validation fails when target not reachable")
@@ -1176,8 +1183,9 @@ struct InsertActionHandlerTests {
             .isOpenable,
             .isOpen,
         )
-        let game = MinimalGame(items: [coin, box])
-        let (engine, _) = await GameEngine.test(blueprint: game, parser: MockParser(), ioHandler: await MockIOHandler()) // Use instance engine
+        let game = MinimalGame(items: coin, box)
+        let (engine, _) = await GameEngine.test(
+            blueprint: game, parser: MockParser(), ioHandler: await MockIOHandler())  // Use instance engine
         let command = Command(
             verb: .insert,
             directObject: .item("coin"),
@@ -1187,7 +1195,7 @@ struct InsertActionHandlerTests {
         )
 
         // Act & Assert Error
-        await #expect(throws: ActionResponse.itemNotAccessible("distantBox")) { // Correct error type
+        await #expect(throws: ActionResponse.itemNotAccessible("distantBox")) {  // Correct error type
             try await handler.validate(
                 context: ActionContext(
                     command: command,
@@ -1195,7 +1203,7 @@ struct InsertActionHandlerTests {
                 )
             )
         }
-        #expect(await engine.gameState.changeHistory.isEmpty) // Use instance engine
+        #expect(await engine.gameState.changeHistory.isEmpty)  // Use instance engine
     }
 
     @Test("Validation fails when target not a container")
@@ -1212,8 +1220,9 @@ struct InsertActionHandlerTests {
             .name("stone statue"),
             .in(.location(.startRoom)),
         )
-        let game = MinimalGame(items: [coin, statue])
-        let (engine, _) = await GameEngine.test(blueprint: game, parser: MockParser(), ioHandler: await MockIOHandler()) // Use instance engine
+        let game = MinimalGame(items: coin, statue)
+        let (engine, _) = await GameEngine.test(
+            blueprint: game, parser: MockParser(), ioHandler: await MockIOHandler())  // Use instance engine
         let command = Command(
             verb: .insert,
             directObject: .item("coin"),
@@ -1231,7 +1240,7 @@ struct InsertActionHandlerTests {
                 )
             )
         }
-        #expect(await engine.gameState.changeHistory.isEmpty) // Use instance engine
+        #expect(await engine.gameState.changeHistory.isEmpty)  // Use instance engine
     }
 
     @Test("Validation fails when target is closed")
@@ -1250,8 +1259,9 @@ struct InsertActionHandlerTests {
             .isContainer,
             .isOpenable,
         )
-        let game = MinimalGame(items: [coin, box])
-        let (engine, _) = await GameEngine.test(blueprint: game, parser: MockParser(), ioHandler: await MockIOHandler()) // Use instance engine
+        let game = MinimalGame(items: coin, box)
+        let (engine, _) = await GameEngine.test(
+            blueprint: game, parser: MockParser(), ioHandler: await MockIOHandler())  // Use instance engine
         let command = Command(
             verb: .insert,
             directObject: .item("coin"),
@@ -1261,7 +1271,7 @@ struct InsertActionHandlerTests {
         )
 
         // Act & Assert Error
-        await #expect(throws: ActionResponse.containerIsClosed("closedBox")) { // Correct error type
+        await #expect(throws: ActionResponse.containerIsClosed("closedBox")) {  // Correct error type
             try await handler.validate(
                 context: ActionContext(
                     command: command,
@@ -1269,7 +1279,7 @@ struct InsertActionHandlerTests {
                 )
             )
         }
-        #expect(await engine.gameState.changeHistory.isEmpty) // Use instance engine
+        #expect(await engine.gameState.changeHistory.isEmpty)  // Use instance engine
     }
 
     @Test("Validation fails when item is too large for container")
@@ -1291,8 +1301,9 @@ struct InsertActionHandlerTests {
             .isOpen,
             .capacity(5)
         )
-        let game = MinimalGame(items: [boulder, box])
-        let (engine, _) = await GameEngine.test(blueprint: game, parser: MockParser(), ioHandler: await MockIOHandler()) // Use instance engine
+        let game = MinimalGame(items: boulder, box)
+        let (engine, _) = await GameEngine.test(
+            blueprint: game, parser: MockParser(), ioHandler: await MockIOHandler())  // Use instance engine
         let command = Command(
             verb: .insert,
             directObject: .item("boulder"),
@@ -1302,7 +1313,9 @@ struct InsertActionHandlerTests {
         )
 
         // Act & Assert Error
-        await #expect(throws: ActionResponse.itemTooLargeForContainer(item: "boulder", container: "box")) { // Correct error type
+        await #expect(
+            throws: ActionResponse.itemTooLargeForContainer(item: "boulder", container: "box")
+        ) {  // Correct error type
             try await handler.validate(
                 context: ActionContext(
                     command: command,
@@ -1310,7 +1323,7 @@ struct InsertActionHandlerTests {
                 )
             )
         }
-        #expect(await engine.gameState.changeHistory.isEmpty) // Use instance engine
+        #expect(await engine.gameState.changeHistory.isEmpty)  // Use instance engine
     }
 
     @Test("Validation fails when inserting into self")
@@ -1325,7 +1338,7 @@ struct InsertActionHandlerTests {
             .isOpenable,
             .isOpen,
         )
-        let game = MinimalGame(items: [bag])
+        let game = MinimalGame(items: bag)
         let (engine, _) = await GameEngine.test(blueprint: game)
         let command = Command(
             verb: .insert,
@@ -1338,7 +1351,7 @@ struct InsertActionHandlerTests {
         // Act & Assert Error
         await #expect(
             throws: ActionResponse.prerequisiteNotMet("You can't put something inside itself.")
-        ) { // Correct error type
+        ) {  // Correct error type
             try await handler.validate(
                 context: ActionContext(
                     command: command,
@@ -1355,25 +1368,25 @@ struct InsertActionHandlerTests {
         // Command: Put Box B (itemToInsert) into Box A (containerItem).
         // Expected Error: "You can’t put Box B in Box A, because Box A is in Box B!"
 
-        let boxA = Item( // This is containerItem (Y)
+        let boxA = Item(  // This is containerItem (Y)
             id: "boxA",
             .name("box A"),
-            .in(.item("boxB")), // Box A is INSIDE Box B
-            .isContainer, // Target for insertion
+            .in(.item("boxB")),  // Box A is INSIDE Box B
+            .isContainer,  // Target for insertion
             .isOpen,
             .isTakable,
         )
-        let boxB = Item( // This is itemToInsert (X)
+        let boxB = Item(  // This is itemToInsert (X)
             id: "boxB",
             .name("box B"),
-            .in(.player), // Held by player
+            .in(.player),  // Held by player
             .isContainer,
             .isOpenable,
             .isOpen,
             .isTakable,
         )
 
-        let game = MinimalGame(items: [boxA, boxB])
+        let game = MinimalGame(items: boxA, boxB)
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(
@@ -1418,7 +1431,7 @@ struct InsertActionHandlerTests {
             .isOpenable,
             .isOpen,
         )
-        let game = MinimalGame(items: [trophy, box])
+        let game = MinimalGame(items: trophy, box)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
         #expect(await engine.gameState.changeHistory.isEmpty)
 
@@ -1493,7 +1506,7 @@ extension InsertActionHandlerTests {
             StateChange(
                 entityID: .global,
                 attribute: .pronounReference(pronoun: "it"),
-                oldValue: nil, // Simplified for test
+                oldValue: nil,  // Simplified for test
                 newValue: .entityReferenceSet([.item(itemToInsertID)])
             )
         )

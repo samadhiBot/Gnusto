@@ -18,11 +18,11 @@ struct DropActionHandlerTests {
         let initialTouched = testItem.hasFlag(.isTouched)
         let initialWorn = testItem.hasFlag(.isWorn)
 
-        let game = MinimalGame(items: [testItem])
+        let game = MinimalGame(items: testItem)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
         let finalLocation = await engine.playerLocationID
 
-        #expect(try await engine.item("key").parent == .player) // Verify setup
+        #expect(try await engine.item("key").parent == .player)  // Verify setup
         #expect(await engine.gameState.changeHistory.isEmpty)
 
         let command = Command(
@@ -37,7 +37,7 @@ struct DropActionHandlerTests {
         // Assert Final State
         let finalItemState = try await engine.item("key")
         #expect(finalItemState.parent == .location(finalLocation), "Item should be in the room")
-        #expect(finalItemState.hasFlag(.isTouched) == true, "Item should have .touched property") // Qualified
+        #expect(finalItemState.hasFlag(.isTouched) == true, "Item should have .touched property")  // Qualified
 
         // Assert Output
         let output = await mockIO.flush()
@@ -63,7 +63,7 @@ struct DropActionHandlerTests {
         let command = Command(
             verb: .drop,
             rawInput: "drop"
-        ) // No direct object
+        )  // No direct object
 
         // Act
         await engine.execute(command: command)
@@ -83,7 +83,7 @@ struct DropActionHandlerTests {
             .isTakable
         )
 
-        let game = MinimalGame(items: [testItem])
+        let game = MinimalGame(items: testItem)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         #expect(try await engine.item("key").parent == .location(.startRoom))
@@ -125,12 +125,12 @@ struct DropActionHandlerTests {
         let initialTouched = testItem.hasFlag(.isTouched)
         let initialWorn = testItem.hasFlag(.isWorn)
 
-        let game = MinimalGame(items: [testItem])
+        let game = MinimalGame(items: testItem)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
         let finalLocation = await engine.playerLocationID
 
         #expect(try await engine.item("cloak").parent == .player)
-        #expect(try await engine.item("cloak").hasFlag(.isWorn) == true) // Qualified
+        #expect(try await engine.item("cloak").hasFlag(.isWorn) == true)  // Qualified
         #expect(await engine.gameState.changeHistory.isEmpty)
 
         let command = Command(
@@ -145,8 +145,8 @@ struct DropActionHandlerTests {
         // Assert Final State
         let finalItemState = try await engine.item("cloak")
         #expect(finalItemState.parent == .location(finalLocation), "Item should be in the room")
-        #expect(finalItemState.hasFlag(.isWorn) == false, "Item should NOT have .worn property") // Qualified
-        #expect(finalItemState.hasFlag(.isTouched) == true, "Item should have .touched property") // Qualified
+        #expect(finalItemState.hasFlag(.isWorn) == false, "Item should NOT have .worn property")  // Qualified
+        #expect(finalItemState.hasFlag(.isTouched) == true, "Item should have .touched property")  // Qualified
 
         // Assert Output
         let output = await mockIO.flush()
@@ -170,10 +170,10 @@ struct DropActionHandlerTests {
         let testItem = Item(
             id: "sword-in-stone",
             .name("sword in stone"),
-            .in(.player), // Hypothetically held
+            .in(.player),  // Hypothetically held
             .omitDescription
         )
-        let game = MinimalGame(items: [testItem])
+        let game = MinimalGame(items: testItem)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
@@ -218,7 +218,7 @@ extension DropActionHandlerTests {
                 StateChange(
                     entityID: .item(itemID),
                     attribute: .itemAttribute(.isTouched),
-                        newValue: true,
+                    newValue: true,
                 )
             )
         }
