@@ -2,16 +2,17 @@
 
 extension GameEngine {
     static func test(
-        blueprint: GameBlueprint,
+        blueprint: GameBlueprint = MinimalGame(),
         vocabulary: Vocabulary? = nil,
         pronouns: [String: Set<EntityReference>] = [:],
         activeFuses: [FuseID: Int] = [:],
         activeDaemons: Set<DaemonID> = [],
         globalState: [GlobalID: StateValue] = [:],
-        parser: Parser,
-        ioHandler: IOHandler
-    ) async -> GameEngine {
-        await .init(
+        parser: Parser = StandardParser(),
+        ioHandler: IOHandler? = nil
+    ) async -> (GameEngine, IOHandler) {
+        let mockIOHandler = await MockIOHandler()
+        let engine = await GameEngine(
             blueprint: blueprint,
             vocabulary: vocabulary,
             pronouns: pronouns,
@@ -19,8 +20,9 @@ extension GameEngine {
             activeDaemons: activeDaemons,
             globalState: globalState,
             parser: parser,
-            ioHandler: ioHandler,
+            ioHandler: ioHandler ?? mockIOHandler,
             randomNumberGenerator: SeededGenerator()
         )
+        return (engine, ioHandler ?? mockIOHandler)
     }
 }
