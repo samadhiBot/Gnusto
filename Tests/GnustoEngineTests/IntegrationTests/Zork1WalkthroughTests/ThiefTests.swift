@@ -57,8 +57,7 @@ struct ThiefTests {
         // Given
         let game = Zork1()
         let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: StandardParser()
+            blueprint: game
         )
 
         try await engine.apply(
@@ -86,8 +85,7 @@ struct ThiefTests {
         // Given
         let game = Zork1()
         let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: StandardParser()
+            blueprint: game
         )
 
         try await engine.apply(
@@ -124,8 +122,7 @@ struct ThiefTests {
         // Given
         let game = Zork1()
         let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: StandardParser()
+            blueprint: game
         )
 
         try await engine.movePlayer(to: .location(.roundRoom))
@@ -159,8 +156,7 @@ struct ThiefTests {
         // Given
         let game = Zork1()
         let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: StandardParser()
+            blueprint: game
         )
 
         try await engine.movePlayer(to: .location(.roundRoom))
@@ -186,8 +182,7 @@ struct ThiefTests {
         // Given
         let game = Zork1()
         let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: StandardParser()
+            blueprint: game
         )
 
         try await engine.movePlayer(to: .location(.roundRoom))
@@ -212,8 +207,7 @@ struct ThiefTests {
         // Given
         let game = Zork1()
         let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: StandardParser()
+            blueprint: game
         )
 
         try await engine.movePlayer(to: .location(.roundRoom))
@@ -238,8 +232,7 @@ struct ThiefTests {
         // Given
         let game = Zork1()
         let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: StandardParser()
+            blueprint: game
         )
 
         try await engine.movePlayer(to: .location(.roundRoom))
@@ -264,8 +257,7 @@ struct ThiefTests {
         // Given
         let game = Zork1()
         let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: StandardParser()
+            blueprint: game
         )
 
         try await engine.apply(
@@ -292,8 +284,7 @@ struct ThiefTests {
         // Given
         let game = Zork1()
         let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: StandardParser()
+            blueprint: game
         )
 
         try await engine.apply(
@@ -322,8 +313,7 @@ struct ThiefTests {
         // Given
         let game = Zork1()
         let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: StandardParser()
+            blueprint: game
         )
 
         try await engine.apply(
@@ -369,8 +359,7 @@ struct ThiefTests {
         // Given
         let game = Zork1()
         let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: StandardParser()
+            blueprint: game
         )
 
         try await engine.apply(
@@ -409,8 +398,7 @@ struct ThiefTests {
         // Given
         let game = Zork1()
         let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: StandardParser()
+            blueprint: game
         )
 
         try await engine.apply(
@@ -439,8 +427,7 @@ struct ThiefTests {
         // Given
         let game = Zork1()
         let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: StandardParser()
+            blueprint: game
         )
 
         try await engine.apply(
@@ -471,8 +458,7 @@ struct ThiefTests {
         // Given
         let game = Zork1()
         let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: StandardParser()
+            blueprint: game
         )
 
         try await engine.apply(
@@ -505,8 +491,7 @@ struct ThiefTests {
         // Given
         let game = Zork1()
         let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: StandardParser()
+            blueprint: game
         )
 
         let initialScore = await engine.playerScore
@@ -532,8 +517,7 @@ struct ThiefTests {
         // Given
         let game = Zork1()
         let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: StandardParser()
+            blueprint: game
         )
 
         try await engine.apply(
@@ -567,8 +551,7 @@ struct ThiefTests {
         // Given
         let game = Zork1()
         let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: StandardParser()
+            blueprint: game
         )
 
         try await engine.apply(
@@ -610,8 +593,7 @@ struct ThiefTests {
         // Given
         let game = Zork1()
         let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: StandardParser()
+            blueprint: game
         )
 
         try await engine.apply(

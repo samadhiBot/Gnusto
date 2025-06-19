@@ -7,13 +7,12 @@ import Testing
 struct UndergroundTests {
     @Test("Underground access via trap door")
     func testUndergroundAccess() async throws {
-        let mockIO = await MockIOHandler(
-            Moves.enterUnderground,
-            "north"
-        )
         let (engine, mockIO) = await GameEngine.test(
             blueprint: Zork1(),
-            parser: StandardParser()
+            ioHandler: await MockIOHandler(
+                Moves.enterUnderground,
+                "north"
+            )
         )
         await engine.run()
 
@@ -40,22 +39,21 @@ struct UndergroundTests {
 
     @Test("Basic underground exploration")
     func testUndergroundExploration() async throws {
-        let mockIO = await MockIOHandler(
-            Moves.enterUnderground,
-            "north",
-            "walk east",
-            "go north",
-            "head west",
-            "talk to the troll",
-            "take the troll",
-            "attack the troll",
-            "stab the troll with the sword",
-            "hit the troll with the lantern",
-            "head west"
-        )
         let (engine, mockIO) = await GameEngine.test(
             blueprint: Zork1(),
-            parser: StandardParser()
+            ioHandler: await MockIOHandler(
+                Moves.enterUnderground,
+                "north",
+                "walk east",
+                "go north",
+                "head west",
+                "talk to the troll",
+                "take the troll",
+                "attack the troll",
+                "stab the troll with the sword",
+                "hit the troll with the lantern",
+                "head west"
+            )
         )
         await engine.run()
 

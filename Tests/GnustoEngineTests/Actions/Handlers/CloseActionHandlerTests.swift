@@ -172,11 +172,7 @@ struct CloseActionHandlerTests {
 
     @Test("Close fails with no direct object")
     func testCloseFailsWithNoObject() async throws {
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: MockParser(),
-            ioHandler: await MockIOHandler()
-        )
+        let (engine, _) = await GameEngine.test()
 
         let command = Command(
             verb: .close,

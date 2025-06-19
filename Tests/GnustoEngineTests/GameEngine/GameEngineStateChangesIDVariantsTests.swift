@@ -259,10 +259,7 @@ struct GameEngineStateChangesIDVariantsTests {
             .name("Test Location")
         )
         let game = MinimalGame(locations: [location])
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: MockParser()
-        )
+        let (engine, mockIO) = await GameEngine.test()
 
         // When
         let change = try await engine.setAttribute(

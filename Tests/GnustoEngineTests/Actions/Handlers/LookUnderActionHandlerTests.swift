@@ -95,10 +95,7 @@ struct LookUnderActionHandlerTests {
 
     @Test("Look under fails with no indirect object")
     func testLookUnderFailsWithNoObject() async throws {
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: MockParser()
-        )
+        let (engine, mockIO) = await GameEngine.test()
 
         let command = Command(
             verb: .lookUnder,
@@ -118,10 +115,7 @@ struct LookUnderActionHandlerTests {
 
     @Test("Look under fails with non-item target")
     func testLookUnderFailsWithNonItemTarget() async throws {
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: MockParser()
-        )
+        let (engine, mockIO) = await GameEngine.test()
 
         let command = Command(
             verb: .lookUnder,
@@ -155,10 +149,7 @@ struct LookUnderActionHandlerTests {
             .isTakable
         )
         let game = MinimalGame(items: [box, carpet])
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: MockParser()
-        )
+        let (engine, mockIO) = await GameEngine.test()
 
         let command = Command(
             verb: .lookUnder,

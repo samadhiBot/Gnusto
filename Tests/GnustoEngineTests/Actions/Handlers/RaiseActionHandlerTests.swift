@@ -69,10 +69,7 @@ struct RaiseActionHandlerTests {
             .isTakable
         )
         let game = MinimalGame(items: [book])
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: MockParser()
-        )
+        let (engine, mockIO) = await GameEngine.test()
 
         let command = Command(
             verb: .raise,
@@ -94,10 +91,7 @@ struct RaiseActionHandlerTests {
 
     @Test("Raise fails with no direct object")
     func testRaiseFailsWithNoObject() async throws {
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: MockParser()
-        )
+        let (engine, mockIO) = await GameEngine.test()
 
         let command = Command(
             verb: .raise,
@@ -116,10 +110,7 @@ struct RaiseActionHandlerTests {
 
     @Test("Raise fails with non-item target")
     func testRaiseFailsWithNonItemTarget() async throws {
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: MockParser()
-        )
+        let (engine, mockIO) = await GameEngine.test()
 
         let command = Command(
             verb: .raise,
@@ -153,10 +144,7 @@ struct RaiseActionHandlerTests {
             .isTakable
         )
         let game = MinimalGame(items: [box, book])
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: MockParser()
-        )
+        let (engine, mockIO) = await GameEngine.test()
 
         let command = Command(
             verb: .raise,

@@ -22,16 +22,18 @@ struct GetAllIssueTests {
             .size(3)
         )
         
-        let player = Player(in: .startRoom, carryingCapacity: 20)
-        let game = MinimalGame(player: player, items: [basket, jug])
-        let parser = StandardParser()
-        let (engine, mockIO) = await GameEngine.test(blueprint: game, parser: parser, ioHandler: mockIO)
+        let (engine, mockIO) = await GameEngine.test(
+            blueprint: MinimalGame(
+                player: Player(in: .startRoom, carryingCapacity: 20),
+                items: [basket, jug]
+            )
+        )
         
         // Act: Parse "get all" directly
         let vocabulary = Vocabulary.build(items: [basket, jug])
         let gameState = await engine.gameState
         
-        let result = parser.parse(
+        let result = await engine.parser.parse(
             input: "get all",
             vocabulary: vocabulary,
             gameState: gameState

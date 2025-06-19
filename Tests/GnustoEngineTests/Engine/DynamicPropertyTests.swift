@@ -27,10 +27,7 @@ struct DynamicPropertyTests {
             locations: [testLocation],
             items: [testItem]
         )
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: MockParser()
-        )
+        let (engine, mockIO) = await GameEngine.test()
 
         // Set initial value through StateChange builder
         let item = try await engine.item("testItem")
@@ -86,10 +83,7 @@ struct DynamicPropertyTests {
                 }
             ]
         )
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: MockParser()
-        )
+        let (engine, mockIO) = await GameEngine.test()
 
         // Fetch the dynamic description
         let description: String? = try await engine.attribute(.description, of: ItemID("testItem"))
@@ -116,10 +110,7 @@ struct DynamicPropertyTests {
                 }
             ]
         )
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: MockParser()
-        )
+        let (engine, mockIO) = await GameEngine.test()
 
         // Fetch the dynamic description
         let description: String? = try await engine.attribute(.description, of: LocationID("testLocation"))
@@ -158,10 +149,7 @@ struct DynamicPropertyTests {
             ]
         )
 
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: MockParser()
-        )
+        let (engine, mockIO) = await GameEngine.test()
 
         // Test looking at the item
         let command = Command(
@@ -201,10 +189,7 @@ struct DynamicPropertyTests {
             ]
         )
 
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: MockParser()
-        )
+        let (engine, mockIO) = await GameEngine.test()
 
         // Trigger room description
         try await engine.describeCurrentLocation(forceFullDescription: true)
@@ -241,10 +226,7 @@ struct DynamicPropertyTests {
                 }
             ]
         )
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: MockParser()
-        )
+        let (engine, mockIO) = await GameEngine.test()
 
         // The compute handler throws an error, so it should fall back to stored value
         // Since there's no stored description, it should return nil and then try the stored value
@@ -271,10 +253,7 @@ struct DynamicPropertyTests {
             locations: [testLocation],
             items: [testItem]
         )
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: MockParser()
-        )
+        let (engine, mockIO) = await GameEngine.test()
 
         // Should fall back to static description
         let description: String? = try await engine.attribute(.description, of: ItemID("testItem"))
@@ -294,10 +273,7 @@ struct DynamicPropertyTests {
         let game = MinimalGame(
             locations: [testLocation]
         )
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: MockParser()
-        )
+        let (engine, mockIO) = await GameEngine.test()
 
         // Change description using StateChange builder
         let location = try await engine.location("testLocation")

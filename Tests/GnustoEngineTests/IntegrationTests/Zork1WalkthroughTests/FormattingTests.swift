@@ -8,8 +8,7 @@ struct FormattingTests {
     @Test("Game introduction formatting has correct linebreaks")
     func testIntroductionFormatting() async throws {
         let (engine, mockIO) = await GameEngine.test(
-            blueprint: Zork1(),
-            parser: StandardParser()
+            blueprint: Zork1()
         )
 
         // Just start the game without any commands
@@ -39,14 +38,13 @@ struct FormattingTests {
 
     @Test("Visited location shows brief output")
     func testVisitedLocationBriefOutput() async throws {
-        let mockIO = await MockIOHandler(
-            "north",     // Go to North of House (first visit - full description)
-            "southwest", // Return to West of House (visited - brief)
-            "north"      // Go to North of House again (visited - brief)
-        )
         let (engine, mockIO) = await GameEngine.test(
             blueprint: Zork1(),
-            parser: StandardParser()
+            ioHandler: await MockIOHandler(
+                "north",     // Go to North of House (first visit - full description)
+                "southwest", // Return to West of House (visited - brief)
+                "north"      // Go to North of House again (visited - brief)
+            )
         )
 
         await engine.run()

@@ -80,10 +80,7 @@ struct ClimbOnActionHandlerTests {
             .isTakable
         )
         let game = MinimalGame(items: [chair])
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: MockParser()
-        )
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .climbOn,
@@ -103,18 +100,10 @@ struct ClimbOnActionHandlerTests {
 
     @Test("Climb on fails with no indirect object")
     func testClimbOnFailsWithNoObject() async throws {
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: MockParser()
-        )
-
-        let command = Command(
-            verb: .climbOn,
-            rawInput: "climb on"
-        )
+        let (engine, mockIO) = await GameEngine.test()
 
         // Act
-        await engine.execute(command: command)
+        try await engine.execute("climb on")
 
         // Assert: Expect error from validate()
         let output = await mockIO.flush()
@@ -125,10 +114,7 @@ struct ClimbOnActionHandlerTests {
 
     @Test("Climb on fails with non-item target")
     func testClimbOnFailsWithNonItemTarget() async throws {
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: MockParser()
-        )
+        let (engine, mockIO) = await GameEngine.test()
 
         let command = Command(
             verb: .climbOn,
@@ -162,10 +148,7 @@ struct ClimbOnActionHandlerTests {
             .isTakable
         )
         let game = MinimalGame(items: [box, ladder])
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: MockParser()
-        )
+        let (engine, mockIO) = await GameEngine.test()
 
         let command = Command(
             verb: .climbOn,

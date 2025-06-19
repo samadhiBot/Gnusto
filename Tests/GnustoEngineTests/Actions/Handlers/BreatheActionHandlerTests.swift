@@ -55,8 +55,7 @@ struct BreatheActionHandlerTests {
     func testBreatheSucceedsWithBasicCommand() async throws {
         // Given
         let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: StandardParser()
+            blueprint: game
         )
 
         // When
@@ -74,8 +73,7 @@ struct BreatheActionHandlerTests {
     func testBreatheIntegrationTest() async throws {
         // Given
         let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: StandardParser()
+            blueprint: game
         )
 
         // When

@@ -7,17 +7,16 @@ import Testing
 struct OutsideHouseTests {
     @Test("Basic house entry via kitchen window")
     func testHouseEntry() async throws {
-        let mockIO = await MockIOHandler(
-            Moves.enterKitchen,
-            "examine table",
-            "open sack",
-            "inventory",
-            "take all",
-            "inventory",
-        )
         let (engine, mockIO) = await GameEngine.test(
             blueprint: Zork1(),
-            parser: StandardParser()
+            ioHandler: await MockIOHandler(
+                Moves.enterKitchen,
+                "examine table",
+                "open sack",
+                "inventory",
+                "take all",
+                "inventory",
+            )
         )
         await engine.run()
 
@@ -51,18 +50,17 @@ struct OutsideHouseTests {
 
     @Test("Interacting with the mailbox")
     func testMailbox() async throws {
-        let mockIO = await MockIOHandler(
-            "take the mailbox",
-            "open the mailbox",
-            "read the leaflet",
-            "east",
-            "open door",
-            "take boards",
-            "look at the house",
-        )
         let (engine, mockIO) = await GameEngine.test(
             blueprint: Zork1(),
-            parser: StandardParser()
+            ioHandler: await MockIOHandler(
+                "take the mailbox",
+                "open the mailbox",
+                "read the leaflet",
+                "east",
+                "open door",
+                "take boards",
+                "look at the house",
+            )
         )
         await engine.run()
 
@@ -105,20 +103,19 @@ struct OutsideHouseTests {
 
     @Test("Interacting with the boards on the house")
     func testBoards() async throws {
-        let mockIO = await MockIOHandler(
-            "take the boards",
-            "north",
-            "take the boards",
-            "east",
-            "examine the window",
-            "look through the window",
-            "take the window",
-            "south",
-            "take the boards",
-        )
         let (engine, mockIO) = await GameEngine.test(
             blueprint: Zork1(),
-            parser: StandardParser()
+            ioHandler: await MockIOHandler(
+                "take the boards",
+                "north",
+                "take the boards",
+                "east",
+                "examine the window",
+                "look through the window",
+                "take the window",
+                "south",
+                "take the boards",
+            )
         )
         await engine.run()
 
@@ -171,23 +168,22 @@ struct OutsideHouseTests {
 
     @Test("Lamp and basic items collection")
     func testBasicItemCollection() async throws {
-        let mockIO = await MockIOHandler(
-            Moves.enterKitchen,
-            "west",
-            "take lamp",
-            "take sword",
-            "examine lamp",
-            "turn on lamp",
-            "inventory",
-            "east",
-            "up",
-            "take rope",
-            "take knife",
-            "inventory"
-        )
         let (engine, mockIO) = await GameEngine.test(
             blueprint: Zork1(),
-            parser: StandardParser()
+            ioHandler: await MockIOHandler(
+                Moves.enterKitchen,
+                "west",
+                "take lamp",
+                "take sword",
+                "examine lamp",
+                "turn on lamp",
+                "inventory",
+                "east",
+                "up",
+                "take rope",
+                "take knife",
+                "inventory"
+            )
         )
         await engine.run()
 
@@ -256,25 +252,24 @@ struct OutsideHouseTests {
 
     @Test("Container interactions (brown sack and bottle)")
     func testContainerInteractions() async throws {
-        let mockIO = await MockIOHandler(
-            Moves.enterKitchen,
-            "examine table",
-            "take sack",
-            "examine sack",
-            "open sack",
-            "examine sack",
-            "take lunch",
-            "take garlic",
-            "take bottle",
-            "examine bottle",
-            "examine water",
-            "drink water",
-            "examine bottle",
-            "inventory"
-        )
         let (engine, mockIO) = await GameEngine.test(
             blueprint: Zork1(),
-            parser: StandardParser()
+            ioHandler: await MockIOHandler(
+                Moves.enterKitchen,
+                "examine table",
+                "take sack",
+                "examine sack",
+                "open sack",
+                "examine sack",
+                "take lunch",
+                "take garlic",
+                "take bottle",
+                "examine bottle",
+                "examine water",
+                "drink water",
+                "examine bottle",
+                "inventory"
+            )
         )
         await engine.run()
 

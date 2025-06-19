@@ -9,8 +9,8 @@ extension GameEngine {
         activeDaemons: Set<DaemonID> = [],
         globalState: [GlobalID: StateValue] = [:],
         parser: Parser = StandardParser(),
-        ioHandler: IOHandler? = nil
-    ) async -> (GameEngine, IOHandler) {
+        ioHandler: MockIOHandler? = nil
+    ) async -> (GameEngine, MockIOHandler) {
         let mockIOHandler = await MockIOHandler()
         let engine = await GameEngine(
             blueprint: blueprint,

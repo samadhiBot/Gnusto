@@ -18,8 +18,7 @@ struct RemoveActionHandlerTests {
         )
         let game = MinimalGame(items: [cloak])
         let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: StandardParser()
+            blueprint: game
         )
 
         let command = Command(

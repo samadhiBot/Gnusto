@@ -221,10 +221,7 @@ struct GoActionHandlerTests {
             locations: [foyer, vault],
             items: [vaultDoor]
         )
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: MockParser()
-        )
+        let (engine, mockIO) = await GameEngine.test()
 
         let command = Command(
             verb: .go,

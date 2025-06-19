@@ -9,10 +9,7 @@ struct AskActionHandlerTests {
     @Test("Ask requires direct object")
     func testAskRequiresDirectObject() async throws {
         // Given
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: MockParser()
-        )
+        let (engine, mockIO) = await GameEngine.test()
 
         let command = Command(verb: .ask, rawInput: "ask")
         let context = ActionContext(command: command, engine: engine)
@@ -34,10 +31,7 @@ struct AskActionHandlerTests {
             .isCharacter
         )
         let game = MinimalGame(items: [character])
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: MockParser()
-        )
+        let (engine, mockIO) = await GameEngine.test()
 
         let command = Command(
             verb: .ask,
@@ -59,10 +53,7 @@ struct AskActionHandlerTests {
         // Given
         let rock = Item(id: "rock", .name("rock"))
         let game = MinimalGame(items: [rock])
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: MockParser()
-        )
+        let (engine, mockIO) = await GameEngine.test()
 
         let command = Command(
             verb: .ask,
@@ -95,10 +86,7 @@ struct AskActionHandlerTests {
             .in(.location(.startRoom))
         )
         let game = MinimalGame(items: [wizard, crystal])
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: MockParser()
-        )
+        let (engine, mockIO) = await GameEngine.test()
 
         let command = Command(
             verb: .ask,
@@ -128,10 +116,7 @@ struct AskActionHandlerTests {
             .isCharacter
         )
         let game = MinimalGame(items: [wizard])
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: MockParser()
-        )
+        let (engine, mockIO) = await GameEngine.test()
 
         let command = Command(
             verb: .ask,
@@ -158,10 +143,7 @@ struct AskActionHandlerTests {
             .isCharacter
         )
         let game = MinimalGame(items: [wizard])
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: MockParser()
-        )
+        let (engine, mockIO) = await GameEngine.test()
 
         let command = Command(
             verb: .ask,
@@ -188,10 +170,7 @@ struct AskActionHandlerTests {
             .isCharacter
         )
         let game = MinimalGame(items: [wizard])
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: MockParser()
-        )
+        let (engine, mockIO) = await GameEngine.test()
 
         let command = Command(
             verb: .ask,

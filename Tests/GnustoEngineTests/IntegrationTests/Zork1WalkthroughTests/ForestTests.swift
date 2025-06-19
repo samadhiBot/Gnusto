@@ -7,20 +7,19 @@ import Testing
 struct ForestTests {
     @Test("Forest exploration and grating discovery")
     func testForestExploration() async throws {
-        let mockIO = await MockIOHandler(
-            "north",
-            "north",
-            "examine tree",
-            "north",
-            "examine trees",
-            "examine grating",
-            "move leaves",
-            "look",
-            "examine grating"
-        )
         let (engine, mockIO) = await GameEngine.test(
             blueprint: Zork1(),
-            parser: StandardParser()
+            ioHandler: await MockIOHandler(
+                "north",
+                "north",
+                "examine tree",
+                "north",
+                "examine trees",
+                "examine grating",
+                "move leaves",
+                "look",
+                "examine grating"
+            )
         )
         await engine.run()
 

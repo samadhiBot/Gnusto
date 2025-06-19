@@ -7,22 +7,21 @@ import Testing
 struct ItemMechanicsTests {
     @Test("Lamp and basic items collection")
     func testBasicItemCollection() async throws {
-        let mockIO = await MockIOHandler(
-            Moves.enterKitchen,
-            "west",
-            "take all",
-            "examine the lamp",
-            "turn on the lamp",
-            "inventory",
-            "east",
-            "up",
-            "take rope",
-            "take knife",
-            "inventory"
-        )
         let (engine, mockIO) = await GameEngine.test(
             blueprint: Zork1(),
-            parser: StandardParser()
+            ioHandler: await MockIOHandler(
+                Moves.enterKitchen,
+                "west",
+                "take all",
+                "examine the lamp",
+                "turn on the lamp",
+                "inventory",
+                "east",
+                "up",
+                "take rope",
+                "take knife",
+                "inventory"
+            )
         )
         await engine.run()
 
@@ -88,24 +87,23 @@ struct ItemMechanicsTests {
 
     @Test("Container interactions (brown sack and bottle)")
     func testContainerInteractions() async throws {
-        let mockIO = await MockIOHandler(
-            Moves.enterKitchen,
-            "examine table",
-            "take sack",
-            "examine sack",
-            "open sack",
-            "examine sack",
-            "get lunch",
-            "take garlic from sack",
-            "take bottle",
-            "examine bottle",
-            "drink water",
-            "examine bottle",
-            "inventory"
-        )
         let (engine, mockIO) = await GameEngine.test(
             blueprint: Zork1(),
-            parser: StandardParser()
+            ioHandler: await MockIOHandler(
+                Moves.enterKitchen,
+                "examine table",
+                "take sack",
+                "examine sack",
+                "open sack",
+                "examine sack",
+                "get lunch",
+                "take garlic from sack",
+                "take bottle",
+                "examine bottle",
+                "drink water",
+                "examine bottle",
+                "inventory"
+            )
         )
         await engine.run()
 
@@ -162,19 +160,18 @@ struct ItemMechanicsTests {
 
     @Test("Lamp mechanics")
     func testLampMechanics() async throws {
-        let mockIO = await MockIOHandler(
-            Moves.enterKitchen,
-            "west",
-            "take the lamp",
-            "examine it",
-            "go east",
-            "climb the stairs",
-            "light the lamp",
-            "extinguish the lamp"
-        )
         let (engine, mockIO) = await GameEngine.test(
             blueprint: Zork1(),
-            parser: StandardParser()
+            ioHandler: await MockIOHandler(
+                Moves.enterKitchen,
+                "west",
+                "take the lamp",
+                "examine it",
+                "go east",
+                "climb the stairs",
+                "light the lamp",
+                "extinguish the lamp"
+            )
         )
         await engine.run()
 

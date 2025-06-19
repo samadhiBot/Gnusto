@@ -7,12 +7,8 @@ import Testing
 @Test("Troll blocks movement in troll room")
 func testTrollBlocksMovement() async throws {
     // Given
-    let game = Zork1()
-    let mockIO = await MockIOHandler()
     let (engine, mockIO) = await GameEngine.test(
-        blueprint: game,
-        parser: StandardParser(),
-        ioHandler: mockIO
+        blueprint: Zork1()
     )
 
     // Position player in troll room with live troll
@@ -37,12 +33,8 @@ func testTrollBlocksMovement() async throws {
 @Test("Troll allows movement when dead")
 func testTrollAllowsMovementWhenDead() async throws {
     // Given
-    let game = Zork1()
-    let mockIO = await MockIOHandler()
-    let (engine, mockIO) = await GameEngine.test(
-        blueprint: game,
-        parser: StandardParser(),
-        ioHandler: mockIO
+    let (engine, _) = await GameEngine.test(
+        blueprint: Zork1()
     )
 
     // Position player in troll room and kill troll
@@ -53,13 +45,7 @@ func testTrollAllowsMovementWhenDead() async throws {
 
 
     // When - try to go east (should work now)
-    await engine.execute(
-        command: Command(
-            verb: .go,
-            direction: .east,
-            rawInput: "go east"
-        )
-    )
+    try await engine.execute("go east")
 
     // Then - player should move successfully
     #expect(await engine.playerLocationID == .eastWestPassage)
@@ -68,12 +54,8 @@ func testTrollAllowsMovementWhenDead() async throws {
 @Test("Giving weapon to troll has random outcomes")
 func testGivingWeaponToTroll() async throws {
     // Given
-    let game = Zork1()
-    let mockIO = await MockIOHandler()
     let (engine, mockIO) = await GameEngine.test(
-        blueprint: game,
-        parser: StandardParser(),
-        ioHandler: mockIO
+        blueprint: Zork1()
     )
 
     // Set up scenario: player has sword, is with troll
@@ -112,11 +94,8 @@ func testGivingWeaponToTroll() async throws {
 @Test("Enhanced combat system evaluates weapon effectiveness")
 func testWeaponEffectivenessEvaluation() async throws {
     // Given
-    let game = Zork1()
     let (engine, mockIO) = await GameEngine.test(
-        blueprint: game,
-        parser: StandardParser(),
-        ioHandler: MockIOHandler()
+        blueprint: Zork1()
     )
     let sword = try await engine.item(.sword)
     let knife = try await engine.item(.knife)
@@ -136,11 +115,8 @@ func testWeaponEffectivenessEvaluation() async throws {
 @Test("Combat outcomes follow ZIL patterns")
 func testCombatOutcomePatterns() async throws {
     // Given
-    let game = Zork1()
     let (engine, mockIO) = await GameEngine.test(
-        blueprint: game,
-        parser: StandardParser(),
-        ioHandler: MockIOHandler()
+        blueprint: Zork1()
     )
     let command = Command(
         verb: .attack,
@@ -184,11 +160,8 @@ func testCombatOutcomePatterns() async throws {
 @Test("Troll responds appropriately to different combat outcomes")
 func testTrollCombatResponses() async throws {
     // Given
-    let game = Zork1()
     let (engine, mockIO) = await GameEngine.test(
-        blueprint: game,
-        parser: StandardParser(),
-        ioHandler: MockIOHandler()
+        blueprint: Zork1()
     )
 
     // When & Then - test each outcome type

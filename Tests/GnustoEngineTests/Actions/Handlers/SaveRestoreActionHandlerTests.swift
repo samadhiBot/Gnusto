@@ -10,10 +10,7 @@ struct SaveRestoreActionHandlerTests {
     @Test("Save attempts to save game")
     func testSaveAttemptsToSaveGame() async throws {
         // Given
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: MockParser()
-        )
+        let (engine, mockIO) = await GameEngine.test()
 
         let command = Command(verb: .save, rawInput: "save")
         let context = ActionContext(command: command, engine: engine)
@@ -32,10 +29,7 @@ struct SaveRestoreActionHandlerTests {
     @Test("Restore attempts to restore game")
     func testRestoreAttemptsToRestoreGame() async throws {
         // Given
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: MockParser()
-        )
+        let (engine, mockIO) = await GameEngine.test()
 
         let command = Command(verb: .restore, rawInput: "restore")
         let context = ActionContext(command: command, engine: engine)
@@ -54,10 +48,7 @@ struct SaveRestoreActionHandlerTests {
     @Test("Save and restore require no validation")
     func testSaveRestoreRequireNoValidation() async throws {
         // Given
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: MockParser()
-        )
+        let (engine, mockIO) = await GameEngine.test()
 
         let saveCommand = Command(verb: .save, rawInput: "save")
         let restoreCommand = Command(verb: .restore, rawInput: "restore")
