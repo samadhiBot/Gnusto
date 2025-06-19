@@ -5,7 +5,7 @@ import Testing
 struct ScopeResolverTests {
     @Test("Location is lit if inherentlyLit property is present")
     func testIsLitInherentlyLit() async throws {
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+        let (engine, mockIO) = await GameEngine.test()
         let resolver = await engine.scopeResolver
 
         await #expect(resolver.isLocationLit(locationID: .startRoom) == true)
@@ -266,7 +266,7 @@ struct ScopeResolverTests {
 
     @Test("No items visible if location ID does not exist")
     func testVisibleItemsNonExistentLocation() async throws {
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+        let (engine, mockIO) = await GameEngine.test()
         let resolver = await engine.scopeResolver
 
         let visibleIDs = await resolver.visibleItemsIn(locationID: "badRoom")

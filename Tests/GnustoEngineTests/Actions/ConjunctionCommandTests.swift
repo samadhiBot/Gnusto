@@ -11,7 +11,7 @@ struct ConjunctionCommandTests {
     // MARK: - Test Helpers
     
     /// Creates a test engine with basic items for conjunction testing
-    private func createTestEngine() async -> GameEngine {
+    private func createTestEngine() async -> (GameEngine, MockIOHandler) {
         // Create items for testing
         let sword = Item(
             id: "sword",
@@ -54,8 +54,11 @@ struct ConjunctionCommandTests {
         )
         
         let player = Player(in: .startRoom, carryingCapacity: 20)
-        let game = MinimalGame(player: player, items: [sword, lantern, book, coin, gem])
-        return await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
+        let game = MinimalGame(
+            player: player,
+            items: [sword, lantern, book, coin, gem]
+        )
+        return await GameEngine.test(blueprint: game)
     }
     
     // MARK: - DROP Conjunction Tests
@@ -153,20 +156,16 @@ struct ConjunctionCommandTests {
         // Create test setup directly
         let sword = Item(id: "sword", .name("sword"), .in(.player), .isTakable)
         let lantern = Item(id: "lantern", .name("lantern"), .in(.player), .isTakable)
-        let player = Player(in: .startRoom)
-        
-        let vocabulary = Vocabulary.build(items: [sword, lantern])
-        let gameState = GameState(
-            locations: [Location(id: .startRoom, .name("Start Room"))],
-            items: [sword, lantern],
-            player: player
+
+        let (engine, _) = await GameEngine.test(
+            blueprint: MinimalGame(items: [sword, lantern])
         )
-        
+
         // Act: Try to parse "open sword and lantern" (OPEN doesn't support multiple objects)
-        let result = parser.parse(
+        let result = await engine.parser.parse(
             input: "open sword and lantern",
-            vocabulary: vocabulary,
-            gameState: gameState
+            vocabulary: engine.gameState.vocabulary,
+            gameState: engine.gameState
         )
         
         // Assert: Should get a parse error about multiple objects not being supported
@@ -185,18 +184,15 @@ struct ConjunctionCommandTests {
         let sword = Item(id: "sword", .name("sword"), .in(.player), .isTakable)
         let player = Player(in: .startRoom)
         
-        let vocabulary = Vocabulary.build(items: [sword])
-        let gameState = GameState(
-            locations: [Location(id: .startRoom, .name("Start Room"))],
-            items: [sword],
-            player: player
+        let (engine, _) = await GameEngine.test(
+            blueprint: MinimalGame(items: [sword])
         )
-        
+
         // Act: Try to parse "drop sword and nonexistent" (nonexistent item should cause error)
-        let result = parser.parse(
+        let result = await engine.parser.parse(
             input: "drop sword and nonexistent",
-            vocabulary: vocabulary,
-            gameState: gameState
+            vocabulary: engine.gameState.vocabulary,
+            gameState: engine.gameState
         )
         
         // Assert: Should get a parse error about the non-existent item
@@ -263,20 +259,16 @@ struct ConjunctionCommandTests {
         // Create test setup directly
         let sword = Item(id: "sword", .name("sword"), .in(.player), .isTakable)
         let lantern = Item(id: "lantern", .name("lantern"), .in(.player), .isTakable)
-        let player = Player(in: .startRoom)
-        
-        let vocabulary = Vocabulary.build(items: [sword, lantern])
-        let gameState = GameState(
-            locations: [Location(id: .startRoom, .name("Start Room"))],
-            items: [sword, lantern],
-            player: player
+
+        let (engine, _) = await GameEngine.test(
+            blueprint: MinimalGame(items: [sword, lantern])
         )
-        
+
         // Act: Parse "drop sword and lantern"
-        let result = parser.parse(
+        let result = await engine.parser.parse(
             input: "drop sword and lantern",
-            vocabulary: vocabulary,
-            gameState: gameState
+            vocabulary: engine.gameState.vocabulary,
+            gameState: engine.gameState
         )
         
         // Assert: Should successfully parse with multiple objects
@@ -299,20 +291,16 @@ struct ConjunctionCommandTests {
         let coin = Item(id: "coin", .name("coin"), .in(.location(.startRoom)), .isTakable)
         let gem = Item(id: "gem", .name("gem"), .in(.location(.startRoom)), .isTakable)
         let book = Item(id: "book", .name("book"), .in(.location(.startRoom)), .isTakable)
-        let player = Player(in: .startRoom)
-        
-        let vocabulary = Vocabulary.build(items: [coin, gem, book])
-        let gameState = GameState(
-            locations: [Location(id: .startRoom, .name("Start Room"))],
-            items: [coin, gem, book],
-            player: player
+
+        let (engine, _) = await GameEngine.test(
+            blueprint: MinimalGame(items: [coin, gem, book])
         )
-        
+
         // Act: Parse "take coin, gem and book"
-        let result = parser.parse(
+        let result = await engine.parser.parse(
             input: "take coin, gem and book",
-            vocabulary: vocabulary,
-            gameState: gameState
+            vocabulary: engine.gameState.vocabulary,
+            gameState: engine.gameState
         )
         
         // Assert: Should successfully parse with multiple objects

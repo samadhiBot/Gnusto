@@ -7,24 +7,24 @@ import Testing
 struct CloakOfDarknessWalkthroughTests {
     @Test("Basic Cloak of Darkness Walkthrough, eventually winning")
     func testBasicCloakWalkthrough() async throws {
-        let mockIO = await MockIOHandler(
-            "inventory",
-            "examine the cloak",
-            "drop it",
-            "go south",
-            "walk north",
-            "go north",
-            "go west",
-            "examine the brass hook",
-            "remove the cloak",
-            "hang it on the brass hook",
-            "examine the hook",
-            "walk east",
-            "go south",
-            "read the message",
-        )
         let (engine, mockIO) = await GameEngine.test(
-            blueprint: CloakOfDarkness()
+            blueprint: CloakOfDarkness(),
+            ioHandler: await MockIOHandler(
+                "inventory",
+                "examine the cloak",
+                "drop it",
+                "go south",
+                "walk north",
+                "go north",
+                "go west",
+                "examine the brass hook",
+                "remove the cloak",
+                "hang it on the brass hook",
+                "examine the hook",
+                "walk east",
+                "go south",
+                "read the message",
+            )
         )
         await engine.run()
 
@@ -110,26 +110,26 @@ struct CloakOfDarknessWalkthroughTests {
 
     @Test("Blundering Cloak of Darkness Walkthrough, eventually losing")
     func testBlunderingCloakWalkthroughLosing() async throws {
-        let mockIO = await MockIOHandler(
-            "go north",
-            "go south",
-            "inventory",
-            "remove the cloak",
-            "shout",
-            "walk east",
-            "go north",
-            "look",
-            "go east",
-            "go west",
-            "take the brass hook",
-            "drop cloak",
-            "e",
-            "s",
-            "look",
-            "read the message",
-        )
         let (engine, mockIO) = await GameEngine.test(
-            blueprint: CloakOfDarkness()
+            blueprint: CloakOfDarkness(),
+            ioHandler: await MockIOHandler(
+                "go north",
+                "go south",
+                "inventory",
+                "remove the cloak",
+                "shout",
+                "walk east",
+                "go north",
+                "look",
+                "go east",
+                "go west",
+                "take the brass hook",
+                "drop cloak",
+                "e",
+                "s",
+                "look",
+                "read the message",
+            )
         )
         await engine.run()
 

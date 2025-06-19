@@ -37,11 +37,6 @@ struct BurnActionHandlerTests {
     @Test("BURN command")
     func testBurn() async throws {
         let (engine, mockIO) = await createTestEngine()
-        let command = Command(
-            verb: .dance,
-            directObject: .item(.startItem),
-            rawInput: "burn pebble"
-        )
 
         // Act
         try await engine.execute("burn pebble")

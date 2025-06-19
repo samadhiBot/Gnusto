@@ -261,7 +261,7 @@ struct AllCommandTests {
     @Test("DROP ALL with no held items")
     func testDropAllNoItems() async throws {
         // Arrange: Player holding nothing
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+        let (engine, mockIO) = await GameEngine.test()
 
         let command = Command(
             verb: .drop,

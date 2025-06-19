@@ -10,7 +10,7 @@ struct ThrowActionHandlerTests {
     @Test("Throw validates missing direct object")
     func testThrowValidatesMissingDirectObject() async throws {
         // Given
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+        let (engine, _) = await GameEngine.test()
 
         let command = Command(verb: .throwItem, rawInput: "throw")
         let context = ActionContext(command: command, engine: engine)
@@ -31,7 +31,7 @@ struct ThrowActionHandlerTests {
         )
 
         let game = MinimalGame(items: [rock])
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+        let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(verb: .throwItem, directObject: .item("rock"), rawInput: "throw rock")
         let context = ActionContext(command: command, engine: engine)
@@ -52,7 +52,7 @@ struct ThrowActionHandlerTests {
         )
 
         let game = MinimalGame(items: [ball])
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+        let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .throwItem,
@@ -84,7 +84,7 @@ struct ThrowActionHandlerTests {
         )
 
         let game = MinimalGame(items: [ball, distantTarget])
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+        let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .throwItem,
@@ -110,7 +110,7 @@ struct ThrowActionHandlerTests {
         )
 
         let game = MinimalGame(items: [ball])
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+        let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(verb: .throwItem, directObject: .item("ball"), rawInput: "throw ball")
         let context = ActionContext(command: command, engine: engine)
@@ -135,7 +135,7 @@ struct ThrowActionHandlerTests {
         )
 
         let game = MinimalGame(items: [ball, target])
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+        let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .throwItem,
@@ -159,7 +159,7 @@ struct ThrowActionHandlerTests {
         )
 
         let game = MinimalGame(items: [ball])
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+        let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(verb: .throwItem, directObject: .item("ball"), rawInput: "throw ball")
         let context = ActionContext(command: command, engine: engine)
@@ -187,7 +187,7 @@ struct ThrowActionHandlerTests {
         )
 
         let game = MinimalGame(items: [ball, wall])
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+        let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .throwItem,
@@ -221,7 +221,7 @@ struct ThrowActionHandlerTests {
         )
 
         let game = MinimalGame(items: [ball, troll])
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+        let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .throwItem,
@@ -256,7 +256,7 @@ struct ThrowActionHandlerTests {
         )
 
         let game = MinimalGame(items: [knife, goblin])
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+        let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .throwItem,
@@ -276,7 +276,7 @@ struct ThrowActionHandlerTests {
     @Test("Throw self reference")
     func testThrowSelfReference() async throws {
         // Given
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+        let (engine, _) = await GameEngine.test()
 
         let command = Command(
             verb: .throwItem,
@@ -302,7 +302,7 @@ struct ThrowActionHandlerTests {
         )
 
         let game = MinimalGame(items: [ball])
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+        let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(verb: .throwItem, directObject: .item("ball"), rawInput: "throw ball")
         let context = ActionContext(command: command, engine: engine)

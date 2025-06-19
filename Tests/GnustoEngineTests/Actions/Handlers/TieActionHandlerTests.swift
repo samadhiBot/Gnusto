@@ -10,7 +10,7 @@ struct TieActionHandlerTests {
     @Test("Tie validates missing direct object")
     func testTieValidatesMissingDirectObject() async throws {
         // Given
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+        let (engine, _) = await GameEngine.test()
 
         let command = Command(verb: .tie, rawInput: "tie")
         let context = ActionContext(command: command, engine: engine)
@@ -33,7 +33,7 @@ struct TieActionHandlerTests {
         )
 
         let game = MinimalGame(items: [rope])
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+        let (engine, _) = await GameEngine.test()
 
         let command = Command(verb: .tie, directObject: .item("rope"), rawInput: "tie rope")
         let context = ActionContext(command: command, engine: engine)

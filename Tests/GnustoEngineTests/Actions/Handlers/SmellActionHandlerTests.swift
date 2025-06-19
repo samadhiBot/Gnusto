@@ -7,16 +7,6 @@ import Testing
 struct SmellActionHandlerTests {
     let handler = SmellActionHandler()
 
-    // MARK: - Setup Helper
-
-    private func createTestEngine() async -> GameEngine {
-
-        return await GameEngine.test(
-            blueprint: game,
-            parser: mockParser
-        )
-    }
-
     // MARK: - Basic Functionality Tests
 
     @Test("SMELL without object produces expected message")
@@ -65,7 +55,7 @@ struct SmellActionHandlerTests {
 
     @Test("SMELL validation rejects non-item objects")
     func testSmellValidationRejectsNonItems() async throws {
-        let engine = await createTestEngine()
+        let (engine, _) = await GameEngine.test()
 
         let command = Command(
             verb: .smell,
@@ -115,7 +105,7 @@ struct SmellActionHandlerTests {
 
     @Test("SMELL validation succeeds with no direct object")
     func testSmellValidationSucceedsWithoutObject() async throws {
-        let engine = await createTestEngine()
+        let (engine, _) = await GameEngine.test()
 
         let command = Command(
             verb: .smell,
@@ -132,7 +122,7 @@ struct SmellActionHandlerTests {
 
     @Test("SMELL produces correct ActionResult for environment")
     func testSmellEnvironmentActionResult() async throws {
-        let engine = await createTestEngine()
+        let (engine, _) = await GameEngine.test()
 
         let command = Command(
             verb: .smell,
@@ -186,7 +176,7 @@ struct SmellActionHandlerTests {
 
     @Test("SMELL does not affect game state")
     func testSmellDoesNotAffectGameState() async throws {
-        let engine = await createTestEngine()
+        let (engine, _) = await GameEngine.test()
 
         // Capture initial state
         let initialState = await engine.gameState

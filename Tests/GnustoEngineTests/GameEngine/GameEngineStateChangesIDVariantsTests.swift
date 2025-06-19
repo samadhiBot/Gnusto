@@ -18,7 +18,7 @@ struct GameEngineStateChangesIDVariantsTests {
             .testItemAttrFlag
         )
         let game = MinimalGame(items: [item])
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+        let (engine, _) = await GameEngine.test(blueprint: game)
 
         // When
         let change = try await engine.clearFlag(.testItemFlag, on: item.id)
@@ -39,7 +39,7 @@ struct GameEngineStateChangesIDVariantsTests {
             .name("Test Item")
         )
         let game = MinimalGame(items: [item])
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+        let (engine, _) = await GameEngine.test(blueprint: game)
 
         // When
         let change = try await engine.clearFlag(.testItemFlag, on: item.id)
@@ -51,7 +51,7 @@ struct GameEngineStateChangesIDVariantsTests {
     @Test("clearFlag with ItemID - nil when itemID is nil")
     func testClearFlagItemIDWhenNil() async throws {
         // Given
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+        let (engine, _) = await GameEngine.test()
 
         // When
         let nilItemID: ItemID? = nil
@@ -65,7 +65,7 @@ struct GameEngineStateChangesIDVariantsTests {
     @Test("clearFlag with ItemID - throws when item not found")
     func testClearFlagItemIDThrowsWhenNotFound() async throws {
         // Given
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+        let (engine, _) = await GameEngine.test()
 
         // When/Then
         await #expect(throws: ActionResponse.self) {
@@ -82,7 +82,7 @@ struct GameEngineStateChangesIDVariantsTests {
             .in(.location("startLocation"))
         )
         let game = MinimalGame(items: [item])
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+        let (engine, _) = await GameEngine.test(blueprint: game)
 
         // When
         let change = try await engine.move(item.id, to: .player)
@@ -97,7 +97,7 @@ struct GameEngineStateChangesIDVariantsTests {
     @Test("move with ItemID - throws when item not found")
     func testMoveItemIDThrowsWhenNotFound() async throws {
         // Given
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+        let (engine, _) = await GameEngine.test()
 
         // When/Then
         await #expect(throws: ActionResponse.self) {
@@ -113,7 +113,7 @@ struct GameEngineStateChangesIDVariantsTests {
             .name("Test Item")
         )
         let game = MinimalGame(items: [item])
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+        let (engine, _) = await GameEngine.test(blueprint: game)
 
         // When
         let change = try await engine.setAttribute(.testItemCounter, on: item.id, to: .int(42))
@@ -133,7 +133,7 @@ struct GameEngineStateChangesIDVariantsTests {
             .name("Test Item")
         )
         let game = MinimalGame(items: [item])
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+        let (engine, _) = await GameEngine.test(blueprint: game)
 
         // When
         let change = try await engine.setAttribute(.testItemFlag, on: item.id, to: true)
@@ -153,7 +153,7 @@ struct GameEngineStateChangesIDVariantsTests {
             .name("Test Item")
         )
         let game = MinimalGame(items: [item])
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+        let (engine, _) = await GameEngine.test(blueprint: game)
 
         // When
         let change = try await engine.setFlag(.testItemFlag, on: item.id)
@@ -166,7 +166,7 @@ struct GameEngineStateChangesIDVariantsTests {
     @Test("setFlag with ItemID - nil when itemID is nil")
     func testSetFlagItemIDWhenNil() async throws {
         // Given
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+        let (engine, _) = await GameEngine.test()
 
         // When
         let nilItemID: ItemID? = nil
@@ -185,7 +185,7 @@ struct GameEngineStateChangesIDVariantsTests {
             .name("Test Item")
         )
         let game = MinimalGame(items: [item])
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+        let (engine, _) = await GameEngine.test(blueprint: game)
 
         // When
         let change = try await engine.setDescription(on: item.id, to: "New description")
@@ -206,7 +206,7 @@ struct GameEngineStateChangesIDVariantsTests {
             .testLocationAttrFlag
         )
         let game = MinimalGame(locations: [location])
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+        let (engine, _) = await GameEngine.test(blueprint: game)
 
         // When
         let change = try await engine.clearFlag(.testLocationFlag, on: LocationID("testLocation"))
@@ -222,7 +222,7 @@ struct GameEngineStateChangesIDVariantsTests {
     @Test("clearFlag with LocationID - throws when location not found")
     func testClearFlagLocationIDThrowsWhenNotFound() async throws {
         // Given
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+        let (engine, _) = await GameEngine.test()
 
         // When/Then
         await #expect(throws: ActionResponse.self) {
@@ -238,7 +238,7 @@ struct GameEngineStateChangesIDVariantsTests {
             .name("Test Location")
         )
         let game = MinimalGame(locations: [location])
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+        let (engine, _) = await GameEngine.test(blueprint: game)
 
         // When
         let change = try await engine.setFlag(.testLocationFlag, on: LocationID("testLocation"))
@@ -259,7 +259,7 @@ struct GameEngineStateChangesIDVariantsTests {
             .name("Test Location")
         )
         let game = MinimalGame(locations: [location])
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+        let (engine, _) = await GameEngine.test(blueprint: game)
 
         // When
         let change = try await engine.setAttribute(
@@ -283,7 +283,7 @@ struct GameEngineStateChangesIDVariantsTests {
             .name("Test Location")
         )
         let game = MinimalGame(locations: [location])
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+        let (engine, _) = await GameEngine.test(blueprint: game)
 
         // When
         let change = try await engine.setDescription(on: LocationID("testLocation"), to: "New description")
@@ -298,7 +298,7 @@ struct GameEngineStateChangesIDVariantsTests {
     @Test("All ItemID variants throw when item not found")
     func testItemIDVariantsThrowWhenNotFound() async throws {
         // Given
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+        let (engine, _) = await GameEngine.test()
         let nonexistentID: ItemID = "nonexistent"
 
         // When/Then - Test all variants that should throw
@@ -330,7 +330,7 @@ struct GameEngineStateChangesIDVariantsTests {
     @Test("All LocationID variants throw when location not found")
     func testLocationIDVariantsThrowWhenNotFound() async throws {
         // Given
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+        let (engine, _) = await GameEngine.test()
         let nonexistentID: ItemID = "nonexistent"
 
         // When/Then - Test all variants that should throw

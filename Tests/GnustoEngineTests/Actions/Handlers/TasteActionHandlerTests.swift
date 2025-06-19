@@ -7,16 +7,6 @@ import Testing
 struct TasteActionHandlerTests {
     let handler = TasteActionHandler()
 
-    // MARK: - Setup Helper
-    
-    private func createTestEngine() async -> GameEngine {
-        
-        return await GameEngine.test(
-            blueprint: game,
-            parser: mockParser
-        )
-    }
-
     // MARK: - Basic Functionality Tests
 
     @Test("TASTE with item produces expected message")
@@ -48,7 +38,7 @@ struct TasteActionHandlerTests {
 
     @Test("TASTE without object is rejected")
     func testTasteWithoutObject() async throws {
-        let engine = await createTestEngine()
+        let (engine, _) = await GameEngine.test()
 
         let command = Command(
             verb: .taste,
@@ -70,7 +60,7 @@ struct TasteActionHandlerTests {
 
     @Test("TASTE validation rejects non-item objects")
     func testTasteValidationRejectsNonItems() async throws {
-        let engine = await createTestEngine()
+        let (engine, _) = await GameEngine.test()
 
         let command = Command(
             verb: .taste,

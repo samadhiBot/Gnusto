@@ -927,20 +927,15 @@ struct TakeActionHandlerTests {
             .isTakable
         )
 
-        let player = Player(in: .startRoom)
-        let vocabulary = Vocabulary.build(items: [bag, coin])
-        let gameState = GameState(
-            locations: [Location(id: .startRoom, .name("Start Room"))],
-            items: [bag, coin],
-            player: player,
-            vocabulary: vocabulary
+        let (engine, mockIO) = await GameEngine.test(
+            blueprint: MinimalGame(items: [bag, coin])
         )
 
         // Act: Parse "take coin from bag"
-        let result = parser.parse(
+        let result = await engine.parser.parse(
             input: "take coin from bag",
-            vocabulary: vocabulary,
-            gameState: gameState
+            vocabulary: engine.gameState.vocabulary,
+            gameState: engine.gameState
         )
 
         // Assert: Should parse successfully with correct structure

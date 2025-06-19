@@ -7,21 +7,9 @@ import Testing
 struct ThinkAboutActionHandlerTests {
     let handler = ThinkAboutActionHandler()
 
-    // MARK: - Setup Helper
-    
-    private func createTestEngine() async -> GameEngine {
-        
-        return await GameEngine.test(
-            blueprint: game,
-            parser: mockParser
-        )
-    }
-
-    // MARK: - Basic Functionality Tests
-
     @Test("THINK ABOUT without object is rejected")
     func testThinkAboutWithoutObject() async throws {
-        let engine = await createTestEngine()
+        let (engine, _) = await GameEngine.test()
 
         let command = Command(
             verb: .thinkAbout,
@@ -91,7 +79,7 @@ struct ThinkAboutActionHandlerTests {
 
     @Test("THINK ABOUT with location is rejected")
     func testThinkAboutWithLocation() async throws {
-        let engine = await createTestEngine()
+        let (engine, _) = await GameEngine.test()
 
         let command = Command(
             verb: .thinkAbout,
@@ -114,7 +102,7 @@ struct ThinkAboutActionHandlerTests {
 
     @Test("THINK ABOUT validation succeeds for player")
     func testThinkAboutValidationSucceedsForPlayer() async throws {
-        let engine = await createTestEngine()
+        let (engine, _) = await GameEngine.test()
 
         let command = Command(
             verb: .thinkAbout,
@@ -159,7 +147,7 @@ struct ThinkAboutActionHandlerTests {
 
     @Test("THINK ABOUT produces correct ActionResult for player")
     func testThinkAboutPlayerActionResult() async throws {
-        let engine = await createTestEngine()
+        let (engine, _) = await GameEngine.test()
 
         let command = Command(
             verb: .thinkAbout,
@@ -212,7 +200,7 @@ struct ThinkAboutActionHandlerTests {
 
     @Test("THINK ABOUT SELF does not modify game state")
     func testThinkAboutSelfDoesNotModifyGameState() async throws {
-        let engine = await createTestEngine()
+        let (engine, _) = await GameEngine.test()
         
         // Capture initial state
         let initialState = await engine.gameState

@@ -422,7 +422,7 @@ struct GameEngineTests {
 
     @Test("Engine Handles Nil Input (EOF) Gracefully")
     func testEngineHandlesNilInputGracefully() async throws {
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+        let (engine, mockIO) = await GameEngine.test()
 
         // Act
         await engine.run()
@@ -769,7 +769,6 @@ struct GameEngineTests {
         let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
             activeFuses: ["testFuse": 2], // Start with 2 turns remaining
-            parser: mockParser
         )
 
         // Act: Simulate 3 turns to trigger the fuse (turn 1: countdown to 1, turn 2: countdown to 0 and trigger)
@@ -798,7 +797,6 @@ struct GameEngineTests {
         let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
             activeDaemons: ["testDaemon"], // Start daemon immediately
-            parser: mockParser
         )
 
         // Act: Run engine for 7 turns to test daemon frequency (every 3 turns)
@@ -834,7 +832,6 @@ struct GameEngineTests {
             blueprint: game,
             activeFuses: ["testFuse": 3], // Start fuse with 3 turns
             activeDaemons: ["testDaemon"], // Start daemon immediately
-            parser: mockParser
         )
 
         // Act: Run for 6 turns

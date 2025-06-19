@@ -9,7 +9,7 @@ struct TellActionHandlerTests {
     @Test("Tell requires direct object")
     func testTellRequiresDirectObject() async throws {
         // Given
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+        let (engine, _) = await GameEngine.test()
 
         let command = Command(verb: .tell, rawInput: "tell")
         let context = ActionContext(command: command, engine: engine)
@@ -29,7 +29,7 @@ struct TellActionHandlerTests {
             .isCharacter
         )
         let game = MinimalGame(items: [character])
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+        let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .tell,
