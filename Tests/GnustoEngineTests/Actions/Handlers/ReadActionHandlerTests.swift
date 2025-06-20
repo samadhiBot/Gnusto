@@ -20,20 +20,17 @@ struct ReadActionHandlerTests {
         let game = MinimalGame(items: book)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        let command = Command(
-            verb: .read,
-            directObject: .item("book"),
-            rawInput: "read book"
-        )
-
         // Act
-        await engine.execute(command: command)
+        try await engine.execute("read book")
 
         // Assert
         let finalItemState = try await engine.item("book")
         #expect(finalItemState.hasFlag(.isTouched) == true)
         let output = await mockIO.flush()
-        expectNoDifference(output, "It reads: “Beware the Grue!”")
+        expectNoDifference(output, """
+            > read book
+            It reads: "Beware the Grue!"
+            """)
     }
 
     @Test("Read item successfully (in lit room)")
@@ -60,20 +57,17 @@ struct ReadActionHandlerTests {
         )
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        let command = Command(
-            verb: .read,
-            directObject: .item("sign"),
-            rawInput: "read sign"
-        )
-
         // Act
-        await engine.execute(command: command)
+        try await engine.execute("read sign")
 
         // Assert
         let finalItemState = try await engine.item("sign")
         #expect(finalItemState.hasFlag(.isTouched) == true)
         let output = await mockIO.flush()
-        expectNoDifference(output, "DANGER AHEAD")
+        expectNoDifference(output, """
+            > read sign
+            DANGER AHEAD
+            """)
     }
 
     @Test("Read fails with no direct object")
@@ -81,23 +75,15 @@ struct ReadActionHandlerTests {
         // Arrange
         let (engine, mockIO) = await GameEngine.test()
 
-        let handler = ReadActionHandler()
-        let command = Command(
-            verb: .read,
-            rawInput: "read"
-        )
+        // Act
+        try await engine.execute("read")
 
-        // Act & Assert
-        await #expect(throws: ActionResponse.custom("Read what?")) {
-            try await handler.validate(
-                context: ActionContext(
-                    command: command,
-                    engine: engine
-                )
-            )
-        }
+        // Assert
         let output = await mockIO.flush()
-        #expect(output.isEmpty)
+        expectNoDifference(output, """
+            > read
+            Expected a direct object phrase for verb '.read'.
+            """)
     }
 
     @Test("Read fails item not accessible")
@@ -112,24 +98,17 @@ struct ReadActionHandlerTests {
         )
 
         let game = MinimalGame(items: scroll)
-        let (engine, _) = await GameEngine.test(blueprint: game)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        let handler = ReadActionHandler()
-        let command = Command(
-            verb: .read,
-            directObject: .item("scroll"),
-            rawInput: "read scroll"
-        )
+        // Act
+        try await engine.execute("read scroll")
 
-        // Act & Assert
-        await #expect(throws: ActionResponse.itemNotAccessible("scroll")) {
-            try await handler.validate(
-                context: ActionContext(
-                    command: command,
-                    engine: engine
-                )
-            )
-        }
+        // Assert
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            > read scroll
+            You can't see any scroll here.
+            """)
     }
 
     @Test("Read fails item not readable")
@@ -142,24 +121,17 @@ struct ReadActionHandlerTests {
         )
 
         let game = MinimalGame(items: rock)
-        let (engine, _) = await GameEngine.test(blueprint: game)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        let handler = ReadActionHandler()
-        let command = Command(
-            verb: .read,
-            directObject: .item("rock"),
-            rawInput: "read rock"
-        )
+        // Act
+        try await engine.execute("read rock")
 
-        // Act & Assert
-        await #expect(throws: ActionResponse.itemNotReadable("rock")) {
-            try await handler.validate(
-                context: ActionContext(
-                    command: command,
-                    engine: engine
-                )
-            )
-        }
+        // Assert
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            > read rock
+            The plain rock isn't something you can read.
+            """)
     }
 
     @Test("Read fails in dark room (item not lit)")
@@ -184,26 +156,17 @@ struct ReadActionHandlerTests {
             locations: darkRoom,
             items: map
         )
-        let (engine, _) = await GameEngine.test(blueprint: game)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        let handler = ReadActionHandler()
-        let command = Command(
-            verb: .read,
-            directObject: .item("map"),
-            rawInput: "read map"
-        )
+        // Act
+        try await engine.execute("read map")
 
-        // Act & Assert
-        await #expect(
-            throws: ActionResponse.roomIsDark
-        ) {
-            try await handler.validate(
-                context: ActionContext(
-                    command: command,
-                    engine: engine
-                )
-            )
-        }
+        // Assert
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            > read map
+            It is pitch black. You can't see a thing.
+            """)
     }
 
     @Test("Read readable item with no text")
@@ -221,20 +184,17 @@ struct ReadActionHandlerTests {
         let game = MinimalGame(items: blankPaper)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        let command = Command(
-            verb: .read,
-            directObject: .item("paper"),
-            rawInput: "read paper"
-        )
-
         // Act
-        await engine.execute(command: command)
+        try await engine.execute("read paper")
 
         // Assert
         let finalItemState = try await engine.item("paper")
         #expect(finalItemState.hasFlag(.isTouched) == true)
         let output = await mockIO.flush()
-        expectNoDifference(output, "There’s nothing written on the blank paper.")
+        expectNoDifference(output, """
+            > read paper
+            There's nothing written on the blank paper.
+            """)
     }
 
     @Test("Read lit item successfully in dark room")
@@ -262,20 +222,17 @@ struct ReadActionHandlerTests {
         )
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        let command = Command(
-            verb: .read,
-            directObject: .item("tablet"),
-            rawInput: "read tablet"
-        )
-
         // Act
-        await engine.execute(command: command)
+        try await engine.execute("read tablet")
 
         // Assert
         let finalItemState = try await engine.item("tablet")
         #expect(finalItemState.hasFlag(.isTouched) == true)
         let output = await mockIO.flush()
-        expectNoDifference(output, "Ancient Runes")
+        expectNoDifference(output, """
+            > read tablet
+            Ancient Runes
+            """)
     }
 
     @Test("Read simple item marks touched")
@@ -293,18 +250,15 @@ struct ReadActionHandlerTests {
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
         #expect(try await engine.item("scroll").hasFlag(.isTouched) == false)
 
-        let command = Command(
-            verb: .read,
-            directObject: .item("scroll"),
-            rawInput: "read scroll"
-        )
-
         // Act
-        await engine.execute(command: command)
+        try await engine.execute("read scroll")
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "Beware the Grue!")
+        expectNoDifference(output, """
+            > read scroll
+            Beware the Grue!
+            """)
 
         // Assert Final State
         let finalItemState = try await engine.item("scroll")
@@ -326,18 +280,15 @@ struct ReadActionHandlerTests {
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
         #expect(try await engine.item("note").hasFlag(.isTouched) == false)
 
-        let command = Command(
-            verb: .read,
-            directObject: .item("note"),
-            rawInput: "read note"
-        )
-
         // Act
-        await engine.execute(command: command)
+        try await engine.execute("read note")
 
         // Assert Output (Default message)
         let output = await mockIO.flush()
-        expectNoDifference(output, "There’s nothing written on the blank note.")
+        expectNoDifference(output, """
+            > read note
+            There's nothing written on the blank note.
+            """)
 
         // Assert Final State
         let finalItemState = try await engine.item("note")
@@ -358,18 +309,15 @@ struct ReadActionHandlerTests {
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
         #expect(try await engine.item("tablet").hasFlag(.isTouched) == false)
 
-        let command = Command(
-            verb: .read,
-            directObject: .item("tablet"),
-            rawInput: "read tablet"
-        )
-
         // Act
-        await engine.execute(command: command)
+        try await engine.execute("read tablet")
 
         // Assert Output (Default message)
         let output = await mockIO.flush()
-        expectNoDifference(output, "There’s nothing written on the stone tablet.")
+        expectNoDifference(output, """
+            > read tablet
+            There's nothing written on the stone tablet.
+            """)
 
         // Assert Final State
         let finalItemState = try await engine.item("tablet")
@@ -388,18 +336,16 @@ struct ReadActionHandlerTests {
         )
         let game = MinimalGame(items: book)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
-        let command = Command(
-            verb: .read,
-            directObject: .item("book"),
-            rawInput: "read book"
-        )
 
         // Act
-        await engine.execute(command: command)
+        try await engine.execute("read book")
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "You can’t see any such thing.")
+        expectNoDifference(output, """
+            > read book
+            You can't see any book here.
+            """)
     }
 
     @Test("Read non-readable item")
@@ -412,18 +358,16 @@ struct ReadActionHandlerTests {
         )
         let game = MinimalGame(items: rock)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
-        let command = Command(
-            verb: .read,
-            directObject: .item("rock"),
-            rawInput: "read rock"
-        )
 
         // Act
-        await engine.execute(command: command)
+        try await engine.execute("read rock")
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "The plain rock isn’t something you can read.")
+        expectNoDifference(output, """
+            > read rock
+            The plain rock isn't something you can read.
+            """)
     }
 
     @Test("Read item in dark room")
@@ -438,7 +382,7 @@ struct ReadActionHandlerTests {
             id: "scroll",
             .name("ancient scroll"),
             .in(.location(darkRoom.id)),
-            .readText("Can’t read this."),
+            .readText("Can't read this."),
             .isReadable
         )
         let game = MinimalGame(
@@ -447,18 +391,16 @@ struct ReadActionHandlerTests {
             items: scroll
         )
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
-        let command = Command(
-            verb: .read,
-            directObject: .item("scroll"),
-            rawInput: "read scroll"
-        )
 
         // Act
-        await engine.execute(command: command)
+        try await engine.execute("read scroll")
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "It is pitch black. You can’t see a thing.")
+        expectNoDifference(output, """
+            > read scroll
+            It is pitch black. You can't see a thing.
+            """)
     }
 
     @Test("Read item providing light in dark room")
@@ -487,18 +429,15 @@ struct ReadActionHandlerTests {
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
         #expect(try await engine.item("tablet").hasFlag(.isTouched) == false)
 
-        let command = Command(
-            verb: .read,
-            directObject: .item("tablet"),
-            rawInput: "read tablet"
-        )
-
         // Act
-        await engine.execute(command: command)
+        try await engine.execute("read tablet")
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "Luminous secrets!")
+        expectNoDifference(output, """
+            > read tablet
+            Luminous secrets!
+            """)
 
         // Assert Final State
         let finalItemState = try await engine.item("tablet")
@@ -509,17 +448,16 @@ struct ReadActionHandlerTests {
     func testReadRequiresDirectObject() async throws {
         // Arrange
         let (engine, mockIO) = await GameEngine.test()
-        let command = Command(
-            verb: .read,
-            rawInput: "read"
-        )
 
         // Act
-        await engine.execute(command: command)
+        try await engine.execute("read")
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "Read what?")
+        expectNoDifference(output, """
+            > read
+            Expected a direct object phrase for verb '.read'.
+            """)
     }
 
     @Test("Read item inside held container")
@@ -543,18 +481,16 @@ struct ReadActionHandlerTests {
 
         let game = MinimalGame(items: box, note)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
-        let command = Command(
-            verb: .read,
-            directObject: .item("note"),
-            rawInput: "read note"
-        )
 
         // Act
-        await engine.execute(command: command)
+        try await engine.execute("read note")
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "Meet at midnight.")
+        expectNoDifference(output, """
+            > read note
+            Meet at midnight.
+            """)
 
         // Assert Final State
         let finalItemState = try await engine.item("note")
@@ -581,18 +517,16 @@ struct ReadActionHandlerTests {
 
         let game = MinimalGame(items: chest, letter)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
-        let command = Command(
-            verb: .read,
-            directObject: .item("letter"),
-            rawInput: "read letter"
-        )
 
         // Act
-        await engine.execute(command: command)
+        try await engine.execute("read letter")
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "Important news.")
+        expectNoDifference(output, """
+            > read letter
+            Important news.
+            """)
 
         // Assert Final State
         let finalItemState = try await engine.item("letter")
@@ -619,18 +553,18 @@ struct ReadActionHandlerTests {
 
         let game = MinimalGame(items: lockedBox, secret)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
-        let command = Command(
-            verb: .read,
-            directObject: .item("secret"),
-            rawInput: "read secret"
-        )
 
-        // Act & Assert
-        await engine.execute(command: command)
+        // Act
+        try await engine.execute("read secret")
+
+        // Assert
         let output = await mockIO.flush()
-        expectNoDifference(output, "You can’t see any such thing.")
+        expectNoDifference(output, """
+            > read secret
+            You can't see any secret here.
+            """)
 
-        // Also assert the item wasn’t touched
+        // Also assert the item wasn't touched
         let finalSecretState = try await engine.item("secret")
         #expect(finalSecretState.hasFlag(.isTouched) == false)
     }
