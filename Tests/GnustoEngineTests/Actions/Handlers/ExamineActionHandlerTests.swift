@@ -516,7 +516,7 @@ struct ExamineActionHandlerTests {
         let water = Item(
             id: "water",
             .name("quantity of water"),
-            .description("It's just water."),
+            .description("It’s just water."),
             .in(.item("bottle")),
             .isTakable
         )
@@ -582,7 +582,7 @@ struct ExamineActionHandlerTests {
         let water = Item(
             id: "water",
             .name("quantity of water"),
-            .description("It's just water."),
+            .description("It’s just water."),
             .synonyms("water", "h2o", "liquid"),
             .in(.item("bottle")),
             .isTakable

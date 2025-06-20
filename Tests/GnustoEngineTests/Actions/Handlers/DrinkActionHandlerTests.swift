@@ -202,7 +202,7 @@ struct DrinkActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > drink water
-            You drink the water. It's quite refreshing.
+            You drink the water. It’s quite refreshing.
             """)
     }
 }

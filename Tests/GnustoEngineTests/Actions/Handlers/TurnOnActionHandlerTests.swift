@@ -116,7 +116,7 @@ struct TurnOnActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > turn on lamp
-            It's already on.
+            It’s already on.
             """)
 
         // Verify item state didn’t change unexpectedly - should NOT be touched if validation fails

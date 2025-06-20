@@ -205,7 +205,7 @@ struct TurnOffActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > turn off lamp
-            It's already off.
+            It’s already off.
             """)
 
         // Check state remains unchanged - touched should NOT be added if validation fails
@@ -287,7 +287,7 @@ struct TurnOffActionHandlerTests {
         let darkRoom = Location(
             id: "darkRoom",
             .name("Pitch Black Room"),
-            .description("It's dark.")
+            .description("It’s dark.")
         )
         let game = MinimalGame(
             player: Player(in: "darkRoom"),
@@ -333,7 +333,7 @@ struct TurnOffActionHandlerTests {
         let darkRoom = Location(
             id: "darkRoom",
             .name("Pitch Black Room"),
-            .description("It's dark.")
+            .description("It’s dark.")
         )
         let game = MinimalGame(
             player: Player(in: "darkRoom"),

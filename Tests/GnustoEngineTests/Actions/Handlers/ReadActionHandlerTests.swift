@@ -46,7 +46,7 @@ struct ReadActionHandlerTests {
         let litRoom = Location(
             id: "litRoom",
             .name("Bright Room"),
-            .description("It's bright here."),
+            .description("It’s bright here."),
             .inherentlyLit
         )
 
@@ -148,7 +148,7 @@ struct ReadActionHandlerTests {
         let darkRoom = Location(
             id: "darkRoom",
             .name("Pitch Black Room"),
-            .description("It's dark.")
+            .description("It’s dark.")
         )
 
         let game = MinimalGame(
@@ -212,7 +212,7 @@ struct ReadActionHandlerTests {
         let darkRoom = Location(
             id: "darkRoom",
             .name("Pitch Black Room"),
-            .description("It's dark.")
+            .description("It’s dark.")
         )
 
         let game = MinimalGame(

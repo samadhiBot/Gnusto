@@ -164,7 +164,7 @@ struct WaveActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > wave flag
-            You wave the red flag around. It's not particularly impressive.
+            You wave the red flag around. It’s not particularly impressive.
             """)
     }
 

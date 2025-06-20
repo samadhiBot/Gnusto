@@ -79,7 +79,7 @@ struct EatActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > eat apple
-            You eat the apple. It's quite satisfying.
+            You eat the apple. It’s quite satisfying.
             """)
     }
 
@@ -186,7 +186,7 @@ struct EatActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > eat apple
-            You eat the apple. It's quite satisfying.
+            You eat the apple. It’s quite satisfying.
             """)
     }
 }
