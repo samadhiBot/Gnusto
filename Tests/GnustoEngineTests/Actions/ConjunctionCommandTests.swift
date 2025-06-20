@@ -65,18 +65,10 @@ struct ConjunctionCommandTests {
 
     @Test("DROP SWORD AND LANTERN drops both items")
     func testDropSwordAndLantern() async throws {
-        let (engine, mockIO) = await GameEngine.test()
-
-        // Create the conjunction command manually for now
-        let command = Command(
-            verb: .drop,
-            directObjects: [.item("sword"), .item("lantern")],
-            isAllCommand: true,  // Mark as multi-object command
-            rawInput: "drop sword and lantern"
-        )
+        let (engine, mockIO) = await createTestEngine()
 
         // Act: Execute the conjunction command
-        await engine.execute(command: command)
+        try await engine.execute("drop sword and lantern")
 
         // Assert: Both items should be dropped
         let swordItem = try await engine.item("sword")
@@ -87,23 +79,18 @@ struct ConjunctionCommandTests {
 
         // Assert: Appropriate message
         let output = await mockIO.flush()
-        expectNoDifference(output, "You drop the lantern and the sword.")
+        expectNoDifference(output, """
+            > drop sword and lantern
+            You drop the lantern and the sword.
+            """)
     }
 
     @Test("DROP SWORD, LANTERN AND BOOK drops all three items")
     func testDropThreeItemsWithCommaAndConjunction() async throws {
-        let (engine, mockIO) = await GameEngine.test()
-
-        // Create the conjunction command manually for now
-        let command = Command(
-            verb: .drop,
-            directObjects: [.item("sword"), .item("lantern"), .item("book")],
-            isAllCommand: true,  // Mark as multi-object command
-            rawInput: "drop sword, lantern and book"
-        )
+        let (engine, mockIO) = await createTestEngine()
 
         // Act: Execute the conjunction command with comma
-        await engine.execute(command: command)
+        try await engine.execute("drop sword, lantern and book")
 
         // Assert: All three items should be dropped
         let swordItem = try await engine.item("sword")
@@ -116,7 +103,10 @@ struct ConjunctionCommandTests {
 
         // Assert: Appropriate message
         let output = await mockIO.flush()
-        expectNoDifference(output, "You drop the book, the lantern, and the sword.")
+        expectNoDifference(output, """
+            > drop sword, lantern and book
+            You drop the book, the lantern, and the sword.
+            """)
 
     }
 
@@ -124,18 +114,10 @@ struct ConjunctionCommandTests {
 
     @Test("TAKE COIN AND GEM takes both items")
     func testTakeCoinAndGem() async throws {
-        let (engine, mockIO) = await GameEngine.test()
-
-        // Create the conjunction command manually for now
-        let command = Command(
-            verb: .take,
-            directObjects: [.item("coin"), .item("gem")],
-            isAllCommand: true,  // Mark as multi-object command
-            rawInput: "take coin and gem"
-        )
+        let (engine, mockIO) = await createTestEngine()
 
         // Act: Execute the conjunction command
-        await engine.execute(command: command)
+        try await engine.execute("take coin and gem")
 
         // Assert: Both items should be taken
         let coinItem = try await engine.item("coin")
@@ -146,7 +128,10 @@ struct ConjunctionCommandTests {
 
         // Assert: Appropriate message
         let output = await mockIO.flush()
-        expectNoDifference(output, "You take the coin and the gem.")
+        expectNoDifference(output, """
+            > take coin and gem
+            You take the coin and the gem.
+            """)
     }
 
     // MARK: - Error Handling Tests
@@ -157,25 +142,19 @@ struct ConjunctionCommandTests {
         let sword = Item(id: "sword", .name("sword"), .in(.player), .isTakable)
         let lantern = Item(id: "lantern", .name("lantern"), .in(.player), .isTakable)
 
-        let (engine, _) = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: MinimalGame(items: sword, lantern)
         )
 
         // Act: Try to parse "open sword and lantern" (OPEN doesn't support multiple objects)
-        let result = await engine.parser.parse(
-            input: "open sword and lantern",
-            vocabulary: engine.gameState.vocabulary,
-            gameState: engine.gameState
-        )
+        try await engine.execute("open sword and lantern")
 
-        // Assert: Should get a parse error about multiple objects not being supported
-        switch result {
-        case .success:
-            #expect(Bool(false), "Expected parsing to fail for unsupported multiple objects")
-        case .failure(let error):
-            let errorMessage = "\(error)"
-            #expect(errorMessage.contains("doesn\\'t support multiple objects"))
-        }
+        // Assert: Should get an error about multiple objects not being supported
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            > open sword and lantern
+            The OPEN command doesn't support multiple objects.
+            """)
     }
 
     @Test("Conjunction with non-existent item handles gracefully")
@@ -183,28 +162,20 @@ struct ConjunctionCommandTests {
         // Create test setup directly
         let sword = Item(id: "sword", .name("sword"), .in(.player), .isTakable)
 
-        let (engine, _) = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: MinimalGame(items: sword)
         )
 
         // Act: Try to parse "drop sword and nonexistent" (nonexistent item should cause error)
-        let result = await engine.parser.parse(
-            input: "drop sword and nonexistent",
-            vocabulary: engine.gameState.vocabulary,
-            gameState: engine.gameState
-        )
+        try await engine.execute("drop sword and nonexistent")
 
         // Assert: Should get a parse error about the non-existent item
-        switch result {
-        case .success:
-            #expect(Bool(false), "Expected parsing to fail for non-existent item")
-        case .failure(let error):
-            let errorMessage = "\(error)"
-            #expect(
-                errorMessage.contains("can't see") || errorMessage.contains("don't see")
-                    || errorMessage.contains("not here") || errorMessage.contains("unknown")
-                    || errorMessage.contains("not in scope"))
-        }
+        let output = await mockIO.flush()
+        #expect(
+            output.contains("can't see") || output.contains("don't see")
+                || output.contains("not here") || output.contains("unknown")
+                || output.contains("not in scope") || output.contains("I don't see")
+        )
     }
 
     // MARK: - Mixed Conjunction Tests
@@ -229,25 +200,21 @@ struct ConjunctionCommandTests {
 
         let player = Player(in: .startRoom, carryingCapacity: 20)
         let game = MinimalGame(player: player, items: sword, statue)
-        let (engine, _) = await GameEngine.test(blueprint: game)
-
-        // Create a command with one held and one not held item
-        let command = Command(
-            verb: .drop,
-            directObjects: [.item("sword"), .item("statue")],
-            isAllCommand: true,
-            rawInput: "drop sword and statue"
-        )
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // Act: Try to drop a held item and a non-held item
-        await engine.execute(command: command)
+        try await engine.execute("drop sword and statue")
 
-        // Assert: Should drop the sword but skip the statue
+        // Assert: Should drop the sword but handle the statue appropriately
         let swordItem = try await engine.item("sword")
         let statueItem = try await engine.item("statue")
 
         #expect(swordItem.parent == .location(.startRoom))
         #expect(statueItem.parent == .location(.startRoom))  // Should remain in location
+
+        // Check output for appropriate error or success message
+        let output = await mockIO.flush()
+        #expect(output.contains("sword"))  // Should mention sword in some way
     }
 
     // MARK: - Parser Integration Tests
@@ -258,29 +225,24 @@ struct ConjunctionCommandTests {
         let sword = Item(id: "sword", .name("sword"), .in(.player), .isTakable)
         let lantern = Item(id: "lantern", .name("lantern"), .in(.player), .isTakable)
 
-        let (engine, _) = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: MinimalGame(items: sword, lantern)
         )
 
-        // Act: Parse "drop sword and lantern"
-        let result = await engine.parser.parse(
-            input: "drop sword and lantern",
-            vocabulary: engine.gameState.vocabulary,
-            gameState: engine.gameState
-        )
+        // Act: Parse and execute "drop sword and lantern"
+        try await engine.execute("drop sword and lantern")
 
-        // Assert: Should successfully parse with multiple objects
-        switch result {
-        case .success(let command):
-            #expect(command.verb == .drop)
-            #expect(command.directObjects.count == 2)
-            #expect(command.directObjects.contains(.item("sword")))
-            #expect(command.directObjects.contains(.item("lantern")))
-            #expect(command.isAllCommand == true)  // Multiple objects should set this flag
-            #expect(command.rawInput == "drop sword and lantern")
-        case .failure(let error):
-            #expect(Bool(false), "Expected parsing to succeed, but got error: \(error)")
-        }
+        // Assert: Should successfully execute with multiple objects
+        let swordItem = try await engine.item("sword")
+        let lanternItem = try await engine.item("lantern")
+        #expect(swordItem.parent == .location(.startRoom))
+        #expect(lanternItem.parent == .location(.startRoom))
+
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            > drop sword and lantern
+            You drop the lantern and the sword.
+            """)
     }
 
     @Test("Parser correctly parses TAKE COIN, GEM AND BOOK")
@@ -290,29 +252,25 @@ struct ConjunctionCommandTests {
         let gem = Item(id: "gem", .name("gem"), .in(.location(.startRoom)), .isTakable)
         let book = Item(id: "book", .name("book"), .in(.location(.startRoom)), .isTakable)
 
-        let (engine, _) = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: MinimalGame(items: coin, gem, book)
         )
 
-        // Act: Parse "take coin, gem and book"
-        let result = await engine.parser.parse(
-            input: "take coin, gem and book",
-            vocabulary: engine.gameState.vocabulary,
-            gameState: engine.gameState
-        )
+        // Act: Parse and execute "take coin, gem and book"
+        try await engine.execute("take coin, gem and book")
 
-        // Assert: Should successfully parse with multiple objects
-        switch result {
-        case .success(let command):
-            #expect(command.verb == .take)
-            #expect(command.directObjects.count == 3)
-            #expect(command.directObjects.contains(.item("coin")))
-            #expect(command.directObjects.contains(.item("gem")))
-            #expect(command.directObjects.contains(.item("book")))
-            #expect(command.isAllCommand == true)  // Multiple objects should set this flag
-            #expect(command.rawInput == "take coin, gem and book")
-        case .failure(let error):
-            #expect(Bool(false), "Expected parsing to succeed, but got error: \(error)")
-        }
+        // Assert: Should successfully execute with multiple objects
+        let coinItem = try await engine.item("coin")
+        let gemItem = try await engine.item("gem")
+        let bookItem = try await engine.item("book")
+        #expect(coinItem.parent == .player)
+        #expect(gemItem.parent == .player)
+        #expect(bookItem.parent == .player)
+
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            > take coin, gem and book
+            You take the book, the coin, and the gem.
+            """)
     }
 }

@@ -27,19 +27,14 @@ struct MultipleObjectTests {
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // Act: Execute "examine all"
-        let command = Command(
-            verb: .examine,
-            directObjects: [.item("sword"), .item("lantern")],
-            isAllCommand: true,
-            rawInput: "examine all"
-        )
-        await engine.execute(command: command)
+        try await engine.execute("examine all")
 
         // Assert: Should examine both items
         let output = await mockIO.flush()
         expectNoDifference(
             output,
             """
+            > examine all
             - Sword: A sharp blade.
             - Lantern: A bright light.
             """)
@@ -64,19 +59,14 @@ struct MultipleObjectTests {
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // Act: Execute "examine sword and lantern"
-        let command = Command(
-            verb: .examine,
-            directObjects: [.item("sword"), .item("lantern")],
-            isAllCommand: false,
-            rawInput: "examine sword and lantern"
-        )
-        await engine.execute(command: command)
+        try await engine.execute("examine sword and lantern")
 
         // Assert: Should examine both items
         let output = await mockIO.flush()
         expectNoDifference(
             output,
             """
+            > examine sword and lantern
             - Sword: A sharp blade.
             - Lantern: A bright light.
             """)
@@ -107,18 +97,14 @@ struct MultipleObjectTests {
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // Act: Execute "give all to merchant"
-        let command = Command(
-            verb: .give,
-            directObjects: [.item("coin"), .item("gem")],
-            indirectObjects: [.item("merchant")],
-            isAllCommand: true,
-            rawInput: "give all to merchant"
-        )
-        await engine.execute(command: command)
+        try await engine.execute("give all to merchant")
 
         // Assert: Should give both items
         let output = await mockIO.flush()
-        expectNoDifference(output, "You give the coin and the gem to the merchant.")
+        expectNoDifference(output, """
+            > give all to merchant
+            You give the coin and the gem to the merchant.
+            """)
 
         // Verify items moved to merchant
         let updatedCoin = try await engine.item("coin")
@@ -150,18 +136,14 @@ struct MultipleObjectTests {
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // Act: Execute "give coin and gem to merchant"
-        let command = Command(
-            verb: .give,
-            directObjects: [.item("coin"), .item("gem")],
-            indirectObjects: [.item("merchant")],
-            isAllCommand: false,
-            rawInput: "give coin and gem to merchant"
-        )
-        await engine.execute(command: command)
+        try await engine.execute("give coin and gem to merchant")
 
         // Assert: Should give both items
         let output = await mockIO.flush()
-        expectNoDifference(output, "You give the coin and the gem to the merchant.")
+        expectNoDifference(output, """
+            > give coin and gem to merchant
+            You give the coin and the gem to the merchant.
+            """)
 
         // Verify items moved to merchant
         let updatedCoin = try await engine.item("coin")
@@ -196,18 +178,14 @@ struct MultipleObjectTests {
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // Act: Execute "put all in box"
-        let command = Command(
-            verb: .insert,
-            directObjects: [.item("coin"), .item("gem")],
-            indirectObjects: [.item("box")],
-            isAllCommand: true,
-            rawInput: "put all in box"
-        )
-        await engine.execute(command: command)
+        try await engine.execute("put all in box")
 
         // Assert: Should put both items in box
         let output = await mockIO.flush()
-        expectNoDifference(output, "You put the coin and the gem in the box.")
+        expectNoDifference(output, """
+            > put all in box
+            You put the coin and the gem in the box.
+            """)
 
         // Verify items moved to box
         let updatedCoin = try await engine.item("coin")
@@ -240,18 +218,14 @@ struct MultipleObjectTests {
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // Act: Execute "put coin and gem in box"
-        let command = Command(
-            verb: .insert,
-            directObjects: [.item("coin"), .item("gem")],
-            indirectObjects: [.item("box")],
-            isAllCommand: false,
-            rawInput: "put coin and gem in box"
-        )
-        await engine.execute(command: command)
+        try await engine.execute("put coin and gem in box")
 
         // Assert: Should put both items in box
         let output = await mockIO.flush()
-        expectNoDifference(output, "You put the coin and the gem in the box.")
+        expectNoDifference(output, """
+            > put coin and gem in box
+            You put the coin and the gem in the box.
+            """)
 
         // Verify items moved to box
         let updatedCoin = try await engine.item("coin")
@@ -279,17 +253,14 @@ struct MultipleObjectTests {
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // Act: Execute "push all"
-        let command = Command(
-            verb: .push,
-            directObjects: [.item("button"), .item("lever")],
-            isAllCommand: true,
-            rawInput: "push all"
-        )
-        await engine.execute(command: command)
+        try await engine.execute("push all")
 
         // Assert: Should push both items
         let output = await mockIO.flush()
-        expectNoDifference(output, "You push the button and the lever. Nothing happens.")
+        expectNoDifference(output, """
+            > push all
+            You push the button and the lever. Nothing happens.
+            """)
     }
 
     @Test("PUSH BUTTON AND LEVER works correctly")
@@ -309,17 +280,14 @@ struct MultipleObjectTests {
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // Act: Execute "push button and lever"
-        let command = Command(
-            verb: .push,
-            directObjects: [.item("button"), .item("lever")],
-            isAllCommand: false,
-            rawInput: "push button and lever"
-        )
-        await engine.execute(command: command)
+        try await engine.execute("push button and lever")
 
         // Assert: Should push both items
         let output = await mockIO.flush()
-        expectNoDifference(output, "You push the button and the lever. Nothing happens.")
+        expectNoDifference(output, """
+            > push button and lever
+            You push the button and the lever. Nothing happens.
+            """)
     }
 
     // MARK: - Error Handling Tests
@@ -341,17 +309,14 @@ struct MultipleObjectTests {
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // Act: Try "open sword and lantern" (OPEN doesn't support multiple objects)
-        let command = Command(
-            verb: .open,
-            directObjects: [.item("sword"), .item("lantern")],
-            isAllCommand: false,
-            rawInput: "open sword and lantern"
-        )
-        await engine.execute(command: command)
+        try await engine.execute("open sword and lantern")
 
         // Assert: Should get an error about multiple objects not being supported
         let output = await mockIO.flush()
-        expectNoDifference(output, "The OPEN command doesn’t support multiple objects.")
+        expectNoDifference(output, """
+            > open sword and lantern
+            The OPEN command doesn't support multiple objects.
+            """)
     }
 
     @Test("ALL with no applicable items handles gracefully")
@@ -359,16 +324,13 @@ struct MultipleObjectTests {
         let (engine, mockIO) = await GameEngine.test()
 
         // Act: Execute "take all" when there's nothing to take
-        let command = Command(
-            verb: .take,
-            directObjects: [],
-            isAllCommand: true,
-            rawInput: "take all"
-        )
-        await engine.execute(command: command)
+        try await engine.execute("take all")
 
         // Assert: Should get appropriate message
         let output = await mockIO.flush()
-        expectNoDifference(output, "There is nothing here to take.")
+        expectNoDifference(output, """
+            > take all
+            There is nothing here to take.
+            """)
     }
 }

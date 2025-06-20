@@ -260,10 +260,8 @@ struct GoActionHandlerTests {
         // Update the location in the game state directly for the test setup
 //        await engine.TEST_ONLY_updateLocation(foyer)
 
-        let command = Command(verb: .go, direction: .east, rawInput: "go east")
-
         // Act
-        await engine.execute(command: command)
+        try await engine.execute("go east")
 
         // Assert
         #expect(await engine.playerLocationID == "garden") // Player moved

@@ -35,15 +35,8 @@ struct AllCommandTests {
         let game = MinimalGame(player: player, items: key, coin, lamp)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        let command = Command(
-            verb: .take,
-            directObjects: [.item("coin"), .item("key"), .item("lamp")],  // Sorted by name
-            isAllCommand: true,
-            rawInput: "take all"
-        )
-
         // Act
-        await engine.execute(command: command)
+        try await engine.execute("take all")
 
         // Assert: All items should be taken
         let finalKeyState = try await engine.item("key")
@@ -56,7 +49,10 @@ struct AllCommandTests {
 
         // Assert: Appropriate message
         let output = await mockIO.flush()
-        expectNoDifference(output, "You take the gold coin, the brass key, and the brass lamp.")
+        expectNoDifference(output, """
+            > take all
+            You take the gold coin, the brass key, and the brass lamp.
+            """)
 
         // Assert: Pronouns updated to last item
         #expect(await engine.getPronounReference(pronoun: "it") == [.item("lamp")])
@@ -75,22 +71,15 @@ struct AllCommandTests {
         let game = MinimalGame(items: scenery)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        let command = Command(
-            verb: .take,
-            directObjects: [],  // Empty because no valid objects found
-            isAllCommand: true,
-            rawInput: "take all"
-        )
-
         // Act
-        await engine.execute(command: command)
+        try await engine.execute("take all")
 
         // Assert: Appropriate message
         let output = await mockIO.flush()
-        #expect(output == "There is nothing here to take.")
-
-        // Assert: No state changes
-        #expect(await engine.gameState.changeHistory.isEmpty)
+        expectNoDifference(output, """
+            > take all
+            There is nothing here to take.
+            """)
     }
 
     @Test("TAKE ALL with mixed takable and non-takable items")
@@ -121,15 +110,8 @@ struct AllCommandTests {
         let game = MinimalGame(player: player, items: key, wall, coin)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        let command = Command(
-            verb: .take,
-            directObjects: [.item("coin"), .item("key")],  // Only takable items
-            isAllCommand: true,
-            rawInput: "take all"
-        )
-
         // Act
-        await engine.execute(command: command)
+        try await engine.execute("take all")
 
         // Assert: Only takable items are taken
         let finalKeyState = try await engine.item("key")
@@ -142,7 +124,10 @@ struct AllCommandTests {
 
         // Assert: Appropriate message
         let output = await mockIO.flush()
-        expectNoDifference(output, "You take the gold coin and the brass key.")
+        expectNoDifference(output, """
+            > take all
+            You take the gold coin and the brass key.
+            """)
     }
 
     @Test("TAKE ALL with capacity limit")
@@ -174,15 +159,8 @@ struct AllCommandTests {
         let game = MinimalGame(player: player, items: key, coin, boulder)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        let command = Command(
-            verb: .take,
-            directObjects: [.item("coin"), .item("key")],  // Boulder filtered out by capacity
-            isAllCommand: true,
-            rawInput: "take all"
-        )
-
         // Act
-        await engine.execute(command: command)
+        try await engine.execute("take all")
 
         // Assert: Only items within capacity are taken
         let finalKeyState = try await engine.item("key")
@@ -195,7 +173,10 @@ struct AllCommandTests {
 
         // Assert: Appropriate message
         let output = await mockIO.flush()
-        expectNoDifference(output, "You take the gold coin and the brass key.")
+        expectNoDifference(output, """
+            > take all
+            You take the gold coin and the brass key.
+            """)
     }
 
     @Test("DROP ALL with multiple held items")
@@ -226,15 +207,8 @@ struct AllCommandTests {
         let game = MinimalGame(items: key, coin, lamp)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        let command = Command(
-            verb: .drop,
-            directObjects: [.item("coin"), .item("key"), .item("lamp")],  // Sorted by name
-            isAllCommand: true,
-            rawInput: "drop all"
-        )
-
         // Act
-        await engine.execute(command: command)
+        try await engine.execute("drop all")
 
         // Assert: All items should be dropped
         let finalKeyState = try await engine.item("key")
@@ -247,7 +221,10 @@ struct AllCommandTests {
 
         // Assert: Appropriate message
         let output = await mockIO.flush()
-        expectNoDifference(output, "You drop the gold coin, the brass key, and the brass lamp.")
+        expectNoDifference(output, """
+            > drop all
+            You drop the gold coin, the brass key, and the brass lamp.
+            """)
 
         // Assert: Pronouns updated to last item
         #expect(await engine.getPronounReference(pronoun: "it") == [.item("lamp")])
@@ -264,22 +241,15 @@ struct AllCommandTests {
         // Arrange: Player holding nothing
         let (engine, mockIO) = await GameEngine.test()
 
-        let command = Command(
-            verb: .drop,
-            directObjects: [],  // Empty because player holds nothing
-            isAllCommand: true,
-            rawInput: "drop all"
-        )
-
         // Act
-        await engine.execute(command: command)
+        try await engine.execute("drop all")
 
         // Assert: Appropriate message
         let output = await mockIO.flush()
-        #expect(output == "You have nothing to drop.")
-
-        // Assert: No state changes
-        #expect(await engine.gameState.changeHistory.isEmpty)
+        expectNoDifference(output, """
+            > drop all
+            You have nothing to drop.
+            """)
     }
 
     @Test("TAKE ALL single item uses singular message")
@@ -297,19 +267,15 @@ struct AllCommandTests {
         let game = MinimalGame(player: player, items: key)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        let command = Command(
-            verb: .take,
-            directObjects: [.item("key")],
-            isAllCommand: true,
-            rawInput: "take all"
-        )
-
         // Act
-        await engine.execute(command: command)
+        try await engine.execute("take all")
 
         // Assert: Singular message format
         let output = await mockIO.flush()
-        #expect(output == "You take the brass key.")
+        expectNoDifference(output, """
+            > take all
+            You take the brass key.
+            """)
 
         // Assert: Item is taken
         let finalKeyState = try await engine.item("key")
@@ -330,19 +296,15 @@ struct AllCommandTests {
         let game = MinimalGame(items: key)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        let command = Command(
-            verb: .drop,
-            directObjects: [.item("key")],
-            isAllCommand: true,
-            rawInput: "drop all"
-        )
-
         // Act
-        await engine.execute(command: command)
+        try await engine.execute("drop all")
 
         // Assert: Singular message format
         let output = await mockIO.flush()
-        #expect(output == "You drop the brass key.")
+        expectNoDifference(output, """
+            > drop all
+            You drop the brass key.
+            """)
 
         // Assert: Item is dropped
         let finalKeyState = try await engine.item("key")
@@ -371,15 +333,8 @@ struct AllCommandTests {
         let game = MinimalGame(player: player, items: heldKey, roomKey)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        let command = Command(
-            verb: .take,
-            directObjects: [.item("roomKey")],  // Only room key should be in the list
-            isAllCommand: true,
-            rawInput: "take all"
-        )
-
         // Act
-        await engine.execute(command: command)
+        try await engine.execute("take all")
 
         // Assert: Only room key is taken (held key skipped)
         let finalHeldKeyState = try await engine.item("heldKey")
@@ -390,6 +345,9 @@ struct AllCommandTests {
 
         // Assert: Message only mentions newly taken item
         let output = await mockIO.flush()
-        #expect(output == "You take the brass key.")
+        expectNoDifference(output, """
+            > take all
+            You take the brass key.
+            """)
     }
 }

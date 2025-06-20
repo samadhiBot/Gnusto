@@ -152,17 +152,13 @@ struct DynamicPropertyTests {
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // Test looking at the item
-        let command = Command(
-            verb: .look,
-            directObject: .item(testItem.id),
-            rawInput: "look magic sword"
-        )
-
-        // Act
-        await engine.execute(command: command)
+        try await engine.execute("look magic sword")
 
         let output = await mockIO.flush()
-        expectNoDifference(output, "The blade shimmers with arcane power.")
+        expectNoDifference(output, """
+            > look magic sword
+            The blade shimmers with arcane power.
+            """)
     }
 
     @Test("Look with Dynamic Location Description")
