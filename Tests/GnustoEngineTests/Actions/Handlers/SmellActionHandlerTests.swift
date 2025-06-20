@@ -18,7 +18,10 @@ struct SmellActionHandlerTests {
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "> smell\n\nYou smell nothing unusual.")
+        expectNoDifference(output, """
+            > smell
+            You smell nothing unusual.
+            """)
     }
 
     @Test("SMELL with item produces expected message")
@@ -39,7 +42,10 @@ struct SmellActionHandlerTests {
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "> smell apple\n\nThat smells about average.")
+        expectNoDifference(output, """
+            > smell apple
+            That smells about average.
+            """)
     }
 
     @Test("SMELL validation rejects non-item objects")
@@ -50,7 +56,10 @@ struct SmellActionHandlerTests {
         try await engine.execute("smell room")
 
         let output = await mockIO.flush()
-        expectNoDifference(output, "> smell room\n\nYou can only smell specific items.")
+        expectNoDifference(output, """
+            > smell room
+            You can only smell specific items.
+            """)
     }
 
     @Test("SMELL validation succeeds for items")
@@ -70,7 +79,10 @@ struct SmellActionHandlerTests {
         try await engine.execute("smell flower")
 
         let output = await mockIO.flush()
-        expectNoDifference(output, "> smell flower\n\nThat smells about average.")
+        expectNoDifference(output, """
+            > smell flower
+            That smells about average.
+            """)
     }
 
     @Test("SMELL validation succeeds with no direct object")

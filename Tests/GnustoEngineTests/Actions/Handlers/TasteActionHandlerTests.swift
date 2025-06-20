@@ -27,7 +27,10 @@ struct TasteActionHandlerTests {
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "> taste apple\n\nThat tastes about average.")
+        expectNoDifference(output, """
+            > taste apple
+            That tastes about average.
+            """)
     }
 
     @Test("TASTE without object is rejected")
@@ -38,7 +41,10 @@ struct TasteActionHandlerTests {
         try await engine.execute("taste")
 
         let output = await mockIO.flush()
-        expectNoDifference(output, "> taste\n\nTaste what?")
+        expectNoDifference(output, """
+            > taste
+            Taste what?
+            """)
     }
 
     @Test("TASTE validation rejects non-item objects")
@@ -49,7 +55,10 @@ struct TasteActionHandlerTests {
         try await engine.execute("taste room")
 
         let output = await mockIO.flush()
-        expectNoDifference(output, "> taste room\n\nYou can only taste specific items.")
+        expectNoDifference(output, """
+            > taste room
+            You can only taste specific items.
+            """)
     }
 
     @Test("TASTE validation succeeds for items")
@@ -69,7 +78,10 @@ struct TasteActionHandlerTests {
         try await engine.execute("taste berry")
 
         let output = await mockIO.flush()
-        expectNoDifference(output, "> taste berry\n\nThat tastes about average.")
+        expectNoDifference(output, """
+            > taste berry
+            That tastes about average.
+            """)
     }
 
     @Test("TASTE produces correct ActionResult")
@@ -131,7 +143,10 @@ struct TasteActionHandlerTests {
         #expect(finalState.player.currentLocationID == initialLocation)
 
         let output = await mockIO.flush()
-        expectNoDifference(output, "> taste cookie\n\nThat tastes about average.")
+        expectNoDifference(output, """
+            > taste cookie
+            That tastes about average.
+            """)
     }
 
     @Test("TASTE works with items in different locations")
@@ -151,7 +166,10 @@ struct TasteActionHandlerTests {
         try await engine.execute("taste fruit")
 
         let output = await mockIO.flush()
-        expectNoDifference(output, "> taste fruit\n\nThat tastes about average.")
+        expectNoDifference(output, """
+            > taste fruit
+            That tastes about average.
+            """)
     }
 
     @Test("TASTE with unreachable item")
@@ -171,7 +189,10 @@ struct TasteActionHandlerTests {
         try await engine.execute("taste fruit")
 
         let output = await mockIO.flush()
-        expectNoDifference(output, "> taste fruit\n\nYou can't see any distant fruit here.")
+        expectNoDifference(output, """
+            > taste fruit
+            You can't see any distant fruit here.
+            """)
     }
 
     @Test("TASTE message is consistent across multiple calls")
@@ -221,7 +242,10 @@ struct TasteActionHandlerTests {
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "> taste medicine\n\nThat tastes about average.")
+        expectNoDifference(output, """
+            > taste medicine
+            That tastes about average.
+            """)
     }
 
     @Test("TASTE works in dark room")
@@ -254,7 +278,10 @@ struct TasteActionHandlerTests {
 
         // Assert Output - should still work
         let output = await mockIO.flush()
-        expectNoDifference(output, "> taste spice\n\nThat tastes about average.")
+        expectNoDifference(output, """
+            > taste spice
+            That tastes about average.
+            """)
     }
 
     @Test("TASTE full workflow integration test")

@@ -30,7 +30,10 @@ struct LookUnderActionHandlerTests {
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "> look under table\n\nYou find nothing of interest under the wooden table.")
+        expectNoDifference(output, """
+            > look under table
+            You find nothing of interest under the wooden table.
+            """)
 
         // Assert Change History
         let changeHistory = await engine.gameState.changeHistory
@@ -66,7 +69,10 @@ struct LookUnderActionHandlerTests {
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "> look under table\n\nYou can't see any such thing.")
+        expectNoDifference(output, """
+            > look under table
+            You can't see any such thing.
+            """)
         #expect(await engine.gameState.changeHistory.isEmpty)
     }
 
@@ -79,7 +85,10 @@ struct LookUnderActionHandlerTests {
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "> look under\n\nLook under what?")
+        expectNoDifference(output, """
+            > look under
+            Look under what?
+            """)
 
         // Assert Error Message
         #expect(await engine.gameState.changeHistory.isEmpty)
@@ -94,7 +103,10 @@ struct LookUnderActionHandlerTests {
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "> look under room\n\nYou can't look under that.")
+        expectNoDifference(output, """
+            > look under room
+            You can't look under that.
+            """)
 
         #expect(await engine.gameState.changeHistory.isEmpty)
     }
@@ -122,7 +134,10 @@ struct LookUnderActionHandlerTests {
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "> look under carpet\n\nYou can't see any such thing.")
+        expectNoDifference(output, """
+            > look under carpet
+            You can't see any such thing.
+            """)
 
         #expect(await engine.gameState.changeHistory.isEmpty)
     }
@@ -143,7 +158,10 @@ struct LookUnderActionHandlerTests {
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "> look under mat\n\nYou find nothing of interest under the welcome mat.")
+        expectNoDifference(output, """
+            > look under mat
+            You find nothing of interest under the welcome mat.
+            """)
 
         // Assert State Change
         let finalMat = try await engine.item("mat")
@@ -173,7 +191,10 @@ struct LookUnderActionHandlerTests {
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "> look under book\n\nYou find nothing of interest under the old book.")
+        expectNoDifference(output, """
+            > look under book
+            You find nothing of interest under the old book.
+            """)
 
         // Assert State Change
         let finalBook = try await engine.item("book")

@@ -176,7 +176,10 @@ struct LookActionHandlerTests {
         // Assert Output
         let output = await mockIO.flush()
         // Corrected Expectation: Darkness message
-        expectNoDifference(output, "> look\n\nIt is pitch black. You can't see a thing.")
+        expectNoDifference(output, """
+            > look
+            It is pitch black. You can't see a thing.
+            """)
 
         // Assert No State Change
         #expect(await engine.gameState.changeHistory.isEmpty)
@@ -370,7 +373,10 @@ struct LookActionHandlerTests {
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "> look at rock\n\nJust a plain rock.")
+        expectNoDifference(output, """
+            > look at rock
+            Just a plain rock.
+            """)
 
         // Assert Final State
         let finalItemState = try await engine.item("rock")
@@ -404,7 +410,10 @@ struct LookActionHandlerTests {
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "> l pebble\n\nYou see nothing special about the smooth pebble.")
+        expectNoDifference(output, """
+            > l pebble
+            You see nothing special about the smooth pebble.
+            """)
 
         // Assert Final State
         let finalItemState = try await engine.item("pebble")
@@ -440,7 +449,10 @@ struct LookActionHandlerTests {
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "> examine stone\n\nA worn stone.")
+        expectNoDifference(output, """
+            > examine stone
+            A worn stone.
+            """)
 
         // Only change is pronoun change
         #expect(

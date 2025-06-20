@@ -120,7 +120,10 @@ struct TakeActionHandlerTests {
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "> take key\n\nTaken.")
+        expectNoDifference(output, """
+            > take key
+            Taken.
+            """)
 
         // Assert Change History
         // Pass the initial attributes map to the helper
@@ -285,7 +288,10 @@ struct TakeActionHandlerTests {
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "> take gem\n\nTaken.")
+        expectNoDifference(output, """
+            > take gem
+            Taken.
+            """)
 
         // Assert Change History
         let expectedChanges = expectedTakeChanges(
@@ -337,7 +343,10 @@ struct TakeActionHandlerTests {
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "> take coin\n\nTaken.")
+        expectNoDifference(output, """
+            > take coin
+            Taken.
+            """)
 
         // Assert Change History
         let expectedChanges = expectedTakeChanges(
@@ -761,7 +770,10 @@ struct TakeActionHandlerTests {
         #expect(finalCoinState.parent == .player)
 
         let output = await mockIO.flush()
-        expectNoDifference(output, "> take coin from bag\n\nTaken.")
+        expectNoDifference(output, """
+            > take coin from bag
+            Taken.
+            """)
     }
 
     @Test("Take item from wrong container fails with appropriate message")
