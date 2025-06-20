@@ -25,14 +25,8 @@ struct DropActionHandlerTests {
         #expect(try await engine.item("key").parent == .player)  // Verify setup
         #expect(await engine.gameState.changeHistory.isEmpty)
 
-        let command = Command(
-            verb: .drop,
-            directObject: .item("key"),
-            rawInput: "drop key"
-        )
-
-        // Act: Use engine.execute for full pipeline
-        await engine.execute(command: command)
+        // Act
+        try await engine.execute("drop key")
 
         // Assert Final State
         let finalItemState = try await engine.item("key")
@@ -41,7 +35,7 @@ struct DropActionHandlerTests {
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "Dropped.")
+        expectNoDifference(output, "> drop key\n\nDropped.")
 
         // Assert Change History
         let expectedChanges = expectedDropChanges(
@@ -60,17 +54,12 @@ struct DropActionHandlerTests {
         // Arrange
         let (engine, mockIO) = await GameEngine.test()
 
-        let command = Command(
-            verb: .drop,
-            rawInput: "drop"
-        )  // No direct object
-
         // Act
-        await engine.execute(command: command)
+        try await engine.execute("drop")
 
         // Assert: Expect error from validate()
         let output = await mockIO.flush()
-        expectNoDifference(output, "Drop what?")
+        expectNoDifference(output, "> drop\n\nDrop what?")
     }
 
     @Test("Drop fails when item not held")
@@ -89,14 +78,8 @@ struct DropActionHandlerTests {
         #expect(try await engine.item("key").parent == .location(.startRoom))
         #expect(await engine.gameState.changeHistory.isEmpty)
 
-        let command = Command(
-            verb: .drop,
-            directObject: .item("key"),
-            rawInput: "drop key"
-        )
-
-        // Act: Use engine.execute for full pipeline
-        await engine.execute(command: command)
+        // Act
+        try await engine.execute("drop key")
 
         // Assert Final State (Unchanged)
         let finalItemState = try await engine.item("key")
@@ -104,7 +87,7 @@ struct DropActionHandlerTests {
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "You aren’t holding the brass key.")
+        expectNoDifference(output, "> drop key\n\nYou aren't holding the brass key.")
 
         // Assert Change History (Should be empty)
         #expect(await engine.gameState.changeHistory.isEmpty)
@@ -133,14 +116,8 @@ struct DropActionHandlerTests {
         #expect(try await engine.item("cloak").hasFlag(.isWorn) == true)  // Qualified
         #expect(await engine.gameState.changeHistory.isEmpty)
 
-        let command = Command(
-            verb: .drop,
-            directObject: .item("cloak"),
-            rawInput: "drop cloak"
-        )
-
-        // Act: Use engine.execute for full pipeline
-        await engine.execute(command: command)
+        // Act
+        try await engine.execute("drop cloak")
 
         // Assert Final State
         let finalItemState = try await engine.item("cloak")
@@ -150,7 +127,7 @@ struct DropActionHandlerTests {
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "Dropped.")
+        expectNoDifference(output, "> drop cloak\n\nDropped.")
 
         // Assert Change History
         let expectedChanges = expectedDropChanges(
@@ -176,18 +153,12 @@ struct DropActionHandlerTests {
         let game = MinimalGame(items: testItem)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        let command = Command(
-            verb: .drop,
-            directObject: .item("sword-in-stone"),
-            rawInput: "drop sword"
-        )
-
         // Act
-        await engine.execute(command: command)
+        try await engine.execute("drop sword")
 
         // Assert: Expect error from validate()
         let output = await mockIO.flush()
-        expectNoDifference(output, "You can’t drop the sword in stone.")
+        expectNoDifference(output, "> drop sword\n\nYou can't drop the sword in stone.")
     }
 }
 

@@ -69,13 +69,8 @@ struct LookActionHandlerTests {
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
         #expect(await engine.gameState.changeHistory.isEmpty)
 
-        let command = Command(
-            verb: .look,
-            rawInput: "look"
-        )
-
         // Act: Use engine.execute
-        await engine.execute(command: command)
+        try await engine.execute("look")
 
         // Assert Output (primary check for LOOK)
         let output = await mockIO.flush()
@@ -83,6 +78,8 @@ struct LookActionHandlerTests {
         expectNoDifference(
             output,
             """
+            > look
+
             — Bright Room —
 
             A brightly lit room.
@@ -129,13 +126,8 @@ struct LookActionHandlerTests {
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
         #expect(await engine.gameState.changeHistory.isEmpty)
 
-        let command = Command(
-            verb: .look,
-            rawInput: "look"
-        )
-
         // Act: Use engine.execute
-        await engine.execute(command: command)
+        try await engine.execute("look")
 
         // Assert Output (primary check for LOOK)
         let output = await mockIO.flush()
@@ -143,6 +135,8 @@ struct LookActionHandlerTests {
         expectNoDifference(
             output,
             """
+            > look
+
             — Test Room —
 
             A basic room.
@@ -176,18 +170,13 @@ struct LookActionHandlerTests {
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
         #expect(await engine.gameState.changeHistory.isEmpty)
 
-        let command = Command(
-            verb: .look,
-            rawInput: "look"
-        )
-
         // Act: Use engine.execute
-        await engine.execute(command: command)
+        try await engine.execute("look")
 
         // Assert Output
         let output = await mockIO.flush()
         // Corrected Expectation: Darkness message
-        expectNoDifference(output, "It is pitch black. You can’t see a thing.")
+        expectNoDifference(output, "> look\n\nIt is pitch black. You can't see a thing.")
 
         // Assert No State Change
         #expect(await engine.gameState.changeHistory.isEmpty)
@@ -222,13 +211,8 @@ struct LookActionHandlerTests {
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
         #expect(await engine.gameState.changeHistory.isEmpty)
 
-        let command = Command(
-            verb: .look,
-            rawInput: "look"
-        )
-
         // Act: Use engine.execute
-        await engine.execute(command: command)
+        try await engine.execute("look")
 
         // Assert Output
         let output = await mockIO.flush()
@@ -236,6 +220,8 @@ struct LookActionHandlerTests {
         expectNoDifference(
             output,
             """
+            > look
+
             — Dark Room —
 
             A dark, damp room.
@@ -263,13 +249,8 @@ struct LookActionHandlerTests {
         )
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        let command = Command(
-            verb: .look,
-            rawInput: "look"
-        )
-
         // Act
-        await engine.execute(command: command)
+        try await engine.execute("look")
 
         // Assert Output (Uses default description from engine.describe)
         let output = await mockIO.flush()
@@ -277,6 +258,8 @@ struct LookActionHandlerTests {
         expectNoDifference(
             output,
             """
+            > look
+
             — Plain Room —
 
             You are in a nondescript location.
@@ -321,13 +304,8 @@ struct LookActionHandlerTests {
             parser: MockParser()
         )
 
-        let command = Command(
-            verb: .look,
-            rawInput: "look"
-        )
-
         // Act 1: Flag is ON
-        await engine.execute(command: command)
+        try await engine.execute("look")
 
         // Assert Output 1 (Should show sparkling description)
         let output1 = await mockIO.flush()
@@ -335,6 +313,8 @@ struct LookActionHandlerTests {
         expectNoDifference(
             output1,
             """
+            > look
+
             — Magic Room —
 
             The room *sparkles* brightly via registry.
@@ -350,7 +330,7 @@ struct LookActionHandlerTests {
                 newValue: false
             )
         )
-        await engine.execute(command: command)
+        try await engine.execute("look")
 
         // Assert Output 2 (Should show normal description)
         let output2 = await mockIO.flush()
@@ -358,6 +338,8 @@ struct LookActionHandlerTests {
         expectNoDifference(
             output2,
             """
+            > look
+
             — Magic Room —
 
             The room seems normal via registry.
@@ -383,18 +365,12 @@ struct LookActionHandlerTests {
         #expect(try await engine.item("rock").hasFlag(.isTouched) == false)
         #expect(await engine.gameState.changeHistory.isEmpty)
 
-        let command = Command(
-            verb: .examine,
-            directObject: .item("rock"),
-            rawInput: "x rock"
-        )
-
         // Act: Use engine.execute
-        await engine.execute(command: command)
+        try await engine.execute("look at rock")
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "Just a plain rock.")
+        expectNoDifference(output, "> look at rock\n\nJust a plain rock.")
 
         // Assert Final State
         let finalItemState = try await engine.item("rock")
@@ -423,18 +399,12 @@ struct LookActionHandlerTests {
         #expect(try await engine.item("pebble").hasFlag(.isTouched) == false)
         #expect(await engine.gameState.changeHistory.isEmpty)
 
-        let command = Command(
-            verb: .look,
-            directObject: .item("pebble"),
-            rawInput: "l pebble"
-        )
-
         // Act: Use engine.execute
-        await engine.execute(command: command)
+        try await engine.execute("l pebble")
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "You see nothing special about the smooth pebble.")
+        expectNoDifference(output, "> l pebble\n\nYou see nothing special about the smooth pebble.")
 
         // Assert Final State
         let finalItemState = try await engine.item("pebble")
@@ -465,18 +435,12 @@ struct LookActionHandlerTests {
         #expect(try await engine.item("stone").hasFlag(.isTouched) == true)
         #expect(await engine.gameState.changeHistory.isEmpty)
 
-        let command = Command(
-            verb: .examine,
-            directObject: .item("stone"),
-            rawInput: "x stone"
-        )
-
         // Act: Use engine.execute
-        await engine.execute(command: command)
+        try await engine.execute("examine stone")
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "A worn stone.")
+        expectNoDifference(output, "> examine stone\n\nA worn stone.")
 
         // Only change is pronoun change
         #expect(
@@ -527,20 +491,16 @@ struct LookActionHandlerTests {
         #expect(try await engine.item("box").hasFlag(.isTouched) == false)
         #expect(await engine.gameState.changeHistory.isEmpty)
 
-        let command = Command(
-            verb: .examine,
-            directObject: .item("box"),
-            rawInput: "x box"
-        )
-
         // Act: Use engine.execute
-        await engine.execute(command: command)
+        try await engine.execute("examine box")
 
         // Assert Output (Description + Contents)
         let output = await mockIO.flush()
         expectNoDifference(
             output,
             """
+            > examine box
+
             On its lid is a rough carving of a skull. The wooden box
             contains a gold coin.
             """)
@@ -581,20 +541,16 @@ struct LookActionHandlerTests {
         #expect(try await engine.item("box").attributes["isOpen"] == nil)
         #expect(await engine.gameState.changeHistory.isEmpty)
 
-        let command = Command(
-            verb: .examine,
-            directObject: .item("box"),
-            rawInput: "x box"
-        )
-
         // Act: Use engine.execute
-        await engine.execute(command: command)
+        try await engine.execute("examine box")
 
         // Assert Output (Description + Closed Message)
         let output = await mockIO.flush()
         expectNoDifference(
             output,
             """
+            > examine box
+
             On its lid is a rough carving of a skull. The wooden box is
             closed.
             """)
@@ -636,20 +592,16 @@ struct LookActionHandlerTests {
         #expect(try await engine.item("jar").attributes["isTransparent"] == true)
         #expect(await engine.gameState.changeHistory.isEmpty)
 
-        let command = Command(
-            verb: .examine,
-            directObject: .item("jar"),
-            rawInput: "x jar"
-        )
-
         // Act: Use engine.execute
-        await engine.execute(command: command)
+        try await engine.execute("examine jar")
 
         // Assert Output (Description + Contents because transparent)
         let output = await mockIO.flush()
         expectNoDifference(
             output,
             """
+            > examine jar
+
             An old canning jar, probably from the 1940s. The glass jar
             contains a dead fly.
             """)
@@ -694,20 +646,16 @@ struct LookActionHandlerTests {
         #expect(try await engine.item("table").hasFlag(.isTouched) == false)
         #expect(await engine.gameState.changeHistory.isEmpty)
 
-        let command = Command(
-            verb: .examine,
-            directObject: .item("table"),
-            rawInput: "x table"
-        )
-
         // Act: Use engine.execute
-        await engine.execute(command: command)
+        try await engine.execute("examine table")
 
         // Assert Output (Description + Surface Contents)
         let output = await mockIO.flush()
         expectNoDifference(
             output,
             """
+            > examine table
+
             A shabby wooden table, worn from years of use. On the kitchen
             table are a dusty book and a lit candle.
             """
@@ -753,18 +701,12 @@ struct LookActionHandlerTests {
         #expect(!reachableItems.contains("artifact"))  // Not reachable
         #expect(await engine.gameState.changeHistory.isEmpty)
 
-        let command = Command(
-            verb: .examine,
-            directObject: .item("artifact"),
-            rawInput: "x artifact"
-        )
-
         // Act: Use engine.execute
-        await engine.execute(command: command)
+        try await engine.execute("examine artifact")
 
         // Assert Output (Error message)
         let output = await mockIO.flush()
-        expectNoDifference(output, "You can’t see any such thing.")
+        expectNoDifference(output, "> examine artifact\n\nYou can't see any such thing.")
 
         // Assert Final State (Item remains untouched and where it was)
         let finalItemState = try await engine.item("artifact")
@@ -801,19 +743,12 @@ struct LookActionHandlerTests {
         #expect(initialItemState.attributes[.isTouched] != true)
         #expect(await engine.gameState.changeHistory.isEmpty)
 
-        // Command for LOOK AT (often parsed as EXAMINE with DO)
-        let command = Command(
-            verb: .look,  // Could also be .examine depending on parser aliasing
-            directObject: .item(itemID),
-            rawInput: "look at desk"
-        )
-
         // Act
-        await engine.execute(command: command)
+        try await engine.execute("look at desk")
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "A large, imposing wooden desk.")
+        expectNoDifference(output, "> look at desk\n\nA large, imposing wooden desk.")
 
         // Assert State Change
         let finalItemState = try await engine.item(itemID)
@@ -843,18 +778,12 @@ struct LookActionHandlerTests {
         #expect(initialItemState.attributes[.isTouched] != true)
         #expect(await engine.gameState.changeHistory.isEmpty)
 
-        let command = Command(
-            verb: .look,  // or .examine
-            directObject: .item(itemID),
-            rawInput: "look at note"
-        )
-
         // Act
-        await engine.execute(command: command)
+        try await engine.execute("look at note")
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "A note with faint writing.")
+        expectNoDifference(output, "> look at note\n\nA note with faint writing.")
 
         // Assert State Change
         let finalItemState = try await engine.item(itemID)
@@ -872,16 +801,10 @@ struct LookActionHandlerTests {
     func testLookAtNonExistentItem() async throws {
         let (engine, mockIO) = await GameEngine.test()
 
-        let command = Command(
-            verb: .look,  // or .examine
-            directObject: .item("unicorn"),
-            rawInput: "look at unicorn"
-        )
-
-        await engine.execute(command: command)
+        try await engine.execute("look at unicorn")
 
         let output = await mockIO.flush()
-        expectNoDifference(output, "You can’t see any such thing.")
+        expectNoDifference(output, "> look at unicorn\n\nYou can't see any such thing.")
         #expect(await engine.gameState.changeHistory.isEmpty)
     }
 
@@ -891,16 +814,10 @@ struct LookActionHandlerTests {
         let game = MinimalGame(items: item)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        let command = Command(
-            verb: .look,  // or .examine
-            directObject: .item("artifact"),
-            rawInput: "look at artifact"
-        )
-
-        await engine.execute(command: command)
+        try await engine.execute("look at artifact")
 
         let output = await mockIO.flush()
-        expectNoDifference(output, "You can’t see any such thing.")
+        expectNoDifference(output, "> look at artifact\n\nYou can't see any such thing.")
         #expect(await engine.gameState.changeHistory.isEmpty)
     }
 }

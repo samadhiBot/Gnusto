@@ -5,27 +5,18 @@ import Testing
 
 @Suite("ClimbActionHandler Tests")
 struct ClimbActionHandlerTests {
-    let handler = ClimbActionHandler()
-
     // MARK: - No Object Tests
 
     @Test("Climb with no object asks what to climb")
     func testClimbNoObject() async throws {
-        let (engine, _) = await GameEngine.test()
-
-        let command = Command(verb: .climb, rawInput: "climb")
-        let context = ActionContext(
-            command: command,
-            engine: engine
-        )
+        let (engine, mockIO) = await GameEngine.test()
 
         // Act
-        try await handler.validate(context: context)
-        let result = try await handler.process(context: context)
+        try await engine.execute("climb")
 
         // Assert
-        #expect(result.message == "Climb what?")
-        #expect(result.changes.isEmpty)
+        let output = await mockIO.flush()
+        expectNoDifference(output, "> climb\n\nClimb what?")
     }
 
     // MARK: - Exit Traversal Tests
@@ -64,16 +55,10 @@ struct ClimbActionHandlerTests {
             items: stairs
         )
 
-        let (engine, _) = await GameEngine.test(blueprint: game)
-
-        let command = Command(
-            verb: .climb,
-            directObject: .item("stairs"),
-            rawInput: "climb stairs"
-        )
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // Act
-        await engine.execute(command: command)
+        try await engine.execute("climb stairs")
 
         // Assert: Player should have moved to attic
         let finalPlayerLocation = try await engine.playerLocation()
@@ -82,6 +67,9 @@ struct ClimbActionHandlerTests {
         // Check that stairs is marked as touched
         let finalStairs = try await engine.item("stairs")
         #expect(finalStairs.hasFlag(.isTouched))
+
+        let output = await mockIO.flush()
+        expectNoDifference(output, "> climb stairs\n\n— Attic —")
     }
 
     @Test("Climb ladder to go down")
@@ -119,20 +107,17 @@ struct ClimbActionHandlerTests {
             items: ladder
         )
 
-        let (engine, _) = await GameEngine.test(blueprint: game)
-
-        let command = Command(
-            verb: .climb,
-            directObject: .item("ladder"),
-            rawInput: "climb ladder"
-        )
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // Act
-        await engine.execute(command: command)
+        try await engine.execute("climb ladder")
 
         // Assert: Player should have moved to bottom
         let finalPlayerLocation = try await engine.playerLocation()
         #expect(finalPlayerLocation.id == "bottom")
+
+        let output = await mockIO.flush()
+        expectNoDifference(output, "> climb ladder\n\n— Bottom —")
     }
 
     @Test("Climb rope enables multiple directions")
@@ -167,20 +152,17 @@ struct ClimbActionHandlerTests {
             items: rope
         )
 
-        let (engine, _) = await GameEngine.test(blueprint: game)
-
-        let command = Command(
-            verb: .climb,
-            directObject: .item("rope"),
-            rawInput: "climb rope"
-        )
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // Act
-        await engine.execute(command: command)
+        try await engine.execute("climb rope")
 
         // Assert: Should prioritize up over down (consistent direction ordering)
         let finalPlayerLocation = try await engine.playerLocation()
         #expect(finalPlayerLocation.id == "top")
+
+        let output = await mockIO.flush()
+        expectNoDifference(output, "> climb rope\n\n— Top —")
     }
 
     // MARK: - Global Object Validation Tests
@@ -211,18 +193,12 @@ struct ClimbActionHandlerTests {
 
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        let command = Command(
-            verb: .climb,
-            directObject: .item("stairs"),
-            rawInput: "climb stairs"
-        )
-
         // Act
-        await engine.execute(command: command)
+        try await engine.execute("climb stairs")
 
         // Assert: Should get error message
         let output = await mockIO.flush()
-        expectNoDifference(output, "You can’t see any such thing.")
+        expectNoDifference(output, "> climb stairs\n\nYou can't see any such thing.")
     }
 
     @Test("Climb plural stairs when not present")
@@ -251,18 +227,12 @@ struct ClimbActionHandlerTests {
 
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        let command = Command(
-            verb: .climb,
-            directObject: .item("stairs"),
-            rawInput: "climb stairs"
-        )
-
         // Act
-        await engine.execute(command: command)
+        try await engine.execute("climb stairs")
 
         // Assert: Should use "are" for plural
         let output = await mockIO.flush()
-        expectNoDifference(output, "You can’t see any such thing.")
+        expectNoDifference(output, "> climb stairs\n\nYou can't see any such thing.")
     }
 
     // MARK: - Regular Climbing Tests
@@ -281,18 +251,12 @@ struct ClimbActionHandlerTests {
         let game = MinimalGame(items: tree)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        let command = Command(
-            verb: .climb,
-            directObject: .item("tree"),
-            rawInput: "climb tree"
-        )
-
         // Act
-        await engine.execute(command: command)
+        try await engine.execute("climb tree")
 
         // Assert: Should get default climbing message
         let output = await mockIO.flush()
-        expectNoDifference(output, "You climb the oak tree.")
+        expectNoDifference(output, "> climb tree\n\nYou climb the oak tree.")
 
         // Check that tree is marked as touched
         let finalTree = try await engine.item("tree")
@@ -314,18 +278,12 @@ struct ClimbActionHandlerTests {
         let game = MinimalGame(items: table)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        let command = Command(
-            verb: .climb,
-            directObject: .item("table"),
-            rawInput: "climb table"
-        )
-
         // Act
-        await engine.execute(command: command)
+        try await engine.execute("climb table")
 
         // Assert: Should get error message
         let output = await mockIO.flush()
-        expectNoDifference(output, "You can’t climb the wooden table.")
+        expectNoDifference(output, "> climb table\n\nYou can't climb the wooden table.")
     }
 
     // MARK: - Error Cases
@@ -341,71 +299,38 @@ struct ClimbActionHandlerTests {
         )
 
         let game = MinimalGame(items: distantTree)
-        let (engine, _) = await GameEngine.test(blueprint: game)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        let command = Command(
-            verb: .climb,
-            directObject: .item("tree"),
-            rawInput: "climb tree"
-        )
-        let context = ActionContext(
-            command: command,
-            engine: engine
-        )
+        // Act
+        try await engine.execute("climb tree")
 
-        // Act & Assert: Should fail validation
-        do {
-            try await handler.validate(context: context)
-            #expect(Bool(false), "Expected validation to fail")
-        } catch {
-            #expect(error is ActionResponse)
-        }
+        // Assert: Should get error message
+        let output = await mockIO.flush()
+        expectNoDifference(output, "> climb tree\n\nYou can't see any such thing.")
     }
 
     @Test("Climb nonexistent item fails validation")
     func testClimbNonexistentItem() async throws {
-        let (engine, _) = await GameEngine.test()
+        let (engine, mockIO) = await GameEngine.test()
 
-        let command = Command(
-            verb: .climb,
-            directObject: .item("nonexistent"),
-            rawInput: "climb nonexistent"
-        )
-        let context = ActionContext(
-            command: command,
-            engine: engine
-        )
+        // Act
+        try await engine.execute("climb nonexistent")
 
-        // Act & Assert: Should fail validation
-        do {
-            try await handler.validate(context: context)
-            #expect(Bool(false), "Expected validation to fail")
-        } catch {
-            #expect(error is ActionResponse)
-        }
+        // Assert: Should get error message
+        let output = await mockIO.flush()
+        expectNoDifference(output, "> climb nonexistent\n\nYou can't see any such thing.")
     }
 
     @Test("Climb non-item entity")
     func testClimbNonItemEntity() async throws {
-        let (engine, _) = await GameEngine.test()
+        let (engine, mockIO) = await GameEngine.test()
 
-        let command = Command(
-            verb: .climb,
-            directObject: .player,  // Try to climb the player
-            rawInput: "climb me"
-        )
-        let context = ActionContext(
-            command: command,
-            engine: engine
-        )
+        // Act
+        try await engine.execute("climb me")
 
-        // Act & Assert: Should fail validation
-        do {
-            try await handler.validate(context: context)
-            #expect(Bool(false), "Expected validation to fail")
-        } catch {
-            #expect(error is ActionResponse)
-        }
+        // Assert: Should get error message
+        let output = await mockIO.flush()
+        expectNoDifference(output, "> climb me\n\nYou can't climb yourself.")
     }
 
     // MARK: - Movement Failure Tests
@@ -445,18 +370,12 @@ struct ClimbActionHandlerTests {
 
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        let command = Command(
-            verb: .climb,
-            directObject: .item("stairs"),
-            rawInput: "climb stairs"
-        )
-
         // Act
-        await engine.execute(command: command)
+        try await engine.execute("climb stairs")
 
         // Assert: Should get the blocked exit message
         let output = await mockIO.flush()
-        expectNoDifference(output, "The ceiling is too low.")
+        expectNoDifference(output, "> climb stairs\n\nThe ceiling is too low.")
     }
 
     @Test("Climb stairs with no exit fails")
@@ -486,17 +405,12 @@ struct ClimbActionHandlerTests {
 
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        let command = Command(
-            verb: .climb,
-            directObject: .item("stairs"),
-            rawInput: "climb stairs"
-        )
         // Act
-        await engine.execute(command: command)
+        try await engine.execute("climb stairs")
 
         // Assert: Should default to regular climbing behavior since no exit uses stairs
         let output = await mockIO.flush()
-        expectNoDifference(output, "You climb the stairs.")
+        expectNoDifference(output, "> climb stairs\n\nYou climb the stairs.")
     }
 
     @Test("Climb stairs from lit to dark room shows transition and custom darkness message")
@@ -534,39 +448,18 @@ struct ClimbActionHandlerTests {
 
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        let command = Command(verb: .climb, directObject: .item("stairs"), rawInput: "climb stairs")
-
-        // Debug: Initial state
-        let initialLocation = try await engine.playerLocation()
-        let kitchenIsLit = await engine.isLocationLit(at: "kitchen")
-        let atticIsLit = await engine.isLocationLit(at: "attic")
-        print("Initial player location: \(initialLocation.id)")
-        print("Kitchen is lit: \(kitchenIsLit)")
-        print("Attic is lit: \(atticIsLit)")
-
         // Act
-        await engine.execute(command: command)
-
-        // Debug: Check intermediate state
-        let afterLocation = try await engine.playerLocation()
-        print("After player location: \(afterLocation.id)")
-        print("Player moved: \(initialLocation.id != afterLocation.id)")
+        try await engine.execute("climb stairs")
 
         // Assert: Player moved to attic
         let finalPlayerLocation = try await engine.playerLocation()
         #expect(finalPlayerLocation.id == "attic")
 
-        // Debug: Check what output was actually generated
-        let output = await mockIO.flush()
-
         // Assert: Output contains both transition and darkness messages
+        let output = await mockIO.flush()
         expectNoDifference(
             output,
-            """
-            You are plunged into darkness.
-
-            It is pitch black. You can’t see a thing.
-            """)
+            "> climb stairs\n\nYou are plunged into darkness.\n\nIt is pitch black. You can't see a thing.")
     }
 
     @Test("Climb stairs from lit to lit room shows normal room description (no transition message)")
@@ -604,10 +497,8 @@ struct ClimbActionHandlerTests {
 
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        let command = Command(verb: .climb, directObject: .item("stairs"), rawInput: "climb stairs")
-
         // Act
-        await engine.execute(command: command)
+        try await engine.execute("climb stairs")
 
         // Assert: Player moved to living room
         let finalPlayerLocation = try await engine.playerLocation()
@@ -615,6 +506,6 @@ struct ClimbActionHandlerTests {
 
         // Assert: Output shows normal room description (no transition message since both rooms are lit)
         let output = await mockIO.flush()
-        expectNoDifference(output, "— Living Room —\n\nA cozy living room.")
+        expectNoDifference(output, "> climb stairs\n\n— Living Room —\n\nA cozy living room.")
     }
 }

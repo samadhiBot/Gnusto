@@ -37,7 +37,6 @@ struct EmptyActionHandlerTests {
             items: box, coin
         )
 
-
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         return (engine, mockIO)
@@ -65,7 +64,6 @@ struct EmptyActionHandlerTests {
             locations: testRoom,
             items: box
         )
-
 
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
@@ -101,7 +99,6 @@ struct EmptyActionHandlerTests {
             items: box, coin
         )
 
-
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         return (engine, mockIO)
@@ -128,7 +125,6 @@ struct EmptyActionHandlerTests {
             items: rock
         )
 
-
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         return (engine, mockIO)
@@ -139,23 +135,21 @@ struct EmptyActionHandlerTests {
     @Test("EMPTY command without object")
     func testEmptyCommandNoObject() async throws {
         let (engine, mockIO) = await createTestEngine()
-        let command = Command(verb: .empty, rawInput: "empty")
 
-        // Execute the command through the full pipeline
-        await engine.execute(command: command)
+        // Act
+        try await engine.execute("empty")
 
         // Check the output
         let output = await mockIO.flush()
-        expectNoDifference(output, "Empty what?")
+        expectNoDifference(output, "> empty\n\nEmpty what?")
     }
 
     @Test("EMPTY command on container with contents")
     func testEmptyCommand() async throws {
         let (engine, mockIO) = await createTestEngine()
-        let command = Command(verb: .empty, directObject: .item("box"), rawInput: "empty box")
 
-        // Execute the command through the full pipeline
-        await engine.execute(command: command)
+        // Act
+        try await engine.execute("empty box")
 
         // Verify box is marked as touched
         let boxAfter = try await engine.item("box")
@@ -167,16 +161,15 @@ struct EmptyActionHandlerTests {
 
         // Check the output
         let output = await mockIO.flush()
-        expectNoDifference(output, "You empty the box, and a coin falls to the ground.")
+        expectNoDifference(output, "> empty box\n\nYou empty the box, and a coin falls to the ground.")
     }
 
     @Test("EMPTY command on empty container")
     func testEmptyEmptyContainer() async throws {
         let (engine, mockIO) = await createTestEngineWithEmptyBox()
-        let command = Command(verb: .empty, directObject: .item("box"), rawInput: "empty box")
 
-        // Execute the command through the full pipeline
-        await engine.execute(command: command)
+        // Act
+        try await engine.execute("empty box")
 
         // Verify box is marked as touched
         let boxAfter = try await engine.item("box")
@@ -184,16 +177,15 @@ struct EmptyActionHandlerTests {
 
         // Check the output
         let output = await mockIO.flush()
-        expectNoDifference(output, "The box is already empty.")
+        expectNoDifference(output, "> empty box\n\nThe box is already empty.")
     }
 
     @Test("EMPTY command on closed container")
     func testEmptyClosedContainer() async throws {
         let (engine, mockIO) = await createTestEngineWithClosedBox()
-        let command = Command(verb: .empty, directObject: .item("box"), rawInput: "empty box")
 
-        // Execute the command through the full pipeline
-        await engine.execute(command: command)
+        // Act
+        try await engine.execute("empty box")
 
         // Check that an error message was displayed
         let output = await mockIO.flush()
@@ -203,10 +195,9 @@ struct EmptyActionHandlerTests {
     @Test("EMPTY command on non-container")
     func testEmptyNonContainer() async throws {
         let (engine, mockIO) = await createTestEngineWithNonContainer()
-        let command = Command(verb: .empty, directObject: .item("rock"), rawInput: "empty rock")
 
-        // Execute the command through the full pipeline
-        await engine.execute(command: command)
+        // Act
+        try await engine.execute("empty rock")
 
         // Check that an error message was displayed
         let output = await mockIO.flush()

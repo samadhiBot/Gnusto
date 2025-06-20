@@ -5,8 +5,6 @@ import Testing
 
 @Suite("CloseActionHandler Tests")
 struct CloseActionHandlerTests {
-    let handler = CloseActionHandler()
-
     @Test("Close open container successfully")
     func testCloseOpenContainerSuccessfully() async throws {
         let box = Item(
@@ -20,19 +18,13 @@ struct CloseActionHandlerTests {
         let game = MinimalGame(items: box)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        let command = Command(
-            verb: .close,
-            directObject: .item("box"),
-            rawInput: "close box"
-        )
-
         // Initial state check
         let initialBox = try await engine.item("box")
         #expect(initialBox.attributes[.isOpen] == true)
         #expect(await engine.gameState.changeHistory.isEmpty)
 
         // Act
-        await engine.execute(command: command)
+        try await engine.execute("close box")
 
         // Assert State Change
         let finalBox = try await engine.item("box")
@@ -41,7 +33,7 @@ struct CloseActionHandlerTests {
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "Closed.")
+        expectNoDifference(output, "> close box\n\nClosed.")
 
         // Assert Change History
         let changeHistory = await engine.gameState.changeHistory
@@ -80,18 +72,12 @@ struct CloseActionHandlerTests {
         let game = MinimalGame(items: box)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        let command = Command(
-            verb: .close,
-            directObject: .item("box"),
-            rawInput: "close box"
-        )
-
-        // Act: Use engine.execute for full pipeline
-        await engine.execute(command: command)
+        // Act
+        try await engine.execute("close box")
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "The wooden box is already closed.")
+        expectNoDifference(output, "> close box\n\nThe wooden box is already closed.")
 
         // Assert Change History
         #expect(await engine.gameState.changeHistory.isEmpty)
@@ -106,23 +92,15 @@ struct CloseActionHandlerTests {
             // isContainer/isOpenable are false by default
         )
         let game = MinimalGame(items: rock)
-        let (engine, _) = await GameEngine.test(blueprint: game)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        let command = Command(
-            verb: .close,
-            directObject: .item("rock"),
-            rawInput: "close rock"
-        )
+        // Act
+        try await engine.execute("close rock")
 
-        // Act & Assert Error
-        await #expect(throws: ActionResponse.itemNotClosable("rock")) {
-            try await handler.validate(
-                context: ActionContext(
-                    command: command,
-                    engine: engine
-                )
-            )
-        }
+        // Assert Output
+        let output = await mockIO.flush()
+        expectNoDifference(output, "> close rock\n\nYou can't close the smooth rock.")
+
         #expect(await engine.gameState.changeHistory.isEmpty)
     }
 
@@ -136,44 +114,29 @@ struct CloseActionHandlerTests {
             .isOpen  // Start open
         )
         let game = MinimalGame(items: box)
-        let (engine, _) = await GameEngine.test(blueprint: game)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        let command = Command(
-            verb: .close,
-            directObject: .item("box"),
-            rawInput: "close box"
-        )
+        // Act
+        try await engine.execute("close box")
 
-        // Act & Assert Error
-        await #expect(throws: ActionResponse.itemNotAccessible("box")) {
-            try await handler.validate(
-                context: ActionContext(
-                    command: command,
-                    engine: engine
-                )
-            )
-        }
+        // Assert Output
+        let output = await mockIO.flush()
+        expectNoDifference(output, "> close box\n\nYou can't see any such thing.")
+
         #expect(await engine.gameState.changeHistory.isEmpty)
     }
 
     @Test("Close fails with no direct object")
     func testCloseFailsWithNoObject() async throws {
-        let (engine, _) = await GameEngine.test()
+        let (engine, mockIO) = await GameEngine.test()
 
-        let command = Command(
-            verb: .close,
-            rawInput: "close"
-        )
+        // Act
+        try await engine.execute("close")
 
-        // Act & Assert Error
-        await #expect(throws: ActionResponse.prerequisiteNotMet("Close what?")) {
-            try await handler.validate(
-                context: ActionContext(
-                    command: command,
-                    engine: engine
-                )
-            )
-        }
+        // Assert Output
+        let output = await mockIO.flush()
+        expectNoDifference(output, "> close\n\nClose what?")
+
         #expect(await engine.gameState.changeHistory.isEmpty)
     }
 }

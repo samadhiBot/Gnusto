@@ -5,8 +5,6 @@ import Testing
 
 @Suite("GoActionHandler Tests")
 struct GoActionHandlerTests {
-    let handler = GoActionHandler()
-
     @Test("GO NORTH moves player to connected room")
     func testGoNorth() async throws {
         let startRoom = Location(
@@ -26,20 +24,11 @@ struct GoActionHandlerTests {
         )
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        let command = Command(
-            verb: .go,
-            direction: .north,
-            rawInput: "north"
-        )
-
-        await engine.execute(command: command)
+        // Act
+        try await engine.execute("north")
 
         let output = await mockIO.flush()
-        expectNoDifference(output, """
-            — end —
-
-            You went there.
-            """)
+        expectNoDifference(output, "> north\n\n— end —\n\nYou went there.")
     }
 
     @Test("GO NORTH prints blocked message when exit is blocked")
@@ -65,23 +54,12 @@ struct GoActionHandlerTests {
         )
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        let command = Command(
-            verb: .go,
-            direction: .north,
-            rawInput: "north"
-        )
+        // Act
+        try await engine.execute("north")
 
-        await #expect(throws: ActionResponse.directionIsBlocked("A wall blocks your path.")) {
-            try await handler.validate(
-                context: ActionContext(
-                    command: command,
-                    engine: engine
-                )
-            )
-        }
-
+        // Assert: Should get blocked message
         let output = await mockIO.flush()
-        #expect(output.isEmpty, "Expected no output when GO is blocked.")
+        expectNoDifference(output, "> north\n\nA wall blocks your path.")
     }
 
     @Test("GO NORTH fails when no exit exists")
@@ -101,23 +79,12 @@ struct GoActionHandlerTests {
         )
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        let command = Command(
-            verb: .go,
-            direction: .north,
-            rawInput: "north"
-        )
+        // Act
+        try await engine.execute("north")
 
-        await #expect(throws: ActionResponse.invalidDirection) {
-            try await handler.validate(
-                context: ActionContext(
-                    command: command,
-                    engine: engine
-                )
-            )
-        }
-
+        // Assert: Should get invalid direction message
         let output = await mockIO.flush()
-        #expect(output.isEmpty, "Expected no output when direction is invalid.")
+        expectNoDifference(output, "> north\n\nYou can't go that way.")
     }
 
     @Test("Go to adjacent room successfully")
@@ -135,20 +102,16 @@ struct GoActionHandlerTests {
             .inherentlyLit
         )
         let game = MinimalGame(player: Player(in: "foyer"), locations: foyer, hall)
-        let (engine, _) = await GameEngine.test(blueprint: game, parser: MockParser(), ioHandler: await MockIOHandler())
-
-        let command = Command(
-            verb: .go,
-            direction: .north,
-            rawInput: "go north"
-        )
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // Act
-        await engine.execute(command: command)
+        try await engine.execute("go north")
 
         // Assert
         #expect(await engine.playerLocationID == "hall")
-        // Output handled by GameEngine's look after move, not tested here directly
+
+        let output = await mockIO.flush()
+        expectNoDifference(output, "> go north\n\n— hall —\n\nA long hall.")
     }
 
     @Test("Go fails with no exit in direction")
@@ -163,19 +126,13 @@ struct GoActionHandlerTests {
         let game = MinimalGame(player: Player(in: "foyer"), locations: foyer)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        let command = Command(
-            verb: .go,
-            direction: .north,
-            rawInput: "go north"
-        )
-
         // Act
-        await engine.execute(command: command)
+        try await engine.execute("go north")
 
         // Assert
-        #expect(await engine.playerLocationID == "foyer") // Player hasn’t moved
+        #expect(await engine.playerLocationID == "foyer") // Player hasn't moved
         let output = await mockIO.flush()
-        expectNoDifference(output, "You can’t go that way.")
+        expectNoDifference(output, "> go north\n\nYou can't go that way.")
     }
 
     @Test("Go fails with locked door")
@@ -211,19 +168,13 @@ struct GoActionHandlerTests {
         )
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        let command = Command(
-            verb: .go,
-            direction: .north,
-            rawInput: "go north"
-        )
-
         // Act
-        await engine.execute(command: command)
+        try await engine.execute("go north")
 
         // Assert
-        #expect(await engine.playerLocationID == "foyer") // Player hasn’t moved
+        #expect(await engine.playerLocationID == "foyer") // Player hasn't moved
         let output = await mockIO.flush()
-        expectNoDifference(output, "The door to the vault is locked.")
+        expectNoDifference(output, "> go north\n\nThe door to the vault is locked.")
     }
 
     @Test("Go fails with conditional exit (condition not met)")
@@ -249,27 +200,21 @@ struct GoActionHandlerTests {
             player: Player(in: "foyer"),
             locations: foyer, garden
         )
-        let (engine, _) = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            globalState: [conditionGlobalID: false],
-            parser: MockParser(),
-            ioHandler: await MockIOHandler()
+            globalState: [conditionGlobalID: false]
         )
 
         // Check flags set using contains
         #expect(await engine.global(conditionGlobalID) == false)
 
-        let command = Command(
-            verb: .go,
-            direction: .east,
-            rawInput: "go east"
-        )
-
         // Act
-        await engine.execute(command: command)
+        try await engine.execute("go east")
 
         // Assert
-        #expect(await engine.playerLocationID == "foyer") // Player hasn’t moved
+        #expect(await engine.playerLocationID == "foyer") // Player hasn't moved
+        let output = await mockIO.flush()
+        expectNoDifference(output, "> go east\n\nYou can't go that way.")
     }
 
     /* TODO: implement conditional exits
@@ -336,18 +281,13 @@ struct GoActionHandlerTests {
         let game = MinimalGame(player: Player(in: "foyer"), locations: foyer)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        let command = Command(
-            verb: .go,
-            rawInput: "go"
-        ) // No direction
-
         // Act
-        await engine.execute(command: command)
+        try await engine.execute("go")
 
         // Assert
-        #expect(await engine.playerLocationID == "foyer") // Player hasn’t moved
+        #expect(await engine.playerLocationID == "foyer") // Player hasn't moved
         let output = await mockIO.flush()
-        expectNoDifference(output, "Go where?")
+        expectNoDifference(output, "> go\n\nGo where?")
     }
 
     @Test("GO fails with permanently blocked exit (nil destination)")
@@ -368,23 +308,14 @@ struct GoActionHandlerTests {
             player: Player(in: "testLocation"),
             locations: testLocation
         )
-        let (engine, _) = await GameEngine.test(blueprint: game)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        let command = Command(
-            verb: .go,
-            direction: .north,
-            rawInput: "go north"
-        )
+        // Act
+        try await engine.execute("go north")
 
-        // When/Then
-        await #expect(throws: ActionResponse.directionIsBlocked(customMessage)) {
-            try await handler.validate(
-                context: ActionContext(
-                    command: command,
-                    engine: engine
-                )
-            )
-        }
+        // Assert: Should get custom blocked message
+        let output = await mockIO.flush()
+        expectNoDifference(output, "> go north\n\nThe path is overgrown with thorns.")
     }
 
     @Test("GO fails with permanently blocked exit (no custom message)")
@@ -401,22 +332,13 @@ struct GoActionHandlerTests {
             player: Player(in: "testLocation"),
             locations: testLocation
         )
-        let (engine, _) = await GameEngine.test(blueprint: game)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        let command = Command(
-            verb: .go,
-            direction: .south,
-            rawInput: "go south"
-        )
+        // Act
+        try await engine.execute("go south")
 
-        // When/Then
-        await #expect(throws: ActionResponse.invalidDirection) {
-            try await handler.validate(
-                context: ActionContext(
-                    command: command,
-                    engine: engine
-                )
-            )
-        }
+        // Assert: Should get generic invalid direction message
+        let output = await mockIO.flush()
+        expectNoDifference(output, "> go south\n\nYou can't go that way.")
     }
 }

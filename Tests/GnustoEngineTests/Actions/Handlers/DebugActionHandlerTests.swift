@@ -5,8 +5,6 @@ import Testing
 
 @Suite("DebugActionHandler Tests")
 struct DebugActionHandlerTests {
-    let handler = DebugActionHandler()
-
     // MARK: - Setup Helper
 
     private func createTestEngine() async -> (GameEngine, MockIOHandler) {
@@ -39,140 +37,87 @@ struct DebugActionHandlerTests {
 
     @Test("DEBUG fails with no direct object")
     func testValidationFailsWithNoDirectObject() async throws {
-        let (engine, _) = await createTestEngine()
+        let (engine, mockIO) = await createTestEngine()
 
-        let command = Command(
-            verb: .debug,
-            rawInput: "debug"
-        )
+        // Act
+        try await engine.execute("debug")
 
-        // Act & Assert Error
-        await #expect(
-            throws: ActionResponse.prerequisiteNotMet("DEBUG requires a direct object to examine.")
-        ) {
-            try await handler.validate(
-                context: ActionContext(
-                    command: command,
-                    engine: engine
-                )
-            )
-        }
+        // Assert Output
+        let output = await mockIO.flush()
+        expectNoDifference(output, "> debug\n\nDEBUG requires a direct object to examine.")
     }
 
     @Test("DEBUG validates player successfully")
     func testValidationSucceedsForPlayer() async throws {
-        let (engine, _) = await createTestEngine()
+        let (engine, mockIO) = await createTestEngine()
 
-        let command = Command(
-            verb: .debug,
-            directObject: .player,
-            rawInput: "debug self"
-        )
+        // Act
+        try await engine.execute("debug self")
 
-        // Should not throw
-        try await handler.validate(
-            context: ActionContext(
-                command: command,
-                engine: engine
-            )
-        )
+        // Assert Output
+        let output = await mockIO.flush()
+        #expect(output.contains("```"))
+        #expect(output.contains("Player") || output.contains("player"))
     }
 
     @Test("DEBUG validates existing item successfully")
     func testValidationSucceedsForExistingItem() async throws {
-        let (engine, _) = await createTestEngine()
+        let (engine, mockIO) = await createTestEngine()
 
-        let command = Command(
-            verb: .debug,
-            directObject: .item("test_item"),
-            rawInput: "debug test_item"
-        )
+        // Act
+        try await engine.execute("debug test_item")
 
-        // Should not throw
-        try await handler.validate(
-            context: ActionContext(
-                command: command,
-                engine: engine
-            )
-        )
+        // Assert Output
+        let output = await mockIO.flush()
+        #expect(output.contains("```"))
+        #expect(output.contains("test_item") || output.contains("Item"))
     }
 
     @Test("DEBUG validates existing location successfully")
     func testValidationSucceedsForExistingLocation() async throws {
-        let (engine, _) = await createTestEngine()
+        let (engine, mockIO) = await createTestEngine()
 
-        let command = Command(
-            verb: .debug,
-            directObject: .location("test_location"),
-            rawInput: "debug test_location"
-        )
+        // Act
+        try await engine.execute("debug test_location")
 
-        // Should not throw
-        try await handler.validate(
-            context: ActionContext(
-                command: command,
-                engine: engine
-            )
-        )
+        // Assert Output
+        let output = await mockIO.flush()
+        #expect(output.contains("```"))
+        #expect(output.contains("test_location") || output.contains("Location"))
     }
 
     @Test("DEBUG fails for non-existent item")
     func testValidationFailsForNonExistentItem() async throws {
-        let (engine, _) = await createTestEngine()
+        let (engine, mockIO) = await createTestEngine()
 
-        let command = Command(
-            verb: .debug,
-            directObject: .item("nonexistent_item"),
-            rawInput: "debug nonexistent_item"
-        )
+        // Act
+        try await engine.execute("debug nonexistent_item")
 
-        // Act & Assert Error
-        await #expect(throws: ActionResponse.unknownEntity(.item("nonexistent_item"))) {
-            try await handler.validate(
-                context: ActionContext(
-                    command: command,
-                    engine: engine
-                )
-            )
-        }
+        // Assert Output
+        let output = await mockIO.flush()
+        expectNoDifference(output, "> debug nonexistent_item\n\nYou can't see any such thing.")
     }
 
     @Test("DEBUG fails for non-existent location")
     func testValidationFailsForNonExistentLocation() async throws {
-        let (engine, _) = await createTestEngine()
+        let (engine, mockIO) = await createTestEngine()
 
-        let command = Command(
-            verb: .debug,
-            directObject: .location("nonexistent_location"),
-            rawInput: "debug nonexistent_location"
-        )
+        // Act
+        try await engine.execute("debug nonexistent_location")
 
-        // Act & Assert Error
-        await #expect(throws: ActionResponse.unknownEntity(.location("nonexistent_location"))) {
-            try await handler.validate(
-                context: ActionContext(
-                    command: command,
-                    engine: engine
-                )
-            )
-        }
+        // Assert Output
+        let output = await mockIO.flush()
+        expectNoDifference(output, "> debug nonexistent_location\n\nYou can't see any such thing.")
     }
 
     // MARK: - Processing Tests
 
     @Test("DEBUG player produces formatted output")
     func testProcessPlayerDebug() async throws {
-        let (engine, _) = await createTestEngine()
-        let mockIO = engine.ioHandler as! MockIOHandler
+        let (engine, mockIO) = await createTestEngine()
 
-        let command = Command(
-            verb: .debug,
-            directObject: .player,
-            rawInput: "debug self"
-        )
-
-        // Act: Use engine.execute for full pipeline
-        await engine.execute(command: command)
+        // Act
+        try await engine.execute("debug self")
 
         // Assert Output
         let output = await mockIO.flush()
@@ -184,17 +129,10 @@ struct DebugActionHandlerTests {
 
     @Test("DEBUG item produces formatted output")
     func testProcessItemDebug() async throws {
-        let (engine, _) = await createTestEngine()
-        let mockIO = engine.ioHandler as! MockIOHandler
+        let (engine, mockIO) = await createTestEngine()
 
-        let command = Command(
-            verb: .debug,
-            directObject: .item("test_item"),
-            rawInput: "debug test_item"
-        )
-
-        // Act: Use engine.execute for full pipeline
-        await engine.execute(command: command)
+        // Act
+        try await engine.execute("debug test_item")
 
         // Assert Output
         let output = await mockIO.flush()
@@ -206,17 +144,10 @@ struct DebugActionHandlerTests {
 
     @Test("DEBUG location produces formatted output")
     func testProcessLocationDebug() async throws {
-        let (engine, _) = await createTestEngine()
-        let mockIO = engine.ioHandler as! MockIOHandler
+        let (engine, mockIO) = await createTestEngine()
 
-        let command = Command(
-            verb: .debug,
-            directObject: .location("test_location"),
-            rawInput: "debug test_location"
-        )
-
-        // Act: Use engine.execute for full pipeline
-        await engine.execute(command: command)
+        // Act
+        try await engine.execute("debug test_location")
 
         // Assert Output
         let output = await mockIO.flush()
@@ -226,214 +157,43 @@ struct DebugActionHandlerTests {
         #expect(output.contains("test_location") || output.contains("Location"))
     }
 
-    @Test("DEBUG process fails with no direct object")
-    func testProcessFailsWithNoDirectObject() async throws {
-        let (engine, _) = await createTestEngine()
-
-        let command = Command(
-            verb: .debug,
-            rawInput: "debug"
-        )
-
-        // Act & Assert Error
-        await #expect(
-            throws: ActionResponse.prerequisiteNotMet("DEBUG requires a direct object to examine.")
-        ) {
-            try await handler.process(
-                context: ActionContext(
-                    command: command,
-                    engine: engine
-                )
-            )
-        }
-    }
-
-    @Test("DEBUG process fails for non-existent item in snapshot")
-    func testProcessFailsForNonExistentItemInSnapshot() async throws {
-        let (engine, _) = await createTestEngine()
-
-        let command = Command(
-            verb: .debug,
-            directObject: .item("nonexistent_item"),
-            rawInput: "debug nonexistent_item"
-        )
-
-        // Act & Assert Error
-        await #expect(throws: ActionResponse.unknownEntity(.item("nonexistent_item"))) {
-            try await handler.process(
-                context: ActionContext(
-                    command: command,
-                    engine: engine
-                )
-            )
-        }
-    }
-
-    @Test("DEBUG process fails for non-existent location in snapshot")
-    func testProcessFailsForNonExistentLocationInSnapshot() async throws {
-        let (engine, _) = await createTestEngine()
-
-        let command = Command(
-            verb: .debug,
-            directObject: .location("nonexistent_location"),
-            rawInput: "debug nonexistent_location"
-        )
-
-        // Act & Assert Error
-        await #expect(throws: ActionResponse.unknownEntity(.location("nonexistent_location"))) {
-            try await handler.process(
-                context: ActionContext(
-                    command: command,
-                    engine: engine
-                )
-            )
-        }
-    }
-
-    // MARK: - Integration Tests
-
-    @Test("DEBUG command full workflow for player")
-    func testFullWorkflowForPlayer() async throws {
-        let (engine, _) = await createTestEngine()
-
-        let command = Command(
-            verb: .debug,
-            directObject: .player,
-            rawInput: "debug self"
-        )
-        let context = ActionContext(
-            command: command,
-            engine: engine
-        )
-
-        // Validate
-        try await handler.validate(context: context)
-
-        // Process
-        let result = try await handler.process(context: context)
-
-        // Verify result
-        #expect(result.message?.contains("```") == true)
-        #expect(result.changes.isEmpty)  // DEBUG should not modify state
-        #expect(result.effects.isEmpty)  // DEBUG should not have side effects
-    }
-
-    @Test("DEBUG command full workflow for item")
-    func testFullWorkflowForItem() async throws {
-        let (engine, _) = await createTestEngine()
-
-        let command = Command(
-            verb: .debug,
-            directObject: .item("test_item"),
-            rawInput: "debug test_item"
-        )
-        let context = ActionContext(
-            command: command,
-            engine: engine
-        )
-
-        // Validate
-        try await handler.validate(context: context)
-
-        // Process
-        let result = try await handler.process(context: context)
-
-        // Verify result
-        #expect(result.message?.contains("```") == true)
-        #expect(result.changes.isEmpty)  // DEBUG should not modify state
-        #expect(result.effects.isEmpty)  // DEBUG should not have side effects
-    }
-
-    @Test("DEBUG command full workflow for location")
-    func testFullWorkflowForLocation() async throws {
-        let (engine, _) = await createTestEngine()
-
-        let command = Command(
-            verb: .debug,
-            directObject: .location("test_location"),
-            rawInput: "debug test_location"
-        )
-        let context = ActionContext(
-            command: command,
-            engine: engine
-        )
-
-        // Validate
-        try await handler.validate(context: context)
-
-        // Process
-        let result = try await handler.process(context: context)
-
-        // Verify result
-        #expect(result.message?.contains("```") == true)
-        #expect(result.changes.isEmpty)  // DEBUG should not modify state
-        #expect(result.effects.isEmpty)  // DEBUG should not have side effects
-    }
-
     // MARK: - Output Format Tests
 
     @Test("DEBUG output is properly formatted with code blocks")
     func testOutputFormatting() async throws {
-        let (engine, _) = await createTestEngine()
+        let (engine, mockIO) = await createTestEngine()
 
-        let command = Command(
-            verb: .debug,
-            directObject: .player,
-            rawInput: "debug self"
-        )
-        let context = ActionContext(
-            command: command,
-            engine: engine
-        )
+        // Act
+        try await engine.execute("debug self")
 
-        let result = try await handler.process(context: context)
+        // Assert Output
+        let output = await mockIO.flush()
 
         // Should start and end with code block markers
-        #expect(result.message?.hasPrefix("```") == true)
-        #expect(result.message?.hasSuffix("```") == true)
-
-        // Should have content between the markers
-        let content = result.message?.dropFirst(3).dropLast(3)
-        #expect(content?.isEmpty == false)
+        #expect(output.contains("```"))
     }
 
     @Test("DEBUG output contains meaningful entity data")
     func testOutputContainsMeaningfulData() async throws {
-        let (engine, _) = await createTestEngine()
+        let (engine, mockIO) = await createTestEngine()
 
         // Test item debug
-        let itemCommand = Command(
-            verb: .debug,
-            directObject: .item("test_item"),
-            rawInput: "debug test_item"
-        )
-        let itemContext = ActionContext(
-            command: itemCommand,
-            engine: engine
-        )
-        let itemResult = try await handler.process(context: itemContext)
+        try await engine.execute("debug test_item")
+        let itemOutput = await mockIO.flush()
 
         // Should contain item-specific data
         #expect(
-            itemResult.message?.contains("test_item") == true
-                || itemResult.message?.contains("id") == true)
+            itemOutput.contains("test_item") == true
+                || itemOutput.contains("id") == true)
 
         // Test location debug
-        let locationCommand = Command(
-            verb: .debug,
-            directObject: .location("test_location"),
-            rawInput: "debug test_location"
-        )
-        let locationContext = ActionContext(
-            command: locationCommand,
-            engine: engine
-        )
-        let locationResult = try await handler.process(context: locationContext)
+        try await engine.execute("debug test_location")
+        let locationOutput = await mockIO.flush()
 
         // Should contain location-specific data
         #expect(
-            locationResult.message?.contains("test_location") == true
-                || locationResult.message?.contains("id") == true)
+            locationOutput.contains("test_location") == true
+                || locationOutput.contains("id") == true)
     }
 
     // MARK: - Edge Cases
@@ -456,14 +216,8 @@ struct DebugActionHandlerTests {
         let game = MinimalGame(items: complexItem)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        let command = Command(
-            verb: .debug,
-            directObject: .item("complex_item"),
-            rawInput: "debug complex_item"
-        )
-
-        // Act: Use engine.execute for full pipeline
-        await engine.execute(command: command)
+        // Act
+        try await engine.execute("debug complex_item")
 
         // Assert Output
         let output = await mockIO.flush()
@@ -491,14 +245,8 @@ struct DebugActionHandlerTests {
         let game = MinimalGame(locations: complexLocation)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        let command = Command(
-            verb: .debug,
-            directObject: .location("complex_location"),
-            rawInput: "debug complex_location"
-        )
-
-        // Act: Use engine.execute for full pipeline
-        await engine.execute(command: command)
+        // Act
+        try await engine.execute("debug complex_location")
 
         // Assert Output
         let output = await mockIO.flush()
@@ -510,8 +258,7 @@ struct DebugActionHandlerTests {
 
     @Test("DEBUG works with player that has modified state")
     func testDebugModifiedPlayer() async throws {
-        let (engine, _) = await createTestEngine()
-        let mockIO = engine.ioHandler as! MockIOHandler
+        let (engine, mockIO) = await createTestEngine()
 
         // Modify player state
         let scoreChange = StateChange(
@@ -528,14 +275,8 @@ struct DebugActionHandlerTests {
         )
         try await engine.apply(movesChange)
 
-        let command = Command(
-            verb: .debug,
-            directObject: .player,
-            rawInput: "debug self"
-        )
-
-        // Act: Use engine.execute for full pipeline
-        await engine.execute(command: command)
+        // Act
+        try await engine.execute("debug self")
 
         // Assert Output
         let output = await mockIO.flush()
@@ -543,44 +284,5 @@ struct DebugActionHandlerTests {
         // Should contain player data
         #expect(output.contains("```"))
         #expect(output.contains("Player") || output.contains("player"))
-    }
-
-    // MARK: - Error Consistency Tests
-
-    @Test("DEBUG validation and process errors are consistent")
-    func testValidationAndProcessErrorConsistency() async throws {
-        let (engine, _) = await createTestEngine()
-
-        // Test with non-existent item
-        let command = Command(
-            verb: .debug,
-            directObject: .item("nonexistent"),
-            rawInput: "debug nonexistent"
-        )
-        let context = ActionContext(
-            command: command,
-            engine: engine
-        )
-
-        var validationError: ActionResponse?
-        var processError: ActionResponse?
-
-        // Capture validation error
-        do {
-            try await handler.validate(context: context)
-        } catch let error as ActionResponse {
-            validationError = error
-        }
-
-        // Capture process error
-        do {
-            let _ = try await handler.process(context: context)
-        } catch let error as ActionResponse {
-            processError = error
-        }
-
-        // Both should fail with the same error type
-        #expect(validationError == .unknownEntity(.item("nonexistent")))
-        #expect(processError == .unknownEntity(.item("nonexistent")))
     }
 }

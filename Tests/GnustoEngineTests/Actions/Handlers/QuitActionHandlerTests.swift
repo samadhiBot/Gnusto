@@ -5,27 +5,21 @@ import Testing
 
 @Suite("QuitActionHandler Tests")
 struct QuitActionHandlerTests {
-    let handler = QuitActionHandler()
-
     @Test("QUIT command produces the expected message")
     func testQuitBasicFunctionality() async throws {
         let (engine, mockIO) = await GameEngine.test()
 
-        let command = Command(
-            verb: .quit,
-            rawInput: "quit"
-        )
-
         // Act: Use engine.execute for full pipeline
-        await engine.execute(command: command)
+        try await engine.execute("quit")
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "Goodbye!")
+        expectNoDifference(output, "> quit\n\nGoodbye!")
     }
 
     @Test("QUIT produces correct ActionResult")
     func testQuitActionResult() async throws {
+        let handler = QuitActionHandler()
         let (engine, _) = await GameEngine.test()
 
         let command = Command(
@@ -36,10 +30,10 @@ struct QuitActionHandlerTests {
             command: command,
             engine: engine
         )
-        
+
         // Process the command directly
         let result = try await handler.process(context: context)
-        
+
         // Verify result
         #expect(result.message == "Goodbye!")
         #expect(result.changes.isEmpty) // QUIT should not modify state directly
@@ -48,6 +42,7 @@ struct QuitActionHandlerTests {
 
     @Test("QUIT validation always succeeds")
     func testQuitValidationSucceeds() async throws {
+        let handler = QuitActionHandler()
         let (engine, _) = await GameEngine.test()
 
         let command = Command(
@@ -65,6 +60,7 @@ struct QuitActionHandlerTests {
 
     @Test("QUIT requests engine to quit")
     func testQuitRequestsEngineQuit() async throws {
+        let handler = QuitActionHandler()
         let (engine, _) = await GameEngine.test()
 
         let command = Command(
@@ -75,13 +71,13 @@ struct QuitActionHandlerTests {
             command: command,
             engine: engine
         )
-        
+
         // Initially should not be quitting
         #expect(await !engine.shouldQuit)
-        
+
         // Process QUIT command
         let _ = try await handler.process(context: context)
-        
+
         // Engine should now be marked to quit
         #expect(await engine.shouldQuit)
     }
@@ -90,24 +86,20 @@ struct QuitActionHandlerTests {
     func testQAliasWorks() async throws {
         let (engine, mockIO) = await GameEngine.test()
 
-        let command = Command(
-            verb: .quit, // Q is mapped to .quit verb
-            rawInput: "q"
-        )
-
         // Act: Use engine.execute for full pipeline
-        await engine.execute(command: command)
+        try await engine.execute("q")
 
         // Assert Output - should be the same as QUIT
         let output = await mockIO.flush()
-        expectNoDifference(output, "Goodbye!")
-        
+        expectNoDifference(output, "> q\n\nGoodbye!")
+
         // Should also request quit
         #expect(await engine.shouldQuit)
     }
 
     @Test("QUIT full workflow integration test")
     func testQuitFullWorkflow() async throws {
+        let handler = QuitActionHandler()
         let (engine, _) = await GameEngine.test()
 
         let command = Command(
@@ -118,13 +110,13 @@ struct QuitActionHandlerTests {
             command: command,
             engine: engine
         )
-        
+
         // Validate
         try await handler.validate(context: context)
-        
+
         // Process
         let result = try await handler.process(context: context)
-        
+
         // Verify complete workflow
         #expect(result.message == "Goodbye!")
         #expect(result.changes.isEmpty)
@@ -143,19 +135,14 @@ struct QuitActionHandlerTests {
             newValue: 100
         )
         try await engine.apply(scoreChange)
-        
-        let command = Command(
-            verb: .quit,
-            rawInput: "quit"
-        )
 
         // Act: QUIT should work the same regardless of game state
-        await engine.execute(command: command)
+        try await engine.execute("quit")
 
         // Assert Output is unchanged
         let output = await mockIO.flush()
-        expectNoDifference(output, "Goodbye!")
-        
+        expectNoDifference(output, "> quit\n\nGoodbye!")
+
         // Should still request quit
         #expect(await engine.shouldQuit)
     }
@@ -169,14 +156,9 @@ struct QuitActionHandlerTests {
         let initialScore = initialState.player.score
         let initialMoves = initialState.player.moves
         let initialLocation = initialState.player.currentLocationID
-        
-        let command = Command(
-            verb: .quit,
-            rawInput: "quit"
-        )
 
         // Execute QUIT
-        await engine.execute(command: command)
+        try await engine.execute("quit")
 
         // Verify game state hasn't changed (except for quit flag)
         let finalState = await engine.gameState
@@ -190,18 +172,13 @@ struct QuitActionHandlerTests {
     func testQuitWithExtraParameters() async throws {
         let (engine, mockIO) = await GameEngine.test()
 
-        let command = Command(
-            verb: .quit,
-            rawInput: "quit game now"
-        )
-
         // Act: Use engine.execute for full pipeline
-        await engine.execute(command: command)
+        try await engine.execute("quit game now")
 
         // Assert Output - should work the same way
         let output = await mockIO.flush()
-        expectNoDifference(output, "Goodbye!")
-        
+        expectNoDifference(output, "> quit game now\n\nGoodbye!")
+
         // Should request quit
         #expect(await engine.shouldQuit)
     }
@@ -210,22 +187,17 @@ struct QuitActionHandlerTests {
     func testMultipleQuitCommands() async throws {
         let (engine, mockIO) = await GameEngine.test()
 
-        let command = Command(
-            verb: .quit,
-            rawInput: "quit"
-        )
-
         // Execute QUIT multiple times
-        await engine.execute(command: command)
+        try await engine.execute("quit")
         #expect(await engine.shouldQuit)
         let firstOutput = await mockIO.flush()
-        
-        await engine.execute(command: command)
+
+        try await engine.execute("quit")
         #expect(await engine.shouldQuit) // Should still be quitting
         let secondOutput = await mockIO.flush()
 
         // Both outputs should be identical
-        expectNoDifference(firstOutput, "Goodbye!")
-        expectNoDifference(secondOutput, "Goodbye!")
+        expectNoDifference(firstOutput, "> quit\n\nGoodbye!")
+        expectNoDifference(secondOutput, "> quit\n\nGoodbye!")
     }
-} 
+}

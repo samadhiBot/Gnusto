@@ -96,20 +96,12 @@ struct PutOnActionHandlerTests {
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
         #expect(await engine.gameState.changeHistory.isEmpty)
 
-        let command = Command(
-            verb: .putOn,
-            directObject: .item("book"),
-            indirectObject: .item("table"),
-            preposition: "on",
-            rawInput: "put book on table"
-        )
-
         // Act
-        await engine.execute(command: command)
+        try await engine.execute("put book on table")
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "You put the heavy book on the sturdy table.")
+        expectNoDifference(output, "> put book on table\n\nYou put the heavy book on the sturdy table.")
 
         // Assert Final State
         let finalBookState = try await engine.item("book")
@@ -146,19 +138,12 @@ struct PutOnActionHandlerTests {
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
         #expect(await engine.gameState.changeHistory.isEmpty)
 
-        let command = Command(
-            verb: .putOn,
-            indirectObject: .item("table"),
-            preposition: "on",
-            rawInput: "put on table"
-        )  // No DO
-
         // Act
-        await engine.execute(command: command)
+        try await engine.execute("put on table")
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "Put what?")
+        expectNoDifference(output, "> put on table\n\nPut what?")
 
         // Assert No State Change
         #expect(await engine.gameState.changeHistory.isEmpty)
@@ -176,19 +161,12 @@ struct PutOnActionHandlerTests {
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
         #expect(await engine.gameState.changeHistory.isEmpty)
 
-        let command = Command(
-            verb: .putOn,
-            directObject: .item("book"),
-            preposition: "on",
-            rawInput: "put book on"
-        )  // No IO
-
         // Act
-        await engine.execute(command: command)
+        try await engine.execute("put book on")
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "Put the book on what?")
+        expectNoDifference(output, "> put book on\n\nPut the book on what?")
 
         // Assert No State Change
         #expect(await engine.gameState.changeHistory.isEmpty)
@@ -212,20 +190,12 @@ struct PutOnActionHandlerTests {
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
         #expect(await engine.gameState.changeHistory.isEmpty)
 
-        let command = Command(
-            verb: .putOn,
-            directObject: .item("book"),
-            indirectObject: .item("table"),
-            preposition: "on",
-            rawInput: "put book on table"
-        )
-
         // Act
-        await engine.execute(command: command)
+        try await engine.execute("put book on table")
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "You aren’t holding the heavy book.")
+        expectNoDifference(output, "> put book on table\n\nYou aren't holding the heavy book.")
 
         // Assert No State Change
         #expect(await engine.gameState.changeHistory.isEmpty)
@@ -259,20 +229,12 @@ struct PutOnActionHandlerTests {
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
         #expect(await engine.gameState.changeHistory.isEmpty)
 
-        let command = Command(
-            verb: .putOn,
-            directObject: .item("book"),
-            indirectObject: .item("table"),
-            preposition: "on",
-            rawInput: "put book on table"
-        )
-
         // Act
-        await engine.execute(command: command)
+        try await engine.execute("put book on table")
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "You can’t see any such thing.")
+        expectNoDifference(output, "> put book on table\n\nYou can't see any such thing.")
 
         // Assert No State Change
         #expect(await engine.gameState.changeHistory.isEmpty)
@@ -296,20 +258,12 @@ struct PutOnActionHandlerTests {
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
         #expect(await engine.gameState.changeHistory.isEmpty)
 
-        let command = Command(
-            verb: .putOn,
-            directObject: .item("book"),
-            indirectObject: .item("box"),
-            preposition: "on",
-            rawInput: "put book on box"
-        )
-
         // Act
-        await engine.execute(command: command)
+        try await engine.execute("put book on box")
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "You can’t put things on the box.")
+        expectNoDifference(output, "> put book on box\n\nYou can't put things on the box.")
 
         // Assert No State Change
         #expect(await engine.gameState.changeHistory.isEmpty)
@@ -328,20 +282,12 @@ struct PutOnActionHandlerTests {
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
         #expect(await engine.gameState.changeHistory.isEmpty)
 
-        let command = Command(
-            verb: .putOn,
-            directObject: .item("table"),
-            indirectObject: .item("table"),
-            preposition: "on",
-            rawInput: "put table on table"
-        )
-
         // Act
-        await engine.execute(command: command)
+        try await engine.execute("put table on table")
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "You can’t put something on itself.")
+        expectNoDifference(output, "> put table on table\n\nYou can't put something on itself.")
 
         // Assert No State Change
         #expect(await engine.gameState.changeHistory.isEmpty)
@@ -368,23 +314,17 @@ struct PutOnActionHandlerTests {
         #expect(await engine.gameState.changeHistory.isEmpty)
 
         // Try to put the tray onto the table (which is on the tray)
-        let command = Command(
-            verb: .putOn,
-            directObject: .item("tray"),
-            indirectObject: .item("table"),
-            preposition: "on",
-            rawInput: "put tray on table"
-        )
-
         // Act
-        await engine.execute(command: command)
+        try await engine.execute("put tray on table")
 
         // Assert Output
         let output = await mockIO.flush()
         expectNoDifference(
             output,
             """
-            You can’t put the silver tray on the table because the table is
+            > put tray on table
+
+            You can't put the silver tray on the table because the table is
             on the silver tray.
             """)
 
