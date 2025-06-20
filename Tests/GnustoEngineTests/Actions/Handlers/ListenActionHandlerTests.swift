@@ -79,7 +79,7 @@ struct ListenActionHandlerTests {
         // Execute LISTEN
         try await engine.execute("listen")
 
-        // Verify state hasn't changed significantly (moves will increment)
+        // Verify state hasn’t changed significantly (moves will increment)
         let finalState = await engine.gameState
         #expect(finalState.player.score == initialScore)
         #expect(finalState.player.currentLocationID == initialLocation)

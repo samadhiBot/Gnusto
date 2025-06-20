@@ -119,7 +119,7 @@ struct TurnOnActionHandlerTests {
             It's already on.
             """)
 
-        // Verify item state didn't change unexpectedly - should NOT be touched if validation fails
+        // Verify item state didn’t change unexpectedly - should NOT be touched if validation fails
         let finalItemState = try await engine.item("lamp")
         #expect(finalItemState.hasFlag(.isOn) == true)  // Should still be on
         #expect(finalItemState.hasFlag(.isTouched) == false)  // Should NOT be touched
@@ -145,7 +145,7 @@ struct TurnOnActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > turn on lamp
-            You can't turn that on.
+            You can’t turn that on.
             """)
 
         let finalItemState = try await engine.item("lamp")
@@ -174,7 +174,7 @@ struct TurnOnActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > turn on lamp
-            You can't see any brass lantern here.
+            You can’t see any brass lantern here.
             """)
     }
 
@@ -282,7 +282,7 @@ struct TurnOnActionHandlerTests {
         )
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        // Verify room is lit initially (so turning on lamp shouldn't trigger description)
+        // Verify room is lit initially (so turning on lamp shouldn’t trigger description)
         let initiallyLit = await engine.playerLocationIsLit()
         #expect(initiallyLit == true, "Room should be lit initially")
 

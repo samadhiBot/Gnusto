@@ -91,7 +91,7 @@ struct ThinkAboutActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > think about key
-            You can't see any golden key here.
+            You can’t see any golden key here.
             """)
     }
 
@@ -213,7 +213,7 @@ struct ThinkAboutActionHandlerTests {
         // Execute THINK ABOUT SELF
         try await engine.execute("think about self")
 
-        // Verify core state hasn't changed
+        // Verify core state hasn’t changed
         let finalState = await engine.gameState
         #expect(finalState.player.score == initialScore)
         #expect(finalState.player.moves == initialMoves)
@@ -311,7 +311,7 @@ struct ThinkAboutActionHandlerTests {
         )
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        // Act: THINK ABOUT should work even in dark rooms (thinking doesn't require sight)
+        // Act: THINK ABOUT should work even in dark rooms (thinking doesn’t require sight)
         try await engine.execute("think about coin")
 
         // Assert Output - should still work

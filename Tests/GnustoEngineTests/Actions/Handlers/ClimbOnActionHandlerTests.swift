@@ -32,7 +32,7 @@ struct ClimbOnActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > climb on chair
-            You can't climb on the wooden chair.
+            You can’t climb on the wooden chair.
             """)
     }
 
@@ -54,7 +54,7 @@ struct ClimbOnActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > climb on chair
-            You can't see any wooden chair here.
+            You can’t see any wooden chair here.
             """)
     }
 
@@ -113,7 +113,7 @@ struct ClimbOnActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > climb on ladder
-            You can't see any small ladder here.
+            You can’t see any small ladder here.
             """)
     }
 
@@ -135,7 +135,7 @@ struct ClimbOnActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > climb on rope
-            You can't climb on the climbing rope.
+            You can’t climb on the climbing rope.
             """)
     }
 
@@ -157,7 +157,7 @@ struct ClimbOnActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > climb on tree
-            You can't climb on the large oak tree.
+            You can’t climb on the large oak tree.
             """)
 
         // Assert State Change

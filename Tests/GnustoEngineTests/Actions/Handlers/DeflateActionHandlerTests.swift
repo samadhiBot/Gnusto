@@ -238,7 +238,7 @@ struct DeflateActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > deflate distant balloon
-            You can't see any distant balloon here.
+            You can’t see any distant balloon here.
             """)
     }
 }

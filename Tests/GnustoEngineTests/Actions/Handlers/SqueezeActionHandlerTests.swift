@@ -141,7 +141,7 @@ struct SqueezeActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > squeeze cushion
-            You squeeze the cushion as hard as you can, but it doesn't give.
+            You squeeze the cushion as hard as you can, but it doesn’t give.
             """)
     }
 
@@ -165,7 +165,7 @@ struct SqueezeActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > squeeze rock
-            You squeeze the hard rock as hard as you can, but it doesn't give.
+            You squeeze the hard rock as hard as you can, but it doesn’t give.
             """)
     }
 

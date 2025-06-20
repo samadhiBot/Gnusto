@@ -88,13 +88,13 @@ struct MessageProviderIntegrationTests {
         // Test single parameter
         expectNoDifference(
             provider.itemNotTakable(item: "the golden sword"),
-            "You can't take the golden sword."
+            "You can’t take the golden sword."
         )
 
         // Test multiple parameters
         expectNoDifference(
             provider.itemNotInContainer(item: "the key", container: "the box"),
-            "The key isn't in the box."
+            "The key isn’t in the box."
         )
 
         // Test parameter with capitalization
@@ -106,7 +106,7 @@ struct MessageProviderIntegrationTests {
         // Test modifier mismatch with array
         expectNoDifference(
             provider.modifierMismatch(noun: "sword", modifiers: ["golden", "magical"]),
-            "I don't see any 'golden magical sword' here."
+            "I don’t see any 'golden magical sword' here."
         )
     }
 }

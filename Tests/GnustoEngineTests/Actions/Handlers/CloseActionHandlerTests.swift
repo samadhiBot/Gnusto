@@ -107,7 +107,7 @@ struct CloseActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > close rock
-            You can't close the smooth rock.
+            You can’t close the smooth rock.
             """)
 
         #expect(await engine.gameState.changeHistory.isEmpty)
@@ -132,7 +132,7 @@ struct CloseActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > close box
-            You can't see any such thing.
+            You can’t see any such thing.
             """)
 
         #expect(await engine.gameState.changeHistory.isEmpty)

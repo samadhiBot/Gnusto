@@ -32,7 +32,7 @@ struct DrinkActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > drink nonexistent
-            You can't see any nonexistent here.
+            You can’t see any nonexistent here.
             """)
     }
 
@@ -56,7 +56,7 @@ struct DrinkActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > drink distant water
-            You can't see any distant water here.
+            You can’t see any distant water here.
             """)
     }
 
@@ -105,7 +105,7 @@ struct DrinkActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > drink rock
-            You can't drink the rock.
+            You can’t drink the rock.
             """)
     }
 
@@ -172,7 +172,7 @@ struct DrinkActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > drink closed bottle
-            You can't drink from the closed bottle while it's closed.
+            You can’t drink from the closed bottle while it's closed.
             """)
     }
 

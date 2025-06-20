@@ -226,7 +226,7 @@ struct DynamicPropertyTests {
 
         // The compute handler throws an error, so it should fall back to stored value
         // Since there's no stored description, it should return nil and then try the stored value
-        // which also doesn't exist, so the attribute fetch should return nil
+        // which also doesn’t exist, so the attribute fetch should return nil
         let description: String? = try await engine.attribute(.description, of: ItemID("testItem"))
         #expect(description == nil)
     }

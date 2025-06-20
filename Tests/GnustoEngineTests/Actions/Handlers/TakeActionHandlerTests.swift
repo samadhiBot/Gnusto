@@ -171,7 +171,7 @@ struct TakeActionHandlerTests {
 
     @Test("Take item fails when not present in location")
     func testTakeItemFailsWhenNotPresent() async throws {
-        // Arrange: Create item that *won't* be added to location
+        // Arrange: Create item that *won’t* be added to location
         let nonexistentItem = Item(
             id: "figurine",
             .name("jade figurine"),
@@ -189,7 +189,7 @@ struct TakeActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > take figurine
-            You can't see any such thing.
+            You can’t see any such thing.
             """)
 
         // Assert No State Change
@@ -219,7 +219,7 @@ struct TakeActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > take rock
-            You can't take the heavy rock.
+            You can’t take the heavy rock.
             """)
 
         // Assert No State Change
@@ -387,7 +387,7 @@ struct TakeActionHandlerTests {
         // ScopeResolver will prevent seeing it, standard message
         expectNoDifference(output, """
             > take gem
-            You can't see any such thing.
+            You can’t see any such thing.
             """)
 
         // Assert No State Change
@@ -426,7 +426,7 @@ struct TakeActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > take chip from statue
-            You can't take things out of the stone statue.
+            You can’t take things out of the stone statue.
             """)
 
         // Assert No State Change
@@ -612,7 +612,7 @@ struct TakeActionHandlerTests {
             """)
 
         // Assert Change History
-        // Helper should only generate parent and pronoun changes as attributes didn't change
+        // Helper should only generate parent and pronoun changes as attributes didn’t change
         let expectedChanges = expectedTakeChanges(
             itemID: "key",
             initialParent: initialParent,

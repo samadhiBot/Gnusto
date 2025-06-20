@@ -81,14 +81,14 @@ struct RemoveActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > take off cloak
-            You aren't wearing the cloak.
+            You aren’t wearing the cloak.
             """)
         #expect(await engine.gameState.changeHistory.isEmpty)
     }
 
     @Test("Remove fails if item not held")
     func testRemoveItemNotHeld() async throws {
-        // Cloak doesn't exist here
+        // Cloak doesn’t exist here
         let (engine, mockIO) = await GameEngine.test()
 
         // Act
@@ -98,7 +98,7 @@ struct RemoveActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > remove cloak
-            You can't see any such thing.
+            You can’t see any such thing.
             """)
         #expect(await engine.gameState.changeHistory.isEmpty)
     }
@@ -139,7 +139,7 @@ struct RemoveActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > remove amulet
-            You can't take off the cursed amulet.
+            You can’t take off the cursed amulet.
             """)
         #expect(await engine.gameState.changeHistory.isEmpty)
     }
@@ -239,7 +239,7 @@ struct RemoveActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > remove all
-            You aren't wearing anything.
+            You aren’t wearing anything.
             """)
     }
 

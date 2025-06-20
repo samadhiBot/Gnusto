@@ -12,7 +12,7 @@ struct LookActionHandlerTests {
         itemID: ItemID,
         initialAttributes: [ItemAttributeID: StateValue]
     ) -> [StateChange] {
-        // Only expect a change if .isTouched wasn't already true
+        // Only expect a change if .isTouched wasn’t already true
         guard initialAttributes[.isTouched] != true else { return [] }
 
         return [
@@ -178,7 +178,7 @@ struct LookActionHandlerTests {
         // Corrected Expectation: Darkness message
         expectNoDifference(output, """
             > look
-            It is pitch black. You can't see a thing.
+            It is pitch black. You can’t see a thing.
             """)
 
         // Assert No State Change
@@ -434,7 +434,7 @@ struct LookActionHandlerTests {
             .name("chipped stone"),
             .description("A worn stone."),
             .in(.location(.startRoom)),
-            .firstDescription("This shouldn't appear."),
+            .firstDescription("This shouldn’t appear."),
             .isTouched
         )
         let initialAttributes = item.attributes
@@ -720,7 +720,7 @@ struct LookActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > examine artifact
-            You can't see any such thing.
+            You can’t see any such thing.
             """)
 
         // Assert Final State (Item remains untouched and where it was)
@@ -827,7 +827,7 @@ struct LookActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > look at unicorn
-            You can't see any such thing.
+            You can’t see any such thing.
             """)
         #expect(await engine.gameState.changeHistory.isEmpty)
     }
@@ -843,7 +843,7 @@ struct LookActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > look at artifact
-            You can't see any such thing.
+            You can’t see any such thing.
             """)
         #expect(await engine.gameState.changeHistory.isEmpty)
     }

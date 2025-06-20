@@ -172,7 +172,7 @@ struct InsertActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > put coin in box
-            You aren't holding the gold coin.
+            You aren’t holding the gold coin.
             """)
 
         // Assert No State Change
@@ -207,7 +207,7 @@ struct InsertActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > put coin in distant box
-            You can't see any such thing.
+            You can’t see any such thing.
             """)
 
         // Assert No State Change
@@ -240,7 +240,7 @@ struct InsertActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > put coin in statue
-            You can't put things in the stone statue.
+            You can’t put things in the stone statue.
             """)
 
         // Assert No State Change
@@ -300,7 +300,7 @@ struct InsertActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > put box in box
-            You can't put something inside itself.
+            You can’t put something inside itself.
             """)
 
         // Assert No State Change
@@ -336,7 +336,7 @@ struct InsertActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > put bag in box
-            You can't put the bag in the box, because the box is inside the
+            You can’t put the bag in the box, because the box is inside the
             bag!
             """)
 
@@ -383,7 +383,7 @@ struct InsertActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > put coin in box
-            The gold coin won't fit in the nearly full box.
+            The gold coin won’t fit in the nearly full box.
             """)
 
         // Assert No State Change
@@ -540,7 +540,7 @@ struct InsertActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > put box in box
-            You can't put something inside itself.
+            You can’t put something inside itself.
             """)
 
         // Assert No State Change
@@ -586,7 +586,7 @@ struct InsertActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > put key in box
-            You can't see any such thing.
+            You can’t see any such thing.
             """)
 
         // Assert No State Change
@@ -624,7 +624,7 @@ struct InsertActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > put key in rock
-            You can't put things in the smooth rock.
+            You can’t put things in the smooth rock.
             """)
 
         // Assert No State Change
@@ -715,7 +715,7 @@ struct InsertActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > put key in box
-            The small key won't fit in the wooden box.
+            The small key won’t fit in the wooden box.
             """)
 
         // Assert No State Change
@@ -759,7 +759,7 @@ struct InsertActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > put key in box
-            The large key won't fit in the small box.
+            The large key won’t fit in the small box.
             """)
 
         // Assert No State Change
@@ -889,7 +889,7 @@ struct InsertActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > put bag in bag
-            You can't put something inside itself.
+            You can’t put something inside itself.
             """)
 
         // Assert No State Change
@@ -900,7 +900,7 @@ struct InsertActionHandlerTests {
     func testInsertIntoIndirectSelfContainer() async throws {
         // Arrange: Player holds Box B (open container). Box A is inside Box B.
         // Command: Put Box B (itemToInsert) into Box A (containerItem).
-        // Expected Error: "You can't put Box B in Box A, because Box A is in Box B!"
+        // Expected Error: "You can’t put Box B in Box A, because Box A is in Box B!"
 
         let boxA = Item(  // This is containerItem (Y)
             id: "boxA",
@@ -930,7 +930,7 @@ struct InsertActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > put box B in box A
-            You can't put the box B in the box A, because the box A is
+            You can’t put the box B in the box A, because the box A is
             inside the box B!
             """)
 
@@ -947,7 +947,7 @@ struct InsertActionHandlerTests {
         // Arrange: Player holds Box C (open container).
         // Box B is inside Box C. Box A is inside Box B.
         // Command: Put Box C (itemToInsert) into Box A (containerItem).
-        // Expected: "You can't put Box C in Box A, because Box A is in Box C!"
+        // Expected: "You can’t put Box C in Box A, because Box A is in Box C!"
 
         let boxA = Item(  // This is containerItem (Y)
             id: "boxA",
@@ -985,7 +985,7 @@ struct InsertActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > put box C in box A
-            You can't put the box C in the box A, because the box A is
+            You can’t put the box C in the box A, because the box A is
             inside the box C!
             """)
 
@@ -1028,7 +1028,7 @@ struct InsertActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > put trophy in the open box
-            You can't put things in the glass trophy.
+            You can’t put things in the glass trophy.
             """)
 
         // Assert No State Change
@@ -1081,7 +1081,7 @@ extension InsertActionHandlerTests {
         }
 
         // 4. Pronoun "it" is set to the inserted item
-        // Assuming "it" wasn't already referring to itemToInsertID or was nil.
+        // Assuming "it" wasn’t already referring to itemToInsertID or was nil.
         // For more robust tests, capture existing pronoun state.
         changes.append(
             StateChange(

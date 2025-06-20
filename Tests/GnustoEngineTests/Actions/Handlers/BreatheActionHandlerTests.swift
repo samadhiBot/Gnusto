@@ -18,7 +18,7 @@ struct BreatheActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > breathe something
-            You can't breathe that.
+            You can’t breathe that.
             """)
     }
 
@@ -33,7 +33,7 @@ struct BreatheActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > breathe with something
-            You can't breathe that.
+            You can’t breathe that.
             """)
     }
 

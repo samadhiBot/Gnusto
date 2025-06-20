@@ -136,7 +136,7 @@ struct ConjunctionCommandTests {
 
     // MARK: - Error Handling Tests
 
-    @Test("Conjunction with verb that doesn't support multiple objects fails")
+    @Test("Conjunction with verb that doesn’t support multiple objects fails")
     func testConjunctionWithUnsupportedVerb() async throws {
         // Create test setup directly
         let sword = Item(id: "sword", .name("sword"), .in(.player), .isTakable)
@@ -146,14 +146,14 @@ struct ConjunctionCommandTests {
             blueprint: MinimalGame(items: sword, lantern)
         )
 
-        // Act: Try to parse "open sword and lantern" (OPEN doesn't support multiple objects)
+        // Act: Try to parse "open sword and lantern" (OPEN doesn’t support multiple objects)
         try await engine.execute("open sword and lantern")
 
         // Assert: Should get an error about multiple objects not being supported
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > open sword and lantern
-            The OPEN command doesn't support multiple objects.
+            The OPEN command doesn’t support multiple objects.
             """)
     }
 
@@ -172,9 +172,9 @@ struct ConjunctionCommandTests {
         // Assert: Should get a parse error about the non-existent item
         let output = await mockIO.flush()
         #expect(
-            output.contains("can't see") || output.contains("don't see")
+            output.contains("can’t see") || output.contains("don’t see")
                 || output.contains("not here") || output.contains("unknown")
-                || output.contains("not in scope") || output.contains("I don't see")
+                || output.contains("not in scope") || output.contains("I don’t see")
         )
     }
 

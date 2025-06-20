@@ -365,7 +365,7 @@ struct FuseIDTests {
         let sameFuseID: FuseID = fuseID
         #expect(sameFuseID == fuseID)
         
-        // Test that we can't accidentally mix with other ID types
+        // Test that we can’t accidentally mix with other ID types
         // (This is enforced at compile time, but we can test runtime behavior)
         let fuseDict: [FuseID: String] = [fuseID: "test"]
         #expect(fuseDict[fuseID] == "test")

@@ -131,7 +131,7 @@ struct InflateActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > inflate coin
-            You can't inflate the coin.
+            You can’t inflate the coin.
             """)
     }
 }

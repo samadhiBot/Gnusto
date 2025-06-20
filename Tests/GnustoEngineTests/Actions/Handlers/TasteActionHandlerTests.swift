@@ -137,7 +137,7 @@ struct TasteActionHandlerTests {
         // Execute TASTE
         try await engine.execute("taste cookie")
 
-        // Verify state hasn't changed significantly (moves will increment)
+        // Verify state hasn’t changed significantly (moves will increment)
         let finalState = await engine.gameState
         #expect(finalState.player.score == initialScore)
         #expect(finalState.player.currentLocationID == initialLocation)
@@ -191,7 +191,7 @@ struct TasteActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > taste fruit
-            You can't see any distant fruit here.
+            You can’t see any distant fruit here.
             """)
     }
 
@@ -273,7 +273,7 @@ struct TasteActionHandlerTests {
         )
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        // Act: TASTE should work even in dark rooms (taste doesn't require sight)
+        // Act: TASTE should work even in dark rooms (taste doesn’t require sight)
         try await engine.execute("taste spice")
 
         // Assert Output - should still work

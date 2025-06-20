@@ -53,7 +53,7 @@ struct PressActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > press rock
-            You can't press the rock.
+            You can’t press the rock.
             """)
     }
 
@@ -110,7 +110,7 @@ struct PressActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > press distant button
-            You can't see any distant button here.
+            You can’t see any distant button here.
             """)
     }
 }

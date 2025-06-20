@@ -86,7 +86,7 @@ struct TouchActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > touch figurine
-            You can't see any jade figurine here.
+            You can’t see any jade figurine here.
             """)
     }
 
@@ -176,7 +176,7 @@ struct TouchActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > touch coin
-            You can't see any gold coin here.
+            You can’t see any gold coin here.
             """)
     }
 }

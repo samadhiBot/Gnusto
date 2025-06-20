@@ -288,7 +288,7 @@ struct BlowActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > blow distant balloon
-            You can't see any distant balloon here.
+            You can’t see any distant balloon here.
             """)
     }
 }

@@ -138,7 +138,7 @@ struct TurnActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > turn key
-            You can't just turn the brass key by itself. You need to use it with something.
+            You can’t just turn the brass key by itself. You need to use it with something.
             """)
     }
 
@@ -162,7 +162,7 @@ struct TurnActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > turn cat
-            You can't turn the fluffy cat around like an object.
+            You can’t turn the fluffy cat around like an object.
             """)
     }
 

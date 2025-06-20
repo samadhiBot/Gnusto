@@ -54,7 +54,7 @@ struct PullActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > pull rock
-            You can't pull the rock.
+            You can’t pull the rock.
             """)
     }
 
@@ -112,7 +112,7 @@ struct PullActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > pull distant rope
-            You can't see any distant rope here.
+            You can’t see any distant rope here.
             """)
     }
 }

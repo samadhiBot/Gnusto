@@ -169,7 +169,7 @@ struct QuitActionHandlerTests {
         // Execute QUIT
         try await engine.execute("quit")
 
-        // Verify game state hasn't changed (except for quit flag)
+        // Verify game state hasn’t changed (except for quit flag)
         let finalState = await engine.gameState
         #expect(finalState.player.score == initialScore)
         #expect(finalState.player.moves == initialMoves)

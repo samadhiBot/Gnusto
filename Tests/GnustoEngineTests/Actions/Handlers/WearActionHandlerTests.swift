@@ -70,7 +70,7 @@ struct WearActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > wear cloak
-            You can't see any such thing.
+            You can’t see any such thing.
             """)
 
         #expect(await engine.gameState.changeHistory.isEmpty)
@@ -94,7 +94,7 @@ struct WearActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > wear rock
-            You can't wear that!
+            You can’t wear that!
             """)
 
         #expect(await engine.gameState.changeHistory.isEmpty)

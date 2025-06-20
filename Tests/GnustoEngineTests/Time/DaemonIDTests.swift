@@ -260,7 +260,7 @@ struct DaemonIDTests {
     func testStringInterpolation() throws {
         let id: DaemonID = "heartbeat"
         let message = "The daemon is \(id)."
-        // DaemonID doesn't implement CustomStringConvertible, so it shows the full struct representation
+        // DaemonID doesn’t implement CustomStringConvertible, so it shows the full struct representation
         #expect(message == "The daemon is .heartbeat.")
     }
 
@@ -337,7 +337,7 @@ struct DaemonIDTests {
         let sameDaemonID: DaemonID = daemonID
         #expect(sameDaemonID == daemonID)
         
-        // Test that we can't accidentally mix with other ID types
+        // Test that we can’t accidentally mix with other ID types
         // (This is enforced at compile time, but we can test runtime behavior)
         let daemonDict: [DaemonID: String] = [daemonID: "test"]
         #expect(daemonDict[daemonID] == "test")

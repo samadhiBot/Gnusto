@@ -32,7 +32,7 @@ struct KickActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > kick nonexistent
-            You can't see any nonexistent here.
+            You can’t see any nonexistent here.
             """)
     }
 
@@ -54,7 +54,7 @@ struct KickActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > kick distant rock
-            You can't see any distant rock here.
+            You can’t see any distant rock here.
             """)
     }
 
@@ -78,7 +78,7 @@ struct KickActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > kick goblin
-            I don't think the goblin would appreciate that.
+            I don’t think the goblin would appreciate that.
             """)
     }
 

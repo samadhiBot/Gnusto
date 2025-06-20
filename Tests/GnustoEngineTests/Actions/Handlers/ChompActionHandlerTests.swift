@@ -63,7 +63,7 @@ struct ChompActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > chomp the pebble
-            You bite the pebble. Your teeth don't make much of an
+            You bite the pebble. Your teeth don’t make much of an
             impression.
             """)
     }

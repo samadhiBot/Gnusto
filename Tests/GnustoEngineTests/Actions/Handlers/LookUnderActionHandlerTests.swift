@@ -71,7 +71,7 @@ struct LookUnderActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > look under table
-            You can't see any such thing.
+            You can’t see any such thing.
             """)
         #expect(await engine.gameState.changeHistory.isEmpty)
     }
@@ -105,7 +105,7 @@ struct LookUnderActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > look under room
-            You can't look under that.
+            You can’t look under that.
             """)
 
         #expect(await engine.gameState.changeHistory.isEmpty)
@@ -136,7 +136,7 @@ struct LookUnderActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > look under carpet
-            You can't see any such thing.
+            You can’t see any such thing.
             """)
 
         #expect(await engine.gameState.changeHistory.isEmpty)

@@ -44,11 +44,11 @@ struct ThiefTests {
         #expect(stoleItem == true)
 
         // Then - check that theft can occur (this test verifies the mechanism exists)
-        // Note: Due to randomness, we can't guarantee theft happens, but the test verifies the system works
+        // Note: Due to randomness, we can’t guarantee theft happens, but the test verifies the system works
         let thiefBag = try await engine.item(.largeBag)
         _ = await engine.items(in: .item(.largeBag))  // Check that bag exists and can hold items
 
-        // Verify thief's bag can hold items (even if theft didn't happen this time)
+        // Verify thief's bag can hold items (even if theft didn’t happen this time)
         #expect(thiefBag.hasFlag(.isContainer))
     }
 
@@ -388,7 +388,7 @@ struct ThiefTests {
         // Then - thief might have moved (daemon runs every 3 turns)
         let finalThiefLocation = try await engine.item(.thief).parent
 
-        // Verify thief can potentially move (even if didn't this time due to randomness)
+        // Verify thief can potentially move (even if didn’t this time due to randomness)
         // At minimum, verify the thief still exists and is in a valid location
         switch finalThiefLocation {
         case .location(let locationID):
@@ -488,7 +488,7 @@ struct ThiefTests {
             // Bag might be removed with thief - that's also valid
             break
         default:
-            // Bag shouldn't still be "held" by removed thief
+            // Bag shouldn’t still be "held" by removed thief
             #expect(Bool(false), "Bag should either be dropped or removed when thief dies")
         }
     }
@@ -516,7 +516,7 @@ struct ThiefTests {
         // Then - score should potentially increase when treasures are recovered
         // (This tests the infrastructure exists even if specific scoring varies)
         let finalScore = await engine.playerScore
-        #expect(finalScore >= initialScore) // Score shouldn't decrease
+        #expect(finalScore >= initialScore) // Score shouldn’t decrease
     }
 
     @Test("Thief refuses to accept bag or stiletto")

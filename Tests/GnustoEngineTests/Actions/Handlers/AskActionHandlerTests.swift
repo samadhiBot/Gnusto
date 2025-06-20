@@ -57,7 +57,7 @@ struct AskActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > ask rock about rock
-            You can't ask the rock about that.
+            You can’t ask the rock about that.
             """)
     }
 
@@ -85,7 +85,7 @@ struct AskActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > ask wizard about crystal
-            Old wizard doesn't seem to know anything about a magic crystal.
+            Old wizard doesn’t seem to know anything about a magic crystal.
             """)
     }
 
@@ -108,7 +108,7 @@ struct AskActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > ask wizard about me
-            Old wizard doesn't seem to know anything about you.
+            Old wizard doesn’t seem to know anything about you.
             """)
     }
 
@@ -131,7 +131,7 @@ struct AskActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > ask wizard about room
-            Old wizard doesn't seem to know anything about any Void.
+            Old wizard doesn’t seem to know anything about any Void.
             """)
     }
 
@@ -154,7 +154,7 @@ struct AskActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > ask wizard about wizard
-            You can't see any wizard here.
+            You can’t see any wizard here.
             """)
     }
 }

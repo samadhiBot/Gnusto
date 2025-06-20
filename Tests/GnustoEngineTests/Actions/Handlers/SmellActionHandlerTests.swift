@@ -169,7 +169,7 @@ struct SmellActionHandlerTests {
         // Execute SMELL
         try await engine.execute("smell")
 
-        // Verify state hasn't changed significantly (moves will increment)
+        // Verify state hasn’t changed significantly (moves will increment)
         let finalState = await engine.gameState
         #expect(finalState.player.score == initialScore)
         #expect(finalState.player.currentLocationID == initialLocation)
@@ -307,7 +307,7 @@ struct SmellActionHandlerTests {
         )
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        // Act: SMELL should work even in dark rooms (smell doesn't require sight)
+        // Act: SMELL should work even in dark rooms (smell doesn’t require sight)
         try await engine.execute("smell")
 
         // Assert Output - should still work
@@ -337,7 +337,7 @@ struct SmellActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > smell flower
-            You can't see any distant flower here.
+            You can’t see any distant flower here.
             """)
     }
 }

@@ -100,7 +100,7 @@ struct DebugActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > debug nonexistent_item
-            You can't see any such thing.
+            You can’t see any such thing.
             """)
     }
 
@@ -115,7 +115,7 @@ struct DebugActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > debug nonexistent_location
-            You can't see any such thing.
+            You can’t see any such thing.
             """)
     }
 

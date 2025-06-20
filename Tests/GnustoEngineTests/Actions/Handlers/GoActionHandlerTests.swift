@@ -93,7 +93,7 @@ struct GoActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > north
-            You can't go that way.
+            You can’t go that way.
             """)
     }
 
@@ -144,11 +144,11 @@ struct GoActionHandlerTests {
         try await engine.execute("go north")
 
         // Assert
-        #expect(await engine.playerLocationID == "foyer") // Player hasn't moved
+        #expect(await engine.playerLocationID == "foyer") // Player hasn’t moved
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > go north
-            You can't go that way.
+            You can’t go that way.
             """)
     }
 
@@ -189,7 +189,7 @@ struct GoActionHandlerTests {
         try await engine.execute("go north")
 
         // Assert
-        #expect(await engine.playerLocationID == "foyer") // Player hasn't moved
+        #expect(await engine.playerLocationID == "foyer") // Player hasn’t moved
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > go north
@@ -232,11 +232,11 @@ struct GoActionHandlerTests {
         try await engine.execute("go east")
 
         // Assert
-        #expect(await engine.playerLocationID == "foyer") // Player hasn't moved
+        #expect(await engine.playerLocationID == "foyer") // Player hasn’t moved
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > go east
-            You can't go that way.
+            You can’t go that way.
             """)
     }
 
@@ -306,7 +306,7 @@ struct GoActionHandlerTests {
         try await engine.execute("go")
 
         // Assert
-        #expect(await engine.playerLocationID == "foyer") // Player hasn't moved
+        #expect(await engine.playerLocationID == "foyer") // Player hasn’t moved
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > go
@@ -368,7 +368,7 @@ struct GoActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > go south
-            You can't go that way.
+            You can’t go that way.
             """)
     }
 }

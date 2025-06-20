@@ -198,7 +198,7 @@ struct EmptyActionHandlerTests {
 
         // Check that an error message was displayed
         let output = await mockIO.flush()
-        #expect(output.contains("closed") || output.contains("can't empty"))
+        #expect(output.contains("closed") || output.contains("can’t empty"))
     }
 
     @Test("EMPTY command on non-container")

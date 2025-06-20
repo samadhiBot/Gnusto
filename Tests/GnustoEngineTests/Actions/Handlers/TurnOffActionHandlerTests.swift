@@ -40,7 +40,7 @@ struct TurnOffActionHandlerTests {
             > turn off lamp
             The lamp is now off. You are plunged into darkness.
 
-            It is pitch black. You can't see a thing.
+            It is pitch black. You can’t see a thing.
             """)
         let finalItemState = try await engine.item("lamp")
         #expect(finalItemState.hasFlag(.isOn) == false)
@@ -75,7 +75,7 @@ struct TurnOffActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > turn off book
-            You can't turn that off.
+            You can’t turn that off.
             """)
     }
 
@@ -100,7 +100,7 @@ struct TurnOffActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > turn off lamp
-            You can't see any such thing.
+            You can’t see any such thing.
             """)
     }
 
@@ -176,7 +176,7 @@ struct TurnOffActionHandlerTests {
             > turn off lamp
             The brass lantern is now off. You are plunged into darkness.
 
-            It is pitch black. You can't see a thing.
+            It is pitch black. You can’t see a thing.
             """)
 
         let finallyLit = await engine.scopeResolver.isLocationLit(locationID: darkRoom.id)
@@ -235,7 +235,7 @@ struct TurnOffActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > turn off lamp
-            You can't turn that off.
+            You can’t turn that off.
             """)
 
         // Check state remains unchanged - touched should NOT be added if validation fails
@@ -268,7 +268,7 @@ struct TurnOffActionHandlerTests {
         // The specific response message comes from GameEngine.report
         expectNoDifference(output, """
             > turn off lamp
-            You can't see any such thing.
+            You can’t see any such thing.
             """)
     }
 
@@ -314,7 +314,7 @@ struct TurnOffActionHandlerTests {
             > extinguish lamp
             The brass lantern is now off. You are plunged into darkness.
 
-            It is pitch black. You can't see a thing.
+            It is pitch black. You can’t see a thing.
             """)
     }
 
@@ -360,7 +360,7 @@ struct TurnOffActionHandlerTests {
             > blow out lamp
             The brass lantern is now off. You are plunged into darkness.
 
-            It is pitch black. You can't see a thing.
+            It is pitch black. You can’t see a thing.
             """)
     }
 }

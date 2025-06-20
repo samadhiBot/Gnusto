@@ -283,7 +283,7 @@ struct GnustoIDTests {
         // These should have the same raw value but be different types
         #expect(testID.rawValue == itemID.rawValue)
         
-        // Test that they can't be accidentally mixed in collections
+        // Test that they can’t be accidentally mixed in collections
         // (This is enforced at compile time, but we can test runtime behavior)
         let testDict: [TestID: String] = [testID: "test"]
         #expect(testDict[testID] == "test")

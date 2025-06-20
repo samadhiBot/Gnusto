@@ -116,7 +116,7 @@ struct XyzzyActionHandlerTests {
         // Execute XYZZY
         try await engine.execute("xyzzy")
 
-        // Verify state hasn't changed
+        // Verify state hasn’t changed
         let finalState = await engine.gameState
         #expect(finalState.player.score == initialScore)
         #expect(finalState.player.moves == initialMoves)

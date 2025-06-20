@@ -32,7 +32,7 @@ struct EnterActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > enter self
-            You can't enter that.
+            You can’t enter that.
             """)
     }
 
@@ -55,7 +55,7 @@ struct EnterActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > enter booth
-            You can't see any booth here.
+            You can’t see any booth here.
             """)
     }
 
@@ -77,7 +77,7 @@ struct EnterActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > enter rock
-            You can't enter the large rock.
+            You can’t enter the large rock.
             """)
     }
 

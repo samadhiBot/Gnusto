@@ -31,7 +31,7 @@ struct RaiseActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > raise book
-            You can't lift the heavy book.
+            You can’t lift the heavy book.
             """)
     }
 
@@ -52,7 +52,7 @@ struct RaiseActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > raise book
-            You can't see any heavy book here.
+            You can’t see any heavy book here.
             """)
     }
 
@@ -113,7 +113,7 @@ struct RaiseActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > raise book
-            You can't see any hidden book here.
+            You can’t see any hidden book here.
             """)
     }
 
@@ -135,7 +135,7 @@ struct RaiseActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > raise coin
-            You can't lift the gold coin.
+            You can’t lift the gold coin.
             """)
 
         // Assert State Change

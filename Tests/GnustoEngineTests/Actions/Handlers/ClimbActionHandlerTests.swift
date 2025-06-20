@@ -212,7 +212,7 @@ struct ClimbActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > climb stairs
-            You can't see any such thing.
+            You can’t see any such thing.
             """)
     }
 
@@ -249,7 +249,7 @@ struct ClimbActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > climb stairs
-            You can't see any such thing.
+            You can’t see any such thing.
             """)
     }
 
@@ -306,7 +306,7 @@ struct ClimbActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > climb table
-            You can't climb the wooden table.
+            You can’t climb the wooden table.
             """)
     }
 
@@ -332,7 +332,7 @@ struct ClimbActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > climb tree
-            You can't see any such thing.
+            You can’t see any such thing.
             """)
     }
 
@@ -347,7 +347,7 @@ struct ClimbActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > climb nonexistent
-            You can't see any such thing.
+            You can’t see any such thing.
             """)
     }
 
@@ -362,7 +362,7 @@ struct ClimbActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > climb me
-            You can't climb yourself.
+            You can’t climb yourself.
             """)
     }
 
@@ -501,7 +501,7 @@ struct ClimbActionHandlerTests {
             """
             > climb stairs
             You are plunged into darkness.
-            It is pitch black. You can't see a thing.
+            It is pitch black. You can’t see a thing.
             """)
     }
 

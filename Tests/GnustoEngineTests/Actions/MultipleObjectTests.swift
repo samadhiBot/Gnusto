@@ -308,14 +308,14 @@ struct MultipleObjectTests {
         let game = MinimalGame(items: sword, lantern)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        // Act: Try "open sword and lantern" (OPEN doesn't support multiple objects)
+        // Act: Try "open sword and lantern" (OPEN doesn’t support multiple objects)
         try await engine.execute("open sword and lantern")
 
         // Assert: Should get an error about multiple objects not being supported
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > open sword and lantern
-            The OPEN command doesn't support multiple objects.
+            The OPEN command doesn’t support multiple objects.
             """)
     }
 

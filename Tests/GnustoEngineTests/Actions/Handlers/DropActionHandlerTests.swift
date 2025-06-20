@@ -95,7 +95,7 @@ struct DropActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > drop key
-            You aren't holding the brass key.
+            You aren’t holding the brass key.
             """)
 
         // Assert Change History (Should be empty)
@@ -172,7 +172,7 @@ struct DropActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > drop sword
-            You can't drop the sword in stone.
+            You can’t drop the sword in stone.
             """)
     }
 }

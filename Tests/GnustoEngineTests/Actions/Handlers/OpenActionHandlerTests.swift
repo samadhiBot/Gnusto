@@ -164,7 +164,7 @@ struct OpenActionHandlerTests {
             id: "box",
             .in(.nowhere),
             .isOpenable
-            // Don't need .isOpen here, it's not reachable anyway
+            // Don’t need .isOpen here, it's not reachable anyway
         )
         let game = MinimalGame(items: box)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
@@ -177,7 +177,7 @@ struct OpenActionHandlerTests {
         // Updated expected message for inaccessible items
         expectNoDifference(output, """
             > open box
-            You can't see any such thing.
+            You can’t see any such thing.
             """)
 
         // Assert No State Change
@@ -203,7 +203,7 @@ struct OpenActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > open rock
-            You can't open the heavy rock.
+            You can’t open the heavy rock.
             """)
 
         // Assert No State Change

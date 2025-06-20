@@ -107,7 +107,7 @@ struct ReadActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > read scroll
-            You can't see any scroll here.
+            You can’t see any scroll here.
             """)
     }
 
@@ -130,7 +130,7 @@ struct ReadActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > read rock
-            The plain rock isn't something you can read.
+            The plain rock isn’t something you can read.
             """)
     }
 
@@ -165,7 +165,7 @@ struct ReadActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > read map
-            It is pitch black. You can't see a thing.
+            It is pitch black. You can’t see a thing.
             """)
     }
 
@@ -344,7 +344,7 @@ struct ReadActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > read book
-            You can't see any book here.
+            You can’t see any book here.
             """)
     }
 
@@ -366,7 +366,7 @@ struct ReadActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > read rock
-            The plain rock isn't something you can read.
+            The plain rock isn’t something you can read.
             """)
     }
 
@@ -382,7 +382,7 @@ struct ReadActionHandlerTests {
             id: "scroll",
             .name("ancient scroll"),
             .in(.location(darkRoom.id)),
-            .readText("Can't read this."),
+            .readText("Can’t read this."),
             .isReadable
         )
         let game = MinimalGame(
@@ -399,7 +399,7 @@ struct ReadActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > read scroll
-            It is pitch black. You can't see a thing.
+            It is pitch black. You can’t see a thing.
             """)
     }
 
@@ -561,10 +561,10 @@ struct ReadActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > read secret
-            You can't see any secret here.
+            You can’t see any secret here.
             """)
 
-        // Also assert the item wasn't touched
+        // Also assert the item wasn’t touched
         let finalSecretState = try await engine.item("secret")
         #expect(finalSecretState.hasFlag(.isTouched) == false)
     }

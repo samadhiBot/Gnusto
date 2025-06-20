@@ -191,7 +191,7 @@ struct StandardParserTests {
         #expect(gameState.items["sword"]?.parent == .location(roomID))
         #expect(gameState.items["coin"]?.parent == .item("backpack"))
         #expect(gameState.items["book"]?.parent == .item("table"))
-        #expect(gameState.items["rug"]?.parent == .nowhere) // Globals aren't parented by this initializer
+        #expect(gameState.items["rug"]?.parent == .nowhere) // Globals aren’t parented by this initializer
         #expect(gameState.pronouns["it"] == [.item("box")])
     }
 
@@ -527,13 +527,13 @@ struct StandardParserTests {
 
     @Test("Filter Fails (Adjective Mismatch)")
     func testFilterFailsAdjectiveMismatch() async throws {
-        // "lantern" is in scope (brass one), but "wooden" doesn't match.
+        // "lantern" is in scope (brass one), but "wooden" doesn’t match.
         let result = parser.parse(
             input: "take wooden lantern",
             vocabulary: vocabulary,
             gameState: gameState
         )
-        // Should fail because modifiers don't match, not because noun is unknown.
+        // Should fail because modifiers don’t match, not because noun is unknown.
         #expect(result.isFailure(matching: .modifierMismatch(noun: "lantern", modifiers: ["wooden"])))
     }
 
@@ -943,7 +943,7 @@ struct StandardParserTests {
 
     @Test("Noun Not In Scope")
     func testNounNotInScope() async {
-        // Lamp exists in vocab, but isn't in the room or held by player
+        // Lamp exists in vocab, but isn’t in the room or held by player
         // Create a custom state where the lamp is explicitly out of scope
         var itemsDict = gameState.items // Base items copy
         itemsDict[lampID]?.attributes[.parentEntity] = .parentEntity(.nowhere) // Move lamp out of scope

@@ -40,7 +40,7 @@ struct BurnActionHandlerTests {
             The leaflet catches fire and burns to ashes.
 
             > burn leaflet
-            You can't see the leaflet.
+            You can’t see the leaflet.
             """)
     }
 }

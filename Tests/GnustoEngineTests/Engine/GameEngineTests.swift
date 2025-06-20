@@ -426,7 +426,7 @@ struct GameEngineTests {
         let teardownCount = await mockIO.teardownCallCount
         #expect(teardownCount == 1)
 
-        // Ensure game loop exited (e.g., by checking turns or a flag if IO doesn't stop it)
+        // Ensure game loop exited (e.g., by checking turns or a flag if IO doesn’t stop it)
         let finalMoves = await engine.playerMoves
         #expect(
             finalMoves == 0,

@@ -39,7 +39,7 @@ struct WaveActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > wave distant wand
-            You can't see any distant wand here.
+            You can’t see any distant wand here.
             """)
     }
 
@@ -187,7 +187,7 @@ struct WaveActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > wave tree
-            You can't wave the large tree around - it's not something you can pick up and wave.
+            You can’t wave the large tree around - it's not something you can pick up and wave.
             """)
     }
 

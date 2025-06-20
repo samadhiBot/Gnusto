@@ -29,8 +29,8 @@ struct ConsoleIOHandlerTests {
     func testStatusLineFormattingNormal() {
         let handler = ConsoleIOHandler()
         
-        // We can't easily capture console output, but we can test the logic
-        // by calling the method and ensuring it doesn't crash
+        // We can’t easily capture console output, but we can test the logic
+        // by calling the method and ensuring it doesn’t crash
         handler.showStatusLine(roomName: "Living Room", score: 42, turns: 15)
         
         // If we get here without crashing, the formatting logic worked
@@ -85,7 +85,7 @@ struct ConsoleIOHandlerTests {
     func testPrintSimpleText() {
         let handler = ConsoleIOHandler()
         
-        // Test basic printing - we can't capture output but can ensure no crashes
+        // Test basic printing - we can’t capture output but can ensure no crashes
         handler.print("Hello, world!", style: .normal, newline: true)
         handler.print("No newline", style: .normal, newline: false)
         

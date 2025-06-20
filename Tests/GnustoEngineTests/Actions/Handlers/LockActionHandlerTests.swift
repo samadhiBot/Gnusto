@@ -148,7 +148,7 @@ struct LockActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > lock box with key
-            You aren't holding the key.
+            You aren’t holding the key.
             """)
 
         // Assert No State Change
@@ -193,7 +193,7 @@ struct LockActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > lock box with key
-            You can't see any such thing.
+            You can’t see any such thing.
             """)
 
         // Assert No State Change
@@ -223,7 +223,7 @@ struct LockActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > lock pebble with key
-            You can't lock the pebble.
+            You can’t lock the pebble.
             """)  // Uses ActionResponse.itemNotLockable message
 
         // Assert No State Change
@@ -258,7 +258,7 @@ struct LockActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > lock box with bent key
-            The bent key doesn't fit the box.
+            The bent key doesn’t fit the box.
             """)
 
         // Assert No State Change
@@ -348,7 +348,7 @@ extension LockActionHandlerTests {
         }
 
         // Pronoun "it" is set to the target item
-        // Assuming "it" wasn't already referring to targetItemID or was nil.
+        // Assuming "it" wasn’t already referring to targetItemID or was nil.
         changes.append(
             StateChange(
                 entityID: .global,

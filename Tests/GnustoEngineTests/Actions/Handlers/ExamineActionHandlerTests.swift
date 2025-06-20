@@ -148,7 +148,7 @@ struct ExamineActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > examine hidden gem
-            You can't see any such thing.
+            You can’t see any such thing.
             """)
 
         #expect(await engine.gameState.changeHistory.isEmpty)
@@ -188,7 +188,7 @@ struct ExamineActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > examine hidden gem
-            You can't see the hidden gem.
+            You can’t see the hidden gem.
             """)
 
         #expect(await engine.gameState.changeHistory.isEmpty)
@@ -207,7 +207,7 @@ struct ExamineActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > examine ghost
-            You can't see any such thing.
+            You can’t see any such thing.
             """)
 
         #expect(await engine.gameState.changeHistory.isEmpty)

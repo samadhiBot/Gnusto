@@ -151,7 +151,7 @@ struct UnlockActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > unlock box with key
-            You aren't holding the key.
+            You aren’t holding the key.
             """)
 
         // Assert No State Change
@@ -197,7 +197,7 @@ struct UnlockActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > unlock box with key
-            You can't see any such thing.
+            You can’t see any such thing.
             """)
 
         // Assert No State Change
@@ -227,7 +227,7 @@ struct UnlockActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > unlock pebble with key
-            You can't unlock the pebble.
+            You can’t unlock the pebble.
             """)
 
         // Assert No State Change
@@ -262,7 +262,7 @@ struct UnlockActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > unlock box with bent key
-            The bent key doesn't fit the box.
+            The bent key doesn’t fit the box.
             """)
 
         // Assert No State Change

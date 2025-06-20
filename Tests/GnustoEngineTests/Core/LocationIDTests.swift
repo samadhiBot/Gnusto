@@ -275,7 +275,7 @@ struct LocationIDTests {
     func testStringInterpolation() throws {
         let id: LocationID = "kitchen"
         let message = "You are in the \(id)."
-        // LocationID doesn't implement CustomStringConvertible, so it shows the full struct representation
+        // LocationID doesn’t implement CustomStringConvertible, so it shows the full struct representation
         #expect(message == "You are in the .kitchen.")
     }
 

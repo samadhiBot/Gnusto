@@ -115,7 +115,7 @@ struct ContextIDTests {
         // (exact order depends on ASCII values)
         let sorted = [context1, context2, context3].sorted()
         
-        // Verify sorting doesn't crash and produces consistent results
+        // Verify sorting doesn’t crash and produces consistent results
         #expect(sorted.count == 3)
         #expect(sorted[0] < sorted[1])
         #expect(sorted[1] < sorted[2])
@@ -294,7 +294,7 @@ struct ContextIDTests {
     
     @Test("ContextID memory efficiency")
     func testMemoryEfficiency() {
-        // Test that ContextID doesn't add significant overhead
+        // Test that ContextID doesn’t add significant overhead
         let context1: ContextID = "test"
         let context2 = ContextID("test")
         

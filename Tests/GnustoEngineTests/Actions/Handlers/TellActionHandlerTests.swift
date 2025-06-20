@@ -56,7 +56,7 @@ struct TellActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > tell rock about rock
-            You can't tell the rock about anything.
+            You can’t tell the rock about anything.
             """)
     }
 
@@ -153,7 +153,7 @@ struct TellActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > tell wizard about wizard
-            You can't see any wizard here.
+            You can’t see any wizard here.
             """)
     }
 }

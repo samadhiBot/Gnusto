@@ -32,7 +32,7 @@ struct AttackActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > attack nonexistent
-            You can't see any nonexistent here.
+            You can’t see any nonexistent here.
             """)
     }
 
@@ -55,7 +55,7 @@ struct AttackActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > attack distant goblin
-            You can't see any distant goblin here.
+            You can’t see any distant goblin here.
             """)
     }
 
@@ -85,7 +85,7 @@ struct AttackActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > attack goblin with sword
-            You don't have the sword.
+            You don’t have the sword.
             """)
     }
 
@@ -163,7 +163,7 @@ struct AttackActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > attack goblin with sword
-            Let's hope it doesn't come to that.
+            Let's hope it doesn’t come to that.
             """)
     }
 
@@ -194,7 +194,7 @@ struct AttackActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > attack goblin with feather
-            You can't attack anything with the feather.
+            You can’t attack anything with the feather.
             """)
     }
 }

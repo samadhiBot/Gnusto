@@ -28,7 +28,7 @@ struct MoveActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > move leaves
-            Moving the pile of leaves doesn't accomplish anything.
+            Moving the pile of leaves doesn’t accomplish anything.
             """)
     }
 
@@ -44,7 +44,7 @@ struct MoveActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > move leaves
-            You can't see any pile of leaves here.
+            You can’t see any pile of leaves here.
             """)
     }
 
@@ -67,7 +67,7 @@ struct MoveActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > move leaves
-            You can't see any pile of leaves here.
+            You can’t see any pile of leaves here.
             """)
     }
 
@@ -109,7 +109,7 @@ struct MoveActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > move key
-            Moving the brass key doesn't accomplish anything.
+            Moving the brass key doesn’t accomplish anything.
             """)
     }
 
@@ -142,7 +142,7 @@ struct MoveActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > move key
-            Moving the brass key doesn't accomplish anything.
+            Moving the brass key doesn’t accomplish anything.
             """)
     }
 
@@ -171,7 +171,7 @@ struct MoveActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > move key
-            You can't see any brass key here.
+            You can’t see any brass key here.
             """)
     }
 }

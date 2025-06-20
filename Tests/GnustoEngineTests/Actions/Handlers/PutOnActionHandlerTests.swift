@@ -206,7 +206,7 @@ struct PutOnActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > put book on table
-            You aren't holding the heavy book.
+            You aren’t holding the heavy book.
             """)
 
         // Assert No State Change
@@ -248,7 +248,7 @@ struct PutOnActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > put book on table
-            You can't see any such thing.
+            You can’t see any such thing.
             """)
 
         // Assert No State Change
@@ -280,7 +280,7 @@ struct PutOnActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > put book on box
-            You can't put things on the box.
+            You can’t put things on the box.
             """)
 
         // Assert No State Change
@@ -307,7 +307,7 @@ struct PutOnActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > put table on table
-            You can't put something on itself.
+            You can’t put something on itself.
             """)
 
         // Assert No State Change
@@ -345,7 +345,7 @@ struct PutOnActionHandlerTests {
             """
             > put tray on table
 
-            You can't put the silver tray on the table because the table is
+            You can’t put the silver tray on the table because the table is
             on the silver tray.
             """)
 
