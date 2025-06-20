@@ -180,7 +180,11 @@ public struct StandardParser: Parser {
         if allPotentialRules.isEmpty && significantTokens.count > verbTokenCount {
             // Provide a generic error based on the *first* matched verb ID (arbitrary choice in ambiguity)
             let firstMatchedID = matchedVerbIDs.first!
-            return .failure(.badGrammar("I understand the verb '\(firstMatchedID.rawValue)', but not the rest of that sentence."))
+            return .failure(
+                .badGrammar(
+                    "I understand the verb '\(firstMatchedID.rawValue)', but not the rest of that sentence."
+                )
+            )
         }
 
         // 6. Match Tokens Against All Potential Syntax Rules
@@ -276,7 +280,11 @@ public struct StandardParser: Parser {
                  // or no structural matches occurred at all. bestError should ideally have been set.
                  // Provide a generic grammar error based on the *first* matched verb ID (arbitrary choice).
                  let firstMatchedID = matchedVerbIDs.first!
-                 return .failure(.badGrammar("I understood '\(firstMatchedID.rawValue)' but couldn't parse the rest of the sentence with its known grammar rules."))
+                 return .failure(
+                    .badGrammar(
+                        "I understood '\(firstMatchedID.rawValue)' but couldn't parse the rest of the sentence with its known grammar rules."
+                    )
+                 )
              }
         }
     }
@@ -438,7 +446,11 @@ public struct StandardParser: Parser {
                 // happens *after* matchRule returns success.
                 guard isKnownPrep else {
                     let expectedType = expectedPrep ?? "a preposition"
-                    return .failure(.badGrammar("Expected \(expectedType) but found '\(currentToken)'."))
+                    return .failure(
+                        .badGrammar(
+                            "Expected \(expectedType) but found '\(currentToken)'."
+                        )
+                    )
                 }
 
                 // If the rule *does* require a specific preposition, and the current token
@@ -469,20 +481,32 @@ public struct StandardParser: Parser {
                      matchedDirection = direction
                      tokenCursor += 1
                  } else {
-                     return .failure(.badGrammar("Expected a direction (like north, s, up) but found '\(currentToken)'."))
+                     return .failure(
+                        .badGrammar(
+                            "Expected a direction (like north, s, up) but found '\(currentToken)'."
+                        )
+                     )
                  }
 
             case .particle(let expectedParticle):
                 let currentToken = tokens[tokenCursor]
                 guard currentToken == expectedParticle else {
-                    return .failure(.badGrammar("Expected '\(expectedParticle)' after '\(tokens[verbStartIndex])' but found '\(currentToken)'."))
+                    return .failure(
+                        .badGrammar(
+                            "Expected '\(expectedParticle)' after '\(tokens[verbStartIndex])' but found '\(currentToken)'."
+                        )
+                    )
                 }
                 tokenCursor += 1
             }
         }
 
         if tokenCursor < tokens.count {
-            return .failure(.badGrammar("Unexpected words found after command: '\(Array(tokens[tokenCursor...]).joined(separator: " "))'"))
+            return .failure(
+                .badGrammar(
+                    "Unexpected words found after command: '\(Array(tokens[tokenCursor...]).joined(separator: " "))'"
+                )
+            )
         }
 
         // Parse multiple noun phrases connected by conjunctions
@@ -504,7 +528,11 @@ public struct StandardParser: Parser {
                 if directObjectPhrases.count > 1 && rule.directObjectConditions.contains(.allowsMultiple) {
                     isMultipleObjectsDO = true
                 } else if directObjectPhrases.count > 1 {
-                    return .failure(.badGrammar("The verb '\(verb)' doesn't support multiple objects."))
+                    return .failure(
+                        .badGrammar(
+                            "The verb '\(verb)' doesn't support multiple objects."
+                        )
+                    )
                 }
 
                 // Process each noun phrase
@@ -567,7 +595,11 @@ public struct StandardParser: Parser {
             if indirectObjectPhrases.count > 1 && rule.indirectObjectConditions.contains(.allowsMultiple) {
                 isMultipleObjectsIO = true
             } else if indirectObjectPhrases.count > 1 {
-                return .failure(.badGrammar("The verb '\(verb)' doesn't support multiple indirect objects."))
+                return .failure(
+                    .badGrammar(
+                        "The verb '\(verb)' doesn't support multiple indirect objects."
+                    )
+                )
             }
 
             // Process each noun phrase
@@ -748,10 +780,12 @@ public struct StandardParser: Parser {
         if playerAliases.contains(lowercasedNoun) {
             guard modifiers.isEmpty else {
                 return .failure(
-                    .badGrammar("""
+                    .badGrammar(
+                        """
                         Player reference '\(lowercasedNoun)' cannot be modified by \
                         '\(modifiers.joined(separator: " "))'.
-                        """)
+                        """
+                    )
                 )
             }
             return .success(.player)
@@ -1019,11 +1053,23 @@ public struct StandardParser: Parser {
             if modifiers.isEmpty {
                 switch verb {
                 case .take:
-                    return .failure(.badGrammar("There is nothing here to take."))
+                    return .failure(
+                        .badGrammar(
+                            "There is nothing here to take."
+                        )
+                    )
                 case .drop:
-                    return .failure(.badGrammar("You aren't carrying anything."))
+                    return .failure(
+                        .badGrammar(
+                            "You aren't carrying anything."
+                        )
+                    )
                 default:
-                    return .failure(.badGrammar("There is nothing here."))
+                    return .failure(
+                        .badGrammar(
+                            "There is nothing here."
+                        )
+                    )
                 }
             } else {
                 return .failure(.modifierMismatch(noun: "all", modifiers: modifiers))

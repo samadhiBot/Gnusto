@@ -176,7 +176,7 @@ public struct Vocabulary: Codable, Equatable, Sendable {
                 SyntaxRule(
                     pattern: [.verb, .preposition, .directObject],
                     requiredPreposition: "through"
-                )
+                ),
             ],
             requiresLight: false
         ),
@@ -196,7 +196,7 @@ public struct Vocabulary: Codable, Equatable, Sendable {
                 SyntaxRule(
                     pattern: [.verb, .preposition, .directObject],
                     requiredPreposition: "on"
-                )
+                ),
             ],
             requiresLight: true
         ),
@@ -316,7 +316,7 @@ public struct Vocabulary: Codable, Equatable, Sendable {
                     pattern: [.verb, .directObject, .preposition, .indirectObject],
                     directObjectConditions: .allowsMultiple,
                     requiredPreposition: "to"
-                )
+                ),
             ],
             requiresLight: true
         ),
@@ -328,7 +328,7 @@ public struct Vocabulary: Codable, Equatable, Sendable {
                 SyntaxRule(
                     pattern: [.verb, .directObject],
                     directObjectConditions: .allowsMultiple
-                )
+                ),
             ],
             requiresLight: true
         ),
@@ -367,7 +367,7 @@ public struct Vocabulary: Codable, Equatable, Sendable {
                 SyntaxRule(
                     pattern: [.verb, .directObject],
                     directObjectConditions: .allowsMultiple
-                )
+                ),
             ],
             requiresLight: false
         ),
@@ -393,7 +393,7 @@ public struct Vocabulary: Codable, Equatable, Sendable {
             synonyms: "sniff",
             syntax: [
                 SyntaxRule(.verb),
-                SyntaxRule(.verb, .directObject)
+                SyntaxRule(.verb, .directObject),
             ],
             requiresLight: false
         ),
@@ -402,7 +402,7 @@ public struct Vocabulary: Codable, Equatable, Sendable {
             id: .listen,
             syntax: [
                 SyntaxRule(.verb),
-                SyntaxRule(.verb, .particle("to"), .directObject)
+                SyntaxRule(.verb, .particle("to"), .directObject),
             ],
             requiresLight: false
         ),
@@ -480,7 +480,7 @@ public struct Vocabulary: Codable, Equatable, Sendable {
                 SyntaxRule(
                     pattern: [.verb, .directObject],
                     directObjectConditions: .allowsMultiple
-                )
+                ),
             ],
             requiresLight: true
         ),
@@ -511,7 +511,7 @@ public struct Vocabulary: Codable, Equatable, Sendable {
                 SyntaxRule(
                     pattern: [.verb, .preposition, .directObject],
                     requiredPreposition: "under"
-                )
+                ),
             ],
             requiresLight: true
         ),
@@ -531,7 +531,7 @@ public struct Vocabulary: Codable, Equatable, Sendable {
                 SyntaxRule(
                     pattern: [.verb, .preposition, .directObject],
                     requiredPreposition: "with"
-                )
+                ),
             ],
             requiresLight: true
         ),
@@ -541,7 +541,7 @@ public struct Vocabulary: Codable, Equatable, Sendable {
             synonyms: "scale",
             syntax: [
                 SyntaxRule(.verb),
-                SyntaxRule(.verb, .directObject)
+                SyntaxRule(.verb, .directObject),
             ],
             requiresLight: true
         ),
@@ -553,7 +553,7 @@ public struct Vocabulary: Codable, Equatable, Sendable {
                 SyntaxRule(
                     pattern: [.verb, .preposition, .directObject],
                     requiredPreposition: "on"
-                )
+                ),
             ],
             requiresLight: true
         ),
@@ -562,7 +562,7 @@ public struct Vocabulary: Codable, Equatable, Sendable {
             id: .find,
             synonyms: "locate", "search for",
             syntax: [
-                SyntaxRule(.verb, .directObject)
+                SyntaxRule(.verb, .directObject),
             ],
             requiresLight: false
         ),
@@ -571,7 +571,7 @@ public struct Vocabulary: Codable, Equatable, Sendable {
             id: .burn,
             synonyms: "ignite", "set fire to",
             syntax: [
-                SyntaxRule(.verb, .directObject)
+                SyntaxRule(.verb, .directObject),
             ],
             requiresLight: true
         ),
@@ -593,7 +593,10 @@ public struct Vocabulary: Codable, Equatable, Sendable {
 
         Verb(
             id: .breathe,
-            syntax: [SyntaxRule(.verb)],
+            syntax: [
+                SyntaxRule(.verb),
+                SyntaxRule(.verb, .directObject),
+            ],
             requiresLight: false
         ),
 
@@ -605,7 +608,7 @@ public struct Vocabulary: Codable, Equatable, Sendable {
                 SyntaxRule(
                     pattern: [.verb, .directObject, .preposition, .indirectObject],
                     requiredPreposition: "with"
-                )
+                ),
             ],
             requiresLight: true
         ),
@@ -619,7 +622,7 @@ public struct Vocabulary: Codable, Equatable, Sendable {
                 SyntaxRule(
                     pattern: [.verb, .directObject, .preposition, .indirectObject],
                     requiredPreposition: "with"
-                )
+                ),
             ],
             requiresLight: true
         ),
@@ -628,7 +631,7 @@ public struct Vocabulary: Codable, Equatable, Sendable {
             id: .drink,
             synonyms: "sip", "quaff",
             syntax: [
-                SyntaxRule(.verb, .directObject)
+                SyntaxRule(.verb, .directObject),
             ],
             requiresLight: false
         ),
@@ -637,7 +640,7 @@ public struct Vocabulary: Codable, Equatable, Sendable {
             id: .eat,
             synonyms: "consume", "devour",
             syntax: [
-                SyntaxRule(.verb, .directObject)
+                SyntaxRule(.verb, .directObject),
             ],
             requiresLight: false
         ),
@@ -649,7 +652,7 @@ public struct Vocabulary: Codable, Equatable, Sendable {
                 SyntaxRule(
                     pattern: [.verb, .directObject, .preposition, .indirectObject],
                     requiredPreposition: "with"
-                )
+                ),
             ],
             requiresLight: true
         ),
@@ -657,7 +660,7 @@ public struct Vocabulary: Codable, Equatable, Sendable {
         Verb(
             id: .kick,
             syntax: [
-                SyntaxRule(.verb, .directObject)
+                SyntaxRule(.verb, .directObject),
             ],
             requiresLight: true
         ),
@@ -666,7 +669,7 @@ public struct Vocabulary: Codable, Equatable, Sendable {
             id: .kiss,
             synonyms: "embrace", "hug",
             syntax: [
-                SyntaxRule(.verb, .directObject)
+                SyntaxRule(.verb, .directObject),
             ],
             requiresLight: true
         ),
@@ -676,7 +679,7 @@ public struct Vocabulary: Codable, Equatable, Sendable {
             synonyms: "rap", "tap",
             syntax: [
                 SyntaxRule(.verb),
-                SyntaxRule(.verb, .directObject)
+                SyntaxRule(.verb, .directObject),
             ],
             requiresLight: true
         ),
@@ -688,7 +691,7 @@ public struct Vocabulary: Codable, Equatable, Sendable {
                 SyntaxRule(
                     pattern: [.verb, .directObject, .preposition, .indirectObject],
                     requiredPreposition: "on"
-                )
+                ),
             ],
             requiresLight: true
         ),
@@ -697,7 +700,7 @@ public struct Vocabulary: Codable, Equatable, Sendable {
             id: .rub,
             synonyms: "polish", "clean",
             syntax: [
-                SyntaxRule(.verb, .directObject)
+                SyntaxRule(.verb, .directObject),
             ],
             requiresLight: true
         ),
@@ -706,7 +709,7 @@ public struct Vocabulary: Codable, Equatable, Sendable {
             id: .shake,
             synonyms: "rattle",
             syntax: [
-                SyntaxRule(.verb, .directObject)
+                SyntaxRule(.verb, .directObject),
             ],
             requiresLight: true
         ),
@@ -715,7 +718,7 @@ public struct Vocabulary: Codable, Equatable, Sendable {
             id: .squeeze,
             synonyms: "compress", "press",
             syntax: [
-                SyntaxRule(.verb, .directObject)
+                SyntaxRule(.verb, .directObject),
             ],
             requiresLight: true
         ),
@@ -728,7 +731,7 @@ public struct Vocabulary: Codable, Equatable, Sendable {
                 SyntaxRule(
                     pattern: [.verb, .directObject, .preposition, .indirectObject],
                     requiredPreposition: "at"
-                )
+                ),
             ],
             requiresLight: true
         ),
@@ -741,7 +744,7 @@ public struct Vocabulary: Codable, Equatable, Sendable {
                 SyntaxRule(
                     pattern: [.verb, .directObject, .preposition, .indirectObject],
                     requiredPreposition: "to"
-                )
+                ),
             ],
             requiresLight: true
         ),
@@ -754,7 +757,7 @@ public struct Vocabulary: Codable, Equatable, Sendable {
                 SyntaxRule(
                     pattern: [.verb, .directObject, .preposition, .indirectObject],
                     requiredPreposition: "with"
-                )
+                ),
             ],
             requiresLight: true
         ),
@@ -763,7 +766,7 @@ public struct Vocabulary: Codable, Equatable, Sendable {
             id: .wave,
             synonyms: "brandish",
             syntax: [
-                SyntaxRule(.verb, .directObject)
+                SyntaxRule(.verb, .directObject),
             ],
             requiresLight: true
         ),
@@ -775,7 +778,7 @@ public struct Vocabulary: Codable, Equatable, Sendable {
             synonyms: "get in",
             syntax: [
                 SyntaxRule(.verb),
-                SyntaxRule(.verb, .directObject)
+                SyntaxRule(.verb, .directObject),
             ],
             requiresLight: false
         ),
@@ -785,7 +788,7 @@ public struct Vocabulary: Codable, Equatable, Sendable {
             synonyms: "get out", "leave",
             syntax: [
                 SyntaxRule(.verb),
-                SyntaxRule(.verb, .directObject)
+                SyntaxRule(.verb, .directObject),
             ],
             requiresLight: false
         ),
@@ -795,7 +798,7 @@ public struct Vocabulary: Codable, Equatable, Sendable {
             synonyms: "leap", "hop",
             syntax: [
                 SyntaxRule(.verb),
-                SyntaxRule(.verb, .directObject)
+                SyntaxRule(.verb, .directObject),
             ],
             requiresLight: false
         ),
@@ -805,7 +808,7 @@ public struct Vocabulary: Codable, Equatable, Sendable {
             synonyms: "climb down",
             syntax: [
                 SyntaxRule(.verb),
-                SyntaxRule(.verb, .directObject)
+                SyntaxRule(.verb, .directObject),
             ],
             requiresLight: false
         ),
@@ -815,7 +818,7 @@ public struct Vocabulary: Codable, Equatable, Sendable {
             synonyms: "climb up",
             syntax: [
                 SyntaxRule(.verb),
-                SyntaxRule(.verb, .directObject)
+                SyntaxRule(.verb, .directObject),
             ],
             requiresLight: false
         ),
@@ -825,7 +828,7 @@ public struct Vocabulary: Codable, Equatable, Sendable {
             synonyms: "get off", "climb off",
             syntax: [
                 SyntaxRule(.verb),
-                SyntaxRule(.verb, .directObject)
+                SyntaxRule(.verb, .directObject),
             ],
             requiresLight: false
         ),
@@ -835,7 +838,7 @@ public struct Vocabulary: Codable, Equatable, Sendable {
             synonyms: "get out", "climb out",
             syntax: [
                 SyntaxRule(.verb),
-                SyntaxRule(.verb, .directObject)
+                SyntaxRule(.verb, .directObject),
             ],
             requiresLight: false
         ),
@@ -845,7 +848,7 @@ public struct Vocabulary: Codable, Equatable, Sendable {
             synonyms: "jump off", "leap off",
             syntax: [
                 SyntaxRule(.verb),
-                SyntaxRule(.verb, .directObject)
+                SyntaxRule(.verb, .directObject),
             ],
             requiresLight: false
         ),
@@ -855,7 +858,7 @@ public struct Vocabulary: Codable, Equatable, Sendable {
             synonyms: "jump out", "leap out",
             syntax: [
                 SyntaxRule(.verb),
-                SyntaxRule(.verb, .directObject)
+                SyntaxRule(.verb, .directObject),
             ],
             requiresLight: false
         ),
@@ -865,7 +868,7 @@ public struct Vocabulary: Codable, Equatable, Sendable {
             synonyms: "depart",
             syntax: [
                 SyntaxRule(.verb),
-                SyntaxRule(.verb, .directObject)
+                SyntaxRule(.verb, .directObject),
             ],
             requiresLight: false
         ),
@@ -874,7 +877,7 @@ public struct Vocabulary: Codable, Equatable, Sendable {
             id: .lookDown,
             synonyms: "look down",
             syntax: [
-                SyntaxRule(.verb)
+                SyntaxRule(.verb),
             ],
             requiresLight: true
         ),
@@ -883,7 +886,7 @@ public struct Vocabulary: Codable, Equatable, Sendable {
             id: .lookUp,
             synonyms: "look up",
             syntax: [
-                SyntaxRule(.verb)
+                SyntaxRule(.verb),
             ],
             requiresLight: true
         ),
@@ -892,7 +895,7 @@ public struct Vocabulary: Codable, Equatable, Sendable {
             id: .swim,
             syntax: [
                 SyntaxRule(.verb),
-                SyntaxRule(.verb, .directObject)
+                SyntaxRule(.verb, .directObject),
             ],
             requiresLight: false
         ),
@@ -906,7 +909,7 @@ public struct Vocabulary: Codable, Equatable, Sendable {
                 SyntaxRule(
                     pattern: [.verb, .directObject, .preposition, .indirectObject],
                     requiredPreposition: "about"
-                )
+                ),
             ],
             requiresLight: false
         ),
@@ -919,7 +922,7 @@ public struct Vocabulary: Codable, Equatable, Sendable {
                 SyntaxRule(
                     pattern: [.verb, .directObject, .preposition, .indirectObject],
                     requiredPreposition: "about"
-                )
+                ),
             ],
             requiresLight: false
         ),
@@ -929,7 +932,7 @@ public struct Vocabulary: Codable, Equatable, Sendable {
             synonyms: "breathe on", "blow on",
             syntax: [
                 SyntaxRule(.verb),
-                SyntaxRule(.verb, .directObject)
+                SyntaxRule(.verb, .directObject),
             ],
             requiresLight: false
         ),
@@ -975,7 +978,7 @@ public struct Vocabulary: Codable, Equatable, Sendable {
             synonyms: "bite", "gnaw", "chew",
             syntax: [
                 SyntaxRule(.verb),
-                SyntaxRule(.verb, .directObject)
+                SyntaxRule(.verb, .directObject),
             ],
             requiresLight: false
         ),
@@ -992,7 +995,7 @@ public struct Vocabulary: Codable, Equatable, Sendable {
             synonyms: "swear", "cuss", "damn",
             syntax: [
                 SyntaxRule(.verb),
-                SyntaxRule(.verb, .directObject)
+                SyntaxRule(.verb, .directObject),
             ],
             requiresLight: false
         ),
