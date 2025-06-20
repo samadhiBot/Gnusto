@@ -1,3 +1,5 @@
+import Logging
+
 /// Standard English message provider for the Gnusto Interactive Fiction Engine.
 ///
 /// This implementation provides traditional interactive fiction responses in English,
@@ -36,6 +38,17 @@
 open class MessageProvider: @unchecked Sendable {
     public let languageCode: String
 
+    /// Internal logger for engine messages, warnings, and errors.
+    let logger = Logger(label: "com.samadhibot.Gnusto.MessageProvider")
+
+    /// A random number generator used for response randomization.
+    ///
+    /// This generator is used for determining random events, NPC behaviors, game mechanics,
+    /// and other probabilistic elements. The default implementation uses the system's
+    /// random number generator.
+    ///
+    /// For testing purposes, you can provide a custom implementation that returns
+    /// predetermined values to ensure consistent test results.
     private var randomNumberGenerator: RandomNumberGenerator
 
     public init(
@@ -47,87 +60,108 @@ open class MessageProvider: @unchecked Sendable {
     }
 
     open func actionHandlerInternalError(handler: String, details: String) -> String {
-        "A strange buzzing sound indicates something is wrong with \(handler): \(details)"
+        logWarning("actionHandlerInternalError(handler: '\(handler)', details: '\(details)')")
+        return "A strange buzzing sound indicates something is wrong with '\(handler)': '\(details)'"
     }
 
     open func actionHandlerMissingObjects(handler: String) -> String {
-        "A strange buzzing sound indicates something is wrong with \(handler)."
+        logWarning("actionHandlerMissingObjects(handler: '\(handler)')")
+        return "A strange buzzing sound indicates something is wrong with \(handler)."
     }
 
     open func alreadyHeld(item: String) -> String {
-        "You already have \(item)."
+        log("alreadyHeld(item: '\(item)')")
+        return "You already have \(item)."
     }
 
     open func alreadyLocked(item: String) -> String {
-        "\(item.capitalizedFirst) is already locked."
+        log("alreadyLocked(item: '\(item)')")
+        return "\(item.capitalizedFirst) is already locked."
     }
 
     open func alreadyOff() -> String {
-        "It's already off."
+        log("alreadyOff()")
+        return "It's already off."
     }
 
     open func alreadyOn() -> String {
-        "It's already on."
+        log("alreadyOn()")
+        return "It's already on."
     }
 
     open func ambiguity(text: String) -> String {
-        text
+        log("ambiguity(text: '\(text)')")
+        return text
     }
 
     open func ambiguousPronounReference(text: String) -> String {
-        text
+        log("ambiguousPronounReference(text: '\(text)')")
+        return text
     }
 
     open func askAboutWhat() -> String {
-        "Ask about what?"
+        log("askAboutWhat()")
+        return "Ask about what?"
     }
 
     open func askWhom() -> String {
-        "Ask whom?"
+        log("askWhom()")
+        return "Ask whom?"
     }
 
     open func attackNonCharacter(item: String) -> String {
-        "I've known strange people, but fighting \(item)?"
+        log("attackNonCharacter(item: '\(item)')")
+        return "I've known strange people, but fighting \(item)?"
     }
 
     open func attackWhat() -> String {
-        "Attack what?"
+        log("attackWhat()")
+        return "Attack what?"
     }
 
     open func attackWithBareHands(character: String) -> String {
-        "Trying to attack \(character) with your bare hands is suicidal."
+        log("attackWithBareHands(character: '\(character)')")
+        return "Trying to attack \(character) with your bare hands is suicidal."
     }
 
     open func attackWithNonWeapon(character: String, weapon: String) -> String {
-        "Trying to attack \(character) with \(weapon) is suicidal."
+        log("attackWithNonWeapon(character: '\(character)', weapon: '\(weapon)')")
+        return "Trying to attack \(character) with \(weapon) is suicidal."
     }
 
     open func attackWithWeapon() -> String {
-        "Let's hope it doesn't come to that."
+        log("attackWithWeapon()")
+        return "Let's hope it doesn't come to that."
     }
 
     open func badGrammar(text: String) -> String {
-        text
+        log("badGrammar(text: '\(text)')")
+        return text
     }
 
     open func blowGeneral() -> String {
-        "You blow the air around, but nothing interesting happens."
+        log("blowGeneral()")
+        return "You blow the air around, but nothing interesting happens."
     }
 
     open func blowOnFlammable(item: String) -> String {
-        "Blowing on \(item) has no effect."
+        log("blowOnFlammable(item: '\(item)')")
+        return "Blowing on \(item) has no effect."
     }
 
     open func blowOnGeneric(item: String) -> String {
-        "You blow on \(item), but nothing interesting happens."
+        log("blowOnGeneric(item: '\(item)')")
+        return "You blow on \(item), but nothing interesting happens."
     }
 
     open func blowOnLightSource(item: String) -> String {
-        "You blow on \(item), but it doesn't go out."
+        log("blowOnLightSource(item: '\(item)')")
+        return "You blow on \(item), but it doesn't go out."
     }
 
     open func breatheResponse() -> String {
-        oneOf(
+        log("breatheResponse()")
+        return oneOf(
             "You breathe thoughtfully, pondering the miracle of atmospheric composition.",
             "You inhale deeply, briefly grateful for the invention of oxygen.",
             "You take a breath, marveling at your lungs' stubborn refusal to give up.",
@@ -144,135 +178,168 @@ open class MessageProvider: @unchecked Sendable {
     }
 
     open func burnCannotBurn(item: String) -> String {
-        "You can't burn \(item)."
+        log("burnCannotBurn(item: '\(item)')")
+        return "You can't burn \(item)."
     }
 
     open func burnToCatchFire(item: String) -> String {
-        "\(item.capitalizedFirst) catches fire and burns to ashes."
+        log("burnToCatchFire(item: '\(item)')")
+        return "\(item.capitalizedFirst) catches fire and burns to ashes."
     }
 
     open func burnWhat() -> String {
-        "Burn what?"
+        log("burnWhat()")
+        return "Burn what?"
     }
 
     open func cannotActOnThat(verb: String) -> String {
-        "You can't \(verb) that."
+        log("cannotActOnThat(verb: '\(verb)')")
+        return "You can't \(verb) that."
     }
 
     open func cannotActWithThat(verb: String) -> String {
-        "You can't \(verb) with that."
+        log("cannotActWithThat(verb: '\(verb)')")
+        return "You can't \(verb) with that."
     }
 
     open func cannotAskAboutThat(item: String) -> String {
-        "You can't ask \(item) about that."
+        log("cannotAskAboutThat(item: '\(item)')")
+        return "You can't ask \(item) about that."
     }
 
     open func cannotDeflate(item: String) -> String {
-        "You can't deflate \(item)."
+        log("cannotDeflate(item: '\(item)')")
+        return "You can't deflate \(item)."
     }
 
     open func cannotDig(item: String) -> String {
-        "You can't dig \(item)."
+        log("cannotDig(item: '\(item)')")
+        return "You can't dig \(item)."
     }
 
     open func cannotDrink(item: String) -> String {
-        "You can't drink \(item)."
+        log("cannotDrink(item: '\(item)')")
+        return "You can't drink \(item)."
     }
 
     open func cannotDrinkFromClosed(container: String) -> String {
-        "You can't drink \(container)."
+        log("cannotDrinkFromClosed(container: \(container))")
+        return "You can't drink \(container)."
     }
 
     open func cannotEat(item: String) -> String {
-        "You can't eat \(item)."
+        log("cannotEat(item: '\(item)')")
+        return "You can't eat \(item)."
     }
 
     open func cannotEatFromClosed(container: String) -> String {
-        "You can't eat from \(container)."
+        log("cannotEatFromClosed(container: \(container))")
+        return "You can't eat from \(container)."
     }
 
     open func cannotEnter(item: String) -> String {
-        "You can't enter \(item)."
+        log("cannotEnter(item: '\(item)')")
+        return "You can't enter \(item)."
     }
 
     open func cannotFillFrom() -> String {
-        "You can't fill from that."
+        log("cannotFillFrom()")
+        return "You can't fill from that."
     }
 
     open func cannotInflate(item: String) -> String {
-        "You can't inflate \(item)."
+        log("cannotInflate(item: '\(item)')")
+        return "You can't inflate \(item)."
     }
 
     open func cannotPress(item: String) -> String {
-        "You can't press \(item)."
+        log("cannotPress(item: '\(item)')")
+        return "You can't press \(item)."
     }
 
     open func cannotPull(item: String) -> String {
-        "You can't pull \(item)."
+        log("cannotPull(item: '\(item)')")
+        return "You can't pull \(item)."
     }
 
     open func cannotSmellThat() -> String {
-        "You can't smell that."
+        log("cannotSmellThat()")
+        return "You can't smell that."
     }
 
     open func cannotThrowYourself() -> String {
-        "You can't throw yourself."
+        log("cannotThrowYourself()")
+        return "You can't throw yourself."
     }
 
     open func cannotTurnOff() -> String {
-        "You can't turn that off."
+        log("cannotTurnOff()")
+        return "You can't turn that off."
     }
 
     open func cannotTurnOn() -> String {
-        "You can't turn that on."
+        log("cannotTurnOn()")
+        return "You can't turn that on."
     }
 
     open func canOnlyActOnCharacters(verb: String) -> String {
-        "You can only \(verb) other characters."
+        log("canOnlyActOnCharacters(verb: '\(verb)')")
+        return "You can only \(verb) other characters."
     }
 
     open func canOnlyActOnItems(verb: String) -> String {
-        "You can only \(verb) items."
+        log("canOnlyActOnItems(verb: '\(verb)')")
+        return "You can only \(verb) items."
     }
 
     open func canOnlyDrinkLiquids() -> String {
-        "You can only drink liquids."
+        log("canOnlyDrinkLiquids()")
+        return "You can only drink liquids."
     }
 
     open func canOnlyEatFood() -> String {
-        "You can only eat food."
+        log("canOnlyEatFood()")
+        return "You can only eat food."
     }
 
     open func canOnlyEmptyContainers() -> String {
-        "You can only empty containers."
+        log("canOnlyEmptyContainers()")
+        return "You can only empty containers."
     }
 
     open func canOnlyLookAtItems() -> String {
-        "You can only look at items this way."
+        log("canOnlyLookAtItems()")
+        return "You can only look at items this way."
     }
 
     open func canOnlyLookInsideItems() -> String {
-        "You can only look inside items."
+        log("canOnlyLookInsideItems()")
+        return "You can only look inside items."
     }
 
     open func canOnlyUseItemAsKey() -> String {
-        "You can only use an item as a key."
+        log("canOnlyUseItemAsKey()")
+        return "You can only use an item as a key."
     }
 
     open func chompContainer() -> String {
-        "You'd probably break your teeth on that."
+        log("chompContainer()")
+        return "You'd probably break your teeth on that."
     }
 
     open func chompEdible(item: String) -> String {
-        "You take a bite. It tastes like \(item)."
+        log("chompEdible(item: '\(item)')")
+        return "You take a bite. It tastes like \(item)."
     }
 
     open func chompPerson() -> String {
-        "That would be rude, not to mention dangerous."
+        log("chompPerson()")
+        return "That would be rude, not to mention dangerous."
     }
 
     open func chompResponse() -> String {
-        oneOf(
+        log("chompResponse()")
+        return oneOf(
             "You chomp your teeth together menacingly.",
             "You clench your fists and gnash your teeth.",
             "You chomp at the air for everyone to see.",
@@ -283,7 +350,8 @@ open class MessageProvider: @unchecked Sendable {
     }
 
     open func chompTargetResponse(item: String) -> String {
-        oneOf(
+        log("chompTargetResponse(item: '\(item)')")
+        return oneOf(
             "You give \(item) a tentative nibble. It tastes terrible.",
             "You chomp on \(item) experimentally. Not very satisfying.",
             "You bite \(item). Your teeth don't make much of an impression.",
@@ -293,55 +361,68 @@ open class MessageProvider: @unchecked Sendable {
     }
 
     open func chompWeapon() -> String {
-        "That seems like a good way to hurt yourself."
+        log("chompWeapon()")
+        return "That seems like a good way to hurt yourself."
     }
 
     open func chompWearable() -> String {
-        "Chewing on clothing is not recommended for your dental health."
+        log("chompWearable()")
+        return "Chewing on clothing is not recommended for your dental health."
     }
 
     open func climbFailure(item: String) -> String {
-        "You can't climb \(item)."
+        log("climbFailure(item: '\(item)')")
+        return "You can't climb \(item)."
     }
 
     open func climbOnFailure(item: String) -> String {
-        "You can't climb on \(item)."
+        log("climbOnFailure(item: '\(item)')")
+        return "You can't climb on \(item)."
     }
 
     open func climbOnWhat() -> String {
-        "Climb on what?"
+        log("climbOnWhat()")
+        return "Climb on what?"
     }
 
     open func climbSuccess(item: String) -> String {
-        "You climb \(item)."
+        log("climbSuccess(item: '\(item)')")
+        return "You climb \(item)."
     }
 
     open func climbWhat() -> String {
-        "Climb what?"
+        log("climbWhat()")
+        return "Climb what?"
     }
 
     open func closed() -> String {
-        "Closed."
+        log("closed()")
+        return "Closed."
     }
 
     open func closedItem(item: String) -> String {
-        "You close \(item)."
+        log("closedItem(item: '\(item)')")
+        return "You close \(item)."
     }
 
     open func containerAlreadyEmpty(container: String) -> String {
-        "\(container.capitalizedFirst) is already empty."
+        log("containerAlreadyEmpty(container: \(container))")
+        return "\(container.capitalizedFirst) is already empty."
     }
 
     open func containerIsClosed(item: String) -> String {
-        "\(item.capitalizedFirst) is closed."
+        log("containerIsClosed(item: '\(item)')")
+        return "\(item.capitalizedFirst) is closed."
     }
 
     open func containerIsOpen(item: String) -> String {
-        "\(item.capitalizedFirst) is already open."
+        log("containerIsOpen(item: '\(item)')")
+        return "\(item.capitalizedFirst) is already open."
     }
 
     open func cryResponse() -> String {
-        oneOf(
+        log("cryResponse()")
+        return oneOf(
             "You shed a tear for the futility of it all.",
             "You weep quietly to yourself.",
             "You sob dramatically, and feel a little better.",
@@ -356,11 +437,13 @@ open class MessageProvider: @unchecked Sendable {
     }
 
     open func currentScore(score: Int, moves: Int) -> String {
-        "Your score is \(score) in \(moves) moves."
+        log("currentScore(score: \(score), moves: \(moves))")
+        return "Your score is \(score) in \(moves) moves."
     }
 
     open func curseResponse() -> String {
-        oneOf(
+        log("curseResponse()")
+        return oneOf(
             "You curse under your breath.",
             "You let out a string of colorful expletives.",
             "You swear like a sailor. Very cathartic.",
@@ -373,7 +456,8 @@ open class MessageProvider: @unchecked Sendable {
     }
 
     open func curseTargetResponse(item: String) -> String {
-        oneOf(
+        log("curseTargetResponse(item: '\(item)')")
+        return oneOf(
             "You curse \(item) roundly. You feel a bit better.",
             "You let loose a string of expletives at \(item).",
             "You damn \(item) to the seven hells.",
@@ -383,31 +467,38 @@ open class MessageProvider: @unchecked Sendable {
     }
 
     open func custom(message: String) -> String {
-        message
+        log("custom(message: '\(message)')")
+        return message
     }
 
     open func cutNoSuitableTool() -> String {
-        "You have no suitable cutting tool."
+        log("cutNoSuitableTool()")
+        return "You have no suitable cutting tool."
     }
 
     open func cutToolNotSharp(tool: String) -> String {
-        "\(tool.capitalizedFirst) isn't sharp enough to cut anything."
+        log("cutToolNotSharp(tool: '\(tool)')")
+        return "\(tool.capitalizedFirst) isn't sharp enough to cut anything."
     }
 
     open func cutWhat() -> String {
-        "Cut what?"
+        log("cutWhat()")
+        return "Cut what?"
     }
 
     open func cutWithAutoTool(item: String, tool: String) -> String {
-        "You cut \(item) with \(tool)."
+        log("cutWithAutoTool(item: '\(item)', tool: '\(tool)')")
+        return "You cut \(item) with \(tool)."
     }
 
     open func cutWithTool(item: String, tool: String) -> String {
-        "You cut \(item) with \(tool)."
+        log("cutWithTool(item: '\(item)', tool: '\(tool)')")
+        return "You cut \(item) with \(tool)."
     }
 
     open func danceResponse() -> String {
-        oneOf(
+        log("danceResponse()")
+        return oneOf(
             "Dancing is forbidden.",
             "You dance an adorable little jig.",
             "You boogie down with surprising grace.",
@@ -423,115 +514,143 @@ open class MessageProvider: @unchecked Sendable {
     }
 
     open func debugRequiresObject() -> String {
-        "DEBUG requires a direct object to examine."
+        log("debugRequiresObject()")
+        return "DEBUG requires a direct object to examine."
     }
 
     open func deflateSuccess(item: String) -> String {
-        "You deflate \(item)."
+        log("deflateSuccess(item: '\(item)')")
+        return "You deflate \(item)."
     }
 
     open func deflateWhat() -> String {
-        "Deflate what?"
+        log("deflateWhat()")
+        return "Deflate what?"
     }
 
     open func diggingBareHandsIneffective() -> String {
-        "Digging with your bare hands is ineffective."
+        log("diggingBareHandsIneffective()")
+        return "Digging with your bare hands is ineffective."
     }
 
     open func digWhat() -> String {
-        "Dig what?"
+        log("digWhat()")
+        return "Dig what?"
     }
 
     open func digWithToolNothing(tool: String) -> String {
-        "You dig with \(tool), but find nothing of interest."
+        log("digWithToolNothing(tool: '\(tool)')")
+        return "You dig with '\(tool)', but find nothing of interest."
     }
 
     open func directionIsBlocked(reason: String?) -> String {
-        reason ?? "Something is blocking the way."
+        log("\(reason ?? "Something is blocking the way.")")
+        return reason ?? "Something is blocking the way."
     }
 
     open func doorIsClosed(door: String) -> String {
-        "\(door.capitalizedFirst) door is closed."
+        log("doorIsClosed(door: '\(door)')")
+        return "\(door.capitalizedFirst) door is closed."
     }
 
     open func doorIsLocked(door: String) -> String {
-        "\(door.capitalizedFirst) is locked."
+        log("doorIsLocked(door: '\(door)')")
+        return "\(door.capitalizedFirst) is locked."
     }
 
     open func drinkFromContainer(liquid: String, container: String) -> String {
-        "You drink \(liquid) from \(container). Refreshing!"
+        log("drinkFromContainer(liquid: '\(liquid)', container: \(container))")
+        return "You drink \(liquid) from \(container). Refreshing!"
     }
 
     open func drinkSuccess(item: String) -> String {
-        "You drink \(item). It's quite refreshing."
+        log("drinkSuccess(item: '\(item)')")
+        return "You drink \(item). It's quite refreshing."
     }
 
     open func drinkWhat() -> String {
-        "Drink what?"
+        log("drinkWhat()")
+        return "Drink what?"
     }
 
     open func dropped() -> String {
-        "Dropped."
+        log("dropped()")
+        return "Dropped."
     }
 
     open func droppedItem(item: String) -> String {
-        "You drop \(item)."
+        log("droppedItem(item: '\(item)')")
+        return "You drop \(item)."
     }
 
     open func eatFromContainer(food: String, container: String) -> String {
-        "You eat \(food) from \(container). Delicious!"
+        log("eatFromContainer(food: '\(food)', container: \(container))")
+        return "You eat \(food) from \(container). Delicious!"
     }
 
     open func eatSuccess(item: String) -> String {
-        "You eat \(item). It's quite satisfying."
+        log("eatSuccess(item: '\(item)')")
+        return "You eat \(item). It's quite satisfying."
     }
 
     open func eatWhat() -> String {
-        "Eat what?"
+        log("eatWhat()")
+        return "Eat what?"
     }
 
     open func emptyInput() -> String {
-        "I beg your pardon?"
+        log("emptyInput()")
+        return "I beg your pardon?"
     }
 
     open func emptySuccess(container: String, items: String, count: Int) -> String {
-        "You empty \(container), and \(items) \(count == 1 ? "falls" : "fall") to the ground."
+        log("emptySuccess(container: \(container), items: '\(items)', count: \(count))")
+        return "You empty \(container), and \(items) \(count == 1 ? "falls" : "fall") to the ground."
     }
 
     open func emptyWhat() -> String {
-        "Empty what?"
+        log("emptyWhat()")
+        return "Empty what?"
     }
 
     open func examineWhat() -> String {
-        "Examine what?"
+        log("examineWhat()")
+        return "Examine what?"
     }
 
     open func examineYourself() -> String {
-        "You are your usual self."
+        log("examineYourself()")
+        return "You are your usual self."
     }
 
     open func fillSuccess(container: String, source: String) -> String {
-        "You fill \(container) from \(source)."
+        log("fillSuccess(container: \(container), source: '\(source)')")
+        return "You fill \(container) from \(source)."
     }
 
     open func fillWhat() -> String {
-        "Fill what?"
+        log("fillWhat()")
+        return "Fill what?"
     }
 
     open func findWhat() -> String {
-        "Find what?"
+        log("findWhat()")
+        return "Find what?"
     }
 
     open func gameRestored() -> String {
-        "Game restored."
+        log("gameRestored()")
+        return "Game restored."
     }
 
     open func gameSaved() -> String {
-        "Game saved."
+        log("gameSaved()")
+        return "Game saved."
     }
 
     open func giggleResponse() -> String {
-        oneOf(
+        log("giggleResponse()")
+        return oneOf(
             "You giggle softly to yourself.",
             "You chuckle with amusement.",
             "You snicker quietly. How mischievous!",
@@ -546,179 +665,223 @@ open class MessageProvider: @unchecked Sendable {
     }
 
     open func giveToWhom() -> String {
-        "Give to whom?"
+        log("giveToWhom()")
+        return "Give to whom?"
     }
 
     open func giveWhat() -> String {
-        "Give what?"
+        log("giveWhat()")
+        return "Give what?"
     }
 
     open func goodbye() -> String {
-        "Goodbye!"
+        log("goodbye()")
+        return "Goodbye!"
     }
 
     open func goWhere() -> String {
-        "Go where?"
+        log("goWhere()")
+        return "Go where?"
     }
 
     open func inflateSuccess(item: String) -> String {
-        "You inflate \(item)."
+        log("inflateSuccess(item: '\(item)')")
+        return "You inflate \(item)."
     }
 
     open func inflateWhat() -> String {
-        "Inflate what?"
+        log("inflateWhat()")
+        return "Inflate what?"
     }
 
     open func insertHaveNothingToPut(container: String) -> String {
-        "You have nothing to put in \(container)."
+        log("insertHaveNothingToPut(container: \(container))")
+        return "You have nothing to put in \(container)."
     }
 
     open func insertIntoWhat() -> String {
-        "Insert into what?"
+        log("insertIntoWhat()")
+        return "Insert into what?"
     }
 
     open func insertWhat() -> String {
-        "Insert what?"
+        log("insertWhat()")
+        return "Insert what?"
     }
 
     open func insertWhere(item: String) -> String {
-        "Where do you want to insert \(item)?"
+        log("insertWhere(item: '\(item)')")
+        return "Where do you want to insert \(item)?"
     }
 
     open func internalEngineError() -> String {
-        "A strange buzzing sound indicates something is wrong."
+        logError("internalEngineError()")
+        return "A strange buzzing sound indicates something is wrong."
     }
 
     open func internalParseError() -> String {
-        "A strange buzzing sound indicates something is wrong."
+        logError("internalParseError()")
+        return "A strange buzzing sound indicates something is wrong."
     }
 
     open func invalidDirection() -> String {
-        "You can't go that way."
+        log("invalidDirection()")
+        return "You can't go that way."
     }
 
     open func invalidIndirectObject(object: String) -> String {
-        "You can't use \(object) for that."
+        log("invalidIndirectObject(object: '\(object)')")
+        return "You can't use \(object) for that."
     }
 
     open func itemAlreadyClosed(item: String) -> String {
-        "\(item.capitalizedFirst) is already closed."
+        log("itemAlreadyClosed(item: '\(item)')")
+        return "\(item.capitalizedFirst) is already closed."
     }
 
     open func itemAlreadyInflated(item: String) -> String {
-        "\(item.capitalizedFirst) is already inflated."
+        log("itemAlreadyInflated(item: '\(item)')")
+        return "\(item.capitalizedFirst) is already inflated."
     }
 
     open func itemAlreadyOpen(item: String) -> String {
-        "\(item.capitalizedFirst) is already open."
+        log("itemAlreadyOpen(item: '\(item)')")
+        return "\(item.capitalizedFirst) is already open."
     }
 
     open func itemGivenTo(item: String, recipient: String) -> String {
-        "You give \(item) to \(recipient)."
+        log("itemGivenTo(item: '\(item)', recipient: '\(recipient)')")
+        return "You give \(item) to \(recipient)."
     }
 
     open func itemInsertedInto(item: String, container: String) -> String {
-        "You put \(item) into \(container)."
+        log("itemInsertedInto(item: '\(item)', container: \(container))")
+        return "You put \(item) into \(container)."
     }
 
     open func itemIsAlreadyWorn(item: String) -> String {
-        "You are already wearing \(item)."
+        log("itemIsAlreadyWorn(item: '\(item)')")
+        return "You are already wearing \(item)."
     }
 
     open func itemIsLocked(item: String) -> String {
-        "\(item.capitalizedFirst) is locked."
+        log("itemIsLocked(item: '\(item)')")
+        return "\(item.capitalizedFirst) is locked."
     }
 
     open func itemIsNotWorn(item: String) -> String {
-        "You are not wearing \(item)."
+        log("itemIsNotWorn(item: '\(item)')")
+        return "You are not wearing \(item)."
     }
 
     open func itemIsUnlocked(item: String) -> String {
-        "\(item.capitalizedFirst) is already unlocked."
+        log("itemIsUnlocked(item: '\(item)')")
+        return "\(item.capitalizedFirst) is already unlocked."
     }
 
     open func itemNotAccessible(item: String) -> String {
-        "You can't see \(item)."
+        log("itemNotAccessible(item: '\(item)')")
+        return "You can't see \(item)."
     }
 
     open func itemNotClosable(item: String) -> String {
-        "\(item.capitalizedFirst) is not something you can close."
+        log("itemNotClosable(item: '\(item)')")
+        return "You can't close \(item)."
     }
 
     open func itemNotDroppable(item: String) -> String {
-        "You can't drop \(item)."
+        log("itemNotDroppable(item: '\(item)')")
+        return "You can't drop \(item)."
     }
 
     open func itemNotEdible(item: String) -> String {
-        "You can't eat \(item)."
+        log("itemNotEdible(item: '\(item)')")
+        return "You can't eat \(item)."
     }
 
     open func itemNotHeld(item: String) -> String {
-        "You aren't holding \(item)."
+        log("itemNotHeld(item: '\(item)')")
+        return "You aren't holding \(item)."
     }
 
     open func itemNotInContainer(item: String, container: String) -> String {
-        "\(item.capitalizedFirst) isn't in \(container)."
+        log("itemNotInContainer(item: '\(item)', container: \(container))")
+        return "\(item.capitalizedFirst) isn't in \(container)."
     }
 
     open func itemNotInflated(item: String) -> String {
-        "\(item.capitalizedFirst) is not inflated."
+        log("itemNotInflated(item: '\(item)')")
+        return "\(item.capitalizedFirst) is not inflated."
     }
 
     open func itemNotInScope(noun: String) -> String {
-        "You can't see any \(noun) here."
+        log("itemNotInScope(noun: '\(noun)')")
+        return "You can't see any \(noun) here."
     }
 
     open func itemNotLockable(item: String) -> String {
-        "You can't lock \(item)."
+        log("itemNotLockable(item: '\(item)')")
+        return "You can't lock \(item)."
     }
 
     open func itemNotOnSurface(item: String, surface: String) -> String {
-        "\(item.capitalizedFirst) isn't on \(surface)."
+        log("itemNotOnSurface(item: '\(item)', surface: '\(surface)')")
+        return "\(item.capitalizedFirst) isn't on \(surface)."
     }
 
     open func itemNotOpenable(item: String) -> String {
-        "You can't open \(item)."
+        log("itemNotOpenable(item: '\(item)')")
+        return "You can't open \(item)."
     }
 
     open func itemNotReadable(item: String) -> String {
-        "\(item.capitalizedFirst) isn't something you can read."
+        log("itemNotReadable(item: '\(item)')")
+        return "\(item.capitalizedFirst) isn't something you can read."
     }
 
     open func itemNotRemovable(item: String) -> String {
-        "You can't remove \(item)."
+        log("itemNotRemovable(item: '\(item)')")
+        return "You can't remove \(item)."
     }
 
     open func itemNotTakable(item: String) -> String {
-        "You can't take \(item)."
+        log("itemNotTakable(item: '\(item)')")
+        return "You can't take \(item)."
     }
 
     open func itemNotUnlockable(item: String) -> String {
-        "You can't unlock \(item)."
+        log("itemNotUnlockable(item: '\(item)')")
+        return "You can't unlock \(item)."
     }
 
     open func itemNotWearable(item: String) -> String {
-        "You can't wear \(item)."
+        log("itemNotWearable(item: '\(item)')")
+        return "You can't wear \(item)."
     }
 
     open func itemTooLargeForContainer(item: String, container: String) -> String {
-        "\(item.capitalizedFirst) won't fit in \(container)."
+        log("itemTooLargeForContainer(item: '\(item)', container: \(container))")
+        return "\(item.capitalizedFirst) won't fit in \(container)."
     }
 
     open func itsRightHere() -> String {
-        "It's right here!"
+        log("itsRightHere()")
+        return "It's right here!"
     }
 
     open func jumpCharacter(character: String) -> String {
-        "You can't jump \(character)."
+        log("jumpCharacter(character: '\(character)')")
+        return "You can't jump \(character)."
     }
 
     open func jumpLargeObject(item: String) -> String {
-        "You can't jump \(item)."
+        log("jumpLargeObject(item: '\(item)')")
+        return "You can't jump \(item)."
     }
 
     open func jumpResponse() -> String {
-        oneOf(
+        log("jumpResponse()")
+        return oneOf(
             "You jump on the spot, fruitlessly.",
             "You jump up and down.",
             "You leap into the air.",
@@ -727,25 +890,30 @@ open class MessageProvider: @unchecked Sendable {
     }
 
     open func kickCharacter(character: String) -> String {
-        "I don't think \(character) would appreciate that."
+        log("kickCharacter(character: '\(character)')")
+        return "I don't think \(character) would appreciate that."
     }
 
     open func kickLargeObject(item: String) -> String {
-        "Ouch! You hurt your foot kicking \(item)."
+        log("kickLargeObject(item: '\(item)')")
+        return "Ouch! You hurt your foot kicking \(item)."
     }
 
     open func kickWhat() -> String {
-        "Kick what?"
+        log("kickWhat()")
+        return "Kick what?"
     }
 
     open func kissCharacter(character: String) -> String {
-        oneOf(
+        log("kissCharacter(character: '\(character)')")
+        return oneOf(
             "\(character.capitalizedFirst) doesn't seem particularly receptive to your affections."
         )
     }
 
     open func kissEnemy(enemy: String) -> String {
-        oneOf(
+        log("kissEnemy(enemy: '\(enemy)')")
+        return oneOf(
             "You try to kiss \(enemy) mid-snarl, which seems poorly timed.",
             "You lean in for a kiss, but \(enemy) seems more interested in eating your face.",
             "You pucker up romantically, but \(enemy) responds with claws and teeth.",
@@ -759,7 +927,8 @@ open class MessageProvider: @unchecked Sendable {
     }
 
     open func kissObject(item: String) -> String {
-        oneOf(
+        log("kissObject(item: '\(item)')")
+        return oneOf(
             "You give \(item) a quick kiss, which fails to reveal anything significant.",
             "You kiss \(item) experimentally, but nothing remarkable happens.",
             "You plant a brief kiss on \(item), yet your lips learn nothing new.",
@@ -773,39 +942,48 @@ open class MessageProvider: @unchecked Sendable {
     }
 
     open func kissSelf() -> String {
-        "You kiss yourself."
+        log("kissSelf()")
+        return "You kiss yourself."
     }
 
     open func kissWhat() -> String {
-        "Kiss what?"
+        log("kissWhat()")
+        return "Kiss what?"
     }
 
     open func knockOnClosedDoor(door: String) -> String {
-        "You knock on \(door), but there's no answer."
+        log("knockOnClosedDoor(door: '\(door)')")
+        return "You knock on '\(door)', but there's no answer."
     }
 
     open func knockOnContainer(container: String) -> String {
-        "Knocking on \(container) produces a hollow sound."
+        log("knockOnContainer(container: \(container))")
+        return "Knocking on \(container) produces a hollow sound."
     }
 
     open func knockOnGenericObject(item: String) -> String {
-        "You knock on \(item), but nothing happens."
+        log("knockOnGenericObject(item: '\(item)')")
+        return "You knock on \(item), but nothing happens."
     }
 
     open func knockOnLockedDoor(door: String) -> String {
-        "You knock on \(door), but nobody's home."
+        log("knockOnLockedDoor(door: '\(door)')")
+        return "You knock on '\(door)', but nobody's home."
     }
 
     open func knockOnOpenDoor(door: String) -> String {
-        "No need to knock, \(door) is already open."
+        log("knockOnOpenDoor(door: '\(door)')")
+        return "No need to knock, \(door) is already open."
     }
 
     open func knockOnWhat() -> String {
-        "Knock on what?"
+        log("knockOnWhat()")
+        return "Knock on what?"
     }
 
     open func laughResponse() -> String {
-        oneOf(
+        log("laughResponse()")
+        return oneOf(
             "You cackle at the futility of everything.",
             "You chortle knowingly.",
             "You chuckle at the meaninglessness of it all.",
@@ -832,263 +1010,350 @@ open class MessageProvider: @unchecked Sendable {
     }
 
     open func listenWhat() -> String {
-        "Listen to what?"
+        log("listenWhat()")
+        return "Listen to what?"
     }
 
     open func lockSuccess(item: String) -> String {
-        "\(item.capitalizedFirst) is now locked."
+        log("lockSuccess(item: '\(item)')")
+        return "\(item.capitalizedFirst) is now locked."
     }
 
     open func lockWhat() -> String {
-        "Lock what?"
+        log("lockWhat()")
+        return "Lock what?"
     }
 
     open func lockWithWhat() -> String {
-        "Lock it with what?"
+        log("lockWithWhat()")
+        return "Lock it with what?"
     }
 
     open func lookInsideWhat() -> String {
-        "Look inside what?"
+        log("lookInsideWhat()")
+        return "Look inside what?"
     }
 
     open func lookUnderWhat() -> String {
-        "Look under what?"
+        log("lookUnderWhat()")
+        return "Look under what?"
     }
 
     open func maximumVerbosity() -> String {
-        "Maximum verbosity. Full location descriptions will be shown every time you enter a location."
+        log("maximumVerbosity()")
+        return """
+            Maximum verbosity. Full location descriptions will
+            be shown every time you enter a location.
+            """
     }
 
     open func modifierMismatch(noun: String, modifiers: [String]) -> String {
-        "You can't see any \(modifiers.joined(separator: " ")) \(noun) here."
+        log("""
+            modifierMismatch(noun: '\(noun)', \
+            modifiers: '\(modifiers.joined(separator: "', '"))')
+            """)
+        return "You can't see any \(modifiers.joined(separator: " ")) \(noun) here."
     }
 
     open func moveWhat() -> String {
-        "Move what?"
+        log("moveWhat()")
+        return "Move what?"
     }
 
     open func multipleObjectsNotSupported(verb: String) -> String {
-        "The \(verb.uppercased()) command doesn't support multiple objects."
+        log("multipleObjectsNotSupported(verb: '\(verb)')")
+        return "The \(verb.uppercased()) command doesn't support multiple objects."
     }
 
     open func noLiquidInSource(source: String) -> String {
-        "There's no liquid in \(source) to fill from."
+        log("noLiquidInSource(source: '\(source)')")
+        return "There's no liquid in \(source) to fill from."
     }
 
     open func noLiquidSourceAvailable() -> String {
-        "There's no source of liquid here to fill from."
+        log("noLiquidSourceAvailable()")
+        return "There's no source of liquid here to fill from."
     }
 
     open func nothingHereToEnter() -> String {
-        "There's nothing here to enter."
+        log("nothingHereToEnter()")
+        return "There's nothing here to enter."
     }
 
     open func nothingHereToExamine() -> String {
-        "There is nothing here to examine."
+        log("nothingHereToExamine()")
+        return "There is nothing here to examine."
     }
 
     open func nothingHereToPush() -> String {
-        "There is nothing here to push."
+        log("nothingHereToPush()")
+        return "There is nothing here to push."
     }
 
     open func nothingHereToRemove() -> String {
-        "There is nothing here to remove."
+        log("nothingHereToRemove()")
+        return "There is nothing here to remove."
     }
 
     open func nothingHereToWear() -> String {
-        "You have nothing to wear."
+        log("nothingHereToWear()")
+        return "You have nothing to wear."
     }
 
     open func nothingSpecialAbout(item: String) -> String {
-        "You see nothing special about \(item)."
+        log("nothingSpecialAbout(item: '\(item)')")
+        return "You see nothing special about \(item)."
     }
 
     open func nothingToDrinkIn(container: String) -> String {
-        "There's nothing to drink in \(container)."
+        log("nothingToDrinkIn(container: \(container))")
+        return "There's nothing to drink in \(container)."
     }
 
     open func nothingToEatIn(container: String) -> String {
-        "There's nothing to eat in \(container)."
+        log("nothingToEatIn(container: \(container))")
+        return "There's nothing to eat in \(container)."
     }
 
     open func nothingToTakeHere() -> String {
-        "Nothing to take here."
+        log("nothingToTakeHere()")
+        return "Nothing to take here."
     }
 
     open func nowDark() -> String {
-        "You are plunged into darkness."
+        log("nowDark()")
+        return "You are plunged into darkness."
     }
 
     open func nowLit() -> String {
-        "You can see your surroundings now."
+        log("nowLit()")
+        return "You can see your surroundings now."
     }
 
     open func opened(item: String) -> String {
-        "You open \(item)."
+        log("opened(item: '\(item)')")
+        return "You open \(item)."
     }
 
     open func openingRevealsContents(container: String, contents: String) -> String {
-        "Opening \(container) reveals \(contents)."
+        log("""
+            openingRevealsContents(container: \(container), \
+            contents: '\(contents)')
+            """)
+        return "Opening \(container) reveals \(contents)."
     }
 
     open func parseUnknownVerb(verb: String) -> String {
-        "I don't know the verb '\(verb)'."
+        log("parseUnknownVerb(verb: '\(verb)')")
+        return "I don't know the verb '(verb)."
     }
 
     open func playerCannotCarryMore() -> String {
-        "Your hands are full."
+        log("playerCannotCarryMore()")
+        return "Your hands are full."
     }
 
     open func pourCannotPourItself(item: String) -> String {
-        "You can't pour \(item) on itself."
+        log("pourCannotPourItself(item: '\(item)')")
+        return "You can't pour \(item) on itself."
     }
 
     open func pourCannotPourOnThat() -> String {
-        "You can't pour something on that."
+        log("pourCannotPourOnThat()")
+        return "You can't pour something on that."
     }
 
     open func pourCannotPourThat() -> String {
-        "You can't pour that."
+        log("pourCannotPourThat()")
+        return "You can't pour that."
     }
 
     open func pourNotLiquid(item: String) -> String {
-        "You can't pour \(item)."
+        log("pourNotLiquid(item: '\(item)')")
+        return "You can't pour \(item)."
     }
 
     open func pourOn(item: String, target: String) -> String {
-        "Pour \(item) on what?"
+        log("pourOn(item: '\(item)', target: '\(target)')")
+        return "Pour \(item) on what?"
     }
 
     open func pourOnCharacter(item: String, character: String) -> String {
-        "You pour \(item) on \(character). They are not pleased with this treatment."
+        log("pourOnCharacter(item: '\(item)', character: '\(character)')")
+        return "You pour \(item) on \(character). They are not pleased with this treatment."
     }
 
     open func pourOnDevice(item: String, device: String) -> String {
-        "You pour \(item) on \(device), which probably wasn't a good idea."
+        log("pourOnDevice(item: '\(item)', device: '\(device)')")
+        return "You pour \(item) on \(device), which probably wasn't a good idea."
     }
 
     open func pourOnFireAndExtinguish(item: String, target: String) -> String {
-        "You pour \(item) on \(target). The flames are extinguished with a hissing sound."
+        log("pourOnFireAndExtinguish(item: '\(item)', target: '\(target)')")
+        return """
+            You pour \(item) on \(target). The flames
+            are extinguished with a hissing sound.
+            """
     }
 
     open func pourOnGeneric(item: String, target: String) -> String {
-        "You pour \(item) on \(target)."
+        log("pourOnGeneric(item: '\(item)', target: '\(target)')")
+        return "You pour \(item) on \(target)."
     }
 
     open func pourOnPlantAndRefresh(item: String, target: String) -> String {
-        "You pour \(item) on \(target). It looks refreshed."
+        log("pourOnPlantAndRefresh(item: '\(item)', target: '\(target)')")
+        return "You pour \(item) on \(target). It looks refreshed."
     }
 
     open func pourWhat() -> String {
-        "Pour what?"
+        log("pourWhat()")
+        return "Pour what?"
     }
 
     open func prerequisiteNotMet(message: String) -> String {
-        message.isEmpty ? "You can't do that." : message
+        log("prerequisiteNotMet(message: '\(message)')")
+        return message.isEmpty ? "You can't do that." : message
     }
 
     open func pressSuccess(item: String) -> String {
-        "You press \(item)."
+        log("pressSuccess(item: '\(item)')")
+        return "You press \(item)."
     }
 
     open func pressWhat() -> String {
-        "Press what?"
+        log("pressWhat()")
+        return "Press what?"
     }
 
     open func pronounNotSet(pronoun: String) -> String {
-        "I don't know what '\(pronoun)' refers to."
+        log("pronounNotSet(pronoun: '\(pronoun)')")
+        return "I don't know what \(pronoun) refers to."
     }
 
     open func pronounRefersToOutOfScopeItem(pronoun: String) -> String {
-        "You can't see what '\(pronoun)' refers to right now."
+        log("pronounRefersToOutOfScopeItem(pronoun: '\(pronoun)')")
+        return "You can't see what \(pronoun) refers to right now."
     }
 
     open func pullSuccess(item: String) -> String {
-        "You pull \(item)."
+        log("pullSuccess(item: '\(item)')")
+        return "You pull \(item)."
     }
 
     open func pullWhat() -> String {
-        "Pull what?"
+        log("pullWhat()")
+        return "Pull what?"
     }
 
     open func pushSuccess(items: String) -> String {
-        "You push \(items), but nothing interesting happens."
+        log("pushSuccess(items: '\(items)')")
+        return "You push \(items), but nothing interesting happens."
     }
 
     open func pushWhat() -> String {
-        "Push what?"
+        log("pushWhat()")
+        return "Push what?"
     }
 
-    open func putCannotPutCircular(item: String, container: String, preposition: String) -> String {
-        "You can't put \(item) on \(container) because \(container) is \(preposition) \(item)."
+    open func putCannotPutCircular(
+        item: String,
+        container: String,
+        preposition: String
+    ) -> String {
+        log("""
+            putCannotPutCircular(item: '\(item)', container: \
+            \(container), preposition: '\(preposition)')
+            """)
+        return """
+            You can't put \(item) on \(container) because
+            \(container) is \(preposition) \(item).
+            """
     }
 
     open func putCannotPutOnSelf() -> String {
-        "You can't put something on itself."
+        log("putCannotPutOnSelf()")
+        return "You can't put something on itself."
     }
 
     open func putOnWhat(item: String) -> String {
-        "Put \(item) on what?"
+        log("putOnWhat(item: '\(item)')")
+        return "Put \(item) on what?"
     }
 
     open func putWhat() -> String {
-        "Put what?"
+        log("putWhat()")
+        return "Put what?"
     }
 
     open func raiseCannotLift(item: String) -> String {
-        "You can't lift \(item)."
+        log("raiseCannotLift(item: '\(item)')")
+        return "You can't lift \(item)."
     }
 
     open func raiseWhat() -> String {
-        "Raise what?"
+        log("raiseWhat()")
+        return "Raise what?"
     }
 
     open func readWhat() -> String {
-        "Read what?"
+        log("readWhat()")
+        return "Read what?"
     }
 
     open func removeWhat() -> String {
-        "Remove what?"
+        log("removeWhat()")
+        return "Remove what?"
     }
 
     open func restoreFailed(error: String) -> String {
-        "Restore failed: \(error)"
+        log("restoreFailed(error: '\(error)')")
+        return "Restore failed: '\(error)'"
     }
 
     open func roomIsDark() -> String {
-        "It is pitch black. You can't see a thing."
+        log("roomIsDark()")
+        return "It is pitch black. You can't see a thing."
     }
 
     open func rubCharacter(character: String) -> String {
-        "I don't think \(character) would appreciate being rubbed."
+        log("rubCharacter(character: '\(character)')")
+        return "I don't think \(character) would appreciate being rubbed."
     }
 
     open func rubCleanItem(item: String) -> String {
-        "You rub \(item). It feels smooth to the touch."
+        log("rubCleanItem(item: '\(item)')")
+        return "You rub \(item). It feels smooth to the touch."
     }
 
     open func rubGenericObject(item: String) -> String {
-        "You rub \(item), but nothing interesting happens."
+        log("rubGenericObject(item: '\(item)')")
+        return "You rub \(item), but nothing interesting happens."
     }
 
     open func rubLamp(item: String) -> String {
-        "Rubbing \(item) doesn't seem to do anything. No djinn appears."
+        log("rubLamp(item: '\(item)')")
+        return "Rubbing \(item) doesn't seem to do anything. No djinn appears."
     }
 
     open func rubTakableObject(item: String) -> String {
-        "You rub \(item). It feels smooth to the touch."
+        log("rubTakableObject(item: '\(item)')")
+        return "You rub \(item). It feels smooth to the touch."
     }
 
     open func rubWhat() -> String {
-        "Rub what?"
+        log("rubWhat()")
+        return "Rub what?"
     }
 
     open func saveFailed(error: String) -> String {
-        "Save failed: \(error)"
+        log("saveFailed(error: '\(error)')")
+        return "Save failed: '\(error)'"
     }
 
     open func screamResponse() -> String {
-        oneOf(
+        log("screamResponse()")
+        return oneOf(
             "You scream at the top of your lungs. Very therapeutic!",
             "You shriek like a banshee.",
             "You let out a blood-curdling scream.",
@@ -1103,43 +1368,53 @@ open class MessageProvider: @unchecked Sendable {
     }
 
     open func scriptAlreadyOn() -> String {
-        "Scripting is already on."
+        log("scriptAlreadyOn()")
+        return "Scripting is already on."
     }
 
     open func scriptNotOn() -> String {
-        "Scripting is not currently on."
+        log("scriptNotOn()")
+        return "Scripting is not currently on."
     }
 
     open func shakeCharacter(character: String) -> String {
-        "I don't think \(character) would appreciate being shaken."
+        log("shakeCharacter(character: '\(character)')")
+        return "I don't think \(character) would appreciate being shaken."
     }
 
     open func shakeClosedContainer(container: String) -> String {
-        "You shake \(container) and hear something rattling inside."
+        log("shakeClosedContainer(container: \(container))")
+        return "You shake \(container) and hear something rattling inside."
     }
 
     open func shakeFixedObject(item: String) -> String {
-        "You can't shake \(item) - it's firmly in place."
+        log("shakeFixedObject(item: '\(item)')")
+        return "You can't shake \(item) - it's firmly in place."
     }
 
     open func shakeLiquidContainer(item: String) -> String {
-        "You shake \(item) and hear liquid sloshing inside."
+        log("shakeLiquidContainer(item: '\(item)')")
+        return "You shake \(item) and hear liquid sloshing inside."
     }
 
     open func shakeOpenContainer(container: String) -> String {
-        "You shake \(container), but nothing falls out."
+        log("shakeOpenContainer(container: \(container))")
+        return "You shake \(container), but nothing falls out."
     }
 
     open func shakeTakableObject(item: String) -> String {
-        "You shake \(item) vigorously, but nothing happens."
+        log("shakeTakableObject(item: '\(item)')")
+        return "You shake \(item) vigorously, but nothing happens."
     }
 
     open func shakeWhat() -> String {
-        "Shake what?"
+        log("shakeWhat()")
+        return "Shake what?"
     }
 
     open func singResponse() -> String {
-        oneOf(
+        log("singResponse()")
+        return oneOf(
             "You sing a little ditty. How delightful!",
             "You hum a tune under your breath.",
             "You warble melodiously. Very soothing.",
@@ -1154,279 +1429,348 @@ open class MessageProvider: @unchecked Sendable {
     }
 
     open func smellCanOnlySmellItems() -> String {
-        "You can only smell items directly."
+        log("smellCanOnlySmellItems()")
+        return "You can only smell items directly."
     }
 
     open func smellNothingUnusual() -> String {
-        "You smell nothing unusual."
+        log("smellNothingUnusual()")
+        return "You smell nothing unusual."
     }
 
     open func smellsAverage() -> String {
-        "That smells about average."
+        log("smellsAverage()")
+        return "That smells about average."
     }
 
     open func smellWhat() -> String {
-        "Smell what?"
+        log("smellWhat()")
+        return "Smell what?"
     }
 
     open func squeezeCharacter(character: String) -> String {
-        "I don't think \(character) would appreciate being squeezed."
+        log("squeezeCharacter(character: '\(character)')")
+        return "I don't think \(character) would appreciate being squeezed."
     }
 
     open func squeezeHardObject(item: String) -> String {
-        "You squeeze \(item) as hard as you can, but it doesn't give."
+        log("squeezeHardObject(item: '\(item)')")
+        return "You squeeze \(item) as hard as you can, but it doesn't give."
     }
 
     open func squeezeLiquidContainer(item: String) -> String {
-        "You squeeze \(item) and some of its contents ooze out."
+        log("squeezeLiquidContainer(item: '\(item)')")
+        return "You squeeze \(item) and some of its contents ooze out."
     }
 
     open func squeezeSoftObject(item: String) -> String {
-        "You squeeze \(item). It feels soft and yielding."
+        log("squeezeSoftObject(item: '\(item)')")
+        return "You squeeze \(item). It feels soft and yielding."
     }
 
     open func squeezeSponge(item: String) -> String {
-        "You squeeze \(item) and water drips out."
+        log("squeezeSponge(item: '\(item)')")
+        return "You squeeze \(item) and water drips out."
     }
 
     open func squeezeWhat() -> String {
-        "Squeeze what?"
+        log("squeezeWhat()")
+        return "Squeeze what?"
     }
 
     open func stateValidationFailed() -> String {
-        "A strange buzzing sound indicates something is wrong with the state validation."
+        logWarning("stateValidationFailed()")
+        return "A strange buzzing sound indicates something is wrong with the state validation."
     }
 
     open func suggestUsingToolToDig() -> String {
-        "You could try using a tool to dig with."
+        log("suggestUsingToolToDig()")
+        return "You could try using a tool to dig with."
     }
 
     open func taken() -> String {
-        "Taken."
+        log("taken()")
+        return "Taken."
     }
 
     open func targetIsNotAContainer(item: String) -> String {
-        "You can't put things in \(item)."
+        log("targetIsNotAContainer(item: '\(item)')")
+        return "You can't put things in \(item)."
     }
 
     open func targetIsNotASurface(item: String) -> String {
-        "You can't put things on \(item)."
+        log("targetIsNotASurface(item: '\(item)')")
+        return "You can't put things on \(item)."
     }
 
     open func tastesAverage() -> String {
-        "That tastes about average."
+        log("tastesAverage()")
+        return "That tastes about average."
     }
 
     open func tasteWhat() -> String {
-        "Taste what?"
+        log("tasteWhat()")
+        return "Taste what?"
     }
 
     open func tellAboutWhat() -> String {
-        "Tell about what?"
+        log("tellAboutWhat()")
+        return "Tell about what?"
     }
 
     open func tellCannotTellAbout(character: String) -> String {
-        "You can't tell \(character) about anything."
+        log("tellCannotTellAbout(character: '\(character)')")
+        return "You can't tell \(character) about anything."
     }
 
     open func tellCanOnlyTellCharacters() -> String {
-        "You can only tell characters about things."
+        log("tellCanOnlyTellCharacters()")
+        return "You can only tell characters about things."
     }
 
     open func tellWhom() -> String {
-        "Tell whom?"
+        log("tellWhom()")
+        return "Tell whom?"
     }
 
     open func thereIsNothingHereToTake() -> String {
-        "There is nothing here to take."
+        log("thereIsNothingHereToTake()")
+        return "There is nothing here to take."
     }
 
     open func thinkAboutItem(item: String) -> String {
-        "You contemplate \(item) for a bit, but nothing fruitful comes to mind."
+        log("thinkAboutItem(item: '\(item)')")
+        return "You contemplate \(item) for a bit, but nothing fruitful comes to mind."
     }
 
     open func thinkAboutLocation() -> String {
-        "You ponder the location, but it remains stubbornly locational."
+        log("thinkAboutLocation()")
+        return "You ponder the location, but it remains stubbornly locational."
     }
 
     open func thinkAboutSelf() -> String {
-        "Yes, yes, you're very important."
+        log("thinkAboutSelf()")
+        return "Yes, yes, you're very important."
     }
 
     open func thinkAboutWhat() -> String {
-        "Think about what?"
+        log("thinkAboutWhat()")
+        return "Think about what?"
     }
 
     open func throwAtCharacter(item: String, character: String) -> String {
-        "You throw \(item) at \(character)."
+        log("throwAtCharacter(item: '\(item)', character: '\(character)')")
+        return "You throw \(item) at \(character)."
     }
 
     open func throwAtObject(item: String, target: String) -> String {
-        "You throw \(item) at \(target). It bounces off harmlessly."
+        log("throwAtObject(item: '\(item)', target: '\(target)')")
+        return "You throw \(item) at \(target). It bounces off harmlessly."
     }
 
     open func throwGeneral(item: String) -> String {
-        "You throw \(item), and it falls to the ground."
+        log("throwGeneral(item: '\(item)')")
+        return "You throw \(item), and it falls to the ground."
     }
 
     open func throwWhat() -> String {
-        "Throw what?"
+        log("throwWhat()")
+        return "Throw what?"
     }
 
     open func tieCannotTieLivingBeings() -> String {
-        "You can't tie living beings together like that."
+        log("tieCannotTieLivingBeings()")
+        return "You can't tie living beings together like that."
     }
 
     open func tieCannotTieThat() -> String {
-        "You can't tie that."
+        log("tieCannotTieThat()")
+        return "You can't tie that."
     }
 
     open func tieCannotTieToSelf(item: String) -> String {
-        "You can't tie \(item) to itself."
+        log("tieCannotTieToSelf(item: '\(item)')")
+        return "You can't tie \(item) to itself."
     }
 
     open func tieCannotTieToThat() -> String {
-        "You can't tie something to that."
+        log("tieCannotTieToThat()")
+        return "You can't tie something to that."
     }
 
     open func tieKnotInRope(item: String) -> String {
-        "You tie a knot in \(item)."
+        log("tieKnotInRope(item: '\(item)')")
+        return "You tie a knot in \(item)."
     }
 
     open func tieNeedsSomethingToTieCharacterWith(character: String) -> String {
-        "You can't tie up \(character) without something to tie them with."
+        log("tieNeedsSomethingToTieCharacterWith(character: '\(character)')")
+        return "You can't tie up \(character) without something to tie them with."
     }
 
     open func tieNeedsSomethingToTieWith(item: String) -> String {
-        "You can't tie \(item) without something to tie it with."
+        log("tieNeedsSomethingToTieWith(item: '\(item)')")
+        return "You can't tie \(item) without something to tie it with."
     }
 
     open func tieWhat() -> String {
-        "Tie what?"
+        log("tieWhat()")
+        return "Tie what?"
     }
 
     open func timePasses() -> String {
-        "Time passes."
+        log("timePasses()")
+        return "Time passes."
     }
 
     open func toolMissing(tool: String) -> String {
-        "You need \(tool) for that."
+        log("toolMissing(tool: '\(tool)')")
+        return "You need \(tool) for that."
     }
 
     open func toolNotSuitableForDigging(tool: String) -> String {
-        "\(tool.capitalizedFirst) isn't suitable for digging."
+        log("toolNotSuitableForDigging(tool: '\(tool)')")
+        return "\(tool.capitalizedFirst) isn't suitable for digging."
     }
 
     open func touchWhat() -> String {
-        "Touch what?"
+        log("touchWhat()")
+        return "Touch what?"
     }
 
     open func turnCharacter(character: String) -> String {
-        "You can't turn \(character) around like an object."
+        log("turnCharacter(character: '\(character)')")
+        return "You can't turn \(character) around like an object."
     }
 
     open func turnDial(item: String) -> String {
-        "You turn \(item). It clicks into a new position."
+        log("turnDial(item: '\(item)')")
+        return "You turn \(item). It clicks into a new position."
     }
 
     open func turnFixedObject(item: String) -> String {
-        "\(item) doesn't seem to be designed to be turned."
+        log("turnFixedObject(item: '\(item)')")
+        return "\(item) doesn't seem to be designed to be turned."
     }
 
     open func turnHandle(item: String) -> String {
-        "You turn \(item). It moves with a grinding sound."
+        log("turnHandle(item: '\(item)')")
+        return "You turn \(item). It moves with a grinding sound."
     }
 
     open func turnKey(item: String) -> String {
-        "You can't just turn \(item) by itself. You need to use it with something."
+        log("turnKey(item: '\(item)')")
+        return "You can't just turn \(item) by itself. You need to use it with something."
     }
 
     open func turnKnob(item: String) -> String {
-        "You turn \(item). It clicks into a new position."
+        log("turnKnob(item: '\(item)')")
+        return "You turn \(item). It clicks into a new position."
     }
 
     open func turnOffWhat() -> String {
-        "Turn off what?"
+        log("turnOffWhat()")
+        return "Turn off what?"
     }
 
     open func turnOnWhat() -> String {
-        "Turn on what?"
+        log("turnOnWhat()")
+        return "Turn on what?"
     }
 
     open func turnRegularObject(item: String) -> String {
-        "You turn \(item) around in your hands, but nothing happens."
+        log("turnRegularObject(item: '\(item)')")
+        return "You turn \(item) around in your hands, but nothing happens."
     }
 
     open func turnWhat() -> String {
-        "Turn what?"
+        log("turnWhat()")
+        return "Turn what?"
     }
 
     open func turnWheel(item: String) -> String {
-        "You turn \(item). It rotates with some effort."
+        log("turnWheel(item: '\(item)')")
+        return "You turn \(item). It rotates with some effort."
     }
 
     open func unknownEntity() -> String {
-        "You can't see any such thing."
+        log("unknownEntity()")
+        return "You can't see any such thing."
     }
 
     open func unknownNoun(noun: String) -> String {
-        "You can't see any \(noun) here."
+        log("unknownNoun(noun: '\(noun)')")
+        return "You can't see any \(noun) here."
     }
 
     open func unknownVerb(verb: String) -> String {
-        "I don't know how to \"\(verb)\" something."
+        log("unknownVerb(verb: '\(verb)')")
+        return "I don't know how to \"'\(verb)'\" something."
     }
 
     open func unlockAlreadyUnlocked(item: String) -> String {
-        "The \(item) is already unlocked."
+        log("unlockAlreadyUnlocked(item: '\(item)')")
+        return "The \(item) is already unlocked."
     }
 
     open func unlockWhat() -> String {
-        "Unlock what?"
+        log("unlockWhat()")
+        return "Unlock what?"
     }
 
     open func unlockWithWhat() -> String {
-        "Unlock it with what?"
+        log("unlockWithWhat()")
+        return "Unlock it with what?"
     }
 
     open func waveCharacter(character: String) -> String {
-        "You wave \(character) around, but it doesn't seem to appreciate being waved."
+        log("waveCharacter(character: '\(character)')")
+        return "You wave \(character) around, but it doesn't seem to appreciate being waved."
     }
 
     open func waveFixedObject(item: String) -> String {
-        "You can't wave \(item) around - it's not something you can pick up and wave."
+        log("waveFixedObject(item: '\(item)')")
+        return "You can't wave \(item) around - it's not something you can pick up and wave."
     }
 
     open func waveFlag(item: String) -> String {
-        "You wave \(item) around. It's not particularly impressive."
+        log("waveFlag(item: '\(item)')")
+        return "You wave \(item) around. It's not particularly impressive."
     }
 
     open func waveMagicalItem(item: String) -> String {
-        "You wave \(item) dramatically, but nothing magical happens."
+        log("waveMagicalItem(item: '\(item)')")
+        return "You wave \(item) dramatically, but nothing magical happens."
     }
 
     open func waveWeapon(item: String) -> String {
-        "You brandish \(item) menacingly."
+        log("waveWeapon(item: '\(item)')")
+        return "You brandish \(item) menacingly."
     }
 
     open func waveWhat() -> String {
-        "Wave what?"
+        log("waveWhat()")
+        return "Wave what?"
     }
 
     open func wearWhat() -> String {
-        "Wear what?"
+        log("wearWhat()")
+        return "Wear what?"
     }
 
     open func whatQuestion(verb: String) -> String {
-        "\(verb.capitalizedFirst) what?"
+        log("whatQuestion(verb: '\(verb)')")
+        return "\(verb.capitalizedFirst) what?"
     }
 
     open func wrongKey(key: String, lock: String) -> String {
-        "\(key.capitalizedFirst) doesn't fit \(lock)."
+        log("wrongKey(key: '\(key)', lock: '\(lock)')")
+        return "\(key.capitalizedFirst) doesn't fit \(lock)."
     }
 
     open func yellResponse() -> String {
-        oneOf(
+        log("yellResponse()")
+        return oneOf(
             "You bellow magnificently as the universe checks its watch.",
             "You bellow with the wild abandon of one who's given up on making sense.",
             "You bellow importantly, although the importance fails to materialize.",
@@ -1442,119 +1786,148 @@ open class MessageProvider: @unchecked Sendable {
     }
 
     open func youAlreadyHaveThat() -> String {
-        "You already have that."
+        log("youAlreadyHaveThat()")
+        return "You already have that."
     }
 
     open func youAreCarrying() -> String {
-        "You are carrying:"
+        log("youAreCarrying()")
+        return "You are carrying:"
     }
 
     open func youAreEmptyHanded() -> String {
-        "You are empty-handed."
+        log("youAreEmptyHanded()")
+        return "You are empty-handed."
     }
 
     open func youArentHoldingThat() -> String {
-        "You aren't holding that."
+        log("youArentHoldingThat()")
+        return "You aren't holding that."
     }
 
     open func youArentWearingAnything() -> String {
-        "You aren't wearing anything."
+        log("youArentWearingAnything()")
+        return "You aren't wearing anything."
     }
 
     open func youCannotTakeFromNonContainer(container: String) -> String {
-        "You can't take things out of \(container)."
+        log("youCannotTakeFromNonContainer(container: \(container))")
+        return "You can't take things out of \(container)."
     }
 
     open func youCanOnlyActOnItems(verb: String) -> String {
-        "You can only \(verb) items."
+        log("youCanOnlyActOnItems(verb: '\(verb)')")
+        return "You can only \(verb) items."
     }
 
     open func youCanOnlyMoveItems() -> String {
-        "You can only move items."
+        log("youCanOnlyMoveItems()")
+        return "You can only move items."
     }
 
     open func youCanOnlyPutItemsOnThings() -> String {
-        "You can only put items on things."
+        log("youCanOnlyPutItemsOnThings()")
+        return "You can only put items on things."
     }
 
     open func youCanOnlyPutThingsOnSurfaces() -> String {
-        "You can only put things on items (that are surfaces)."
+        log("youCanOnlyPutThingsOnSurfaces()")
+        return "You can only put things on items (that are surfaces)."
     }
 
     open func youCanOnlyRaiseItems() -> String {
-        "You can only raise items."
+        log("youCanOnlyRaiseItems()")
+        return "You can only raise items."
     }
 
     open func youCanOnlyReadItems() -> String {
-        "You can only read items."
+        log("youCanOnlyReadItems()")
+        return "You can only read items."
     }
 
     open func youCanOnlySmellItems() -> String {
-        "You can only smell items directly."
+        log("youCanOnlySmellItems()")
+        return "You can only smell items directly."
     }
 
     open func youCanOnlyTasteItems() -> String {
-        "You can only taste items."
+        log("youCanOnlyTasteItems()")
+        return "You can only taste items."
     }
 
     open func youCanOnlyTellCharacters() -> String {
-        "You can only tell characters about things."
+        log("youCanOnlyTellCharacters()")
+        return "You can only tell characters about things."
     }
 
     open func youCanOnlyTouchItems() -> String {
-        "You can only touch items."
+        log("youCanOnlyTouchItems()")
+        return "You can only touch items."
     }
 
     open func youCanOnlyTurnOffItems() -> String {
-        "You can only turn off items."
+        log("youCanOnlyTurnOffItems()")
+        return "You can only turn off items."
     }
 
     open func youCanOnlyTurnOnItems() -> String {
-        "You can only turn on items."
+        log("youCanOnlyTurnOnItems()")
+        return "You can only turn on items."
     }
 
     open func youCanOnlyUnlockItems() -> String {
-        "You can only unlock items."
+        log("youCanOnlyUnlockItems()")
+        return "You can only unlock items."
     }
 
     open func youCanOnlyUseItemAsKey() -> String {
-        "You can only use an item as a key."
+        log("youCanOnlyUseItemAsKey()")
+        return "You can only use an item as a key."
     }
 
     open func youCanOnlyWearItems() -> String {
-        "You can only wear items."
+        log("youCanOnlyWearItems()")
+        return "You can only wear items."
     }
 
     open func youCantDoThat() -> String {
-        "You can't do that."
+        log("youCantDoThat()")
+        return "You can't do that."
     }
 
     open func youDontHaveThat() -> String {
-        "You don't have that."
+        log("youDontHaveThat()")
+        return "You don't have that."
     }
 
     open func youDropMultipleItems(items: String) -> String {
-        "You drop \(items)."
+        log("youDropMultipleItems(items: '\(items)')")
+        return "You drop \(items)."
     }
 
     open func youHaveIt() -> String {
-        "You have it."
+        log("youHaveIt()")
+        return "You have it."
     }
 
     open func youHearNothingUnusual() -> String {
-        "You hear nothing unusual."
+        log("youHearNothingUnusual()")
+        return "You hear nothing unusual."
     }
 
     open func youRemoveMultipleItems(items: String) -> String {
-        "You take off \(items)."
+        log("youRemoveMultipleItems(items: '\(items)')")
+        return "You take off \(items)."
     }
 
     open func youSeeNo(item: String) -> String {
-        "You see no \(item) here."
+        log("youSeeNo(item: '\(item)')")
+        return "You see no \(item) here."
     }
 
     open func youTakeMultipleItems(items: String) -> String {
-        "You take \(items)."
+        log("youTakeMultipleItems(items: '\(items)')")
+        return "You take \(items)."
     }
 }
 
@@ -1568,5 +1941,29 @@ extension MessageProvider {
     /// - Returns: A randomly selected response.
     public func oneOf(_ responses: String...) -> String {
         responses.randomElement(using: &randomNumberGenerator) ?? internalEngineError()
+    }
+
+    func log(_ message: String) {
+        logger.info(
+            Logger.Message(
+                stringLiteral: "\n🎯 \(message)"
+            )
+        )
+    }
+
+    func logError(_ message: String) {
+        logger.error(
+            Logger.Message(
+                stringLiteral: "\n🔥 \(message)"
+            )
+        )
+    }
+
+    func logWarning(_ message: String) {
+        logger.warning(
+            Logger.Message(
+                stringLiteral: "\n⚠️ \(message)"
+            )
+        )
     }
 }

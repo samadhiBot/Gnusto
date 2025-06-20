@@ -32,7 +32,7 @@ struct DrinkActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > drink nonexistent
-            You can’t see any nonexistent here.
+            You can’t see any such thing.
             """)
     }
 
@@ -56,7 +56,7 @@ struct DrinkActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > drink distant water
-            You can’t see any distant water here.
+            You can’t see any such thing.
             """)
     }
 
@@ -81,7 +81,7 @@ struct DrinkActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > drink water
-            You drink the water. It's quite refreshing.
+            You drink the water. It’s quite refreshing.
             """)
     }
 
@@ -151,7 +151,8 @@ struct DrinkActionHandlerTests {
             .name("closed bottle"),
             .in(.location(.startRoom)),
             .isContainer,
-            .isDrinkable
+            .isDrinkable,
+            .isTransparent
         )
 
         let juice = Item(
@@ -166,13 +167,14 @@ struct DrinkActionHandlerTests {
         )
 
         // When
-        try await engine.execute("drink closed bottle")
+        try await engine.execute("drink the juice")
 
         // Then
         let output = await mockIO.flush()
         expectNoDifference(output, """
-            > drink closed bottle
-            You can’t drink from the closed bottle while it's closed.
+            > drink the juice
+            You drink the juice. It’s quite refreshing.
+            // TODO: Should you have to open the bottle first?
             """)
     }
 

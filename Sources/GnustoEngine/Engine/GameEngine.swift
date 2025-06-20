@@ -328,9 +328,9 @@ extension GameEngine {
         // Determine the user-facing message using MessageProvider
         let message = switch response {
         case .containerIsClosed(let item):
-            messageProvider.containerIsClosed(item: the(item))
+            messageProvider.containerIsClosed(item: theThat(item))
         case .containerIsOpen(let item):
-            messageProvider.containerIsOpen(item: the(item))
+            messageProvider.containerIsOpen(item: theThat(item))
         case .custom(let message):
             messageProvider.custom(message: message)
         case .directionIsBlocked(let reason):
@@ -344,21 +344,21 @@ extension GameEngine {
         case .invalidValue:
             messageProvider.internalEngineError()
         case .itemAlreadyClosed(let item):
-            messageProvider.itemAlreadyClosed(item: the(item))
+            messageProvider.itemAlreadyClosed(item: theThat(item))
         case .itemAlreadyOpen(let item):
-            messageProvider.itemAlreadyOpen(item: the(item))
+            messageProvider.itemAlreadyOpen(item: theThat(item))
         case .itemIsAlreadyWorn(let item):
             messageProvider.itemIsAlreadyWorn(item: theThat(item))
         case .itemIsLocked(let item):
-            messageProvider.itemIsLocked(item: the(item))
+            messageProvider.itemIsLocked(item: theThat(item))
         case .itemIsNotWorn(let item):
             messageProvider.itemIsNotWorn(item: theThat(item))
         case .itemIsUnlocked(let item):
-            messageProvider.itemIsUnlocked(item: the(item))
+            messageProvider.itemIsUnlocked(item: theThat(item))
         case .itemNotAccessible(let item):
             messageProvider.itemNotAccessible(item: anySuch(item))
         case .itemNotClosable(let item):
-            messageProvider.itemNotClosable(item: the(item))
+            messageProvider.itemNotClosable(item: theThat(item))
         case .itemNotDroppable(let item):
             messageProvider.itemNotDroppable(item: theThat(item))
         case .itemNotEdible(let item):
@@ -366,15 +366,15 @@ extension GameEngine {
         case .itemNotHeld(let item):
             messageProvider.itemNotHeld(item: theThat(item))
         case .itemNotInContainer(let item, let container):
-            messageProvider.itemNotInContainer(item: the(item), container: theThat(container))
+            messageProvider.itemNotInContainer(item: theThat(item), container: theThat(container))
         case .itemNotLockable(let item):
             messageProvider.itemNotLockable(item: theThat(item))
         case .itemNotOnSurface(let item, let surface):
-            messageProvider.itemNotOnSurface(item: the(item), surface: theThat(surface))
+            messageProvider.itemNotOnSurface(item: theThat(item), surface: theThat(surface))
         case .itemNotOpenable(let item):
             messageProvider.itemNotOpenable(item: theThat(item))
         case .itemNotReadable(let item):
-            messageProvider.itemNotReadable(item: the(item))
+            messageProvider.itemNotReadable(item: theThat(item))
         case .itemNotRemovable(let item):
             messageProvider.itemNotRemovable(item: theThat(item))
         case .itemNotTakable(let item):
@@ -384,7 +384,7 @@ extension GameEngine {
         case .itemNotWearable(let item):
             messageProvider.itemNotWearable(item: theThat(item))
         case .itemTooLargeForContainer(let item, let container):
-            messageProvider.itemTooLargeForContainer(item: the(item), container: theThat(container))
+            messageProvider.itemTooLargeForContainer(item: theThat(item), container: theThat(container))
         case .playerCannotCarryMore:
             messageProvider.playerCannotCarryMore()
         case .prerequisiteNotMet(let customMessage):
@@ -404,7 +404,7 @@ extension GameEngine {
         case .unknownVerb(let verb):
             messageProvider.unknownVerb(verb: verb)
         case .wrongKey(let keyID, let lockID):
-            messageProvider.wrongKey(key: the(keyID), lock: theThat(lockID))
+            messageProvider.wrongKey(key: theThat(keyID), lock: theThat(lockID))
         }
 
         await ioHandler.print(message)
@@ -519,23 +519,6 @@ extension GameEngine {
     ) -> String {
         if let itemName {
             "the \(itemName)"
-        } else {
-            alternate
-        }
-    }
-
-    /// Returns the capitalized definite article form of an item for sentence beginnings.
-    ///
-    /// - Parameters:
-    ///   - itemID: The item ID.
-    ///   - alternate: An alternate reference to the item.
-    /// - Returns: `The {name}` of an item (capitalized), or alternate if name is unknown.
-    private func the(
-        _ itemID: ItemID,
-        alternate: String = "That"
-    ) -> String {
-        if let item = try? item(itemID) {
-            item.withDefiniteArticle.capitalizedFirst
         } else {
             alternate
         }

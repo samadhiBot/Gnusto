@@ -710,7 +710,7 @@ public struct StandardParser: Parser {
         return result
     }
 
-    /// Extracts the likely noun and preceding modifiers from a phrase.
+        /// Extracts the likely noun and preceding modifiers from a phrase.
     /// Filters noise words, identifies known nouns, and assumes the last known noun is primary.
     private func extractNounAndMods(
         from phrase: [String],
@@ -718,6 +718,21 @@ public struct StandardParser: Parser {
     ) -> (noun: String?, mods: [String]) {
         let significantPhrase = phrase.filter { !vocabulary.noiseWords.contains($0) }
         guard !significantPhrase.isEmpty else { return (nil, []) }
+
+                        // First, check if the entire phrase (joined) matches any known item or location
+        // Only do this for multi-word phrases to avoid interfering with single-word cases
+        if significantPhrase.count > 1 {
+            let fullPhrase = significantPhrase.joined(separator: " ").lowercased()
+
+            // Check if the full phrase is a known item or location
+            if vocabulary.items.keys.contains(fullPhrase) {
+                return (fullPhrase, [])
+            }
+
+            if vocabulary.locationNames.keys.contains(fullPhrase) {
+                return (fullPhrase, [])
+            }
+        }
 
         let playerAliases: Set<String> = ["me", "self", "myself"]
         var knownNounIndices: [Int] = []
@@ -732,7 +747,7 @@ public struct StandardParser: Parser {
             }
         }
 
-        guard let lastNounIndex = knownNounIndices.last else {
+                guard let lastNounIndex = knownNounIndices.last else {
             let potentialMods = significantPhrase.filter { word in
                 !vocabulary.items.keys.contains(word) &&
                 !vocabulary.locationNames.keys.contains(word) &&
@@ -754,8 +769,20 @@ public struct StandardParser: Parser {
             let isKnownPrep = vocabulary.prepositions.contains(word)
             let isKnownDirection = vocabulary.directions.keys.contains(word)
 
-            if !isKnownNoun && !isKnownVerb && !isKnownPrep && !isKnownDirection {
-                mods.append(word)
+            // Refined logic: Include words before the chosen noun as modifiers if they are:
+            // 1. Not verbs, prepositions, or directions (original logic)
+            // 2. Not known nouns UNLESS we're dealing with a compound phrase that matches a specific item
+
+            // First check if this might be part of a compound phrase
+            let potentialCompoundPhrase = significantPhrase[index...lastNounIndex].joined(separator: " ").lowercased()
+            let isPartOfCompoundPhrase = vocabulary.items.keys.contains(potentialCompoundPhrase) ||
+                                        vocabulary.locationNames.keys.contains(potentialCompoundPhrase)
+
+            if !isKnownVerb && !isKnownPrep && !isKnownDirection {
+                // Include as modifier if it's not a known noun, OR if it's part of a compound phrase
+                if !isKnownNoun || isPartOfCompoundPhrase {
+                    mods.append(word)
+                }
             }
         }
 
@@ -855,7 +882,34 @@ public struct StandardParser: Parser {
         // 3. Noun Resolution (Items and Locations)
         var potentialEntities: [EntityReference] = []
 
-        // Check for items
+        // First, try alternative interpretations if modifiers are present
+        // Check if any modifier could actually be the primary noun
+        if !modifiers.isEmpty {
+            for modifier in modifiers {
+                let lowercasedModifier = modifier.lowercased()
+
+                // Check if the modifier is actually a noun for some items
+                if let itemIDs = vocabulary.items[lowercasedModifier] {
+                    for itemID in itemIDs {
+                        // Only consider this alternative if the item is specifically identified by this modifier
+                        // and also has the current noun as part of its name/synonyms
+                        if let item = gameState.items[itemID] {
+                            let itemNameWords = Set(item.name.lowercased().split(separator: " ").map(String.init))
+                            let itemSynonyms = Set(item.synonyms.map { $0.lowercased() })
+                            let allItemWords = itemNameWords.union(itemSynonyms)
+
+                            // If this item contains both the modifier and the noun in its identity,
+                            // consider it as an alternative interpretation
+                            if allItemWords.contains(lowercasedModifier) && allItemWords.contains(lowercasedNoun) {
+                                potentialEntities.append(.item(itemID))
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        // Check for items using the main noun
         if let itemIDs = vocabulary.items[lowercasedNoun] {
             for itemID in itemIDs {
                 potentialEntities.append(.item(itemID))
@@ -876,6 +930,8 @@ public struct StandardParser: Parser {
 
         // 4. Scope, Conditions, Modifiers, and Disambiguation
         var resolvedAndScopedEntities: [EntityReference] = []
+
+
 
         for entityRef in potentialEntities {
             switch entityRef {
@@ -927,16 +983,53 @@ public struct StandardParser: Parser {
             }
         }
 
-        if resolvedAndScopedEntities.isEmpty {
+                                if resolvedAndScopedEntities.isEmpty {
+            // Special case: If modifiers are provided, check if the full phrase (modifiers + noun)
+            // matches a synonym for any item that exists but is not accessible
+            if !modifiers.isEmpty {
+                let fullPhrase = (modifiers + [noun]).joined(separator: " ").lowercased()
+
+                // Look through all items to see if any have this full phrase as a synonym
+                for (_, itemIDs) in vocabulary.items {
+                    for itemID in itemIDs {
+                        if let item = gameState.items[itemID] {
+                            // Check if the full phrase matches the item's name or any synonym
+                            let itemNameLowercase = item.name.lowercased()
+                            let itemSynonyms = item.synonyms.map { $0.lowercased() }
+
+                            if itemNameLowercase == fullPhrase || itemSynonyms.contains(fullPhrase) {
+                                // This exact phrase refers to a specific item, but it's not accessible
+                                // Return an unresolved reference to trigger "You can't see any such thing."
+                                let unresolvedRef = EntityReference.item(ItemID(fullPhrase))
+                                return .success(unresolvedRef)
+                            }
+                        }
+                    }
+                }
+
+                // Check if any accessible items match the noun but not the modifiers
+                let itemCandidates = gatherCandidates(
+                    in: gameState,
+                    requiredConditions: requiredConditions
+                )
+                let accessiblePotentialItems = potentialEntities.compactMap { entityRef -> Item? in
+                    if case .item(let itemID) = entityRef,
+                       let item = itemCandidates[itemID] {
+                        return item
+                    }
+                    return nil
+                }
+
+                if !accessiblePotentialItems.isEmpty {
+                    // We have accessible items with this noun but none match the modifiers
+                    return .failure(.modifierMismatch(noun: noun, modifiers: modifiers))
+                }
+            }
+
             // If we had potential entities but none survived scoping/modifiers,
             // still return the first potential entity to allow action handlers
             // to provide more specific error messages
             if !potentialEntities.isEmpty {
-                if !modifiers.isEmpty {
-                    // For modifier mismatches, still pass through the first entity
-                    // but the action handler will need to deal with the modifier issue
-                    return .success(potentialEntities.first!)
-                }
                 // Return the first potential entity even if out of scope
                 return .success(potentialEntities.first!)
             }
