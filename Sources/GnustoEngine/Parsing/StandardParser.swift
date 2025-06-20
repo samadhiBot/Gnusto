@@ -867,8 +867,11 @@ public struct StandardParser: Parser {
             potentialEntities.append(.location(locationID))
         }
 
-        guard !potentialEntities.isEmpty else {
-            return .failure(.unknownNoun(noun))
+        // If no entities found in vocabulary, create an unresolved item reference
+        // This allows action handlers to provide more specific error messages
+        if potentialEntities.isEmpty {
+            let unresolvedRef = EntityReference.item(ItemID(noun))
+            return .success(unresolvedRef)
         }
 
         // 4. Scope, Conditions, Modifiers, and Disambiguation
@@ -925,11 +928,21 @@ public struct StandardParser: Parser {
         }
 
         if resolvedAndScopedEntities.isEmpty {
-            // If we had potential entities but none survived scoping/modifiers
-            if !potentialEntities.isEmpty && !modifiers.isEmpty {
-                 return .failure(.modifierMismatch(noun: noun, modifiers: modifiers))
+            // If we had potential entities but none survived scoping/modifiers,
+            // still return the first potential entity to allow action handlers
+            // to provide more specific error messages
+            if !potentialEntities.isEmpty {
+                if !modifiers.isEmpty {
+                    // For modifier mismatches, still pass through the first entity
+                    // but the action handler will need to deal with the modifier issue
+                    return .success(potentialEntities.first!)
+                }
+                // Return the first potential entity even if out of scope
+                return .success(potentialEntities.first!)
             }
-            return .failure(.itemNotInScope(noun: noun)) // Or a more generic EntityNotInScope
+
+            // This case should not happen given our changes above, but keep as fallback
+            return .failure(.itemNotInScope(noun: noun))
         }
 
         if resolvedAndScopedEntities.count > 1 {

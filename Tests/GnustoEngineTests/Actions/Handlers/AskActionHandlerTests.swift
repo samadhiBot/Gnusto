@@ -148,13 +148,37 @@ struct AskActionHandlerTests {
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // Act
-        try await engine.execute("ask wizard about wizard")
+        try await engine.execute("ask the wizard about the wizard")
 
         // Assert
         let output = await mockIO.flush()
         expectNoDifference(output, """
-            > ask wizard about wizard
-            You can’t see any wizard here.
+            > ask the wizard about the wizard
+            You can’t see any such thing.
+            """)
+    }
+
+    @Test("Ask inaccessible but previously met character fails")
+    func testAskInaccessiblePreviouslyMetCharacterFails() async throws {
+        // Given
+        let wizard = Item(
+            id: "wizard",
+            .name("old wizard"),
+            .in(.nowhere),
+            .isCharacter,
+            .isTouched
+        )
+        let game = MinimalGame(items: wizard)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // Act
+        try await engine.execute("ask the wizard about the wizard")
+
+        // Assert
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            > ask the wizard about the wizard
+            You can’t see the old wizard.
             """)
     }
 }

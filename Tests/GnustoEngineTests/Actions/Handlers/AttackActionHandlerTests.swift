@@ -32,16 +32,17 @@ struct AttackActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > attack nonexistent
-            You can’t see any nonexistent here.
+            You can’t see any such thing.
             """)
     }
 
-    @Test("Attack validates item not reachable")
-    func testAttackValidatesItemNotReachable() async throws {
+    @Test("Attack validates unknown (not yet met) item not reachable")
+    func testAttackValidatesUnknownItemNotReachable() async throws {
         // Given
         let distantGoblin = Item(
-            id: "distant_goblin",
+            id: "distantGoblin",
             .name("distant goblin"),
+            .synonyms("goblin"),
             .in(.nowhere),
             .isCharacter
         )
@@ -50,12 +51,48 @@ struct AttackActionHandlerTests {
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // When / Then
-        try await engine.execute("attack distant goblin")
+        try await engine.execute("attack the goblin")
 
         let output = await mockIO.flush()
         expectNoDifference(output, """
-            > attack distant goblin
-            You can’t see any goblin here.
+            > attack the goblin
+            You can’t see any such thing.
+            """)
+    }
+
+    @Test("Attack validates item met but not reachable")
+    func testAttackValidatesItemMetButNotReachable() async throws {
+        // Given
+        let here = Location(
+            id: "startRoom",
+            .inherentlyLit
+        )
+        let distantLand = Location(
+            id: "distantLand",
+            .inherentlyLit
+        )
+        let distantGoblin = Item(
+            id: "distantGoblin",
+            .name("distant goblin"),
+            .synonyms("goblin"),
+            .in(.location("distantLand")),
+            .isCharacter,
+            .isTouched
+        )
+
+        let game = MinimalGame(
+            locations: here, distantLand,
+            items: distantGoblin
+        )
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // When / Then
+        try await engine.execute("attack the goblin")
+
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            > attack the goblin
+            You can’t see the distant goblin.
             """)
     }
 

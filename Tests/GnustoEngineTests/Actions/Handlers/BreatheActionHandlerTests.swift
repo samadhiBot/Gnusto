@@ -49,7 +49,8 @@ struct BreatheActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > breathe
-            You take a breath, noting that it's roughly the same as the last one.
+            You take a breath, noting that it’s roughly the same as the
+            last one.
             """)
     }
 
@@ -65,13 +66,16 @@ struct BreatheActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > breathe
-            You take a breath, noting that it's roughly the same as the last one.
+            You take a breath, noting that it’s roughly the same as the
+            last one.
 
             > breathe
-            You take a breath, noting that it's roughly the same as the last one.
+            You breathe in life’s very essence, which tastes faintly of
+            confusion.
 
             > breathe
-            You take a tentative breath, unsure whether the atmosphere is still working.
+            You breathe with great purpose, although breathing tends to
+            happen anyway.
             """)
     }
 

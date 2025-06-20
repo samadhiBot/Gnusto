@@ -182,7 +182,8 @@ struct BlowActionHandlerTests {
     func testBlowInaccessibleItem() async throws {
         let balloon = Item(
             id: "balloon",
-            .name("balloon"),
+            .name("held balloon"),
+            .synonyms("held", "balloon"),
             .isTakable,
             .in(.player)
         )
@@ -190,8 +191,10 @@ struct BlowActionHandlerTests {
         let distantBalloon = Item(
             id: "distantBalloon",
             .name("distant balloon"),
+            .synonyms("distant", "balloon"),
             .isTakable,
-            .in(.location("anotherRoom"))
+            .in(.location("anotherRoom")),
+            .isTouched
         )
 
         let testRoom = Location(
@@ -217,13 +220,13 @@ struct BlowActionHandlerTests {
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // Execute the command through the full pipeline
-        try await engine.execute("blow distant balloon")
+        try await engine.execute("blow on the distant balloon")
 
         // Check that an error message was displayed
         let output = await mockIO.flush()
         expectNoDifference(output, """
-            > blow distant balloon
-            You can’t see any distant balloon here.
+            > blow on the distant balloon
+            You can’t see any such thing.
             """)
     }
 }
