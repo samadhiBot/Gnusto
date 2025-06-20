@@ -125,12 +125,12 @@ struct AskActionHandlerTests {
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // Act
-        try await engine.execute("ask wizard about room")
+        try await engine.execute("ask wizard about the void")
 
         // Assert
         let output = await mockIO.flush()
         expectNoDifference(output, """
-            > ask wizard about room
+            > ask wizard about the void
             Old wizard doesn’t seem to know anything about any Void.
             """)
     }

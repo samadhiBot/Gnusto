@@ -666,7 +666,7 @@ open class MessageProvider: @unchecked Sendable {
     }
 
     open func itemNotInScope(noun: String) -> String {
-        "You can't see any '\(noun)' here."
+        "You can't see any \(noun) here."
     }
 
     open func itemNotLockable(item: String) -> String {
@@ -860,7 +860,7 @@ open class MessageProvider: @unchecked Sendable {
     }
 
     open func modifierMismatch(noun: String, modifiers: [String]) -> String {
-        "I don't see any '\(modifiers.joined(separator: " ")) \(noun)' here."
+        "You can't see any \(modifiers.joined(separator: " ")) \(noun) here."
     }
 
     open func moveWhat() -> String {
@@ -1370,7 +1370,7 @@ open class MessageProvider: @unchecked Sendable {
     }
 
     open func unknownNoun(noun: String) -> String {
-        "I don't see any '\(noun)' here."
+        "You can't see any \(noun) here."
     }
 
     open func unknownVerb(verb: String) -> String {
