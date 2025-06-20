@@ -33,7 +33,10 @@ struct CloseActionHandlerTests {
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "> close box\n\nClosed.")
+        expectNoDifference(output, """
+            > close box
+            Closed.
+            """)
 
         // Assert Change History
         let changeHistory = await engine.gameState.changeHistory
@@ -77,7 +80,10 @@ struct CloseActionHandlerTests {
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "> close box\n\nThe wooden box is already closed.")
+        expectNoDifference(output, """
+            > close box
+            The wooden box is already closed.
+            """)
 
         // Assert Change History
         #expect(await engine.gameState.changeHistory.isEmpty)
@@ -99,7 +105,10 @@ struct CloseActionHandlerTests {
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "> close rock\n\nYou can't close the smooth rock.")
+        expectNoDifference(output, """
+            > close rock
+            You can't close the smooth rock.
+            """)
 
         #expect(await engine.gameState.changeHistory.isEmpty)
     }
@@ -121,7 +130,10 @@ struct CloseActionHandlerTests {
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "> close box\n\nYou can't see any such thing.")
+        expectNoDifference(output, """
+            > close box
+            You can't see any such thing.
+            """)
 
         #expect(await engine.gameState.changeHistory.isEmpty)
     }
@@ -135,7 +147,10 @@ struct CloseActionHandlerTests {
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "> close\n\nClose what?")
+        expectNoDifference(output, """
+            > close
+            Close what?
+            """)
 
         #expect(await engine.gameState.changeHistory.isEmpty)
     }

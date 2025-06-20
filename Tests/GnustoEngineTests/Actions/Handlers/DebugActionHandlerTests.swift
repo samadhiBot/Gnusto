@@ -44,7 +44,10 @@ struct DebugActionHandlerTests {
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "> debug\n\nDEBUG requires a direct object to examine.")
+        expectNoDifference(output, """
+            > debug
+            DEBUG requires a direct object to examine.
+            """)
     }
 
     @Test("DEBUG validates player successfully")
@@ -95,7 +98,10 @@ struct DebugActionHandlerTests {
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "> debug nonexistent_item\n\nYou can't see any such thing.")
+        expectNoDifference(output, """
+            > debug nonexistent_item
+            You can't see any such thing.
+            """)
     }
 
     @Test("DEBUG fails for non-existent location")
@@ -107,7 +113,10 @@ struct DebugActionHandlerTests {
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "> debug nonexistent_location\n\nYou can't see any such thing.")
+        expectNoDifference(output, """
+            > debug nonexistent_location
+            You can't see any such thing.
+            """)
     }
 
     // MARK: - Processing Tests

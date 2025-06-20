@@ -28,7 +28,11 @@ struct GoActionHandlerTests {
         try await engine.execute("north")
 
         let output = await mockIO.flush()
-        expectNoDifference(output, "> north\n\n— end —\n\nYou went there.")
+        expectNoDifference(output, """
+            > north
+            — end —
+            You went there.
+            """)
     }
 
     @Test("GO NORTH prints blocked message when exit is blocked")
@@ -59,7 +63,10 @@ struct GoActionHandlerTests {
 
         // Assert: Should get blocked message
         let output = await mockIO.flush()
-        expectNoDifference(output, "> north\n\nA wall blocks your path.")
+        expectNoDifference(output, """
+            > north
+            A wall blocks your path.
+            """)
     }
 
     @Test("GO NORTH fails when no exit exists")
@@ -84,7 +91,10 @@ struct GoActionHandlerTests {
 
         // Assert: Should get invalid direction message
         let output = await mockIO.flush()
-        expectNoDifference(output, "> north\n\nYou can't go that way.")
+        expectNoDifference(output, """
+            > north
+            You can't go that way.
+            """)
     }
 
     @Test("Go to adjacent room successfully")
@@ -111,7 +121,11 @@ struct GoActionHandlerTests {
         #expect(await engine.playerLocationID == "hall")
 
         let output = await mockIO.flush()
-        expectNoDifference(output, "> go north\n\n— hall —\n\nA long hall.")
+        expectNoDifference(output, """
+            > go north
+            — hall —
+            A long hall.
+            """)
     }
 
     @Test("Go fails with no exit in direction")
@@ -132,7 +146,10 @@ struct GoActionHandlerTests {
         // Assert
         #expect(await engine.playerLocationID == "foyer") // Player hasn't moved
         let output = await mockIO.flush()
-        expectNoDifference(output, "> go north\n\nYou can't go that way.")
+        expectNoDifference(output, """
+            > go north
+            You can't go that way.
+            """)
     }
 
     @Test("Go fails with locked door")
@@ -174,7 +191,10 @@ struct GoActionHandlerTests {
         // Assert
         #expect(await engine.playerLocationID == "foyer") // Player hasn't moved
         let output = await mockIO.flush()
-        expectNoDifference(output, "> go north\n\nThe door to the vault is locked.")
+        expectNoDifference(output, """
+            > go north
+            The door to the vault is locked.
+            """)
     }
 
     @Test("Go fails with conditional exit (condition not met)")
@@ -214,7 +234,10 @@ struct GoActionHandlerTests {
         // Assert
         #expect(await engine.playerLocationID == "foyer") // Player hasn't moved
         let output = await mockIO.flush()
-        expectNoDifference(output, "> go east\n\nYou can't go that way.")
+        expectNoDifference(output, """
+            > go east
+            You can't go that way.
+            """)
     }
 
     /* TODO: implement conditional exits
@@ -285,7 +308,10 @@ struct GoActionHandlerTests {
         // Assert
         #expect(await engine.playerLocationID == "foyer") // Player hasn't moved
         let output = await mockIO.flush()
-        expectNoDifference(output, "> go\n\nGo where?")
+        expectNoDifference(output, """
+            > go
+            Go where?
+            """)
     }
 
     @Test("GO fails with permanently blocked exit (nil destination)")
@@ -313,7 +339,10 @@ struct GoActionHandlerTests {
 
         // Assert: Should get custom blocked message
         let output = await mockIO.flush()
-        expectNoDifference(output, "> go north\n\nThe path is overgrown with thorns.")
+        expectNoDifference(output, """
+            > go north
+            The path is overgrown with thorns.
+            """)
     }
 
     @Test("GO fails with permanently blocked exit (no custom message)")
@@ -337,6 +366,9 @@ struct GoActionHandlerTests {
 
         // Assert: Should get generic invalid direction message
         let output = await mockIO.flush()
-        expectNoDifference(output, "> go south\n\nYou can't go that way.")
+        expectNoDifference(output, """
+            > go south
+            You can't go that way.
+            """)
     }
 }

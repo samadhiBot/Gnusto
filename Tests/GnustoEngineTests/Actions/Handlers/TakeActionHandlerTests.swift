@@ -157,7 +157,10 @@ struct TakeActionHandlerTests {
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "> take key\n\nYou already have that.")
+        expectNoDifference(output, """
+            > take key
+            You already have that.
+            """)
 
         // Assert Change History (Should be empty)
         #expect(await engine.gameState.changeHistory.isEmpty)
@@ -181,7 +184,10 @@ struct TakeActionHandlerTests {
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "> take figurine\n\nYou can't see any such thing.")
+        expectNoDifference(output, """
+            > take figurine
+            You can't see any such thing.
+            """)
 
         // Assert No State Change
         #expect(await engine.gameState.changeHistory.isEmpty)
@@ -208,7 +214,10 @@ struct TakeActionHandlerTests {
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "> take rock\n\nYou can't take the heavy rock.")
+        expectNoDifference(output, """
+            > take rock
+            You can't take the heavy rock.
+            """)
 
         // Assert No State Change
         #expect(await engine.gameState.changeHistory.isEmpty)
@@ -228,7 +237,10 @@ struct TakeActionHandlerTests {
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "> take\n\nTake what?")
+        expectNoDifference(output, """
+            > take
+            Take what?
+            """)
 
         // Assert No State Change
         #expect(await engine.gameState.changeHistory.isEmpty)

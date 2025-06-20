@@ -14,7 +14,10 @@ struct QuitActionHandlerTests {
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "> quit\n\nGoodbye!")
+        expectNoDifference(output, """
+            > quit
+            Goodbye!
+            """)
     }
 
     @Test("QUIT produces correct ActionResult")
@@ -91,7 +94,10 @@ struct QuitActionHandlerTests {
 
         // Assert Output - should be the same as QUIT
         let output = await mockIO.flush()
-        expectNoDifference(output, "> q\n\nGoodbye!")
+        expectNoDifference(output, """
+            > q
+            Goodbye!
+            """)
 
         // Should also request quit
         #expect(await engine.shouldQuit)
@@ -141,7 +147,10 @@ struct QuitActionHandlerTests {
 
         // Assert Output is unchanged
         let output = await mockIO.flush()
-        expectNoDifference(output, "> quit\n\nGoodbye!")
+        expectNoDifference(output, """
+            > quit
+            Goodbye!
+            """)
 
         // Should still request quit
         #expect(await engine.shouldQuit)
@@ -177,7 +186,10 @@ struct QuitActionHandlerTests {
 
         // Assert Output - should work the same way
         let output = await mockIO.flush()
-        expectNoDifference(output, "> quit game now\n\nGoodbye!")
+        expectNoDifference(output, """
+            > quit game now
+            Goodbye!
+            """)
 
         // Should request quit
         #expect(await engine.shouldQuit)
@@ -197,7 +209,13 @@ struct QuitActionHandlerTests {
         let secondOutput = await mockIO.flush()
 
         // Both outputs should be identical
-        expectNoDifference(firstOutput, "> quit\n\nGoodbye!")
-        expectNoDifference(secondOutput, "> quit\n\nGoodbye!")
+        expectNoDifference(firstOutput, """
+            > quit
+            Goodbye!
+            """)
+        expectNoDifference(secondOutput, """
+            > quit
+            Goodbye!
+            """)
     }
 }

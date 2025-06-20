@@ -141,7 +141,10 @@ struct EmptyActionHandlerTests {
 
         // Check the output
         let output = await mockIO.flush()
-        expectNoDifference(output, "> empty\n\nEmpty what?")
+        expectNoDifference(output, """
+            > empty
+            Empty what?
+            """)
     }
 
     @Test("EMPTY command on container with contents")
@@ -161,7 +164,10 @@ struct EmptyActionHandlerTests {
 
         // Check the output
         let output = await mockIO.flush()
-        expectNoDifference(output, "> empty box\n\nYou empty the box, and a coin falls to the ground.")
+        expectNoDifference(output, """
+            > empty box
+            You empty the box, and a coin falls to the ground.
+            """)
     }
 
     @Test("EMPTY command on empty container")
@@ -177,7 +183,10 @@ struct EmptyActionHandlerTests {
 
         // Check the output
         let output = await mockIO.flush()
-        expectNoDifference(output, "> empty box\n\nThe box is already empty.")
+        expectNoDifference(output, """
+            > empty box
+            The box is already empty.
+            """)
     }
 
     @Test("EMPTY command on closed container")
