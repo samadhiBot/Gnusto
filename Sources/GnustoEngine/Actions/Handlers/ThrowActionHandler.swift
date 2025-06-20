@@ -56,18 +56,21 @@ public struct ThrowActionHandler: ActionHandler {
     public func process(context: ActionContext) async throws -> ActionResult {
         guard let directObjectRef = context.command.directObject else {
             throw ActionResponse.internalEngineError(
-                "ThrowActionHandler: directObject was nil in process.")
+                "ThrowActionHandler: directObject was nil in process."
+            )
         }
 
         // Handle self reference
         if case .player = directObjectRef {
-            let message = context.message.cannotThrowYourself()
-            return ActionResult(message)
+            return ActionResult(
+                context.message.cannotVerbYourself(verb: "throw")
+            )
         }
 
         guard case .item(let itemToThrowID) = directObjectRef else {
             throw ActionResponse.internalEngineError(
-                "ThrowActionHandler: directObject was not an item in process.")
+                "ThrowActionHandler: directObject was not an item in process."
+            )
         }
 
         let itemToThrow = try await context.engine.item(itemToThrowID)

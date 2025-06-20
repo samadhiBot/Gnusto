@@ -50,75 +50,6 @@ struct DebugActionHandlerTests {
             """)
     }
 
-    @Test("DEBUG validates player successfully")
-    func testValidationSucceedsForPlayer() async throws {
-        let (engine, mockIO) = await createTestEngine()
-
-        // Act
-        try await engine.execute("debug self")
-
-        // Assert Output
-        let output = await mockIO.flush()
-        #expect(output.contains("```"))
-        #expect(output.contains("Player") || output.contains("player"))
-    }
-
-    @Test("DEBUG validates existing item successfully")
-    func testValidationSucceedsForExistingItem() async throws {
-        let (engine, mockIO) = await createTestEngine()
-
-        // Act
-        try await engine.execute("debug test_item")
-
-        // Assert Output
-        let output = await mockIO.flush()
-        #expect(output.contains("```"))
-        #expect(output.contains("test_item") || output.contains("Item"))
-    }
-
-    @Test("DEBUG validates existing location successfully")
-    func testValidationSucceedsForExistingLocation() async throws {
-        let (engine, mockIO) = await createTestEngine()
-
-        // Act
-        try await engine.execute("debug test_location")
-
-        // Assert Output
-        let output = await mockIO.flush()
-        #expect(output.contains("```"))
-        #expect(output.contains("test_location") || output.contains("Location"))
-    }
-
-    @Test("DEBUG fails for non-existent item")
-    func testValidationFailsForNonExistentItem() async throws {
-        let (engine, mockIO) = await createTestEngine()
-
-        // Act
-        try await engine.execute("debug nonexistent_item")
-
-        // Assert Output
-        let output = await mockIO.flush()
-        expectNoDifference(output, """
-            > debug nonexistent_item
-            You can’t see any such thing.
-            """)
-    }
-
-    @Test("DEBUG fails for non-existent location")
-    func testValidationFailsForNonExistentLocation() async throws {
-        let (engine, mockIO) = await createTestEngine()
-
-        // Act
-        try await engine.execute("debug nonexistent_location")
-
-        // Assert Output
-        let output = await mockIO.flush()
-        expectNoDifference(output, """
-            > debug nonexistent_location
-            You can’t see any such thing.
-            """)
-    }
-
     // MARK: - Processing Tests
 
     @Test("DEBUG player produces formatted output")
@@ -132,8 +63,18 @@ struct DebugActionHandlerTests {
         let output = await mockIO.flush()
 
         // Should contain markdown code block and player data
-        #expect(output.contains("```"))
-        #expect(output.contains("Player") || output.contains("player"))
+        expectNoDifference(output, """
+            > debug self
+            ```
+            Player(
+              carryingCapacity: 100,
+              currentLocationID: .startRoom,
+              health: 100,
+              moves: 0,
+              score: 0
+            )
+            ```
+            """)
     }
 
     @Test("DEBUG item produces formatted output")
@@ -141,14 +82,26 @@ struct DebugActionHandlerTests {
         let (engine, mockIO) = await createTestEngine()
 
         // Act
-        try await engine.execute("debug test_item")
+        try await engine.execute("debug test item")
 
         // Assert Output
         let output = await mockIO.flush()
 
         // Should contain markdown code block and item data
-        #expect(output.contains("```"))
-        #expect(output.contains("test_item") || output.contains("Item"))
+        expectNoDifference(output, """
+            > debug test item
+            ```
+            Item(
+              id: .test_item,
+              attributes: [
+                .description: .string("A test item for debugging."),
+                .isTakable: .bool(true),
+                .name: .string("test item"),
+                .parentEntity: .parentEntity(..player)
+              ]
+            )
+            ```
+            """)
     }
 
     @Test("DEBUG location produces formatted output")
@@ -156,14 +109,25 @@ struct DebugActionHandlerTests {
         let (engine, mockIO) = await createTestEngine()
 
         // Act
-        try await engine.execute("debug test_location")
+        try await engine.execute("debug test location")
 
         // Assert Output
         let output = await mockIO.flush()
 
         // Should contain markdown code block and location data
-        #expect(output.contains("```"))
-        #expect(output.contains("test_location") || output.contains("Location"))
+        expectNoDifference(output, """
+            > debug test location
+            ```
+            Location(
+              id: .test_location,
+              attributes: [
+                .description: .string("A test location for debugging."),
+                .exits: .exits(.north: to: .other_location),
+                .name: .string("Test Location")
+              ]
+            )
+            ```
+            """)
     }
 
     // MARK: - Output Format Tests
@@ -179,30 +143,18 @@ struct DebugActionHandlerTests {
         let output = await mockIO.flush()
 
         // Should start and end with code block markers
-        #expect(output.contains("```"))
-    }
-
-    @Test("DEBUG output contains meaningful entity data")
-    func testOutputContainsMeaningfulData() async throws {
-        let (engine, mockIO) = await createTestEngine()
-
-        // Test item debug
-        try await engine.execute("debug test_item")
-        let itemOutput = await mockIO.flush()
-
-        // Should contain item-specific data
-        #expect(
-            itemOutput.contains("test_item") == true
-                || itemOutput.contains("id") == true)
-
-        // Test location debug
-        try await engine.execute("debug test_location")
-        let locationOutput = await mockIO.flush()
-
-        // Should contain location-specific data
-        #expect(
-            locationOutput.contains("test_location") == true
-                || locationOutput.contains("id") == true)
+        expectNoDifference(output, """
+            > debug self
+            ```
+            Player(
+              carryingCapacity: 100,
+              currentLocationID: .startRoom,
+              health: 100,
+              moves: 0,
+              score: 0
+            )
+            ```
+            """)
     }
 
     // MARK: - Edge Cases
@@ -219,28 +171,47 @@ struct DebugActionHandlerTests {
             .isContainer,
             .size(10),
             .capacity(5),
-            .in(.location("test_location"))
+            .in(.location(.startRoom))
         )
 
         let game = MinimalGame(items: complexItem)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // Act
-        try await engine.execute("debug complex_item")
+        try await engine.execute("debug complex item")
 
         // Assert Output
         let output = await mockIO.flush()
 
         // Should contain complex item data
-        #expect(output.contains("```"))
-        #expect(output.contains("complex_item"))
+        expectNoDifference(output, """
+            > debug complex item
+            ```
+            Item(
+              id: .complex_item,
+              attributes: [
+                .capacity: .int(5),
+                .description: .string("A complex item with many properties."),
+                .isContainer: .bool(true),
+                .isOpenable: .bool(true),
+                .isTakable: .bool(true),
+                .isWearable: .bool(true),
+                .name: .string("complex item"),
+                .parentEntity: .parentEntity(
+                  .location(.startRoom)
+                ),
+                .size: .int(10)
+              ]
+            )
+            ```
+            """)
     }
 
     @Test("DEBUG works with location that has complex exits")
     func testDebugComplexLocation() async throws {
         let complexLocation = Location(
             id: "complex_location",
-            .name("Complex Location"),
+            .name("complex Location"),
             .description("A location with multiple exits and properties."),
             .exits([
                 .north: .to("north_room"),
@@ -255,14 +226,31 @@ struct DebugActionHandlerTests {
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // Act
-        try await engine.execute("debug complex_location")
+        try await engine.execute("debug complex Location")
 
         // Assert Output
         let output = await mockIO.flush()
 
         // Should contain complex location data
-        #expect(output.contains("```"))
-        #expect(output.contains("complex_location"))
+        expectNoDifference(output, """
+            > debug complex Location
+            ```
+            Location(
+              id: .complex_location,
+              attributes: [
+                .description: .string("A location with multiple exits and properties."),
+                .exits: .exits(
+                  .east: to: .east_room
+                  .north: to: .north_room
+                  .south: to: .south_room
+                  .west: to: .west_room
+                ),
+                .inherentlyLit: .bool(true),
+                .name: .string("complex Location")
+              ]
+            )
+            ```
+            """)
     }
 
     @Test("DEBUG works with player that has modified state")
@@ -291,7 +279,17 @@ struct DebugActionHandlerTests {
         let output = await mockIO.flush()
 
         // Should contain player data
-        #expect(output.contains("```"))
-        #expect(output.contains("Player") || output.contains("player"))
+        expectNoDifference(output, """
+            > debug self
+            ```
+            Player(
+              carryingCapacity: 100,
+              currentLocationID: .startRoom,
+              health: 100,
+              moves: 50,
+              score: 100
+            )
+            ```
+            """)
     }
 }

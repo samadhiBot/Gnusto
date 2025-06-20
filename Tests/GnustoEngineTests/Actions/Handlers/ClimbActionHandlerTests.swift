@@ -185,7 +185,7 @@ struct ClimbActionHandlerTests {
 
     // MARK: - Global Object Validation Tests
 
-    @Test("Climb stairs when not present in location")
+    @Test("Climb stairs when touched but not present in location")
     func testClimbStairsNotPresent() async throws {
         // Arrange: Location without stairs in localGlobals
         let room = Location(
@@ -199,7 +199,7 @@ struct ClimbActionHandlerTests {
             id: "stairs",
             .name("stairs"),
             .isClimbable,
-            .in(.nowhere)  // Global item
+            .isTouched
         )
 
         let player = Player(in: "room")
@@ -218,7 +218,7 @@ struct ClimbActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > climb stairs
-            You can’t see any stairs here.
+            You can’t see the stairs.
             """)
     }
 
@@ -301,7 +301,7 @@ struct ClimbActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > climb tree
-            You can’t see any tree here.
+            You can’t see any such thing.
             """)
     }
 
@@ -470,6 +470,7 @@ struct ClimbActionHandlerTests {
             """
             > climb stairs
             You are plunged into darkness.
+
             It is pitch black. You can’t see a thing.
             """)
     }
@@ -521,6 +522,7 @@ struct ClimbActionHandlerTests {
         expectNoDifference(output, """
             > climb stairs
             — Living Room —
+
             A cozy living room.
             """)
     }

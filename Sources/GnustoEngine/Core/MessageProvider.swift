@@ -267,11 +267,6 @@ open class MessageProvider: @unchecked Sendable {
         return "You can't smell that."
     }
 
-    open func cannotThrowYourself() -> String {
-        log("cannotThrowYourself()")
-        return "You can't throw yourself."
-    }
-
     open func cannotTurnOff() -> String {
         log("cannotTurnOff()")
         return "You can't turn that off."
@@ -280,6 +275,11 @@ open class MessageProvider: @unchecked Sendable {
     open func cannotTurnOn() -> String {
         log("cannotTurnOn()")
         return "You can't turn that on."
+    }
+
+    open func cannotVerbYourself(verb: String) -> String {
+        log("cannotVerbYourself(verb: '\(verb)'")
+        return "You can't \(verb) yourself."
     }
 
     open func canOnlyActOnCharacters(verb: String) -> String {

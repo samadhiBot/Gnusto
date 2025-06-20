@@ -10,12 +10,12 @@ public struct ClimbOnActionHandler: ActionHandler {
     /// - Parameter context: The `ActionContext` containing the command and game state.
     /// - Throws: An `ActionResponse` if validation fails.
     public func validate(context: ActionContext) async throws {
-        guard let indirectObjectRef = context.command.indirectObject else {
+        guard let directObjectRef = context.command.directObject else {
             let message = context.message.climbOnWhat()
             throw ActionResponse.prerequisiteNotMet(message)
         }
 
-        guard case .item(let targetItemID) = indirectObjectRef else {
+        guard case .item(let targetItemID) = directObjectRef else {
             let message = context.message.cannotActOnThat(verb: "climb on")
             throw ActionResponse.prerequisiteNotMet(message)
         }
@@ -35,10 +35,10 @@ public struct ClimbOnActionHandler: ActionHandler {
     /// - Parameter context: The `ActionContext` containing the command and game state.
     /// - Returns: An `ActionResult` with the action outcome.
     public func process(context: ActionContext) async throws -> ActionResult {
-        guard case .item(let targetItemID) = context.command.indirectObject else {
+        guard case .item(let targetItemID) = context.command.directObject else {
             let message = context.message.actionHandlerInternalError(
                 handler: "ClimbOnActionHandler",
-                details: "indirectObject was not an item in process"
+                details: "directObject was not an item in process"
             )
             throw ActionResponse.internalEngineError(message)
         }

@@ -25,9 +25,18 @@ public struct ClimbActionHandler: ActionHandler {
             return
         }
 
-        guard case .item(let targetItemID) = directObjectRef else {
-            let message = context.message.cannotActOnThat(verb: "climb")
-            throw ActionResponse.prerequisiteNotMet(message)
+        let targetItemID: ItemID
+        switch directObjectRef {
+        case .item(let itemID):
+            targetItemID = itemID
+        case .location:
+            throw ActionResponse.prerequisiteNotMet(
+                context.message.cannotActOnThat(verb: "climb")
+            )
+        case .player:
+            throw ActionResponse.prerequisiteNotMet(
+                context.message.cannotVerbYourself(verb: "climb")
+            )
         }
 
         // Check if the target exists

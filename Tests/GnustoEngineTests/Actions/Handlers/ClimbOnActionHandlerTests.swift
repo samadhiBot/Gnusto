@@ -5,12 +5,13 @@ import Testing
 
 @Suite("ClimbOnActionHandler Tests")
 struct ClimbOnActionHandlerTests {
-
     @Test("Climb on item gives default response")
     func testClimbOnItemGivesDefaultResponse() async throws {
         let chair = Item(
             id: "chair",
             .name("wooden chair"),
+            .adjectives("wooden"),
+            .synonyms("chair"),
             .in(.location(.startRoom)),
             .isTakable
         )
@@ -19,14 +20,14 @@ struct ClimbOnActionHandlerTests {
 
         // Initial state check
         let initialChair = try await engine.item("chair")
-        #expect(initialChair.attributes[.isTouched] == nil)
+        #expect(initialChair.hasFlag(.isTouched) == false)
 
         // Act
         try await engine.execute("climb on chair")
 
         // Assert State Change
         let finalChair = try await engine.item("chair")
-        #expect(finalChair.hasFlag(.isTouched))
+        #expect(finalChair.hasFlag(.isTouched) == true)
 
         // Assert Output
         let output = await mockIO.flush()
@@ -54,7 +55,30 @@ struct ClimbOnActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > climb on chair
-            You can’t see any wooden chair here.
+            You can’t see any such thing.
+            """)
+    }
+
+    @Test("Climb on fails if item touched but not accessible")
+    func testClimbOnFailsIfTouchedButNotAccessible() async throws {
+        let chair = Item(
+            id: "chair",
+            .name("wooden chair"),
+            .in(.nowhere),
+            .isTakable,
+            .isTouched
+        )
+        let game = MinimalGame(items: chair)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // Act
+        try await engine.execute("climb on chair")
+
+        // Assert Output
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            > climb on chair
+            You can’t see the wooden chair.
             """)
     }
 
@@ -78,13 +102,13 @@ struct ClimbOnActionHandlerTests {
         let (engine, mockIO) = await GameEngine.test()
 
         // Act
-        try await engine.execute("climb on room")
+        try await engine.execute("climb on the void")
 
         // Assert Output
         let output = await mockIO.flush()
         expectNoDifference(output, """
-            > climb on room
-            You can only climb on specific items.
+            > climb on the void
+            You can’t climb on that.
             """)
     }
 
@@ -113,7 +137,7 @@ struct ClimbOnActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > climb on ladder
-            You can’t see any small ladder here.
+            You can’t see any such thing.
             """)
     }
 

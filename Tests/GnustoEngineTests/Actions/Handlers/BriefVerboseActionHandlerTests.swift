@@ -1,5 +1,6 @@
 import CustomDump
 import Testing
+
 @testable import GnustoEngine
 
 @Suite("Brief and Verbose Action Handler Tests")
@@ -65,9 +66,9 @@ struct BriefVerboseActionHandlerTests {
         let result = try await verboseHandler.process(context: context)
 
         // Then
-        #expect(result.message == """
-            Maximum verbosity. Full location descriptions \
-            will be shown every time you enter a location.
+        expectNoDifference(result.message, """
+            Maximum verbosity. Full location descriptions will
+            be shown every time you enter a location.
             """)
         #expect(result.changes.count == 1) // Should set verbose mode
         #expect(result.effects.isEmpty)
@@ -91,8 +92,8 @@ struct BriefVerboseActionHandlerTests {
 
         // Then
         #expect(result.message == """
-            Maximum verbosity. Full location descriptions \
-            will be shown every time you enter a location.
+            Maximum verbosity. Full location descriptions will
+            be shown every time you enter a location.
             """)
         #expect(result.changes.count == 2) // Should set verbose mode and clear brief mode
     }
