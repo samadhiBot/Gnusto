@@ -560,7 +560,7 @@ struct GameStateApplyTests {
             Issue.record("Test setup failure: WOH location not found.")
             return
         }
-        // Let's change the .isLit attribute (assuming it exists)
+        // Let’s change the .isLit attribute (assuming it exists)
         let attributeID: LocationAttributeID = .isLit
         let oldAttributeValue = initialLocation.attributes[attributeID]
         let newAttributeValue: StateValue = true
@@ -589,7 +589,7 @@ struct GameStateApplyTests {
             Issue.record("Test setup failure: WOH location not found.")
             return
         }
-        // Let's try to change the .isLit attribute
+        // Let’s try to change the .isLit attribute
         let attributeID: LocationAttributeID = .isLit
         let actualOldValue = initialLocation.attributes[attributeID]
         // Ensure incorrectOldValue is different

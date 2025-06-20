@@ -225,20 +225,19 @@ public struct StandardParser: Parser {
                             continue // Try next rule, this one is invalid for this input
                         }
                     } else {
-                        // RULE REQUIRES PREP, INPUT HAS NONE - Record error, continue
-                        // Use the specific verb associated with this rule
-                        let missingPrepError = ParseError.badGrammar("Verb '\(verb)' requires preposition '\(requiredPrep)' which was missing.")
-                        if bestError == nil || shouldReplaceError(existing: bestError!, new: missingPrepError) {
-                            bestError = missingPrepError
+                        // RULE REQUIRES PREP, INPUT HAS NONE - Allow command to proceed
+                        // The action handler will provide appropriate error messages for missing prepositions
+                        if successfulParse == nil {
+                            successfulParse = command // Allow command with missing preposition
                         }
-                        continue // Try next rule, this one is invalid for this input
+                        continue // Continue searching for potentially better matches
                     }
                 } else {
                     // RULE REQUIRES NO SPECIFIC PREPOSITION
                     // If the input *also* has no preposition, this is a strong match.
                     // If the input *does* have a preposition, this is still a structural match,
                     // but potentially weaker than one where prepositions align. ZIL often ignores extra preps.
-                    // Let's treat this as a potential success but keep looking for a better (preposition-matching) rule.
+                    // Let’s treat this as a potential success but keep looking for a better (preposition-matching) rule.
                     // However, for simplicity now, let's consider it a success unless we find a better one later.
                     // TODO: Refine logic if ZIL treats extra prepositions differently (e.g., as errors).
                     if successfulParse == nil { // Only take this if we don't have a preposition-matched success yet
@@ -405,13 +404,10 @@ public struct StandardParser: Parser {
             let tokenType = rule.pattern[patternIndex]
 
             guard tokenCursor < tokens.count else {
-                let remainingPattern = rule.pattern[patternIndex...]
-                let onlyObjectsRemain = remainingPattern.allSatisfy { $0 == .directObject || $0 == .indirectObject }
-                if onlyObjectsRemain {
-                     break
-                } else {
-                    return .failure(.badGrammar("Command seems incomplete, expected more input like '\(tokenType)'."))
-                }
+                // If we've run out of tokens, break out and let missing objects be handled by action handlers
+                // This allows commands like "ask" (missing direct object) to be parsed successfully
+                // and provides better user-facing error messages from the action handlers
+                break
             }
 
             switch tokenType {
@@ -425,16 +421,12 @@ public struct StandardParser: Parser {
                     patternIndex: patternIndex,
                     vocabulary: vocabulary
                 )
-                guard phraseEndIndex > tokenCursor else {
-                    let context = (tokenCursor < tokens.count) ? "'\(tokens[tokenCursor])'" : "end of input"
-                    return .failure(
-                        .badGrammar(
-                            "Expected a direct object phrase for verb '\(verb)', but found \(context)."
-                        )
-                    )
+                if phraseEndIndex > tokenCursor {
+                    directObjectPhraseTokens = Array(tokens[tokenCursor..<phraseEndIndex])
+                    tokenCursor = phraseEndIndex
                 }
-                directObjectPhraseTokens = Array(tokens[tokenCursor..<phraseEndIndex])
-                tokenCursor = phraseEndIndex
+                // If no direct object found, leave directObjectPhraseTokens empty
+                // Action handlers will provide appropriate error messages
 
             case .preposition:
                 let currentToken = tokens[tokenCursor]
@@ -464,12 +456,12 @@ public struct StandardParser: Parser {
                     patternIndex: patternIndex,
                     vocabulary: vocabulary
                  )
-                 guard phraseEndIndex > tokenCursor else {
-                    let context = (tokenCursor < tokens.count) ? "'\(tokens[tokenCursor])'" : "end of input"
-                     return .failure(.badGrammar("Expected an indirect object phrase for verb '\(verb)', but found \(context)."))
+                 if phraseEndIndex > tokenCursor {
+                    indirectObjectPhraseTokens = Array(tokens[tokenCursor..<phraseEndIndex])
+                    tokenCursor = phraseEndIndex
                  }
-                indirectObjectPhraseTokens = Array(tokens[tokenCursor..<phraseEndIndex])
-                tokenCursor = phraseEndIndex
+                 // If no indirect object found, leave indirectObjectPhraseTokens empty
+                 // Action handlers will provide appropriate error messages
 
             case .direction:
                  let currentToken = tokens[tokenCursor]
@@ -503,55 +495,57 @@ public struct StandardParser: Parser {
         var isMultipleObjectsDO = false
 
         if rule.pattern.contains(.directObject) {
+            // If no direct object phrases were parsed, leave resolvedDirectObjects empty
+            // The action handler will provide appropriate error messages
             if directObjectPhrases.isEmpty {
-                return .failure(.badGrammar("Expected a direct object phrase for verb '\(verb)'."))
-            }
+                // Continue with empty direct objects - action handlers will handle this
+            } else {
+                // Check if we have multiple phrases (conjunctions) and the rule allows multiple objects
+                if directObjectPhrases.count > 1 && rule.directObjectConditions.contains(.allowsMultiple) {
+                    isMultipleObjectsDO = true
+                } else if directObjectPhrases.count > 1 {
+                    return .failure(.badGrammar("The verb '\(verb)' doesn't support multiple objects."))
+                }
 
-            // Check if we have multiple phrases (conjunctions) and the rule allows multiple objects
-            if directObjectPhrases.count > 1 && rule.directObjectConditions.contains(.allowsMultiple) {
-                isMultipleObjectsDO = true
-            } else if directObjectPhrases.count > 1 {
-                return .failure(.badGrammar("The verb '\(verb)' doesn't support multiple objects."))
-            }
+                // Process each noun phrase
+                for (noun, modifiers) in directObjectPhrases {
+                    let lowercasedNoun = noun.lowercased()
 
-            // Process each noun phrase
-            for (noun, modifiers) in directObjectPhrases {
-                let lowercasedNoun = noun.lowercased()
-
-                // Check if this is an ALL command and the rule allows multiple objects
-                if vocabulary.specialKeywords.contains(lowercasedNoun) &&
-                   rule.directObjectConditions.contains(.allowsMultiple) {
-                    isAllCommandDO = true
-                    let allObjectsResult = resolveAllObjects(
-                        verb: verb,
-                        modifiers: modifiers,
-                        in: gameState,
-                        using: vocabulary,
-                        requiredConditions: rule.directObjectConditions
-                    )
-                    switch allObjectsResult {
-                    case .success(let objects):
-                        resolvedDirectObjects.append(contentsOf: objects)
-                    case .failure(let error):
-                        return .failure(error)
-                    }
-                } else {
-                    // Regular single object resolution
-                    let singleObjectResult = resolveObject(
-                        noun: noun,
-                        verb: verb,
-                        modifiers: modifiers,
-                        in: gameState,
-                        using: vocabulary,
-                        requiredConditions: rule.directObjectConditions
-                    )
-                    switch singleObjectResult {
-                    case .success(let objectRef):
-                        if let ref = objectRef {
-                            resolvedDirectObjects.append(ref)
+                    // Check if this is an ALL command and the rule allows multiple objects
+                    if vocabulary.specialKeywords.contains(lowercasedNoun) &&
+                       rule.directObjectConditions.contains(.allowsMultiple) {
+                        isAllCommandDO = true
+                        let allObjectsResult = resolveAllObjects(
+                            verb: verb,
+                            modifiers: modifiers,
+                            in: gameState,
+                            using: vocabulary,
+                            requiredConditions: rule.directObjectConditions
+                        )
+                        switch allObjectsResult {
+                        case .success(let objects):
+                            resolvedDirectObjects.append(contentsOf: objects)
+                        case .failure(let error):
+                            return .failure(error)
                         }
-                    case .failure(let error):
-                        return .failure(error)
+                    } else {
+                        // Regular single object resolution
+                        let singleObjectResult = resolveObject(
+                            noun: noun,
+                            verb: verb,
+                            modifiers: modifiers,
+                            in: gameState,
+                            using: vocabulary,
+                            requiredConditions: rule.directObjectConditions
+                        )
+                        switch singleObjectResult {
+                        case .success(let objectRef):
+                            if let ref = objectRef {
+                                resolvedDirectObjects.append(ref)
+                            }
+                        case .failure(let error):
+                            return .failure(error)
+                        }
                     }
                 }
             }
@@ -563,9 +557,11 @@ public struct StandardParser: Parser {
         var isMultipleObjectsIO = false
 
         if rule.pattern.contains(.indirectObject) {
+            // If no indirect object phrases were parsed, leave resolvedIndirectObjects empty
+            // The action handler will provide appropriate error messages
             if indirectObjectPhrases.isEmpty {
-                return .failure(.badGrammar("Expected an indirect object phrase for verb '\(verb)'."))
-            }
+                // Continue with empty indirect objects - action handlers will handle this
+            } else {
 
             // Check if we have multiple phrases (conjunctions) and the rule allows multiple objects
             if indirectObjectPhrases.count > 1 && rule.indirectObjectConditions.contains(.allowsMultiple) {
@@ -616,6 +612,7 @@ public struct StandardParser: Parser {
                 }
             }
         }
+        } // Close the else block for indirect object processing
 
         // Create command with multiple object support
         let command = Command(

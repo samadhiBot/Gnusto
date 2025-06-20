@@ -171,7 +171,7 @@ struct StandardParserTests {
 
         // 5. Define initial pronouns
         let initialPronouns: [String: Set<EntityReference>] = [
-            "it": [.item("box")] // Let's say "it" initially refers to the box in the room
+            "it": [.item("box")] // Let’s say "it" initially refers to the box in the room
         ]
 
         // 6. Build Vocabulary using defaults + game-specific items/verbs
@@ -855,7 +855,7 @@ struct StandardParserTests {
         tempVocabulary.items["key", default: []].insert(permKey.id)
 
         // Parsing "take key" might become ambiguous IF the parser finds both.
-        // Let's test with the modifier to target the *real* key.
+        // Let’s test with the modifier to target the *real* key.
         let resultSpecific = parser.parse(
             input: "take rusty key",
             vocabulary: tempVocabulary,

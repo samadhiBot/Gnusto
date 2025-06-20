@@ -201,7 +201,7 @@ let message = await breatheResponses)
 ### Parameterized Messages
 ```swift
 let message = context.message.attackNonCharacter(item: "box")
-// Returns: "I've known strange people, but fighting a box?"
+// Returns: "I’ve known strange people, but fighting a box?"
 ```
 
 ### Custom Message Providers

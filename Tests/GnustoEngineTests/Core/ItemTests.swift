@@ -18,7 +18,7 @@ struct ItemTests {
     }
 
     func createCustomItem() -> Item {
-        // Let's assume this custom item starts directly held by the player
+        // Let’s assume this custom item starts directly held by the player
         Item(
             id: "customItem",
             .adjectives("brass", "shiny"),

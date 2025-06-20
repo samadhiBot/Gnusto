@@ -48,7 +48,7 @@ public struct AttackActionHandler: ActionHandler {
     /// Processes the "ATTACK" command.
     ///
     /// Handles different attack scenarios following ZIL V-ATTACK logic:
-    /// 1. Non-characters: "I've known strange people, but fighting a [object]?"
+    /// 1. Non-characters: "I’ve known strange people, but fighting a [object]?"
     /// 2. Bare-handed attacks on characters: "Trying to attack a [character] with your bare hands is suicidal."
     /// 3. Non-weapon attacks on characters: "Trying to attack the [character] with a [item] is suicidal."
     /// 4. Weapon attacks: "You can't." (placeholder for combat system)
