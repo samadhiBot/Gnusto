@@ -498,9 +498,11 @@ struct ClimbActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(
             output,
-            "> climb stairs
+            """
+            > climb stairs
             You are plunged into darkness.
-            It is pitch black. You can't see a thing.")
+            It is pitch black. You can't see a thing.
+            """)
     }
 
     @Test("Climb stairs from lit to lit room shows normal room description (no transition message)")

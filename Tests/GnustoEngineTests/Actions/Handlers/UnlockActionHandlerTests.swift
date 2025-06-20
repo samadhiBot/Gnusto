@@ -35,19 +35,15 @@ struct UnlockActionHandlerTests {
 
         #expect(await engine.gameState.changeHistory.isEmpty)
 
-        let command = Command(
-            verb: .unlock,
-            directObject: .item("box"),
-            indirectObject: .item("key"),
-            rawInput: "unlock box with key"
-        )
-
         // Act: Use engine.execute
-        await engine.execute(command: command)
+        try await engine.execute("unlock box with key")
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "The wooden box is now unlocked.")
+        expectNoDifference(output, """
+            > unlock box with key
+            The wooden box is now unlocked.
+            """)
 
         // Assert Final State
         let finalBoxState = try await engine.item("box")
@@ -82,18 +78,15 @@ struct UnlockActionHandlerTests {
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
         #expect(await engine.gameState.changeHistory.isEmpty)
 
-        let command = Command(
-            verb: .unlock,
-            indirectObject: .item("key"),
-            rawInput: "unlock with key"
-        )  // No direct object
-
         // Act
-        await engine.execute(command: command)
+        try await engine.execute("unlock with key")
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "Unlock what?")
+        expectNoDifference(output, """
+            > unlock with key
+            Unlock what?
+            """)
 
         // Assert No State Change
         #expect(await engine.gameState.changeHistory.isEmpty)
@@ -115,18 +108,15 @@ struct UnlockActionHandlerTests {
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
         #expect(await engine.gameState.changeHistory.isEmpty)
 
-        let command = Command(
-            verb: .unlock,
-            directObject: .item("box"),
-            rawInput: "unlock box"
-        )  // No indirect object
-
         // Act
-        await engine.execute(command: command)
+        try await engine.execute("unlock box")
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "Unlock it with what?")
+        expectNoDifference(output, """
+            > unlock box
+            Unlock it with what?
+            """)
 
         // Assert No State Change
         #expect(await engine.gameState.changeHistory.isEmpty)
@@ -154,19 +144,15 @@ struct UnlockActionHandlerTests {
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
         #expect(await engine.gameState.changeHistory.isEmpty)
 
-        let command = Command(
-            verb: .unlock,
-            directObject: .item("box"),
-            indirectObject: .item("key"),
-            rawInput: "unlock box with key"
-        )
-
         // Act
-        await engine.execute(command: command)
+        try await engine.execute("unlock box with key")
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "You aren’t holding the key.")
+        expectNoDifference(output, """
+            > unlock box with key
+            You aren't holding the key.
+            """)
 
         // Assert No State Change
         #expect(await engine.gameState.changeHistory.isEmpty)
@@ -204,19 +190,15 @@ struct UnlockActionHandlerTests {
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
         #expect(await engine.gameState.changeHistory.isEmpty)
 
-        let command = Command(
-            verb: .unlock,
-            directObject: .item("box"),
-            indirectObject: .item("key"),
-            rawInput: "unlock box with key"
-        )
-
         // Act
-        await engine.execute(command: command)
+        try await engine.execute("unlock box with key")
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "You can’t see any such thing.")
+        expectNoDifference(output, """
+            > unlock box with key
+            You can't see any such thing.
+            """)
 
         // Assert No State Change
         #expect(await engine.gameState.changeHistory.isEmpty)
@@ -238,19 +220,15 @@ struct UnlockActionHandlerTests {
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
         #expect(await engine.gameState.changeHistory.isEmpty)
 
-        let command = Command(
-            verb: .unlock,
-            directObject: .item("pebble"),
-            indirectObject: .item("key"),
-            rawInput: "unlock pebble with key"
-        )
-
         // Act
-        await engine.execute(command: command)
+        try await engine.execute("unlock pebble with key")
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "You can’t unlock the pebble.")  // Uses ActionResponse.itemNotUnlockable message
+        expectNoDifference(output, """
+            > unlock pebble with key
+            You can't unlock the pebble.
+            """)
 
         // Assert No State Change
         #expect(await engine.gameState.changeHistory.isEmpty)
@@ -277,19 +255,15 @@ struct UnlockActionHandlerTests {
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
         #expect(await engine.gameState.changeHistory.isEmpty)
 
-        let command = Command(
-            verb: .unlock,
-            directObject: .item("box"),
-            indirectObject: .item("wrongkey"),
-            rawInput: "unlock box with bent key"
-        )
-
         // Act
-        await engine.execute(command: command)
+        try await engine.execute("unlock box with bent key")
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "The bent key doesn’t fit the box.")
+        expectNoDifference(output, """
+            > unlock box with bent key
+            The bent key doesn't fit the box.
+            """)
 
         // Assert No State Change
         #expect(await engine.gameState.changeHistory.isEmpty)
@@ -316,19 +290,15 @@ struct UnlockActionHandlerTests {
         #expect(initialBoxSnapshot.hasFlag(.isLocked) == false)
         #expect(await engine.gameState.changeHistory.isEmpty)
 
-        let command = Command(
-            verb: .unlock,
-            directObject: .item("box"),
-            indirectObject: .item("key"),
-            rawInput: "unlock box with key"
-        )
-
         // Act
-        await engine.execute(command: command)
+        try await engine.execute("unlock box with key")
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "The box is already unlocked.")
+        expectNoDifference(output, """
+            > unlock box with key
+            The box is already unlocked.
+            """)
 
         // Assert No State Change
         #expect(await engine.gameState.changeHistory.isEmpty)

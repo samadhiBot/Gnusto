@@ -13,17 +13,15 @@ struct XyzzyActionHandlerTests {
     func testXyzzyBasicFunctionality() async throws {
         let (engine, mockIO) = await GameEngine.test()
 
-        let command = Command(
-            verb: .xyzzy,
-            rawInput: "xyzzy"
-        )
-
         // Act: Use engine.execute for full pipeline
-        await engine.execute(command: command)
+        try await engine.execute("xyzzy")
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "A hollow voice says “Fool.”")
+        expectNoDifference(output, """
+            > xyzzy
+            A hollow voice says "Fool."
+            """)
     }
 
     @Test("XYZZY produces correct ActionResult")
@@ -38,10 +36,10 @@ struct XyzzyActionHandlerTests {
             command: command,
             engine: engine
         )
-        
+
         // Process the command directly
         let result = try await handler.process(context: context)
-        
+
         // Verify result
         #expect(result.message == "A hollow voice says \"Fool.\"")
         #expect(result.changes.isEmpty) // XYZZY should not modify state
@@ -69,17 +67,15 @@ struct XyzzyActionHandlerTests {
     func testXyzzyWithExtraText() async throws {
         let (engine, mockIO) = await GameEngine.test()
 
-        let command = Command(
-            verb: .xyzzy,
-            rawInput: "xyzzy please work"
-        )
-
         // Act: Use engine.execute for full pipeline
-        await engine.execute(command: command)
+        try await engine.execute("xyzzy please work")
 
         // Assert Output - should still work the same way
         let output = await mockIO.flush()
-        expectNoDifference(output, "A hollow voice says “Fool.”")
+        expectNoDifference(output, """
+            > xyzzy please work
+            A hollow voice says "Fool."
+            """)
     }
 
     @Test("XYZZY full workflow integration test")
@@ -94,13 +90,13 @@ struct XyzzyActionHandlerTests {
             command: command,
             engine: engine
         )
-        
+
         // Validate
         try await handler.validate(context: context)
-        
+
         // Process
         let result = try await handler.process(context: context)
-        
+
         // Verify complete workflow
         #expect(result.message == "A hollow voice says \"Fool.\"")
         #expect(result.changes.isEmpty)
@@ -116,14 +112,9 @@ struct XyzzyActionHandlerTests {
         let initialScore = initialState.player.score
         let initialMoves = initialState.player.moves
         let initialLocation = initialState.player.currentLocationID
-        
-        let command = Command(
-            verb: .xyzzy,
-            rawInput: "xyzzy"
-        )
 
         // Execute XYZZY
-        await engine.execute(command: command)
+        try await engine.execute("xyzzy")
 
         // Verify state hasn't changed
         let finalState = await engine.gameState
@@ -144,42 +135,44 @@ struct XyzzyActionHandlerTests {
             newValue: 100
         )
         try await engine.apply(scoreChange)
-        
-        let command = Command(
-            verb: .xyzzy,
-            rawInput: "xyzzy"
-        )
 
         // Act: XYZZY should work the same regardless of game state
-        await engine.execute(command: command)
+        try await engine.execute("xyzzy")
 
         // Assert Output is unchanged
         let output = await mockIO.flush()
-        expectNoDifference(output, "A hollow voice says “Fool.”")
+        expectNoDifference(output, """
+            > xyzzy
+            A hollow voice says "Fool."
+            """)
     }
 
     @Test("XYZZY message is consistent across multiple calls")
     func testXyzzyConsistency() async throws {
         let (engine, mockIO) = await GameEngine.test()
 
-        let command = Command(
-            verb: .xyzzy,
-            rawInput: "xyzzy"
-        )
-
         // Execute XYZZY multiple times
-        await engine.execute(command: command)
+        try await engine.execute("xyzzy")
         let firstOutput = await mockIO.flush()
-        
-        await engine.execute(command: command)
+
+        try await engine.execute("xyzzy")
         let secondOutput = await mockIO.flush()
-        
-        await engine.execute(command: command)
+
+        try await engine.execute("xyzzy")
         let thirdOutput = await mockIO.flush()
 
         // All outputs should be identical
-        expectNoDifference(firstOutput, "A hollow voice says “Fool.”")
-        expectNoDifference(secondOutput, "A hollow voice says “Fool.”")
-        expectNoDifference(thirdOutput, "A hollow voice says “Fool.”")
+        expectNoDifference(firstOutput, """
+            > xyzzy
+            A hollow voice says "Fool."
+            """)
+        expectNoDifference(secondOutput, """
+            > xyzzy
+            A hollow voice says "Fool."
+            """)
+        expectNoDifference(thirdOutput, """
+            > xyzzy
+            A hollow voice says "Fool."
+            """)
     }
-} 
+}

@@ -30,21 +30,17 @@ struct TurnOffActionHandlerTests {
         )
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        let command = Command(
-            verb: .turnOff,
-            directObject: .item("lamp"),
-            rawInput: "turn off lamp"
-        )
-
-        await engine.execute(command: command)
+        // Act
+        try await engine.execute("turn off lamp")
 
         let output = await mockIO.flush()
         expectNoDifference(
             output,
             """
+            > turn off lamp
             The lamp is now off. You are plunged into darkness.
 
-            It is pitch black. You can’t see a thing.
+            It is pitch black. You can't see a thing.
             """)
         let finalItemState = try await engine.item("lamp")
         #expect(finalItemState.hasFlag(.isOn) == false)
@@ -70,22 +66,17 @@ struct TurnOffActionHandlerTests {
             locations: room,
             items: book
         )
-        let (engine, _) = await GameEngine.test(blueprint: game)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        let command = Command(
-            verb: .turnOff,
-            directObject: .item("book"),
-            rawInput: "turn off book"
-        )
+        // Act
+        try await engine.execute("turn off book")
 
-        await #expect(throws: ActionResponse.prerequisiteNotMet("You can't turn that off.")) {
-            try await handler.validate(
-                context: ActionContext(
-                    command: command,
-                    engine: engine
-                )
-            )
-        }
+        // Assert Output
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            > turn off book
+            You can't turn that off.
+            """)
     }
 
     @Test("TURN OFF fails for non-existent item")
@@ -100,23 +91,17 @@ struct TurnOffActionHandlerTests {
             player: Player(in: "room"),
             locations: room
         )
-        let (engine, _) = await GameEngine.test(blueprint: game)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        let command = Command(
-            verb: .turnOff,
-            directObject: .item("lamp"),
-            rawInput: "turn off lamp"
-        )
+        // Act
+        try await engine.execute("turn off lamp")
 
-        // Expect internalEngineError when item ID doesn't exist in gameState
-        await #expect(throws: ActionResponse.itemNotAccessible("lamp")) {
-            try await handler.validate(
-                context: ActionContext(
-                    command: command,
-                    engine: engine
-                )
-            )
-        }
+        // Assert Output
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            > turn off lamp
+            You can't see any such thing.
+            """)
     }
 
     @Test("Successfully turn off a light source in inventory")
@@ -134,20 +119,19 @@ struct TurnOffActionHandlerTests {
         )
         let game = MinimalGame(items: lamp)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
-        let command = Command(
-            verb: .turnOff,
-            directObject: .item("lamp"),
-            rawInput: "turn off lamp"
-        )
 
-        await engine.execute(command: command)
+        // Act
+        try await engine.execute("turn off lamp")
 
         let finalItemState = try await engine.item("lamp")
         #expect(finalItemState.hasFlag(.isOn) == false)
         #expect(finalItemState.hasFlag(.isTouched) == true)
 
         let output = await mockIO.flush()
-        expectNoDifference(output, "The brass lantern is now off.")
+        expectNoDifference(output, """
+            > turn off lamp
+            The brass lantern is now off.
+            """)
     }
 
     @Test("Turn off light source making a room pitch black")
@@ -178,13 +162,8 @@ struct TurnOffActionHandlerTests {
         let initiallyLit = await engine.scopeResolver.isLocationLit(locationID: darkRoom.id)
         #expect(initiallyLit == true)
 
-        let command = Command(
-            verb: .turnOff,
-            directObject: .item("lamp"),
-            rawInput: "turn off lamp"
-        )
-
-        await engine.execute(command: command)
+        // Act
+        try await engine.execute("turn off lamp")
 
         let finalItemState = try await engine.item("lamp")
         #expect(finalItemState.hasFlag(.isOn) == false)
@@ -194,9 +173,10 @@ struct TurnOffActionHandlerTests {
         expectNoDifference(
             output,
             """
+            > turn off lamp
             The brass lantern is now off. You are plunged into darkness.
 
-            It is pitch black. You can’t see a thing.
+            It is pitch black. You can't see a thing.
             """)
 
         let finallyLit = await engine.scopeResolver.isLocationLit(locationID: darkRoom.id)
@@ -216,23 +196,17 @@ struct TurnOffActionHandlerTests {
             .size(10)
         )
         let game = MinimalGame(items: lamp)
-        let (engine, _) = await GameEngine.test(blueprint: game)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        let command = Command(
-            verb: .turnOff,
-            directObject: .item("lamp"),
-            rawInput: "turn off lamp"
-        )
+        // Act
+        try await engine.execute("turn off lamp")
 
-        // Act & Assert: Expect error during validation
-        await #expect(throws: ActionResponse.custom("It's already off.")) {
-            try await handler.validate(
-                context: ActionContext(
-                    command: command,
-                    engine: engine
-                )
-            )
-        }
+        // Assert Output
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            > turn off lamp
+            It's already off.
+            """)
 
         // Check state remains unchanged - touched should NOT be added if validation fails
         let finalItemState = try await engine.item("lamp")
@@ -252,22 +226,18 @@ struct TurnOffActionHandlerTests {
             .size(10)
         )
         let game = MinimalGame(items: lamp)
-        let (engine, _) = await GameEngine.test(blueprint: game)
-        let command = Command(
-            verb: .turnOff,
-            directObject: .item("lamp"),
-            rawInput: "turn off lamp"
-        )
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        // Act & Assert: Expect error during validation
-        await #expect(throws: ActionResponse.prerequisiteNotMet("You can't turn that off.")) {
-            try await handler.validate(
-                context: ActionContext(
-                    command: command,
-                    engine: engine
-                )
-            )
-        }
+        // Act
+        try await engine.execute("turn off lamp")
+
+        // Assert Output
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            > turn off lamp
+            You can't turn that off.
+            """)
+
         // Check state remains unchanged - touched should NOT be added if validation fails
         let finalItemState = try await engine.item("lamp")
         #expect(finalItemState.hasFlag(.isOn) == true)
@@ -289,19 +259,17 @@ struct TurnOffActionHandlerTests {
         )
         let game = MinimalGame(items: lamp)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
-        let command = Command(
-            verb: .turnOff,
-            directObject: .item("lamp"),
-            rawInput: "turn off lamp"
-        )
 
         // Act: Execute the command
-        await engine.execute(command: command)
+        try await engine.execute("turn off lamp")
 
         // Assert: Check IOHandler output for the expected error message
         let output = await mockIO.flush()
         // The specific response message comes from GameEngine.report
-        expectNoDifference(output, "You can’t see any such thing.")
+        expectNoDifference(output, """
+            > turn off lamp
+            You can't see any such thing.
+            """)
     }
 
     @Test("Extinguish alias works correctly")
@@ -332,16 +300,7 @@ struct TurnOffActionHandlerTests {
         )
 
         // Act
-        // Parse the raw input first
-        let parseResult = await engine.parser.parse(
-            input: "extinguish lamp",
-            vocabulary: await engine.gameState.vocabulary,
-            gameState: await engine.gameState
-        )
-        let command = try parseResult.get()  // Get the parsed command
-
-        // Execute the parsed command
-        await engine.execute(command: command)
+        try await engine.execute("extinguish lamp")
 
         // Assert
         let finalItemState = try await engine.item("lamp")
@@ -352,9 +311,10 @@ struct TurnOffActionHandlerTests {
         expectNoDifference(
             output,
             """
+            > extinguish lamp
             The brass lantern is now off. You are plunged into darkness.
 
-            It is pitch black. You can’t see a thing.
+            It is pitch black. You can't see a thing.
             """)
     }
 
@@ -386,16 +346,7 @@ struct TurnOffActionHandlerTests {
         )
 
         // Act
-        // Parse the raw input first
-        let parseResult = await engine.parser.parse(
-            input: "blow out lamp",
-            vocabulary: await engine.gameState.vocabulary,
-            gameState: await engine.gameState
-        )
-        let command = try parseResult.get()  // Get the parsed command
-
-        // Execute the parsed command
-        await engine.execute(command: command)
+        try await engine.execute("blow out lamp")
 
         // Assert
         let finalItemState = try await engine.item("lamp")
@@ -406,9 +357,10 @@ struct TurnOffActionHandlerTests {
         expectNoDifference(
             output,
             """
+            > blow out lamp
             The brass lantern is now off. You are plunged into darkness.
 
-            It is pitch black. You can’t see a thing.
+            It is pitch black. You can't see a thing.
             """)
     }
 }

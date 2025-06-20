@@ -19,15 +19,14 @@ struct ExamineActionHandlerTests {
         #expect(initialItemState.attributes[.isTouched] != true)
         #expect(await engine.gameState.changeHistory.isEmpty)
 
-        let command = Command(
-            verb: .examine,
-            directObject: .item(itemID),
-            rawInput: "examine pebble"
-        )
-        await engine.execute(command: command)
+        // Act
+        try await engine.execute("examine pebble")
 
         let output = await mockIO.flush()
-        expectNoDifference(output, "A smooth, grey pebble.")
+        expectNoDifference(output, """
+            > examine pebble
+            A smooth, grey pebble.
+            """)
 
         let finalItemState = try await engine.item(itemID)
         #expect(finalItemState.attributes[.isTouched] == true)
@@ -54,15 +53,14 @@ struct ExamineActionHandlerTests {
         #expect(initialItemState.attributes[.isTouched] != true)
         #expect(await engine.gameState.changeHistory.isEmpty)
 
-        let command = Command(
-            verb: .examine,
-            directObject: .item(itemID),
-            rawInput: "examine locket"
-        )
-        await engine.execute(command: command)
+        // Act
+        try await engine.execute("examine locket")
 
         let output = await mockIO.flush()
-        expectNoDifference(output, "A small, tarnished silver locket.")
+        expectNoDifference(output, """
+            > examine locket
+            A small, tarnished silver locket.
+            """)
 
         let finalItemState = try await engine.item(itemID)
         #expect(finalItemState.attributes[.isTouched] == true)
@@ -99,15 +97,14 @@ struct ExamineActionHandlerTests {
         #expect(initialItemState.attributes[.isTouched] != true)
         #expect(await engine.gameState.changeHistory.isEmpty)
 
-        let command = Command(
-            verb: .examine,
-            directObject: .item(itemID),
-            rawInput: "examine statue"
-        )
-        await engine.execute(command: command)
+        // Act
+        try await engine.execute("examine statue")
 
         let output = await mockIO.flush()
-        expectNoDifference(output, "A weathered statue of a grue.")
+        expectNoDifference(output, """
+            > examine statue
+            A weathered statue of a grue.
+            """)
 
         let finalItemState = try await engine.item(itemID)
         #expect(finalItemState.attributes[.isTouched] == true)
@@ -145,15 +142,14 @@ struct ExamineActionHandlerTests {
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
         #expect(await engine.gameState.changeHistory.isEmpty)
 
-        let command = Command(
-            verb: .examine,
-            directObject: .item(itemID),
-            rawInput: "examine hidden gem"
-        )
-        await engine.execute(command: command)
+        // Act
+        try await engine.execute("examine hidden gem")
 
         let output = await mockIO.flush()
-        expectNoDifference(output, "You can’t see any such thing.")
+        expectNoDifference(output, """
+            > examine hidden gem
+            You can't see any such thing.
+            """)
 
         #expect(await engine.gameState.changeHistory.isEmpty)
         let itemState = try await engine.item(itemID)
@@ -186,15 +182,14 @@ struct ExamineActionHandlerTests {
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
         #expect(await engine.gameState.changeHistory.isEmpty)
 
-        let command = Command(
-            verb: .examine,
-            directObject: .item(itemID),
-            rawInput: "examine hidden gem"
-        )
-        await engine.execute(command: command)
+        // Act
+        try await engine.execute("examine hidden gem")
 
         let output = await mockIO.flush()
-        expectNoDifference(output, "You can’t see the hidden gem.")
+        expectNoDifference(output, """
+            > examine hidden gem
+            You can't see the hidden gem.
+            """)
 
         #expect(await engine.gameState.changeHistory.isEmpty)
         let itemState = try await engine.item(itemID)
@@ -206,15 +201,14 @@ struct ExamineActionHandlerTests {
         let itemID: ItemID = "ghost"
         #expect(await engine.gameState.changeHistory.isEmpty)
 
-        let command = Command(
-            verb: .examine,
-            directObject: .item(itemID),
-            rawInput: "examine ghost"
-        )
-        await engine.execute(command: command)
+        // Act
+        try await engine.execute("examine ghost")
 
         let output = await mockIO.flush()
-        expectNoDifference(output, "You can’t see any such thing.")
+        expectNoDifference(output, """
+            > examine ghost
+            You can't see any such thing.
+            """)
 
         #expect(await engine.gameState.changeHistory.isEmpty)
     }
@@ -241,40 +235,34 @@ struct ExamineActionHandlerTests {
         let game = MinimalGame(
             items: item1, item2,
         )
-        let (engine, _) = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: game
         )
         #expect(await engine.gameState.changeHistory.isEmpty)
 
         // Act
-        // Parse the raw input first
-        let parseResult = await engine.parser.parse(
-            input: "examine ball",
-            vocabulary: await engine.gameState.vocabulary,
-            gameState: await engine.gameState
-        )
+        try await engine.execute("examine ball")
 
-        // Assert
-        #expect(
-            throws: ParseError.ambiguity("Which do you mean: the blue ball or the red ball?")
-        ) {
-            try parseResult.get()
-        }
+        // Assert: Should get ambiguity error
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            > examine ball
+            Which do you mean: the blue ball or the red ball?
+            """)
     }
 
     @Test func testExamineSelf() async throws {
         let (engine, mockIO) = await GameEngine.test()
         #expect(await engine.gameState.changeHistory.isEmpty)
 
-        let command = Command(
-            verb: .examine,
-            directObject: .player,
-            rawInput: "examine self"
-        )
-        await engine.execute(command: command)
+        // Act
+        try await engine.execute("examine self")
 
         let output = await mockIO.flush()
-        expectNoDifference(output, "You are your usual self.")
+        expectNoDifference(output, """
+            > examine self
+            You are your usual self.
+            """)
 
         #expect(await engine.gameState.changeHistory.isEmpty)
     }
@@ -300,15 +288,14 @@ struct ExamineActionHandlerTests {
         #expect(initialItemState.attributes[.isTouched] != true)
         #expect(await engine.gameState.changeHistory.isEmpty)
 
-        let command = Command(
-            verb: .examine,
-            directObject: .item(item.id),
-            rawInput: "examine mirror"
-        )
-        await engine.execute(command: command)
+        // Act
+        try await engine.execute("examine mirror")
 
         let output = await mockIO.flush()
-        expectNoDifference(output, "You see your reflection in the magic mirror.")
+        expectNoDifference(output, """
+            > examine mirror
+            You see your reflection in the magic mirror.
+            """)
 
         #expect(await engine.gameState.changeHistory.isEmpty)
         let finalItemState = try await engine.item("magicMirror")
@@ -340,15 +327,14 @@ struct ExamineActionHandlerTests {
         #expect(initialItemState.attributes[.isTouched] != true)
         #expect(await engine.gameState.changeHistory.isEmpty)
 
-        let command = Command(
-            verb: .examine,
-            directObject: .item(itemID),
-            rawInput: "examine window"
-        )
-        await engine.execute(command: command)
+        // Act
+        try await engine.execute("examine window")
 
         let output = await mockIO.flush()
-        expectNoDifference(output, "The window is slightly ajar, but not enough to allow entry.")
+        expectNoDifference(output, """
+            > examine window
+            The window is slightly ajar, but not enough to allow entry.
+            """)
 
         let finalItemState = try await engine.item(itemID)
         #expect(finalItemState.attributes[.isTouched] == true)
@@ -394,18 +380,15 @@ struct ExamineActionHandlerTests {
         let game = MinimalGame(items: kitchenTable, bottle, brownSack)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        let command = Command(
-            verb: .examine,
-            directObject: .item("kitchenTable"),
-            rawInput: "examine table"
-        )
-
         // Act
-        await engine.execute(command: command)
+        try await engine.execute("examine table")
 
         // Assert: Should skip generic description and show only what's on the table
         let output = await mockIO.flush()
-        expectNoDifference(output, "On the kitchen table are a glass bottle and a brown sack.")
+        expectNoDifference(output, """
+            > examine table
+            On the kitchen table are a glass bottle and a brown sack.
+            """)
 
         // Assert Final State (Surface marked touched)
         let finalItemState = try await engine.item("kitchenTable")
@@ -434,18 +417,15 @@ struct ExamineActionHandlerTests {
         let game = MinimalGame(items: kitchenTable)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        let command = Command(
-            verb: .examine,
-            directObject: .item("kitchenTable"),
-            rawInput: "examine table"
-        )
-
         // Act
-        await engine.execute(command: command)
+        try await engine.execute("examine table")
 
         // Assert: Should show generic description since there's nothing on the table
         let output = await mockIO.flush()
-        expectNoDifference(output, "You see nothing special about the kitchen table.")
+        expectNoDifference(output, """
+            > examine table
+            You see nothing special about the kitchen table.
+            """)
 
         // Assert Final State (Surface marked touched)
         let finalItemState = try await engine.item("kitchenTable")
@@ -491,20 +471,13 @@ struct ExamineActionHandlerTests {
         let game = MinimalGame(items: kitchenTable, bottle, brownSack)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        let command = Command(
-            verb: .examine,
-            directObject: .item("kitchenTable"),
-            rawInput: "examine table"
-        )
-
         // Act
-        await engine.execute(command: command)
+        try await engine.execute("examine table")
 
         // Assert: Should show custom description followed by surface contents
         let output = await mockIO.flush()
-        expectNoDifference(
-            output,
-            """
+        expectNoDifference(output, """
+            > examine table
             A sturdy wooden table with scratches from years of use. On the
             kitchen table are a glass bottle and a brown sack.
             """)
@@ -562,20 +535,13 @@ struct ExamineActionHandlerTests {
         let game = MinimalGame(items: kitchenTable, bottle, water, brownSack)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        let command = Command(
-            verb: .examine,
-            directObject: .item("kitchenTable"),
-            rawInput: "examine table"
-        )
-
         // Act
-        await engine.execute(command: command)
+        try await engine.execute("examine table")
 
         // Assert: Should skip generic description and show only enhanced item descriptions
         let output = await mockIO.flush()
-        expectNoDifference(
-            output,
-            """
+        expectNoDifference(output, """
+            > examine table
             A bottle is sitting on the table. The glass bottle contains a
             quantity of water. On the table is an elongated brown sack,
             smelling of hot peppers.
@@ -641,22 +607,13 @@ struct ExamineActionHandlerTests {
         #expect(try await engine.item("kitchenTable").hasFlag(.isTouched) == false)
         #expect(await engine.gameState.changeHistory.isEmpty)
 
-        let command = Command(
-            verb: .examine,
-            directObject: .item("kitchenTable"),
-            rawInput: "examine table"
-        )
-
         // Act
-        await engine.execute(command: command)
-
-        // Debug: Let's see exactly what's being produced
-        let output = await mockIO.flush()
+        try await engine.execute("examine table")
 
         // Assert: Should show enhanced surface description
-        expectNoDifference(
-            output,
-            """
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            > examine table
             A bottle is sitting on the table. The glass bottle contains a
             quantity of water. On the table is an elongated brown sack,
             smelling of hot peppers.

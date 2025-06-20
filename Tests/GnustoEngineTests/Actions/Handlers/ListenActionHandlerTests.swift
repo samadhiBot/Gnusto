@@ -5,8 +5,6 @@ import Testing
 
 @Suite("ListenActionHandler Tests")
 struct ListenActionHandlerTests {
-    let handler = ListenActionHandler()
-
     // MARK: - Basic Functionality Tests
 
     @Test("LISTEN command produces the expected message")
@@ -18,74 +16,43 @@ struct ListenActionHandlerTests {
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, """
-            > listen
-            You hear nothing unusual.
-            """)
+        expectNoDifference(output, "> listen\n\nYou hear nothing unusual.")
     }
 
     @Test("LISTEN produces correct ActionResult")
     func testListenActionResult() async throws {
-        let (engine, _) = await GameEngine.test()
+        let (engine, mockIO) = await GameEngine.test()
 
-        let command = Command(
-            verb: .listen,
-            rawInput: "listen"
-        )
-        let context = ActionContext(
-            command: command,
-            engine: engine
-        )
+        // Act
+        try await engine.execute("listen")
 
-        // Process the command directly
-        let result = try await handler.process(context: context)
-
-        // Verify result
-        #expect(result.message == "You hear nothing unusual.")
-        #expect(result.changes.isEmpty)  // LISTEN should not modify state
-        #expect(result.effects.isEmpty)  // LISTEN should not have side effects
+        // Assert
+        let output = await mockIO.flush()
+        expectNoDifference(output, "> listen\n\nYou hear nothing unusual.")
     }
 
     @Test("LISTEN validation always succeeds")
     func testListenValidationSucceeds() async throws {
-        let (engine, _) = await GameEngine.test()
+        let (engine, mockIO) = await GameEngine.test()
 
-        let command = Command(
-            verb: .listen,
-            rawInput: "listen"
-        )
-        let context = ActionContext(
-            command: command,
-            engine: engine
-        )
+        // Act
+        try await engine.execute("listen")
 
-        // Should not throw - LISTEN has no validation requirements
-        try await handler.validate(context: context)
+        // Assert - Should not throw and should produce output
+        let output = await mockIO.flush()
+        expectNoDifference(output, "> listen\n\nYou hear nothing unusual.")
     }
 
     @Test("LISTEN full workflow integration test")
     func testListenFullWorkflow() async throws {
-        let (engine, _) = await GameEngine.test()
+        let (engine, mockIO) = await GameEngine.test()
 
-        let command = Command(
-            verb: .listen,
-            rawInput: "listen"
-        )
-        let context = ActionContext(
-            command: command,
-            engine: engine
-        )
+        // Act
+        try await engine.execute("listen")
 
-        // Validate
-        try await handler.validate(context: context)
-
-        // Process
-        let result = try await handler.process(context: context)
-
-        // Verify complete workflow
-        #expect(result.message == "You hear nothing unusual.")
-        #expect(result.changes.isEmpty)
-        #expect(result.effects.isEmpty)
+        // Assert complete workflow
+        let output = await mockIO.flush()
+        expectNoDifference(output, "> listen\n\nYou hear nothing unusual.")
     }
 
     @Test("LISTEN does not affect game state")
@@ -106,10 +73,7 @@ struct ListenActionHandlerTests {
         #expect(finalState.player.currentLocationID == initialLocation)
 
         let output = await mockIO.flush()
-        expectNoDifference(output, """
-            > listen
-            You hear nothing unusual.
-            """)
+        expectNoDifference(output, "> listen\n\nYou hear nothing unusual.")
     }
 
     @Test("LISTEN works regardless of game state")
@@ -129,10 +93,7 @@ struct ListenActionHandlerTests {
 
         // Assert Output is unchanged
         let output = await mockIO.flush()
-        expectNoDifference(output, """
-            > listen
-            You hear nothing unusual.
-            """)
+        expectNoDifference(output, "> listen\n\nYou hear nothing unusual.")
     }
 
     @Test("LISTEN works in different locations")
@@ -154,10 +115,7 @@ struct ListenActionHandlerTests {
         // Test in first location
         try await engine.execute("listen")
         let output1 = await mockIO.flush()
-        expectNoDifference(output1, """
-            > listen
-            You hear nothing unusual.
-            """)
+        expectNoDifference(output1, "> listen\n\nYou hear nothing unusual.")
 
         // Move to second location
         let moveChange = StateChange(
@@ -170,10 +128,7 @@ struct ListenActionHandlerTests {
         // Test in second location - should give same generic response
         try await engine.execute("listen")
         let output2 = await mockIO.flush()
-        expectNoDifference(output2, """
-            > listen
-            You hear nothing unusual.
-            """)
+        expectNoDifference(output2, "> listen\n\nYou hear nothing unusual.")
     }
 
     @Test("LISTEN with extra text still works")
@@ -185,35 +140,27 @@ struct ListenActionHandlerTests {
 
         // Assert Output - should still work the same way
         let output = await mockIO.flush()
-        expectNoDifference(output, """
-            > listen carefully
-            You hear nothing unusual.
-            """)
+        expectNoDifference(output, "> listen carefully\n\nYou hear nothing unusual.")
     }
 
     @Test("LISTEN message is consistent across multiple calls")
     func testListenConsistency() async throws {
         let (engine, mockIO) = await GameEngine.test()
 
-        let command = Command(
-            verb: .listen,
-            rawInput: "listen"
-        )
-
         // Execute LISTEN multiple times
-        await engine.execute(command: command)
+        try await engine.execute("listen")
         let firstOutput = await mockIO.flush()
 
-        await engine.execute(command: command)
+        try await engine.execute("listen")
         let secondOutput = await mockIO.flush()
 
-        await engine.execute(command: command)
+        try await engine.execute("listen")
         let thirdOutput = await mockIO.flush()
 
         // All outputs should be identical
-        expectNoDifference(firstOutput, "You hear nothing unusual.")
-        expectNoDifference(secondOutput, "You hear nothing unusual.")
-        expectNoDifference(thirdOutput, "You hear nothing unusual.")
+        expectNoDifference(firstOutput, "> listen\n\nYou hear nothing unusual.")
+        expectNoDifference(secondOutput, "> listen\n\nYou hear nothing unusual.")
+        expectNoDifference(thirdOutput, "> listen\n\nYou hear nothing unusual.")
     }
 
     @Test("LISTEN works in dark room")
@@ -232,17 +179,12 @@ struct ListenActionHandlerTests {
         )
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        let command = Command(
-            verb: .listen,
-            rawInput: "listen"
-        )
-
         // Act: LISTEN should work even in dark rooms
-        await engine.execute(command: command)
+        try await engine.execute("listen")
 
         // Assert Output - should still work
         let output = await mockIO.flush()
-        expectNoDifference(output, "You hear nothing unusual.")
+        expectNoDifference(output, "> listen\n\nYou hear nothing unusual.")
     }
 
     @Test("LISTEN works with items present")
@@ -257,16 +199,11 @@ struct ListenActionHandlerTests {
         let game = MinimalGame(items: noisyItem)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        let command = Command(
-            verb: .listen,
-            rawInput: "listen"
-        )
-
         // Act: Default LISTEN should still give generic response even with noisy items
-        await engine.execute(command: command)
+        try await engine.execute("listen")
 
         // Assert Output - generic response (custom item sounds would need custom handlers)
         let output = await mockIO.flush()
-        expectNoDifference(output, "You hear nothing unusual.")
+        expectNoDifference(output, "> listen\n\nYou hear nothing unusual.")
     }
 }
