@@ -51,29 +51,26 @@ public struct BlowActionHandler: ActionHandler {
         let targetItem = try await context.engine.item(targetItemID)
 
         // Default behavior for blowing on objects
-        let message =
-            if targetItem.hasFlag(.isLightSource) && targetItem.hasFlag(.isLit) {
-                // Blowing on lit light sources might extinguish them
-                context.message.blowOnLightSource(
-                    item: targetItem.withDefiniteArticle
-                )
-            } else if targetItem.hasFlag(.isFlammable) {
-                // Specific extinguishing behavior should use TurnOffActionHandler or custom logic
-                context.message.blowOnFlammable(
-                    item: targetItem.withDefiniteArticle
-                )
-            } else {
-                context.message.blowOnGeneric(
-                    item: targetItem.withDefiniteArticle
-                )
-            }
+        let message = if targetItem.hasFlag(.isLightSource) && targetItem.hasFlag(.isLit) {
+            // Blowing on lit light sources might extinguish them
+            context.message.blowOnLightSource(
+                item: targetItem.withDefiniteArticle
+            )
+        } else if targetItem.hasFlag(.isFlammable) {
+            // Specific extinguishing behavior should use TurnOffActionHandler or custom logic
+            context.message.blowOnFlammable(
+                item: targetItem.withDefiniteArticle
+            )
+        } else {
+            context.message.blowOnGeneric(
+                item: targetItem.withDefiniteArticle
+            )
+        }
 
         return ActionResult(
-            message: message,
-            changes: [
-                await context.engine.setFlag(.isTouched, on: targetItem),
-                await context.engine.updatePronouns(to: targetItem),
-            ]
+            message,
+            await context.engine.setFlag(.isTouched, on: targetItem),
+            await context.engine.updatePronouns(to: targetItem),
         )
     }
 }

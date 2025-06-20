@@ -111,7 +111,7 @@ open class MessageProvider: @unchecked Sendable {
     }
 
     open func blowGeneral() -> String {
-        "You blow air around. Nothing happens."
+        "You blow the air around, but nothing interesting happens."
     }
 
     open func blowOnFlammable(item: String) -> String {
@@ -119,7 +119,7 @@ open class MessageProvider: @unchecked Sendable {
     }
 
     open func blowOnGeneric(item: String) -> String {
-        "You blow on \(item). Nothing happens."
+        "You blow on \(item), but nothing interesting happens."
     }
 
     open func blowOnLightSource(item: String) -> String {
@@ -1012,7 +1012,7 @@ open class MessageProvider: @unchecked Sendable {
     }
 
     open func pushSuccess(items: String) -> String {
-        "You push \(items). Nothing happens."
+        "You push \(items), but nothing interesting happens."
     }
 
     open func pushWhat() -> String {
