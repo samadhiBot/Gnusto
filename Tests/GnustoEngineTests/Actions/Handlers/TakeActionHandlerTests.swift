@@ -106,17 +106,11 @@ struct TakeActionHandlerTests {
         let game = MinimalGame(player: player, items: testItem)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        let command = Command(
-            verb: .take,
-            directObject: .item("key"),
-            rawInput: "take key"
-        )
-
         // Initial state check
         #expect(await engine.gameState.changeHistory.isEmpty)
 
         // Act: Use engine.execute for full pipeline
-        await engine.execute(command: command)
+        try await engine.execute("take key")
 
         // Assert Final State
         let finalItemState = try await engine.item("key")
@@ -126,7 +120,7 @@ struct TakeActionHandlerTests {
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "Taken.")
+        expectNoDifference(output, "> take key\n\nTaken.")
 
         // Assert Change History
         // Pass the initial attributes map to the helper
@@ -150,17 +144,12 @@ struct TakeActionHandlerTests {
         )
         let game = MinimalGame(items: testItem)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
-        let command = Command(
-            verb: .take,
-            directObject: .item("key"),
-            rawInput: "take key"
-        )
 
         // Initial state check
         #expect(await engine.gameState.changeHistory.isEmpty)
 
         // Act: Use engine.execute for full pipeline
-        await engine.execute(command: command)
+        try await engine.execute("take key")
 
         // Assert Final State (Unchanged)
         let finalItemState = try await engine.item("key")
@@ -168,7 +157,7 @@ struct TakeActionHandlerTests {
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "You already have that.")
+        expectNoDifference(output, "> take key\n\nYou already have that.")
 
         // Assert Change History (Should be empty)
         #expect(await engine.gameState.changeHistory.isEmpty)
@@ -176,7 +165,7 @@ struct TakeActionHandlerTests {
 
     @Test("Take item fails when not present in location")
     func testTakeItemFailsWhenNotPresent() async throws {
-        // Arrange: Create item that *won’t* be added to location
+        // Arrange: Create item that *won't* be added to location
         let nonexistentItem = Item(
             id: "figurine",
             .name("jade figurine"),
@@ -187,18 +176,12 @@ struct TakeActionHandlerTests {
         let game = MinimalGame(items: nonexistentItem)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        let command = Command(
-            verb: .take,
-            directObject: .item("figurine"),
-            rawInput: "take figurine"
-        )
-
         // Act
-        await engine.execute(command: command)
+        try await engine.execute("take figurine")
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "You can’t see any such thing.")
+        expectNoDifference(output, "> take figurine\n\nYou can't see any such thing.")
 
         // Assert No State Change
         #expect(await engine.gameState.changeHistory.isEmpty)
@@ -220,18 +203,12 @@ struct TakeActionHandlerTests {
         let game = MinimalGame(items: testItem)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        let command = Command(
-            verb: .take,
-            directObject: .item("rock"),
-            rawInput: "take rock"
-        )
-
         // Act
-        await engine.execute(command: command)
+        try await engine.execute("take rock")
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "You can’t take the heavy rock.")
+        expectNoDifference(output, "> take rock\n\nYou can't take the heavy rock.")
 
         // Assert No State Change
         #expect(await engine.gameState.changeHistory.isEmpty)
@@ -245,17 +222,13 @@ struct TakeActionHandlerTests {
     func testTakeFailsWithNoObject() async throws {
         // Arrange
         let (engine, mockIO) = await GameEngine.test()
-        let command = Command(
-            verb: .take,
-            rawInput: "take"
-        )
 
         // Act
-        await engine.execute(command: command)
+        try await engine.execute("take")
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "Take what?")
+        expectNoDifference(output, "> take\n\nTake what?")
 
         // Assert No State Change
         #expect(await engine.gameState.changeHistory.isEmpty)
@@ -283,17 +256,11 @@ struct TakeActionHandlerTests {
         let game = MinimalGame(items: container, itemInContainer)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        let command = Command(
-            verb: .take,
-            directObject: .item("gem"),
-            rawInput: "take gem"
-        )
-
         // Initial state check
         #expect(await engine.gameState.changeHistory.isEmpty)
 
         // Act: Use engine.execute for full pipeline
-        await engine.execute(command: command)
+        try await engine.execute("take gem")
 
         // Assert Final State
         let finalItemState = try await engine.item("gem")
@@ -306,7 +273,7 @@ struct TakeActionHandlerTests {
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "Taken.")
+        expectNoDifference(output, "> take gem\n\nTaken.")
 
         // Assert Change History
         let expectedChanges = expectedTakeChanges(
@@ -341,17 +308,11 @@ struct TakeActionHandlerTests {
         let game = MinimalGame(items: container, itemInContainer)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        let command = Command(
-            verb: .take,
-            directObject: .item("coin"),
-            rawInput: "take coin"
-        )
-
         // Initial state check
         #expect(await engine.gameState.changeHistory.isEmpty)
 
         // Act: Use engine.execute for full pipeline
-        await engine.execute(command: command)
+        try await engine.execute("take coin")
 
         // Assert Final State
         let finalItemState = try await engine.item("coin")
@@ -364,7 +325,7 @@ struct TakeActionHandlerTests {
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "Taken.")
+        expectNoDifference(output, "> take coin\n\nTaken.")
 
         // Assert Change History
         let expectedChanges = expectedTakeChanges(
@@ -397,19 +358,13 @@ struct TakeActionHandlerTests {
 
         #expect(try await engine.item("box").hasFlag(.isOpen) == false)  // Verify closed
 
-        let command = Command(
-            verb: .take,
-            directObject: .item("gem"),
-            rawInput: "take gem"
-        )
-
         // Act
-        await engine.execute(command: command)
+        try await engine.execute("take gem")
 
         // Assert Output
         let output = await mockIO.flush()  // Define output before using it
         // ScopeResolver will prevent seeing it, standard message
-        expectNoDifference(output, "You can’t see any such thing.")
+        expectNoDifference(output, "> take gem\n\nYou can't see any such thing.")
 
         // Assert No State Change
         #expect(await engine.gameState.changeHistory.isEmpty)
@@ -440,21 +395,12 @@ struct TakeActionHandlerTests {
 
         #expect(try await engine.item("statue").hasFlag(.isContainer) == false)  // Verify statue is not container
 
-        // Command targets the chip, but context is "from statue"
-        let command = Command(
-            verb: .take,
-            directObject: .item("chip"),
-            indirectObject: .item("statue"),
-            // Specify source
-            rawInput: "take chip from statue"
-        )
-
         // Act
-        await engine.execute(command: command)
+        try await engine.execute("take chip from statue")
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "You can’t take things out of the stone statue.")
+        expectNoDifference(output, "> take chip from statue\n\nYou can't take things out of the stone statue.")
 
         // Assert No State Change
         #expect(await engine.gameState.changeHistory.isEmpty)
@@ -478,18 +424,13 @@ struct TakeActionHandlerTests {
         let player = Player(in: .startRoom, carryingCapacity: 0)
         let game = MinimalGame(player: player, items: heavyItem)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
-        let command = Command(
-            verb: .take,
-            directObject: .item("heavy"),
-            rawInput: "take heavy"
-        )
 
         // We need to use the engine.execute to get the standard error message
-        await engine.execute(command: command)
+        try await engine.execute("take heavy")
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "Your hands are full.")  // Check standard message
+        expectNoDifference(output, "> take heavy\n\nYour hands are full.")  // Check standard message
 
         // Assert no state changes occurred
         #expect(await engine.gameState.changeHistory.isEmpty)
@@ -518,17 +459,11 @@ struct TakeActionHandlerTests {
         let game = MinimalGame(player: player, items: testItem)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        let command = Command(
-            verb: .take,
-            directObject: .item("cloak"),
-            rawInput: "take cloak"
-        )
-
         // Initial state check
         #expect(await engine.gameState.changeHistory.isEmpty)
 
         // Act: Use engine.execute for full pipeline
-        await engine.execute(command: command)
+        try await engine.execute("take cloak")
 
         // Assert Final State
         let finalItemState = try await engine.item("cloak")
@@ -539,7 +474,7 @@ struct TakeActionHandlerTests {
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "Taken.")
+        expectNoDifference(output, "> take cloak\n\nTaken.")
 
         // Assert Change History
         let expectedChanges = expectedTakeChanges(
@@ -575,17 +510,11 @@ struct TakeActionHandlerTests {
         let game = MinimalGame(player: player, items: surfaceItem, itemOnSurface)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        let command = Command(
-            verb: .take,
-            directObject: .item(itemOnSurface.id),
-            rawInput: "take book"
-        )
-
         // Initial state check
         #expect(await engine.gameState.changeHistory.isEmpty)
 
         // Act: Use engine.execute for full pipeline
-        await engine.execute(command: command)
+        try await engine.execute("take book")
 
         // Assert Final State
         let finalItemState = try await engine.item(itemOnSurface.id)
@@ -597,7 +526,7 @@ struct TakeActionHandlerTests {
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "Taken.")
+        expectNoDifference(output, "> take book\n\nTaken.")
 
         // Assert Change History
         let expectedChanges = expectedTakeChanges(
@@ -628,16 +557,10 @@ struct TakeActionHandlerTests {
         let game = MinimalGame(player: player, items: testItem)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        let command = Command(
-            verb: .take,
-            directObject: .item("key"),
-            rawInput: "take key"
-        )
-
         #expect(await engine.gameState.changeHistory.isEmpty)
 
         // Act
-        await engine.execute(command: command)
+        try await engine.execute("take key")
 
         // Assert Final State
         let finalItemState = try await engine.item("key")
@@ -647,10 +570,10 @@ struct TakeActionHandlerTests {
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "Taken.")
+        expectNoDifference(output, "> take key\n\nTaken.")
 
         // Assert Change History
-        // Helper should only generate parent and pronoun changes as attributes didn’t change
+        // Helper should only generate parent and pronoun changes as attributes didn't change
         let expectedChanges = expectedTakeChanges(
             itemID: "key",
             initialParent: initialParent,
@@ -690,16 +613,10 @@ struct TakeActionHandlerTests {
         let game = MinimalGame(player: player, items: heldItem, itemToTake)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        let command = Command(
-            verb: .take,
-            directObject: .item("key"),
-            rawInput: "take key"
-        )
-
         #expect(await engine.gameState.changeHistory.isEmpty)
 
         // Act
-        await engine.execute(command: command)
+        try await engine.execute("take key")
 
         // Assert Final State
         let finalItemState = try await engine.item("key")
@@ -709,7 +626,7 @@ struct TakeActionHandlerTests {
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "Taken.")
+        expectNoDifference(output, "> take key\n\nTaken.")
 
         // Assert Change History
         let expectedChanges = expectedTakeChanges(
@@ -744,22 +661,16 @@ struct TakeActionHandlerTests {
         let game = MinimalGame(player: player, items: container, itemInContainer)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        let command = Command(
-            verb: .take,
-            directObject: .item("fly"),
-            rawInput: "take fly"
-        )
-
         #expect(await engine.gameState.changeHistory.isEmpty)
         #expect(try await engine.item("jar").hasFlag(.isOpen) == false)  // Verify closed
         #expect(try await engine.item("jar").hasFlag(.isTransparent) == true)  // Verify transparent
 
         // Act: ScopeResolver sees through transparent containers, but TakeActionHandler should still check if container is open
-        await engine.execute(command: command)
+        try await engine.execute("take fly")
 
         // Assert Output - Should fail because container is closed
         let output = await mockIO.flush()
-        expectNoDifference(output, "The glass jar is closed.")
+        expectNoDifference(output, "> take fly\n\nThe glass jar is closed.")
 
         // Assert No State Change
         #expect(await engine.gameState.changeHistory.isEmpty)
@@ -791,18 +702,12 @@ struct TakeActionHandlerTests {
         let game = MinimalGame(player: player, items: itemHeld, itemToTake)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        let command = Command(
-            verb: .take,
-            directObject: .item("shield"),
-            rawInput: "take shield"
-        )
-
         // Act
-        await engine.execute(command: command)
+        try await engine.execute("take shield")
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "Your hands are full.")
+        expectNoDifference(output, "> take shield\n\nYour hands are full.")
 
         // Assert No State Change
         #expect(await engine.gameState.changeHistory.isEmpty)
@@ -837,25 +742,14 @@ struct TakeActionHandlerTests {
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // Act: Parse and execute "take coin from bag"
-        let parseResult = await engine.parser.parse(
-            input: "take coin from bag",
-            vocabulary: engine.gameState.vocabulary,
-            gameState: engine.gameState
-        )
-
-        guard case .success(let command) = parseResult else {
-            Issue.record("Failed to parse 'take coin from bag': \(parseResult)")
-            return
-        }
-
-        await engine.execute(command: command)
+        try await engine.execute("take coin from bag")
 
         // Assert: Coin should be taken from bag and moved to player
         let finalCoinState = try await engine.item("coin")
         #expect(finalCoinState.parent == .player)
 
         let output = await mockIO.flush()
-        expectNoDifference(output, "Taken.")
+        expectNoDifference(output, "> take coin from bag\n\nTaken.")
     }
 
     @Test("Take item from wrong container fails with appropriate message")
@@ -890,22 +784,11 @@ struct TakeActionHandlerTests {
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // Act: Try to parse and execute "take coin from box" (coin is in bag, not box)
-        let parseResult = await engine.parser.parse(
-            input: "take coin from box",
-            vocabulary: engine.gameState.vocabulary,
-            gameState: engine.gameState
-        )
-
-        guard case .success(let command) = parseResult else {
-            Issue.record("Failed to parse 'take coin from box': \(parseResult)")
-            return
-        }
-
-        await engine.execute(command: command)
+        try await engine.execute("take coin from box")
 
         // Assert: Should get error message
         let output = await mockIO.flush()
-        expectNoDifference(output, "The gold coin is not in the wooden box.")
+        expectNoDifference(output, "> take coin from box\n\nThe gold coin is not in the wooden box.")
     }
 
     @Test("Take item from container parses correctly")

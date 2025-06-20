@@ -18,10 +18,7 @@ struct SmellActionHandlerTests {
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, """
-            > smell
-            You smell nothing unusual.
-            """)
+        expectNoDifference(output, "> smell\n\nYou smell nothing unusual.")
     }
 
     @Test("SMELL with item produces expected message")
@@ -42,10 +39,7 @@ struct SmellActionHandlerTests {
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, """
-            > smell apple
-            That smells about average.
-            """)
+        expectNoDifference(output, "> smell apple\n\nThat smells about average.")
     }
 
     @Test("SMELL validation rejects non-item objects")
@@ -56,10 +50,7 @@ struct SmellActionHandlerTests {
         try await engine.execute("smell room")
 
         let output = await mockIO.flush()
-        expectNoDifference(output, """
-            > smell room
-            You can only smell specific items.
-            """)
+        expectNoDifference(output, "> smell room\n\nYou can only smell specific items.")
     }
 
     @Test("SMELL validation succeeds for items")
@@ -79,10 +70,7 @@ struct SmellActionHandlerTests {
         try await engine.execute("smell flower")
 
         let output = await mockIO.flush()
-        expectNoDifference(output, """
-            > smell flower
-            That smells about average.
-            """)
+        expectNoDifference(output, "> smell flower\n\nThat smells about average.")
     }
 
     @Test("SMELL validation succeeds with no direct object")
@@ -175,10 +163,7 @@ struct SmellActionHandlerTests {
         #expect(finalState.player.currentLocationID == initialLocation)
 
         let output = await mockIO.flush()
-        expectNoDifference(output, """
-            > smell
-            You smell nothing unusual.
-            """)
+        expectNoDifference(output, "> smell\n\nYou smell nothing unusual.")
     }
 
     @Test("SMELL works in different locations")
@@ -197,15 +182,10 @@ struct SmellActionHandlerTests {
         let game = MinimalGame(locations: location1, location2)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        let command = Command(
-            verb: .smell,
-            rawInput: "smell"
-        )
-
         // Test in first location
-        await engine.execute(command: command)
+        try await engine.execute("smell")
         let output1 = await mockIO.flush()
-        expectNoDifference(output1, "You smell nothing unusual.")
+        expectNoDifference(output1, "> smell\n\nYou smell nothing unusual.")
 
         // Move to second location
         let moveChange = StateChange(
@@ -216,9 +196,9 @@ struct SmellActionHandlerTests {
         try await engine.apply(moveChange)
 
         // Test in second location - should give same generic response
-        await engine.execute(command: command)
+        try await engine.execute("smell")
         let output2 = await mockIO.flush()
-        expectNoDifference(output2, "You smell nothing unusual.")
+        expectNoDifference(output2, "> smell\n\nYou smell nothing unusual.")
     }
 
     @Test("SMELL works with items in different locations")
@@ -234,41 +214,30 @@ struct SmellActionHandlerTests {
         let game = MinimalGame(items: testItem)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        let command = Command(
-            verb: .smell,
-            directObject: .item("perfume"),
-            rawInput: "smell perfume"
-        )
-
         // Test smelling item in room
-        await engine.execute(command: command)
+        try await engine.execute("smell perfume")
         let output = await mockIO.flush()
-        expectNoDifference(output, "That smells about average.")
+        expectNoDifference(output, "> smell perfume\n\nThat smells about average.")
     }
 
     @Test("SMELL message is consistent across multiple calls")
     func testSmellConsistency() async throws {
         let (engine, mockIO) = await GameEngine.test()
 
-        let command = Command(
-            verb: .smell,
-            rawInput: "smell"
-        )
-
         // Execute SMELL multiple times
-        await engine.execute(command: command)
+        try await engine.execute("smell")
         let firstOutput = await mockIO.flush()
 
-        await engine.execute(command: command)
+        try await engine.execute("smell")
         let secondOutput = await mockIO.flush()
 
-        await engine.execute(command: command)
+        try await engine.execute("smell")
         let thirdOutput = await mockIO.flush()
 
         // All outputs should be identical
-        expectNoDifference(firstOutput, "You smell nothing unusual.")
-        expectNoDifference(secondOutput, "You smell nothing unusual.")
-        expectNoDifference(thirdOutput, "You smell nothing unusual.")
+        expectNoDifference(firstOutput, "> smell\n\nYou smell nothing unusual.")
+        expectNoDifference(secondOutput, "> smell\n\nYou smell nothing unusual.")
+        expectNoDifference(thirdOutput, "> smell\n\nYou smell nothing unusual.")
     }
 
     @Test("SMELL with carried item works")
@@ -284,18 +253,12 @@ struct SmellActionHandlerTests {
         let game = MinimalGame(items: testItem)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        let command = Command(
-            verb: .smell,
-            directObject: .item("soap"),
-            rawInput: "smell soap"
-        )
-
         // Act: Use engine.execute for full pipeline
-        await engine.execute(command: command)
+        try await engine.execute("smell soap")
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "That smells about average.")
+        expectNoDifference(output, "> smell soap\n\nThat smells about average.")
     }
 
     @Test("SMELL works in dark room")
@@ -314,17 +277,12 @@ struct SmellActionHandlerTests {
         )
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        let command = Command(
-            verb: .smell,
-            rawInput: "smell"
-        )
-
         // Act: SMELL should work even in dark rooms (smell doesn't require sight)
-        await engine.execute(command: command)
+        try await engine.execute("smell")
 
         // Assert Output - should still work
         let output = await mockIO.flush()
-        expectNoDifference(output, "You smell nothing unusual.")
+        expectNoDifference(output, "> smell\n\nYou smell nothing unusual.")
     }
 
     @Test("SMELL works with unreachable items")
@@ -344,9 +302,6 @@ struct SmellActionHandlerTests {
         try await engine.execute("smell flower")
 
         let output = await mockIO.flush()
-        expectNoDifference(output, """
-            > smell flower
-            You can't see any distant flower here.
-            """)
+        expectNoDifference(output, "> smell flower\n\nYou can't see any distant flower here.")
     }
 }

@@ -5,8 +5,6 @@ import Testing
 
 @Suite("RaiseActionHandler Tests")
 struct RaiseActionHandlerTests {
-    let handler = RaiseActionHandler()
-
     @Test("Raise item gives default response")
     func testRaiseItemGivesDefaultResponse() async throws {
         let book = Item(
@@ -31,10 +29,7 @@ struct RaiseActionHandlerTests {
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, """
-            > raise book
-            You can't lift the heavy book.
-            """)
+        expectNoDifference(output, "> raise book\n\nYou can't lift the heavy book.")
     }
 
     @Test("Raise fails if item not accessible")
@@ -52,10 +47,7 @@ struct RaiseActionHandlerTests {
         try await engine.execute("raise book")
 
         let output = await mockIO.flush()
-        expectNoDifference(output, """
-            > raise book
-            You can't see any heavy book here.
-            """)
+        expectNoDifference(output, "> raise book\n\nYou can't see any heavy book here.")
     }
 
     @Test("Raise fails with no direct object")
@@ -67,28 +59,19 @@ struct RaiseActionHandlerTests {
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, """
-            > raise
-            Raise what?
-            """)
+        expectNoDifference(output, "> raise\n\nRaise what?")
     }
 
     @Test("Raise fails with non-item target")
     func testRaiseFailsWithNonItemTarget() async throws {
         let (engine, mockIO) = await GameEngine.test()
 
-        let command = Command(
-            verb: .raise,
-            directObject: .location(.startRoom),
-            rawInput: "raise room"
-        )
-
         // Act
-        await engine.execute(command: command)
+        try await engine.execute("raise room")
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "You can only raise items.")
+        expectNoDifference(output, "> raise room\n\nYou can only raise items.")
 
         #expect(await engine.gameState.changeHistory.isEmpty)
     }
@@ -116,10 +99,7 @@ struct RaiseActionHandlerTests {
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, """
-            > raise book
-            You can't see any hidden book here.
-            """)
+        expectNoDifference(output, "> raise book\n\nYou can't see any hidden book here.")
     }
 
     @Test("Raise works on player inventory items")
@@ -138,10 +118,7 @@ struct RaiseActionHandlerTests {
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, """
-            > raise coin
-            You can't lift the gold coin.
-            """)
+        expectNoDifference(output, "> raise coin\n\nYou can't lift the gold coin.")
 
         // Assert State Change
         let finalCoin = try await engine.item("coin")

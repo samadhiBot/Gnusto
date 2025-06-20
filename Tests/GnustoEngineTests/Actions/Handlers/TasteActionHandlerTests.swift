@@ -27,10 +27,7 @@ struct TasteActionHandlerTests {
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, """
-            > taste apple
-            That tastes about average.
-            """)
+        expectNoDifference(output, "> taste apple\n\nThat tastes about average.")
     }
 
     @Test("TASTE without object is rejected")
@@ -41,10 +38,7 @@ struct TasteActionHandlerTests {
         try await engine.execute("taste")
 
         let output = await mockIO.flush()
-        expectNoDifference(output, """
-            > taste
-            Taste what?
-            """)
+        expectNoDifference(output, "> taste\n\nTaste what?")
     }
 
     @Test("TASTE validation rejects non-item objects")
@@ -55,10 +49,7 @@ struct TasteActionHandlerTests {
         try await engine.execute("taste room")
 
         let output = await mockIO.flush()
-        expectNoDifference(output, """
-            > taste room
-            You can only taste specific items.
-            """)
+        expectNoDifference(output, "> taste room\n\nYou can only taste specific items.")
     }
 
     @Test("TASTE validation succeeds for items")
@@ -78,10 +69,7 @@ struct TasteActionHandlerTests {
         try await engine.execute("taste berry")
 
         let output = await mockIO.flush()
-        expectNoDifference(output, """
-            > taste berry
-            That tastes about average.
-            """)
+        expectNoDifference(output, "> taste berry\n\nThat tastes about average.")
     }
 
     @Test("TASTE produces correct ActionResult")
@@ -143,10 +131,7 @@ struct TasteActionHandlerTests {
         #expect(finalState.player.currentLocationID == initialLocation)
 
         let output = await mockIO.flush()
-        expectNoDifference(output, """
-            > taste cookie
-            That tastes about average.
-            """)
+        expectNoDifference(output, "> taste cookie\n\nThat tastes about average.")
     }
 
     @Test("TASTE works with items in different locations")
@@ -166,10 +151,7 @@ struct TasteActionHandlerTests {
         try await engine.execute("taste fruit")
 
         let output = await mockIO.flush()
-        expectNoDifference(output, """
-            > taste fruit
-            That tastes about average.
-            """)
+        expectNoDifference(output, "> taste fruit\n\nThat tastes about average.")
     }
 
     @Test("TASTE with unreachable item")
@@ -189,10 +171,7 @@ struct TasteActionHandlerTests {
         try await engine.execute("taste fruit")
 
         let output = await mockIO.flush()
-        expectNoDifference(output, """
-            > taste fruit
-            You can't see any distant fruit here.
-            """)
+        expectNoDifference(output, "> taste fruit\n\nYou can't see any distant fruit here.")
     }
 
     @Test("TASTE message is consistent across multiple calls")
@@ -208,26 +187,20 @@ struct TasteActionHandlerTests {
         let game = MinimalGame(items: testItem)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        let command = Command(
-            verb: .taste,
-            directObject: .item("candy"),
-            rawInput: "taste candy"
-        )
-
         // Execute TASTE multiple times
-        await engine.execute(command: command)
+        try await engine.execute("taste candy")
         let firstOutput = await mockIO.flush()
 
-        await engine.execute(command: command)
+        try await engine.execute("taste candy")
         let secondOutput = await mockIO.flush()
 
-        await engine.execute(command: command)
+        try await engine.execute("taste candy")
         let thirdOutput = await mockIO.flush()
 
         // All outputs should be identical
-        expectNoDifference(firstOutput, "That tastes about average.")
-        expectNoDifference(secondOutput, "That tastes about average.")
-        expectNoDifference(thirdOutput, "That tastes about average.")
+        expectNoDifference(firstOutput, "> taste candy\n\nThat tastes about average.")
+        expectNoDifference(secondOutput, "> taste candy\n\nThat tastes about average.")
+        expectNoDifference(thirdOutput, "> taste candy\n\nThat tastes about average.")
     }
 
     @Test("TASTE with carried item works")
@@ -243,18 +216,12 @@ struct TasteActionHandlerTests {
         let game = MinimalGame(items: testItem)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        let command = Command(
-            verb: .taste,
-            directObject: .item("medicine"),
-            rawInput: "taste medicine"
-        )
-
         // Act: Use engine.execute for full pipeline
-        await engine.execute(command: command)
+        try await engine.execute("taste medicine")
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "That tastes about average.")
+        expectNoDifference(output, "> taste medicine\n\nThat tastes about average.")
     }
 
     @Test("TASTE works in dark room")
@@ -282,18 +249,12 @@ struct TasteActionHandlerTests {
         )
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        let command = Command(
-            verb: .taste,
-            directObject: .item("spice"),
-            rawInput: "taste spice"
-        )
-
         // Act: TASTE should work even in dark rooms (taste doesn't require sight)
-        await engine.execute(command: command)
+        try await engine.execute("taste spice")
 
         // Assert Output - should still work
         let output = await mockIO.flush()
-        expectNoDifference(output, "That tastes about average.")
+        expectNoDifference(output, "> taste spice\n\nThat tastes about average.")
     }
 
     @Test("TASTE full workflow integration test")
@@ -353,23 +314,13 @@ struct TasteActionHandlerTests {
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // Test tasting liquid
-        let waterCommand = Command(
-            verb: .taste,
-            directObject: .item("water"),
-            rawInput: "taste water"
-        )
-        await engine.execute(command: waterCommand)
+        try await engine.execute("taste water")
         let waterOutput = await mockIO.flush()
-        expectNoDifference(waterOutput, "That tastes about average.")
+        expectNoDifference(waterOutput, "> taste water\n\nThat tastes about average.")
 
         // Test tasting solid
-        let rockCommand = Command(
-            verb: .taste,
-            directObject: .item("rock"),
-            rawInput: "taste rock"
-        )
-        await engine.execute(command: rockCommand)
+        try await engine.execute("taste rock")
         let rockOutput = await mockIO.flush()
-        expectNoDifference(rockOutput, "That tastes about average.")
+        expectNoDifference(rockOutput, "> taste rock\n\nThat tastes about average.")
     }
 }

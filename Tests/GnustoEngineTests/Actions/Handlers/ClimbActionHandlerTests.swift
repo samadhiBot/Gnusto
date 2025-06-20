@@ -16,7 +16,10 @@ struct ClimbActionHandlerTests {
 
         // Assert
         let output = await mockIO.flush()
-        expectNoDifference(output, "> climb\n\nClimb what?")
+        expectNoDifference(output, """
+            > climb
+            Climb what?
+            """)
     }
 
     // MARK: - Exit Traversal Tests
@@ -69,7 +72,10 @@ struct ClimbActionHandlerTests {
         #expect(finalStairs.hasFlag(.isTouched))
 
         let output = await mockIO.flush()
-        expectNoDifference(output, "> climb stairs\n\n— Attic —")
+        expectNoDifference(output, """
+            > climb stairs
+            — Attic —
+            """)
     }
 
     @Test("Climb ladder to go down")
@@ -117,7 +123,10 @@ struct ClimbActionHandlerTests {
         #expect(finalPlayerLocation.id == "bottom")
 
         let output = await mockIO.flush()
-        expectNoDifference(output, "> climb ladder\n\n— Bottom —")
+        expectNoDifference(output, """
+            > climb ladder
+            — Bottom —
+            """)
     }
 
     @Test("Climb rope enables multiple directions")
@@ -162,7 +171,10 @@ struct ClimbActionHandlerTests {
         #expect(finalPlayerLocation.id == "top")
 
         let output = await mockIO.flush()
-        expectNoDifference(output, "> climb rope\n\n— Top —")
+        expectNoDifference(output, """
+            > climb rope
+            — Top —
+            """)
     }
 
     // MARK: - Global Object Validation Tests
@@ -198,7 +210,10 @@ struct ClimbActionHandlerTests {
 
         // Assert: Should get error message
         let output = await mockIO.flush()
-        expectNoDifference(output, "> climb stairs\n\nYou can't see any such thing.")
+        expectNoDifference(output, """
+            > climb stairs
+            You can't see any such thing.
+            """)
     }
 
     @Test("Climb plural stairs when not present")
@@ -232,7 +247,10 @@ struct ClimbActionHandlerTests {
 
         // Assert: Should use "are" for plural
         let output = await mockIO.flush()
-        expectNoDifference(output, "> climb stairs\n\nYou can't see any such thing.")
+        expectNoDifference(output, """
+            > climb stairs
+            You can't see any such thing.
+            """)
     }
 
     // MARK: - Regular Climbing Tests
@@ -256,7 +274,10 @@ struct ClimbActionHandlerTests {
 
         // Assert: Should get default climbing message
         let output = await mockIO.flush()
-        expectNoDifference(output, "> climb tree\n\nYou climb the oak tree.")
+        expectNoDifference(output, """
+            > climb tree
+            You climb the oak tree.
+            """)
 
         // Check that tree is marked as touched
         let finalTree = try await engine.item("tree")
@@ -283,7 +304,10 @@ struct ClimbActionHandlerTests {
 
         // Assert: Should get error message
         let output = await mockIO.flush()
-        expectNoDifference(output, "> climb table\n\nYou can't climb the wooden table.")
+        expectNoDifference(output, """
+            > climb table
+            You can't climb the wooden table.
+            """)
     }
 
     // MARK: - Error Cases
@@ -306,7 +330,10 @@ struct ClimbActionHandlerTests {
 
         // Assert: Should get error message
         let output = await mockIO.flush()
-        expectNoDifference(output, "> climb tree\n\nYou can't see any such thing.")
+        expectNoDifference(output, """
+            > climb tree
+            You can't see any such thing.
+            """)
     }
 
     @Test("Climb nonexistent item fails validation")
@@ -318,7 +345,10 @@ struct ClimbActionHandlerTests {
 
         // Assert: Should get error message
         let output = await mockIO.flush()
-        expectNoDifference(output, "> climb nonexistent\n\nYou can't see any such thing.")
+        expectNoDifference(output, """
+            > climb nonexistent
+            You can't see any such thing.
+            """)
     }
 
     @Test("Climb non-item entity")
@@ -330,7 +360,10 @@ struct ClimbActionHandlerTests {
 
         // Assert: Should get error message
         let output = await mockIO.flush()
-        expectNoDifference(output, "> climb me\n\nYou can't climb yourself.")
+        expectNoDifference(output, """
+            > climb me
+            You can't climb yourself.
+            """)
     }
 
     // MARK: - Movement Failure Tests
@@ -375,7 +408,10 @@ struct ClimbActionHandlerTests {
 
         // Assert: Should get the blocked exit message
         let output = await mockIO.flush()
-        expectNoDifference(output, "> climb stairs\n\nThe ceiling is too low.")
+        expectNoDifference(output, """
+            > climb stairs
+            The ceiling is too low.
+            """)
     }
 
     @Test("Climb stairs with no exit fails")
@@ -410,7 +446,10 @@ struct ClimbActionHandlerTests {
 
         // Assert: Should default to regular climbing behavior since no exit uses stairs
         let output = await mockIO.flush()
-        expectNoDifference(output, "> climb stairs\n\nYou climb the stairs.")
+        expectNoDifference(output, """
+            > climb stairs
+            You climb the stairs.
+            """)
     }
 
     @Test("Climb stairs from lit to dark room shows transition and custom darkness message")
@@ -459,7 +498,9 @@ struct ClimbActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(
             output,
-            "> climb stairs\n\nYou are plunged into darkness.\n\nIt is pitch black. You can't see a thing.")
+            "> climb stairs
+            You are plunged into darkness.
+            It is pitch black. You can't see a thing.")
     }
 
     @Test("Climb stairs from lit to lit room shows normal room description (no transition message)")
@@ -506,6 +547,10 @@ struct ClimbActionHandlerTests {
 
         // Assert: Output shows normal room description (no transition message since both rooms are lit)
         let output = await mockIO.flush()
-        expectNoDifference(output, "> climb stairs\n\n— Living Room —\n\nA cozy living room.")
+        expectNoDifference(output, """
+            > climb stairs
+            — Living Room —
+            A cozy living room.
+            """)
     }
 }
