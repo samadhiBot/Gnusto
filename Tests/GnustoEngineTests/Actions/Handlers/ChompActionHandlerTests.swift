@@ -27,13 +27,13 @@ struct ChompActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > chomp
-            You chomp at the air, but there's nothing to bite.
+            You chomp at the air for everyone to see.
 
             > chomp
-            You gnaw hopefully, but nothing's within range.
+            You clench your fists and gnash your teeth.
 
             > chomp
-            You snap your jaws like a hungry predator.
+            You practice your chomping technique.
             """)
     }
 

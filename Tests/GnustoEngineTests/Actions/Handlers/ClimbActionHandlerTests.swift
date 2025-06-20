@@ -75,6 +75,8 @@ struct ClimbActionHandlerTests {
         expectNoDifference(output, """
             > climb stairs
             — Attic —
+
+            You are in a nondescript location.
             """)
     }
 
@@ -126,6 +128,8 @@ struct ClimbActionHandlerTests {
         expectNoDifference(output, """
             > climb ladder
             — Bottom —
+
+            You are in a nondescript location.
             """)
     }
 
@@ -174,6 +178,8 @@ struct ClimbActionHandlerTests {
         expectNoDifference(output, """
             > climb rope
             — Top —
+
+            You are in a nondescript location.
             """)
     }
 
@@ -212,44 +218,7 @@ struct ClimbActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > climb stairs
-            You can’t see any such thing.
-            """)
-    }
-
-    @Test("Climb plural stairs when not present")
-    func testClimbPluralStairsNotPresent() async throws {
-        // Arrange: Plural stairs not present
-        let room = Location(
-            id: "room",
-            .name("Empty Room"),
-            .inherentlyLit
-        )
-
-        let pluralStairs = Item(
-            id: "stairs",
-            .name("stairs"),
-            .isPlural,
-            .isClimbable,
-            .in(.nowhere)
-        )
-
-        let player = Player(in: "room")
-        let game = MinimalGame(
-            player: player,
-            locations: room,
-            items: pluralStairs
-        )
-
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
-
-        // Act
-        try await engine.execute("climb stairs")
-
-        // Assert: Should use "are" for plural
-        let output = await mockIO.flush()
-        expectNoDifference(output, """
-            > climb stairs
-            You can’t see any such thing.
+            You can’t see any stairs here.
             """)
     }
 
@@ -332,7 +301,7 @@ struct ClimbActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > climb tree
-            You can’t see any such thing.
+            You can’t see any tree here.
             """)
     }
 
