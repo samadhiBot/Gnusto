@@ -16,7 +16,10 @@ struct ListenActionHandlerTests {
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "> listen\n\nYou hear nothing unusual.")
+        expectNoDifference(output, """
+            > listen
+            You hear nothing unusual.
+            """)
     }
 
     @Test("LISTEN produces correct ActionResult")
@@ -28,7 +31,10 @@ struct ListenActionHandlerTests {
 
         // Assert
         let output = await mockIO.flush()
-        expectNoDifference(output, "> listen\n\nYou hear nothing unusual.")
+        expectNoDifference(output, """
+            > listen
+            You hear nothing unusual.
+            """)
     }
 
     @Test("LISTEN validation always succeeds")
@@ -40,7 +46,10 @@ struct ListenActionHandlerTests {
 
         // Assert - Should not throw and should produce output
         let output = await mockIO.flush()
-        expectNoDifference(output, "> listen\n\nYou hear nothing unusual.")
+        expectNoDifference(output, """
+            > listen
+            You hear nothing unusual.
+            """)
     }
 
     @Test("LISTEN full workflow integration test")
@@ -52,7 +61,10 @@ struct ListenActionHandlerTests {
 
         // Assert complete workflow
         let output = await mockIO.flush()
-        expectNoDifference(output, "> listen\n\nYou hear nothing unusual.")
+        expectNoDifference(output, """
+            > listen
+            You hear nothing unusual.
+            """)
     }
 
     @Test("LISTEN does not affect game state")
@@ -93,7 +105,10 @@ struct ListenActionHandlerTests {
 
         // Assert Output is unchanged
         let output = await mockIO.flush()
-        expectNoDifference(output, "> listen\n\nYou hear nothing unusual.")
+        expectNoDifference(output, """
+            > listen
+            You hear nothing unusual.
+            """)
     }
 
     @Test("LISTEN works in different locations")
@@ -128,7 +143,10 @@ struct ListenActionHandlerTests {
         // Test in second location - should give same generic response
         try await engine.execute("listen")
         let output2 = await mockIO.flush()
-        expectNoDifference(output2, "> listen\n\nYou hear nothing unusual.")
+        expectNoDifference(output2, """
+            > listen
+            You hear nothing unusual.
+            """)
     }
 
     @Test("LISTEN with extra text still works")
@@ -140,7 +158,10 @@ struct ListenActionHandlerTests {
 
         // Assert Output - should still work the same way
         let output = await mockIO.flush()
-        expectNoDifference(output, "> listen carefully\n\nYou hear nothing unusual.")
+        expectNoDifference(output, """
+            > listen carefully
+            You hear nothing unusual.
+            """)
     }
 
     @Test("LISTEN message is consistent across multiple calls")

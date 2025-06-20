@@ -29,7 +29,10 @@ struct RaiseActionHandlerTests {
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "> raise book\n\nYou can't lift the heavy book.")
+        expectNoDifference(output, """
+            > raise book
+            You can't lift the heavy book.
+            """)
     }
 
     @Test("Raise fails if item not accessible")

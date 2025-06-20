@@ -13,7 +13,10 @@ struct ThinkAboutActionHandlerTests {
         try await engine.execute("think about")
 
         let output = await mockIO.flush()
-        expectNoDifference(output, "> think about\n\nThink about what?")
+        expectNoDifference(output, """
+            > think about
+            Think about what?
+            """)
     }
 
     @Test("THINK ABOUT SELF produces specific message")
@@ -25,7 +28,10 @@ struct ThinkAboutActionHandlerTests {
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "> think about self\n\nYes, yes, you're very important.")
+        expectNoDifference(output, """
+            > think about self
+            Yes, yes, you're very important.
+            """)
     }
 
     @Test("THINK ABOUT with reachable item produces specific message")

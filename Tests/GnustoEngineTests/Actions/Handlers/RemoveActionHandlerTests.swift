@@ -35,7 +35,10 @@ struct RemoveActionHandlerTests {
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "> remove cloak\n\nYou take off the cloak.")
+        expectNoDifference(output, """
+            > remove cloak
+            You take off the cloak.
+            """)
 
         // Assert Change History
         let expectedChanges = [
@@ -76,7 +79,10 @@ struct RemoveActionHandlerTests {
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "> take off cloak\n\nYou aren't wearing the cloak.")
+        expectNoDifference(output, """
+            > take off cloak
+            You aren't wearing the cloak.
+            """)
         #expect(await engine.gameState.changeHistory.isEmpty)
     }
 
@@ -90,7 +96,10 @@ struct RemoveActionHandlerTests {
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "> remove cloak\n\nYou can't see any such thing.")
+        expectNoDifference(output, """
+            > remove cloak
+            You can't see any such thing.
+            """)
         #expect(await engine.gameState.changeHistory.isEmpty)
     }
 
@@ -103,7 +112,10 @@ struct RemoveActionHandlerTests {
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "> remove\n\nRemove what?")
+        expectNoDifference(output, """
+            > remove
+            Remove what?
+            """)
         #expect(await engine.gameState.changeHistory.isEmpty)
     }
 
@@ -125,7 +137,10 @@ struct RemoveActionHandlerTests {
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "> remove amulet\n\nYou can't take off the cursed amulet.")
+        expectNoDifference(output, """
+            > remove amulet
+            You can't take off the cursed amulet.
+            """)
         #expect(await engine.gameState.changeHistory.isEmpty)
     }
 
