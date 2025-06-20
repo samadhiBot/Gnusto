@@ -718,7 +718,10 @@ struct LookActionHandlerTests {
 
         // Assert Output (Error message)
         let output = await mockIO.flush()
-        expectNoDifference(output, "> examine artifact\n\nYou can't see any such thing.")
+        expectNoDifference(output, """
+            > examine artifact
+            You can't see any such thing.
+            """)
 
         // Assert Final State (Item remains untouched and where it was)
         let finalItemState = try await engine.item("artifact")
@@ -760,7 +763,10 @@ struct LookActionHandlerTests {
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "> look at desk\n\nA large, imposing wooden desk.")
+        expectNoDifference(output, """
+            > look at desk
+            A large, imposing wooden desk.
+            """)
 
         // Assert State Change
         let finalItemState = try await engine.item(itemID)
@@ -795,7 +801,10 @@ struct LookActionHandlerTests {
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "> look at note\n\nA note with faint writing.")
+        expectNoDifference(output, """
+            > look at note
+            A note with faint writing.
+            """)
 
         // Assert State Change
         let finalItemState = try await engine.item(itemID)
@@ -816,7 +825,10 @@ struct LookActionHandlerTests {
         try await engine.execute("look at unicorn")
 
         let output = await mockIO.flush()
-        expectNoDifference(output, "> look at unicorn\n\nYou can't see any such thing.")
+        expectNoDifference(output, """
+            > look at unicorn
+            You can't see any such thing.
+            """)
         #expect(await engine.gameState.changeHistory.isEmpty)
     }
 
@@ -829,7 +841,10 @@ struct LookActionHandlerTests {
         try await engine.execute("look at artifact")
 
         let output = await mockIO.flush()
-        expectNoDifference(output, "> look at artifact\n\nYou can't see any such thing.")
+        expectNoDifference(output, """
+            > look at artifact
+            You can't see any such thing.
+            """)
         #expect(await engine.gameState.changeHistory.isEmpty)
     }
 }

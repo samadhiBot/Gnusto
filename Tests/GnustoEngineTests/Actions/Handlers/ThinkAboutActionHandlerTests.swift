@@ -52,7 +52,10 @@ struct ThinkAboutActionHandlerTests {
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "> think about puzzle\n\nYou contemplate the mysterious puzzle for a bit, but nothing fruitful comes to mind.")
+        expectNoDifference(output, """
+            > think about puzzle
+            You contemplate the mysterious puzzle for a bit, but nothing fruitful comes to mind.
+            """)
     }
 
     @Test("THINK ABOUT with location is rejected")
@@ -63,7 +66,10 @@ struct ThinkAboutActionHandlerTests {
         try await engine.execute("think about room")
 
         let output = await mockIO.flush()
-        expectNoDifference(output, "> think about room\n\nYou can only think about yourself or specific items.")
+        expectNoDifference(output, """
+            > think about room
+            You can only think about yourself or specific items.
+            """)
     }
 
     @Test("THINK ABOUT with unreachable item")
@@ -83,7 +89,10 @@ struct ThinkAboutActionHandlerTests {
         try await engine.execute("think about key")
 
         let output = await mockIO.flush()
-        expectNoDifference(output, "> think about key\n\nYou can't see any golden key here.")
+        expectNoDifference(output, """
+            > think about key
+            You can't see any golden key here.
+            """)
     }
 
     @Test("THINK ABOUT validation succeeds for player")

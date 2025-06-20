@@ -159,7 +159,10 @@ struct RemoveActionHandlerTests {
 
         // Assert: Should remove both items
         let output = await mockIO.flush()
-        expectNoDifference(output, "> remove all\n\nYou take off the boots and the cloak.")
+        expectNoDifference(output, """
+            > remove all
+            You take off the boots and the cloak.
+            """)
 
         // Verify items are no longer worn
         let updatedCloak = try await engine.item("cloak")
@@ -185,7 +188,10 @@ struct RemoveActionHandlerTests {
 
         // Assert: Should remove both items
         let output = await mockIO.flush()
-        expectNoDifference(output, "> remove cloak and boots\n\nYou take off the boots and the cloak.")
+        expectNoDifference(output, """
+            > remove cloak and boots
+            You take off the boots and the cloak.
+            """)
 
         // Verify items are no longer worn
         let updatedCloak = try await engine.item("cloak")
@@ -207,7 +213,10 @@ struct RemoveActionHandlerTests {
 
         // Assert: Should remove only the cloak
         let output = await mockIO.flush()
-        expectNoDifference(output, "> remove all\n\nYou take off the cloak.")
+        expectNoDifference(output, """
+            > remove all
+            You take off the cloak.
+            """)
 
         // Verify only cloak is affected
         let updatedCloak = try await engine.item("cloak")
@@ -228,7 +237,10 @@ struct RemoveActionHandlerTests {
 
         // Assert: Should get appropriate message
         let output = await mockIO.flush()
-        expectNoDifference(output, "> remove all\n\nYou aren't wearing anything.")
+        expectNoDifference(output, """
+            > remove all
+            You aren't wearing anything.
+            """)
     }
 
     @Test("REMOVE ALL skips scenery items")
@@ -246,7 +258,10 @@ struct RemoveActionHandlerTests {
 
         // Assert: Should remove only the cloak (skip cursed amulet)
         let output = await mockIO.flush()
-        expectNoDifference(output, "> remove all\n\nYou take off the cloak.")
+        expectNoDifference(output, """
+            > remove all
+            You take off the cloak.
+            """)
 
         // Verify only cloak is affected
         let updatedCloak = try await engine.item("cloak")

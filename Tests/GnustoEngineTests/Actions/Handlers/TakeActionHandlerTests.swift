@@ -385,7 +385,10 @@ struct TakeActionHandlerTests {
         // Assert Output
         let output = await mockIO.flush()  // Define output before using it
         // ScopeResolver will prevent seeing it, standard message
-        expectNoDifference(output, "> take gem\n\nYou can't see any such thing.")
+        expectNoDifference(output, """
+            > take gem
+            You can't see any such thing.
+            """)
 
         // Assert No State Change
         #expect(await engine.gameState.changeHistory.isEmpty)
@@ -421,7 +424,10 @@ struct TakeActionHandlerTests {
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "> take chip from statue\n\nYou can't take things out of the stone statue.")
+        expectNoDifference(output, """
+            > take chip from statue
+            You can't take things out of the stone statue.
+            """)
 
         // Assert No State Change
         #expect(await engine.gameState.changeHistory.isEmpty)
@@ -451,7 +457,10 @@ struct TakeActionHandlerTests {
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "> take heavy\n\nYour hands are full.")  // Check standard message
+        expectNoDifference(output, """
+            > take heavy
+            Your hands are full.
+            """)  // Check standard message
 
         // Assert no state changes occurred
         #expect(await engine.gameState.changeHistory.isEmpty)
@@ -495,7 +504,10 @@ struct TakeActionHandlerTests {
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "> take cloak\n\nTaken.")
+        expectNoDifference(output, """
+            > take cloak
+            Taken.
+            """)
 
         // Assert Change History
         let expectedChanges = expectedTakeChanges(
@@ -547,7 +559,10 @@ struct TakeActionHandlerTests {
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "> take book\n\nTaken.")
+        expectNoDifference(output, """
+            > take book
+            Taken.
+            """)
 
         // Assert Change History
         let expectedChanges = expectedTakeChanges(
@@ -591,7 +606,10 @@ struct TakeActionHandlerTests {
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "> take key\n\nTaken.")
+        expectNoDifference(output, """
+            > take key
+            Taken.
+            """)
 
         // Assert Change History
         // Helper should only generate parent and pronoun changes as attributes didn't change
@@ -647,7 +665,10 @@ struct TakeActionHandlerTests {
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "> take key\n\nTaken.")
+        expectNoDifference(output, """
+            > take key
+            Taken.
+            """)
 
         // Assert Change History
         let expectedChanges = expectedTakeChanges(
@@ -691,7 +712,10 @@ struct TakeActionHandlerTests {
 
         // Assert Output - Should fail because container is closed
         let output = await mockIO.flush()
-        expectNoDifference(output, "> take fly\n\nThe glass jar is closed.")
+        expectNoDifference(output, """
+            > take fly
+            The glass jar is closed.
+            """)
 
         // Assert No State Change
         #expect(await engine.gameState.changeHistory.isEmpty)
@@ -728,7 +752,10 @@ struct TakeActionHandlerTests {
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "> take shield\n\nYour hands are full.")
+        expectNoDifference(output, """
+            > take shield
+            Your hands are full.
+            """)
 
         // Assert No State Change
         #expect(await engine.gameState.changeHistory.isEmpty)
@@ -812,7 +839,10 @@ struct TakeActionHandlerTests {
 
         // Assert: Should get error message
         let output = await mockIO.flush()
-        expectNoDifference(output, "> take coin from box\n\nThe gold coin is not in the wooden box.")
+        expectNoDifference(output, """
+            > take coin from box
+            The gold coin is not in the wooden box.
+            """)
     }
 
     @Test("Take item from container parses correctly")

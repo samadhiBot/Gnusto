@@ -101,7 +101,10 @@ struct PutOnActionHandlerTests {
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "> put book on table\n\nYou put the heavy book on the sturdy table.")
+        expectNoDifference(output, """
+            > put book on table
+            You put the heavy book on the sturdy table.
+            """)
 
         // Assert Final State
         let finalBookState = try await engine.item("book")
@@ -143,7 +146,10 @@ struct PutOnActionHandlerTests {
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "> put on table\n\nPut what?")
+        expectNoDifference(output, """
+            > put on table
+            Put what?
+            """)
 
         // Assert No State Change
         #expect(await engine.gameState.changeHistory.isEmpty)
@@ -166,7 +172,10 @@ struct PutOnActionHandlerTests {
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "> put book on\n\nPut the book on what?")
+        expectNoDifference(output, """
+            > put book on
+            Put the book on what?
+            """)
 
         // Assert No State Change
         #expect(await engine.gameState.changeHistory.isEmpty)
@@ -195,7 +204,10 @@ struct PutOnActionHandlerTests {
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "> put book on table\n\nYou aren't holding the heavy book.")
+        expectNoDifference(output, """
+            > put book on table
+            You aren't holding the heavy book.
+            """)
 
         // Assert No State Change
         #expect(await engine.gameState.changeHistory.isEmpty)
@@ -234,7 +246,10 @@ struct PutOnActionHandlerTests {
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "> put book on table\n\nYou can't see any such thing.")
+        expectNoDifference(output, """
+            > put book on table
+            You can't see any such thing.
+            """)
 
         // Assert No State Change
         #expect(await engine.gameState.changeHistory.isEmpty)
@@ -263,7 +278,10 @@ struct PutOnActionHandlerTests {
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "> put book on box\n\nYou can't put things on the box.")
+        expectNoDifference(output, """
+            > put book on box
+            You can't put things on the box.
+            """)
 
         // Assert No State Change
         #expect(await engine.gameState.changeHistory.isEmpty)
@@ -287,7 +305,10 @@ struct PutOnActionHandlerTests {
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "> put table on table\n\nYou can't put something on itself.")
+        expectNoDifference(output, """
+            > put table on table
+            You can't put something on itself.
+            """)
 
         // Assert No State Change
         #expect(await engine.gameState.changeHistory.isEmpty)

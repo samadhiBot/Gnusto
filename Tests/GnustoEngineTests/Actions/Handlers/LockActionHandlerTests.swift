@@ -39,7 +39,10 @@ struct LockActionHandlerTests {
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "> lock box with key\n\nThe wooden box is now locked.")
+        expectNoDifference(output, """
+            > lock box with key
+            The wooden box is now locked.
+            """)
 
         // Assert Final State
         let finalBoxState = try await engine.item("box")
@@ -79,7 +82,10 @@ struct LockActionHandlerTests {
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "> lock with key\n\nLock what?")
+        expectNoDifference(output, """
+            > lock with key
+            Lock what?
+            """)
 
         // Assert No State Change
         #expect(await engine.gameState.changeHistory.isEmpty)
@@ -105,7 +111,10 @@ struct LockActionHandlerTests {
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "> lock box\n\nLock it with what?")
+        expectNoDifference(output, """
+            > lock box
+            Lock it with what?
+            """)
 
         // Assert No State Change
         #expect(await engine.gameState.changeHistory.isEmpty)
@@ -137,7 +146,10 @@ struct LockActionHandlerTests {
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "> lock box with key\n\nYou aren't holding the key.")
+        expectNoDifference(output, """
+            > lock box with key
+            You aren't holding the key.
+            """)
 
         // Assert No State Change
         #expect(await engine.gameState.changeHistory.isEmpty)
@@ -179,7 +191,10 @@ struct LockActionHandlerTests {
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "> lock box with key\n\nYou can't see any such thing.")
+        expectNoDifference(output, """
+            > lock box with key
+            You can't see any such thing.
+            """)
 
         // Assert No State Change
         #expect(await engine.gameState.changeHistory.isEmpty)
@@ -206,7 +221,10 @@ struct LockActionHandlerTests {
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "> lock pebble with key\n\nYou can't lock the pebble.")  // Uses ActionResponse.itemNotLockable message
+        expectNoDifference(output, """
+            > lock pebble with key
+            You can't lock the pebble.
+            """)  // Uses ActionResponse.itemNotLockable message
 
         // Assert No State Change
         #expect(await engine.gameState.changeHistory.isEmpty)
@@ -238,7 +256,10 @@ struct LockActionHandlerTests {
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "> lock box with bent key\n\nThe bent key doesn't fit the box.")
+        expectNoDifference(output, """
+            > lock box with bent key
+            The bent key doesn't fit the box.
+            """)
 
         // Assert No State Change
         #expect(await engine.gameState.changeHistory.isEmpty)
@@ -273,7 +294,10 @@ struct LockActionHandlerTests {
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "> lock box with key\n\nThe box is already locked.")
+        expectNoDifference(output, """
+            > lock box with key
+            The box is already locked.
+            """)
 
         // Assert No State Change
         #expect(await engine.gameState.changeHistory.isEmpty)

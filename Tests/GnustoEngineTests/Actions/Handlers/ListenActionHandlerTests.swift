@@ -85,7 +85,10 @@ struct ListenActionHandlerTests {
         #expect(finalState.player.currentLocationID == initialLocation)
 
         let output = await mockIO.flush()
-        expectNoDifference(output, "> listen\n\nYou hear nothing unusual.")
+        expectNoDifference(output, """
+            > listen
+            You hear nothing unusual.
+            """)
     }
 
     @Test("LISTEN works regardless of game state")
@@ -130,7 +133,10 @@ struct ListenActionHandlerTests {
         // Test in first location
         try await engine.execute("listen")
         let output1 = await mockIO.flush()
-        expectNoDifference(output1, "> listen\n\nYou hear nothing unusual.")
+        expectNoDifference(output1, """
+            > listen
+            You hear nothing unusual.
+            """)
 
         // Move to second location
         let moveChange = StateChange(
@@ -179,9 +185,18 @@ struct ListenActionHandlerTests {
         let thirdOutput = await mockIO.flush()
 
         // All outputs should be identical
-        expectNoDifference(firstOutput, "> listen\n\nYou hear nothing unusual.")
-        expectNoDifference(secondOutput, "> listen\n\nYou hear nothing unusual.")
-        expectNoDifference(thirdOutput, "> listen\n\nYou hear nothing unusual.")
+        expectNoDifference(firstOutput, """
+            > listen
+            You hear nothing unusual.
+            """)
+        expectNoDifference(secondOutput, """
+            > listen
+            You hear nothing unusual.
+            """)
+        expectNoDifference(thirdOutput, """
+            > listen
+            You hear nothing unusual.
+            """)
     }
 
     @Test("LISTEN works in dark room")
@@ -205,7 +220,10 @@ struct ListenActionHandlerTests {
 
         // Assert Output - should still work
         let output = await mockIO.flush()
-        expectNoDifference(output, "> listen\n\nYou hear nothing unusual.")
+        expectNoDifference(output, """
+            > listen
+            You hear nothing unusual.
+            """)
     }
 
     @Test("LISTEN works with items present")
@@ -225,6 +243,9 @@ struct ListenActionHandlerTests {
 
         // Assert Output - generic response (custom item sounds would need custom handlers)
         let output = await mockIO.flush()
-        expectNoDifference(output, "> listen\n\nYou hear nothing unusual.")
+        expectNoDifference(output, """
+            > listen
+            You hear nothing unusual.
+            """)
     }
 }
