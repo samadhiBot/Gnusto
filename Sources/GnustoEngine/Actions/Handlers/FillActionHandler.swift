@@ -17,7 +17,7 @@ public struct FillActionHandler: ActionHandler {
     public func validate(context: ActionContext) async throws {
         // Fill requires a direct object (what to fill)
         guard let directObjectRef = context.command.directObject else {
-            let message = context.message.fillWhat()
+            let message = context.message.doWhat(verb: .fill)
             throw ActionResponse.prerequisiteNotMet(message)
         }
         guard case .item(let containerItemID) = directObjectRef else {

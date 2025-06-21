@@ -70,8 +70,8 @@ struct BreatheActionHandlerTests {
             last one.
 
             > breathe
-            You breathe in life’s very essence, which tastes faintly of
-            confusion.
+            You breathe in life’s very essence, which tastes faintly
+            of confusion.
 
             > breathe
             You breathe with great purpose, although breathing tends to

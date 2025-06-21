@@ -98,22 +98,17 @@ public struct EnterActionHandler: ActionHandler {
                     engine: context.engine
                 )
 
-                do {
-                    try await goHandler.validate(context: goContext)
-                    let goResult = try await goHandler.process(context: goContext)
+                try await goHandler.validate(context: goContext)
+                let goResult = try await goHandler.process(context: goContext)
 
-                    // Combine state changes from enter (touch/pronouns) with go result
-                    return ActionResult(
-                        message: goResult.message,
-                        changes: [
-                            await context.engine.setFlag(.isTouched, on: targetItem),
-                            await context.engine.updatePronouns(to: targetItem),
-                        ] + goResult.changes
-                    )
-                } catch {
-                    // If movement fails, handle the error
-                    throw error
-                }
+                // Combine state changes from enter (touch/pronouns) with go result
+                return ActionResult(
+                    message: goResult.message,
+                    changes: [
+                        await context.engine.setFlag(.isTouched, on: targetItem),
+                        await context.engine.updatePronouns(to: targetItem),
+                    ] + goResult.changes
+                )
             }
         }
 

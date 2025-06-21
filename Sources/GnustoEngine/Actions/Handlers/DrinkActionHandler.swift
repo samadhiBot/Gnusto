@@ -17,7 +17,7 @@ public struct DrinkActionHandler: ActionHandler {
     public func validate(context: ActionContext) async throws {
         // Ensure we have a direct object
         guard let directObjectRef = context.command.directObject else {
-            let message = context.message.drinkWhat()
+            let message = context.message.doWhat(verb: .drink)
             throw ActionResponse.prerequisiteNotMet(message)
         }
         guard case .item(let targetItemID) = directObjectRef else {

@@ -16,7 +16,7 @@ public struct KissActionHandler: ActionHandler {
     public func validate(context: ActionContext) async throws {
         // Kiss requires a direct object (what to kiss)
         guard let directObjectRef = context.command.directObject else {
-            let message = context.message.kissWhat()
+            let message = context.message.doWhat(verb: .kiss)
             throw ActionResponse.prerequisiteNotMet(message)
         }
         guard case .item(let targetItemID) = directObjectRef else {
@@ -51,7 +51,7 @@ public struct KissActionHandler: ActionHandler {
 
         guard case .item(let targetItemID) = directObjectRef else {
             return ActionResult(
-                context.message.kissWhat()
+                context.message.doWhat(verb: .kiss)
             )
         }
 

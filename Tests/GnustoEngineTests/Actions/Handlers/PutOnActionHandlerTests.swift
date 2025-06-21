@@ -128,7 +128,7 @@ struct PutOnActionHandlerTests {
         expectNoDifference(changeHistory, expectedChanges)
     }
 
-    @Test("PutOn fails with no direct object")
+    @Test("PutOn with no direct object routes to WearActionHandler")
     func testPutOnFailsNoDirectObject() async throws {
         // Arrange: Table is reachable
         let table = Item(
@@ -148,7 +148,7 @@ struct PutOnActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > put on table
-            Put what?
+            You aren’t holding the table.
             """)
 
         // Assert No State Change
@@ -344,7 +344,6 @@ struct PutOnActionHandlerTests {
             output,
             """
             > put tray on table
-
             You can’t put the silver tray on the table because the table is
             on the silver tray.
             """)

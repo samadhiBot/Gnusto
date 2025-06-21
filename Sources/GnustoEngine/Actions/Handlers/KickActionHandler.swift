@@ -16,7 +16,7 @@ public struct KickActionHandler: ActionHandler {
     public func validate(context: ActionContext) async throws {
         // Kick requires a direct object (what to kick)
         guard let directObjectRef = context.command.directObject else {
-            let message = context.message.kickWhat()
+            let message = context.message.doWhat(verb: .kick)
             throw ActionResponse.prerequisiteNotMet(message)
         }
         guard case .item(let targetItemID) = directObjectRef else {

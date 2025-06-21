@@ -18,7 +18,7 @@ public struct FindActionHandler: ActionHandler {
     /// - Throws: `ActionError` if no direct object is specified.
     public func validate(context: ActionContext) async throws {
         guard context.command.directObject != nil else {
-            let message = context.message.findWhat()
+            let message = context.message.doWhat(verb: .find)
             throw ActionResponse.prerequisiteNotMet(message)
         }
     }

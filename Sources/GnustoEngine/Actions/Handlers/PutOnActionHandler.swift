@@ -120,13 +120,16 @@ public struct PutOnActionHandler: ActionHandler {
         guard let directObjectRef = context.command.directObject,
             case .item(let itemToPutID) = directObjectRef
         else {
-            throw ActionResponse.internalEngineError("PutOn: Direct object not an item in process.")
+            throw ActionResponse.internalEngineError(
+                "PutOn: Direct object not an item in process."
+            )
         }
         guard let indirectObjectRef = context.command.indirectObject,
             case .item(let surfaceID) = indirectObjectRef
         else {
             throw ActionResponse.internalEngineError(
-                "PutOn: Indirect object not an item in process.")
+                "PutOn: Indirect object not an item in process."
+            )
         }
 
         // Get snapshots (existence guaranteed by validate)
@@ -134,13 +137,14 @@ public struct PutOnActionHandler: ActionHandler {
         let surface = try await context.engine.item(surfaceID)
 
         return ActionResult(
-            message: "You put the \(itemToPut.name) on the \(surface.name).",
-            changes: [
-                await context.engine.move(itemToPut, to: .item(surface.id)),
-                await context.engine.setFlag(.isTouched, on: itemToPut),
-                await context.engine.setFlag(.isTouched, on: surface),
-                await context.engine.updatePronouns(to: itemToPut),
-            ]
+            context.message.youPutItemOnSurface(
+                item: itemToPut.withDefiniteArticle,
+                surface: surface.withDefiniteArticle
+            ),
+            await context.engine.move(itemToPut, to: .item(surface.id)),
+            await context.engine.setFlag(.isTouched, on: itemToPut),
+            await context.engine.setFlag(.isTouched, on: surface),
+            await context.engine.updatePronouns(to: itemToPut),
         )
     }
 }

@@ -16,7 +16,7 @@ public struct EatActionHandler: ActionHandler {
     public func validate(context: ActionContext) async throws {
         // Ensure we have a direct object
         guard let directObjectRef = context.command.directObject else {
-            let message = context.message.eatWhat()
+            let message = context.message.doWhat(verb: .eat)
             throw ActionResponse.prerequisiteNotMet(message)
         }
         guard case .item(let targetItemID) = directObjectRef else {

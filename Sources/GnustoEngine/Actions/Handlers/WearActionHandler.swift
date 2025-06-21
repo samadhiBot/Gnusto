@@ -158,7 +158,7 @@ public struct WearActionHandler: ActionHandler {
                     ? context.message.nothingHereToWear()
                     : context.message.wearWhat()
             } else {
-                "You put on \(wornItems.listWithDefiniteArticles)."
+                context.message.youPutOn(item: wornItems.listWithDefiniteArticles)
             }
 
         return ActionResult(

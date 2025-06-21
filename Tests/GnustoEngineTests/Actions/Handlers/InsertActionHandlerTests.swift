@@ -337,8 +337,8 @@ struct InsertActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > put the bag in the box
-            You can’t put the bag in the box, because the box is inside the
-            bag.
+            You can’t put the bag in the box, because the box is inside
+            the bag.
             """)
 
         // Assert No State Change

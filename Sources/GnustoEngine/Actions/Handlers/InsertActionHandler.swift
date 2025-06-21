@@ -59,12 +59,12 @@ public struct InsertActionHandler: ActionHandler {
         // 1. Validate Direct and Indirect Objects
         guard !context.command.directObjects.isEmpty else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.insertWhat()
+                context.message.doWhat(verb: .insert)
             )
         }
         guard let directObjectRef = context.command.directObject else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.insertWhat()
+                context.message.doWhat(verb: .insert)
             )
         }
         guard
@@ -180,7 +180,7 @@ public struct InsertActionHandler: ActionHandler {
         // For ALL commands, empty directObjects is valid (means nothing to insert)
         if !context.command.isAllCommand {
             guard !context.command.directObjects.isEmpty else {
-                let message = context.message.insertWhat()
+                let message = context.message.doWhat(verb: .insert)
                 return ActionResult(message)
             }
         }
@@ -305,10 +305,13 @@ public struct InsertActionHandler: ActionHandler {
         let message =
             if insertedItems.isEmpty {
                 context.command.isAllCommand
-                    ? "You have nothing to put in the \(container.withDefiniteArticle)."
-                    : "Insert what?"
+                ? context.message.youHaveNothingToPutIn(container: container.withDefiniteArticle)
+                : context.message.whatQuestion(verb: "insert")
             } else {
-                "You put \(insertedItems.listWithDefiniteArticles) in the \(container.withDefiniteArticle)."
+                context.message.youPutItemInContainer(
+                    item: insertedItems.listWithDefiniteArticles,
+                    container: container.withDefiniteArticle
+                )
             }
 
         return ActionResult(

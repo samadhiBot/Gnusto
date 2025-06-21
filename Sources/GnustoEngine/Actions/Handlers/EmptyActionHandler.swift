@@ -17,7 +17,7 @@ public struct EmptyActionHandler: ActionHandler {
     public func validate(context: ActionContext) async throws {
         // Empty requires a direct object (what to empty)
         guard let directObjectRef = context.command.directObject else {
-            let message = context.message.emptyWhat()
+            let message = context.message.doWhat(verb: .empty)
             throw ActionResponse.prerequisiteNotMet(message)
         }
         guard case .item(let targetItemID) = directObjectRef else {

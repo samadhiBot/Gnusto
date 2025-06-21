@@ -17,7 +17,7 @@ public struct InflateActionHandler: ActionHandler {
     public func validate(context: ActionContext) async throws {
         // Inflate requires a direct object (what to inflate)
         guard let directObjectRef = context.command.directObject else {
-            let message = context.message.inflateWhat()
+            let message = context.message.doWhat(verb: .inflate)
             throw ActionResponse.prerequisiteNotMet(message)
         }
         guard case .item(let targetItemID) = directObjectRef else {

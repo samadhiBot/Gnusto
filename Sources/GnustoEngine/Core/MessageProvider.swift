@@ -568,6 +568,11 @@ open class MessageProvider: @unchecked Sendable {
         return "\(door.capitalizedFirst) is locked."
     }
 
+    open func doWhat(verb: VerbID) -> String {
+        log("doWhat(verb: .\(verb))")
+        return "\(verb.rawValue.capitalizedFirst) what?"
+    }
+
     open func drinkFromContainer(liquid: String, container: String) -> String {
         log("drinkFromContainer(liquid: '\(liquid)', container: \(container))")
         return "You drink \(liquid) from \(container). Refreshing!"
@@ -576,11 +581,6 @@ open class MessageProvider: @unchecked Sendable {
     open func drinkSuccess(item: String) -> String {
         log("drinkSuccess(item: '\(item)')")
         return "You drink \(item). It's quite refreshing."
-    }
-
-    open func drinkWhat() -> String {
-        log("drinkWhat()")
-        return "Drink what?"
     }
 
     open func dropped() -> String {
@@ -603,11 +603,6 @@ open class MessageProvider: @unchecked Sendable {
         return "You eat \(item). It's quite satisfying."
     }
 
-    open func eatWhat() -> String {
-        log("eatWhat()")
-        return "Eat what?"
-    }
-
     open func emptyInput() -> String {
         log("emptyInput()")
         return "I beg your pardon?"
@@ -618,16 +613,6 @@ open class MessageProvider: @unchecked Sendable {
         return "You empty \(container), and \(items) \(count == 1 ? "falls" : "fall") to the ground."
     }
 
-    open func emptyWhat() -> String {
-        log("emptyWhat()")
-        return "Empty what?"
-    }
-
-    open func examineWhat() -> String {
-        log("examineWhat()")
-        return "Examine what?"
-    }
-
     open func examineYourself() -> String {
         log("examineYourself()")
         return "You are your usual self."
@@ -636,16 +621,6 @@ open class MessageProvider: @unchecked Sendable {
     open func fillSuccess(container: String, source: String) -> String {
         log("fillSuccess(container: \(container), source: '\(source)')")
         return "You fill \(container) from \(source)."
-    }
-
-    open func fillWhat() -> String {
-        log("fillWhat()")
-        return "Fill what?"
-    }
-
-    open func findWhat() -> String {
-        log("findWhat()")
-        return "Find what?"
     }
 
     open func gameRestored() -> String {
@@ -679,11 +654,6 @@ open class MessageProvider: @unchecked Sendable {
         return "Give to whom?"
     }
 
-    open func giveWhat() -> String {
-        log("giveWhat()")
-        return "Give what?"
-    }
-
     open func goodbye() -> String {
         log("goodbye()")
         return "Goodbye!"
@@ -699,11 +669,6 @@ open class MessageProvider: @unchecked Sendable {
         return "You inflate \(item)."
     }
 
-    open func inflateWhat() -> String {
-        log("inflateWhat()")
-        return "Inflate what?"
-    }
-
     open func insertHaveNothingToPut(container: String) -> String {
         log("insertHaveNothingToPut(container: \(container))")
         return "You have nothing to put in \(container)."
@@ -712,11 +677,6 @@ open class MessageProvider: @unchecked Sendable {
     open func insertIntoWhat() -> String {
         log("insertIntoWhat()")
         return "Insert into what?"
-    }
-
-    open func insertWhat() -> String {
-        log("insertWhat()")
-        return "Insert what?"
     }
 
     open func insertWhere(item: String) -> String {
@@ -909,11 +869,6 @@ open class MessageProvider: @unchecked Sendable {
         return "Ouch! You hurt your foot kicking \(item)."
     }
 
-    open func kickWhat() -> String {
-        log("kickWhat()")
-        return "Kick what?"
-    }
-
     open func kissCharacter(character: String) -> String {
         log("kissCharacter(character: '\(character)')")
         return oneOf(
@@ -954,11 +909,6 @@ open class MessageProvider: @unchecked Sendable {
     open func kissSelf() -> String {
         log("kissSelf()")
         return "You kiss yourself."
-    }
-
-    open func kissWhat() -> String {
-        log("kissWhat()")
-        return "Kiss what?"
     }
 
     open func knockOnClosedDoor(door: String) -> String {
@@ -1920,6 +1870,11 @@ open class MessageProvider: @unchecked Sendable {
         return "You have it."
     }
 
+    open func youHaveNothingToPutIn(container: String) -> String {
+        log("youHaveNothingToPutIn(container: \(container))")
+        return "You have nothing to put in \(container)."
+    }
+
     open func youHearNothingUnusual() -> String {
         log("youHearNothingUnusual()")
         return "You hear nothing unusual."
@@ -1928,6 +1883,21 @@ open class MessageProvider: @unchecked Sendable {
     open func youRemoveMultipleItems(items: String) -> String {
         log("youRemoveMultipleItems(items: '\(items)')")
         return "You take off \(items)."
+    }
+
+    open func youPutItemInContainer(item: String, container: String) -> String {
+        log("youPutItemInContainer(item: '\(item)', container: \(container))")
+        return "You put \(item) in \(container)."
+    }
+
+    open func youPutItemOnSurface(item: String, surface: String) -> String {
+        log("youPutItemOnSurface(item: '\(item)', surface: \(surface))")
+        return "You put \(item) on \(surface)."
+    }
+
+    open func youPutOn(item: String) -> String {
+        log("youPutOn(item: '\(item)')")
+        return "You put on \(item)."
     }
 
     open func youSeeNo(item: String) -> String {
