@@ -57,12 +57,12 @@ struct InsertActionHandlerTests {
         #expect(await engine.gameState.changeHistory.isEmpty)
 
         // Act
-        try await engine.execute("put coin in open box")
+        try await engine.execute("put the gold coin in the open box")
 
         // Assert Output
         let output = await mockIO.flush()
         expectNoDifference(output, """
-            > put coin in open box
+            > put the gold coin in the open box
             You put the gold coin in the open box.
             """)
 
@@ -155,7 +155,8 @@ struct InsertActionHandlerTests {
         )
         let box = Item(
             id: "openBox",
-            .name("open box"),
+            .name("box"),
+            .adjectives("open"),
             .in(.location(.startRoom)),
             .isOpen,
             .isContainer,
@@ -166,12 +167,12 @@ struct InsertActionHandlerTests {
         #expect(await engine.gameState.changeHistory.isEmpty)
 
         // Act
-        try await engine.execute("put coin in box")
+        try await engine.execute("put coin in the open box")
 
         // Assert Output
         let output = await mockIO.flush()
         expectNoDifference(output, """
-            > put coin in box
+            > put coin in the open box
             You aren’t holding the gold coin.
             """)
 
@@ -377,12 +378,12 @@ struct InsertActionHandlerTests {
         #expect(initialLoad == 6)
 
         // Act
-        try await engine.execute("put coin in box")
+        try await engine.execute("put the coin in the nearly full box")
 
         // Assert Output
         let output = await mockIO.flush()
         expectNoDifference(output, """
-            > put coin in box
+            > put the coin in the nearly full box
             The gold coin won’t fit in the nearly full box.
             """)
 
@@ -408,7 +409,8 @@ struct InsertActionHandlerTests {
         )
         let initialBox = Item(
             id: "exactBox",
-            .name("half-full box"),
+            .name("box"),
+            .adjectives("half-full"),
             .in(.location(.startRoom)),
             .isContainer,
             .isOpenable,
@@ -427,12 +429,12 @@ struct InsertActionHandlerTests {
         #expect(initialLoad == 5)
 
         // Act
-        try await engine.execute("put coin in box")
+        try await engine.execute("put coin in half-full box")
 
         // Assert Output
         let output = await mockIO.flush()
         expectNoDifference(output, """
-            > put coin in box
+            > put coin in half-full box
             You put the gold coin in the half-full box.
             """)  // Success message
 

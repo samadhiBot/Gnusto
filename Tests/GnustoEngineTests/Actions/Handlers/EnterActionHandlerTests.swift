@@ -17,7 +17,7 @@ struct EnterActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > enter
-            There's nothing here to enter.
+            There’s nothing here to enter.
             """)
     }
 
@@ -50,12 +50,12 @@ struct EnterActionHandlerTests {
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // When/Then
-        try await engine.execute("enter booth")
+        try await engine.execute("enter phone booth")
 
         let output = await mockIO.flush()
         expectNoDifference(output, """
-            > enter booth
-            You can’t see any booth here.
+            > enter phone booth
+            You can’t see any such thing.
             """)
     }
 

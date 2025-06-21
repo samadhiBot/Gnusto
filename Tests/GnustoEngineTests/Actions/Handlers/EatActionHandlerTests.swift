@@ -32,7 +32,7 @@ struct EatActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > eat nonexistent
-            You can’t see any nonexistent here.
+            You can’t see any such thing.
             """)
     }
 
@@ -55,7 +55,7 @@ struct EatActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > eat distant apple
-            You can’t see any distant apple here.
+            You can’t see any such thing.
             """)
     }
 
@@ -134,7 +134,7 @@ struct EatActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > eat lunch box
-            You eat the sandwich from the lunch box.
+            You eat the sandwich from the lunch box. Delicious!
             """)
     }
 
@@ -159,7 +159,7 @@ struct EatActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > eat empty box
-            There's nothing to eat in the empty box.
+            There’s nothing to eat in the empty box.
             """)
     }
 

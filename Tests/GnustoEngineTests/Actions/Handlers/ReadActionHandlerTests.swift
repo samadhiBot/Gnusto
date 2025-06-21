@@ -193,7 +193,7 @@ struct ReadActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > read paper
-            There's nothing written on the blank paper.
+            There’s nothing written on the blank paper.
             """)
     }
 
@@ -287,7 +287,7 @@ struct ReadActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > read note
-            There's nothing written on the blank note.
+            There’s nothing written on the blank note.
             """)
 
         // Assert Final State
@@ -316,7 +316,7 @@ struct ReadActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > read tablet
-            There's nothing written on the stone tablet.
+            There’s nothing written on the stone tablet.
             """)
 
         // Assert Final State

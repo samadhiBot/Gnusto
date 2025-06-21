@@ -31,6 +31,7 @@ struct GoActionHandlerTests {
         expectNoDifference(output, """
             > north
             — end —
+
             You went there.
             """)
     }
@@ -124,6 +125,7 @@ struct GoActionHandlerTests {
         expectNoDifference(output, """
             > go north
             — hall —
+
             A long hall.
             """)
     }

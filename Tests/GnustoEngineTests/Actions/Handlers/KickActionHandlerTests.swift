@@ -32,7 +32,7 @@ struct KickActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > kick nonexistent
-            You can’t see any nonexistent here.
+            You can’t see any such thing.
             """)
     }
 

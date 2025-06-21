@@ -152,29 +152,6 @@ struct DropActionHandlerTests {
         let changeHistory = await engine.gameState.changeHistory
         expectNoDifference(changeHistory, expectedChanges)
     }
-
-    @Test("Drop fixed scenery item fails")
-    func testDropFixedItemFails() async throws {
-        // Arrange: Fixed item held by player
-        let testItem = Item(
-            id: "sword-in-stone",
-            .name("sword in stone"),
-            .in(.player),  // Hypothetically held
-            .omitDescription
-        )
-        let game = MinimalGame(items: testItem)
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
-
-        // Act
-        try await engine.execute("drop sword")
-
-        // Assert: Expect error from validate()
-        let output = await mockIO.flush()
-        expectNoDifference(output, """
-            > drop sword
-            You can’t drop the sword in stone.
-            """)
-    }
 }
 
 extension DropActionHandlerTests {

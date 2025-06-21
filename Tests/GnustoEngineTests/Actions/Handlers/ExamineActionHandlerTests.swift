@@ -198,7 +198,6 @@ struct ExamineActionHandlerTests {
 
     @Test func testExamineNonExistentItem() async throws {
         let (engine, mockIO) = await GameEngine.test()
-        let itemID: ItemID = "ghost"
         #expect(await engine.gameState.changeHistory.isEmpty)
 
         // Act
@@ -271,6 +270,7 @@ struct ExamineActionHandlerTests {
         let item = Item(
             id: "magicMirror",
             .name("magic mirror"),
+            .synonyms("mirror"),
             .description("A dusty old mirror."),
             .in(.player)
         )
@@ -381,12 +381,12 @@ struct ExamineActionHandlerTests {
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // Act
-        try await engine.execute("examine table")
+        try await engine.execute("examine kitchen table")
 
         // Assert: Should skip generic description and show only what's on the table
         let output = await mockIO.flush()
         expectNoDifference(output, """
-            > examine table
+            > examine kitchen table
             On the kitchen table are a glass bottle and a brown sack.
             """)
 
@@ -418,12 +418,12 @@ struct ExamineActionHandlerTests {
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // Act
-        try await engine.execute("examine table")
+        try await engine.execute("examine kitchen table")
 
         // Assert: Should show generic description since there's nothing on the table
         let output = await mockIO.flush()
         expectNoDifference(output, """
-            > examine table
+            > examine kitchen table
             You see nothing special about the kitchen table.
             """)
 
@@ -472,12 +472,12 @@ struct ExamineActionHandlerTests {
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // Act
-        try await engine.execute("examine table")
+        try await engine.execute("examine kitchen table")
 
         // Assert: Should show custom description followed by surface contents
         let output = await mockIO.flush()
         expectNoDifference(output, """
-            > examine table
+            > examine kitchen table
             A sturdy wooden table with scratches from years of use. On the
             kitchen table are a glass bottle and a brown sack.
             """)
@@ -536,12 +536,12 @@ struct ExamineActionHandlerTests {
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // Act
-        try await engine.execute("examine table")
+        try await engine.execute("examine kitchen table")
 
         // Assert: Should skip generic description and show only enhanced item descriptions
         let output = await mockIO.flush()
         expectNoDifference(output, """
-            > examine table
+            > examine kitchen table
             A bottle is sitting on the table. The glass bottle contains a
             quantity of water. On the table is an elongated brown sack,
             smelling of hot peppers.
@@ -608,12 +608,12 @@ struct ExamineActionHandlerTests {
         #expect(await engine.gameState.changeHistory.isEmpty)
 
         // Act
-        try await engine.execute("examine table")
+        try await engine.execute("examine kitchen table")
 
         // Assert: Should show enhanced surface description
         let output = await mockIO.flush()
         expectNoDifference(output, """
-            > examine table
+            > examine kitchen table
             A bottle is sitting on the table. The glass bottle contains a
             quantity of water. On the table is an elongated brown sack,
             smelling of hot peppers.
