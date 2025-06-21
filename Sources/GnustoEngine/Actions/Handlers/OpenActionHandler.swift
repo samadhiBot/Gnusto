@@ -33,7 +33,7 @@ public struct OpenActionHandler: ActionHandler {
         // 2. Ensure we have a direct object and it's an item
         guard let directObjectRef = context.command.directObject else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.whatQuestion(verb: "open")
+                context.message.doWhat(verb: .open)
             )
         }
         guard case .item(let targetItemID) = directObjectRef else {

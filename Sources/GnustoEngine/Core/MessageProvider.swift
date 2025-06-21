@@ -924,9 +924,9 @@ open class MessageProvider: @unchecked Sendable {
         return "\(item.capitalizedFirst) is now locked."
     }
 
-    open func lockWithWhat() -> String {
-        log("lockWithWhat()")
-        return "Lock it with what?"
+    open func lockWithWhat(item: String) -> String {
+        log("lockWithWhat(item: \(item))")
+        return "Lock \(item) with what?"
     }
 
     open func maximumVerbosity() -> String {
@@ -1498,21 +1498,6 @@ open class MessageProvider: @unchecked Sendable {
     open func waveWeapon(item: String) -> String {
         log("waveWeapon(item: '\(item)')")
         return "You brandish \(item) menacingly."
-    }
-
-    open func waveWhat() -> String {
-        log("waveWhat()")
-        return "Wave what?"
-    }
-
-    open func wearWhat() -> String {
-        log("wearWhat()")
-        return "Wear what?"
-    }
-
-    open func whatQuestion(verb: String) -> String {
-        log("whatQuestion(verb: '\(verb)')")
-        return "\(verb.capitalizedFirst) what?"
     }
 
     open func wrongKey(key: String, lock: String) -> String {

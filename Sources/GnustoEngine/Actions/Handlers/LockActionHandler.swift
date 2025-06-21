@@ -33,10 +33,12 @@ public struct LockActionHandler: ActionHandler {
             let message = context.message.canOnlyActOnItems(verb: "lock")
             throw ActionResponse.prerequisiteNotMet(message)
         }
+        let targetItem = try await context.engine.item(targetItemID)
 
         guard let indirectObjectRef = context.command.indirectObject else {
-            let message = context.message.lockWithWhat()
-            throw ActionResponse.prerequisiteNotMet(message)
+            throw ActionResponse.prerequisiteNotMet(
+                context.message.lockWithWhat(item: targetItem.withDefiniteArticle)
+            )
         }
         guard case .item(let keyItemID) = indirectObjectRef else {
             let message = context.message.canOnlyUseItemAsKey()
@@ -46,7 +48,6 @@ public struct LockActionHandler: ActionHandler {
         // 2. Get item snapshots (existence should be implicitly validated by parser/scope resolver before this point)
         // If items don't exist, engine.item() will throw, which is an acceptable failure.
         // Alternatively, could add explicit unknownEntity checks here if desired.
-        let targetItem = try await context.engine.item(targetItemID)
         let keyItem = try await context.engine.item(keyItemID)
 
         // 3. Check reachability

@@ -306,8 +306,9 @@ public struct InsertActionHandler: ActionHandler {
         let message =
             if insertedItems.isEmpty {
                 context.command.isAllCommand
-                ? context.message.youHaveNothingToPutIn(container: container.withDefiniteArticle)
-                : context.message.whatQuestion(verb: "insert")
+                    ? context.message.youHaveNothingToPutIn(
+                        container: container.withDefiniteArticle)
+                    : context.message.doWhat(verb: .insert)
             } else {
                 context.message.youPutItemInContainer(
                     item: insertedItems.listWithDefiniteArticles,

@@ -34,14 +34,14 @@ public struct TakeActionHandler: ActionHandler {
         // 1. Ensure we have at least one direct object for non-ALL commands
         guard !context.command.directObjects.isEmpty else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.whatQuestion(verb: "take")
+                context.message.doWhat(verb: .take)
             )
         }
 
         // For single object commands, validate the single object
         guard let directObjectRef = context.command.directObject else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.whatQuestion(verb: "take")
+                context.message.doWhat(verb: .take)
             )
         }
         guard case .item(let targetItemID) = directObjectRef else {

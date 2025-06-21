@@ -21,14 +21,14 @@ public struct WearActionHandler: ActionHandler {
         // 1. Ensure we have at least one direct object for non-ALL commands
         guard !context.command.directObjects.isEmpty else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.wearWhat()
+                context.message.doWhat(verb: .wear)
             )
         }
 
         // For single object commands, validate the single object
         guard let directObjectRef = context.command.directObject else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.wearWhat()
+                context.message.doWhat(verb: .wear)
             )
         }
         guard case .item(let targetItemID) = directObjectRef else {
@@ -70,7 +70,7 @@ public struct WearActionHandler: ActionHandler {
         // For ALL commands, empty directObjects is valid (means nothing to wear)
         if !context.command.isAllCommand {
             guard !context.command.directObjects.isEmpty else {
-                return ActionResult(context.message.wearWhat())
+                return ActionResult(context.message.doWhat(verb: .wear))
             }
         }
 
@@ -154,9 +154,8 @@ public struct WearActionHandler: ActionHandler {
         // Generate appropriate message
         let message =
             if wornItems.isEmpty {
-                context.command.isAllCommand
-                    ? context.message.nothingHereToWear()
-                    : context.message.wearWhat()
+                context.command.isAllCommand ? context.message.nothingHereToWear()
+                                             : context.message.doWhat(verb: .wear)
             } else {
                 context.message.youPutOn(item: wornItems.listWithDefiniteArticles)
             }
