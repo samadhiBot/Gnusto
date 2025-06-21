@@ -40,7 +40,7 @@ struct AskActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > ask wizard
-            Ask about what?
+            Ask what?
             """)
     }
 

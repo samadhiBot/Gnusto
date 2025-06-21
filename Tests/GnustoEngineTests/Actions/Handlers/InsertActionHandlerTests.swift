@@ -63,7 +63,7 @@ struct InsertActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > put the gold coin in the open box
-            You put the gold coin in the the open box.
+            You put the gold coin in the open box.
             """)
 
         // Assert Final State
@@ -543,7 +543,7 @@ struct InsertActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > put box in box
-            You can’t put something inside itself.
+            You can’t put the wooden box inside itself.
             """)
 
         // Assert No State Change
@@ -892,7 +892,7 @@ struct InsertActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > put bag in bag
-            You can’t put something inside itself.
+            You can’t put the cloth bag inside itself.
             """)
 
         // Assert No State Change
@@ -907,7 +907,9 @@ struct InsertActionHandlerTests {
 
         let boxA = Item(  // This is containerItem (Y)
             id: "boxA",
-            .name("box A"),
+            .name("dusty box"),
+            .synonyms("box"),
+            .adjectives("dusty"),
             .in(.item("boxB")),  // Box A is INSIDE Box B
             .isContainer,  // Technically, for it to be a target container, it needs this
             .isOpen,
@@ -915,7 +917,9 @@ struct InsertActionHandlerTests {
         )
         let boxB = Item(  // This is itemToInsert (X)
             id: "boxB",
-            .name("box B"),
+            .name("slippery box"),
+            .synonyms("box"),
+            .adjectives("slippery"),
             .in(.player),  // Held by player
             .isContainer,
             .isOpen,
@@ -927,14 +931,14 @@ struct InsertActionHandlerTests {
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // Act
-        try await engine.execute("put box B in box A")
+        try await engine.execute("put the slippery box in the dusty box")
 
         // Assert Output
         let output = await mockIO.flush()
         expectNoDifference(output, """
-            > put box B in box A
-            You can’t put the box B in the box A, because the box A is
-            inside the box B!
+            > put the slippery box in the dusty box
+            You can’t put the slippery box in the dusty box, because the
+            dusty box is inside the slippery box.
             """)
 
         // Assert No State Change (Box A still in Box B, Box B still held)
