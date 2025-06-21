@@ -63,7 +63,7 @@ struct InsertActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > put the gold coin in the open box
-            You put the gold coin in the open box.
+            You put the gold coin in the the open box.
             """)
 
         // Assert Final State
@@ -295,13 +295,13 @@ struct InsertActionHandlerTests {
         #expect(await engine.gameState.changeHistory.isEmpty)
 
         // Act
-        try await engine.execute("put box in box")
+        try await engine.execute("put the box in the box")
 
         // Assert Output
         let output = await mockIO.flush()
         expectNoDifference(output, """
-            > put box in box
-            You can’t put something inside itself.
+            > put the box in the box
+            You can’t put the box inside itself.
             """)
 
         // Assert No State Change
@@ -331,14 +331,14 @@ struct InsertActionHandlerTests {
 
         // Try to put the bag into the box (which is inside the bag)
         // Act
-        try await engine.execute("put bag in box")
+        try await engine.execute("put the bag in the box")
 
         // Assert Output
         let output = await mockIO.flush()
         expectNoDifference(output, """
-            > put bag in box
+            > put the bag in the box
             You can’t put the bag in the box, because the box is inside the
-            bag!
+            bag.
             """)
 
         // Assert No State Change
@@ -409,7 +409,8 @@ struct InsertActionHandlerTests {
         )
         let initialBox = Item(
             id: "exactBox",
-            .name("box"),
+            .name("half-full box"),
+            .synonyms("box"),
             .adjectives("half-full"),
             .in(.location(.startRoom)),
             .isContainer,

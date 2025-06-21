@@ -68,7 +68,7 @@ public struct TakeActionHandler: ActionHandler {
                 actualParentID == containerID
             else {
                 throw ActionResponse.prerequisiteNotMet(
-                    "The \(targetItem.name) is not in the \(container.name).")
+                    "🤡 The \(targetItem.name) is not in the \(container.name).")
             }
         }
 
@@ -91,7 +91,7 @@ public struct TakeActionHandler: ActionHandler {
             if !isContainer && !isSurface {
                 // Custom message similar to Zork's, using the plain name.
                 throw ActionResponse.prerequisiteNotMet(
-                    "You can't take things out of the \(parentItem.name).")
+                    "🤡 You can't take things out of the \(parentItem.name).")
             }
         }
 

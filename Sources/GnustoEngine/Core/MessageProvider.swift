@@ -262,6 +262,16 @@ open class MessageProvider: @unchecked Sendable {
         return "You can't pull \(item)."
     }
 
+    open func cannotPutItemInItself(item: String) -> String {
+        log("cannotPutItemInItself(item: '\(item)')")
+        return "You can't put \(item) inside itself."
+    }
+
+    open func cannotPutContainerInContained(parent: String, child: String) -> String {
+        log("cannotPutContainerInContained(parent: '\(parent), child: '\(child)')")
+        return "You can't put \(parent) in \(child), because \(child) is inside \(parent)."
+    }
+
     open func cannotSmellThat() -> String {
         log("cannotSmellThat()")
         return "You can't smell that."

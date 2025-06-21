@@ -107,7 +107,7 @@ public struct InsertActionHandler: ActionHandler {
         // Prevent putting item inside/onto itself
         if itemToInsertID == containerID {
             throw ActionResponse.prerequisiteNotMet(
-                "You can't put something inside itself."
+                context.message.cannotPutItemInItself(item: itemToInsert.withDefiniteArticle)
             )
         }
 
@@ -116,7 +116,10 @@ public struct InsertActionHandler: ActionHandler {
         while case .item(let parentItemID) = currentParent {
             if parentItemID == itemToInsertID {
                 throw ActionResponse.prerequisiteNotMet(
-                    "You can't put the \(itemToInsert.name) in the \(containerItem.name), because the \(containerItem.name) is inside the \(itemToInsert.name)!"
+                    context.message.cannotPutContainerInContained(
+                        parent: itemToInsert.withDefiniteArticle,
+                        child: containerItem.withDefiniteArticle
+                    )
                 )
             }
             let parentItem = try await context.engine.item(parentItemID)
@@ -302,10 +305,10 @@ public struct InsertActionHandler: ActionHandler {
         let message =
             if insertedItems.isEmpty {
                 context.command.isAllCommand
-                    ? "You have nothing to put in the \(container.name)."
+                    ? "You have nothing to put in the \(container.withDefiniteArticle)."
                     : "Insert what?"
             } else {
-                "You put \(insertedItems.listWithDefiniteArticles) in the \(container.name)."
+                "You put \(insertedItems.listWithDefiniteArticles) in the \(container.withDefiniteArticle)."
             }
 
         return ActionResult(

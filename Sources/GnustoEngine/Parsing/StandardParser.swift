@@ -351,8 +351,8 @@ public struct StandardParser: Parser {
         // Simple whitespace and punctuation separation, converts to lowercase.
         // ZIL tokenization was more complex (e.g., dictionary separators).
 
-        // Allow alphanumeric characters, spaces, and commas (for conjunctions)
-        let allowedChars = CharacterSet.alphanumerics.union(.whitespaces).union(CharacterSet(charactersIn: ","))
+        // Allow alphanumeric characters, spaces, commas (for conjunctions), and hyphens (for compound adjectives)
+        let allowedChars = CharacterSet.alphanumerics.union(.whitespaces).union(CharacterSet(charactersIn: ",-"))
         let sanitizedInput = String(input.unicodeScalars.filter { allowedChars.contains($0) })
 
         // Split by whitespace and also treat commas as separate tokens
