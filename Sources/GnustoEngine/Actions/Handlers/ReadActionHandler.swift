@@ -20,7 +20,7 @@ public struct ReadActionHandler: ActionHandler {
         // 1. Ensure we have a direct object and it's an item
         guard let directObjectRef = context.command.directObject else {
             throw ActionResponse.custom(
-                context.message.readWhat()
+                context.message.doWhat(verb: .read)
             )
         }
         guard case .item(let targetItemID) = directObjectRef else {

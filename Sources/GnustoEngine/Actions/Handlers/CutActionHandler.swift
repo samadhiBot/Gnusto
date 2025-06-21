@@ -20,8 +20,9 @@ public struct CutActionHandler: ActionHandler {
     public func validate(context: ActionContext) async throws {
         // Cut requires a direct object (what to cut)
         guard let directObjectRef = context.command.directObject else {
-            let message = context.message.cutWhat()
-            throw ActionResponse.prerequisiteNotMet(message)
+            throw ActionResponse.prerequisiteNotMet(
+                context.message.doWhat(verb: .cut)
+            )
         }
         guard case .item(let targetItemID) = directObjectRef else {
             let message = context.message.cannotActOnThat(verb: "cut")

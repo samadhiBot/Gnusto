@@ -16,8 +16,9 @@ public struct WaveActionHandler: ActionHandler {
     public func validate(context: ActionContext) async throws {
         // Wave requires a direct object (what to wave)
         guard let directObjectRef = context.command.directObject else {
-            let message = context.message.waveWhat()
-            throw ActionResponse.prerequisiteNotMet(message)
+            throw ActionResponse.prerequisiteNotMet(
+                context.message.doWhat(verb: .wave)
+            )
         }
         guard case .item(let targetItemID) = directObjectRef else {
             let message = context.message.cannotActOnThat(verb: "wave")

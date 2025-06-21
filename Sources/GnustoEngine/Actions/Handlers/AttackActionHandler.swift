@@ -17,8 +17,9 @@ public struct AttackActionHandler: ActionHandler {
     public func validate(context: ActionContext) async throws {
         // Attack requires a direct object (what to attack)
         guard let directObjectRef = context.command.directObject else {
-            let message = context.message.attackWhat()
-            throw ActionResponse.prerequisiteNotMet(message)
+            throw ActionResponse.prerequisiteNotMet(
+                context.message.doWhat(verb: .attack)
+            )
         }
         guard case .item(let targetItemID) = directObjectRef else {
             let message = context.message.cannotActOnThat(verb: "attack")

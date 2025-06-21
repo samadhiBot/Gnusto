@@ -9,8 +9,9 @@ public struct LookInsideActionHandler: ActionHandler {
     /// Requires a direct object that must be an item the player can reach.
     public func validate(context: ActionContext) async throws {
         guard let directObjectRef = context.command.directObject else {
-            let message = context.message.lookInsideWhat()
-            throw ActionResponse.prerequisiteNotMet(message)
+            throw ActionResponse.prerequisiteNotMet(
+                context.message.doWhat(verb: .lookInside)
+            )
         }
 
         guard case .item(let targetItemID) = directObjectRef else {

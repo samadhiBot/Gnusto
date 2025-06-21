@@ -26,7 +26,7 @@ public struct LockActionHandler: ActionHandler {
     public func validate(context: ActionContext) async throws {
         // 1. Validate command structure: Need DO and IO, both must be items
         guard let directObjectRef = context.command.directObject else {
-            let message = context.message.lockWhat()
+            let message = context.message.doWhat(verb: .lock)
             throw ActionResponse.prerequisiteNotMet(message)
         }
         guard case .item(let targetItemID) = directObjectRef else {

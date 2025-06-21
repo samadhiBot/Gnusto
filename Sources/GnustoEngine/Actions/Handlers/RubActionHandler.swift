@@ -16,8 +16,9 @@ public struct RubActionHandler: ActionHandler {
     public func validate(context: ActionContext) async throws {
         // Rub requires a direct object (what to rub)
         guard let directObjectRef = context.command.directObject else {
-            let message = context.message.rubWhat()
-            throw ActionResponse.prerequisiteNotMet(message)
+            throw ActionResponse.prerequisiteNotMet(
+                context.message.doWhat(verb: .rub)
+            )
         }
         guard case .item(let targetItemID) = directObjectRef else {
             let message = context.message.cannotActOnThat(verb: "rub")

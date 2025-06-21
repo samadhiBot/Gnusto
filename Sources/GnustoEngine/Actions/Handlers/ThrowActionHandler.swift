@@ -17,7 +17,7 @@ public struct ThrowActionHandler: ActionHandler {
     public func validate(context: ActionContext) async throws {
         // Throw requires a direct object (what to throw)
         guard let directObjectRef = context.command.directObject else {
-            let message = context.message.throwWhat()
+            let message = context.message.doWhat(verb: .throwItem)
             throw ActionResponse.prerequisiteNotMet(message)
         }
         guard case .item(let itemToThrowID) = directObjectRef else {

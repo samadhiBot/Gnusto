@@ -26,7 +26,7 @@ public struct UnlockActionHandler: ActionHandler {
         // 1. Validate command structure: Need DO and IO, both must be items
         guard let directObjectRef = context.command.directObject else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.unlockWhat()
+                context.message.doWhat(verb: .unlock)
             )
         }
         guard case .item(let targetItemID) = directObjectRef else {
@@ -34,10 +34,12 @@ public struct UnlockActionHandler: ActionHandler {
                 context.message.youCanOnlyUnlockItems()
             )
         }
+        let targetItem = try await context.engine.item(targetItemID)
+
 
         guard let indirectObjectRef = context.command.indirectObject else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.unlockWithWhat()
+                context.message.unlockWithWhat(item: targetItem.withDefiniteArticle)
             )
         }
         guard case .item(let keyItemID) = indirectObjectRef else {
@@ -45,9 +47,6 @@ public struct UnlockActionHandler: ActionHandler {
                 context.message.youCanOnlyUseItemAsKey()
             )
         }
-
-        // 2. Get item snapshots
-        let targetItem = try await context.engine.item(targetItemID)
         let keyItem = try await context.engine.item(keyItemID)
 
         // 3. Check reachability

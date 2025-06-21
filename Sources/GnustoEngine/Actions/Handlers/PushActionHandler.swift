@@ -19,13 +19,13 @@ public struct PushActionHandler: ActionHandler {
 
         // 1. Ensure we have at least one direct object for non-ALL commands
         guard !context.command.directObjects.isEmpty else {
-            let message = context.message.pushWhat()
+            let message = context.message.doWhat(verb: .push)
             throw ActionResponse.prerequisiteNotMet(message)
         }
 
         // For single object commands, validate the single object
         guard let directObjectRef = context.command.directObject else {
-            let message = context.message.pushWhat()
+            let message = context.message.doWhat(verb: .push)
             throw ActionResponse.prerequisiteNotMet(message)
         }
         guard case .item(let targetItemID) = directObjectRef else {
@@ -55,7 +55,7 @@ public struct PushActionHandler: ActionHandler {
         // For ALL commands, empty directObjects is valid (means nothing to push)
         if !context.command.isAllCommand {
             guard !context.command.directObjects.isEmpty else {
-                let message = context.message.pushWhat()
+                let message = context.message.doWhat(verb: .push)
                 return ActionResult(message)
             }
         }
@@ -127,7 +127,7 @@ public struct PushActionHandler: ActionHandler {
         let message =
             if pushedItems.isEmpty {
                 context.command.isAllCommand ? context.message.nothingHereToPush()
-                                             : context.message.pushWhat()
+                : context.message.doWhat(verb: .push)
             } else {
                 context.message.pushSuccess(items: pushedItems.listWithDefiniteArticles)
             }

@@ -21,7 +21,7 @@ public struct AskActionHandler: ActionHandler {
             throw ActionResponse.prerequisiteNotMet(message)
         }
         guard context.command.indirectObject != nil else {
-            let message = context.message.askAboutWhat()
+            let message = context.message.doWhat(verb: .ask)
             throw ActionResponse.prerequisiteNotMet(message)
         }
 

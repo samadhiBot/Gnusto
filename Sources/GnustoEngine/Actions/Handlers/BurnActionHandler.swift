@@ -20,7 +20,7 @@ public struct BurnActionHandler: ActionHandler {
     /// - Throws: `ActionError` if validation fails.
     public func validate(context: ActionContext) async throws {
         guard let targetObjectID = context.command.directObject else {
-            let message = context.message.burnWhat()
+            let message = context.message.doWhat(verb: .burn)
             throw ActionResponse.prerequisiteNotMet(message)
         }
 

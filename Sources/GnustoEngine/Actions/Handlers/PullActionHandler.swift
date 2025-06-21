@@ -17,8 +17,9 @@ public struct PullActionHandler: ActionHandler {
     public func validate(context: ActionContext) async throws {
         // Pull requires a direct object (what to pull)
         guard let directObjectRef = context.command.directObject else {
-            let message = context.message.pullWhat()
-            throw ActionResponse.prerequisiteNotMet(message)
+            throw ActionResponse.prerequisiteNotMet(
+                context.message.doWhat(verb: .pull)
+            )
         }
         guard case .item(let targetItemID) = directObjectRef else {
             let message = context.message.canOnlyActOnItems(verb: "pull")

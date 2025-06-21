@@ -16,7 +16,7 @@ public struct SqueezeActionHandler: ActionHandler {
     public func validate(context: ActionContext) async throws {
         // Squeeze requires a direct object (what to squeeze)
         guard let directObjectRef = context.command.directObject else {
-            let message = context.message.squeezeWhat()
+            let message = context.message.doWhat(verb: .squeeze)
             throw ActionResponse.prerequisiteNotMet(message)
         }
         guard case .item(let targetItemID) = directObjectRef else {

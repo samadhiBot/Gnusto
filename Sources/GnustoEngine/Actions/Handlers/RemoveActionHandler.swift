@@ -21,14 +21,14 @@ public struct RemoveActionHandler: ActionHandler {
         // 1. Ensure we have at least one direct object for non-ALL commands
         guard !context.command.directObjects.isEmpty else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.removeWhat()
+                context.message.doWhat(verb: .remove)
             )
         }
 
         // For single object commands, validate the single object
         guard let directObjectRef = context.command.directObject else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.removeWhat()
+                context.message.doWhat(verb: .remove)
             )
         }
         guard case .item(let targetItemID) = directObjectRef else {
@@ -67,7 +67,7 @@ public struct RemoveActionHandler: ActionHandler {
         // For ALL commands, empty directObjects is valid (means nothing to remove)
         if !context.command.isAllCommand {
             guard !context.command.directObjects.isEmpty else {
-                let message = context.message.removeWhat()
+                let message = context.message.doWhat(verb: .remove)
                 return ActionResult(message)
             }
         }
@@ -151,7 +151,7 @@ public struct RemoveActionHandler: ActionHandler {
             if removedItems.isEmpty {
                 context.command.isAllCommand
                     ? context.message.youArentWearingAnything()
-                    : context.message.removeWhat()
+                : context.message.doWhat(verb: .remove)
             } else {
                 context.message.youRemoveMultipleItems(
                     items: removedItems.listWithDefiniteArticles

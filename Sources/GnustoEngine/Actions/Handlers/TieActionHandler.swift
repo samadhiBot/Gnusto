@@ -18,7 +18,7 @@ public struct TieActionHandler: ActionHandler {
         // Tie requires a direct object (what to tie)
         guard let directObjectRef = context.command.directObject else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.tieWhat()
+                context.message.doWhat(verb: .tie)
             )
         }
         guard case .item(let targetItemID) = directObjectRef else {

@@ -16,8 +16,9 @@ public struct TurnActionHandler: ActionHandler {
     public func validate(context: ActionContext) async throws {
         // Turn requires a direct object (what to turn)
         guard let directObjectRef = context.command.directObject else {
-            let message = context.message.turnWhat()
-            throw ActionResponse.prerequisiteNotMet(message)
+            throw ActionResponse.prerequisiteNotMet(
+                context.message.doWhat(verb: .turn)
+            )
         }
         guard case .item(let targetItemID) = directObjectRef else {
             let message = context.message.cannotActOnThat(verb: "turn")

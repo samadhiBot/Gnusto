@@ -17,24 +17,26 @@ public struct PourOnActionHandler: ActionHandler {
     public func validate(context: ActionContext) async throws {
         // Pour requires a direct object (what to pour)
         guard let directObjectRef = context.command.directObject else {
-            throw ActionResponse.prerequisiteNotMet(context.message.pourWhat())
+            throw ActionResponse.prerequisiteNotMet(
+                context.message.doWhat(verb: .pourOn)
+            )
         }
         guard case .item(let sourceItemID) = directObjectRef else {
             throw ActionResponse.prerequisiteNotMet(context.message.pourCannotPourThat())
         }
 
+        let sourceItem = try await context.engine.item(sourceItemID)
+
         // Pour requires an indirect object (what to pour on)
         guard let indirectObjectRef = context.command.indirectObject else {
-            let sourceItem = try await context.engine.item(sourceItemID)
             throw ActionResponse.prerequisiteNotMet(
-                context.message.pourOn(
-                    item: sourceItem.withDefiniteArticle,
-                    target: ""
-                )
+                context.message.pourItemOnWhat(item: sourceItem.withDefiniteArticle)
             )
         }
         guard case .item(let targetItemID) = indirectObjectRef else {
-            throw ActionResponse.prerequisiteNotMet(context.message.pourCannotPourOnThat())
+            throw ActionResponse.prerequisiteNotMet(
+                context.message.pourCannotPourItemOnThat(item: sourceItem.withDefiniteArticle)
+            )
         }
 
         // Check if source exists and is reachable
@@ -71,93 +73,22 @@ public struct PourOnActionHandler: ActionHandler {
         let sourceItem = try await context.engine.item(sourceItemID)
         let targetItem = try await context.engine.item(targetItemID)
 
-        // Determine appropriate response based on what's being poured and where.
-        // This must be done *before* creating state changes so it reflects the world
-        // state prior to the action.
-        let message = try await handlePouring(
-            sourceItem: sourceItem,
-            targetItem: targetItem,
-            context: context
-        )
-
-        var changes: [StateChange?] = [
-            await context.engine.setFlag(.isTouched, on: sourceItem),
-            await context.engine.setFlag(.isTouched, on: targetItem),
-            await context.engine.updatePronouns(to: targetItem),
-        ]
-
-        if targetItem.hasFlag(.isLit) && targetItem.hasFlag(.isFlammable) {
-            changes.append(await context.engine.clearFlag(.isLit, on: targetItem))
+        if sourceItem.id == targetItem.id {
+            throw ActionResponse.prerequisiteNotMet(
+                context.message.pourCannotPourItself(
+                    item: sourceItem.withDefiniteArticle
+                )
+            )
         }
 
         return ActionResult(
-            message: message,
-            changes: changes
-        )
-    }
-
-    /// Handles the actual pouring logic.
-    private func handlePouring(
-        sourceItem: Item,
-        targetItem: Item,
-        context: ActionContext
-    ) async throws -> String {
-        // Check if we're trying to pour something on itself
-        if sourceItem.id == targetItem.id {
-            return context.message.pourCannotPourItself(
-                item: sourceItem.withDefiniteArticle
-            )
-        }
-
-        // Check if the source is actually pourable
-        if !sourceItem.hasFlag(.isDrinkable) {
-            return context.message.pourNotLiquid(item: sourceItem.withDefiniteArticle)
-        }
-
-        // Check for pouring on a lit, flammable object to extinguish it
-        if targetItem.hasFlag(.isLit) && targetItem.hasFlag(.isFlammable) {
-            return context.message.pourOnFireAndExtinguish(
+            context.message.pourItemOn(
                 item: sourceItem.withDefiniteArticle,
                 target: targetItem.withDefiniteArticle
-            )
-        }
-
-        if targetItem.hasFlag(.isPlant) {
-            return context.message.pourOnPlantAndRefresh(
-                item: sourceItem.withDefiniteArticle,
-                target: targetItem.withDefiniteArticle
-            )
-        }
-
-        // Special cases for characters as targets
-        if targetItem.hasFlag(.isCharacter) {
-            return context.message.pourOnCharacter(
-                item: sourceItem.withDefiniteArticle,
-                character: targetItem.withDefiniteArticle
-            )
-        }
-
-        // Special cases for sensitive objects
-        if targetItem.hasFlag(.isDevice) {
-            return context.message.pourOnDevice(
-                item: sourceItem.withDefiniteArticle,
-                device: targetItem.withDefiniteArticle
-            )
-        }
-
-        // General pouring response
-        return context.message.pourOnGeneric(
-            item: sourceItem.withDefiniteArticle,
-            target: targetItem.withDefiniteArticle
+            ),
+            await context.engine.setFlag(.isTouched, on: sourceItem),
+            await context.engine.setFlag(.isTouched, on: targetItem),
+            await context.engine.updatePronouns(to: sourceItem, targetItem),
         )
-    }
-
-    /// Performs any post-processing after the pour action completes.
-    ///
-    /// Currently no post-processing is needed for basic pouring.
-    ///
-    /// - Parameter context: The action context for the current action.
-    public func postProcess(context: ActionContext) async throws {
-        // No post-processing needed for pour
     }
 }

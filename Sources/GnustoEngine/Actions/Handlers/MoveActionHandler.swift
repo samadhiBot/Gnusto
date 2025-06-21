@@ -30,14 +30,14 @@ public struct MoveActionHandler: ActionHandler {
         // 1. Ensure we have at least one direct object for non-ALL commands
         guard !context.command.directObjects.isEmpty else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.moveWhat()
+                context.message.doWhat(verb: .move)
             )
         }
 
         // For single object commands, validate the single object
         guard let directObjectRef = context.command.directObject else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.moveWhat()
+                context.message.doWhat(verb: .move)
             )
         }
         guard case .item(let targetItemID) = directObjectRef else {

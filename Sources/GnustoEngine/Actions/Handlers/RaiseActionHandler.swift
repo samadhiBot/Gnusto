@@ -12,7 +12,7 @@ public struct RaiseActionHandler: ActionHandler {
     public func validate(context: ActionContext) async throws {
         guard let directObjectRef = context.command.directObject else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.raiseWhat()
+                context.message.doWhat(verb: .raise)
             )
         }
 

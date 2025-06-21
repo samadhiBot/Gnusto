@@ -17,8 +17,9 @@ public struct DeflateActionHandler: ActionHandler {
     public func validate(context: ActionContext) async throws {
         // Deflate requires a direct object (what to deflate)
         guard let directObjectRef = context.command.directObject else {
-            let message = context.message.deflateWhat()
-            throw ActionResponse.prerequisiteNotMet(message)
+            throw ActionResponse.prerequisiteNotMet(
+                context.message.doWhat(verb: .deflate)
+            )
         }
         guard case .item(let targetItemID) = directObjectRef else {
             let message = context.message.canOnlyActOnItems(verb: "deflate")

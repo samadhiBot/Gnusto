@@ -34,7 +34,7 @@ public struct InsertActionHandler: ActionHandler {
             // Still need an indirect object (container)
             guard let indirectObjectRef = context.command.indirectObject else {
                 throw ActionResponse.prerequisiteNotMet(
-                    context.message.insertIntoWhat()
+                    context.message.doWhat(verb: .insert)
                 )
             }
             guard case .item(let containerID) = indirectObjectRef else {
@@ -171,8 +171,9 @@ public struct InsertActionHandler: ActionHandler {
         guard let indirectObjectRef = context.command.indirectObject,
             case .item(let containerID) = indirectObjectRef
         else {
-            let message = context.message.insertIntoWhat()
-            return ActionResult(message)
+            return ActionResult(
+                context.message.doWhat(verb: .insert)
+            )
         }
 
         let container = try await context.engine.item(containerID)

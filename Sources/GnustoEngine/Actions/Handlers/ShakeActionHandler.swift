@@ -16,7 +16,7 @@ public struct ShakeActionHandler: ActionHandler {
     public func validate(context: ActionContext) async throws {
         // Shake requires a direct object (what to shake)
         guard let directObjectRef = context.command.directObject else {
-            let message = context.message.shakeWhat()
+            let message = context.message.doWhat(verb: .shake)
             throw ActionResponse.prerequisiteNotMet(message)
         }
         guard case .item(let targetItemID) = directObjectRef else {

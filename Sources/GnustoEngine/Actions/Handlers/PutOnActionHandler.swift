@@ -26,7 +26,7 @@ public struct PutOnActionHandler: ActionHandler {
         // 1. Validate Direct and Indirect Objects - both must be items
         guard let directObjectRef = context.command.directObject else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.putWhat()
+                context.message.doWhat(verb: .putOn)
             )
         }
         guard case .item(let itemToPutID) = directObjectRef else {

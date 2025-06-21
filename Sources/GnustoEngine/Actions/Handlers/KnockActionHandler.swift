@@ -16,8 +16,9 @@ public struct KnockActionHandler: ActionHandler {
     public func validate(context: ActionContext) async throws {
         // Knock requires a direct object (what to knock on)
         guard let directObjectRef = context.command.directObject else {
-            let message = context.message.knockOnWhat()
-            throw ActionResponse.prerequisiteNotMet(message)
+            throw ActionResponse.prerequisiteNotMet(
+                context.message.doWhat(verb: .knock)
+            )
         }
         guard case .item(let targetItemID) = directObjectRef else {
             let message = context.message.cannotActOnThat(verb: "knock on")

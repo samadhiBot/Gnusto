@@ -99,11 +99,6 @@ open class MessageProvider: @unchecked Sendable {
         return text
     }
 
-    open func askAboutWhat() -> String {
-        log("askAboutWhat()")
-        return "Ask about what?"
-    }
-
     open func askWhom() -> String {
         log("askWhom()")
         return "Ask whom?"
@@ -112,11 +107,6 @@ open class MessageProvider: @unchecked Sendable {
     open func attackNonCharacter(item: String) -> String {
         log("attackNonCharacter(item: '\(item)')")
         return "I've known strange people, but fighting \(item)?"
-    }
-
-    open func attackWhat() -> String {
-        log("attackWhat()")
-        return "Attack what?"
     }
 
     open func attackWithBareHands(character: String) -> String {
@@ -185,11 +175,6 @@ open class MessageProvider: @unchecked Sendable {
     open func burnToCatchFire(item: String) -> String {
         log("burnToCatchFire(item: '\(item)')")
         return "\(item.capitalizedFirst) catches fire and burns to ashes."
-    }
-
-    open func burnWhat() -> String {
-        log("burnWhat()")
-        return "Burn what?"
     }
 
     open func cannotActOnThat(verb: String) -> String {
@@ -390,19 +375,9 @@ open class MessageProvider: @unchecked Sendable {
         return "You can't climb on \(item)."
     }
 
-    open func climbOnWhat() -> String {
-        log("climbOnWhat()")
-        return "Climb on what?"
-    }
-
     open func climbSuccess(item: String) -> String {
         log("climbSuccess(item: '\(item)')")
         return "You climb \(item)."
-    }
-
-    open func climbWhat() -> String {
-        log("climbWhat()")
-        return "Climb what?"
     }
 
     open func closed() -> String {
@@ -491,11 +466,6 @@ open class MessageProvider: @unchecked Sendable {
         return "\(tool.capitalizedFirst) isn't sharp enough to cut anything."
     }
 
-    open func cutWhat() -> String {
-        log("cutWhat()")
-        return "Cut what?"
-    }
-
     open func cutWithAutoTool(item: String, tool: String) -> String {
         log("cutWithAutoTool(item: '\(item)', tool: '\(tool)')")
         return "You cut \(item) with \(tool)."
@@ -533,19 +503,9 @@ open class MessageProvider: @unchecked Sendable {
         return "You deflate \(item)."
     }
 
-    open func deflateWhat() -> String {
-        log("deflateWhat()")
-        return "Deflate what?"
-    }
-
     open func diggingBareHandsIneffective() -> String {
         log("diggingBareHandsIneffective()")
         return "Digging with your bare hands is ineffective."
-    }
-
-    open func digWhat() -> String {
-        log("digWhat()")
-        return "Dig what?"
     }
 
     open func digWithToolNothing(tool: String) -> String {
@@ -672,11 +632,6 @@ open class MessageProvider: @unchecked Sendable {
     open func insertHaveNothingToPut(container: String) -> String {
         log("insertHaveNothingToPut(container: \(container))")
         return "You have nothing to put in \(container)."
-    }
-
-    open func insertIntoWhat() -> String {
-        log("insertIntoWhat()")
-        return "Insert into what?"
     }
 
     open func insertWhere(item: String) -> String {
@@ -936,11 +891,6 @@ open class MessageProvider: @unchecked Sendable {
         return "No need to knock, \(door) is already open."
     }
 
-    open func knockOnWhat() -> String {
-        log("knockOnWhat()")
-        return "Knock on what?"
-    }
-
     open func laughResponse() -> String {
         log("laughResponse()")
         return oneOf(
@@ -969,34 +919,14 @@ open class MessageProvider: @unchecked Sendable {
         )
     }
 
-    open func listenWhat() -> String {
-        log("listenWhat()")
-        return "Listen to what?"
-    }
-
     open func lockSuccess(item: String) -> String {
         log("lockSuccess(item: '\(item)')")
         return "\(item.capitalizedFirst) is now locked."
     }
 
-    open func lockWhat() -> String {
-        log("lockWhat()")
-        return "Lock what?"
-    }
-
     open func lockWithWhat() -> String {
         log("lockWithWhat()")
         return "Lock it with what?"
-    }
-
-    open func lookInsideWhat() -> String {
-        log("lookInsideWhat()")
-        return "Look inside what?"
-    }
-
-    open func lookUnderWhat() -> String {
-        log("lookUnderWhat()")
-        return "Look under what?"
     }
 
     open func maximumVerbosity() -> String {
@@ -1013,11 +943,6 @@ open class MessageProvider: @unchecked Sendable {
             modifiers: '\(modifiers.joined(separator: "', '"))')
             """)
         return "You can't see any \(modifiers.joined(separator: " ")) \(noun) here."
-    }
-
-    open func moveWhat() -> String {
-        log("moveWhat()")
-        return "Move what?"
     }
 
     open func multipleObjectsNotSupported(verb: String) -> String {
@@ -1118,9 +1043,9 @@ open class MessageProvider: @unchecked Sendable {
         return "You can't pour \(item) on itself."
     }
 
-    open func pourCannotPourOnThat() -> String {
-        log("pourCannotPourOnThat()")
-        return "You can't pour something on that."
+    open func pourCannotPourItemOnThat(item: String) -> String {
+        log("pourCannotPourItemOnThat(item: \(item))")
+        return "You can't pour \(item) on that."
     }
 
     open func pourCannotPourThat() -> String {
@@ -1128,47 +1053,14 @@ open class MessageProvider: @unchecked Sendable {
         return "You can't pour that."
     }
 
-    open func pourNotLiquid(item: String) -> String {
-        log("pourNotLiquid(item: '\(item)')")
-        return "You can't pour \(item)."
-    }
-
-    open func pourOn(item: String, target: String) -> String {
-        log("pourOn(item: '\(item)', target: '\(target)')")
+    open func pourItemOnWhat(item: String) -> String {
+        log("pourItemOnWhat(item: '\(item)'")
         return "Pour \(item) on what?"
     }
 
-    open func pourOnCharacter(item: String, character: String) -> String {
-        log("pourOnCharacter(item: '\(item)', character: '\(character)')")
-        return "You pour \(item) on \(character). They are not pleased with this treatment."
-    }
-
-    open func pourOnDevice(item: String, device: String) -> String {
-        log("pourOnDevice(item: '\(item)', device: '\(device)')")
-        return "You pour \(item) on \(device), which probably wasn't a good idea."
-    }
-
-    open func pourOnFireAndExtinguish(item: String, target: String) -> String {
-        log("pourOnFireAndExtinguish(item: '\(item)', target: '\(target)')")
-        return """
-            You pour \(item) on \(target). The flames
-            are extinguished with a hissing sound.
-            """
-    }
-
-    open func pourOnGeneric(item: String, target: String) -> String {
-        log("pourOnGeneric(item: '\(item)', target: '\(target)')")
+    open func pourItemOn(item: String, target: String) -> String {
+        log("pourItemOn(item: '\(item)', target: '\(target)')")
         return "You pour \(item) on \(target)."
-    }
-
-    open func pourOnPlantAndRefresh(item: String, target: String) -> String {
-        log("pourOnPlantAndRefresh(item: '\(item)', target: '\(target)')")
-        return "You pour \(item) on \(target). It looks refreshed."
-    }
-
-    open func pourWhat() -> String {
-        log("pourWhat()")
-        return "Pour what?"
     }
 
     open func prerequisiteNotMet(message: String) -> String {
@@ -1179,11 +1071,6 @@ open class MessageProvider: @unchecked Sendable {
     open func pressSuccess(item: String) -> String {
         log("pressSuccess(item: '\(item)')")
         return "You press \(item)."
-    }
-
-    open func pressWhat() -> String {
-        log("pressWhat()")
-        return "Press what?"
     }
 
     open func pronounNotSet(pronoun: String) -> String {
@@ -1201,19 +1088,9 @@ open class MessageProvider: @unchecked Sendable {
         return "You pull \(item)."
     }
 
-    open func pullWhat() -> String {
-        log("pullWhat()")
-        return "Pull what?"
-    }
-
     open func pushSuccess(items: String) -> String {
         log("pushSuccess(items: '\(items)')")
         return "You push \(items), but nothing interesting happens."
-    }
-
-    open func pushWhat() -> String {
-        log("pushWhat()")
-        return "Push what?"
     }
 
     open func putCannotPutCircular(
@@ -1241,29 +1118,9 @@ open class MessageProvider: @unchecked Sendable {
         return "Put \(item) on what?"
     }
 
-    open func putWhat() -> String {
-        log("putWhat()")
-        return "Put what?"
-    }
-
     open func raiseCannotLift(item: String) -> String {
         log("raiseCannotLift(item: '\(item)')")
         return "You can't lift \(item)."
-    }
-
-    open func raiseWhat() -> String {
-        log("raiseWhat()")
-        return "Raise what?"
-    }
-
-    open func readWhat() -> String {
-        log("readWhat()")
-        return "Read what?"
-    }
-
-    open func removeWhat() -> String {
-        log("removeWhat()")
-        return "Remove what?"
     }
 
     open func restoreFailed(error: String) -> String {
@@ -1299,11 +1156,6 @@ open class MessageProvider: @unchecked Sendable {
     open func rubTakableObject(item: String) -> String {
         log("rubTakableObject(item: '\(item)')")
         return "You rub \(item). It feels smooth to the touch."
-    }
-
-    open func rubWhat() -> String {
-        log("rubWhat()")
-        return "Rub what?"
     }
 
     open func saveFailed(error: String) -> String {
@@ -1367,11 +1219,6 @@ open class MessageProvider: @unchecked Sendable {
         return "You shake \(item) vigorously, but nothing happens."
     }
 
-    open func shakeWhat() -> String {
-        log("shakeWhat()")
-        return "Shake what?"
-    }
-
     open func singResponse() -> String {
         log("singResponse()")
         return oneOf(
@@ -1403,11 +1250,6 @@ open class MessageProvider: @unchecked Sendable {
         return "That smells about average."
     }
 
-    open func smellWhat() -> String {
-        log("smellWhat()")
-        return "Smell what?"
-    }
-
     open func squeezeCharacter(character: String) -> String {
         log("squeezeCharacter(character: '\(character)')")
         return "I don't think \(character) would appreciate being squeezed."
@@ -1431,11 +1273,6 @@ open class MessageProvider: @unchecked Sendable {
     open func squeezeSponge(item: String) -> String {
         log("squeezeSponge(item: '\(item)')")
         return "You squeeze \(item) and water drips out."
-    }
-
-    open func squeezeWhat() -> String {
-        log("squeezeWhat()")
-        return "Squeeze what?"
     }
 
     open func stateValidationFailed() -> String {
@@ -1468,24 +1305,19 @@ open class MessageProvider: @unchecked Sendable {
         return "That tastes about average."
     }
 
-    open func tasteWhat() -> String {
-        log("tasteWhat()")
-        return "Taste what?"
+    open func tellCharacterAboutWhat(character: String) -> String {
+        log("tellCharacterAboutWhat(character: \(character)")
+        return "Tell \(character) about what?"
     }
 
-    open func tellAboutWhat() -> String {
-        log("tellAboutWhat()")
-        return "Tell about what?"
-    }
-
-    open func tellCannotTellAbout(character: String) -> String {
-        log("tellCannotTellAbout(character: '\(character)')")
-        return "You can't tell \(character) about anything."
+    open func tellCannotTellAbout(item: String) -> String {
+        log("tellCannotTellAbout(item: '\(item)')")
+        return "You can't tell \(item) about anything."
     }
 
     open func tellCanOnlyTellCharacters() -> String {
         log("tellCanOnlyTellCharacters()")
-        return "You can only tell characters about things."
+        return "You can only tell things to other characters."
     }
 
     open func tellWhom() -> String {
@@ -1513,11 +1345,6 @@ open class MessageProvider: @unchecked Sendable {
         return "Yes, yes, you're very important."
     }
 
-    open func thinkAboutWhat() -> String {
-        log("thinkAboutWhat()")
-        return "Think about what?"
-    }
-
     open func throwAtCharacter(item: String, character: String) -> String {
         log("throwAtCharacter(item: '\(item)', character: '\(character)')")
         return "You throw \(item) at \(character)."
@@ -1531,11 +1358,6 @@ open class MessageProvider: @unchecked Sendable {
     open func throwGeneral(item: String) -> String {
         log("throwGeneral(item: '\(item)')")
         return "You throw \(item), and it falls to the ground."
-    }
-
-    open func throwWhat() -> String {
-        log("throwWhat()")
-        return "Throw what?"
     }
 
     open func tieCannotTieLivingBeings() -> String {
@@ -1573,11 +1395,6 @@ open class MessageProvider: @unchecked Sendable {
         return "You can't tie \(item) without something to tie it with."
     }
 
-    open func tieWhat() -> String {
-        log("tieWhat()")
-        return "Tie what?"
-    }
-
     open func timePasses() -> String {
         log("timePasses()")
         return "Time passes."
@@ -1591,11 +1408,6 @@ open class MessageProvider: @unchecked Sendable {
     open func toolNotSuitableForDigging(tool: String) -> String {
         log("toolNotSuitableForDigging(tool: '\(tool)')")
         return "\(tool.capitalizedFirst) isn't suitable for digging."
-    }
-
-    open func touchWhat() -> String {
-        log("touchWhat()")
-        return "Touch what?"
     }
 
     open func turnCharacter(character: String) -> String {
@@ -1628,24 +1440,9 @@ open class MessageProvider: @unchecked Sendable {
         return "You turn \(item). It clicks into a new position."
     }
 
-    open func turnOffWhat() -> String {
-        log("turnOffWhat()")
-        return "Turn off what?"
-    }
-
-    open func turnOnWhat() -> String {
-        log("turnOnWhat()")
-        return "Turn on what?"
-    }
-
     open func turnRegularObject(item: String) -> String {
         log("turnRegularObject(item: '\(item)')")
         return "You turn \(item) around in your hands, but nothing happens."
-    }
-
-    open func turnWhat() -> String {
-        log("turnWhat()")
-        return "Turn what?"
     }
 
     open func turnWheel(item: String) -> String {
@@ -1673,14 +1470,9 @@ open class MessageProvider: @unchecked Sendable {
         return "The \(item) is already unlocked."
     }
 
-    open func unlockWhat() -> String {
-        log("unlockWhat()")
-        return "Unlock what?"
-    }
-
-    open func unlockWithWhat() -> String {
-        log("unlockWithWhat()")
-        return "Unlock it with what?"
+    open func unlockWithWhat(item: String) -> String {
+        log("unlockWithWhat(item: \(item))")
+        return "Unlock \(item) with what?"
     }
 
     open func waveCharacter(character: String) -> String {

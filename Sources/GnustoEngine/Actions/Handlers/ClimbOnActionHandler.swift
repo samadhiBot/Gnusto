@@ -11,8 +11,9 @@ public struct ClimbOnActionHandler: ActionHandler {
     /// - Throws: An `ActionResponse` if validation fails.
     public func validate(context: ActionContext) async throws {
         guard let directObjectRef = context.command.directObject else {
-            let message = context.message.climbOnWhat()
-            throw ActionResponse.prerequisiteNotMet(message)
+            throw ActionResponse.prerequisiteNotMet(
+                context.message.doWhat(verb: .climbOn)
+            )
         }
 
         guard case .item(let targetItemID) = directObjectRef else {

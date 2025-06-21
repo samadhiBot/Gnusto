@@ -21,12 +21,6 @@ public struct TellActionHandler: ActionHandler {
                 context.message.tellWhom()
             )
         }
-        guard context.command.indirectObject != nil else {
-            throw ActionResponse.prerequisiteNotMet(
-                context.message.tellAboutWhat()
-            )
-        }
-
         guard case .item(let characterID) = directObjectRef else {
             throw ActionResponse.prerequisiteNotMet(
                 context.message.tellCanOnlyTellCharacters()
@@ -35,13 +29,21 @@ public struct TellActionHandler: ActionHandler {
 
         // Check if character exists and is reachable
         let character = try await context.engine.item(characterID)
+
         guard character.hasFlag(.isCharacter) else {
             throw ActionResponse.prerequisiteNotMet(
-                "You can't tell the \(character.name) about anything.")
+                context.message.tellCannotTellAbout(item: character.withDefiniteArticle)
+            )
         }
 
         guard await context.engine.playerCanReach(characterID) else {
             throw ActionResponse.itemNotAccessible(characterID)
+        }
+
+        guard context.command.indirectObject != nil else {
+            throw ActionResponse.prerequisiteNotMet(
+                context.message.tellCharacterAboutWhat(character: character.name)
+            )
         }
     }
 
@@ -59,7 +61,8 @@ public struct TellActionHandler: ActionHandler {
             let indirectObjectRef = context.command.indirectObject
         else {
             throw ActionResponse.internalEngineError(
-                "TellActionHandler: missing required objects in process.")
+                "TellActionHandler: missing required objects in process."
+            )
         }
 
         let character = try await context.engine.item(characterID)

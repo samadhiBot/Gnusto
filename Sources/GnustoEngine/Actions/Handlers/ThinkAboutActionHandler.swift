@@ -18,8 +18,9 @@ public struct ThinkAboutActionHandler: ActionHandler {
     public func validate(context: ActionContext) async throws {
         // 1. Ensure we have a direct object
         guard let directObjectRef = context.command.directObject else {
-            let message = context.message.thinkAboutWhat()
-            throw ActionResponse.custom(message)
+            throw ActionResponse.custom(
+                context.message.doWhat(verb: .thinkAbout)
+            )
         }
 
         switch directObjectRef {

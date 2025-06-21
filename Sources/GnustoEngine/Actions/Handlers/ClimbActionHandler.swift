@@ -63,8 +63,9 @@ public struct ClimbActionHandler: ActionHandler {
     public func process(context: ActionContext) async throws -> ActionResult {
         // Handle CLIMB with no object
         guard let directObjectRef = context.command.directObject else {
-            let message = context.message.climbWhat()
-            return ActionResult(message)
+            return ActionResult(
+                context.message.doWhat(verb: .climb)
+            )
         }
 
         guard case .item(let targetItemID) = directObjectRef else {

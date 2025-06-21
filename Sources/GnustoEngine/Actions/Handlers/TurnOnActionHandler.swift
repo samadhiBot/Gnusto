@@ -26,7 +26,7 @@ public struct TurnOnActionHandler: ActionHandler {
         // 1. Get direct object and ensure it's an item
         guard let directObjectRef = context.command.directObject else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.turnOnWhat()
+                context.message.doWhat(verb: .turnOn)
             )
         }
         guard case .item(let targetItemID) = directObjectRef else {

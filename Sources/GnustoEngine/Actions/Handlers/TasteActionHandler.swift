@@ -22,7 +22,7 @@ public struct TasteActionHandler: ActionHandler {
     public func validate(context: ActionContext) async throws {
         guard let directObjectRef = context.command.directObject else {
             throw ActionResponse.custom(
-                context.message.tasteWhat()
+                context.message.doWhat(verb: .taste)
             )
         }
         guard case .item(_) = directObjectRef else {
