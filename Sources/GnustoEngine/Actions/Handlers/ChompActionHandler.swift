@@ -16,8 +16,9 @@ public struct ChompActionHandler: ActionHandler {
         }
 
         guard case .item(let targetItemID) = directObjectRef else {
-            let message = context.message.canOnlyActOnItems(verb: "chomp")
-            throw ActionResponse.prerequisiteNotMet(message)
+            throw ActionResponse.prerequisiteNotMet(
+                context.message.canOnlyActOnItems(verb: "chomp")
+            )
         }
 
         // Check if item exists (engine.item() will throw if not found)
@@ -37,8 +38,9 @@ public struct ChompActionHandler: ActionHandler {
             case .item(let targetItemID) = directObjectRef
         else {
             // Get random response from message provider
-            let message = context.message.chompResponse()
-            return ActionResult(message)
+            return ActionResult(
+                context.message.chompResponse()
+            )
         }
 
         let targetItem = try await context.engine.item(targetItemID)

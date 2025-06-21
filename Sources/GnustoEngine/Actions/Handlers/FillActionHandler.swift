@@ -17,12 +17,14 @@ public struct FillActionHandler: ActionHandler {
     public func validate(context: ActionContext) async throws {
         // Fill requires a direct object (what to fill)
         guard let directObjectRef = context.command.directObject else {
-            let message = context.message.doWhat(verb: .fill)
-            throw ActionResponse.prerequisiteNotMet(message)
+            throw ActionResponse.prerequisiteNotMet(
+                context.message.doWhat(verb: .fill)
+            )
         }
         guard case .item(let containerItemID) = directObjectRef else {
-            let message = context.message.cannotActOnThat(verb: "fill")
-            throw ActionResponse.prerequisiteNotMet(message)
+            throw ActionResponse.prerequisiteNotMet(
+                context.message.cannotActOnThat(verb: "fill")
+            )
         }
 
         // Check if container exists and is reachable

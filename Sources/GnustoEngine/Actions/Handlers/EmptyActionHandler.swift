@@ -17,12 +17,14 @@ public struct EmptyActionHandler: ActionHandler {
     public func validate(context: ActionContext) async throws {
         // Empty requires a direct object (what to empty)
         guard let directObjectRef = context.command.directObject else {
-            let message = context.message.doWhat(verb: .empty)
-            throw ActionResponse.prerequisiteNotMet(message)
+            throw ActionResponse.prerequisiteNotMet(
+                context.message.doWhat(verb: .empty)
+            )
         }
         guard case .item(let targetItemID) = directObjectRef else {
-            let message = context.message.canOnlyEmptyContainers()
-            throw ActionResponse.prerequisiteNotMet(message)
+            throw ActionResponse.prerequisiteNotMet(
+                context.message.canOnlyEmptyContainers()
+            )
         }
 
         // Check if target exists and is reachable

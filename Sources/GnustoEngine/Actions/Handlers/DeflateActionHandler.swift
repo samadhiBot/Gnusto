@@ -22,8 +22,9 @@ public struct DeflateActionHandler: ActionHandler {
             )
         }
         guard case .item(let targetItemID) = directObjectRef else {
-            let message = context.message.canOnlyActOnItems(verb: "deflate")
-            throw ActionResponse.prerequisiteNotMet(message)
+            throw ActionResponse.prerequisiteNotMet(
+                context.message.canOnlyActOnItems(verb: "deflate")
+            )
         }
 
         // Check if target exists and is reachable
@@ -34,8 +35,9 @@ public struct DeflateActionHandler: ActionHandler {
 
         // Check if item is inflatable (which means it can also be deflated)
         guard targetItem.hasFlag(.isInflatable) else {
-            let message = context.message.cannotDeflate(item: targetItem.withDefiniteArticle)
-            throw ActionResponse.prerequisiteNotMet(message)
+            throw ActionResponse.prerequisiteNotMet(
+                context.message.cannotDeflate(item: targetItem.withDefiniteArticle)
+            )
         }
     }
 

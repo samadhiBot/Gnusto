@@ -30,8 +30,9 @@ public struct LookActionHandler: ActionHandler {
         // If a direct object is present, it must be an item for LOOK/EXAMINE.
         guard case .item(let targetItemID) = directObjectRef else {
             // For now, only items are supported when a direct object is specified.
-            let message = context.message.canOnlyLookAtItems()
-            throw ActionResponse.prerequisiteNotMet(message)
+            throw ActionResponse.prerequisiteNotMet(
+                context.message.canOnlyLookAtItems()
+            )
         }
 
         // EXAMINE [Item] - Ensure item exists and is reachable

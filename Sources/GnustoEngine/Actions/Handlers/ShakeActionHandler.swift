@@ -16,12 +16,14 @@ public struct ShakeActionHandler: ActionHandler {
     public func validate(context: ActionContext) async throws {
         // Shake requires a direct object (what to shake)
         guard let directObjectRef = context.command.directObject else {
-            let message = context.message.doWhat(verb: .shake)
-            throw ActionResponse.prerequisiteNotMet(message)
+            throw ActionResponse.prerequisiteNotMet(
+                context.message.doWhat(verb: .shake)
+            )
         }
         guard case .item(let targetItemID) = directObjectRef else {
-            let message = context.message.cannotActOnThat(verb: "shake")
-            throw ActionResponse.prerequisiteNotMet(message)
+            throw ActionResponse.prerequisiteNotMet(
+                context.message.cannotActOnThat(verb: "shake")
+            )
         }
 
         // Check if target exists and is reachable

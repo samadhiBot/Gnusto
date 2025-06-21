@@ -17,8 +17,9 @@ public struct LookUnderActionHandler: ActionHandler {
         }
 
         guard case .item(let targetItemID) = indirectObjectRef else {
-            let message = context.message.cannotActOnThat(verb: "look under")
-            throw ActionResponse.prerequisiteNotMet(message)
+            throw ActionResponse.prerequisiteNotMet(
+                context.message.cannotActOnThat(verb: "look under")
+            )
         }
 
         // Check if item exists and is reachable

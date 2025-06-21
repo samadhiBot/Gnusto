@@ -22,8 +22,9 @@ public struct AttackActionHandler: ActionHandler {
             )
         }
         guard case .item(let targetItemID) = directObjectRef else {
-            let message = context.message.cannotActOnThat(verb: "attack")
-            throw ActionResponse.prerequisiteNotMet(message)
+            throw ActionResponse.prerequisiteNotMet(
+                context.message.cannotActOnThat(verb: "attack")
+            )
         }
 
         // Check if target exists and is reachable
@@ -35,8 +36,9 @@ public struct AttackActionHandler: ActionHandler {
         // If weapon is specified, validate it
         if let indirectObjectRef = context.command.indirectObject {
             guard case .item(let weaponItemID) = indirectObjectRef else {
-                let message = context.message.cannotActWithThat(verb: "attack")
-                throw ActionResponse.prerequisiteNotMet(message)
+                throw ActionResponse.prerequisiteNotMet(
+                    context.message.cannotActWithThat(verb: "attack")
+                )
             }
 
             let weaponItem = try await context.engine.item(weaponItemID)

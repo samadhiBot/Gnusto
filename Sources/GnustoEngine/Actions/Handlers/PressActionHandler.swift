@@ -22,8 +22,9 @@ public struct PressActionHandler: ActionHandler {
             )
         }
         guard case .item(let targetItemID) = directObjectRef else {
-            let message = context.message.canOnlyActOnItems(verb: "press")
-            throw ActionResponse.prerequisiteNotMet(message)
+            throw ActionResponse.prerequisiteNotMet(
+                context.message.canOnlyActOnItems(verb: "press")
+            )
         }
 
         // Check if target exists and is reachable

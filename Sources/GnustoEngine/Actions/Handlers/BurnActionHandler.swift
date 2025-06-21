@@ -20,13 +20,15 @@ public struct BurnActionHandler: ActionHandler {
     /// - Throws: `ActionError` if validation fails.
     public func validate(context: ActionContext) async throws {
         guard let targetObjectID = context.command.directObject else {
-            let message = context.message.doWhat(verb: .burn)
-            throw ActionResponse.prerequisiteNotMet(message)
+            throw ActionResponse.prerequisiteNotMet(
+                context.message.doWhat(verb: .burn)
+            )
         }
 
         guard case .item(let itemID) = targetObjectID else {
-            let message = context.message.canOnlyActOnItems(verb: "burn")
-            throw ActionResponse.prerequisiteNotMet(message)
+            throw ActionResponse.prerequisiteNotMet(
+                context.message.canOnlyActOnItems(verb: "burn")
+            )
         }
 
         // Check if the item exists and is accessible
@@ -55,8 +57,9 @@ public struct BurnActionHandler: ActionHandler {
         guard let targetObjectID = context.command.directObject,
             case .item(let itemID) = targetObjectID
         else {
-            let message = context.message.cannotActOnThat(verb: "burn")
-            return ActionResult(message)
+            return ActionResult(
+                context.message.cannotActOnThat(verb: "burn")
+            )
         }
 
         let targetItem = try await context.engine.item(itemID)
@@ -76,14 +79,10 @@ public struct BurnActionHandler: ActionHandler {
             )
         } else {
             // Most items cannot be burned
-            let message = context.message.burnCannotBurn(item: targetItem.withDefiniteArticle)
-
             return ActionResult(
-                message: message,
-                changes: [
-                    await context.engine.setFlag(.isTouched, on: targetItem),
-                    await context.engine.updatePronouns(to: targetItem),
-                ]
+                context.message.burnCannotBurn(item: targetItem.withDefiniteArticle),
+                await context.engine.setFlag(.isTouched, on: targetItem),
+                await context.engine.updatePronouns(to: targetItem)
             )
         }
     }

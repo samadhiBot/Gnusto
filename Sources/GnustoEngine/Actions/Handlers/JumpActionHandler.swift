@@ -19,8 +19,9 @@ public struct JumpActionHandler: ActionHandler {
         }
 
         guard case .item(let targetItemID) = directObjectRef else {
-            let message = context.message.cannotActOnThat(verb: "jump")
-            throw ActionResponse.prerequisiteNotMet(message)
+            throw ActionResponse.prerequisiteNotMet(
+                context.message.cannotActOnThat(verb: "jump")
+            )
         }
 
         // Check if target exists and is reachable
@@ -41,8 +42,9 @@ public struct JumpActionHandler: ActionHandler {
         // Handle JUMP with no object - general jumping
         guard let directObjectRef = context.command.directObject else {
             // General jumping - use random response from MessageProvider
-            let message = context.message.jumpResponse()
-            return ActionResult(message)
+            return ActionResult(
+                context.message.jumpResponse()
+            )
         }
 
         guard case .item(let targetItemID) = directObjectRef else {

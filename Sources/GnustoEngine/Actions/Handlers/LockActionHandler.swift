@@ -26,12 +26,14 @@ public struct LockActionHandler: ActionHandler {
     public func validate(context: ActionContext) async throws {
         // 1. Validate command structure: Need DO and IO, both must be items
         guard let directObjectRef = context.command.directObject else {
-            let message = context.message.doWhat(verb: .lock)
-            throw ActionResponse.prerequisiteNotMet(message)
+            throw ActionResponse.prerequisiteNotMet(
+                context.message.doWhat(verb: .lock)
+            )
         }
         guard case .item(let targetItemID) = directObjectRef else {
-            let message = context.message.canOnlyActOnItems(verb: "lock")
-            throw ActionResponse.prerequisiteNotMet(message)
+            throw ActionResponse.prerequisiteNotMet(
+                context.message.canOnlyActOnItems(verb: "lock")
+            )
         }
         let targetItem = try await context.engine.item(targetItemID)
 
@@ -41,8 +43,9 @@ public struct LockActionHandler: ActionHandler {
             )
         }
         guard case .item(let keyItemID) = indirectObjectRef else {
-            let message = context.message.canOnlyUseItemAsKey()
-            throw ActionResponse.prerequisiteNotMet(message)
+            throw ActionResponse.prerequisiteNotMet(
+                context.message.canOnlyUseItemAsKey()
+            )
         }
 
         // 2. Get item snapshots (existence should be implicitly validated by parser/scope resolver before this point)

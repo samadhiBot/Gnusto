@@ -17,12 +17,14 @@ public struct ThrowActionHandler: ActionHandler {
     public func validate(context: ActionContext) async throws {
         // Throw requires a direct object (what to throw)
         guard let directObjectRef = context.command.directObject else {
-            let message = context.message.doWhat(verb: .throwItem)
-            throw ActionResponse.prerequisiteNotMet(message)
+            throw ActionResponse.prerequisiteNotMet(
+                context.message.doWhat(verb: .throwItem)
+            )
         }
         guard case .item(let itemToThrowID) = directObjectRef else {
-            let message = context.message.cannotActOnThat(verb: "throw")
-            throw ActionResponse.prerequisiteNotMet(message)
+            throw ActionResponse.prerequisiteNotMet(
+                context.message.cannotActOnThat(verb: "throw")
+            )
         }
 
         // Check if item exists and is held
@@ -34,8 +36,9 @@ public struct ThrowActionHandler: ActionHandler {
         // If a target is specified, validate it
         if let indirectObjectRef = context.command.indirectObject {
             guard case .item(let targetItemID) = indirectObjectRef else {
-                let message = context.message.cannotActWithThat(verb: "throw at")
-                throw ActionResponse.prerequisiteNotMet(message)
+                throw ActionResponse.prerequisiteNotMet(
+                    context.message.cannotActWithThat(verb: "throw at")
+                )
             }
 
             _ = try await context.engine.item(targetItemID)

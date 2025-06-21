@@ -21,8 +21,9 @@ public struct RubActionHandler: ActionHandler {
             )
         }
         guard case .item(let targetItemID) = directObjectRef else {
-            let message = context.message.cannotActOnThat(verb: "rub")
-            throw ActionResponse.prerequisiteNotMet(message)
+            throw ActionResponse.prerequisiteNotMet(
+                context.message.cannotActOnThat(verb: "rub")
+            )
         }
 
         // Check if target exists and is reachable

@@ -17,12 +17,14 @@ public struct InflateActionHandler: ActionHandler {
     public func validate(context: ActionContext) async throws {
         // Inflate requires a direct object (what to inflate)
         guard let directObjectRef = context.command.directObject else {
-            let message = context.message.doWhat(verb: .inflate)
-            throw ActionResponse.prerequisiteNotMet(message)
+            throw ActionResponse.prerequisiteNotMet(
+                context.message.doWhat(verb: .inflate)
+            )
         }
         guard case .item(let targetItemID) = directObjectRef else {
-            let message = context.message.canOnlyActOnItems(verb: "inflate")
-            throw ActionResponse.prerequisiteNotMet(message)
+            throw ActionResponse.prerequisiteNotMet(
+                context.message.canOnlyActOnItems(verb: "inflate")
+            )
         }
 
         // Check if target exists and is reachable
@@ -33,8 +35,9 @@ public struct InflateActionHandler: ActionHandler {
 
         // Check if item is inflatable
         guard targetItem.hasFlag(.isInflatable) else {
-            let message = context.message.cannotInflate(item: targetItem.withDefiniteArticle)
-            throw ActionResponse.prerequisiteNotMet(message)
+            throw ActionResponse.prerequisiteNotMet(
+                context.message.cannotInflate(item: targetItem.withDefiniteArticle)
+            )
         }
     }
 

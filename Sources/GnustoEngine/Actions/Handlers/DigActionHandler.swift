@@ -17,8 +17,9 @@ public struct DigActionHandler: ActionHandler {
         // If a direct object is specified, validate it
         if let directObjectRef = context.command.directObject {
             guard case .item(let targetItemID) = directObjectRef else {
-                let message = context.message.cannotActOnThat(verb: "dig")
-                throw ActionResponse.prerequisiteNotMet(message)
+                throw ActionResponse.prerequisiteNotMet(
+                    context.message.cannotActOnThat(verb: "dig")
+                )
             }
 
             _ = try await context.engine.item(targetItemID)
@@ -30,8 +31,9 @@ public struct DigActionHandler: ActionHandler {
         // If digging tool is specified, validate it
         if let indirectObjectRef = context.command.indirectObject {
             guard case .item(let toolItemID) = indirectObjectRef else {
-                let message = context.message.cannotActWithThat(verb: "dig")
-                throw ActionResponse.prerequisiteNotMet(message)
+                throw ActionResponse.prerequisiteNotMet(
+                    context.message.cannotActWithThat(verb: "dig")
+                )
             }
 
             let toolItem = try await context.engine.item(toolItemID)
@@ -57,14 +59,11 @@ public struct DigActionHandler: ActionHandler {
             case .item(let targetItemID) = directObjectRef
         {
             let targetItem = try await context.engine.item(targetItemID)
-            let message = context.message.cannotDig(item: targetItem.withDefiniteArticle)
 
             return ActionResult(
-                message: message,
-                changes: [
-                    await context.engine.setFlag(.isTouched, on: targetItem),
-                    await context.engine.updatePronouns(to: targetItem),
-                ]
+                context.message.cannotDig(item: targetItem.withDefiniteArticle),
+                await context.engine.setFlag(.isTouched, on: targetItem),
+                await context.engine.updatePronouns(to: targetItem),
             )
         } else {
             // General digging (no specific target)

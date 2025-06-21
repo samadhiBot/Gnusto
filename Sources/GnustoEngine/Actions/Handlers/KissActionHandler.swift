@@ -16,12 +16,14 @@ public struct KissActionHandler: ActionHandler {
     public func validate(context: ActionContext) async throws {
         // Kiss requires a direct object (what to kiss)
         guard let directObjectRef = context.command.directObject else {
-            let message = context.message.doWhat(verb: .kiss)
-            throw ActionResponse.prerequisiteNotMet(message)
+            throw ActionResponse.prerequisiteNotMet(
+                context.message.doWhat(verb: .kiss)
+            )
         }
         guard case .item(let targetItemID) = directObjectRef else {
-            let message = context.message.cannotActOnThat(verb: "kiss")
-            throw ActionResponse.prerequisiteNotMet(message)
+            throw ActionResponse.prerequisiteNotMet(
+                context.message.cannotActOnThat(verb: "kiss")
+            )
         }
 
         // Check if target exists and is reachable

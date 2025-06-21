@@ -15,13 +15,15 @@ public struct BreatheActionHandler: ActionHandler {
     public func validate(context: ActionContext) async throws {
         // Breathe should not take any objects
         if context.command.directObject != nil {
-            let message = context.message.cannotActOnThat(verb: "breathe")
-            throw ActionResponse.prerequisiteNotMet(message)
+            throw ActionResponse.prerequisiteNotMet(
+                context.message.cannotActOnThat(verb: "breathe")
+            )
         }
 
         if context.command.indirectObject != nil {
-            let message = context.message.cannotActOnThat(verb: "breathe")
-            throw ActionResponse.prerequisiteNotMet(message)
+            throw ActionResponse.prerequisiteNotMet(
+                context.message.cannotActOnThat(verb: "breathe")
+            )
         }
     }
 
@@ -34,8 +36,9 @@ public struct BreatheActionHandler: ActionHandler {
     /// - Returns: An `ActionResult` with an atmospheric message.
     public func process(context: ActionContext) async throws -> ActionResult {
         // Get random response from message provider
-        let message = context.message.breatheResponse()
-        return ActionResult(message)
+        return ActionResult(
+            context.message.breatheResponse()
+        )
     }
 
     /// Performs any post-processing after the "BREATHE" command.

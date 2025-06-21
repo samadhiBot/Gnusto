@@ -25,8 +25,9 @@ public struct CutActionHandler: ActionHandler {
             )
         }
         guard case .item(let targetItemID) = directObjectRef else {
-            let message = context.message.cannotActOnThat(verb: "cut")
-            throw ActionResponse.prerequisiteNotMet(message)
+            throw ActionResponse.prerequisiteNotMet(
+                context.message.cannotActOnThat(verb: "cut")
+            )
         }
 
         // Check if target exists and is reachable
@@ -38,8 +39,9 @@ public struct CutActionHandler: ActionHandler {
         // If cutting tool is specified, validate it
         if let indirectObjectRef = context.command.indirectObject {
             guard case .item(let toolItemID) = indirectObjectRef else {
-                let message = context.message.cannotActWithThat(verb: "cut")
-                throw ActionResponse.prerequisiteNotMet(message)
+                throw ActionResponse.prerequisiteNotMet(
+                    context.message.cannotActWithThat(verb: "cut")
+                )
             }
 
             let toolItem = try await context.engine.item(toolItemID)

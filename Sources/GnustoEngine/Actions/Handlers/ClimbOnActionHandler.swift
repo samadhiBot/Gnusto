@@ -17,8 +17,9 @@ public struct ClimbOnActionHandler: ActionHandler {
         }
 
         guard case .item(let targetItemID) = directObjectRef else {
-            let message = context.message.cannotActOnThat(verb: "climb on")
-            throw ActionResponse.prerequisiteNotMet(message)
+            throw ActionResponse.prerequisiteNotMet(
+                context.message.cannotActOnThat(verb: "climb on")
+            )
         }
 
         // Check if item exists and is reachable
@@ -47,13 +48,10 @@ public struct ClimbOnActionHandler: ActionHandler {
         let targetItem = try await context.engine.item(targetItemID)
 
         // Default behavior: You can't climb on most things
-        let message = context.message.climbOnFailure(item: targetItem.withDefiniteArticle)
         return ActionResult(
-            message: message,
-            changes: [
-                await context.engine.setFlag(.isTouched, on: targetItem),
-                await context.engine.updatePronouns(to: targetItem),
-            ]
+            context.message.climbOnFailure(item: targetItem.withDefiniteArticle),
+            await context.engine.setFlag(.isTouched, on: targetItem),
+            await context.engine.updatePronouns(to: targetItem)
         )
     }
 }

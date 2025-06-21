@@ -16,8 +16,9 @@ public struct CurseActionHandler: ActionHandler {
         }
 
         guard case .item(let targetItemID) = directObjectRef else {
-            let message = context.message.canOnlyActOnItems(verb: "curse")
-            throw ActionResponse.prerequisiteNotMet(message)
+            throw ActionResponse.prerequisiteNotMet(
+                context.message.canOnlyActOnItems(verb: "curse")
+            )
         }
 
         // Check if item exists
@@ -44,8 +45,9 @@ public struct CurseActionHandler: ActionHandler {
             return ActionResult(message)
         } else {
             // General cursing (no object)
-            let message = context.message.curseResponse()
-            return ActionResult(message)
+            return ActionResult(
+                context.message.curseResponse()
+            )
         }
     }
 }

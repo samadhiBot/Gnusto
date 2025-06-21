@@ -17,8 +17,9 @@ public struct BlowActionHandler: ActionHandler {
         // Blow can be used without an object (general blowing) or with an object
         if let directObjectRef = context.command.directObject {
             guard case .item(let targetItemID) = directObjectRef else {
-                let message = context.message.canOnlyActOnItems(verb: "blow")
-                throw ActionResponse.prerequisiteNotMet(message)
+                throw ActionResponse.prerequisiteNotMet(
+                    context.message.canOnlyActOnItems(verb: "blow")
+                )
             }
 
             // Check if target exists and is reachable

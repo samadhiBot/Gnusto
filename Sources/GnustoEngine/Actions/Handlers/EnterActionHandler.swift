@@ -22,15 +22,17 @@ public struct EnterActionHandler: ActionHandler {
                 .filter { $0.hasFlag(.isEnterable) }
 
             if enterableItems.isEmpty {
-                let message = context.message.nothingHereToEnter()
-                throw ActionResponse.prerequisiteNotMet(message)
+                throw ActionResponse.prerequisiteNotMet(
+                    context.message.nothingHereToEnter()
+                )
             }
             return  // Will handle selection in process
         }
 
         guard case .item(let targetItemID) = directObjectRef else {
-            let message = context.message.cannotActOnThat(verb: "enter")
-            throw ActionResponse.prerequisiteNotMet(message)
+            throw ActionResponse.prerequisiteNotMet(
+                context.message.cannotActOnThat(verb: "enter")
+            )
         }
 
         // Check if target exists and is reachable
@@ -41,8 +43,9 @@ public struct EnterActionHandler: ActionHandler {
 
         // Check if item is enterable
         guard targetItem.hasFlag(.isEnterable) else {
-            let message = context.message.cannotEnter(item: targetItem.withDefiniteArticle)
-            throw ActionResponse.prerequisiteNotMet(message)
+            throw ActionResponse.prerequisiteNotMet(
+                context.message.cannotEnter(item: targetItem.withDefiniteArticle)
+            )
         }
     }
 
@@ -62,8 +65,9 @@ public struct EnterActionHandler: ActionHandler {
                 .filter { $0.hasFlag(.isEnterable) }
 
             guard let firstEnterable = enterableItems.first else {
-                let message = context.message.nothingHereToEnter()
-                throw ActionResponse.prerequisiteNotMet(message)
+                throw ActionResponse.prerequisiteNotMet(
+                    context.message.nothingHereToEnter()
+                )
             }
 
             return ActionResult(

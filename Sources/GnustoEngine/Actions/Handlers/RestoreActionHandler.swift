@@ -22,12 +22,14 @@ public struct RestoreActionHandler: ActionHandler {
         do {
             // Request the engine to restore the game
             try await context.engine.restoreGame()
-            let message = context.message.gameRestored()
-            return ActionResult(message)
+            return ActionResult(
+                context.message.gameRestored()
+            )
         } catch {
             // If restore fails, provide appropriate error message
-            let message = context.message.restoreFailed(error: error.localizedDescription)
-            return ActionResult(message)
+            return ActionResult(
+                context.message.restoreFailed(error: error.localizedDescription)
+            )
         }
     }
 

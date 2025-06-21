@@ -23,8 +23,9 @@ public struct DebugActionHandler: ActionHandler {
     ///           or `ActionResponse.unknownEntity` if the direct object does not exist.
     public func validate(context: ActionContext) async throws {
         guard let directObjectRef = context.command.directObject else {
-            let message = context.message.debugRequiresObject()
-            throw ActionResponse.prerequisiteNotMet(message)
+            throw ActionResponse.prerequisiteNotMet(
+                context.message.debugRequiresObject()
+            )
         }
 
         switch directObjectRef {
@@ -54,8 +55,9 @@ public struct DebugActionHandler: ActionHandler {
     ///           if the entity does not exist in the snapshot.
     public func process(context: ActionContext) async throws -> ActionResult {
         guard let directObjectRef = context.command.directObject else {
-            let message = context.message.debugRequiresObject()
-            throw ActionResponse.prerequisiteNotMet(message)
+            throw ActionResponse.prerequisiteNotMet(
+                context.message.debugRequiresObject()
+            )
         }
 
         var target = ""

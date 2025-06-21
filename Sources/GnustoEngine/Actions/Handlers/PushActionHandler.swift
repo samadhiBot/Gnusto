@@ -19,18 +19,21 @@ public struct PushActionHandler: ActionHandler {
 
         // 1. Ensure we have at least one direct object for non-ALL commands
         guard !context.command.directObjects.isEmpty else {
-            let message = context.message.doWhat(verb: .push)
-            throw ActionResponse.prerequisiteNotMet(message)
+            throw ActionResponse.prerequisiteNotMet(
+                context.message.doWhat(verb: .push)
+            )
         }
 
         // For single object commands, validate the single object
         guard let directObjectRef = context.command.directObject else {
-            let message = context.message.doWhat(verb: .push)
-            throw ActionResponse.prerequisiteNotMet(message)
+            throw ActionResponse.prerequisiteNotMet(
+                context.message.doWhat(verb: .push)
+            )
         }
         guard case .item(let targetItemID) = directObjectRef else {
-            let message = context.message.canOnlyActOnItems(verb: "push")
-            throw ActionResponse.prerequisiteNotMet(message)
+            throw ActionResponse.prerequisiteNotMet(
+                context.message.canOnlyActOnItems(verb: "push")
+            )
         }
 
         // 2. Check if item exists
@@ -55,8 +58,9 @@ public struct PushActionHandler: ActionHandler {
         // For ALL commands, empty directObjects is valid (means nothing to push)
         if !context.command.isAllCommand {
             guard !context.command.directObjects.isEmpty else {
-                let message = context.message.doWhat(verb: .push)
-                return ActionResult(message)
+                return ActionResult(
+                    context.message.doWhat(verb: .push)
+                )
             }
         }
 
@@ -70,8 +74,9 @@ public struct PushActionHandler: ActionHandler {
                 if context.command.isAllCommand {
                     continue  // Skip non-items in ALL commands
                 } else {
-                    let message = context.message.canOnlyActOnItems(verb: "push")
-                    return ActionResult(message)
+                    return ActionResult(
+                        context.message.canOnlyActOnItems(verb: "push")
+                    )
                 }
             }
 

@@ -16,12 +16,14 @@ public struct EatActionHandler: ActionHandler {
     public func validate(context: ActionContext) async throws {
         // Ensure we have a direct object
         guard let directObjectRef = context.command.directObject else {
-            let message = context.message.doWhat(verb: .eat)
-            throw ActionResponse.prerequisiteNotMet(message)
+            throw ActionResponse.prerequisiteNotMet(
+                context.message.doWhat(verb: .eat)
+            )
         }
         guard case .item(let targetItemID) = directObjectRef else {
-            let message = context.message.canOnlyEatFood()
-            throw ActionResponse.prerequisiteNotMet(message)
+            throw ActionResponse.prerequisiteNotMet(
+                context.message.canOnlyEatFood()
+            )
         }
 
         // Check if item exists

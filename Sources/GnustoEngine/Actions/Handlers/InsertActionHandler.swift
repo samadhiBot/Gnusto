@@ -181,8 +181,9 @@ public struct InsertActionHandler: ActionHandler {
         // For ALL commands, empty directObjects is valid (means nothing to insert)
         if !context.command.isAllCommand {
             guard !context.command.directObjects.isEmpty else {
-                let message = context.message.doWhat(verb: .insert)
-                return ActionResult(message)
+                return ActionResult(
+                    context.message.doWhat(verb: .insert)
+                )
             }
         }
 
@@ -196,8 +197,9 @@ public struct InsertActionHandler: ActionHandler {
                 if context.command.isAllCommand {
                     continue  // Skip non-items in ALL commands
                 } else {
-                    let message = context.message.canOnlyActOnItems(verb: "insert")
-                    return ActionResult(message)
+                    return ActionResult(
+                        context.message.canOnlyActOnItems(verb: "insert")
+                    )
                 }
             }
 

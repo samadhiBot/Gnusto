@@ -17,12 +17,14 @@ public struct DrinkActionHandler: ActionHandler {
     public func validate(context: ActionContext) async throws {
         // Ensure we have a direct object
         guard let directObjectRef = context.command.directObject else {
-            let message = context.message.doWhat(verb: .drink)
-            throw ActionResponse.prerequisiteNotMet(message)
+            throw ActionResponse.prerequisiteNotMet(
+                context.message.doWhat(verb: .drink)
+            )
         }
         guard case .item(let targetItemID) = directObjectRef else {
-            let message = context.message.canOnlyDrinkLiquids()
-            throw ActionResponse.prerequisiteNotMet(message)
+            throw ActionResponse.prerequisiteNotMet(
+                context.message.canOnlyDrinkLiquids()
+            )
         }
 
         // Check if item exists
@@ -51,7 +53,9 @@ public struct DrinkActionHandler: ActionHandler {
 
             // Check if container has drinkable contents (either isDrinkable or isEdible for ZIL compatibility)
             let containerContents = await context.engine.items(in: .item(targetItemID))
-            let drinkableContents = containerContents.filter { $0.hasFlag(.isDrinkable) || $0.hasFlag(.isEdible) }
+            let drinkableContents = containerContents.filter {
+                $0.hasFlag(.isDrinkable) || $0.hasFlag(.isEdible)
+            }
 
             guard !drinkableContents.isEmpty else {
                 let message = context.message.nothingToDrinkIn(
@@ -63,8 +67,9 @@ public struct DrinkActionHandler: ActionHandler {
         }
 
         // Item is neither drinkable nor a container with drinkables
-        let message = context.message.cannotDrink(item: targetItem.withDefiniteArticle)
-        throw ActionResponse.prerequisiteNotMet(message)
+        throw ActionResponse.prerequisiteNotMet(
+            context.message.cannotDrink(item: targetItem.withDefiniteArticle)
+        )
     }
 
     /// Processes the "DRINK" command.
@@ -87,7 +92,9 @@ public struct DrinkActionHandler: ActionHandler {
         // Handle container first (prioritize over direct drinkable)
         if targetItem.hasFlag(.isContainer) {
             let containerContents = await context.engine.items(in: .item(targetItemID))
-            let drinkableContents = containerContents.filter { $0.hasFlag(.isDrinkable) || $0.hasFlag(.isEdible) }
+            let drinkableContents = containerContents.filter {
+                $0.hasFlag(.isDrinkable) || $0.hasFlag(.isEdible)
+            }
 
             if let firstDrinkable = drinkableContents.first {
                 // For closed containers, can't drink from them

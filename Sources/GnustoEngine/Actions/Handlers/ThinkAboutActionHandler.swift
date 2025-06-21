@@ -35,8 +35,9 @@ public struct ThinkAboutActionHandler: ActionHandler {
             }
         case .location(_):
             // For now, only allow thinking about items or the player.
-            let message = context.message.canOnlyActOnItems(verb: "think about")
-            throw ActionResponse.prerequisiteNotMet(message)
+            throw ActionResponse.prerequisiteNotMet(
+                context.message.canOnlyActOnItems(verb: "think about")
+            )
         }
     }
 

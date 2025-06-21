@@ -15,8 +15,9 @@ public struct LookInsideActionHandler: ActionHandler {
         }
 
         guard case .item(let targetItemID) = directObjectRef else {
-            let message = context.message.canOnlyLookInsideItems()
-            throw ActionResponse.prerequisiteNotMet(message)
+            throw ActionResponse.prerequisiteNotMet(
+                context.message.canOnlyLookInsideItems()
+            )
         }
 
         // Ensure item exists and is reachable

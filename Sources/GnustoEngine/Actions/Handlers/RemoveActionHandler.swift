@@ -67,8 +67,9 @@ public struct RemoveActionHandler: ActionHandler {
         // For ALL commands, empty directObjects is valid (means nothing to remove)
         if !context.command.isAllCommand {
             guard !context.command.directObjects.isEmpty else {
-                let message = context.message.doWhat(verb: .remove)
-                return ActionResult(message)
+                return ActionResult(
+                    context.message.doWhat(verb: .remove)
+                )
             }
         }
 

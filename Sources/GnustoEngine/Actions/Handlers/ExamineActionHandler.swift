@@ -46,8 +46,9 @@ public struct ExamineActionHandler: ActionHandler {
             // Allow examining self
             return
         default:
-            let message = context.message.canOnlyActOnItems(verb: "examine")
-            throw ActionResponse.prerequisiteNotMet(message)
+            throw ActionResponse.prerequisiteNotMet(
+                context.message.canOnlyActOnItems(verb: "examine")
+            )
         }
     }
 
