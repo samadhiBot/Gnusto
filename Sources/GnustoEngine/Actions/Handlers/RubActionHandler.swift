@@ -22,7 +22,7 @@ public struct RubActionHandler: ActionHandler {
         }
         guard case .item(let targetItemID) = directObjectRef else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.cannotActOnThat(verb: "rub")
+                context.message.cannotDoThat(verb: "rub")
             )
         }
 

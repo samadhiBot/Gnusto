@@ -35,13 +35,13 @@ struct KnockActionHandlerTests {
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // When
-        try await engine.execute("knock door")
+        try await engine.execute("knock on the door")
 
         // Then
         let output = await mockIO.flush()
         expectNoDifference(output, """
-            > knock door
-            You knock on the wooden door, but there's no answer.
+            > knock on the door
+            You knock on the wooden door, but there’s no answer.
             """)
     }
 
@@ -58,12 +58,12 @@ struct KnockActionHandlerTests {
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // When
-        try await engine.execute("knock wall")
+        try await engine.execute("knock on the wall")
 
         // Then
         let output = await mockIO.flush()
         expectNoDifference(output, """
-            > knock wall
+            > knock on the wall
             You knock on the stone wall, but nothing happens.
             """)
     }
@@ -82,12 +82,12 @@ struct KnockActionHandlerTests {
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // When
-        try await engine.execute("knock chest")
+        try await engine.execute("knock on the chest")
 
         // Then
         let output = await mockIO.flush()
         expectNoDifference(output, """
-            > knock chest
+            > knock on the chest
             Knocking on the wooden chest produces a hollow sound.
             """)
     }
@@ -107,12 +107,12 @@ struct KnockActionHandlerTests {
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // When
-        try await engine.execute("knock door")
+        try await engine.execute("knock on the door")
 
         // Then
         let output = await mockIO.flush()
         expectNoDifference(output, """
-            > knock door
+            > knock on the door
             No need to knock, the door is already open.
             """)
     }

@@ -18,7 +18,7 @@ public struct DigActionHandler: ActionHandler {
         if let directObjectRef = context.command.directObject {
             guard case .item(let targetItemID) = directObjectRef else {
                 throw ActionResponse.prerequisiteNotMet(
-                    context.message.cannotActOnThat(verb: "dig")
+                    context.message.cannotDoThat(verb: "dig")
                 )
             }
 

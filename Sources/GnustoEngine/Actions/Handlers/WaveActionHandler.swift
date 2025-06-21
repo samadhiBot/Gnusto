@@ -22,7 +22,7 @@ public struct WaveActionHandler: ActionHandler {
         }
         guard case .item(let targetItemID) = directObjectRef else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.cannotActOnThat(verb: "wave")
+                context.message.cannotDoThat(verb: "wave")
             )
         }
 

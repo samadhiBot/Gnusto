@@ -54,7 +54,7 @@ struct KickActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > kick distant rock
-            You can’t see any distant rock here.
+            You can’t see any such thing.
             """)
     }
 

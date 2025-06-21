@@ -17,12 +17,12 @@ public struct KnockActionHandler: ActionHandler {
         // Knock requires a direct object (what to knock on)
         guard let directObjectRef = context.command.directObject else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.doWhat(verb: .knock)
+                context.message.knockOnWhat()
             )
         }
         guard case .item(let targetItemID) = directObjectRef else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.cannotActOnThat(verb: "knock on")
+                context.message.cannotDoThat(verb: "knock on")
             )
         }
 

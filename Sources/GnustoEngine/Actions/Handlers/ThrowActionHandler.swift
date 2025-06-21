@@ -23,7 +23,7 @@ public struct ThrowActionHandler: ActionHandler {
         }
         guard case .item(let itemToThrowID) = directObjectRef else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.cannotActOnThat(verb: "throw")
+                context.message.cannotDoThat(verb: "throw")
             )
         }
 

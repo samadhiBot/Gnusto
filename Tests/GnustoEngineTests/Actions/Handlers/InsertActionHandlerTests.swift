@@ -954,11 +954,11 @@ struct InsertActionHandlerTests {
         // Arrange: Player holds Box C (open container).
         // Box B is inside Box C. Box A is inside Box B.
         // Command: Put Box C (itemToInsert) into Box A (containerItem).
-        // Expected: "You can’t put Box C in Box A, because Box A is in Box C!"
+        // Expected: "You can't put Box C in Box A, because Box A is in Box C!"
 
         let boxA = Item(  // This is containerItem (Y)
             id: "boxA",
-            .name("box A"),
+            .name("silver box"),
             .in(.item("boxB")),  // A is in B
             .isTakable,
             .isContainer,  // Target for insertion
@@ -966,7 +966,7 @@ struct InsertActionHandlerTests {
         )
         let boxB = Item(
             id: "boxB",
-            .name("box B"),
+            .name("bronze box"),
             .in(.item("boxC")),  // B is in C
             .isContainer,
             .isOpenable,
@@ -974,7 +974,7 @@ struct InsertActionHandlerTests {
         )
         let boxC = Item(  // This is itemToInsert (X)
             id: "boxC",
-            .name("box C"),
+            .name("gold box"),
             .in(.player),  // Held by player
             .isContainer,
             .isOpenable,
@@ -986,14 +986,14 @@ struct InsertActionHandlerTests {
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // Act
-        try await engine.execute("put box C in box A")
+        try await engine.execute("put the gold box inside the silver box")
 
         // Assert Output
         let output = await mockIO.flush()
         expectNoDifference(output, """
-            > put box C in box A
-            You can’t put the box C in the box A, because the box A is
-            inside the box C!
+            > put the gold box inside the silver box
+            You can’t put the gold box in the silver box, because the
+            silver box is inside the gold box.
             """)
 
         // Assert No State Change

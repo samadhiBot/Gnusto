@@ -22,7 +22,7 @@ public struct SqueezeActionHandler: ActionHandler {
         }
         guard case .item(let targetItemID) = directObjectRef else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.cannotActOnThat(verb: "squeeze")
+                context.message.cannotDoThat(verb: "squeeze")
             )
         }
 

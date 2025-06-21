@@ -18,7 +18,7 @@ public struct ClimbOnActionHandler: ActionHandler {
 
         guard case .item(let targetItemID) = directObjectRef else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.cannotActOnThat(verb: "climb on")
+                context.message.cannotDoThat(verb: "climb on")
             )
         }
 

@@ -41,7 +41,8 @@ struct KissActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > kiss princess
-            The beautiful princess doesn’t seem particularly receptive to your affections.
+            The beautiful princess doesn’t seem particularly receptive to
+            your affections.
             """)
     }
 
@@ -59,10 +60,12 @@ struct KissActionHandlerTests {
             You kiss it curiously, but your curiosity remains unsatisfied.
 
             > kiss the pebble
-            You plant a brief kiss on the pebble, yet your lips learn nothing new.
+            You plant a brief kiss on the pebble, yet your lips learn
+            nothing new.
 
             > kiss the pebble
-            You plant a small kiss on the pebble, learning nothing your eyes hadn’t already told you.
+            You plant a small kiss on the pebble, learning nothing your
+            eyes hadn’t already told you.
             """)
     }
 

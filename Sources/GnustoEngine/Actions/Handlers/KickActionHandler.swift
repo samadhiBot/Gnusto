@@ -22,7 +22,7 @@ public struct KickActionHandler: ActionHandler {
         }
         guard case .item(let targetItemID) = directObjectRef else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.cannotActOnThat(verb: "kick")
+                context.message.cannotDoThat(verb: "kick")
             )
         }
 

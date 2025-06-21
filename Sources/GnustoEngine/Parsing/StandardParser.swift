@@ -326,10 +326,8 @@ public struct StandardParser: Parser {
 
      private func isGrammarError(_ error: ParseError) -> Bool {
          switch error {
-         case .badGrammar:
-             return true
-         default:
-             return false
+         case .badGrammar: true
+         default: false
          }
      }
 
@@ -503,8 +501,10 @@ public struct StandardParser: Parser {
 
         if tokenCursor < tokens.count {
             return .failure(
-                .badGrammar(
-                    "Unexpected words found after command: '\(Array(tokens[tokenCursor...]).joined(separator: " "))'"
+                .badGrammar("""
+                    Unexpected words found after command:
+                    '\(Array(tokens[tokenCursor...]).joined(separator: " "))'
+                    """
                 )
             )
         }
@@ -704,7 +704,11 @@ public struct StandardParser: Parser {
             // This allows unknown nouns to be handled by the resolution phase
             let finalNoun = noun ?? phrase.last
             guard let finalNoun = finalNoun else { return nil }
-            return (noun: finalNoun, modifiers: mods)
+
+            // If we used the fallback noun (phrase.last), don't include it as a modifier too
+            let finalMods = noun != nil ? mods : mods.filter { $0 != finalNoun }
+
+            return (noun: finalNoun, modifiers: finalMods)
         }
 
         return result
@@ -716,10 +720,11 @@ public struct StandardParser: Parser {
         from phrase: [String],
         vocabulary: Vocabulary
     ) -> (noun: String?, mods: [String]) {
-        let significantPhrase = phrase.filter { !vocabulary.noiseWords.contains($0) }
+        // Note: Input phrase has already been processed by removeNoise, so no need to filter again
+        let significantPhrase = phrase
         guard !significantPhrase.isEmpty else { return (nil, []) }
 
-                        // First, check if the entire phrase (joined) matches any known item or location
+        // First, check if the entire phrase (joined) matches any known item or location
         // Only do this for multi-word phrases to avoid interfering with single-word cases
         if significantPhrase.count > 1 {
             let fullPhrase = significantPhrase.joined(separator: " ").lowercased()
@@ -747,7 +752,15 @@ public struct StandardParser: Parser {
             }
         }
 
-                guard let lastNounIndex = knownNounIndices.last else {
+        guard let lastNounIndex = knownNounIndices.last else {
+            // No known nouns found, but for multi-word phrases, try the full phrase as a noun
+            // This handles cases like "box c" where the individual words don't match
+            // but the combination might refer to a specific item
+            if significantPhrase.count > 1 {
+                let fullPhrase = significantPhrase.joined(separator: " ").lowercased()
+                return (fullPhrase, [])
+            }
+
             let potentialMods = significantPhrase.filter { word in
                 !vocabulary.items.keys.contains(word) &&
                 !vocabulary.locationNames.keys.contains(word) &&
@@ -931,8 +944,6 @@ public struct StandardParser: Parser {
         // 4. Scope, Conditions, Modifiers, and Disambiguation
         var resolvedAndScopedEntities: [EntityReference] = []
 
-
-
         for entityRef in potentialEntities {
             switch entityRef {
             case .item(let itemID):
@@ -983,7 +994,7 @@ public struct StandardParser: Parser {
             }
         }
 
-                                if resolvedAndScopedEntities.isEmpty {
+        if resolvedAndScopedEntities.isEmpty {
             // Special case: If modifiers are provided, check if the full phrase (modifiers + noun)
             // matches a synonym for any item that exists but is not accessible
             if !modifiers.isEmpty {

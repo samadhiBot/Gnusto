@@ -17,7 +17,7 @@ struct LaughActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > laugh
-            You laugh heroically at impossible circumstances.
+            You laugh heroically at your impossible circumstances.
 
             > laugh
             You laugh brazenly at your predicament.

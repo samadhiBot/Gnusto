@@ -131,6 +131,7 @@ public struct Vocabulary: Codable, Equatable, Sendable {
         "for",
         "from",
         "in",
+        "inside",
         "into",
         "on",
         "onto",
@@ -274,6 +275,11 @@ public struct Vocabulary: Codable, Equatable, Sendable {
                     pattern: [.verb, .directObject, .preposition, .indirectObject],
                     directObjectConditions: .allowsMultiple,
                     requiredPreposition: "into"
+                ),
+                SyntaxRule(
+                    pattern: [.verb, .directObject, .preposition, .indirectObject],
+                    directObjectConditions: .allowsMultiple,
+                    requiredPreposition: "inside"
                 ),
             ],
             requiresLight: true
@@ -679,7 +685,10 @@ public struct Vocabulary: Codable, Equatable, Sendable {
             synonyms: "rap", "tap",
             syntax: [
                 SyntaxRule(.verb),
-                SyntaxRule(.verb, .directObject),
+                SyntaxRule(
+                    pattern: [.verb, .preposition, .directObject],
+                    requiredPreposition: "on"
+                ),
             ],
             requiresLight: true
         ),
@@ -1066,12 +1075,46 @@ public struct Vocabulary: Codable, Equatable, Sendable {
         let lowercasedName = item.name.lowercased()
         let lowercasedID = itemID.rawValue.lowercased()
 
-        // Add name, ID, and synonyms as potential nouns
+        // Add full name as a potential noun (for multi-word names like "gold box")
         self.items[lowercasedName, default: []].insert(itemID)
-        self.items[lowercasedID, default: []].insert(itemID) // Add item ID
-        for synonym in item.synonyms {
-            self.items[synonym.lowercased(), default: []].insert(itemID)
+
+        // Add individual words from multi-word names
+        // This allows "box" to match "gold box" when used with proper modifiers
+        let nameWords = lowercasedName.split(separator: " ").map(String.init)
+        if nameWords.count > 1 {
+            // For multi-word names, add the last word as the primary noun
+            // and earlier words as potential adjectives
+            if let lastWord = nameWords.last {
+                self.items[lastWord, default: []].insert(itemID)
+            }
+
+            // Add earlier words as adjectives so they can be used as modifiers
+            for word in nameWords.dropLast() {
+                self.adjectives[word, default: []].insert(itemID)
+            }
         }
+
+        // Add item ID as a potential noun
+        self.items[lowercasedID, default: []].insert(itemID)
+
+        // Add synonyms as potential nouns
+        for synonym in item.synonyms {
+            let lowercasedSynonym = synonym.lowercased()
+            self.items[lowercasedSynonym, default: []].insert(itemID)
+
+            // Handle multi-word synonyms similarly
+            let synonymWords = lowercasedSynonym.split(separator: " ").map(String.init)
+            if synonymWords.count > 1 {
+                if let lastWord = synonymWords.last {
+                    self.items[lastWord, default: []].insert(itemID)
+                }
+                for word in synonymWords.dropLast() {
+                    self.adjectives[word, default: []].insert(itemID)
+                }
+            }
+        }
+
+        // Add explicit adjectives
         for adjective in item.adjectives {
             let lowercasedAdj = adjective.lowercased()
             self.adjectives[lowercasedAdj, default: []].insert(itemID)

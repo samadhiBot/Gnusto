@@ -40,7 +40,7 @@ extension VerbID {
     public static let inventory = VerbID("inventory")
     public static let kick = VerbID("kick")
     public static let kiss = VerbID("kiss")
-    public static let knock = VerbID("knock on")
+    public static let knock = VerbID("knock")
     public static let listen = VerbID("listen")
     public static let lock = VerbID("lock")
     public static let look = VerbID("look")

@@ -22,7 +22,7 @@ public struct KissActionHandler: ActionHandler {
         }
         guard case .item(let targetItemID) = directObjectRef else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.cannotActOnThat(verb: "kiss")
+                context.message.cannotDoThat(verb: "kiss")
             )
         }
 

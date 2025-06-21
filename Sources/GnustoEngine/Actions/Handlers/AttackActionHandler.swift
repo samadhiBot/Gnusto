@@ -23,7 +23,7 @@ public struct AttackActionHandler: ActionHandler {
         }
         guard case .item(let targetItemID) = directObjectRef else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.cannotActOnThat(verb: "attack")
+                context.message.cannotDoThat(verb: "attack")
             )
         }
 

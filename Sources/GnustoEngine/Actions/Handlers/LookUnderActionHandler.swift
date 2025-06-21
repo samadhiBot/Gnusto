@@ -18,7 +18,7 @@ public struct LookUnderActionHandler: ActionHandler {
 
         guard case .item(let targetItemID) = indirectObjectRef else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.cannotActOnThat(verb: "look under")
+                context.message.cannotDoThat(verb: "look under")
             )
         }
 

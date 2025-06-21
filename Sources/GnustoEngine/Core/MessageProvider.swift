@@ -126,7 +126,7 @@ open class MessageProvider: @unchecked Sendable {
 
     open func badGrammar(text: String) -> String {
         log("badGrammar(text: '\(text)')")
-        return text
+        return "I don't understand that sentence."
     }
 
     open func blowGeneral() -> String {
@@ -177,8 +177,8 @@ open class MessageProvider: @unchecked Sendable {
         return "\(item.capitalizedFirst) catches fire and burns to ashes."
     }
 
-    open func cannotActOnThat(verb: String) -> String {
-        log("cannotActOnThat(verb: '\(verb)')")
+    open func cannotDoThat(verb: String) -> String {
+        log("cannotDoThat(verb: '\(verb)')")
         return "You can't \(verb) that."
     }
 
@@ -868,7 +868,7 @@ open class MessageProvider: @unchecked Sendable {
 
     open func knockOnClosedDoor(door: String) -> String {
         log("knockOnClosedDoor(door: '\(door)')")
-        return "You knock on '\(door)', but there's no answer."
+        return "You knock on \(door), but there's no answer."
     }
 
     open func knockOnContainer(container: String) -> String {
@@ -883,12 +883,17 @@ open class MessageProvider: @unchecked Sendable {
 
     open func knockOnLockedDoor(door: String) -> String {
         log("knockOnLockedDoor(door: '\(door)')")
-        return "You knock on '\(door)', but nobody's home."
+        return "You knock on \(door), but nobody's home."
     }
 
     open func knockOnOpenDoor(door: String) -> String {
         log("knockOnOpenDoor(door: '\(door)')")
         return "No need to knock, \(door) is already open."
+    }
+
+    open func knockOnWhat() -> String {
+        log("knockOnWhat()")
+        return "Knock on what?"
     }
 
     open func laughResponse() -> String {
@@ -902,9 +907,9 @@ open class MessageProvider: @unchecked Sendable {
             "You laugh boldly at the forces arrayed against you.",
             "You laugh brazenly at your predicament.",
             "You laugh courageously in spite of everything.",
-            "You laugh defiantly at fate itself.",
+            "You laugh defiantly at Fate itself.",
             "You laugh fearlessly at the abyss.",
-            "You laugh heroically at impossible circumstances.",
+            "You laugh heroically at your impossible circumstances.",
             "You laugh in the face of cosmic indifference.",
             "You laugh in the face of danger.",
             "You laugh in the face of overwhelming odds.",
@@ -1030,7 +1035,7 @@ open class MessageProvider: @unchecked Sendable {
 
     open func parseUnknownVerb(verb: String) -> String {
         log("parseUnknownVerb(verb: '\(verb)')")
-        return "I don't know the verb '(verb)."
+        return "I don't know the verb '\(verb)'."
     }
 
     open func playerCannotCarryMore() -> String {

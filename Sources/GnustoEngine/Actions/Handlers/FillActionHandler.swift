@@ -23,7 +23,7 @@ public struct FillActionHandler: ActionHandler {
         }
         guard case .item(let containerItemID) = directObjectRef else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.cannotActOnThat(verb: "fill")
+                context.message.cannotDoThat(verb: "fill")
             )
         }
 

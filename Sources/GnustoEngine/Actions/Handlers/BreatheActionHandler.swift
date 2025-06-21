@@ -16,13 +16,13 @@ public struct BreatheActionHandler: ActionHandler {
         // Breathe should not take any objects
         if context.command.directObject != nil {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.cannotActOnThat(verb: "breathe")
+                context.message.cannotDoThat(verb: "breathe")
             )
         }
 
         if context.command.indirectObject != nil {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.cannotActOnThat(verb: "breathe")
+                context.message.cannotDoThat(verb: "breathe")
             )
         }
     }

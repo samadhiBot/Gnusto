@@ -31,7 +31,7 @@ public struct ClimbActionHandler: ActionHandler {
             targetItemID = itemID
         case .location:
             throw ActionResponse.prerequisiteNotMet(
-                context.message.cannotActOnThat(verb: "climb")
+                context.message.cannotDoThat(verb: "climb")
             )
         case .player:
             throw ActionResponse.prerequisiteNotMet(

@@ -26,7 +26,7 @@ public struct CutActionHandler: ActionHandler {
         }
         guard case .item(let targetItemID) = directObjectRef else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.cannotActOnThat(verb: "cut")
+                context.message.cannotDoThat(verb: "cut")
             )
         }
 

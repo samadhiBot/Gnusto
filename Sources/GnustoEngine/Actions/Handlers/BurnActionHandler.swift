@@ -58,7 +58,7 @@ public struct BurnActionHandler: ActionHandler {
             case .item(let itemID) = targetObjectID
         else {
             return ActionResult(
-                context.message.cannotActOnThat(verb: "burn")
+                context.message.cannotDoThat(verb: "burn")
             )
         }
 

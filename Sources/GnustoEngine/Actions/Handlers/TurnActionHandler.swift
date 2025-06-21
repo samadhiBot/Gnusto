@@ -22,7 +22,7 @@ public struct TurnActionHandler: ActionHandler {
         }
         guard case .item(let targetItemID) = directObjectRef else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.cannotActOnThat(verb: "turn")
+                context.message.cannotDoThat(verb: "turn")
             )
         }
 

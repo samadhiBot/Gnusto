@@ -22,7 +22,7 @@ public struct ShakeActionHandler: ActionHandler {
         }
         guard case .item(let targetItemID) = directObjectRef else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.cannotActOnThat(verb: "shake")
+                context.message.cannotDoThat(verb: "shake")
             )
         }
 
