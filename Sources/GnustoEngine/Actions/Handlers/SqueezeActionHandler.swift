@@ -55,35 +55,15 @@ public struct SqueezeActionHandler: ActionHandler {
             if targetItem.hasFlag(.isCharacter) {
                 // Squeezing characters - not advisable
                 context.message.squeezeCharacter(character: targetItem.withDefiniteArticle)
-            } else if targetItem.hasFlag(.isSponge) {
-                // Special message for sponges
-                context.message.squeezeSponge(item: targetItem.withDefiniteArticle)
-            } else if targetItem.hasFlag(.isLiquidContainer) {
-                // Special message for liquid containers
-                context.message.squeezeLiquidContainer(item: targetItem.withDefiniteArticle)
-            } else if targetItem.hasFlag(.isSoft) {
-                // Special message for soft objects
-                context.message.squeezeSoftObject(item: targetItem.withDefiniteArticle)
             } else {
                 // Generic squeezing response for objects
-                context.message.squeezeHardObject(item: targetItem.withDefiniteArticle)
+                context.message.squeezeItem(item: targetItem.withDefiniteArticle)
             }
 
         return ActionResult(
-            message: message,
-            changes: [
-                await context.engine.setFlag(.isTouched, on: targetItem),
-                await context.engine.updatePronouns(to: targetItem),
-            ]
+            message,
+            await context.engine.setFlag(.isTouched, on: targetItem),
+            await context.engine.updatePronouns(to: targetItem)
         )
-    }
-
-    /// Performs any post-processing after the squeeze action completes.
-    ///
-    /// Currently no post-processing is needed for basic squeezing.
-    ///
-    /// - Parameter context: The action context for the current action.
-    public func postProcess(context: ActionContext) async throws {
-        // No post-processing needed for squeeze
     }
 }

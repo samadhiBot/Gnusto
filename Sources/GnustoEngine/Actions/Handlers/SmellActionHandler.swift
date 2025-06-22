@@ -18,14 +18,13 @@ public struct SmellActionHandler: ActionHandler {
     /// - Throws: `ActionResponse.prerequisiteNotMet` if the direct object is not an item.
     public func validate(context: ActionContext) async throws {
         // If a direct object is provided, it should be an item.
-        if let directObjectRef = context.command.directObject {
-            guard case .item(_) = directObjectRef else {
-                throw ActionResponse.prerequisiteNotMet(
-                    context.message.smellCanOnlySmellItems()
-                )
-            }
-            // Further validation (existence, reachability) could be added if desired,
-            // but default SMELL is often lenient.
+        guard
+            let directObjectRef = context.command.directObject,
+            case .item(let itemID) = directObjectRef
+        else { return }
+
+        guard await context.engine.playerCanReach(itemID) else {
+            throw ActionResponse.itemNotAccessible(itemID)
         }
     }
 
@@ -42,17 +41,20 @@ public struct SmellActionHandler: ActionHandler {
     /// - Parameter context: The `ActionContext` for the current action.
     /// - Returns: An `ActionResult` with a default smell-related message.
     public func process(context: ActionContext) async throws -> ActionResult {
-        let message = if let directObjectRef = context.command.directObject {
-            if case .item(_) = directObjectRef {
-                // If smelling a specific item, give a generic response.
-                // Specific items could be handled by ItemEventHandler or custom handlers.
-                context.message.smellsAverage()
-            } else {
-                // This case should ideally be caught by validate.
-                context.message.cannotSmellThat()
+        let message: String
+        if let directObjectRef = context.command.directObject {
+            switch directObjectRef {
+            case .item(let itemID):
+                let item = try await context.engine.item(itemID)
+                message = context.message.smellsAverage(item: item.withDefiniteArticle)
+            case .location(let locationID):
+                _ = try await context.engine.location(locationID)
+                message = context.message.smellNothingUnusual()
+            case .player:
+                message = context.message.smellMyself()
             }
         } else {
-            context.message.smellNothingUnusual()
+            message = context.message.smellNothingUnusual()
         }
 
         return ActionResult(message)

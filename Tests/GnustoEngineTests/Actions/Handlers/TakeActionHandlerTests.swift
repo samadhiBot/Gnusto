@@ -426,7 +426,7 @@ struct TakeActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > take chip from statue
-            You can’t take things out of the stone statue.
+            You can’t take things from the stone statue.
             """)
 
         // Assert No State Change

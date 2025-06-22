@@ -17,13 +17,16 @@ struct DanceActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > dance
-            You cut a rug with style and panache.
+            You dance with an interpretive boldness that transcends
+            conventional movement.
 
             > dance
-            You perform a modern interpretive dance.
+            You dance with admirable commitment to the full spectrum of
+            human motion.
 
             > dance
-            You break into spontaneous choreography.
+            You dance with the natural grace of one unencumbered by
+            traditional technique.
             """)
     }
 }

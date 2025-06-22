@@ -39,57 +39,7 @@ struct WaveActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > wave distant wand
-            You can’t see any distant wand here.
-            """)
-    }
-
-    @Test("Wave wand shows magical message")
-    func testWaveWandShowsMagicalMessage() async throws {
-        // Given
-        let wand = Item(
-            id: "wand",
-            .name("magic wand"),
-            .in(.location(.startRoom)),
-            .isTakable,
-            .isWand
-        )
-
-        let game = MinimalGame(items: wand)
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
-
-        // When
-        try await engine.execute("wave wand")
-
-        // Then
-        let output = await mockIO.flush()
-        expectNoDifference(output, """
-            > wave wand
-            You wave the magic wand dramatically, but nothing magical happens.
-            """)
-    }
-
-    @Test("Wave staff shows magical message")
-    func testWaveStaffShowsMagicalMessage() async throws {
-        // Given
-        let staff = Item(
-            id: "staff",
-            .name("wooden staff"),
-            .in(.location(.startRoom)),
-            .isTakable,
-            .isStaff
-        )
-
-        let game = MinimalGame(items: staff)
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
-
-        // When
-        try await engine.execute("wave staff")
-
-        // Then
-        let output = await mockIO.flush()
-        expectNoDifference(output, """
-            > wave staff
-            You wave the wooden staff dramatically, but nothing magical happens.
+            You can’t see any such thing.
             """)
     }
 
@@ -143,31 +93,6 @@ struct WaveActionHandlerTests {
             """)
     }
 
-    @Test("Wave flag shows appropriate message")
-    func testWaveFlagShowsAppropriateMessage() async throws {
-        // Given
-        let flag = Item(
-            id: "flag",
-            .name("red flag"),
-            .in(.location(.startRoom)),
-            .isTakable,
-            .isFlag
-        )
-
-        let game = MinimalGame(items: flag)
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
-
-        // When
-        try await engine.execute("wave flag")
-
-        // Then
-        let output = await mockIO.flush()
-        expectNoDifference(output, """
-            > wave flag
-            You wave the red flag around. It’s not particularly impressive.
-            """)
-    }
-
     @Test("Wave fixed object shows different message")
     func testWaveFixedObjectShowsDifferentMessage() async throws {
         // Given
@@ -187,6 +112,9 @@ struct WaveActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > wave tree
+            You can’t wave the large tree around - it’s not something you
+            + You can’t wave the large tree around - it's not something you can pick up and wave.
+            − can pick up and wave.
             You can’t wave the large tree around - it's not something you can pick up and wave.
             """)
     }
@@ -198,8 +126,7 @@ struct WaveActionHandlerTests {
             id: "wand",
             .name("magic wand"),
             .in(.location(.startRoom)),
-            .isTakable,
-            .isWand
+            .isTakable
         )
 
         let game = MinimalGame(items: wand)

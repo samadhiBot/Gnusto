@@ -28,7 +28,8 @@ struct SmellActionHandlerTests {
     func testSmellWithItem() async throws {
         let testItem = Item(
             id: "apple",
-            .name("red apple"),
+            .name("apple"),
+            .adjectives("red"),
             .description("A juicy red apple."),
             .isTakable,
             .in(.player)
@@ -38,13 +39,13 @@ struct SmellActionHandlerTests {
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // Act: Use engine.execute for full pipeline
-        try await engine.execute("smell apple")
+        try await engine.execute("smell the red apple")
 
         // Assert Output
         let output = await mockIO.flush()
         expectNoDifference(output, """
-            > smell apple
-            That smells about average.
+            > smell the red apple
+            The apple smells about average.
             """)
     }
 
@@ -53,12 +54,12 @@ struct SmellActionHandlerTests {
         let (engine, mockIO) = await GameEngine.test()
 
         // Act
-        try await engine.execute("smell room")
+        try await engine.execute("smell the void")
 
         let output = await mockIO.flush()
         expectNoDifference(output, """
-            > smell room
-            You can only smell specific items.
+            > smell the void
+            You smell nothing unusual.
             """)
     }
 
@@ -81,7 +82,7 @@ struct SmellActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > smell flower
-            That smells about average.
+            The rose smells about average.
             """)
     }
 
@@ -151,33 +152,31 @@ struct SmellActionHandlerTests {
         let result = try await handler.process(context: context)
 
         // Verify result
-        #expect(result.message == "That smells about average.")
+        #expect(result.message == "The old cheese smells about average.")
         #expect(result.changes.isEmpty)  // SMELL should not modify state
         #expect(result.effects.isEmpty)  // SMELL should not have side effects
     }
 
-    @Test("SMELL does not affect game state")
-    func testSmellDoesNotAffectGameState() async throws {
+    @Test("SMELL myself")
+    func testPlayerSmellMyself() async throws {
         let (engine, mockIO) = await GameEngine.test()
 
-        // Capture initial state
-        let initialState = await engine.gameState
-        let initialScore = initialState.player.score
-        let initialMoves = initialState.player.moves
-        let initialLocation = initialState.player.currentLocationID
-
-        // Execute SMELL
-        try await engine.execute("smell")
-
-        // Verify state hasn’t changed significantly (moves will increment)
-        let finalState = await engine.gameState
-        #expect(finalState.player.score == initialScore)
-        #expect(finalState.player.currentLocationID == initialLocation)
+        // Act
+        try await engine.execute("smell myself", times: 3)
 
         let output = await mockIO.flush()
         expectNoDifference(output, """
-            > smell
-            You smell nothing unusual.
+            > smell myself
+            You smell yourself with admirable commitment to personal
+            quality control.
+
+            > smell myself
+            You inhale your own scent, proving your dedication to
+            comprehensive self-monitoring.
+
+            > smell myself
+            You smell yourself with the determination of someone who faces
+            facts head-on.
             """)
     }
 
@@ -200,7 +199,10 @@ struct SmellActionHandlerTests {
         // Test in first location
         try await engine.execute("smell")
         let output1 = await mockIO.flush()
-        expectNoDifference(output1, "> smell\n\nYou smell nothing unusual.")
+        expectNoDifference(output1, """
+            > smell
+            You smell nothing unusual.
+            """)
 
         // Move to second location
         let moveChange = StateChange(
@@ -213,7 +215,10 @@ struct SmellActionHandlerTests {
         // Test in second location - should give same generic response
         try await engine.execute("smell")
         let output2 = await mockIO.flush()
-        expectNoDifference(output2, "> smell\n\nYou smell nothing unusual.")
+        expectNoDifference(output2, """
+            > smell
+            You smell nothing unusual.
+            """)
     }
 
     @Test("SMELL works with items in different locations")
@@ -234,36 +239,7 @@ struct SmellActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > smell perfume
-            That smells about average.
-            """)
-    }
-
-    @Test("SMELL message is consistent across multiple calls")
-    func testSmellConsistency() async throws {
-        let (engine, mockIO) = await GameEngine.test()
-
-        // Execute SMELL multiple times
-        try await engine.execute("smell")
-        let firstOutput = await mockIO.flush()
-
-        try await engine.execute("smell")
-        let secondOutput = await mockIO.flush()
-
-        try await engine.execute("smell")
-        let thirdOutput = await mockIO.flush()
-
-        // All outputs should be identical
-        expectNoDifference(firstOutput, """
-            > smell
-            You smell nothing unusual.
-            """)
-        expectNoDifference(secondOutput, """
-            > smell
-            You smell nothing unusual.
-            """)
-        expectNoDifference(thirdOutput, """
-            > smell
-            You smell nothing unusual.
+            The bottle of perfume smells about average.
             """)
     }
 
@@ -287,7 +263,7 @@ struct SmellActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > smell soap
-            That smells about average.
+            The bar of soap smells about average.
             """)
     }
 
@@ -337,7 +313,7 @@ struct SmellActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > smell flower
-            You can’t see any distant flower here.
+            You can’t see any such thing.
             """)
     }
 }

@@ -51,26 +51,16 @@ public struct WaveActionHandler: ActionHandler {
         let targetItem = try await context.engine.item(targetItemID)
 
         // Determine appropriate response based on object type and properties
-        let message =
-            if targetItem.hasFlag(.isCharacter) {
-                // Waving at characters
-                context.message.waveCharacter(character: targetItem.withDefiniteArticle)
-            } else if !targetItem.hasFlag(.isTakable) {
-                // Fixed objects can't be waved
-                context.message.waveFixedObject(item: targetItem.withDefiniteArticle)
-            } else if targetItem.hasFlag(.isWand) || targetItem.hasFlag(.isStaff) {
-                // Magical items
-                context.message.waveMagicalItem(item: targetItem.withDefiniteArticle)
-            } else if targetItem.hasFlag(.isWeapon) {
-                // Weapons are brandished
-                context.message.waveWeapon(item: targetItem.withDefiniteArticle)
-            } else if targetItem.hasFlag(.isFlag) {
-                // Flags have their own message
-                context.message.waveFlag(item: targetItem.withDefiniteArticle)
-            } else {
-                // Generic waving response for other takable objects
-                context.message.waveFixedObject(item: targetItem.withDefiniteArticle)
-            }
+        let message = if !targetItem.hasFlag(.isTakable) {
+            // Fixed objects can't be waved
+            context.message.waveFixedObject(item: targetItem.withDefiniteArticle)
+        } else if targetItem.hasFlag(.isWeapon) {
+            // Weapons are brandished
+            context.message.waveWeapon(item: targetItem.withDefiniteArticle)
+        } else {
+            // Generic waving response for other takable objects
+            context.message.waveObject(item: targetItem.withDefiniteArticle)
+        }
 
         return ActionResult(
             message: message,
@@ -79,14 +69,5 @@ public struct WaveActionHandler: ActionHandler {
                 await context.engine.updatePronouns(to: targetItem),
             ]
         )
-    }
-
-    /// Performs any post-processing after the wave action completes.
-    ///
-    /// Currently no post-processing is needed for basic waving.
-    ///
-    /// - Parameter context: The action context for the current action.
-    public func postProcess(context: ActionContext) async throws {
-        // No post-processing needed for wave
     }
 }

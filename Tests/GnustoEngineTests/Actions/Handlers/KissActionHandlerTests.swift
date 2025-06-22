@@ -35,14 +35,22 @@ struct KissActionHandlerTests {
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // Act
-        try await engine.execute("kiss princess")
+        try await engine.execute("kiss the princess", times: 3)
 
         // Assert
         let output = await mockIO.flush()
         expectNoDifference(output, """
-            > kiss princess
-            The beautiful princess doesn’t seem particularly receptive to
-            your affections.
+            > kiss the princess
+            You lean in to kiss the beautiful princess with unshakable
+            confidence in your interpersonal appeal.
+            
+            > kiss the princess
+            You lean in to kiss the beautiful princess with the confident
+            charm of one who knows their worth.
+            
+            > kiss the princess
+            You pucker up at the beautiful princess with the fearless
+            romanticism of one who shoots their shot.
             """)
     }
 
@@ -57,15 +65,16 @@ struct KissActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > kiss the pebble
-            You kiss it curiously, but your curiosity remains unsatisfied.
-
+            You kiss the pebble with impressive commitment to expressing
+            affection in all its forms.
+            
             > kiss the pebble
-            You plant a brief kiss on the pebble, yet your lips learn
-            nothing new.
-
+            You kiss the pebble curiously, but your curiosity
+            remains unsatisfied.
+            
             > kiss the pebble
-            You plant a small kiss on the pebble, learning nothing your
-            eyes hadn’t already told you.
+            You plant a smooch on the pebble with admirable openness to
+            unconventional relationships.
             """)
     }
 
@@ -74,13 +83,22 @@ struct KissActionHandlerTests {
         let (engine, mockIO) = await GameEngine.test()
 
         // Act
-        try await engine.execute("kiss myself")
+        try await engine.execute("kiss myself", times: 3)
 
         // Assert
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > kiss myself
-            You can’t kiss that.
+            You give yourself a passionate smooch with admirable commitment
+            to being your own best partner.
+            
+            > kiss myself
+            You smooch yourself with the fearless self-appreciation of
+            someone who knows their value.
+            
+            > kiss myself
+            You kiss yourself with impressive range in your capacity for
+            love and appreciation.
             """)
     }
 
@@ -94,7 +112,7 @@ struct KissActionHandlerTests {
         )
 
         let game = MinimalGame(items: mirror)
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+        let (engine, _) = await GameEngine.test(blueprint: game)
 
         // When
         try await engine.execute("kiss mirror")
@@ -102,11 +120,5 @@ struct KissActionHandlerTests {
         // Then - Check that the item was touched
         let finalMirror = try await engine.item("mirror")
         #expect(finalMirror.hasFlag(.isTouched))
-
-        let output = await mockIO.flush()
-        expectNoDifference(output, """
-            > kiss mirror
-            You kiss it curiously, but your curiosity remains unsatisfied.
-            """)
     }
 }

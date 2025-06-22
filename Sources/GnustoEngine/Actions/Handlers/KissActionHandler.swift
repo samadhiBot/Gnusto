@@ -20,6 +20,9 @@ public struct KissActionHandler: ActionHandler {
                 context.message.doWhat(verb: .kiss)
             )
         }
+
+        if case .player = directObjectRef { return }
+
         guard case .item(let targetItemID) = directObjectRef else {
             throw ActionResponse.prerequisiteNotMet(
                 context.message.cannotDoThat(verb: "kiss")

@@ -16,7 +16,8 @@ struct CryActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > cry
-            You bawl your eyes out, which is somewhat cathartic.
+            You shed tears with the confident vulnerability of a
+            true empath.
             """)
     }
 
@@ -31,13 +32,16 @@ struct CryActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > cry
-            You bawl your eyes out, which is somewhat cathartic.
+            You shed tears with the confident vulnerability of a
+            true empath.
 
             > cry
-            You sob dramatically, and feel a little better.
+            You cry with the authentic passion of someone unafraid to
+            feel deeply.
 
             > cry
-            You weep bitter tears.
+            You weep beautifully, demonstrating your impressive range
+            of expression.
             """)
     }
 }

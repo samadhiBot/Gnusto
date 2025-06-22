@@ -225,11 +225,6 @@ extension ItemAttribute {
         ItemAttribute(id: .isFighting, rawValue: true)
     }
 
-    /// Is a flag that can be waved.
-    public static var isFlag: ItemAttribute {
-        ItemAttribute(id: .isFlag, rawValue: true)
-    }
-
     /// BURNBIT / FLAMEBIT: Is flammable or burning.
     public static var isFlammable: ItemAttribute {
         ItemAttribute(id: .isFlammable, rawValue: true)
@@ -355,16 +350,6 @@ extension ItemAttribute {
         ItemAttribute(id: .isSoft, rawValue: true)
     }
 
-    /// Is a sponge that can absorb and release water.
-    public static var isSponge: ItemAttribute {
-        ItemAttribute(id: .isSponge, rawValue: true)
-    }
-
-    /// Is a magical staff that can be waved.
-    public static var isStaff: ItemAttribute {
-        ItemAttribute(id: .isStaff, rawValue: true)
-    }
-
     /// SURFACEBIT: Items can be placed *on* it.
     public static var isSurface: ItemAttribute {
         ItemAttribute(id: .isSurface, rawValue: true)
@@ -403,11 +388,6 @@ extension ItemAttribute {
     /// VOWELBIT: Name starts with vowel (for "an").
     public static var startsWithVowel: ItemAttribute {
         ItemAttribute(id: .startsWithVowel, rawValue: true)
-    }
-
-    /// Is a magical wand that can be waved.
-    public static var isWand: ItemAttribute {
-        ItemAttribute(id: .isWand, rawValue: true)
     }
 
     /// WEAPONBIT: Is a weapon.

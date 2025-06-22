@@ -17,13 +17,16 @@ struct CurseActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > curse
-            You curse the fates that brought you here.
+            You let loose a string of expletives that reveals an impressive
+            technical proficiency.
 
             > curse
-            You swear like a sailor. Very cathartic.
+            You curse with the fluency of one comfortable with all
+            registers of language.
 
             > curse
-            You curse fluently in several languages.
+            You unleash expletives with the boldness of one who knows
+            their craft.
             """)
     }
 
@@ -38,7 +41,8 @@ struct CurseActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > curse the pebble
-            You damn the pebble to the seven hells.
+            You direct profanity at the pebble with that kind of strategic
+            thinking that gets results.
             """)
     }
 

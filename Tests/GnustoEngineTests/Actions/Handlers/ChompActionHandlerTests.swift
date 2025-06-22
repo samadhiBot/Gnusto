@@ -27,13 +27,16 @@ struct ChompActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > chomp
-            You chomp at the air for everyone to see.
+            You chomp with a conviction that makes reality itself
+            seem negotiable.
 
             > chomp
-            You clench your fists and gnash your teeth.
+            You chomp enthusiastically at the air, flexing your impressive
+            jaw strength.
 
             > chomp
-            You practice your chomping technique.
+            You gnash your teeth with the passion of one who believes in
+            their vision.
             """)
     }
 
@@ -48,7 +51,8 @@ struct ChompActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > chomp
-            You chomp at the air for everyone to see.
+            You chomp with a conviction that makes reality itself
+            seem negotiable.
             """)
     }
 
@@ -63,8 +67,8 @@ struct ChompActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > chomp the pebble
-            You bite the pebble. Your teeth don’t make much of
-            an impression.
+            You chomp the pebble with the fearless innovation of someone
+            unbound by convention.
             """)
     }
 }

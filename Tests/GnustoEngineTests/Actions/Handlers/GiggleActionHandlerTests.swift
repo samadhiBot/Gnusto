@@ -16,7 +16,8 @@ struct GiggleActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > giggle
-            You giggle uncontrollably. How embarrassing!
+            You chuckle with the fearless delight of someone who finds
+            things funny that others do not.
             """)
     }
 
@@ -31,13 +32,15 @@ struct GiggleActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > giggle
-            You giggle uncontrollably. How embarrassing!
+            You chuckle with the fearless delight of someone who finds
+            things funny that others do not.
 
             > giggle
-            You snicker quietly. How mischievous!
+            You chuckle with an appreciation for life’s subtle ironies.
 
             > giggle
-            You chortle with delight.
+            You snicker with the discerning wit of someone who sees the
+            bigger picture.
             """)
     }
 }

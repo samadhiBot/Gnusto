@@ -15,21 +15,6 @@ struct SingActionHandlerTests {
 
     // MARK: - Tests
 
-    @Test("SING command")
-    func testSing() async throws {
-        let (engine, mockIO) = await GameEngine.test()
-
-        // Act
-        try await engine.execute("sing")
-
-        // Assert
-        let output = await mockIO.flush()
-        expectNoDifference(output, """
-            > sing
-            You hum a tune under your breath.
-            """)
-    }
-
     @Test("SING returns varied responses")
     func testSingVariedResponses() async throws {
         let (engine, mockIO) = await GameEngine.test()
@@ -41,13 +26,14 @@ struct SingActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > sing
-            You hum a tune under your breath.
+            You sing the song of your people.
 
             > sing
-            You sing so beautifully that birds gather to listen.
+            You hum a little theme from an old adventure game.
 
             > sing
-            You warble melodiously. Very soothing.
+            You warble charmingly, redefining several musical concepts in
+            the process.
             """)
     }
 }

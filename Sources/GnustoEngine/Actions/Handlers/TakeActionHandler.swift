@@ -68,7 +68,11 @@ public struct TakeActionHandler: ActionHandler {
                 actualParentID == containerID
             else {
                 throw ActionResponse.prerequisiteNotMet(
-                    "🤡 The \(targetItem.name) is not in the \(container.name).")
+                    context.message.takeItemNotInContainer(
+                        item: targetItem.withDefiniteArticle,
+                        container: container.withDefiniteArticle
+                    )
+                )
             }
         }
 
@@ -86,12 +90,13 @@ public struct TakeActionHandler: ActionHandler {
 
             // Fail only if the parent is NOT a container and NOT a surface.
             // We allow taking from *closed* containers here; reachability handles closed state later.
-            let isContainer = parentItem.hasFlag(.isContainer)
-            let isSurface = parentItem.hasFlag(.isSurface)
-            if !isContainer && !isSurface {
+            guard parentItem.hasFlag(.isContainer) || parentItem.hasFlag(.isSurface) else {
                 // Custom message similar to Zork's, using the plain name.
                 throw ActionResponse.prerequisiteNotMet(
-                    "🤡 You can't take things out of the \(parentItem.name).")
+                    context.message.takeItemFromNonContainer(
+                        nonContainer: parentItem.withDefiniteArticle
+                    )
+                )
             }
         }
 
@@ -265,6 +270,4 @@ public struct TakeActionHandler: ActionHandler {
             changes: allStateChanges
         )
     }
-
-    // Rely on default postProcess.
 }

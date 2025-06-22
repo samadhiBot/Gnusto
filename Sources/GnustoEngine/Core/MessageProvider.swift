@@ -333,13 +333,6 @@ open class MessageProvider: @unchecked Sendable {
         )
     }
 
-    open func cannotSmellThat() -> String {
-        output(
-            "cannotSmellThat()",
-            "You can't smell that."
-        )
-    }
-
     open func cannotTurnOff() -> String {
         output(
             "cannotTurnOff()",
@@ -449,7 +442,7 @@ open class MessageProvider: @unchecked Sendable {
                 "You chomp enthusiastically at the air, flexing your impressive jaw strength.",
                 "You chomp with a creative interpretation that redefines the whole concept.",
                 "You chomp with a primal intensity that earns your ancestors' approval.",
-                "You chomp with such conviction that reality itself seems negotiable.",
+                "You chomp with a conviction that makes reality itself seem negotiable.",
                 "You chomp with the fearless abandon of a true innovator.",
                 "You chomp with the raw authenticity of someone unencumbered by context.",
                 "You chomp your teeth together menacingly.",
@@ -710,8 +703,13 @@ open class MessageProvider: @unchecked Sendable {
     }
 
     open func directionIsBlocked(reason: String?) -> String {
-        output(
-            "\(reason ?? "Something is blocking the way.")",
+        let logMessage = if let reason {
+            "directionIsBlocked(reason: '\(reason)')"
+        } else {
+            "directionIsBlocked(reason: nil)"
+        }
+        return output(
+            logMessage,
             reason ?? "Something is blocking the way."
         )
     }
@@ -829,7 +827,7 @@ open class MessageProvider: @unchecked Sendable {
                 "You chuckle with an admirable lightness of spirit in the face of everything.",
                 "You chuckle with an appreciation for life's subtle ironies.",
                 "You chuckle with the confident amusement of someone in on the cosmic joke.",
-                "You chuckle with the fearless joy of someone unafraid to find things funny.",
+                "You chuckle with the fearless delight of someone who finds things funny that others do not.",
                 "You giggle with a genuine delight that's beautifully unguarded.",
                 "You giggle with refreshing honesty about what you find amusing.",
                 "You snicker with impressive insight into the absurdities around you.",
@@ -1204,13 +1202,13 @@ open class MessageProvider: @unchecked Sendable {
                 "You give \(item) a quick kiss, which fails to reveal anything significant.",
                 "You give \(item) a tender kiss with confidence in your ability to connect with anything.",
                 "You give \(item) an investigative kiss. The investigation yields little.",
+                "You kiss \(item) curiously, but your curiosity remains unsatisfied.",
                 "You kiss \(item) experimentally, but nothing remarkable happens.",
                 "You kiss \(item) once, and think you detect trace amounts of indifference.",
                 "You kiss \(item) with a passionate curiosity that explores all possibilities.",
                 "You kiss \(item) with impressive commitment to expressing affection in all its forms.",
                 "You kiss \(item) with impressive dedication to spreading love wherever you go.",
                 "You kiss \(item) with the bold authenticity of one who follows their heart.",
-                "You kiss it curiously, but your curiosity remains unsatisfied.",
                 "You plant a brief kiss on \(item), yet your lips learn nothing new.",
                 "You plant a kiss on \(item) with an emotional generosity that's beautifully inclusive.",
                 "You plant a small kiss on \(item), learning nothing your eyes hadn't already told you.",
@@ -1756,13 +1754,6 @@ open class MessageProvider: @unchecked Sendable {
         )
     }
 
-    open func smellCanOnlySmellItems() -> String {
-        output(
-            "smellCanOnlySmellItems()",
-            "You can only smell items directly."
-        )
-    }
-
     open func smellNothingUnusual() -> String {
         output(
             "smellNothingUnusual()",
@@ -1770,45 +1761,70 @@ open class MessageProvider: @unchecked Sendable {
         )
     }
 
-    open func smellsAverage() -> String {
+    open func smellsAverage(item: String) -> String {
         output(
             "smellsAverage()",
-            "That smells about average."
+            "\(item.capitalizedFirst) smells about average."
+        )
+    }
+
+    open func smellMyself() -> String {
+        output(
+            "smellMyself()",
+            oneOf(
+                "You give yourself a sniff with the bold authenticity of one who knows where they stand.",
+                "You give yourself a sniff, proving your resolve when it comes to conducting thorough self-assessments.",
+                "You inhale your own aroma, exhibiting a practical wisdom that prevents surprises.",
+                "You inhale your own scent, proving your dedication to comprehensive self-monitoring.",
+                "You smell yourself in a proactive measure that shows excellent planning skills.",
+                "You smell yourself with admirable commitment to personal quality control.",
+                "You smell yourself with admirable dedication to your personal maintenance routine.",
+                "You smell yourself with an undeniable commitment to evidence-based personal awareness.",
+                "You smell yourself with the determination of someone who faces facts head-on.",
+                "You sniff yourself with the scientific curiosity of a dedicated researcher.",
+                "You take a whiff of yourself in an impressive example of staying informed about your situation.",
+            )
         )
     }
 
     open func squeezeCharacter(character: String) -> String {
         output(
             "squeezeCharacter(character: '\(character)')",
-            "I don't think \(character) would appreciate being squeezed."
+            oneOf(
+                "You squeeze \(character) as someone unafraid who expresses love physically.",
+                "You give \(character) a firm squeeze, confident in your bonding techniques.",
+                "You squeeze \(character) with the fearless intimacy of a natural hugger.",
+                "You give \(character) a testing squeeze with refreshing honesty about your feelings.",
+                "You compress \(character) with the boldness of someone unafraid to connect.",
+                "You squeeze \(character) with an impressive dedication to interpersonal closeness.",
+                "You compress \(character), demonstrating your commitment to physical expression.",
+                "You squeeze \(character) with a warmth that transcends social boundaries.",
+                "You give \(character) a testing squeeze like the dedicated empiricist you are.",
+                "You compress \(character) with a refreshing directness in your emotional approach.",
+                "You give \(character) a firm squeeze like someone dedicated to hands-on bonding.",
+            )
         )
     }
 
-    open func squeezeHardObject(item: String) -> String {
+    open func squeezeItem(item: String) -> String {
         output(
-            "squeezeHardObject(item: '\(item)')",
-            "You squeeze \(item) as hard as you can, but it doesn't give."
-        )
-    }
-
-    open func squeezeLiquidContainer(item: String) -> String {
-        output(
-            "squeezeLiquidContainer(item: '\(item)')",
-            "You squeeze \(item) and some of its contents ooze out."
-        )
-    }
-
-    open func squeezeSoftObject(item: String) -> String {
-        output(
-            "squeezeSoftObject(item: '\(item)')",
-            "You squeeze \(item). It feels soft and yielding."
-        )
-    }
-
-    open func squeezeSponge(item: String) -> String {
-        output(
-            "squeezeSponge(item: '\(item)')",
-            "You squeeze \(item) and water drips out."
+            "squeezeItem(item: '\(item)')",
+            oneOf(
+                "You squeeze \(item) with the empiricism of one who learns through direct experience.",
+                "You compress \(item) with the thoroughness of a dedicated researcher.",
+                "You squeeze \(item) with the methodical curiosity of a true investigator.",
+                "You give \(item) a firm squeeze with admirable diagnostic confidence.",
+                "You compress \(item) with the scientific rigor of a hands-on analyst.",
+                "You squeeze \(item) with the fearless experimentation of a pioneer.",
+                "You give \(item) a testing squeeze with impressive tactile prowess.",
+                "You compress \(item) with the bold curiosity of a person seeking answers.",
+                "You squeeze \(item) with the practical wisdom of direct investigation.",
+                "You give \(item) a firm squeeze with refreshing commitment to evidence-based science.",
+                "You compress \(item) with the kind of approach that advances knowledge.",
+                "You squeeze \(item) with admirable faith in physical examination.",
+                "You give \(item) a testing squeeze with a confidence that comes from years of experience.",
+                "You compress \(item) with a thoroughness that leaves nothing unexplored.",
+            )
         )
     }
 
@@ -1831,6 +1847,20 @@ open class MessageProvider: @unchecked Sendable {
         output(
             "taken()",
             "Taken."
+        )
+    }
+
+    open func takeItemNotInContainer(item: String, container: String) -> String {
+        output(
+            "takeItemNotInContainer()",
+            "\(item.capitalizedFirst) is not in \(container)."
+        )
+    }
+
+    open func takeItemFromNonContainer(nonContainer: String) -> String {
+        output(
+            "takeItemFromNonContainer(nonContainer: '\(nonContainer)')",
+            "You can't take things from \(nonContainer)."
         )
     }
 
@@ -2019,7 +2049,7 @@ open class MessageProvider: @unchecked Sendable {
     open func turnFixedObject(item: String) -> String {
         output(
             "turnFixedObject(item: '\(item)')",
-            "\(item) doesn't seem to be designed to be turned."
+            "\(item.capitalizedFirst) doesn't seem to be designed to be turned."
         )
     }
 
@@ -2093,31 +2123,17 @@ open class MessageProvider: @unchecked Sendable {
         )
     }
 
-    open func waveCharacter(character: String) -> String {
-        output(
-            "waveCharacter(character: '\(character)')",
-            "You wave \(character) around, but it doesn't seem to appreciate being waved."
-        )
-    }
-
     open func waveFixedObject(item: String) -> String {
         output(
             "waveFixedObject(item: '\(item)')",
-            "You can't wave \(item) around - it's not something you can pick up and wave."
+            "You can't wave \(item) around -- it's not something you can pick up and wave."
         )
     }
 
-    open func waveFlag(item: String) -> String {
+    open func waveObject(item: String) -> String {
         output(
-            "waveFlag(item: '\(item)')",
-            "You wave \(item) around. It's not particularly impressive."
-        )
-    }
-
-    open func waveMagicalItem(item: String) -> String {
-        output(
-            "waveMagicalItem(item: '\(item)')",
-            "You wave \(item) dramatically, but nothing magical happens."
+            "waveObject(item: '\(item)')",
+            "You give \(item) a little wave."
         )
     }
 
