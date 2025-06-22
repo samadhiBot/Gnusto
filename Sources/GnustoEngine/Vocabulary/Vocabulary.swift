@@ -47,17 +47,38 @@ public struct Vocabulary: Codable, Equatable, Sendable {
 
     /// Computed property to get the verb synonym mapping needed by the parser.
     /// Maps a synonym string (lowercase) to the Set of VerbIDs it can represent.
+    /// When multiple verbs match, exact ID matches are prioritized over synonym matches.
     public var verbSynonyms: [String: Set<VerbID>] {
         var mapping: [String: Set<VerbID>] = [:]
+
+        // First pass: collect all exact ID matches
+        var exactMatches: [String: VerbID] = [:]
+        for verb in verbDefinitions.values {
+            let primaryKey = verb.id.rawValue.lowercased()
+            exactMatches[primaryKey] = verb.id
+        }
+
+        // Second pass: build the mapping with prioritization
         for verb in verbDefinitions.values {
             let verbID = verb.id
             let primaryKey = verbID.rawValue.lowercased()
+
             // Map the primary ID
             mapping[primaryKey, default: Set()].insert(verbID)
-            // Map all synonyms
+
+            // Map all synonyms, but only if there's no exact ID match for that synonym
             for synonym in verb.synonyms {
                 let synonymKey = synonym.lowercased()
-                mapping[synonymKey, default: Set()].insert(verbID) // Insert instead of overwrite
+
+                // If this synonym exactly matches another verb ID, don't include this as a synonym match
+                // The exact match takes priority
+                if exactMatches[synonymKey] == nil {
+                    mapping[synonymKey, default: Set()].insert(verbID)
+                } else if exactMatches[synonymKey] == verbID {
+                    // This synonym is the same as the verb's own ID, so include it
+                    mapping[synonymKey, default: Set()].insert(verbID)
+                }
+                // Otherwise, skip this synonym to prioritize the exact ID match
             }
         }
         return mapping
@@ -353,7 +374,7 @@ public struct Vocabulary: Codable, Equatable, Sendable {
 
         Verb(
             id: .push,
-            synonyms: "press", "shove",
+            synonyms: "shove",
             syntax: [
                 SyntaxRule(
                     pattern: [.verb, .directObject],
@@ -749,7 +770,7 @@ public struct Vocabulary: Codable, Equatable, Sendable {
 
         Verb(
             id: .squeeze,
-            synonyms: "compress", "press",
+            synonyms: "compress",
             syntax: [
                 SyntaxRule(.verb, .directObject),
             ],
@@ -992,7 +1013,7 @@ public struct Vocabulary: Codable, Equatable, Sendable {
 
         Verb(
             id: .press,
-            synonyms: "push", "depress",
+            synonyms: "depress",
             syntax: [SyntaxRule(.verb, .directObject)],
             requiresLight: true
         ),

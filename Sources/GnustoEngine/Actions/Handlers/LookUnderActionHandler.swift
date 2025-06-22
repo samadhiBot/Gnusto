@@ -10,13 +10,13 @@ public struct LookUnderActionHandler: ActionHandler {
     /// - Parameter context: The `ActionContext` containing the command and game state.
     /// - Returns: An `ActionResult` indicating validation success or failure.
     public func validate(context: ActionContext) async throws {
-        guard let indirectObjectRef = context.command.indirectObject else {
+        guard let directObjectRef = context.command.directObject else {
             throw ActionResponse.prerequisiteNotMet(
                 context.message.doWhat(verb: .lookUnder)
             )
         }
 
-        guard case .item(let targetItemID) = indirectObjectRef else {
+        guard case .item(let targetItemID) = directObjectRef else {
             throw ActionResponse.prerequisiteNotMet(
                 context.message.cannotDoThat(verb: "look under")
             )
@@ -24,7 +24,9 @@ public struct LookUnderActionHandler: ActionHandler {
 
         // Check if item exists and is reachable
         guard (try? await context.engine.item(targetItemID)) != nil else {
-            throw ActionResponse.itemNotAccessible(targetItemID)
+            throw ActionResponse.prerequisiteNotMet(
+                context.message.cannotDoThat(verb: "look under")
+            )
         }
 
         guard await context.engine.playerCanReach(targetItemID) else {
@@ -37,9 +39,9 @@ public struct LookUnderActionHandler: ActionHandler {
     /// - Parameter context: The `ActionContext` containing the command and game state.
     /// - Returns: An `ActionResult` with the action outcome.
     public func process(context: ActionContext) async throws -> ActionResult {
-        guard case .item(let targetItemID) = context.command.indirectObject else {
+        guard case .item(let targetItemID) = context.command.directObject else {
             throw ActionResponse.internalEngineError(
-                "LookUnder: indirectObject was not an item in process."
+                "LookUnder: directObject was not an item in process."
             )
         }
 
@@ -47,11 +49,9 @@ public struct LookUnderActionHandler: ActionHandler {
 
         // Default behavior: You can't see anything of interest under most things
         return ActionResult(
-            message: "You find nothing of interest under \(targetItem.withDefiniteArticle).",
-            changes: [
-                await context.engine.setFlag(.isTouched, on: targetItem),
-                await context.engine.updatePronouns(to: targetItem),
-            ]
+            context.message.nothingOfInterestUnder(item: targetItem.withDefiniteArticle),
+            await context.engine.setFlag(.isTouched, on: targetItem),
+            await context.engine.updatePronouns(to: targetItem)
         )
     }
 }

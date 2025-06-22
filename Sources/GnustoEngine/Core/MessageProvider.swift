@@ -621,7 +621,7 @@ open class MessageProvider: @unchecked Sendable {
 
     open func goWhere() -> String {
         log("goWhere()")
-        return "Go where?"
+        return "Where do you want to go?"
     }
 
     open func inflateSuccess(item: String) -> String {
@@ -990,6 +990,11 @@ open class MessageProvider: @unchecked Sendable {
         return "You have nothing to wear."
     }
 
+    open func nothingOfInterestUnder(item: String) -> String {
+        log("nothingOfInterestUnder(item: '\(item)')")
+        return "You find nothing of interest under \(item)."
+    }
+
     open func nothingSpecialAbout(item: String) -> String {
         log("nothingSpecialAbout(item: '\(item)')")
         return "You see nothing special about \(item)."
@@ -1121,6 +1126,11 @@ open class MessageProvider: @unchecked Sendable {
     open func putOnWhat(item: String) -> String {
         log("putOnWhat(item: '\(item)')")
         return "Put \(item) on what?"
+    }
+
+    open func putWhatOn(item: String) -> String {
+        log("putWhatOn(item: '\(item)')")
+        return "Put what on \(item)?"
     }
 
     open func raiseCannotLift(item: String) -> String {

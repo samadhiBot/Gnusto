@@ -25,9 +25,18 @@ public struct PutOnActionHandler: ActionHandler {
     public func validate(context: ActionContext) async throws {
         // 1. Validate Direct and Indirect Objects - both must be items
         guard let directObjectRef = context.command.directObject else {
-            throw ActionResponse.prerequisiteNotMet(
-                context.message.doWhat(verb: .putOn)
-            )
+            if let indirectObjectRef = context.command.indirectObject,
+               case .item(let surfaceID) = indirectObjectRef
+            {
+                let surfaceItem = try await context.engine.item(surfaceID)
+                throw ActionResponse.prerequisiteNotMet(
+                    context.message.putWhatOn(item: surfaceItem.withDefiniteArticle)
+                )
+            } else {
+                throw ActionResponse.prerequisiteNotMet(
+                    context.message.doWhat(verb: .putOn)
+                )
+            }
         }
         guard case .item(let itemToPutID) = directObjectRef else {
             throw ActionResponse.prerequisiteNotMet(

@@ -312,7 +312,7 @@ struct GoActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > go
-            Go where?
+            Where do you want to go?
             """)
     }
 

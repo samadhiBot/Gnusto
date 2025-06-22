@@ -5,7 +5,6 @@ import Testing
 
 @Suite("MoveActionHandler Tests")
 struct MoveActionHandlerTests {
-
     @Test("Move simple object (reachable)")
     func testMoveSimpleObjectReachable() async throws {
         // Given
@@ -44,7 +43,7 @@ struct MoveActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > move leaves
-            You can’t see any pile of leaves here.
+            You can’t see any such thing.
             """)
     }
 
@@ -67,7 +66,7 @@ struct MoveActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > move leaves
-            You can’t see any pile of leaves here.
+            You can’t see any such thing.
             """)
     }
 
@@ -171,7 +170,7 @@ struct MoveActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > move key
-            You can’t see any brass key here.
+            You can’t see any such thing.
             """)
     }
 }
