@@ -4,6 +4,12 @@ import Foundation
 public struct QuitActionHandler: ActionHandler {
     public init() {}
 
+    /// Validates the "QUIT" command.
+    /// Currently, quit requires no specific validation and always proceeds.
+    public func validate(context: ActionContext) async throws {
+        // No validation needed for QUIT.
+    }
+
     /// Processes the "QUIT" command.
     ///
     /// This action displays the player's current score and move count, then prompts

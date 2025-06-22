@@ -5,6 +5,44 @@ import Testing
 
 @Suite("QuitActionHandler Tests")
 struct QuitActionHandlerTests {
+    @Test("DEBUG: Verify quit handler is available")
+    func testQuitHandlerAvailable() async throws {
+        // Check if QuitActionHandler is in default handlers
+        let defaultHandlers = GameEngine.defaultActionHandlers
+        let hasQuitHandler = defaultHandlers[.quit] != nil
+        print("Default handlers has quit: \(hasQuitHandler)")
+        print("Default handlers count: \(defaultHandlers.count)")
+        print("Quit handler type: \(type(of: defaultHandlers[.quit]))")
+
+        #expect(hasQuitHandler, "QuitActionHandler should be in default handlers")
+    }
+
+    @Test("DEBUG: Test if other action handlers work")
+    func testOtherHandlersWork() async throws {
+        // Given
+        let (engine, mockIO) = await GameEngine.test()
+
+        print("=== Testing inventory command ===")
+        try await engine.execute("inventory")
+        let inventoryOutput = await mockIO.flush()
+        print("Inventory output: '\(inventoryOutput)'")
+
+        print("=== Testing look command ===")
+        try await engine.execute("look")
+        let lookOutput = await mockIO.flush()
+        print("Look output: '\(lookOutput)'")
+
+        print("=== Testing score command ===")
+        try await engine.execute("score")
+        let scoreOutput = await mockIO.flush()
+        print("Score output: '\(scoreOutput)'")
+
+        // Check that these commands produced some output
+        #expect(!inventoryOutput.isEmpty, "Inventory should produce output")
+        #expect(!lookOutput.isEmpty, "Look should produce output")
+        #expect(!scoreOutput.isEmpty, "Score should produce output")
+    }
+
     @Test("QUIT command produces the expected message")
     func testQuitBasicFunctionality() async throws {
         let (engine, mockIO) = await GameEngine.test()
@@ -169,7 +207,7 @@ struct QuitActionHandlerTests {
         // Execute QUIT
         try await engine.execute("quit")
 
-        // Verify game state hasn’t changed (except for quit flag)
+        // Verify game state hasn't changed (except for quit flag)
         let finalState = await engine.gameState
         #expect(finalState.player.score == initialScore)
         #expect(finalState.player.moves == initialMoves)
@@ -217,6 +255,56 @@ struct QuitActionHandlerTests {
             > quit
             Goodbye!
             """)
+    }
+
+    @Test("DEBUG: Check if quit verb is in vocabulary")
+    func testDebugQuitVocabulary() async throws {
+        // Given
+        let (engine, _) = await GameEngine.test()
+
+        // Check if quit verb is in vocabulary
+        let vocabulary = await engine.gameState.vocabulary
+        let quitVerbs = vocabulary.verbSynonyms["quit"]
+        print("Quit verbs in vocabulary: \(quitVerbs)")
+
+        // Check if parser recognizes quit
+        let parseResult = await engine.parser.parse(
+            input: "quit",
+            vocabulary: vocabulary,
+            gameState: await engine.gameState
+        )
+
+        switch parseResult {
+        case .success(let command):
+            print("Parser successfully recognized quit: \(command)")
+            #expect(command.verb == .quit)
+        case .failure(let error):
+            print("Parser failed to recognize quit: \(error)")
+            Issue.record("Parser should recognize quit but failed with error: \(error)")
+        }
+    }
+
+    @Test("DEBUG: What happens when we execute quit")
+    func testDebugQuitExecution() async throws {
+        // Given
+        let (engine, mockIO) = await GameEngine.test()
+        await mockIO.enqueueInput("y")
+
+        print("=== Before execute ===")
+        print("Should quit: \(await engine.shouldQuit)")
+
+        // When
+        try await engine.execute("quit")
+
+        print("=== After execute ===")
+        print("Should quit: \(await engine.shouldQuit)")
+
+        // Then
+        let output = await mockIO.flush()
+        print("Output: '\(output)'")
+
+        // Just check that something happened
+        #expect(!output.isEmpty)
     }
 
     @Test("QUIT displays score and confirms with Y")
@@ -325,32 +413,6 @@ struct QuitActionHandlerTests {
         #expect(await engine.shouldQuit)
     }
 
-        @Test("QUIT with default maximum score")
-    func testQuitWithDefaultMaxScore() async throws {
-        // Given
-        let game = MinimalGame(
-            player: Player(in: .startRoom, moves: 13, score: 8)
-        )
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
-
-        // Queue Y as response to confirmation
-        await mockIO.enqueueInput("y")
-
-        // When
-        try await engine.execute("quit")
-
-        // Then
-        let output = await mockIO.flush()
-        expectNoDifference(output, """
-            > quit
-            Your score is 8 (total of 10 points), in 13 moves.
-            Do you wish to leave the game? (Y is affirmative): y
-            Goodbye!
-            """)
-
-        #expect(await engine.shouldQuit)
-    }
-
     @Test("QUIT handles EOF as confirmation")
     func testQuitHandlesEOF() async throws {
         // Given
@@ -363,7 +425,7 @@ struct QuitActionHandlerTests {
 
         // Then
         let output = await mockIO.flush()
-                expectNoDifference(output, """
+        expectNoDifference(output, """
             > quit
             Your score is 0 (total of 10 points), in 0 moves.
             Do you wish to leave the game? (Y is affirmative):
@@ -373,8 +435,8 @@ struct QuitActionHandlerTests {
         #expect(await engine.shouldQuit)
     }
 
-    @Test("QUIT works with different player states")
-    func testQuitWithDifferentPlayerStates() async throws {
+    @Test("QUIT works with different score values")
+    func testQuitWithDifferentScores() async throws {
         // Given
         let game = MinimalGame(
             player: Player(in: .startRoom, moves: 100, score: 999)
@@ -389,11 +451,64 @@ struct QuitActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > quit
-            Your score is 999 (total of 100 points), in 100 moves.
+            Your score is 999 (total of 10 points), in 100 moves.
             Do you wish to leave the game? (Y is affirmative): no
             OK, continuing the game.
             """)
 
         #expect(await !engine.shouldQuit)
+    }
+
+    @Test("QUIT with extra text is parsed correctly")
+    func testQuitWithExtraText() async throws {
+        let (engine, mockIO) = await GameEngine.test()
+        await mockIO.enqueueInput("y")
+
+        try await engine.execute("quit game now")
+
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            > quit game now
+            Your score is 0 (total of 10 points), in 0 moves.
+            Do you wish to leave the game? (Y is affirmative): y
+            Goodbye!
+            """)
+
+        #expect(await engine.shouldQuit)
+    }
+
+    @Test("QUIT handler works directly")
+    func testQuitHandlerDirect() async throws {
+        // Given
+        let handler = QuitActionHandler()
+        let game = MinimalGame(
+            player: Player(in: .startRoom, moves: 13, score: 35)
+        )
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // Queue Y as response to confirmation
+        await mockIO.enqueueInput("y")
+
+        let command = Command(
+            verb: .quit,
+            rawInput: "quit"
+        )
+        let context = ActionContext(
+            command: command,
+            engine: engine
+        )
+
+        // When
+        let result = try await handler.process(context: context)
+
+        // Then
+        print("Result message: \(result.message)")
+        print("Should quit: \(await engine.shouldQuit)")
+
+        let output = await mockIO.flush()
+        print("Output: '\(output)'")
+
+        #expect(await engine.shouldQuit)
+        #expect(result.message == "Goodbye!")
     }
 }

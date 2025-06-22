@@ -62,7 +62,8 @@ extension GameEngine {
             _ = await ioHandler.readLine(prompt: input)
             switch parseResult {
             case .success(let command):
-                if command.verb == .quit || shouldQuit { return }
+                // Allow quit command to be processed by QuitActionHandler
+                if shouldQuit { return }
 
                 await execute(command: command)
 

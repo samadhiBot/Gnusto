@@ -300,7 +300,9 @@ extension GameEngine {
         // 4. Execute Command or Handle Error
         switch parseResult {
         case .success(let command):
-            if command.verb == .quit || shouldQuit { return }
+            // Allow quit command to be processed by QuitActionHandler
+            // Only exit early if shouldQuit is already set
+            if shouldQuit { return }
             await execute(command: command)
 
         case .failure(let error):
