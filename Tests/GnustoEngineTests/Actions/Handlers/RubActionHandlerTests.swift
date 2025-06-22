@@ -39,7 +39,7 @@ struct RubActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > rub distant sphere
-            You can’t see any distant sphere here.
+            You can’t see any such thing.
             """)
     }
 
@@ -112,7 +112,8 @@ struct RubActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > rub lamp
-            Rubbing the brass lamp doesn’t seem to do anything. No djinn appears.
+            Rubbing the brass lamp doesn’t seem to do anything. No
+            djinn appears.
             """)
     }
 
@@ -137,7 +138,8 @@ struct RubActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > rub lantern
-            Rubbing the old lantern doesn’t seem to do anything. No djinn appears.
+            Rubbing the old lantern doesn’t seem to do anything. No
+            djinn appears.
             """)
     }
 

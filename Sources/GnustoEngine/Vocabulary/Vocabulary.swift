@@ -402,7 +402,7 @@ public struct Vocabulary: Codable, Equatable, Sendable {
 
         Verb(
             id: .wear,
-            synonyms: "don", "put on",
+            synonyms: "don",
             syntax: [
                 SyntaxRule(
                     pattern: [.verb, .directObject],

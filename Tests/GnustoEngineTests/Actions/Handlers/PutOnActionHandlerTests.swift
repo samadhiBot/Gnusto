@@ -128,7 +128,7 @@ struct PutOnActionHandlerTests {
         expectNoDifference(changeHistory, expectedChanges)
     }
 
-    @Test("PutOn with no direct object routes to WearActionHandler")
+    @Test("PutOn fails with ambiguous object")
     func testPutOnFailsNoDirectObject() async throws {
         // Arrange: Table is reachable
         let table = Item(
@@ -148,7 +148,7 @@ struct PutOnActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > put on table
-            Put what on the table?
+            Put the table on what?
             """)
 
         // Assert No State Change

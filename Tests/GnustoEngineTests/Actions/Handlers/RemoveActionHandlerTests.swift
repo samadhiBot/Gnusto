@@ -139,7 +139,7 @@ struct RemoveActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > remove amulet
-            You can’t take off the cursed amulet.
+            You can’t remove the cursed amulet.
             """)
         #expect(await engine.gameState.changeHistory.isEmpty)
     }

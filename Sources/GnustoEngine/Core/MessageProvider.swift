@@ -925,7 +925,7 @@ open class MessageProvider: @unchecked Sendable {
     open func itemIsNotWorn(item: String) -> String {
         output(
             "itemIsNotWorn(item: '\(item)')",
-            "You are not wearing \(item)."
+            "You aren't wearing \(item)."
         )
     }
 
@@ -1647,16 +1647,18 @@ open class MessageProvider: @unchecked Sendable {
         output(
             "singResponse()",
             oneOf(
-                "You sing a little ditty. How delightful!",
-                "You hum a tune under your breath.",
-                "You warble melodiously. Very soothing.",
-                "You croon like a nightingale.",
-                "You sing off-key. Perhaps stick to adventuring.",
-                "You belt out a rousing chorus. Bravo!",
-                "You hum the theme from an old adventure game.",
-                "You sing a song of your people.",
-                "You vocalize with surprising talent.",
-                "You sing so beautifully that birds gather to listen."
+                "You belt out a tune with the fearless creativity of a true genius.",
+                "You croon beautifully, in a very personal interpretation of the melody.",
+                "You croon like a nightingale with a head cold, but somehow it works.",
+                "You hum a little theme from an old adventure game.",
+                "You sing melodiously, creating your own unique scale system.",
+                "You sing the song of your people.",
+                "You sing with a natural ability that defies conventional music theory.",
+                "You sing with the confidence of someone who's never heard themselves.",
+                "You vocalize with admirable enthusiasm, inventing new notes as you go.",
+                "You warble charmingly, redefining several musical concepts in the process.",
+                "You warble with the kind of authenticity that cannot be taught.",
+                "Your musical genius is painfully ahead of its time.",
             )
         )
     }
