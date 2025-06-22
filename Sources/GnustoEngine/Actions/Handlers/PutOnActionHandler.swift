@@ -22,7 +22,7 @@ public struct PutOnActionHandler: ActionHandler {
     ///           `itemNotAccessible` (if surface cannot be reached),
     ///           `targetIsNotASurface` (if indirect object is not a surface).
     ///           Can also throw errors from `context.engine.item()`.
-    public func validate(context: ActionContext) async throws {
+        public func validate(context: ActionContext) async throws {
         // 1. Validate Direct and Indirect Objects - both must be items
         guard let directObjectRef = context.command.directObject else {
             if let indirectObjectRef = context.command.indirectObject,
@@ -48,7 +48,7 @@ public struct PutOnActionHandler: ActionHandler {
             // Fetch item name for a more informative message if indirect object is missing.
             let itemToPut = try await context.engine.item(itemToPutID)
             throw ActionResponse.prerequisiteNotMet(
-                context.message.putWhatOn(
+                context.message.putOnWhat(
                     item: itemToPut.withDefiniteArticle
                 )
             )

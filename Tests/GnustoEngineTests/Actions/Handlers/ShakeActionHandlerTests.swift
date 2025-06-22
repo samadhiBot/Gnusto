@@ -17,7 +17,7 @@ struct ShakeActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > shake
-            Expected a direct object phrase for verb '.shake'.
+            Shake what?
             """)
     }
 
@@ -115,7 +115,7 @@ struct ShakeActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > shake wall
-            You can’t shake the stone wall - it's firmly in place.
+            You can’t shake the stone wall - it’s firmly in place.
             """)
     }
 

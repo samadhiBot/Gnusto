@@ -191,18 +191,18 @@ open class MessageProvider: @unchecked Sendable {
         output(
             "breatheResponse()",
             oneOf(
-                "You breathe thoughtfully, pondering the miracle of atmospheric composition.",
-                "You inhale deeply, briefly grateful for the invention of oxygen.",
-                "You take a breath, marveling at your lungs' stubborn refusal to give up.",
                 "You breathe in life's very essence, which tastes faintly of confusion.",
-                "You inhale slowly, appreciating the universe's decision to include breathable air.",
-                "You take a breath, noting that it's roughly the same as the last one.",
-                "You take a tentative breath, unsure whether the atmosphere is still working.",
                 "You breathe in whatever passes for air around here.",
-                "You take a breath, tasting hints of adventure and poor ventilation.",
+                "You breathe thoughtfully, pondering the miracle of atmospheric composition.",
                 "You breathe with great purpose, although breathing tends to happen anyway.",
-                "You were already doing that, but also you continue to breathe.",
-                "'Breathe in the love... and blow out the jive...'",
+                "You inhale deeply, briefly grateful for the invention of oxygen.",
+                "You inhale slowly, appreciating the universe's decision to include breathable air.",
+                "You recall your mantra, 'Breathe in the love... and blow out the jive...'",
+                "You take a breath, marveling at your lungs' stubborn refusal to give up.",
+                "You take a breath, noting that it's roughly the same as the last one.",
+                "You take a breath, tasting hints of adventure and poor ventilation.",
+                "You take a tentative breath, unsure whether the atmosphere is still working.",
+                "You were already doing that, but you also continue to breathe.",
             )
         )
     }
