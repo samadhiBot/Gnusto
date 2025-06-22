@@ -52,12 +52,12 @@ struct TasteActionHandlerTests {
         let (engine, mockIO) = await GameEngine.test()
 
         // Act
-        try await engine.execute("taste room")
+        try await engine.execute("taste the void")
 
         let output = await mockIO.flush()
         expectNoDifference(output, """
-            > taste room
-            You can only taste specific items.
+            > taste the void
+            That tastes about average.
             """)
     }
 
@@ -191,7 +191,7 @@ struct TasteActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > taste fruit
-            You can’t see any distant fruit here.
+            You can’t see any such thing.
             """)
     }
 

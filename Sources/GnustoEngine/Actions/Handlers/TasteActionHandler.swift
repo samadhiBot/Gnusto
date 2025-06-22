@@ -25,12 +25,14 @@ public struct TasteActionHandler: ActionHandler {
                 context.message.doWhat(verb: .taste)
             )
         }
-        guard case .item(_) = directObjectRef else {
+        guard case .item(let itemID) = directObjectRef else {
             throw ActionResponse.prerequisiteNotMet(
                 context.message.youCanOnlyTasteItems()
             )
         }
-        // Basic TASTE doesn't need further validation like reachability by default.
+        guard await context.engine.playerCanReach(itemID) else {
+            throw ActionResponse.itemNotAccessible(itemID)
+        }
     }
 
     /// Processes the "TASTE" command.
