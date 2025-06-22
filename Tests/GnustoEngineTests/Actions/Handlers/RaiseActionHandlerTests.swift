@@ -81,7 +81,7 @@ struct RaiseActionHandlerTests {
         // Assert Output
         let output = await mockIO.flush()
         expectNoDifference(output, """
-            > raise room
+            > raise the void
             You can only raise items.
             """)
 

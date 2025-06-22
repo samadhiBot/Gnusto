@@ -559,10 +559,7 @@ public struct Vocabulary: Codable, Equatable, Sendable {
             id: .lookUnder,
             synonyms: "look under", "peek under",
             syntax: [
-                SyntaxRule(
-                    pattern: [.verb, .preposition, .directObject],
-                    requiredPreposition: "under"
-                ),
+                SyntaxRule(.verb, .directObject),
             ],
             requiresLight: true
         ),
@@ -571,18 +568,7 @@ public struct Vocabulary: Codable, Equatable, Sendable {
             id: .lookInside,
             synonyms: "look in", "look inside", "look with",
             syntax: [
-                SyntaxRule(
-                    pattern: [.verb, .preposition, .directObject],
-                    requiredPreposition: "in"
-                ),
-                SyntaxRule(
-                    pattern: [.verb, .preposition, .directObject],
-                    requiredPreposition: "inside"
-                ),
-                SyntaxRule(
-                    pattern: [.verb, .preposition, .directObject],
-                    requiredPreposition: "with"
-                ),
+                SyntaxRule(.verb, .directObject),
             ],
             requiresLight: true
         ),
@@ -601,10 +587,7 @@ public struct Vocabulary: Codable, Equatable, Sendable {
             id: .climbOn,
             synonyms: "climb on", "sit on", "stand on",
             syntax: [
-                SyntaxRule(
-                    pattern: [.verb, .preposition, .directObject],
-                    requiredPreposition: "on"
-                ),
+                SyntaxRule(.verb, .directObject),
             ],
             requiresLight: true
         ),

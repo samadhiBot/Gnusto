@@ -29,7 +29,7 @@ struct ReadActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > read book
-            It reads: "Beware the Grue!"
+            It reads: “Beware the Grue!”
             """)
     }
 
@@ -82,7 +82,7 @@ struct ReadActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > read
-            Expected a direct object phrase for verb '.read'.
+            Read what?
             """)
     }
 
@@ -107,7 +107,7 @@ struct ReadActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > read scroll
-            You can’t see any scroll here.
+            You can’t see any such thing.
             """)
     }
 
@@ -344,7 +344,7 @@ struct ReadActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > read book
-            You can’t see any book here.
+            You can’t see any such thing.
             """)
     }
 
@@ -456,7 +456,7 @@ struct ReadActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > read
-            Expected a direct object phrase for verb '.read'.
+            Read what?
             """)
     }
 
@@ -561,7 +561,7 @@ struct ReadActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > read secret
-            You can’t see any secret here.
+            You can’t see any such thing.
             """)
 
         // Also assert the item wasn’t touched

@@ -207,6 +207,7 @@ public struct StandardParser: Parser {
                 rule: rule,
                 tokens: filteredTokens,
                 verbStartIndex: verbStartIndex,
+                verbTokenCount: verbTokenCount,
                 verb: verb, // <<< Pass the specific verb for this rule
                 vocabulary: vocabulary,
                 gameState: gameState,
@@ -411,12 +412,13 @@ public struct StandardParser: Parser {
         rule: SyntaxRule,
         tokens: [String],
         verbStartIndex: Int,
+        verbTokenCount: Int,
         verb: VerbID,
         vocabulary: Vocabulary,
         gameState: GameState,
         originalInput: String
     ) -> Result<Command, ParseError> {
-        var tokenCursor = verbStartIndex + 1
+        var tokenCursor = verbStartIndex + verbTokenCount
         var directObjectPhraseTokens: [String] = []
         var indirectObjectPhraseTokens: [String] = []
         var matchedPreposition: String? = nil
