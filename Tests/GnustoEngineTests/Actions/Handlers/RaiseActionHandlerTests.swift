@@ -52,7 +52,7 @@ struct RaiseActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > raise book
-            You can’t see any heavy book here.
+            You can’t see any such thing.
             """)
     }
 
@@ -76,7 +76,7 @@ struct RaiseActionHandlerTests {
         let (engine, mockIO) = await GameEngine.test()
 
         // Act
-        try await engine.execute("raise room")
+        try await engine.execute("raise the void")
 
         // Assert Output
         let output = await mockIO.flush()
@@ -113,7 +113,7 @@ struct RaiseActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > raise book
-            You can’t see any hidden book here.
+            You can’t see any such thing.
             """)
     }
 

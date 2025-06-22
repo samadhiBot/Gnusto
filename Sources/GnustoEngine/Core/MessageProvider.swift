@@ -1701,6 +1701,24 @@ open class MessageProvider: @unchecked Sendable {
         log("youTakeMultipleItems(items: '\(items)')")
         return "You take \(items)."
     }
+
+    open func quitScoreAndPrompt(score: Int, maxScore: Int, moves: Int) -> String {
+        log("quitScoreAndPrompt(score: \(score), maxScore: \(maxScore), moves: \(moves))")
+        return """
+            Your score is \(score) (total of \(maxScore) points), in \(moves) moves.
+            Do you wish to leave the game? (Y is affirmative):
+            """
+    }
+
+    open func quitConfirmationHelp() -> String {
+        log("quitConfirmationHelp()")
+        return "Please answer yes or no."
+    }
+
+    open func quitCancelled() -> String {
+        log("quitCancelled()")
+        return "OK, continuing the game."
+    }
 }
 
 extension MessageProvider {

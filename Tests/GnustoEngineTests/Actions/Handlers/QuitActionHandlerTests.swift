@@ -218,4 +218,182 @@ struct QuitActionHandlerTests {
             Goodbye!
             """)
     }
+
+    @Test("QUIT displays score and confirms with Y")
+    func testQuitConfirmsWithY() async throws {
+        // Given
+        let game = MinimalGame(
+            player: Player(in: .startRoom, moves: 13, score: 35)
+        )
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // Queue Y as response to confirmation
+        await mockIO.enqueueInput("y")
+
+        // When
+        try await engine.execute("quit")
+
+        // Then
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            > quit
+            Your score is 35 (total of 10 points), in 13 moves.
+            Do you wish to leave the game? (Y is affirmative): y
+            Goodbye!
+            """)
+
+        #expect(await engine.shouldQuit)
+    }
+
+    @Test("QUIT displays score and cancels with N")
+    func testQuitCancelsWithN() async throws {
+        // Given
+        let game = MinimalGame(
+            player: Player(in: .startRoom, moves: 5, score: 20)
+        )
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // Queue N as response to confirmation
+        await mockIO.enqueueInput("n")
+
+        // When
+        try await engine.execute("quit")
+
+        // Then
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            > quit
+            Your score is 20 (total of 10 points), in 5 moves.
+            Do you wish to leave the game? (Y is affirmative): n
+            OK, continuing the game.
+            """)
+
+        #expect(await !engine.shouldQuit)
+    }
+
+    @Test("QUIT accepts 'yes' and 'no' as well as Y/N")
+    func testQuitAcceptsFullWords() async throws {
+        // Given
+        let game = MinimalGame(
+            player: Player(in: .startRoom, moves: 8, score: 42)
+        )
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // Queue "yes" as response to confirmation
+        await mockIO.enqueueInput("yes")
+
+        // When
+        try await engine.execute("quit")
+
+        // Then
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            > quit
+            Your score is 42 (total of 10 points), in 8 moves.
+            Do you wish to leave the game? (Y is affirmative): yes
+            Goodbye!
+            """)
+
+        #expect(await engine.shouldQuit)
+    }
+
+    @Test("QUIT handles invalid responses and retries")
+    func testQuitHandlesInvalidResponses() async throws {
+        // Given
+        let game = MinimalGame(
+            player: Player(in: .startRoom, moves: 1, score: 0)
+        )
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // Queue invalid responses followed by valid one
+        await mockIO.enqueueInput("maybe", "perhaps", "y")
+
+        // When
+        try await engine.execute("quit")
+
+        // Then
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            > quit
+            Your score is 0 (total of 10 points), in 1 moves.
+            Do you wish to leave the game? (Y is affirmative): maybe
+            Please answer yes or no. perhaps
+            Please answer yes or no. y
+            Goodbye!
+            """)
+
+        #expect(await engine.shouldQuit)
+    }
+
+        @Test("QUIT with default maximum score")
+    func testQuitWithDefaultMaxScore() async throws {
+        // Given
+        let game = MinimalGame(
+            player: Player(in: .startRoom, moves: 13, score: 8)
+        )
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // Queue Y as response to confirmation
+        await mockIO.enqueueInput("y")
+
+        // When
+        try await engine.execute("quit")
+
+        // Then
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            > quit
+            Your score is 8 (total of 10 points), in 13 moves.
+            Do you wish to leave the game? (Y is affirmative): y
+            Goodbye!
+            """)
+
+        #expect(await engine.shouldQuit)
+    }
+
+    @Test("QUIT handles EOF as confirmation")
+    func testQuitHandlesEOF() async throws {
+        // Given
+        let (engine, mockIO) = await GameEngine.test()
+
+        // Don't queue any input - readLine will return nil (EOF)
+
+        // When
+        try await engine.execute("quit")
+
+        // Then
+        let output = await mockIO.flush()
+                expectNoDifference(output, """
+            > quit
+            Your score is 0 (total of 10 points), in 0 moves.
+            Do you wish to leave the game? (Y is affirmative):
+            Goodbye!
+            """)
+
+        #expect(await engine.shouldQuit)
+    }
+
+    @Test("QUIT works with different player states")
+    func testQuitWithDifferentPlayerStates() async throws {
+        // Given
+        let game = MinimalGame(
+            player: Player(in: .startRoom, moves: 100, score: 999)
+        )
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+        await mockIO.enqueueInput("no")
+
+        // When
+        try await engine.execute("quit")
+
+        // Then
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            > quit
+            Your score is 999 (total of 100 points), in 100 moves.
+            Do you wish to leave the game? (Y is affirmative): no
+            OK, continuing the game.
+            """)
+
+        #expect(await !engine.shouldQuit)
+    }
 }
