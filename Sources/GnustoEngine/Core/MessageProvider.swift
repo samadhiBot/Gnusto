@@ -60,12 +60,12 @@ open class MessageProvider: @unchecked Sendable {
     }
 
     open func actionHandlerInternalError(handler: String, details: String) -> String {
-        logWarning("actionHandlerInternalError(handler: '\(handler)', details: '\(details)')")
+        log("actionHandlerInternalError(handler: '\(handler)', details: '\(details)')", .warning)
         return "A strange buzzing sound indicates something is wrong with '\(handler)': '\(details)'"
     }
 
     open func actionHandlerMissingObjects(handler: String) -> String {
-        logWarning("actionHandlerMissingObjects(handler: '\(handler)')")
+        log("actionHandlerMissingObjects(handler: '\(handler)')", .warning)
         return "A strange buzzing sound indicates something is wrong with \(handler)."
     }
 
@@ -640,12 +640,12 @@ open class MessageProvider: @unchecked Sendable {
     }
 
     open func internalEngineError() -> String {
-        logError("internalEngineError()")
+        log("internalEngineError()", .error)
         return "A strange buzzing sound indicates something is wrong."
     }
 
     open func internalParseError() -> String {
-        logError("internalParseError()")
+        log("internalParseError()", .error)
         return "A strange buzzing sound indicates something is wrong."
     }
 
@@ -1291,7 +1291,7 @@ open class MessageProvider: @unchecked Sendable {
     }
 
     open func stateValidationFailed() -> String {
-        logWarning("stateValidationFailed()")
+        log("stateValidationFailed()", .warning)
         return "A strange buzzing sound indicates something is wrong with the state validation."
     }
 
@@ -1733,27 +1733,31 @@ extension MessageProvider {
         responses.randomElement(using: &randomNumberGenerator) ?? internalEngineError()
     }
 
-    func log(_ message: String) {
-        logger.info(
-            Logger.Message(
-                stringLiteral: "\n🎯 \(message)"
-            )
+    /// Logs a message with the specified level and an appropriate emoji icon.
+    ///
+    /// This method provides a convenient way to log messages from the MessageProvider
+    /// with visual indicators for different log levels. The message parameter is
+    /// autoclosure to avoid string interpolation overhead when logging is disabled.
+    ///
+    /// - Parameters:
+    ///   - message: The message to log, provided as an autoclosure for performance.
+    ///   - level: The logging level, defaults to `.info`.
+    public func log(
+        _ message: @autoclosure () -> String,
+        _ level: Logger.Level = .info
+    ) {
+        let icon = switch level {
+        case .trace: "🔍"
+        case .debug: "🐛"
+        case .info: "🎯"
+        case .notice: "📣"
+        case .warning: "⚠️"
+        case .error: "🛑"
+        case .critical: "💀"
+        }
+        let loggerMessage = Logger.Message(
+            stringLiteral: "\n\(icon) \(message())"
         )
-    }
-
-    func logError(_ message: String) {
-        logger.error(
-            Logger.Message(
-                stringLiteral: "\n🔥 \(message)"
-            )
-        )
-    }
-
-    func logWarning(_ message: String) {
-        logger.warning(
-            Logger.Message(
-                stringLiteral: "\n⚠️ \(message)"
-            )
-        )
+        logger.log(level: level, loggerMessage)
     }
 }
