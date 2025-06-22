@@ -34,6 +34,7 @@ final class MockIOHandler: IOHandler {
     }
 
     // — Configuration Methods (for tests) —
+
     /// Clears all recorded calls and resets input queue.
     func reset() {
         recordedOutput = []
@@ -87,6 +88,18 @@ final class MockIOHandler: IOHandler {
         }
         let line = inputQueue[inputIndex]
         inputIndex += 1
+
+        // Record the user's response so it appears in the output
+        if let line = line {
+            recordedOutput.append(
+                OutputCall(
+                    text: " \(line)",  // Add space prefix for proper formatting
+                    style: .input,
+                    newline: true
+                )
+            )
+        }
+
         return line
     }
 
@@ -99,27 +112,43 @@ final class MockIOHandler: IOHandler {
     }
 
     func flush() async -> String {
-        var commandIndex = 0
         var actualTranscript = ""
-        for call in recordedOutput {
-            if call.style == .input && call.text == "> " && !call.newline {
-                actualTranscript += ">"
-                if commandIndex < inputQueue.count {
-                    if let command = inputQueue[commandIndex] {
-                        actualTranscript += " \(command)\n"
-                    }
-                    commandIndex += 1
-                } else {
+        var i = 0
+        while i < recordedOutput.count {
+            let call = recordedOutput[i]
+
+            if call.style == .input && call.text.hasPrefix("> ") && call.newline {
+                // Main command (like "> quit")
+                actualTranscript += call.text
+                if call.newline {
                     actualTranscript += "\n"
                 }
-            } else if call.style == .input {
-                actualTranscript += "> \(call.text)\n"
+            } else if call.style == .input && !call.newline {
+                // Custom prompt (like quit confirmation prompt)
+                actualTranscript += call.text
+
+                // Check if the next call is a user response to this prompt
+                if i + 1 < recordedOutput.count &&
+                    recordedOutput[i + 1].style == .input &&
+                    recordedOutput[i + 1].newline {
+                    // There's a user response following this prompt, don't add newline here
+                } else {
+                    // No user response (EOF case), add newline after prompt
+                    actualTranscript += "\n"
+                }
+            } else if call.style == .input && call.newline {
+                // User response to a prompt
+                actualTranscript += call.text
+                if call.newline {
+                    actualTranscript += "\n"
+                }
             } else if call.style != .input {
                 actualTranscript += call.text
                 if call.newline {
                     actualTranscript += "\n\n"
                 }
             }
+            i += 1
         }
 
         recordedOutput.removeAll()

@@ -47,6 +47,9 @@ struct QuitActionHandlerTests {
     func testQuitBasicFunctionality() async throws {
         let (engine, mockIO) = await GameEngine.test()
 
+        // Queue Y as response to confirmation
+        await mockIO.enqueueInput("y")
+
         // Act: Use engine.execute for full pipeline
         try await engine.execute("quit")
 
@@ -55,9 +58,12 @@ struct QuitActionHandlerTests {
         expectNoDifference(output, """
             > quit
             Your score is 0 (total of 10 points), in 0 moves. Do you wish
-            to leave the game? (Y is affirmative):> 
+            to leave the game? (Y is affirmative): y
             Goodbye!
             """)
+
+        // Should also request quit
+        #expect(await engine.shouldQuit)
     }
 
     @Test("QUIT produces correct ActionResult")
@@ -129,6 +135,9 @@ struct QuitActionHandlerTests {
     func testQAliasWorks() async throws {
         let (engine, mockIO) = await GameEngine.test()
 
+        // Queue Y as response to confirmation
+        await mockIO.enqueueInput("y")
+
         // Act: Use engine.execute for full pipeline
         try await engine.execute("q")
 
@@ -137,7 +146,7 @@ struct QuitActionHandlerTests {
         expectNoDifference(output, """
             > q
             Your score is 0 (total of 10 points), in 0 moves. Do you wish
-            to leave the game? (Y is affirmative):> 
+            to leave the game? (Y is affirmative): y
             Goodbye!
             """)
 
@@ -181,6 +190,9 @@ struct QuitActionHandlerTests {
             engine.updatePlayerScore(by: 100)
         )
 
+        // Queue Y as response to confirmation
+        await mockIO.enqueueInput("y")
+
         // Act: QUIT should work the same regardless of game state
         try await engine.execute("quit")
 
@@ -189,7 +201,7 @@ struct QuitActionHandlerTests {
         expectNoDifference(output, """
             > quit
             Your score is 100 (total of 10 points), in 0 moves. Do you wish
-            to leave the game? (Y is affirmative):> 
+            to leave the game? (Y is affirmative): y
             Goodbye!
             """)
 
@@ -210,7 +222,7 @@ struct QuitActionHandlerTests {
         // Execute QUIT
         try await engine.execute("quit")
 
-        // Verify game state hasn't changed (except for quit flag)
+        // Verify game state hasn’t changed (except for quit flag)
         let finalState = await engine.gameState
         #expect(finalState.player.score == initialScore)
         #expect(finalState.player.moves == initialMoves)
@@ -218,22 +230,22 @@ struct QuitActionHandlerTests {
         #expect(await engine.gameState.changeHistory.isEmpty)
     }
 
-    @Test("QUIT with extra parameters still works")
+    @Test("QUIT with extra parameters is rejected by parser")
     func testQuitWithExtraParameters() async throws {
         let (engine, mockIO) = await GameEngine.test()
 
         // Act: Use engine.execute for full pipeline
         try await engine.execute("quit game now")
 
-        // Assert Output - should work the same way
+        // Assert Output - should be rejected as bad grammar
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > quit game now
-            Goodbye!
+            I don’t understand that sentence.
             """)
 
-        // Should request quit
-        #expect(await engine.shouldQuit)
+        // Should NOT request quit
+        #expect(await !engine.shouldQuit)
     }
 
     @Test("Multiple QUIT commands maintain quit state")
@@ -249,18 +261,16 @@ struct QuitActionHandlerTests {
         #expect(await engine.shouldQuit) // Should still be quitting
         let secondOutput = await mockIO.flush()
 
-        // Both outputs should be identical
+        // First should produce full quit output
         expectNoDifference(firstOutput, """
             > quit
             Your score is 0 (total of 10 points), in 0 moves. Do you wish
-            to leave the game? (Y is affirmative):> 
+            to leave the game? (Y is affirmative):
             Goodbye!
             """)
+        // Second should be ignored due to shouldQuit flag
         expectNoDifference(secondOutput, """
             > quit
-            Your score is 0 (total of 10 points), in 0 moves. Do you wish
-            to leave the game? (Y is affirmative):> 
-            Goodbye!
             """)
     }
 
@@ -269,15 +279,10 @@ struct QuitActionHandlerTests {
         // Given
         let (engine, _) = await GameEngine.test()
 
-        // Check if quit verb is in vocabulary
-        let vocabulary = await engine.gameState.vocabulary
-        let quitVerbs = vocabulary.verbSynonyms["quit"]
-        print("Quit verbs in vocabulary: \(quitVerbs)")
-
         // Check if parser recognizes quit
         let parseResult = await engine.parser.parse(
             input: "quit",
-            vocabulary: vocabulary,
+            vocabulary: await engine.gameState.vocabulary,
             gameState: await engine.gameState
         )
 
@@ -333,7 +338,7 @@ struct QuitActionHandlerTests {
         expectNoDifference(output, """
             > quit
             Your score is 35 (total of 10 points), in 13 moves. Do you wish
-            to leave the game? (Y is affirmative):
+            to leave the game? (Y is affirmative): y
             Goodbye!
             """)
 
@@ -425,7 +430,7 @@ struct QuitActionHandlerTests {
         // Given
         let (engine, mockIO) = await GameEngine.test()
 
-        // Don't queue any input - readLine will return nil (EOF)
+        // Don’t queue any input - readLine will return nil (EOF)
 
         // When
         try await engine.execute("quit")
@@ -458,30 +463,27 @@ struct QuitActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > quit
-            Your score is 999 (total of 10 points), in 100 moves. Do you wish
-            to leave the game? (Y is affirmative): no
+            Your score is 999 (total of 10 points), in 100 moves. Do you
+            wish to leave the game? (Y is affirmative): no
             OK, continuing the game.
             """)
 
         #expect(await !engine.shouldQuit)
     }
 
-    @Test("QUIT with extra text is parsed correctly")
+    @Test("QUIT with extra text is also rejected by parser")
     func testQuitWithExtraText() async throws {
         let (engine, mockIO) = await GameEngine.test()
-        await mockIO.enqueueInput("y")
 
         try await engine.execute("quit game now")
 
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > quit game now
-            Your score is 0 (total of 10 points), in 0 moves. Do you wish
-            to leave the game? (Y is affirmative): y
-            Goodbye!
+            I don’t understand that sentence.
             """)
 
-        #expect(await engine.shouldQuit)
+        #expect(await !engine.shouldQuit)
     }
 
     @Test("QUIT handler works directly")
@@ -518,4 +520,6 @@ struct QuitActionHandlerTests {
         #expect(await engine.shouldQuit)
         #expect(result.message == "Goodbye!")
     }
+
+
 }

@@ -59,7 +59,9 @@ extension GameEngine {
         )
 
         for _ in 0..<times {
-            _ = await ioHandler.readLine(prompt: input)
+            // Record the command prompt for output transcript
+            await ioHandler.print("> \(input)", style: .input, newline: true)
+
             switch parseResult {
             case .success(let command):
                 // Allow quit command to be processed by QuitActionHandler
