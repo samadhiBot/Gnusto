@@ -54,6 +54,8 @@ struct QuitActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > quit
+            Your score is 0 (total of 10 points), in 0 moves. Do you wish
+            to leave the game? (Y is affirmative):> 
             Goodbye!
             """)
     }
@@ -134,6 +136,8 @@ struct QuitActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > q
+            Your score is 0 (total of 10 points), in 0 moves. Do you wish
+            to leave the game? (Y is affirmative):> 
             Goodbye!
             """)
 
@@ -173,12 +177,9 @@ struct QuitActionHandlerTests {
         let (engine, mockIO) = await GameEngine.test()
 
         // Modify game state
-        let scoreChange = StateChange(
-            entityID: .player,
-            attribute: .playerScore,
-            newValue: 100
+        try await engine.apply(
+            engine.updatePlayerScore(by: 100)
         )
-        try await engine.apply(scoreChange)
 
         // Act: QUIT should work the same regardless of game state
         try await engine.execute("quit")
@@ -187,6 +188,8 @@ struct QuitActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > quit
+            Your score is 100 (total of 10 points), in 0 moves. Do you wish
+            to leave the game? (Y is affirmative):> 
             Goodbye!
             """)
 
@@ -249,10 +252,14 @@ struct QuitActionHandlerTests {
         // Both outputs should be identical
         expectNoDifference(firstOutput, """
             > quit
+            Your score is 0 (total of 10 points), in 0 moves. Do you wish
+            to leave the game? (Y is affirmative):> 
             Goodbye!
             """)
         expectNoDifference(secondOutput, """
             > quit
+            Your score is 0 (total of 10 points), in 0 moves. Do you wish
+            to leave the game? (Y is affirmative):> 
             Goodbye!
             """)
     }
@@ -325,8 +332,8 @@ struct QuitActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > quit
-            Your score is 35 (total of 10 points), in 13 moves.
-            Do you wish to leave the game? (Y is affirmative): y
+            Your score is 35 (total of 10 points), in 13 moves. Do you wish
+            to leave the game? (Y is affirmative):
             Goodbye!
             """)
 
@@ -351,8 +358,8 @@ struct QuitActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > quit
-            Your score is 20 (total of 10 points), in 5 moves.
-            Do you wish to leave the game? (Y is affirmative): n
+            Your score is 20 (total of 10 points), in 5 moves. Do you wish
+            to leave the game? (Y is affirmative): n
             OK, continuing the game.
             """)
 
@@ -377,8 +384,8 @@ struct QuitActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > quit
-            Your score is 42 (total of 10 points), in 8 moves.
-            Do you wish to leave the game? (Y is affirmative): yes
+            Your score is 42 (total of 10 points), in 8 moves. Do you wish
+            to leave the game? (Y is affirmative): yes
             Goodbye!
             """)
 
@@ -403,8 +410,8 @@ struct QuitActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > quit
-            Your score is 0 (total of 10 points), in 1 moves.
-            Do you wish to leave the game? (Y is affirmative): maybe
+            Your score is 0 (total of 10 points), in 1 moves. Do you wish
+            to leave the game? (Y is affirmative): maybe
             Please answer yes or no. perhaps
             Please answer yes or no. y
             Goodbye!
@@ -427,8 +434,8 @@ struct QuitActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > quit
-            Your score is 0 (total of 10 points), in 0 moves.
-            Do you wish to leave the game? (Y is affirmative):
+            Your score is 0 (total of 10 points), in 0 moves. Do you wish
+            to leave the game? (Y is affirmative):
             Goodbye!
             """)
 
@@ -451,8 +458,8 @@ struct QuitActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > quit
-            Your score is 999 (total of 10 points), in 100 moves.
-            Do you wish to leave the game? (Y is affirmative): no
+            Your score is 999 (total of 10 points), in 100 moves. Do you wish
+            to leave the game? (Y is affirmative): no
             OK, continuing the game.
             """)
 
@@ -469,8 +476,8 @@ struct QuitActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > quit game now
-            Your score is 0 (total of 10 points), in 0 moves.
-            Do you wish to leave the game? (Y is affirmative): y
+            Your score is 0 (total of 10 points), in 0 moves. Do you wish
+            to leave the game? (Y is affirmative): y
             Goodbye!
             """)
 
