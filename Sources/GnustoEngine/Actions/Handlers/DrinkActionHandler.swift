@@ -32,6 +32,18 @@ public struct DrinkActionHandler: ActionHandler {
 
         // Check if the item is directly drinkable (either isDrinkable or isEdible for ZIL compatibility)
         if targetItem.hasFlag(.isDrinkable) || targetItem.hasFlag(.isEdible) {
+            // Check if item is inside a closed container
+            if case .item(let parentID) = targetItem.parent {
+                let container = try await context.engine.item(parentID)
+                if container.hasFlag(.isContainer) && !container.hasFlag(.isOpen) {
+                    if targetItem.hasFlag(.isTouched) || container.hasFlag(.isTransparent) {
+                        throw ActionResponse.containerIsClosed(parentID)
+                    } else {
+                        throw ActionResponse.itemNotAccessible(targetItemID)
+                    }
+                }
+            }
+
             // Direct drinkable item - check reachability
             guard await context.engine.playerCanReach(targetItemID) else {
                 throw ActionResponse.itemNotAccessible(targetItemID)

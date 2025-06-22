@@ -113,7 +113,7 @@ struct LockActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > lock box
-            Lock it with what?
+            Lock the box with what?
             """)
 
         // Assert No State Change

@@ -15,14 +15,16 @@ import Logging
 /// 2.  **Noise Word Removal:** Common, grammatically necessary but semantically unimportant
 ///     words (e.g., "the", "a", "to") are filtered out. These are defined in the
 ///     game's `Vocabulary`.
-/// 3.  **Verb Identification:** The parser identifies the primary action word (verb).
+/// 3.  **Adverb Removal:** Words that are adverbs (e.g., "quickly", "slowly") are filtered out.
+///     These are defined in the game's `Vocabulary`.
+/// 4.  **Verb Identification:** The parser identifies the primary action word (verb).
 ///     It can recognize multi-word verb synonyms (e.g., "pick up" for "take") if
 ///     they are defined in the `Vocabulary`.
-/// 4.  **Syntax Rule Matching:** The sequence of significant tokens is compared against
+/// 5.  **Syntax Rule Matching:** The sequence of significant tokens is compared against
 ///     the `SyntaxRule`s associated with the identified verb (also from `Vocabulary`).
 ///     Each rule defines a valid grammatical pattern (e.g., VERB-DIRECT_OBJECT,
 ///     VERB-DIRECT_OBJECT-PREPOSITION-INDIRECT_OBJECT).
-/// 5.  **Object Resolution:** Noun phrases are identified as potential direct and indirect
+/// 6.  **Object Resolution:** Noun phrases are identified as potential direct and indirect
 ///     objects. This involves:
 ///     *   Looking up nouns in the `Vocabulary`.
 ///     *   Considering their context within the `GameState` (e.g., what items are
@@ -96,9 +98,15 @@ public struct StandardParser: Parser {
             noiseWords: vocabulary.noiseWords
         )
 
-        // 3. Handle Single-Word Direction Command (e.g., "NORTH", "N")
-        if significantTokens.count == 1,
-           let directionWord = significantTokens.first,
+        // 3. Remove Adverbs (allow but ignore them)
+        let filteredTokens = removeAdverbs(
+            tokens: significantTokens,
+            adverbs: vocabulary.adverbs
+        )
+
+        // 4. Handle Single-Word Direction Command (e.g., "NORTH", "N")
+        if filteredTokens.count == 1,
+           let directionWord = filteredTokens.first,
            let direction = vocabulary.directions[directionWord]
         {
             // Assume a default movement verb like 'go'
@@ -111,24 +119,24 @@ public struct StandardParser: Parser {
             return .success(command)
         }
 
-        // 4. Handle Empty Input (after noise removal and direction check)
-        guard !significantTokens.isEmpty else {
+        // 5. Handle Empty Input (after noise removal and direction check)
+        guard !filteredTokens.isEmpty else {
             return .failure(.emptyInput)
         }
 
-        // 5. Identify Verb (handling multi-word synonyms)
+        // 6. Identify Verb (handling multi-word synonyms)
         var matchedVerbIDs: Set<VerbID> = [] // Store all potential verb IDs
         var verbTokenCount = 0
         var verbStartIndex = 0
 
         // Iterate through possible starting positions for the verb
-        for i in 0..<significantTokens.count {
+        for i in 0..<filteredTokens.count {
             var longestMatchLength = 0
             var potentialMatchIDs: Set<VerbID> = [] // Track IDs for the current longest match length
 
             // Check token sequences starting from index i
-            for length in (1...min(4, significantTokens.count - i)).reversed() { // Check up to 4-word verbs, reversed for longest match first
-                let subSequence = significantTokens[i..<(i + length)]
+            for length in (1...min(4, filteredTokens.count - i)).reversed() { // Check up to 4-word verbs, reversed for longest match first
+                let subSequence = filteredTokens[i..<(i + length)]
                 let verbPhrase = subSequence.joined(separator: " ")
 
                 // Look up the set of verbs associated with this phrase
@@ -159,7 +167,7 @@ public struct StandardParser: Parser {
         // Ensure at least one verb was matched
         guard !matchedVerbIDs.isEmpty else {
             // No known single or multi-word verb/synonym found
-            return .failure(.unknownVerb(significantTokens.first ?? significantTokens.joined(separator: " "))) // Use first word as guess
+            return .failure(.unknownVerb(filteredTokens.first ?? filteredTokens.joined(separator: " "))) // Use first word as guess
         }
 
         // ***** REVISED: Fetch rules for ALL matched VerbIDs *****
@@ -177,7 +185,7 @@ public struct StandardParser: Parser {
         }
 
         // Handle cases where verb(s) were matched but NONE have rules, and there are extra tokens
-        if allPotentialRules.isEmpty && significantTokens.count > verbTokenCount {
+        if allPotentialRules.isEmpty && filteredTokens.count > verbTokenCount {
             // Provide a generic error based on the *first* matched verb ID (arbitrary choice in ambiguity)
             let firstMatchedID = matchedVerbIDs.first!
             return .failure(
@@ -187,17 +195,17 @@ public struct StandardParser: Parser {
             )
         }
 
-        // 6. Match Tokens Against All Potential Syntax Rules
+        // 7. Match Tokens Against All Potential Syntax Rules
         var successfulParse: Command? = nil
         var bestError: ParseError? = nil
 
         // Pre-calculate input preposition once, as it's the same for all rules
-        let inputPreposition = findInputPreposition(tokens: significantTokens, startIndex: verbStartIndex + verbTokenCount, vocabulary: vocabulary)
+        let inputPreposition = findInputPreposition(tokens: filteredTokens, startIndex: verbStartIndex + verbTokenCount, vocabulary: vocabulary)
 
         for (verb, rule) in allPotentialRules { // Iterate through all potential rules
             let matchResult = matchRule(
                 rule: rule,
-                tokens: significantTokens,
+                tokens: filteredTokens,
                 verbStartIndex: verbStartIndex,
                 verb: verb, // <<< Pass the specific verb for this rule
                 vocabulary: vocabulary,
@@ -241,7 +249,7 @@ public struct StandardParser: Parser {
                     // If the input *also* has no preposition, this is a strong match.
                     // If the input *does* have a preposition, this is still a structural match,
                     // but potentially weaker than one where prepositions align. ZIL often ignores extra preps.
-                    // Let’s treat this as a potential success but keep looking for a better (preposition-matching) rule.
+                    // Let's treat this as a potential success but keep looking for a better (preposition-matching) rule.
                     // However, for simplicity now, let's consider it a success unless we find a better one later.
                     // TODO: Refine logic if ZIL treats extra prepositions differently (e.g., as errors).
                     if successfulParse == nil { // Only take this if we don't have a preposition-matched success yet
@@ -261,14 +269,14 @@ public struct StandardParser: Parser {
         } // End rule loop
         endRuleLoop: // Label for goto
 
-        // 7. Return Result
+        // 8. Return Result
         if let command = successfulParse {
             return .success(command)
         } else if let error = bestError { // Otherwise return best error found
              return .failure(error)
         } else {
             // Handle simple verb-only commands or internal error
-             if allPotentialRules.isEmpty && significantTokens.count == verbTokenCount {
+             if allPotentialRules.isEmpty && filteredTokens.count == verbTokenCount {
                  // Input was just a verb phrase matching one or more verbs, none of which had rules.
                  // Pick the first matched verb ID as the canonical one (arbitrary choice).
                  let firstMatchedID = matchedVerbIDs.first!
@@ -386,6 +394,14 @@ public struct StandardParser: Parser {
         noiseWords: Set<String>
     ) -> [String] {
         tokens.filter { !noiseWords.contains($0) }
+    }
+
+    /// Filters out adverbs from a token list.
+    func removeAdverbs(
+        tokens: [String],
+        adverbs: Set<String>
+    ) -> [String] {
+        tokens.filter { !adverbs.contains($0) }
     }
 
     // MARK: - Syntax Matching Logic (New)

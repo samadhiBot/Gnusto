@@ -79,7 +79,6 @@ struct LookActionHandlerTests {
             output,
             """
             > look
-
             — Bright Room —
 
             A brightly lit room.
@@ -136,7 +135,6 @@ struct LookActionHandlerTests {
             output,
             """
             > look
-
             — Test Room —
 
             A basic room.
@@ -224,7 +222,6 @@ struct LookActionHandlerTests {
             output,
             """
             > look
-
             — Dark Room —
 
             A dark, damp room.
@@ -262,7 +259,6 @@ struct LookActionHandlerTests {
             output,
             """
             > look
-
             — Plain Room —
 
             You are in a nondescript location.
@@ -291,11 +287,9 @@ struct LookActionHandlerTests {
             locations: dynamicRoom,
             locationComputers: [
                 dynamicRoom.id: LocationComputer { attributeID, gameState in
-                    let isFlagOn = gameState.globalState[specialFlag] == true
-                    let text =
-                        isFlagOn
-                        ? "The room *sparkles* brightly via registry."
-                        : "The room seems normal via registry."
+                    let isFlagOn = try gameState.hasFlag(specialFlag)
+                    let text = isFlagOn ? "The room *sparkles* brightly via registry."
+                                        : "The room seems normal via registry."
                     return .string(text)
                 }
             ]
@@ -303,8 +297,7 @@ struct LookActionHandlerTests {
 
         let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            globalState: [specialFlag: true],
-            parser: MockParser()
+            globalState: [specialFlag: true]
         )
 
         // Act 1: Flag is ON
@@ -317,7 +310,6 @@ struct LookActionHandlerTests {
             output1,
             """
             > look
-
             — Magic Room —
 
             The room *sparkles* brightly via registry.
@@ -342,7 +334,6 @@ struct LookActionHandlerTests {
             output2,
             """
             > look
-
             — Magic Room —
 
             The room seems normal via registry.
@@ -512,7 +503,6 @@ struct LookActionHandlerTests {
             output,
             """
             > examine box
-
             On its lid is a rough carving of a skull. The wooden box
             contains a gold coin.
             """)
@@ -562,9 +552,8 @@ struct LookActionHandlerTests {
             output,
             """
             > examine box
-
-            On its lid is a rough carving of a skull. The wooden box is
-            closed.
+            On its lid is a rough carving of a skull. The wooden box
+            is closed.
             """)
 
         // Assert Final State (Container marked touched)
@@ -613,7 +602,6 @@ struct LookActionHandlerTests {
             output,
             """
             > examine jar
-
             An old canning jar, probably from the 1940s. The glass jar
             contains a dead fly.
             """)
@@ -667,7 +655,6 @@ struct LookActionHandlerTests {
             output,
             """
             > examine table
-
             A shabby wooden table, worn from years of use. On the kitchen
             table are a dusty book and a lit candle.
             """

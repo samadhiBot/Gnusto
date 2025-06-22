@@ -20,6 +20,11 @@ public struct Vocabulary: Codable, Equatable, Sendable {
     /// Example: `["a", "an", "the", ".", ","]`
     public var noiseWords: Set<String>
 
+    /// Common adverbs that can be ignored by the parser.
+    /// These words are recognized but don't affect command processing.
+    /// Example: `["carefully", "quickly", "slowly", "quietly"]`
+    public var adverbs: Set<String>
+
     /// Common prepositions used to separate objects (e.g., "put X IN Y").
     public var prepositions: Set<String>
 
@@ -72,6 +77,7 @@ public struct Vocabulary: Codable, Equatable, Sendable {
         self.directions = [:]
         self.specialKeywords = Vocabulary.defaultSpecialKeywords
         self.conjunctions = Vocabulary.defaultConjunctions
+        self.adverbs = Vocabulary.defaultAdverbs
     }
 
     /// Initializes a vocabulary with pre-populated dictionaries and sets.
@@ -85,7 +91,8 @@ public struct Vocabulary: Codable, Equatable, Sendable {
         prepositions: Set<String> = Vocabulary.defaultPrepositions,
         pronouns: Set<String> = Vocabulary.defaultPronouns,
         specialKeywords: Set<String> = Vocabulary.defaultSpecialKeywords,
-        conjunctions: Set<String> = Vocabulary.defaultConjunctions
+        conjunctions: Set<String> = Vocabulary.defaultConjunctions,
+        adverbs: Set<String> = Vocabulary.defaultAdverbs
     ) {
         self.verbDefinitions = verbDefinitions // Assign new dictionary
         self.items = items
@@ -97,6 +104,7 @@ public struct Vocabulary: Codable, Equatable, Sendable {
         self.pronouns = pronouns
         self.specialKeywords = specialKeywords
         self.conjunctions = conjunctions
+        self.adverbs = adverbs
     }
 
     // MARK: - Default Definitions
@@ -162,6 +170,22 @@ public struct Vocabulary: Codable, Equatable, Sendable {
     public static let defaultConjunctions: Set<String> = [
         "and",
         ","
+    ]
+
+    /// Default adverbs that can be ignored by the parser.
+    /// These words are recognized but don't affect command processing.
+    /// Example: `["carefully", "quickly", "slowly", "quietly"]`
+    public static let defaultAdverbs: Set<String> = [
+        "carefully",
+        "gently",
+        "loudly",
+        "quietly",
+        "quickly",
+        "rapidly",
+        "slowly",
+        "softly",
+        "thoroughly",
+        "vigorously",
     ]
 
     /// Default verbs common to most IF games.
@@ -1026,7 +1050,13 @@ public struct Vocabulary: Codable, Equatable, Sendable {
         Verb(
             id: .laugh,
             synonyms: "guffaw", "chortle", "cackle",
-            syntax: [SyntaxRule(.verb)],
+            syntax: [
+                SyntaxRule(.verb),
+                SyntaxRule(
+                    pattern: [.verb, .preposition, .directObject],
+                    requiredPreposition: "at"
+                ),
+            ],
             requiresLight: false
         ),
 
@@ -1219,6 +1249,7 @@ public struct Vocabulary: Codable, Equatable, Sendable {
         case adjectives
         case locationNames // Added coding key
         case noiseWords
+        case adverbs
         case prepositions
         case pronouns
         case directions
@@ -1235,6 +1266,7 @@ public struct Vocabulary: Codable, Equatable, Sendable {
         adjectives = try container.decode([String: Set<ItemID>].self, forKey: .adjectives)
         locationNames = try container.decodeIfPresent([String: LocationID].self, forKey: .locationNames) ?? [:] // Decode new property
         noiseWords = try container.decode(Set<String>.self, forKey: .noiseWords)
+        adverbs = try container.decode(Set<String>.self, forKey: .adverbs)
         prepositions = try container.decode(Set<String>.self, forKey: .prepositions)
         pronouns = try container.decode(Set<String>.self, forKey: .pronouns)
         directions = try container.decode([String: Direction].self, forKey: .directions)
@@ -1249,6 +1281,7 @@ public struct Vocabulary: Codable, Equatable, Sendable {
         try container.encode(adjectives, forKey: .adjectives)
         try container.encode(locationNames, forKey: .locationNames) // Encode new property
         try container.encode(noiseWords, forKey: .noiseWords)
+        try container.encode(adverbs, forKey: .adverbs)
         try container.encode(prepositions, forKey: .prepositions)
         try container.encode(pronouns, forKey: .pronouns)
         try container.encode(directions, forKey: .directions)

@@ -38,7 +38,7 @@ struct LaughActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > laugh at the pebble
-            Unexpected words found after command: ‘at pebble’ // FIXME
+            You laugh heroically at your impossible circumstances.
             """)
     }
 }

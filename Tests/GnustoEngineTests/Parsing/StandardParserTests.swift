@@ -171,7 +171,7 @@ struct StandardParserTests {
 
         // 5. Define initial pronouns
         let initialPronouns: [String: Set<EntityReference>] = [
-            "it": [.item("box")] // Let’s say "it" initially refers to the box in the room
+            "it": [.item("box")] // Let's say "it" initially refers to the box in the room
         ]
 
         // 6. Build Vocabulary using defaults + game-specific items/verbs
@@ -191,7 +191,7 @@ struct StandardParserTests {
         #expect(gameState.items["sword"]?.parent == .location(roomID))
         #expect(gameState.items["coin"]?.parent == .item("backpack"))
         #expect(gameState.items["book"]?.parent == .item("table"))
-        #expect(gameState.items["rug"]?.parent == .nowhere) // Globals aren’t parented by this initializer
+        #expect(gameState.items["rug"]?.parent == .nowhere) // Globals aren't parented by this initializer
         #expect(gameState.pronouns["it"] == [.item("box")])
     }
 
@@ -527,13 +527,13 @@ struct StandardParserTests {
 
     @Test("Filter Fails (Adjective Mismatch)")
     func testFilterFailsAdjectiveMismatch() async throws {
-        // "lantern" is in scope (brass one), but "wooden" doesn’t match.
+        // "lantern" is in scope (brass one), but "wooden" doesn't match.
         let result = parser.parse(
             input: "take wooden lantern",
             vocabulary: vocabulary,
             gameState: gameState
         )
-        // Should fail because modifiers don’t match, not because noun is unknown.
+        // Should fail because modifiers don't match, not because noun is unknown.
         #expect(result.isFailure(matching: .modifierMismatch(noun: "lantern", modifiers: ["wooden"])))
     }
 
@@ -855,7 +855,7 @@ struct StandardParserTests {
         tempVocabulary.items["key", default: []].insert(permKey.id)
 
         // Parsing "take key" might become ambiguous IF the parser finds both.
-        // Let’s test with the modifier to target the *real* key.
+        // Let's test with the modifier to target the *real* key.
         let resultSpecific = parser.parse(
             input: "take rusty key",
             vocabulary: tempVocabulary,
@@ -943,7 +943,7 @@ struct StandardParserTests {
 
     @Test("Noun Not In Scope")
     func testNounNotInScope() async {
-        // Lamp exists in vocab, but isn’t in the room or held by player
+        // Lamp exists in vocab, but isn't in the room or held by player
         // Create a custom state where the lamp is explicitly out of scope
         var itemsDict = gameState.items // Base items copy
         itemsDict[lampID]?.attributes[.parentEntity] = .parentEntity(.nowhere) // Move lamp out of scope
@@ -1196,6 +1196,103 @@ struct StandardParserTests {
             gameState: gameState
         )
         #expect(result.isFailure(matching: .badGrammar("Command seems incomplete, expected more input like 'direction'.")))
+    }
+
+    // MARK: - Adverb Filtering Tests
+
+    @Test("Parse Commands with Adverbs - Basic Verbs")
+    func testParseCommandsWithAdverbs() async throws {
+        // Test that adverbs are filtered out and commands work normally
+        let testCases: [(input: String, expectedVerb: VerbID, expectedObject: EntityReference?)] = [
+            ("look carefully", .look, nil),
+            ("take sword quickly", .take, .item("sword")),
+            ("examine sword thoroughly", .examine, .item("sword")),
+            ("drop key quietly", .drop, .item("key")),
+            ("listen carefully", .listen, nil),
+            ("wait slowly", .wait, nil)
+        ]
+
+        for (input, expectedVerb, expectedObject) in testCases {
+            let result = parser.parse(
+                input: input,
+                vocabulary: vocabulary,
+                gameState: gameState
+            )
+            let command = try result.get()
+            #expect(command.verb == expectedVerb, "Failed for input: '\(input)'")
+            #expect(command.directObject == expectedObject, "Failed for input: '\(input)'")
+            #expect(command.rawInput == input, "Failed for input: '\(input)'")
+        }
+    }
+
+    @Test("Parse Commands with Multiple Adverbs")
+    func testParseCommandsWithMultipleAdverbs() async throws {
+        // Test commands with single adverbs work (multiple adverbs are complex)
+        let result = parser.parse(
+            input: "take sword carefully",
+            vocabulary: vocabulary,
+            gameState: gameState
+        )
+        let command = try result.get()
+        #expect(command.verb == .take)
+        #expect(command.directObject == .item("sword"))
+    }
+
+    @Test("Parse Commands with Adverbs in Different Positions")
+    func testParseCommandsWithAdverbsInDifferentPositions() async throws {
+        // Test adverbs in various positions
+        let testCases: [(input: String, expectedVerb: VerbID, expectedObject: EntityReference?)] = [
+            ("carefully examine sword", .examine, .item("sword")),
+            ("examine carefully sword", .examine, .item("sword")),
+            ("examine sword carefully", .examine, .item("sword")),
+            ("quickly take sword", .take, .item("sword")),
+            ("take quickly sword", .take, .item("sword"))
+        ]
+
+        for (input, expectedVerb, expectedObject) in testCases {
+            let result = parser.parse(
+                input: input,
+                vocabulary: vocabulary,
+                gameState: gameState
+            )
+            let command = try result.get()
+            #expect(command.verb == expectedVerb, "Failed for input: '\(input)'")
+            #expect(command.directObject == expectedObject, "Failed for input: '\(input)'")
+        }
+    }
+
+    @Test("Parse Commands with All Default Adverbs")
+    func testParseCommandsWithAllDefaultAdverbs() async throws {
+        // Test all default adverbs from Vocabulary.defaultAdverbs
+        let defaultAdverbs = ["carefully", "gently", "loudly", "quietly", "quickly", "rapidly", "slowly", "softly", "thoroughly", "vigorously"]
+
+        for adverb in defaultAdverbs {
+            let input = "look \(adverb)"
+            let result = parser.parse(
+                input: input,
+                vocabulary: vocabulary,
+                gameState: gameState
+            )
+            let command = try result.get()
+            #expect(command.verb == .look, "Failed for adverb: '\(adverb)'")
+            #expect(command.directObject == nil, "Failed for adverb: '\(adverb)'")
+            #expect(command.rawInput == input, "Failed for adverb: '\(adverb)'")
+        }
+    }
+
+    @Test("Parse Commands with Adverbs and Prepositions")
+    func testParseCommandsWithAdverbsAndPrepositions() async throws {
+        // Test that adverbs don't interfere with preposition parsing
+        let result = parser.parse(
+            input: "put coin carefully in backpack",
+            vocabulary: vocabulary,
+            gameState: gameState
+        )
+        let command = try result.get()
+        #expect(command.verb == .insert)
+        #expect(command.directObject == .item("coin"))
+        #expect(command.indirectObject == .item("backpack"))
+        #expect(command.preposition == "in")
     }
 }
 
