@@ -442,12 +442,22 @@ open class MessageProvider: @unchecked Sendable {
         output(
             "chompResponse()",
             oneOf(
+                "It feels good to get some chomping done.",
+                "Sounds of your chomping echo all around you.",
+                "You bite with the confidence of someone who need never question their methods.",
+                "You chomp decisively, showing excellent follow-through on a bold concept.",
+                "You chomp enthusiastically at the air, flexing your impressive jaw strength.",
+                "You chomp with a creative interpretation that redefines the whole concept.",
+                "You chomp with a primal intensity that earns your ancestors' approval.",
+                "You chomp with such conviction that reality itself seems negotiable.",
+                "You chomp with the fearless abandon of a true innovator.",
+                "You chomp with the raw authenticity of someone unencumbered by context.",
                 "You chomp your teeth together menacingly.",
                 "You clench your fists and gnash your teeth.",
-                "You chomp at the air for everyone to see.",
-                "Sounds of your chomping echo around you.",
+                "You gnash your teeth with the passion of one who believes in their vision.",
+                "You gnaw thoughtfully on nothing in particular.",
                 "You practice your chomping technique.",
-                "It feels good to get some chomping done.",
+
             )
         )
     }
@@ -456,11 +466,19 @@ open class MessageProvider: @unchecked Sendable {
         output(
             "chompTargetResponse(item: '\(item)')",
             oneOf(
-                "You give \(item) a tentative nibble. It tastes terrible.",
-                "You chomp on \(item) experimentally. Not very satisfying.",
-                "You bite \(item). Your teeth don't make much of an impression.",
-                "You gnaw on \(item) briefly before giving up.",
-                "You take a bite of \(item). It's not very appetizing.",
+                "You bite \(item) decisively, demonstrating impressive dedication to the concept.",
+                "You bite \(item) enthusiastically, showing excellent problem-solving instincts.",
+                "You bite \(item) with a refreshing confidence in your unconventional approach.",
+                "You bite \(item) with the experimental spirit that advances civilizations.",
+                "You bite \(item) with the sort of outside-the-box thinking that changes everything.",
+                "You chomp \(item) boldly, redefining what's possible in this space.",
+                "You chomp \(item) with the fearless innovation of someone unbound by convention.",
+                "You chomp \(item) with the kind of creative thinking that challenges assumptions.",
+                "You chomp on \(item) with the boldness of a true pioneer.",
+                "You gnaw \(item) thoughtfully, exploring new frontiers of possibility.",
+                "You gnaw \(item) with the focused determination of a visionary.",
+                "You gnaw \(item) with the methodical approach of a serious researcher.",
+                "You gnaw on \(item) with the persistence of someone who truly believes in their methods.",
             )
         )
     }
@@ -539,16 +557,18 @@ open class MessageProvider: @unchecked Sendable {
         output(
             "cryResponse()",
             oneOf(
-                "You shed a tear for the futility of it all.",
-                "You weep quietly to yourself.",
-                "You sob dramatically, and feel a little better.",
-                "You cry a bit. There, there now.",
-                "You bawl your eyes out, which is somewhat cathartic.",
-                "You weep with the passion of a thousand sorrows.",
-                "You cry like a baby. How embarrassing.",
-                "You shed crocodile tears. Very convincing.",
-                "You weep bitter tears.",
-                "You break down and cry. After a bit the world seems a little brighter.",
+                "You cry boldly, demonstrating an intuitive grasp of cathartic release.",
+                "You cry with a raw vulnerability that takes real courage.",
+                "You cry with an emotional authenticity that cannot be taught.",
+                "You cry with the authentic passion of someone unafraid to feel deeply.",
+                "You shed tears with an admirable commitment to the full human experience.",
+                "You shed tears with the confident vulnerability of a true empath.",
+                "You sob with the fearless emotional intelligence of a philosopher gone mad.",
+                "You sob with the kind of emotional honesty that's refreshingly genuine.",
+                "You sob with the natural grace of someone comfortable with their feelings.",
+                "You weep beautifully, demonstrating your impressive range of expression.",
+                "You weep with the emotional depth of a true artist.",
+                "You weep with a heartfelt expression that defies cynicism.",
             )
         )
     }
@@ -564,14 +584,20 @@ open class MessageProvider: @unchecked Sendable {
         output(
             "curseResponse()",
             oneOf(
-                "You curse under your breath.",
-                "You let out a string of colorful expletives.",
-                "You swear like a sailor. Very cathartic.",
-                "You curse the fates that brought you here.",
-                "You damn everything in sight. You feel better now.",
-                "You use language that would make your mother wash your mouth out with soap.",
-                "You curse fluently in several languages.",
+                "You curse with a linguistic innovation that pushes boundaries.",
+                "You curse with an expressive range that demonstrates real versatility.",
+                "You curse with the eloquence of a true wordsmith.",
+                "You curse with the flair of a poet exploring darker themes.",
+                "You curse with the fluency of one comfortable with all registers of language.",
+                "You curse with the linguistic fearlessness of a true innovator.",
+                "You let loose a string of expletives that reveals an impressive technical proficiency.",
+                "You swear with a dedication to the full spectrum of human expression.",
+                "You swear with admirable creativity, even inventing a few new combinations.",
                 "You swear with the passion of a thousand frustrated adventurers.",
+                "You swear with the vocabulary of someone unencumbered by politeness.",
+                "You unleash expletives with the boldness of one who knows their craft.",
+                "You unleash profanity with a passionate intensity that's genuinely moving.",
+                "You unleash profanity with the confidence of a seasoned orator.",
             )
         )
     }
@@ -580,11 +606,20 @@ open class MessageProvider: @unchecked Sendable {
         output(
             "curseTargetResponse(item: '\(item)')",
             oneOf(
-                "You curse \(item) roundly. You feel a bit better.",
-                "You let loose a string of expletives at \(item).",
-                "You damn \(item) to the seven hells.",
-                "You swear colorfully at \(item). How therapeutic!",
-                "You curse \(item) with words that would make a sailor blush.",
+                "You curse \(item) with a directed passion that shows excellent analytical skills.",
+                "You curse \(item) with a refreshing clarity on where to assign blame.",
+                "You curse \(item) with impressive dedication to holding the right parties responsible.",
+                "You curse \(item) with the assuredness of one who's identified the real problem.",
+                "You curse \(item) with the focused anger of someone who's really thought this through.",
+                "You direct expletives at \(item) with the systematic thinking of a true investigator.",
+                "You direct profanity at \(item) with that kind of strategic thinking that gets results.",
+                "You swear at \(item) with a targeted approach that demonstrates real insight.",
+                "You swear at \(item) with an admirable precision in your target selection.",
+                "You swear at \(item) with refreshing decisiveness when it comes to fault attribution.",
+                "You swear at \(item) with the logical approach of one who understands accountability.",
+                "You swear at \(item) with unmatched confidence in your problem-solving methodology.",
+                "You unleash a tirade at \(item) with excellent instincts for root cause analysis.",
+                "You unleash expletives at \(item) with an impressive commitment to cause-and-effect reasoning.",
             )
         )
     }
@@ -628,17 +663,20 @@ open class MessageProvider: @unchecked Sendable {
         output(
             "danceResponse()",
             oneOf(
-                "Dancing is forbidden.",
-                "You dance an adorable little jig.",
-                "You boogie down with surprising grace.",
-                "You perform a modern interpretive dance.",
-                "You dance like nobody's watching (which they aren't).",
-                "You cut a rug with style and panache.",
-                "You dance the dance of your people.",
-                "You waltz around the area with imaginary partners.",
-                "You break into spontaneous choreography.",
-                "You dance with wild abandon. Bravo!",
-                "Let all the children boogie.",
+                "You boogie with admirable confidence in your choreographic vision.",
+                "You boogie with impressive commitment to your personal artistic expression.",
+                "You boogie with the bold conviction of one who's rewriting the rules.",
+                "You boogie with the fearless self-expression of a pioneering artist.",
+                "You dance with admirable commitment to the full spectrum of human motion.",
+                "You dance with an innovative spirit that pushes the boundaries of the form.",
+                "You dance with an interpretive boldness that transcends conventional movement.",
+                "You dance with impressive range, exploring movements that defy categorization.",
+                "You dance with refreshing originality, creating your own relationship with music.",
+                "You dance with the confident flair of one who has finally found their voice.",
+                "You dance with the fearless creativity of someone redefining rhythm itself.",
+                "You dance with the natural grace of one unencumbered by traditional technique.",
+                "You move rhythmically with profound dedication to your own internal beat.",
+                "You move with an authentic passion that cannot be choreographed.",
             )
         )
     }
@@ -787,16 +825,16 @@ open class MessageProvider: @unchecked Sendable {
         output(
             "giggleResponse()",
             oneOf(
-                "You giggle softly to yourself.",
-                "You chuckle with amusement.",
-                "You snicker quietly. How mischievous!",
-                "You titter like a schoolchild.",
-                "You giggle uncontrollably. How embarrassing!",
-                "You chuckle at some private joke.",
-                "You giggle with glee.",
-                "You snicker at the absurdity of it all.",
-                "You chortle with delight.",
-                "You giggle like a maniac. Very therapeutic.",
+                "You chortle with the sophisticated humor of someone who gets jokes others don't.",
+                "You chuckle with an admirable lightness of spirit in the face of everything.",
+                "You chuckle with an appreciation for life's subtle ironies.",
+                "You chuckle with the confident amusement of someone in on the cosmic joke.",
+                "You chuckle with the fearless joy of someone unafraid to find things funny.",
+                "You giggle with a genuine delight that's beautifully unguarded.",
+                "You giggle with refreshing honesty about what you find amusing.",
+                "You snicker with impressive insight into the absurdities around you.",
+                "You snicker with the discerning wit of someone who sees the bigger picture.",
+                "You snicker with the sophisticated appreciation of someone who truly understands irony.",
             )
         )
     }
@@ -1080,10 +1118,21 @@ open class MessageProvider: @unchecked Sendable {
         output(
             "jumpResponse()",
             oneOf(
-                "You jump on the spot, fruitlessly.",
-                "You jump up and down.",
-                "You leap into the air.",
-                "You bounce up and down.",
+                "You bounce with a kinetic enthusiasm that shows real _joie de vivre_.",
+                "You bounce with admirable dedication to the ancient art of controlled falling.",
+                "You bounce with an energetic authenticity that's genuinely inspiring.",
+                "You bounce with refreshing optimism about the possibilities of upward motion.",
+                "You bounce with the natural grace of one comfortable with all dimensions of vertical movement.",
+                "You jump with a dedication to exploring the full range of human locomotion.",
+                "You jump with a physical expression that transcends mere transportation.",
+                "You jump with absolute confidence in your relationship with physics.",
+                "You jump with the athletic confidence of one who's mastered vertical movement.",
+                "You jump with the bold conviction of one who refuses to be earthbound.",
+                "You leap unencumbered by conventional ground-based thinking.",
+                "You leap with admirable commitment to defying gravity, however briefly.",
+                "You leap with admirable faith in your own propulsive capabilities.",
+                "You leap with impressive range, really exploring the vertical space around you.",
+                "You leap with the ambition of one reaching for new heights.",
             )
         )
     }
@@ -1106,7 +1155,20 @@ open class MessageProvider: @unchecked Sendable {
         output(
             "kissCharacter(character: '\(character)')",
             oneOf(
-                "\(character.capitalizedFirst) doesn't seem particularly receptive to your affections."
+                "You attempt to smooch \(character) in a bold romantic initiative that takes real courage.",
+                "You attempt to smooch \(character) with admirable dedication to expressing your feelings.",
+                "You attempt to smooch \(character) with refreshing honesty about your intentions.",
+                "You lean in to kiss \(character) with a romantic authenticity that's beautifully unguarded.",
+                "You lean in to kiss \(character) with the confident charm of one who knows their worth.",
+                "You lean in to kiss \(character) with the romantic confidence of one who's really reading the signals.",
+                "You lean in to kiss \(character) with unshakable confidence in your interpersonal appeal.",
+                "You move in for a kiss with \(character), demonstrating a bold faith in your charm offensive.",
+                "You move in for a kiss with \(character), demonstrating excellent instincts for seizing the moment.",
+                "You move in for a kiss with \(character), showing the bold vulnerability of a true romantic.",
+                "You pucker up at \(character) with admirable faith in the power of spontaneous affection.",
+                "You pucker up at \(character) with the fearless romanticism of one who shoots their shot.",
+                "You pucker up toward \(character) with impressive commitment to following your heart.",
+                "You pucker up toward \(character) with unchecked optimism about mutual attraction.",
             )
         )
     }
@@ -1115,15 +1177,20 @@ open class MessageProvider: @unchecked Sendable {
         output(
             "kissEnemy(enemy: '\(enemy)')",
             oneOf(
-                "You try to kiss \(enemy) mid-snarl, which seems poorly timed.",
-                "You lean in for a kiss, but \(enemy) seems more interested in eating your face.",
-                "You pucker up romantically, but \(enemy) responds with claws and teeth.",
-                "You move in for a smooch, but apparently \(enemy) is not in the mood for romance.",
-                "You lean in for a kiss while \(enemy) is actively trying to kill you.",
-                "Reading the room incorrectly, you pucker up as \(enemy) in full attack mode.",
+                "Reading the room incorrectly, you pucker up as \(enemy) enters full attack mode.",
+                "You attempt to kiss \(enemy) in an innovative act of diplomacy that truly thinks outside the box.",
+                "You attempt to smooch \(enemy) with admirable dedication to the power of unexpected gestures.",
+                "You attempt to smooch \(enemy) with a disarming confidence in your ability to find common ground.",
                 "You give them a smooch, but \(enemy) remains disappointingly homicidal.",
                 "You lean in for a kiss and narrowly avoid losing your nose.",
+                "You lean in for a kiss while \(enemy) is actively trying to kill you.",
+                "You lean in for a kiss, but \(enemy) seems more interested in eating your face.",
+                "You lean in to kiss \(enemy) with the fearless romanticism of one who refuses to give up on love.",
+                "You lean in to kiss \(enemy) in an act of creative problem-solving that redefines the situation.",
+                "You move in for a kiss with \(enemy), demonstrating the bold vulnerability of a true peacemaker.",
                 "You pucker up and then immediately regret this tactical decision.",
+                "You pucker up at \(enemy), knowing inside that _love_ is the ultimate weapon.",
+                "You try to kiss \(enemy) mid-snarl, which seems poorly timed.",
             )
         )
     }
@@ -1132,15 +1199,26 @@ open class MessageProvider: @unchecked Sendable {
         output(
             "kissObject(item: '\(item)')",
             oneOf(
-                "You give \(item) a quick kiss, which fails to reveal anything significant.",
-                "You kiss \(item) experimentally, but nothing remarkable happens.",
-                "You plant a brief kiss on \(item), yet your lips learn nothing new.",
-                "You kiss \(item) once, and think you detect trace amounts of indifference.",
-                "You kiss it curiously, but your curiosity remains unsatisfied.",
                 "You briefly kiss \(item), which offers no secrets to your lips.",
+                "You give \(item) a passionate kiss with the fearless vulnerability of a true romantic.",
+                "You give \(item) a quick kiss, which fails to reveal anything significant.",
+                "You give \(item) a tender kiss with confidence in your ability to connect with anything.",
                 "You give \(item) an investigative kiss. The investigation yields little.",
+                "You kiss \(item) experimentally, but nothing remarkable happens.",
+                "You kiss \(item) once, and think you detect trace amounts of indifference.",
+                "You kiss \(item) with a passionate curiosity that explores all possibilities.",
+                "You kiss \(item) with impressive commitment to expressing affection in all its forms.",
+                "You kiss \(item) with impressive dedication to spreading love wherever you go.",
+                "You kiss \(item) with the bold authenticity of one who follows their heart.",
+                "You kiss it curiously, but your curiosity remains unsatisfied.",
+                "You plant a brief kiss on \(item), yet your lips learn nothing new.",
+                "You plant a kiss on \(item) with an emotional generosity that's beautifully inclusive.",
                 "You plant a small kiss on \(item), learning nothing your eyes hadn't already told you.",
+                "You plant a smooch on \(item) with admirable commitment to your emotional truth.",
+                "You plant a smooch on \(item) with admirable openness to unconventional relationships.",
                 "You plant a testing kiss on \(item), but the test results are inconclusive.",
+                "You smooch \(item) with an open-minded affection that transcends normal boundaries.",
+                "You smooch \(item) with the fearless romanticism of someone unbound by social conventions.",
             )
         )
     }
@@ -1148,7 +1226,22 @@ open class MessageProvider: @unchecked Sendable {
     open func kissSelf() -> String {
         output(
             "kissSelf()",
-            "You kiss yourself."
+            oneOf(
+                "You plant a smooch on yourself with admirable confidence in your own worth.",
+                "You kiss yourself with the kind of self-acceptance that's genuinely inspiring.",
+                "You give yourself a tender kiss with refreshing honesty about who deserves your affection most.",
+                "You smooch yourself with the fearless self-appreciation of someone who knows their value.",
+                "You kiss yourself with impressive dedication to practicing what you preach about self-care.",
+                "You plant a loving kiss on yourself with the kind of emotional intelligence that starts from within.",
+                "You give yourself a passionate smooch with admirable commitment to being your own best partner.",
+                "You kiss yourself with the bold authenticity of someone unafraid to show self-affection.",
+                "You plant a tender kiss on yourself with refreshing prioritization of the most important relationship.",
+                "You smooch yourself with a _healthy_ narcissism that's actually quite evolved.",
+                "You kiss yourself with impressive range in your capacity for love and appreciation.",
+                "You give yourself a romantic kiss with the fearless vulnerability of true self-acceptance.",
+                "You plant a smooch on yourself with admirable recognition of where charity begins.",
+
+            )
         )
     }
 
