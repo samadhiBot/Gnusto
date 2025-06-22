@@ -48,7 +48,7 @@ public struct PutOnActionHandler: ActionHandler {
             // Fetch item name for a more informative message if indirect object is missing.
             let itemToPut = try await context.engine.item(itemToPutID)
             throw ActionResponse.prerequisiteNotMet(
-                context.message.putOnWhat(
+                context.message.putWhatOn(
                     item: itemToPut.withDefiniteArticle
                 )
             )

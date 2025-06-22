@@ -712,7 +712,7 @@ public struct Vocabulary: Codable, Equatable, Sendable {
             id: .knock,
             synonyms: "rap", "tap",
             syntax: [
-                SyntaxRule(.verb),
+                SyntaxRule(.verb, .directObject),
                 SyntaxRule(
                     pattern: [.verb, .preposition, .directObject],
                     requiredPreposition: "on"
@@ -723,7 +723,7 @@ public struct Vocabulary: Codable, Equatable, Sendable {
 
         Verb(
             id: .pourOn,
-            synonyms: "pour on", "spill on",
+            synonyms: "pour", "spill",
             syntax: [
                 SyntaxRule(
                     pattern: [.verb, .directObject, .preposition, .indirectObject],
@@ -953,7 +953,7 @@ public struct Vocabulary: Codable, Equatable, Sendable {
 
         Verb(
             id: .tell,
-            synonyms: "inform", "say to", "talk",
+            synonyms: "inform", "talk to",
             syntax: [
                 SyntaxRule(.verb, .directObject),  // For "talk to troll" or "tell troll"
                 SyntaxRule(
@@ -968,7 +968,6 @@ public struct Vocabulary: Codable, Equatable, Sendable {
             id: .blow,
             synonyms: "breathe on", "blow on",
             syntax: [
-                SyntaxRule(.verb),
                 SyntaxRule(.verb, .directObject),
             ],
             requiresLight: false
