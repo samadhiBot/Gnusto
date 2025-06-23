@@ -124,20 +124,35 @@ final class MockIOHandler: IOHandler {
                     actualTranscript += "\n"
                 }
             } else if call.style == .input && !call.newline {
-                // Custom prompt (like quit confirmation prompt)
+                // Prompt (like "> " or quit confirmation prompt)
                 actualTranscript += call.text
 
                 // Check if the next call is a user response to this prompt
                 if i + 1 < recordedOutput.count &&
                     recordedOutput[i + 1].style == .input &&
                     recordedOutput[i + 1].newline {
-                    // There's a user response following this prompt, don't add newline here
+                    let response = recordedOutput[i + 1]
+
+                    // Check if this is the main prompt ("> ") with a response
+                    if call.text == "> " {
+                        // For main prompt, combine prompt and response on same line
+                        actualTranscript += response.text.trimmingCharacters(in: .whitespaces)
+                        actualTranscript += "\n"
+                        i += 1 // Skip the response since we handled it
+                    } else {
+                        // For custom prompts, keep response separate but don't add extra newline
+                        actualTranscript += response.text
+                        if response.newline {
+                            actualTranscript += "\n"
+                        }
+                        i += 1 // Skip the response since we handled it
+                    }
                 } else {
                     // No user response (EOF case), add newline after prompt
                     actualTranscript += "\n"
                 }
             } else if call.style == .input && call.newline {
-                // User response to a prompt
+                // User response to a prompt (if not already handled above)
                 actualTranscript += call.text
                 if call.newline {
                     actualTranscript += "\n"
