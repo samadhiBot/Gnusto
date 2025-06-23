@@ -1237,7 +1237,6 @@ extension GameEngine {
             .rub: RubActionHandler(),
             .save: SaveActionHandler(),
             .score: ScoreActionHandler(),
-            .scream: ScreamActionHandler(),
             .script: ScriptActionHandler(),
             .shake: ShakeActionHandler(),
             .sing: SingActionHandler(),

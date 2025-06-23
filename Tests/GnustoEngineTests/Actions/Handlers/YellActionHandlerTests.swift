@@ -6,7 +6,6 @@ import Testing
 /// Tests for the YellActionHandler.
 @Suite("YellActionHandler Tests")
 struct YellActionHandlerTests {
-
     @Test("YELL returns varied responses")
     func testYell() async throws {
         let (engine, mockIO) = await GameEngine.test()
@@ -26,5 +25,40 @@ struct YellActionHandlerTests {
 
         // Should have prompts and responses
         #expect(output.contains("> yell"), "Should contain command prompts")
+    }
+
+    func testScreamVariedResponses() async throws {
+        let (engine, mockIO) = await GameEngine.test()
+
+        // Act
+        try await engine.execute("scream", times: 3)
+
+        // Assert Output
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            > scream
+            You howl like a wounded animal.
+            
+            > scream
+            You let out a blood-curdling scream.
+            
+            > scream
+            You let loose a scream that would wake the dead.
+            """)
+    }
+
+    @Test("SCREAM at an object")
+    func testScreamAtObject() async throws {
+        let (engine, mockIO) = await GameEngine.test()
+
+        // Act
+        try await engine.execute("scream at the pebble")
+
+        // Assert Output
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            > scream at the pebble
+            You shout with gusto. The world remains studiously unimpressed.
+            """)
     }
 }

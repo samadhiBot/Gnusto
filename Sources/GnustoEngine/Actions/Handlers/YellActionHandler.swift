@@ -11,10 +11,10 @@ public struct YellActionHandler: ActionHandler {
 
     public let syntax: [SyntaxRule] = [
         .match(.verb),
-        .match(.verb, .directObject),
+        .match(.verb, .at, .directObject),
     ]
 
-    public let synonyms: [String] = ["shout", "scream", "holler"]
+    public let synonyms: [String] = ["shout", "scream", "shriek", "holler"]
 
     public let requiresLight: Bool = false
 

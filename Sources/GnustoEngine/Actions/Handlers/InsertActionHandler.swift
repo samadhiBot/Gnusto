@@ -9,6 +9,7 @@ public struct InsertActionHandler: ActionHandler {
 
     public let syntax: [SyntaxRule] = [
         .match(.verb, .directObjects, .in, .indirectObject),
+        .match(.verb, .directObjects, .inside, .indirectObject),
         .match(.verb, .directObjects, .into, .indirectObject),
     ]
 

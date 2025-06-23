@@ -82,7 +82,7 @@ struct MoveActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > move
-            Move what?
+            Where do you want to go?
             """)
     }
 

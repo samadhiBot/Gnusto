@@ -10,11 +10,11 @@ struct ThinkAboutActionHandlerTests {
         let (engine, mockIO) = await GameEngine.test()
 
         // Act
-        try await engine.execute("think about")
+        try await engine.execute("think")
 
         let output = await mockIO.flush()
         expectNoDifference(output, """
-            > think about
+            > think
             Think about what?
             """)
     }

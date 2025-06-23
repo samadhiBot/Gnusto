@@ -15,7 +15,8 @@ public struct LookActionHandler: ActionHandler {
 
     public let syntax: [SyntaxRule] = [
         .match(.verb),
-//        .match(.verb, .directObject),
+        .match(.verb, .directObject),
+        .match(.verb, .at, .directObject),
 //        .match(.verb, .through, .directObject),
     ]
 

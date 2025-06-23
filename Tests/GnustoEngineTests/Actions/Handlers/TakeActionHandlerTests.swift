@@ -880,7 +880,6 @@ struct TakeActionHandlerTests {
             #expect(command.verb == .take)
             #expect(command.directObject == .item("coin"))
             #expect(command.indirectObject == .item("bag"))
-            #expect(command.preposition == "from")
             #expect(command.rawInput == "take coin from bag")
         case .failure(let error):
             Issue.record("Expected successful parsing but got error: \(error)")

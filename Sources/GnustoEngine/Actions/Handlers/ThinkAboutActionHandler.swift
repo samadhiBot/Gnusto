@@ -8,7 +8,8 @@ public struct ThinkAboutActionHandler: ActionHandler {
     public let verbID: VerbID = .thinkAbout
 
     public let syntax: [SyntaxRule] = [
-        .match(.verb, .about, .directObject)
+        .match(.verb),
+        .match(.verb, .about, .directObject),
     ]
 
     public let synonyms: [String] = ["ponder", "consider"]
@@ -33,7 +34,7 @@ public struct ThinkAboutActionHandler: ActionHandler {
         // 1. Ensure we have a direct object
         guard let directObjectRef = context.command.directObject else {
             throw ActionResponse.custom(
-                context.message.doWhat(verb: .thinkAbout)
+                context.message.doWhat(action: "think about")
             )
         }
 

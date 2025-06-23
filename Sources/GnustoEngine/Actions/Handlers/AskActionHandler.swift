@@ -8,7 +8,9 @@ public struct AskActionHandler: ActionHandler {
     public let verbID: VerbID = .ask
 
     public let syntax: [SyntaxRule] = [
-        .match(.verb, .directObject, .about, .indirectObject)
+        .match(.verb),
+        .match(.verb, .directObject),
+        .match(.verb, .directObject, .about, .indirectObject),
     ]
 
     public let synonyms: [String] = ["question"]

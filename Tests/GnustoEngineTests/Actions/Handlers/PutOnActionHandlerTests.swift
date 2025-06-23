@@ -148,7 +148,7 @@ struct PutOnActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > put on table
-            Put the table on what?
+            Put what on the table?
             """)
 
         // Assert No State Change

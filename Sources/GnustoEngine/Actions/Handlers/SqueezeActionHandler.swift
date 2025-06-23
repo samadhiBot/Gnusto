@@ -11,7 +11,7 @@ public struct SqueezeActionHandler: ActionHandler {
         .match(.verb, .directObject)
     ]
 
-    public let synonyms: [String] = ["compress", "press"]
+    public let synonyms: [String] = ["compress"]
 
     public let requiresLight: Bool = true
 
