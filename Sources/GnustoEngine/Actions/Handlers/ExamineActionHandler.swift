@@ -3,6 +3,30 @@ import Foundation
 /// Handles the "EXAMINE" command and its synonyms (e.g., "LOOK AT", "DESCRIBE"), providing
 /// a detailed description of a specified item or the player.
 public struct ExamineActionHandler: ActionHandler {
+    // MARK: - Verb Definition Properties
+
+    public let verbID: VerbID = .examine
+
+    public let syntax: [SyntaxRule] = [
+        SyntaxRule(
+            pattern: [.verb, .directObject],
+            directObjectConditions: .allowsMultiple
+        ),
+        SyntaxRule(
+            pattern: [.verb, .preposition, .directObject],
+            requiredPreposition: "in"
+        ),
+        SyntaxRule(
+            pattern: [.verb, .preposition, .directObject],
+            requiredPreposition: "on"
+        ),
+    ]
+
+    public let synonyms: [String] = ["x", "inspect", "look at"]
+
+    public let requiresLight: Bool = true
+
+    // MARK: - Action Processing Methods
     /// Validates the "EXAMINE" command.
     ///
     /// This method ensures that:

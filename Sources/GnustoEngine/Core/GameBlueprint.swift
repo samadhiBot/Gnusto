@@ -46,16 +46,25 @@ public protocol GameBlueprint: Sendable {
     /// build the initial `GameState`.
     var locations: [Location] { get }
 
-    /// Optional closures to provide custom action handlers for specific verbs,
-    /// overriding the default engine handlers.
+    /// Custom action handlers that provide both verb definitions and logic.
     ///
-    /// Use this dictionary to replace or augment the standard behavior for verbs
-    /// like "take", "open", "go", etc. The key is a `VerbID` (e.g., `.take`) and
-    /// the value is an `ActionHandler` implementation.
+    /// Each `ActionHandler` is self-contained, defining its own `verbID`, `syntax`,
+    /// `synonyms`, and `requiresLight` properties along with the action logic.
+    /// This eliminates the need to coordinate verb definitions across multiple files.
     ///
-    /// The default implementation provides an empty dictionary, meaning all verbs
-    /// will use their standard engine behaviors unless overridden.
-    var customActionHandlers: [VerbID: ActionHandler] { get }
+    /// Example:
+    /// ```swift
+    /// var customActionHandlers: [ActionHandler] {
+    ///     [
+    ///         SpellcastActionHandler(), // Defines .spellcast verb with custom syntax
+    ///         CustomTakeHandler(),      // Overrides default .take behavior
+    ///     ]
+    /// }
+    /// ```
+    ///
+    /// Custom handlers will override any default engine handlers with the same `verbID`.
+    /// The default implementation provides an empty array.
+    var customActionHandlers: [ActionHandler] { get }
 
     /// Handlers triggered by events occurring for a specific item.
     ///
@@ -179,8 +188,8 @@ extension GameBlueprint {
         []
     }
 
-    public var customActionHandlers: [VerbID: ActionHandler] {
-        [:]
+    public var customActionHandlers: [ActionHandler] {
+        []
     }
 
     public var itemEventHandlers: [ItemID: ItemEventHandler] {

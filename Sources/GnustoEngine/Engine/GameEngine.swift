@@ -154,20 +154,20 @@ public actor GameEngine: Sendable {
         self.release = blueprint.release
         self.storyTitle = blueprint.storyTitle
 
-        // Build vocabulary with custom verbs if not provided
+        // Build action handlers and vocabulary from blueprint
+        let allActionHandlers: [VerbID: ActionHandler]
         let gameVocabulary: Vocabulary
-        if let providedVocabulary = vocabulary {
-            gameVocabulary = providedVocabulary
-        } else {
-            // Create custom verbs from the blueprint's custom action handlers
-            var customVerbs: [Verb] = []
-            for verbID in blueprint.customActionHandlers.keys {
-                // Create a basic definition; requiresLight=false is a safe default for custom verbs
-                let verbDef = Verb(id: verbID, syntax: [], requiresLight: false)
-                customVerbs.append(verbDef)
-            }
 
-            // Build vocabulary with custom verbs
+        if let providedVocabulary = vocabulary {
+            // If vocabulary is provided, use it and build handlers separately
+            gameVocabulary = providedVocabulary
+            allActionHandlers = Self.buildActionHandlers(from: blueprint.customActionHandlers)
+        } else {
+            // Extract both verb definitions and handlers from ActionHandler instances
+            let customHandlers = Self.buildActionHandlers(from: blueprint.customActionHandlers)
+            let customVerbs = Self.extractVerbDefinitions(from: blueprint.customActionHandlers)
+
+            allActionHandlers = customHandlers
             gameVocabulary = Vocabulary.build(
                 items: blueprint.items,
                 locations: blueprint.locations,
@@ -193,7 +193,7 @@ public actor GameEngine: Sendable {
         self.itemComputers = blueprint.itemComputers
         self.locationComputers = blueprint.locationComputers
 
-        self.actionHandlers = blueprint.customActionHandlers
+        self.actionHandlers = allActionHandlers
             .merging(Self.defaultActionHandlers) { (custom, _) in custom }
         self.itemEventHandlers = blueprint.itemEventHandlers
         self.locationEventHandlers = blueprint.locationEventHandlers
@@ -201,6 +201,30 @@ public actor GameEngine: Sendable {
         #if DEBUG
         self.actionHandlers[.debug] = DebugActionHandler()
         #endif
+    }
+
+    // MARK: - Action Handler Processing
+
+    /// Builds a dictionary of action handlers from an array of handlers, using their verbIDs as keys.
+    private static func buildActionHandlers(from handlers: [ActionHandler]) -> [VerbID: ActionHandler] {
+        var result: [VerbID: ActionHandler] = [:]
+        for handler in handlers {
+            result[handler.verbID] = handler
+        }
+        return result
+    }
+
+    /// Extracts verb definitions from action handlers to build vocabulary.
+    private static func extractVerbDefinitions(from handlers: [ActionHandler]) -> [Verb] {
+        return handlers.map { handler in
+            var verb = Verb(
+                id: handler.verbID,
+                syntax: handler.syntax,
+                requiresLight: handler.requiresLight
+            )
+            verb.synonyms = Set(handler.synonyms)
+            return verb
+        }
     }
 }
 

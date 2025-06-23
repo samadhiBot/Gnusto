@@ -3,6 +3,19 @@ import Foundation
 /// Handles the "INVENTORY" command (and its common synonym "I"), displaying a list
 /// of items currently carried by the player.
 public struct InventoryActionHandler: ActionHandler {
+    // MARK: - Verb Definition Properties
+
+    public let verbID: VerbID = .inventory
+
+    public let syntax: [SyntaxRule] = [
+        SyntaxRule(.verb)
+    ]
+
+    public let synonyms: [String] = ["i"]
+
+    public let requiresLight: Bool = false
+
+    // MARK: - Action Processing Methods
     /// Validates the "INVENTORY" command.
     /// This action typically requires no specific validation.
     public func validate(context: ActionContext) async throws {

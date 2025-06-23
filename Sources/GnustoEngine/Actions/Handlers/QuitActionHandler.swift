@@ -2,6 +2,19 @@ import Foundation
 
 /// Handles the "QUIT" (or "Q") command, allowing the player to end the game session.
 public struct QuitActionHandler: ActionHandler {
+    // MARK: - Verb Definition Properties
+
+    public let verbID: VerbID = .quit
+
+    public let syntax: [SyntaxRule] = [
+        SyntaxRule(.verb)
+    ]
+
+    public let synonyms: [String] = ["q"]
+
+    public let requiresLight: Bool = false
+
+    // MARK: - Action Processing Methods
     public init() {}
 
     /// Validates the "QUIT" command.

@@ -3,6 +3,27 @@ import Foundation
 /// Handles the "TAKE" command and its synonyms (e.g., "GET"), allowing the player to pick up
 /// an item and add it to their inventory.
 public struct TakeActionHandler: ActionHandler {
+    // MARK: - Verb Definition Properties
+
+    public let verbID: VerbID = .take
+
+    public let syntax: [SyntaxRule] = [
+        SyntaxRule(
+            pattern: [.verb, .directObject],
+            directObjectConditions: .allowsMultiple
+        ),
+        SyntaxRule(
+            pattern: [.verb, .directObject, .preposition, .indirectObject],
+            directObjectConditions: .allowsMultiple,
+            requiredPreposition: "from"
+        )
+    ]
+
+    public let synonyms: [String] = ["get", "grab", "pick"]
+
+    public let requiresLight: Bool = true
+
+    // MARK: - Action Processing Methods
     /// Validates the "TAKE" command.
     ///
     /// This method ensures that:

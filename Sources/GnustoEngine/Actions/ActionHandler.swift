@@ -7,6 +7,10 @@ import Foundation
 /// instances (provided via `GameBlueprint.customActionHandlers` or the engine's default
 /// handlers) to execute parsed player `Command`s.
 ///
+/// Each `ActionHandler` is completely self-contained, defining both the verb's parsing
+/// rules (via `verbID`, `syntax`, `synonyms`, etc.) and its execution logic. This eliminates
+/// the need to coordinate changes across multiple files when adding new verbs.
+///
 /// The handling of an action is divided into three distinct, asynchronous phases:
 /// 1.  **`validate(context:)`**: Check if the action is currently possible (e.g., prerequisites met,
 ///     target item is accessible). This phase should *not* modify game state.
@@ -20,6 +24,38 @@ import Foundation
 ///
 /// Handlers should be `Sendable` as they are used by the `GameEngine` actor.
 public protocol ActionHandler: Sendable {
+    // MARK: - Verb Definition Properties
+
+    /// The unique identifier for this verb.
+    ///
+    /// This defines the canonical name for the verb (e.g., "take", "examine", "spellcast").
+    /// The `GameEngine` uses this to register the handler and match parsed commands.
+    var verbID: VerbID { get }
+
+    /// Syntax patterns that this verb accepts.
+    ///
+    /// Each `SyntaxRule` defines a valid command structure for this verb, such as:
+    /// - `SyntaxRule(.verb)` for verbs without objects (e.g., "inventory")
+    /// - `SyntaxRule(.verb, .directObject)` for verbs with one object (e.g., "take sword")
+    /// - `SyntaxRule(.verb, .directObject, .preposition("with"), .indirectObject)` for complex patterns
+    ///
+    /// The parser uses these rules to validate and structure player input.
+    var syntax: [SyntaxRule] { get }
+
+    /// Alternative words that can trigger this verb.
+    ///
+    /// These provide convenient shortcuts for players (e.g., "x" for "examine", "i" for "inventory").
+    /// The parser treats synonyms as equivalent to the primary `verbID`.
+    var synonyms: [String] { get }
+
+    /// Whether this verb requires light to execute.
+    ///
+    /// If `true`, the verb will fail with a "room is dark" message when executed in darkness
+    /// (except for light-producing verbs like "turn on"). If `false`, the verb can be used
+    /// regardless of lighting conditions.
+    var requiresLight: Bool { get }
+
+    // MARK: - Action Processing Methods
     /// Validates if the action can be performed based on the current game state and command context.
     ///
     /// This method should check all prerequisites for the action (e.g., is the target item held?
@@ -102,5 +138,19 @@ extension ActionHandler {
         result: ActionResult
     ) async throws {
         // Default: Do nothing
+    }
+
+    /// Default implementation for `synonyms`. Returns an empty array.
+    ///
+    /// Override this property to provide alternative words that can trigger this verb.
+    public var synonyms: [String] {
+        []
+    }
+
+    /// Default implementation for `requiresLight`. Returns `true` for safety.
+    ///
+    /// Override this property to `false` for verbs that can be used in darkness.
+    public var requiresLight: Bool {
+        true
     }
 }
