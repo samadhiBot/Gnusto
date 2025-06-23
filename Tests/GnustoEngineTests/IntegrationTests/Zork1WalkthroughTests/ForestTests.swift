@@ -57,7 +57,7 @@ struct ForestTests {
             The forest is all around you, with trees in every direction.
 
             > examine grating
-            You can’t see any grating here.
+            You can’t see any such thing.
 
             > move leaves
             In disturbing the pile of leaves, a grating is revealed.
