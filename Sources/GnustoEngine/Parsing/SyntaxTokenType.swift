@@ -55,6 +55,9 @@ extension SyntaxTokenType {
     /// Expects the particle "behind" (e.g., "LOOK BEHIND DOOR").
     static let behind: SyntaxTokenType = .particle("behind")
 
+    /// Expects the particle "beneath" (e.g., "LOOK BENEATH THE DOORMAT").
+    static let beneath: SyntaxTokenType = .particle("beneath")
+
     /// Expects the particle "down" (e.g., "CLIMB DOWN LADDER").
     static let down: SyntaxTokenType = .particle("down")
 
