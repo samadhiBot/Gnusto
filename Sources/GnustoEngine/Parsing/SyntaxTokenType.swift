@@ -27,44 +27,65 @@ public enum SyntaxTokenType: Sendable, Equatable, Codable {
     case particle(String)  // Matches a specific particle word (e.g., "on", "off")
 }
 
+// MARK: - Conformances
+
 extension SyntaxTokenType: ExpressibleByStringLiteral {
     public init(stringLiteral value: String) {
         self = .particle(value)
     }
 }
 
+// MARK: - Default English Prepositions
+
 extension SyntaxTokenType {
+    /// Expects the particle "about" (e.g., "THINK ABOUT PUZZLE").
     static let about: SyntaxTokenType = .particle("about")
 
+    /// Expects the particle "at" (e.g., "LOOK AT PAINTING").
     static let at: SyntaxTokenType = .particle("at")
 
+    /// Expects the particle "behind" (e.g., "LOOK BEHIND DOOR").
     static let behind: SyntaxTokenType = .particle("behind")
 
+    /// Expects the particle "down" (e.g., "CLIMB DOWN LADDER").
     static let down: SyntaxTokenType = .particle("down")
 
+    /// Expects the particle "for" (e.g., "SEARCH FOR TREASURE").
     static let `for`: SyntaxTokenType = .particle("for")
 
+    /// Expects the particle "from" (e.g., "TAKE COIN FROM POCKET").
     static let from: SyntaxTokenType = .particle("from")
 
+    /// Expects the particle "in" (e.g., "PUT APPLE IN BAG").
     static let `in`: SyntaxTokenType = .particle("in")
 
+    /// Expects the particle "inside" (e.g., "LOOK INSIDE BOX").
     static let inside: SyntaxTokenType = .particle("inside")
 
+    /// Expects the particle "into" (e.g., "GO INTO CAVE").
     static let into: SyntaxTokenType = .particle("into")
 
+    /// Expects the particle "on" (e.g., "PUT BOOK ON TABLE").
     static let on: SyntaxTokenType = .particle("on")
 
+    /// Expects the particle "onto" (e.g., "CLIMB ONTO CHAIR").
     static let onto: SyntaxTokenType = .particle("onto")
 
+    /// Expects the particle "over" (e.g., "JUMP OVER FENCE").
     static let over: SyntaxTokenType = .particle("over")
 
+    /// Expects the particle "through" (e.g., "GO THROUGH DOOR").
     static let through: SyntaxTokenType = .particle("through")
 
+    /// Expects the particle "to" (e.g., "GIVE COIN TO MERCHANT").
     static let to: SyntaxTokenType = .particle("to")
 
+    /// Expects the particle "under" (e.g., "LOOK UNDER RUG").
     static let under: SyntaxTokenType = .particle("under")
 
+    /// Expects the particle "up" (e.g., "CLIMB UP TREE").
     static let up: SyntaxTokenType = .particle("up")
 
+    /// Expects the particle "with" (e.g., "UNLOCK DOOR WITH KEY").
     static let with: SyntaxTokenType = .particle("with")
 }
