@@ -11,10 +11,9 @@ public struct ClimbOnActionHandler: ActionHandler {
 
     public let syntax: [SyntaxRule] = [
         .match(.verb, .on, .directObject),
-        .match(.verb, .directObject),
     ]
 
-    public let synonyms: [String] = ["sit on", "mount"]
+    public let synonyms: [String] = ["climb", "sit", "mount"]
 
     public let requiresLight: Bool = true
 
@@ -27,7 +26,7 @@ public struct ClimbOnActionHandler: ActionHandler {
     public func validate(context: ActionContext) async throws {
         guard let directObjectRef = context.command.directObject else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.doWhat(verb: .climbOn)
+                context.message.doWhat(action: "climb on")
             )
         }
 

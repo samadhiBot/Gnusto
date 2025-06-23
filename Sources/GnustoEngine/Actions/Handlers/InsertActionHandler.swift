@@ -10,10 +10,9 @@ public struct InsertActionHandler: ActionHandler {
     public let syntax: [SyntaxRule] = [
         .match(.verb, .directObjects, .in, .indirectObject),
         .match(.verb, .directObjects, .into, .indirectObject),
-        .match(.verb, .directObjects, .indirectObject),
     ]
 
-    public let synonyms: [String] = ["put in", "place in"]
+    public let synonyms: [String] = ["put", "place"]
 
     public let requiresLight: Bool = true
 

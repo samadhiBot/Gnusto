@@ -47,18 +47,12 @@ public struct Vocabulary: Codable, Equatable, Sendable {
 
     /// Computed property to get the verb synonym mapping needed by the parser.
     /// Maps a synonym string (lowercase) to the Set of VerbIDs it can represent.
-    /// When multiple verbs match, exact ID matches are prioritized over synonym matches.
+    /// When multiple verbs match, all potential matches are included so the parser can
+    /// use syntax rules to determine the best match.
     public var verbSynonyms: [String: Set<VerbID>] {
         var mapping: [String: Set<VerbID>] = [:]
 
-        // First pass: collect all exact ID matches
-        var exactMatches: [String: VerbID] = [:]
-        for verb in verbDefinitions.values {
-            let primaryKey = verb.id.rawValue.lowercased()
-            exactMatches[primaryKey] = verb.id
-        }
-
-        // Second pass: build the mapping with prioritization
+        // Build the mapping without prioritization - include all possible matches
         for verb in verbDefinitions.values {
             let verbID = verb.id
             let primaryKey = verbID.rawValue.lowercased()
@@ -66,19 +60,10 @@ public struct Vocabulary: Codable, Equatable, Sendable {
             // Map the primary ID
             mapping[primaryKey, default: Set()].insert(verbID)
 
-            // Map all synonyms, but only if there's no exact ID match for that synonym
+            // Map all synonyms - allow synonyms to coexist with exact ID matches
             for synonym in verb.synonyms {
                 let synonymKey = synonym.lowercased()
-
-                // If this synonym exactly matches another verb ID, don't include this as a synonym match
-                // The exact match takes priority
-                if exactMatches[synonymKey] == nil {
-                    mapping[synonymKey, default: Set()].insert(verbID)
-                } else if exactMatches[synonymKey] == verbID {
-                    // This synonym is the same as the verb's own ID, so include it
-                    mapping[synonymKey, default: Set()].insert(verbID)
-                }
-                // Otherwise, skip this synonym to prioritize the exact ID match
+                mapping[synonymKey, default: Set()].insert(verbID)
             }
         }
         return mapping

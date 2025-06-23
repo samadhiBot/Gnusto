@@ -9,10 +9,9 @@ public struct PutOnActionHandler: ActionHandler {
 
     public let syntax: [SyntaxRule] = [
         .match(.verb, .directObject, .on, .indirectObject),
-        .match(.verb, .directObject, .indirectObject),
     ]
 
-    public let synonyms: [String] = ["place on", "set on"]
+    public let synonyms: [String] = ["put", "place", "set", "balance"]
 
     public let requiresLight: Bool = true
 

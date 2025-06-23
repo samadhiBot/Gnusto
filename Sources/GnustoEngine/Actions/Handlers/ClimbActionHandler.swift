@@ -16,7 +16,8 @@ public struct ClimbActionHandler: ActionHandler {
     public let verbID: VerbID = .climb
 
     public let syntax: [SyntaxRule] = [
-        .match(.verb, .directObject)
+        .match(.verb),
+        .match(.verb, .directObject),
     ]
 
     public let synonyms: [String] = ["ascend"]

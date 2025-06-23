@@ -719,6 +719,13 @@ open class MessageProvider: @unchecked Sendable {
         )
     }
 
+    open func doWhat(action: String) -> String {
+        output(
+            "doWhat(action: '\(action)')",
+            "\(action.capitalizedFirst) what?"
+        )
+    }
+
     open func doWhat(verb: VerbID) -> String {
         output(
             "doWhat(verb: .\(verb))",
