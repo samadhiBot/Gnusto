@@ -8,10 +8,7 @@ public struct PushActionHandler: ActionHandler {
     public let verbID: VerbID = .push
 
     public let syntax: [SyntaxRule] = [
-        SyntaxRule(
-            pattern: [.verb, .directObject],
-            directObjectConditions: .allowsMultiple
-        )
+        SyntaxRule(.verb, .directObjects)
     ]
 
     public let synonyms: [String] = ["shove"]

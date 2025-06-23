@@ -441,7 +441,7 @@ public struct StandardParser: Parser {
             switch tokenType {
             case .verb: continue
 
-            case .directObject:
+            case .directObject, .directObjects:
                 let phraseEndIndex = findEndOfNounPhrase(
                     startIndex: tokenCursor,
                     tokens: tokens,
@@ -456,7 +456,7 @@ public struct StandardParser: Parser {
                 // If no direct object found, leave directObjectPhraseTokens empty
                 // Action handlers will provide appropriate error messages
 
-            case .indirectObject:
+            case .indirectObject, .indirectObjects:
                  let phraseEndIndex = findEndOfNounPhrase(
                     startIndex: tokenCursor,
                     tokens: tokens,
@@ -516,14 +516,16 @@ public struct StandardParser: Parser {
         var isAllCommandDO = false
         var isMultipleObjectsDO = false
 
-        if rule.pattern.contains(.directObject) {
+        if rule.pattern.contains(.directObject) || rule.pattern.contains(.directObjects) {
+            let allowsMultiple = rule.pattern.contains(.directObjects)
+
             // If no direct object phrases were parsed, leave resolvedDirectObjects empty
             // The action handler will provide appropriate error messages
             if directObjectPhrases.isEmpty {
                 // Continue with empty direct objects - action handlers will handle this
             } else {
                 // Check if we have multiple phrases (conjunctions) and the rule allows multiple objects
-                if directObjectPhrases.count > 1 && rule.directObjectConditions.contains(.allowsMultiple) {
+                if directObjectPhrases.count > 1 && allowsMultiple {
                     isMultipleObjectsDO = true
                 } else if directObjectPhrases.count > 1 {
                     return .failure(
@@ -538,15 +540,13 @@ public struct StandardParser: Parser {
                     let lowercasedNoun = noun.lowercased()
 
                     // Check if this is an ALL command and the rule allows multiple objects
-                    if vocabulary.specialKeywords.contains(lowercasedNoun) &&
-                       rule.directObjectConditions.contains(.allowsMultiple) {
+                    if vocabulary.specialKeywords.contains(lowercasedNoun) && allowsMultiple {
                         isAllCommandDO = true
                         let allObjectsResult = resolveAllObjects(
                             verb: verb,
                             modifiers: modifiers,
                             in: gameState,
-                            using: vocabulary,
-                            requiredConditions: rule.directObjectConditions
+                            using: vocabulary
                         )
                         switch allObjectsResult {
                         case .success(let objects):
@@ -561,8 +561,7 @@ public struct StandardParser: Parser {
                             verb: verb,
                             modifiers: modifiers,
                             in: gameState,
-                            using: vocabulary,
-                            requiredConditions: rule.directObjectConditions
+                            using: vocabulary
                         )
                         switch singleObjectResult {
                         case .success(let objectRef):
@@ -582,7 +581,9 @@ public struct StandardParser: Parser {
         var isAllCommandIO = false
         var isMultipleObjectsIO = false
 
-        if rule.pattern.contains(.indirectObject) {
+        if rule.pattern.contains(.indirectObject) || rule.pattern.contains(.indirectObjects) {
+            let allowsMultiple = rule.pattern.contains(.indirectObjects)
+
             // If no indirect object phrases were parsed, leave resolvedIndirectObjects empty
             // The action handler will provide appropriate error messages
             if indirectObjectPhrases.isEmpty {
@@ -590,7 +591,7 @@ public struct StandardParser: Parser {
             } else {
 
             // Check if we have multiple phrases (conjunctions) and the rule allows multiple objects
-            if indirectObjectPhrases.count > 1 && rule.indirectObjectConditions.contains(.allowsMultiple) {
+            if indirectObjectPhrases.count > 1 && allowsMultiple {
                 isMultipleObjectsIO = true
             } else if indirectObjectPhrases.count > 1 {
                 return .failure(
@@ -605,15 +606,13 @@ public struct StandardParser: Parser {
                 let lowercasedNoun = noun.lowercased()
 
                 // Check if this is an ALL command and the rule allows multiple objects
-                if vocabulary.specialKeywords.contains(lowercasedNoun) &&
-                   rule.indirectObjectConditions.contains(.allowsMultiple) {
+                if vocabulary.specialKeywords.contains(lowercasedNoun) && allowsMultiple {
                     isAllCommandIO = true
                     let allObjectsResult = resolveAllObjects(
                         verb: verb,
                         modifiers: modifiers,
                         in: gameState,
-                        using: vocabulary,
-                        requiredConditions: rule.indirectObjectConditions
+                        using: vocabulary
                     )
                     switch allObjectsResult {
                     case .success(let objects):
@@ -628,8 +627,7 @@ public struct StandardParser: Parser {
                         verb: verb,
                         modifiers: modifiers,
                         in: gameState,
-                        using: vocabulary,
-                        requiredConditions: rule.indirectObjectConditions
+                        using: vocabulary
                     )
                     switch singleObjectResult {
                     case .success(let objectRef):
@@ -808,8 +806,7 @@ public struct StandardParser: Parser {
         verb: VerbID,
         modifiers: [String],
         in gameState: GameState,
-        using vocabulary: Vocabulary,
-        requiredConditions: ObjectCondition
+        using vocabulary: Vocabulary
     ) -> Result<EntityReference?, ParseError> {
         let lowercasedNoun = noun.lowercased()
         let playerAliases: Set<String> = ["me", "self", "myself"]
@@ -852,10 +849,7 @@ public struct StandardParser: Parser {
                 switch ref {
                 case .item(let itemID):
                     // Check scope for this specific itemID
-                    let itemCandidates = gatherCandidates(
-                        in: gameState,
-                        requiredConditions: requiredConditions
-                    )
+                    let itemCandidates = gatherCandidates(in: gameState)
                     if itemCandidates.keys.contains(itemID) { // Check if item is in the general candidate pool
                         // Modifiers (adjectives) usually don't apply to pronouns directly,
                         // but if they did, this is where they'd be checked against the item's adjectives.
@@ -949,10 +943,7 @@ public struct StandardParser: Parser {
                 if verb == .debug, itemID.rawValue == noun { return .success(entityRef) }
 
                 // Use existing item-centric scoping and filtering
-                let itemCandidates = gatherCandidates(
-                    in: gameState,
-                    requiredConditions: requiredConditions
-                )
+                let itemCandidates = gatherCandidates(in: gameState)
                 if itemCandidates.keys.contains(itemID) { // Check if item is in the general candidate pool
                     // Pass the specific item's snapshot for modifier checking
                     if let item = gameState.items[itemID] {
@@ -1017,10 +1008,7 @@ public struct StandardParser: Parser {
                 }
 
                 // Check if any accessible items match the noun but not the modifiers
-                let itemCandidates = gatherCandidates(
-                    in: gameState,
-                    requiredConditions: requiredConditions
-                )
+                let itemCandidates = gatherCandidates(in: gameState)
                 let accessiblePotentialItems = potentialEntities.compactMap { entityRef -> Item? in
                     if case .item(let itemID) = entityRef,
                        let item = itemCandidates[itemID] {
@@ -1102,14 +1090,10 @@ public struct StandardParser: Parser {
         verb: VerbID,
         modifiers: [String],
         in gameState: GameState,
-        using vocabulary: Vocabulary,
-        requiredConditions: ObjectCondition
+        using vocabulary: Vocabulary
     ) -> Result<[EntityReference], ParseError> {
-        // Get all candidates that match the required conditions
-        let itemCandidates = gatherCandidates(
-            in: gameState,
-            requiredConditions: requiredConditions
-        )
+        // Get all candidates
+        let itemCandidates = gatherCandidates(in: gameState)
 
         // Filter candidates based on verb-specific criteria
         var validItems: [Item] = []
@@ -1196,12 +1180,9 @@ public struct StandardParser: Parser {
         return .success(entityRefs)
     }
 
-    /// Gathers all potential candidate ItemIDs currently in scope and matching required conditions.
+    /// Gathers all potential candidate ItemIDs currently in scope.
     /// NOTE: This function remains item-centric for now. It's used by `resolveObject` for item candidates.
-    func gatherCandidates(
-        in gameState: GameState,
-        requiredConditions: ObjectCondition
-    ) -> [ItemID: Item] {
+    func gatherCandidates(in gameState: GameState) -> [ItemID: Item] {
         let currentLocationID = gameState.player.currentLocationID
 
         // Use ReachabilityUtils for consistent scope resolution, but don't filter by light
@@ -1211,14 +1192,9 @@ public struct StandardParser: Parser {
         // Filter by parser-specific conditions
         var candidates: [ItemID: Item] = [:]
         for (itemID, item) in reachableItems {
-            if ReachabilityUtils.itemMeetsConditions(
-                item,
-                requiredConditions: requiredConditions,
-                currentLocationID: currentLocationID,
-                gameState: gameState
-            ) {
-                candidates[itemID] = item
-            }
+            // Since we removed ObjectCondition, we just include all reachable items
+            // Specific filtering happens at the verb level in resolveAllObjects
+            candidates[itemID] = item
         }
 
         return candidates
@@ -1298,7 +1274,7 @@ public struct StandardParser: Parser {
                     if currentToken == expectedParticle {
                         isBoundaryToken = true
                     }
-                case .directObject, .indirectObject:
+                case .directObject, .directObjects, .indirectObject, .indirectObjects:
                     break
                 }
 

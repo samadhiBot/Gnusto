@@ -8,10 +8,7 @@ public struct WearActionHandler: ActionHandler {
     public let verbID: VerbID = .wear
 
     public let syntax: [SyntaxRule] = [
-        SyntaxRule(
-            pattern: [.verb, .directObject],
-            directObjectConditions: .allowsMultiple
-        )
+        SyntaxRule(.verb, .directObjects)
     ]
 
     public let synonyms: [String] = ["don"]

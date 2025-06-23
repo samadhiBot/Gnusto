@@ -11,12 +11,20 @@ public enum SyntaxTokenType: Sendable, Equatable, Codable {
 
     /// Expects a noun phrase that will be identified as the direct object of the
     /// verb (e.g., the "APPLE" in "TAKE APPLE") _or_ the object of a preposition
-    /// (e.g. the "ANT" in "YELL AT THE ANT").
+    /// (e.g. the "ANT" in "YELL AT THE ANT"). Expects a single object.
     case directObject
 
+    /// Expects one or more noun phrases that will be identified as direct objects
+    /// of the verb (e.g., "TAKE ALL" or "TAKE APPLE AND ORANGE"). Allows multiple objects.
+    case directObjects
+
     /// Expects a noun phrase that will be identified as the indirect object of the
-    /// verb (e.g., the "BAG" in "PUT APPLE IN BAG").
+    /// verb (e.g., the "BAG" in "PUT APPLE IN BAG"). Expects a single object.
     case indirectObject
+
+    /// Expects one or more noun phrases that will be identified as indirect objects
+    /// of the verb. Allows multiple objects.
+    case indirectObjects
 
     /// Expects a word indicating a direction of movement (e.g., "NORTH", "UP", "WEST").
     case direction  // Matches a known direction word (e.g., "north", "n")

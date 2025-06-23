@@ -8,10 +8,7 @@ public struct ExamineActionHandler: ActionHandler {
     public let verbID: VerbID = .examine
 
     public let syntax: [SyntaxRule] = [
-        SyntaxRule(
-            pattern: [.verb, .directObject],
-            directObjectConditions: .allowsMultiple
-        ),
+        SyntaxRule(.verb, .directObjects),
         SyntaxRule(.verb, .in, .directObject),
         SyntaxRule(.verb, .on, .directObject),
     ]

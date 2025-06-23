@@ -8,10 +8,7 @@ public struct PullActionHandler: ActionHandler {
     public let verbID: VerbID = .pull
 
     public let syntax: [SyntaxRule] = [
-        SyntaxRule(
-            pattern: [.verb, .directObject],
-            directObjectConditions: .allowsMultiple
-        )
+        SyntaxRule(.verb, .directObjects)
     ]
 
     public let synonyms: [String] = []

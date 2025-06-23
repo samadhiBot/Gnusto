@@ -11,23 +11,15 @@ import Foundation
 ///
 /// For example, a "TAKE" verb might have rules like:
 /// - `SyntaxRule(.verb, .directObject)` for "TAKE APPLE"
+/// - `SyntaxRule(.verb, .directObjects)` for "TAKE ALL" or "TAKE APPLE AND ORANGE"
 /// - `SyntaxRule(.verb, .directObject, .in, .indirectObject)` for "PUT APPLE IN BAG"
 ///
 /// Game developers typically define these rules implicitly when creating `VerbDefinition`s
 /// using convenience initializers, or explicitly if more control over the grammar is needed.
 public struct SyntaxRule: Sendable, Equatable, Codable {
     /// The sequence of `SyntaxTokenType`s that define the grammatical structure of this rule.
-    /// For example, `[.verb, .directObject]` or `[.verb, .directObject, [.preposition], .indirectObject]`.
+    /// For example, `[.verb, .directObject]` or `[.verb, .directObjects, .in, .indirectObject]`.
     public let pattern: [SyntaxTokenType]
-
-    /// A set of `ObjectCondition`s that the direct object (if specified by `.directObject`
-    /// in the `pattern`) must satisfy for this rule to match. For instance, it might
-    /// need to be `.held` by the player or be a `.container`.
-    public let directObjectConditions: ObjectCondition
-
-    /// A set of `ObjectCondition`s that the indirect object (if specified by `.indirectObject`
-    /// in the `pattern`) must satisfy. Similar to `directObjectConditions`.
-    public let indirectObjectConditions: ObjectCondition
 
     /// Computed property that returns the required preposition for this rule.
     ///
@@ -51,31 +43,19 @@ public struct SyntaxRule: Sendable, Equatable, Codable {
     // Explicit Codable conformance
     enum CodingKeys: String, CodingKey {
         case pattern
-        case directObjectConditionsRawValue // Encode/decode rawValue
-        case indirectObjectConditionsRawValue // Encode/decode rawValue
     }
 
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         pattern = try container.decode([SyntaxTokenType].self, forKey: .pattern)
-        let doRawValue = try container.decode(Int.self, forKey: .directObjectConditionsRawValue)
-        directObjectConditions = ObjectCondition(rawValue: doRawValue)
-        let ioRawValue = try container.decode(Int.self, forKey: .indirectObjectConditionsRawValue)
-        indirectObjectConditions = ObjectCondition(rawValue: ioRawValue)
-
-        // Initialize without validation, assume encoded data is valid
-        // Or re-add validation if needed
     }
 
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(pattern, forKey: .pattern)
-        try container.encode(directObjectConditions.rawValue, forKey: .directObjectConditionsRawValue)
-        try container.encode(indirectObjectConditions.rawValue, forKey: .indirectObjectConditionsRawValue)
     }
 
-    /// Creates a `SyntaxRule` with the given sequence of `SyntaxTokenType`s and default
-    /// (empty) conditions for objects, and no required preposition.
+    /// Creates a `SyntaxRule` with the given sequence of `SyntaxTokenType`s.
     ///
     /// This is a convenience initializer for simple patterns.
     /// Example: `SyntaxRule(.verb, .directObject)`
@@ -85,20 +65,11 @@ public struct SyntaxRule: Sendable, Equatable, Codable {
         self = .init(pattern: pattern)
     }
 
-    /// Creates a `SyntaxRule` with a specific pattern and optional conditions for objects
-    /// and a required preposition.
+    /// Creates a `SyntaxRule` with a specific pattern.
     ///
     /// - Parameters:
     ///   - pattern: An array of `SyntaxTokenType`s defining the rule's structure.
-    ///   - directObjectConditions: Conditions the direct object must meet. Defaults to `.none`.
-    ///   - indirectObjectConditions: Conditions the indirect object must meet. Defaults to `.none`.
-    public init(
-        pattern: [SyntaxTokenType],
-        directObjectConditions: ObjectCondition = .none,
-        indirectObjectConditions: ObjectCondition = .none
-    ) {
+    public init(pattern: [SyntaxTokenType]) {
         self.pattern = pattern
-        self.directObjectConditions = directObjectConditions
-        self.indirectObjectConditions = indirectObjectConditions
     }
 }

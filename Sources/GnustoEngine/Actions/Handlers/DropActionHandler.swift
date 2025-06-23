@@ -8,10 +8,7 @@ public struct DropActionHandler: ActionHandler {
     public let verbID: VerbID = .drop
 
     public let syntax: [SyntaxRule] = [
-        SyntaxRule(
-            pattern: [.verb, .directObject],
-            directObjectConditions: .allowsMultiple
-        )
+        SyntaxRule(.verb, .directObjects)
     ]
 
     public let synonyms: [String] = ["discard"]
