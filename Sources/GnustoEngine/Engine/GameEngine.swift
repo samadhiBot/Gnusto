@@ -165,14 +165,16 @@ public actor GameEngine: Sendable {
         } else {
             // Extract both verb definitions and handlers from ActionHandler instances
             let customHandlers = Self.buildActionHandlers(from: blueprint.customActionHandlers)
-            let customVerbs = Self.extractVerbDefinitions(from: blueprint.customActionHandlers)
+
+            // Combine custom and default action handlers to extract all verb definitions
+            let allHandlers = blueprint.customActionHandlers + Array(Self.defaultActionHandlers.values)
+            let allVerbs = Self.extractVerbDefinitions(from: allHandlers)
 
             allActionHandlers = customHandlers
             gameVocabulary = Vocabulary.build(
                 items: blueprint.items,
                 locations: blueprint.locations,
-                verbs: customVerbs,
-                useDefaultVerbs: true
+                verbs: allVerbs
             )
         }
 

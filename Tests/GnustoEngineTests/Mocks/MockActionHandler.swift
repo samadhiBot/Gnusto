@@ -5,13 +5,13 @@ import Foundation
 actor MockActionHandler: ActionHandler {
         // MARK: - ActionHandler Protocol Properties
 
-    nonisolated var verbID: VerbID { .take }
+    nonisolated let verbID: VerbID
 
-    nonisolated var syntax: [SyntaxRule] { [SyntaxRule(.verb, .directObject)] }
+    nonisolated let syntax: [SyntaxRule]
 
-    nonisolated var synonyms: [String] { [] }
+    nonisolated let synonyms: [String]
 
-    nonisolated var requiresLight: Bool { true }
+    nonisolated let requiresLight: Bool
 
     // MARK: - Mock Properties
 
@@ -37,10 +37,18 @@ actor MockActionHandler: ActionHandler {
 
     // Initializer for the actor
     init(
+        verbID: VerbID = .take,
+        syntax: [SyntaxRule] = [SyntaxRule(.verb, .directObject)],
+        synonyms: [String] = [],
+        requiresLight: Bool = true,
         processHandler: (@Sendable (ActionContext) async throws -> ActionResult)? = nil,
         errorToThrow: ActionResponse? = nil,
         throwFrom: ThrowPhase = .process // Default to throwing from process
     ) {
+        self.verbID = verbID
+        self.syntax = syntax
+        self.synonyms = synonyms
+        self.requiresLight = requiresLight
         self.processHandler = processHandler
         self.errorToThrow = errorToThrow
         self.throwFrom = throwFrom

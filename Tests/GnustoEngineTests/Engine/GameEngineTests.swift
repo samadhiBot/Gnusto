@@ -140,6 +140,7 @@ struct GameEngineTests {
     @Test("Engine Handles Action Error")
     func testEngineHandlesActionResponse() async throws {
         let mockTakeHandler = MockActionHandler(
+            verbID: .take,
             errorToThrow: .itemNotTakable("startItem"),
             throwFrom: .process
         )
@@ -244,7 +245,7 @@ struct GameEngineTests {
 
     @Test("Engine Processes Successful Command")
     func testEngineProcessesSuccessfulCommand() async throws {
-        let mockLookHandler = MockActionHandler()
+        let mockLookHandler = MockActionHandler(verbID: .look, syntax: [SyntaxRule(.verb)])
 
         // Initialize room with isLit: true
         let startRoom = Location(
@@ -309,8 +310,8 @@ struct GameEngineTests {
 
     @Test("Engine Processes Multiple Commands")
     func testEngineProcessesMultipleCommands() async throws {
-        let mockLookHandler = MockActionHandler()
-        let mockTakeHandler = MockActionHandler()
+        let mockLookHandler = MockActionHandler(verbID: .look, syntax: [SyntaxRule(.verb)])
+        let mockTakeHandler = MockActionHandler(verbID: .take)
 
         // Initialize room with isLit: true
         let startRoom = Location(
@@ -478,7 +479,7 @@ struct GameEngineTests {
 
     @Test("Engine State Persists Between Turns (Take -> Inventory)")
     func testEngineStatePersistsBetweenTurns() async throws {
-        let mockInventoryHandler = MockActionHandler()
+        let mockInventoryHandler = MockActionHandler(verbID: .inventory, syntax: [SyntaxRule(.verb)])
         // Use default TakeActionHandler to test state persistence
 
         // Initialize items with correct properties
@@ -596,7 +597,7 @@ struct GameEngineTests {
     func testEngineRecordsStateChangesFromActionHandler() async throws {
         // Given: An action handler that changes multiple things
         struct MockMultiChangeHandler: ActionHandler {
-            let verbID: VerbID = .take
+            let verbID: VerbID = VerbID("activate")
             let syntax: [SyntaxRule] = [SyntaxRule(.verb, .directObject)]
             let synonyms: [String] = []
             let requiresLight: Bool = true
@@ -666,7 +667,7 @@ struct GameEngineTests {
             items: lamp,
             // Use customActionHandlers directly with the ActionHandler
             customActionHandlers: [
-                "activate": mockActionHandler
+                mockActionHandler
             ]
         )
 
@@ -1495,8 +1496,9 @@ struct GameEngineTests {
         )
 
         // Create a mock handler that returns the ActionResult
+        let testVerb = VerbID("testapply")
         struct MockResultHandler: ActionHandler {
-            let verbID: VerbID = .take
+            let verbID: VerbID
             let syntax: [SyntaxRule] = [SyntaxRule(.verb, .directObject)]
             let synonyms: [String] = []
             let requiresLight: Bool = true
@@ -1508,13 +1510,12 @@ struct GameEngineTests {
             { /* No post-processing needed */  }
         }
 
-        let testVerb = VerbID("testapply")
-        let mockHandler = MockResultHandler(result: resultToTest)
+        let mockHandler = MockResultHandler(verbID: testVerb, result: resultToTest)
 
         // Setup game with the mock handler
         let game = MinimalGame(
             items: lamp,
-            customActionHandlers: [testVerb: mockHandler]
+            customActionHandlers: [mockHandler]
         )
 
         let (engine, mockIO) = await GameEngine.test(blueprint: game)

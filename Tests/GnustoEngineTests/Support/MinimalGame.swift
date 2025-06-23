@@ -11,7 +11,7 @@ public struct MinimalGame: GameBlueprint {
     public var player: Player
     public var items: [Item]
     public var locations: [Location]
-    public var customActionHandlers: [VerbID: ActionHandler]
+    public var customActionHandlers: [ActionHandler]
     public var itemEventHandlers: [ItemID: ItemEventHandler]
     public var locationEventHandlers: [LocationID: LocationEventHandler]
     public var fuses: [FuseID: Fuse]
@@ -24,7 +24,7 @@ public struct MinimalGame: GameBlueprint {
         player: Player = Player(in: LocationID("startRoom")),
         locations: Location...,
         items: Item...,
-        customActionHandlers: [VerbID: ActionHandler] = [:],
+        customActionHandlers: [ActionHandler] = [],
         itemEventHandlers: [ItemID: ItemEventHandler] = [:],
         locationEventHandlers: [LocationID: LocationEventHandler] = [:],
         fuses: [FuseID: Fuse] = [:],
@@ -51,6 +51,50 @@ public struct MinimalGame: GameBlueprint {
             )
         ] : locations
         self.customActionHandlers = customActionHandlers
+        self.itemEventHandlers = itemEventHandlers
+        self.locationEventHandlers = locationEventHandlers
+        self.fuses = fuses
+        self.daemons = daemons
+        self.itemComputers = itemComputers
+        self.locationComputers = locationComputers
+        self.messageProvider = messageProvider ?? MessageProvider(
+            randomNumberGenerator: SeededGenerator()
+        )
+    }
+
+    /// Convenience initializer for backward compatibility with test patterns.
+    /// Converts dictionary-style action handlers to array-style for the new API.
+    public init(
+        player: Player = Player(in: LocationID("startRoom")),
+        locations: Location...,
+        items: Item...,
+        customActionHandlers: [VerbID: ActionHandler],
+        itemEventHandlers: [ItemID: ItemEventHandler] = [:],
+        locationEventHandlers: [LocationID: LocationEventHandler] = [:],
+        fuses: [FuseID: Fuse] = [:],
+        daemons: [DaemonID: Daemon] = [:],
+        itemComputers: [ItemID: ItemComputer] = [:],
+        locationComputers: [LocationID: LocationComputer] = [:],
+        messageProvider: MessageProvider? = nil
+    ) {
+        self.player = player
+        self.items = items.isEmpty ? [
+            Item(
+                id: .startItem,
+                .name("pebble"),
+                .in(.location(LocationID("startRoom"))),
+                .isTakable
+            ),
+        ] : items
+        self.locations = locations.isEmpty ? [
+            Location(
+                id: .startRoom,
+                .name("Void"),
+                .description("An empty void."),
+                .inherentlyLit
+            )
+        ] : locations
+        self.customActionHandlers = Array(customActionHandlers.values)
         self.itemEventHandlers = itemEventHandlers
         self.locationEventHandlers = locationEventHandlers
         self.fuses = fuses
