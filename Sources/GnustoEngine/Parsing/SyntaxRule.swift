@@ -36,6 +36,33 @@ public struct SyntaxRule: Sendable, Equatable, Codable {
     /// or if the pattern doesn't include `.preposition`.
     public let requiredPreposition: String? // Store the string, not PrepositionID
 
+    /// Computed property that returns the required preposition for this rule.
+    ///
+    /// This checks both the explicit `requiredPreposition` property (used with `.preposition` tokens)
+    /// and any `.particle(string)` tokens that function as prepositions. This allows the parser
+    /// to treat `.particle("about")` the same as `.preposition` with `requiredPreposition: "about"`.
+    ///
+    /// - Returns: The required preposition string, or `nil` if no specific preposition is required.
+    public var effectiveRequiredPreposition: String? {
+        // First check explicit requiredPreposition
+        if let explicit = requiredPreposition {
+            return explicit
+        }
+
+        // Then check for particle tokens that are prepositions
+        for token in pattern {
+            if case .particle(let particle) = token {
+                // Check if this particle is actually a preposition by seeing if it's in the standard set
+                // This is a reasonable heuristic since particles used as prepositions should be prepositions
+                if Vocabulary.defaultPrepositions.contains(particle) {
+                    return particle
+                }
+            }
+        }
+
+        return nil
+    }
+
     // Explicit Codable conformance
     enum CodingKeys: String, CodingKey {
         case pattern

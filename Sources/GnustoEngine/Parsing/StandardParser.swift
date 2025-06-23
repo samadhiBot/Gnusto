@@ -200,7 +200,11 @@ public struct StandardParser: Parser {
         var bestError: ParseError? = nil
 
         // Pre-calculate input preposition once, as it's the same for all rules
-        let inputPreposition = findInputPreposition(tokens: filteredTokens, startIndex: verbStartIndex + verbTokenCount, vocabulary: vocabulary)
+        let inputPreposition = findInputPreposition(
+            tokens: filteredTokens,
+            startIndex: verbStartIndex + verbTokenCount,
+            vocabulary: vocabulary
+        )
 
         for (verb, rule) in allPotentialRules { // Iterate through all potential rules
             let matchResult = matchRule(
@@ -216,8 +220,8 @@ public struct StandardParser: Parser {
 
             switch matchResult {
             case .success(let command): // Command already contains the correct verb from matchRule
-                // Rule matched structurally. Now check prepositions.
-                if let requiredPrep = rule.requiredPreposition {
+                                        // Rule matched structurally. Now check prepositions.
+                if let requiredPrep = rule.effectiveRequiredPreposition {
                     // Rule requires a specific preposition
                     if let inputPrep = inputPreposition {
                         // Input also has a preposition
@@ -454,7 +458,7 @@ public struct StandardParser: Parser {
 
             case .preposition:
                 let currentToken = tokens[tokenCursor]
-                let expectedPrep = rule.requiredPreposition
+                let expectedPrep = rule.effectiveRequiredPreposition
                 let isKnownPrep = vocabulary.prepositions.contains(currentToken)
 
                 // Check if the current token is a known preposition.
