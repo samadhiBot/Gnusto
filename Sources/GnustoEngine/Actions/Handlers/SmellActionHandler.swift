@@ -7,6 +7,20 @@ import Foundation
 /// Game developers can provide more detailed smell descriptions for particular items or
 /// locations by implementing custom `ItemEventHandler` or `LocationEventHandler` logic.
 public struct SmellActionHandler: ActionHandler {
+    // MARK: - Verb Definition Properties
+
+    public let verbID: VerbID = .smell
+
+    public let syntax: [SyntaxRule] = [
+        SyntaxRule(.verb),
+        SyntaxRule(.verb, .directObject)
+    ]
+
+    public let synonyms: [String] = ["sniff"]
+
+    public let requiresLight: Bool = false
+
+    // MARK: - Action Processing Methods
     public init() {}
     /// Validates the "SMELL" command.
     ///

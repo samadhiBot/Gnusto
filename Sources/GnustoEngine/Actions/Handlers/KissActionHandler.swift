@@ -3,6 +3,20 @@ import Foundation
 /// Handles the "KISS" command for kissing objects or characters.
 /// Implements kissing mechanics following ZIL patterns for social interactions.
 public struct KissActionHandler: ActionHandler {
+    // MARK: - Verb Definition Properties
+
+    public let verbID: VerbID = .kiss
+
+    public let syntax: [SyntaxRule] = [
+        SyntaxRule(.verb, .directObject)
+    ]
+
+    public let synonyms: [String] = []
+
+    public let requiresLight: Bool = true
+
+    // MARK: - Action Processing Methods
+
     public init() {}
 
     /// Validates the "KISS" command.

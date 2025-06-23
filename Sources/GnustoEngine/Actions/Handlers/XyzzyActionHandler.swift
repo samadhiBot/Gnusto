@@ -2,6 +2,20 @@ import Foundation
 
 /// Handles the "xyzzy" command, a classic adventure game easter egg.
 public struct XyzzyActionHandler: ActionHandler {
+    // MARK: - Verb Definition Properties
+
+    public let verbID: VerbID = .xyzzy
+
+    public let syntax: [SyntaxRule] = [
+        SyntaxRule(.verb)
+    ]
+
+    public let synonyms: [String] = []
+
+    public let requiresLight: Bool = false
+
+    // MARK: - Action Processing Methods
+
     public init() {}
 
     // No 'validate' or 'postProcess' needed, default implementations are sufficient.

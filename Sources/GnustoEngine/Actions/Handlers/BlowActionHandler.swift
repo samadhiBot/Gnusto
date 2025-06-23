@@ -3,6 +3,21 @@ import Foundation
 /// Handles the "BLOW" command for blowing on objects like candles, fires, wind instruments, etc.
 /// Implements blowing mechanics following ZIL patterns.
 public struct BlowActionHandler: ActionHandler {
+    // MARK: - Verb Definition Properties
+
+    public let verbID: VerbID = .blow
+
+    public let syntax: [SyntaxRule] = [
+        SyntaxRule(.verb, .directObject),
+        SyntaxRule(.verb, .particle("on"), .directObject)
+    ]
+
+    public let synonyms: [String] = ["puff"]
+
+    public let requiresLight: Bool = true
+
+    // MARK: - Action Processing Methods
+
     public init() {}
 
     /// Validates the "BLOW" command.

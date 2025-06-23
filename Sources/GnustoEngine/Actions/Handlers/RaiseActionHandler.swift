@@ -5,6 +5,20 @@ import Foundation
 /// The ZIL equivalent is the `V-RAISE` routine. This action represents the player
 /// attempting to lift or raise an object.
 public struct RaiseActionHandler: ActionHandler {
+    // MARK: - Verb Definition Properties
+
+    public let verbID: VerbID = .raise
+
+    public let syntax: [SyntaxRule] = [
+        SyntaxRule(.verb, .directObject)
+    ]
+
+    public let synonyms: [String] = ["lift", "hoist"]
+
+    public let requiresLight: Bool = true
+
+    // MARK: - Action Processing Methods
+
     /// Validates that the action can be performed.
     ///
     /// - Parameter context: The `ActionContext` containing the command and game state.

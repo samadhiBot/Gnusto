@@ -2,6 +2,19 @@ import Foundation
 
 /// Handles the "SCORE" command, displaying the player's current score and turn count.
 public struct ScoreActionHandler: ActionHandler {
+    // MARK: - Verb Definition Properties
+
+    public let verbID: VerbID = .score
+
+    public let syntax: [SyntaxRule] = [
+        SyntaxRule(.verb)
+    ]
+
+    public let synonyms: [String] = []
+
+    public let requiresLight: Bool = false
+
+    // MARK: - Action Processing Methods
     public init() {}
     /// Processes the "SCORE" command.
     ///

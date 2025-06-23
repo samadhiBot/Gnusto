@@ -3,6 +3,19 @@ import Foundation
 /// Handles the "TOUCH" command and its synonyms (e.g., "FEEL", "RUB", "PAT"), allowing the
 /// player to physically interact with an item by touching it.
 public struct TouchActionHandler: ActionHandler {
+    // MARK: - Verb Definition Properties
+
+    public let verbID: VerbID = .touch
+
+    public let syntax: [SyntaxRule] = [
+        SyntaxRule(.verb, .directObject)
+    ]
+
+    public let synonyms: [String] = ["feel"]
+
+    public let requiresLight: Bool = true
+
+    // MARK: - Action Processing Methods
     /// Validates the "TOUCH" command.
     ///
     /// This method ensures that:

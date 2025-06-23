@@ -3,6 +3,21 @@ import Foundation
 /// Handles the "EMPTY" command for emptying containers of their contents.
 /// Implements emptying mechanics following ZIL patterns.
 public struct EmptyActionHandler: ActionHandler {
+    // MARK: - Verb Definition Properties
+
+    public let verbID: VerbID = .empty
+
+    public let syntax: [SyntaxRule] = [
+        SyntaxRule(.verb, .directObject),
+        SyntaxRule(.verb, .directObject, .particle("into"), .indirectObject)
+    ]
+
+    public let synonyms: [String] = ["dump", "pour out"]
+
+    public let requiresLight: Bool = true
+
+    // MARK: - Action Processing Methods
+
     public init() {}
 
     /// Validates the "EMPTY" command.

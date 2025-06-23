@@ -6,6 +6,20 @@ import Foundation
 /// This handler provides different responses based on whether the target
 /// object is visible, held by the player, or not present in the current scope.
 public struct FindActionHandler: ActionHandler {
+    // MARK: - Verb Definition Properties
+
+    public let verbID: VerbID = .find
+
+    public let syntax: [SyntaxRule] = [
+        SyntaxRule(.verb, .directObject)
+    ]
+
+    public let synonyms: [String] = ["locate", "search for"]
+
+    public let requiresLight: Bool = true
+
+    // MARK: - Action Processing Methods
+
     public init() {}
 
     /// Validates the find command.

@@ -3,6 +3,22 @@ import Foundation
 /// Handles the "PUSH" command and its synonyms (e.g., "PRESS", "SHOVE"), allowing the player
 /// to push objects.
 public struct PushActionHandler: ActionHandler {
+    // MARK: - Verb Definition Properties
+
+    public let verbID: VerbID = .push
+
+    public let syntax: [SyntaxRule] = [
+        SyntaxRule(
+            pattern: [.verb, .directObject],
+            directObjectConditions: .allowsMultiple
+        )
+    ]
+
+    public let synonyms: [String] = ["shove"]
+
+    public let requiresLight: Bool = true
+
+    // MARK: - Action Processing Methods
     /// Validates the "PUSH" command.
     ///
     /// This method ensures that:

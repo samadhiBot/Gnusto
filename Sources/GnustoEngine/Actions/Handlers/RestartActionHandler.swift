@@ -3,6 +3,20 @@ import Foundation
 /// Handles the "RESTART" command for restarting the game from the beginning.
 /// Follows ZIL traditions for game restart functionality.
 public struct RestartActionHandler: ActionHandler {
+    // MARK: - Verb Definition Properties
+
+    public let verbID: VerbID = .restart
+
+    public let syntax: [SyntaxRule] = [
+        SyntaxRule(.verb)
+    ]
+
+    public let synonyms: [String] = []
+
+    public let requiresLight: Bool = false
+
+    // MARK: - Action Processing Methods
+
     public init() {}
 
     /// Validates the "RESTART" command.

@@ -6,6 +6,21 @@ import Foundation
 /// This handler checks for cutting tools (knives, swords, etc.), validates the target,
 /// and provides appropriate responses based on ZIL behavior.
 public struct CutActionHandler: ActionHandler {
+    // MARK: - Verb Definition Properties
+
+    public let verbID: VerbID = .cut
+
+    public let syntax: [SyntaxRule] = [
+        SyntaxRule(.verb, .directObject),
+        SyntaxRule(.verb, .directObject, .particle("with"), .indirectObject)
+    ]
+
+    public let synonyms: [String] = ["slice", "chop"]
+
+    public let requiresLight: Bool = true
+
+    // MARK: - Action Processing Methods
+
     public init() {}
 
     /// Validates the "CUT" command.

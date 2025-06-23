@@ -7,6 +7,21 @@ import Foundation
 /// appropriate responses. Most objects cannot be burned, but some specific
 /// items (like paper, wood, etc.) may have special burn behavior.
 public struct BurnActionHandler: ActionHandler {
+    // MARK: - Verb Definition Properties
+
+    public let verbID: VerbID = .burn
+
+    public let syntax: [SyntaxRule] = [
+        SyntaxRule(.verb, .directObject),
+        SyntaxRule(.verb, .directObject, .particle("with"), .indirectObject)
+    ]
+
+    public let synonyms: [String] = ["ignite", "light"]
+
+    public let requiresLight: Bool = true
+
+    // MARK: - Action Processing Methods
+
     public init() {}
 
     /// Validates the burn command.

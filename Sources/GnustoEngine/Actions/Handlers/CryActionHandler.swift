@@ -5,6 +5,20 @@ import Foundation
 /// This is a humorous atmospheric command that provides entertaining responses
 /// to player attempts to cry or weep. Based on ZIL tradition.
 public struct CryActionHandler: ActionHandler {
+    // MARK: - Verb Definition Properties
+
+    public let verbID: VerbID = .cry
+
+    public let syntax: [SyntaxRule] = [
+        SyntaxRule(.verb)
+    ]
+
+    public let synonyms: [String] = ["weep", "sob"]
+
+    public let requiresLight: Bool = false
+
+    // MARK: - Action Processing Methods
+
     public init() {}
 
     public func process(

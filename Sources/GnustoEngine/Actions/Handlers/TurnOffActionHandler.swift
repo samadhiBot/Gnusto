@@ -3,6 +3,19 @@ import Foundation
 /// Handles the "TURN OFF" command, allowing the player to deactivate items that are
 /// considered devices (e.g., light sources).
 public struct TurnOffActionHandler: ActionHandler {
+    // MARK: - Verb Definition Properties
+
+    public let verbID: VerbID = .turnOff
+
+    public let syntax: [SyntaxRule] = [
+        SyntaxRule(.verb, .directObject)
+    ]
+
+    public let synonyms: [String] = ["extinguish", "douse", "switch off", "blow out", "turn off"]
+
+    public let requiresLight: Bool = true
+
+    // MARK: - Action Processing Methods
     /// Validates the "TURN OFF" command.
     ///
     /// This method ensures that:

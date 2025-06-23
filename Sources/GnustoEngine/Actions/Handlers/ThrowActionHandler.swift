@@ -3,6 +3,22 @@ import Foundation
 /// Handles the "THROW" command for throwing objects with optional targets.
 /// Implements object throwing mechanics following ZIL patterns.
 public struct ThrowActionHandler: ActionHandler {
+    // MARK: - Verb Definition Properties
+
+    public let verbID: VerbID = .throwItem
+
+    public let syntax: [SyntaxRule] = [
+        SyntaxRule(.verb, .directObject),
+        SyntaxRule(.verb, .directObject, .particle("at"), .indirectObject),
+        SyntaxRule(.verb, .directObject, .indirectObject)
+    ]
+
+    public let synonyms: [String] = ["hurl", "toss"]
+
+    public let requiresLight: Bool = true
+
+    // MARK: - Action Processing Methods
+
     public init() {}
 
     /// Validates the "THROW" command.

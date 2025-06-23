@@ -3,6 +3,19 @@ import Foundation
 /// Handles the "SAVE" command for saving game state.
 /// Provides game save functionality following ZIL traditions.
 public struct SaveActionHandler: ActionHandler {
+    // MARK: - Verb Definition Properties
+
+    public let verbID: VerbID = .save
+
+    public let syntax: [SyntaxRule] = [
+        SyntaxRule(.verb)
+    ]
+
+    public let synonyms: [String] = []
+
+    public let requiresLight: Bool = false
+
+    // MARK: - Action Processing Methods
     public init() {}
 
     /// Validates the "SAVE" command.

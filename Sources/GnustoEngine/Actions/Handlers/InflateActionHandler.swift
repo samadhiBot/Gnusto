@@ -3,6 +3,21 @@ import Foundation
 /// Handles the "INFLATE" command for inflating objects like balloons, rafts, life preservers, etc.
 /// Implements inflation mechanics following ZIL patterns.
 public struct InflateActionHandler: ActionHandler {
+    // MARK: - Verb Definition Properties
+
+    public let verbID: VerbID = .inflate
+
+    public let syntax: [SyntaxRule] = [
+        SyntaxRule(.verb, .directObject),
+        SyntaxRule(.verb, .directObject, .particle("with"), .indirectObject)
+    ]
+
+    public let synonyms: [String] = ["blow up"]
+
+    public let requiresLight: Bool = true
+
+    // MARK: - Action Processing Methods
+
     public init() {}
 
     /// Validates the "INFLATE" command.

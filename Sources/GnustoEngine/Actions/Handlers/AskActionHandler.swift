@@ -3,6 +3,20 @@ import Foundation
 /// Handles the "ASK" command for asking characters about topics.
 /// Implements communication mechanics following ZIL patterns for character interaction.
 public struct AskActionHandler: ActionHandler {
+    // MARK: - Verb Definition Properties
+
+    public let verbID: VerbID = .ask
+
+    public let syntax: [SyntaxRule] = [
+        SyntaxRule(.verb, .directObject, .particle("about"), .indirectObject)
+    ]
+
+    public let synonyms: [String] = ["question"]
+
+    public let requiresLight: Bool = true
+
+    // MARK: - Action Processing Methods
+
     public init() {}
 
     /// Validates the "ASK" command.

@@ -3,6 +3,20 @@ import Foundation
 /// Handles the "KICK" command for kicking objects.
 /// Implements kicking mechanics following ZIL patterns for physical interactions.
 public struct KickActionHandler: ActionHandler {
+    // MARK: - Verb Definition Properties
+
+    public let verbID: VerbID = .kick
+
+    public let syntax: [SyntaxRule] = [
+        SyntaxRule(.verb, .directObject)
+    ]
+
+    public let synonyms: [String] = []
+
+    public let requiresLight: Bool = true
+
+    // MARK: - Action Processing Methods
+
     public init() {}
 
     /// Validates the "KICK" command.

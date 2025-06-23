@@ -3,6 +3,21 @@ import Foundation
 /// Handles the "TURN" command for turning objects.
 /// Implements turning mechanics following ZIL patterns for object manipulation.
 public struct TurnActionHandler: ActionHandler {
+    // MARK: - Verb Definition Properties
+
+    public let verbID: VerbID = .turn
+
+    public let syntax: [SyntaxRule] = [
+        SyntaxRule(.verb, .directObject),
+        SyntaxRule(.verb, .directObject, .particle("to"), .indirectObject)
+    ]
+
+    public let synonyms: [String] = ["rotate", "twist"]
+
+    public let requiresLight: Bool = true
+
+    // MARK: - Action Processing Methods
+
     public init() {}
 
     /// Validates the "TURN" command.

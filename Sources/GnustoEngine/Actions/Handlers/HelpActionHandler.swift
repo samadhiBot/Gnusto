@@ -3,6 +3,19 @@ import Foundation
 /// Handles the "HELP" command for displaying game help information.
 /// Provides basic interactive fiction command guidance following ZIL traditions.
 public struct HelpActionHandler: ActionHandler {
+    // MARK: - Verb Definition Properties
+
+    public let verbID: VerbID = .help
+
+    public let syntax: [SyntaxRule] = [
+        SyntaxRule(.verb)
+    ]
+
+    public let synonyms: [String] = []
+
+    public let requiresLight: Bool = false
+
+    // MARK: - Action Processing Methods
     public init() {}
 
     /// Validates the "HELP" command.

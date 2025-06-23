@@ -3,6 +3,20 @@ import Foundation
 /// Handles the "BREATHE" command, an atmospheric command that provides varied responses.
 /// In ZIL traditions, this is a simple command that doesn't require objects.
 public struct BreatheActionHandler: ActionHandler {
+    // MARK: - Verb Definition Properties
+
+    public let verbID: VerbID = .breathe
+
+    public let syntax: [SyntaxRule] = [
+        SyntaxRule(.verb)
+    ]
+
+    public let synonyms: [String] = []
+
+    public let requiresLight: Bool = false
+
+    // MARK: - Action Processing Methods
+
     public init() {}
 
     /// Validates the "BREATHE" command.

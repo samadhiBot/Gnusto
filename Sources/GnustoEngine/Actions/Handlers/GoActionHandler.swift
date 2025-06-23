@@ -3,6 +3,19 @@ import Foundation
 /// Handles movement commands (e.g., "GO NORTH", "NORTH", "N"), allowing the player to navigate
 /// between locations in the game world.
 public struct GoActionHandler: ActionHandler {
+    // MARK: - Verb Definition Properties
+
+    public let verbID: VerbID = .go
+
+    public let syntax: [SyntaxRule] = [
+        SyntaxRule(.verb, .direction)
+    ]
+
+    public let synonyms: [String] = ["walk", "run", "proceed", "stroll", "hike", "head", "move", "travel"]
+
+    public let requiresLight: Bool = false
+
+    // MARK: - Action Processing Methods
     /// Validates the "GO" command (or its directional shorthand).
     ///
     /// This method ensures that:

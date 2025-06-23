@@ -3,6 +3,21 @@ import Foundation
 /// Handles the "PUT <direct object> ON <indirect object>" command, allowing the player
 /// to place an item they are holding onto a surface item.
 public struct PutOnActionHandler: ActionHandler {
+    // MARK: - Verb Definition Properties
+
+    public let verbID: VerbID = .putOn
+
+    public let syntax: [SyntaxRule] = [
+        SyntaxRule(.verb, .directObject, .particle("on"), .indirectObject),
+        SyntaxRule(.verb, .directObject, .indirectObject)
+    ]
+
+    public let synonyms: [String] = ["place on", "set on"]
+
+    public let requiresLight: Bool = true
+
+    // MARK: - Action Processing Methods
+
     /// Validates the "PUT ... ON" command.
     ///
     /// This method ensures that:

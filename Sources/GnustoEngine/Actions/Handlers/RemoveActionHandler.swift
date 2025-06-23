@@ -3,6 +3,22 @@ import Foundation
 /// Handles the "REMOVE" command and its synonyms (e.g., "DOFF", "TAKE OFF"), allowing the
 /// player to unequip an item they are currently wearing.
 public struct RemoveActionHandler: ActionHandler {
+    // MARK: - Verb Definition Properties
+
+    public let verbID: VerbID = .remove
+
+    public let syntax: [SyntaxRule] = [
+        SyntaxRule(
+            pattern: [.verb, .directObject],
+            directObjectConditions: .allowsMultiple
+        ),
+    ]
+
+    public let synonyms: [String] = ["take off", "doff"]
+
+    public let requiresLight: Bool = false
+
+    // MARK: - Action Processing Methods
     /// Validates the "REMOVE" command.
     ///
     /// This method ensures that:

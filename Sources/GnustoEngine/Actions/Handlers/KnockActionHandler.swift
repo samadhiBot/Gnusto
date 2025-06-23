@@ -3,6 +3,22 @@ import Foundation
 /// Handles the "KNOCK" command for knocking on objects.
 /// Implements knocking mechanics following ZIL patterns for interactions.
 public struct KnockActionHandler: ActionHandler {
+    // MARK: - Verb Definition Properties
+
+    public let verbID: VerbID = .knock
+
+    public let syntax: [SyntaxRule] = [
+        SyntaxRule(.verb),
+        SyntaxRule(.verb, .directObject),
+        SyntaxRule(.verb, .particle("on"), .directObject)
+    ]
+
+    public let synonyms: [String] = ["rap", "tap"]
+
+    public let requiresLight: Bool = true
+
+    // MARK: - Action Processing Methods
+
     public init() {}
 
     /// Validates the "KNOCK" command.

@@ -3,6 +3,22 @@ import Foundation
 /// Handles the "PULL" command for pulling objects.
 /// Implements pulling mechanics following ZIL patterns, as a complement to PUSH.
 public struct PullActionHandler: ActionHandler {
+    // MARK: - Verb Definition Properties
+
+    public let verbID: VerbID = .pull
+
+    public let syntax: [SyntaxRule] = [
+        SyntaxRule(
+            pattern: [.verb, .directObject],
+            directObjectConditions: .allowsMultiple
+        )
+    ]
+
+    public let synonyms: [String] = []
+
+    public let requiresLight: Bool = true
+
+    // MARK: - Action Processing Methods
     public init() {}
 
     /// Validates the "PULL" command.

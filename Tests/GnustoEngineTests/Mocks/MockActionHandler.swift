@@ -3,6 +3,17 @@ import Foundation
 
 /// A mock implementation of the `ActionHandler` protocol for testing purposes.
 actor MockActionHandler: ActionHandler {
+        // MARK: - ActionHandler Protocol Properties
+
+    nonisolated var verbID: VerbID { .take }
+
+    nonisolated var syntax: [SyntaxRule] { [SyntaxRule(.verb, .directObject)] }
+
+    nonisolated var synonyms: [String] { [] }
+
+    nonisolated var requiresLight: Bool { true }
+
+    // MARK: - Mock Properties
 
     /// A closure to execute when `process` is called. Allows custom logic or error throwing.
     let processHandler: (@Sendable (ActionContext) async throws -> ActionResult)?

@@ -3,6 +3,19 @@ import Foundation
 /// Handles the "EAT" command for consuming food items.
 /// This handler manages food consumption with proper container logic and state changes.
 public struct EatActionHandler: ActionHandler {
+    // MARK: - Verb Definition Properties
+
+    public let verbID: VerbID = .eat
+
+    public let syntax: [SyntaxRule] = [
+        SyntaxRule(.verb, .directObject)
+    ]
+
+    public let synonyms: [String] = ["consume", "devour"]
+
+    public let requiresLight: Bool = true
+
+    // MARK: - Action Processing Methods
 
     /// Validates the "EAT" command.
     ///

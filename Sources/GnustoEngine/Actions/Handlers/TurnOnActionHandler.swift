@@ -3,6 +3,19 @@ import Foundation
 /// Handles the "TURN ON" command, allowing the player to activate items that are
 /// considered devices (e.g., light sources).
 public struct TurnOnActionHandler: ActionHandler {
+    // MARK: - Verb Definition Properties
+
+    public let verbID: VerbID = .turnOn
+
+    public let syntax: [SyntaxRule] = [
+        SyntaxRule(.verb, .directObject)
+    ]
+
+    public let synonyms: [String] = ["light", "switch on", "turn on"]
+
+    public let requiresLight: Bool = true
+
+    // MARK: - Action Processing Methods
 
     // MARK: - ActionHandler Methods
 

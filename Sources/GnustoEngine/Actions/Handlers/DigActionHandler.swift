@@ -3,6 +3,22 @@ import Foundation
 /// Handles the "DIG" command for digging with or without tools.
 /// Implements digging mechanics following ZIL patterns.
 public struct DigActionHandler: ActionHandler {
+    // MARK: - Verb Definition Properties
+
+    public let verbID: VerbID = .dig
+
+    public let syntax: [SyntaxRule] = [
+        SyntaxRule(.verb),
+        SyntaxRule(.verb, .directObject),
+        SyntaxRule(.verb, .directObject, .particle("with"), .indirectObject)
+    ]
+
+    public let synonyms: [String] = ["excavate"]
+
+    public let requiresLight: Bool = true
+
+    // MARK: - Action Processing Methods
+
     public init() {}
 
     /// Validates the "DIG" command.

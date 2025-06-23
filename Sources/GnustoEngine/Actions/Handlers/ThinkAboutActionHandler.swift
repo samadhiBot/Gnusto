@@ -3,6 +3,20 @@ import Foundation
 /// Handles the "THINK ABOUT" command, allowing the player to ponder an item or themselves.
 /// This is a more introspective action, often resulting in a generic or humorous response.
 public struct ThinkAboutActionHandler: ActionHandler {
+    // MARK: - Verb Definition Properties
+
+    public let verbID: VerbID = .thinkAbout
+
+    public let syntax: [SyntaxRule] = [
+        SyntaxRule(.verb, .particle("about"), .directObject)
+    ]
+
+    public let synonyms: [String] = ["ponder", "consider"]
+
+    public let requiresLight: Bool = false
+
+    // MARK: - Action Processing Methods
+
     /// Validates the "THINK ABOUT" command.
     ///
     /// This method ensures that:

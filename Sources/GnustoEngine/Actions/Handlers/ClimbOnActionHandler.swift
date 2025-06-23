@@ -5,6 +5,21 @@ import Foundation
 /// The ZIL equivalent is the `V-CLIMB-ON` routine. This action represents the player
 /// attempting to climb onto or sit on an object.
 public struct ClimbOnActionHandler: ActionHandler {
+    // MARK: - Verb Definition Properties
+
+    public let verbID: VerbID = .climbOn
+
+    public let syntax: [SyntaxRule] = [
+        SyntaxRule(.verb, .particle("on"), .directObject),
+        SyntaxRule(.verb, .directObject)
+    ]
+
+    public let synonyms: [String] = ["sit on", "mount"]
+
+    public let requiresLight: Bool = true
+
+    // MARK: - Action Processing Methods
+
     /// Validates that the action can be performed.
     ///
     /// - Parameter context: The `ActionContext` containing the command and game state.

@@ -5,6 +5,21 @@ import Foundation
 /// The ZIL equivalent is the `V-LOOK-UNDER` routine. This action represents the player
 /// attempting to look underneath an object.
 public struct LookUnderActionHandler: ActionHandler {
+    // MARK: - Verb Definition Properties
+
+    public let verbID: VerbID = .lookUnder
+
+    public let syntax: [SyntaxRule] = [
+        SyntaxRule(.verb, .particle("under"), .directObject),
+        SyntaxRule(.verb, .particle("beneath"), .directObject)
+    ]
+
+    public let synonyms: [String] = ["peek under"]
+
+    public let requiresLight: Bool = true
+
+    // MARK: - Action Processing Methods
+
     /// Validates that the action can be performed.
     ///
     /// - Parameter context: The `ActionContext` containing the command and game state.

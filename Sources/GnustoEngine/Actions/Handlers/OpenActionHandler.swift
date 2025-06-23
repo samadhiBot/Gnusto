@@ -3,6 +3,19 @@ import Foundation
 /// Handles the "OPEN" command, allowing the player to open an item that is openable,
 /// not locked, and not already open.
 public struct OpenActionHandler: ActionHandler {
+    // MARK: - Verb Definition Properties
+
+    public let verbID: VerbID = .open
+
+    public let syntax: [SyntaxRule] = [
+        SyntaxRule(.verb, .directObject)
+    ]
+
+    public let synonyms: [String] = []
+
+    public let requiresLight: Bool = true
+
+    // MARK: - Action Processing Methods
     /// Validates the "OPEN" command.
     ///
     /// This method ensures that:

@@ -3,6 +3,19 @@ import Foundation
 /// Handles the "RESTORE" command for restoring saved game state.
 /// Provides game restore functionality following ZIL traditions.
 public struct RestoreActionHandler: ActionHandler {
+    // MARK: - Verb Definition Properties
+
+    public let verbID: VerbID = .restore
+
+    public let syntax: [SyntaxRule] = [
+        SyntaxRule(.verb)
+    ]
+
+    public let synonyms: [String] = ["load"]
+
+    public let requiresLight: Bool = false
+
+    // MARK: - Action Processing Methods
     public init() {}
 
     /// Validates the "RESTORE" command.

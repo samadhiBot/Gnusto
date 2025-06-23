@@ -3,6 +3,20 @@ import Foundation
 /// Handles the "WAVE" command for waving objects.
 /// Implements waving mechanics following ZIL patterns for physical interactions.
 public struct WaveActionHandler: ActionHandler {
+    // MARK: - Verb Definition Properties
+
+    public let verbID: VerbID = .wave
+
+    public let syntax: [SyntaxRule] = [
+        SyntaxRule(.verb, .directObject),
+        SyntaxRule(.verb, .directObject, .particle("at"), .indirectObject)
+    ]
+
+    public let synonyms: [String] = ["brandish"]
+
+    public let requiresLight: Bool = true
+
+    // MARK: - Action Processing Methods
     public init() {}
 
     /// Validates the "WAVE" command.

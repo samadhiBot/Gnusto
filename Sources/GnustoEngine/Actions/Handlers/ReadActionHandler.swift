@@ -2,6 +2,19 @@ import Foundation
 
 /// Handles the "READ" command, allowing the player to attempt to read text from an item.
 public struct ReadActionHandler: ActionHandler {
+    // MARK: - Verb Definition Properties
+
+    public let verbID: VerbID = .read
+
+    public let syntax: [SyntaxRule] = [
+        SyntaxRule(.verb, .directObject)
+    ]
+
+    public let synonyms: [String] = []
+
+    public let requiresLight: Bool = true
+
+    // MARK: - Action Processing Methods
     /// Validates the "READ" command.
     ///
     /// This method ensures that:

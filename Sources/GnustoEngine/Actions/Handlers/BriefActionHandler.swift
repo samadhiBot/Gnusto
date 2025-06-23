@@ -3,6 +3,19 @@ import Foundation
 /// Handles the "BRIEF" command for setting brief description mode.
 /// Controls verbosity of location descriptions following ZIL traditions.
 public struct BriefActionHandler: ActionHandler {
+    // MARK: - Verb Definition Properties
+
+    public let verbID: VerbID = .brief
+
+    public let syntax: [SyntaxRule] = [
+        SyntaxRule(.verb)
+    ]
+
+    public let synonyms: [String] = []
+
+    public let requiresLight: Bool = false
+
+    // MARK: - Action Processing Methods
     public init() {}
 
     /// Processes the "BRIEF" command.

@@ -3,6 +3,21 @@ import Foundation
 /// Handles the "DRINK" command for consuming liquids from various sources.
 /// Separate from eating, this handles liquid consumption with proper container logic.
 public struct DrinkActionHandler: ActionHandler {
+    // MARK: - Verb Definition Properties
+
+    public let verbID: VerbID = .drink
+
+    public let syntax: [SyntaxRule] = [
+        SyntaxRule(.verb, .directObject),
+        SyntaxRule(.verb, .directObject, .particle("from"), .indirectObject)
+    ]
+
+    public let synonyms: [String] = ["sip", "quaff"]
+
+    public let requiresLight: Bool = true
+
+    // MARK: - Action Processing Methods
+
     public init() {}
 
     /// Validates the "DRINK" command.

@@ -3,6 +3,22 @@ import Foundation
 /// Handles the "INSERT <direct object> INTO/IN <indirect object>" command, allowing the player
 /// to place an item they are holding into an open container item.
 public struct InsertActionHandler: ActionHandler {
+    // MARK: - Verb Definition Properties
+
+    public let verbID: VerbID = .insert
+
+    public let syntax: [SyntaxRule] = [
+        SyntaxRule(.verb, .directObject, .particle("into"), .indirectObject),
+        SyntaxRule(.verb, .directObject, .particle("in"), .indirectObject),
+        SyntaxRule(.verb, .directObject, .indirectObject)
+    ]
+
+    public let synonyms: [String] = ["put in", "place in"]
+
+    public let requiresLight: Bool = true
+
+    // MARK: - Action Processing Methods
+
     /// Validates the "INSERT ... INTO/IN" command.
     ///
     /// This method ensures that:

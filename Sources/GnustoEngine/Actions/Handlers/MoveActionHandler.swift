@@ -4,6 +4,21 @@ import Foundation
 /// to move or manipulate objects in the game world. This is typically used for objects that
 /// can be moved but not taken, such as moving leaves to reveal something underneath.
 public struct MoveActionHandler: ActionHandler {
+    // MARK: - Verb Definition Properties
+
+    public let verbID: VerbID = .move
+
+    public let syntax: [SyntaxRule] = [
+        SyntaxRule(.verb, .directObject),
+        SyntaxRule(.verb, .directObject, .particle("to"), .indirectObject)
+    ]
+
+    public let synonyms: [String] = ["shift", "slide"]
+
+    public let requiresLight: Bool = true
+
+    // MARK: - Action Processing Methods
+
     /// Validates the "MOVE" command.
     ///
     /// This method ensures that:

@@ -3,6 +3,20 @@ import Foundation
 /// Handles the "UNSCRIPT" command for stopping transcript recording.
 /// Implements transcript recording mechanics following ZIL patterns.
 public struct UnscriptActionHandler: ActionHandler {
+    // MARK: - Verb Definition Properties
+
+    public let verbID: VerbID = .unscript
+
+    public let syntax: [SyntaxRule] = [
+        SyntaxRule(.verb)
+    ]
+
+    public let synonyms: [String] = []
+
+    public let requiresLight: Bool = false
+
+    // MARK: - Action Processing Methods
+
     public init() {}
 
     /// Validates the "UNSCRIPT" command.

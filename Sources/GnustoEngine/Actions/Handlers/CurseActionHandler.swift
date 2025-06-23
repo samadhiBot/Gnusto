@@ -5,6 +5,21 @@ import Foundation
 /// This is a humorous atmospheric command that provides entertaining responses
 /// to player attempts to curse or swear. Based on ZIL tradition.
 public struct CurseActionHandler: ActionHandler {
+    // MARK: - Verb Definition Properties
+
+    public let verbID: VerbID = .curse
+
+    public let syntax: [SyntaxRule] = [
+        SyntaxRule(.verb),
+        SyntaxRule(.verb, .directObject)
+    ]
+
+    public let synonyms: [String] = ["swear", "damn"]
+
+    public let requiresLight: Bool = false
+
+    // MARK: - Action Processing Methods
+
     public init() {}
 
     public func validate(

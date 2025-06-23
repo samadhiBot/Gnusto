@@ -3,6 +3,19 @@ import Foundation
 /// Handles the "VERBOSE" command for setting verbose description mode.
 /// Controls verbosity of location descriptions following ZIL traditions.
 public struct VerboseActionHandler: ActionHandler {
+    // MARK: - Verb Definition Properties
+
+    public let verbID: VerbID = .verbose
+
+    public let syntax: [SyntaxRule] = [
+        SyntaxRule(.verb)
+    ]
+
+    public let synonyms: [String] = []
+
+    public let requiresLight: Bool = false
+
+    // MARK: - Action Processing Methods
     public init() {}
 
     /// Validates the "VERBOSE" command.

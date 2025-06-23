@@ -5,6 +5,20 @@ import Foundation
 /// This is a humorous atmospheric command that provides entertaining responses
 /// to player attempts to laugh. Based on ZIL tradition.
 public struct LaughActionHandler: ActionHandler {
+    // MARK: - Verb Definition Properties
+
+    public let verbID: VerbID = .laugh
+
+    public let syntax: [SyntaxRule] = [
+        SyntaxRule(.verb)
+    ]
+
+    public let synonyms: [String] = []
+
+    public let requiresLight: Bool = false
+
+    // MARK: - Action Processing Methods
+
     public init() {}
 
     public func process(

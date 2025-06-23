@@ -3,6 +3,21 @@ import Foundation
 /// Handles the "JUMP" command and its synonyms (e.g., "LEAP", "HOP").
 /// Implements jumping behavior following ZIL patterns.
 public struct JumpActionHandler: ActionHandler {
+    // MARK: - Verb Definition Properties
+
+    public let verbID: VerbID = .jump
+
+    public let syntax: [SyntaxRule] = [
+        SyntaxRule(.verb),
+        SyntaxRule(.verb, .directObject)
+    ]
+
+    public let synonyms: [String] = ["leap", "hop"]
+
+    public let requiresLight: Bool = false
+
+    // MARK: - Action Processing Methods
+
     public init() {}
 
     /// Validates the "JUMP" command.

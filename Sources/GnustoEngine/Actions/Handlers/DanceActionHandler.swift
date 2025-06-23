@@ -6,6 +6,21 @@ import Foundation
 /// to player attempts to dance. Based on ZIL tradition, including the classic
 /// "Dancing is forbidden" response from Cloak of Darkness.
 public struct DanceActionHandler: ActionHandler {
+    // MARK: - Verb Definition Properties
+
+    public let verbID: VerbID = .dance
+
+    public let syntax: [SyntaxRule] = [
+        SyntaxRule(.verb),
+        SyntaxRule(.verb, .particle("with"), .directObject)
+    ]
+
+    public let synonyms: [String] = []
+
+    public let requiresLight: Bool = false
+
+    // MARK: - Action Processing Methods
+
     public init() {}
 
     public func process(

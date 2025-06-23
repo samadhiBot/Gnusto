@@ -3,6 +3,19 @@ import Foundation
 /// Handles the "WAIT" command, allowing the player to pass a turn without performing
 /// any specific action other than advancing game time.
 public struct WaitActionHandler: ActionHandler {
+    // MARK: - Verb Definition Properties
+
+    public let verbID: VerbID = .wait
+
+    public let syntax: [SyntaxRule] = [
+        SyntaxRule(.verb)
+    ]
+
+    public let synonyms: [String] = ["z"]
+
+    public let requiresLight: Bool = false
+
+    // MARK: - Action Processing Methods
     public init() {}
     /// Processes the "WAIT" command.
     ///

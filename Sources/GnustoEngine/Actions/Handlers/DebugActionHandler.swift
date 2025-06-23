@@ -10,6 +10,20 @@ import Foundation
 ///
 /// > Note: This handler is a development tool, and is only available in DEBUG game builds.
 public struct DebugActionHandler: ActionHandler {
+    // MARK: - Verb Definition Properties
+
+    public let verbID: VerbID = .debug
+
+    public let syntax: [SyntaxRule] = [
+        SyntaxRule(.verb)
+    ]
+
+    public let synonyms: [String] = []
+
+    public let requiresLight: Bool = false
+
+    // MARK: - Action Processing Methods
+
     public init() {}
 
     /// Validates the "DEBUG" command.

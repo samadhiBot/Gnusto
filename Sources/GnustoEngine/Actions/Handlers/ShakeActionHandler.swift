@@ -3,6 +3,19 @@ import Foundation
 /// Handles the "SHAKE" command for shaking objects.
 /// Implements shaking mechanics following ZIL patterns for physical interactions.
 public struct ShakeActionHandler: ActionHandler {
+    // MARK: - Verb Definition Properties
+
+    public let verbID: VerbID = .shake
+
+    public let syntax: [SyntaxRule] = [
+        SyntaxRule(.verb, .directObject)
+    ]
+
+    public let synonyms: [String] = ["rattle"]
+
+    public let requiresLight: Bool = true
+
+    // MARK: - Action Processing Methods
     public init() {}
 
     /// Validates the "SHAKE" command.

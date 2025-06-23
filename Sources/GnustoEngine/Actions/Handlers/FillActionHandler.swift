@@ -3,6 +3,22 @@ import Foundation
 /// Handles the "FILL" command for filling containers with liquids.
 /// Implements container filling mechanics following ZIL patterns.
 public struct FillActionHandler: ActionHandler {
+    // MARK: - Verb Definition Properties
+
+    public let verbID: VerbID = .fill
+
+    public let syntax: [SyntaxRule] = [
+        SyntaxRule(.verb, .directObject),
+        SyntaxRule(.verb, .directObject, .particle("with"), .indirectObject),
+        SyntaxRule(.verb, .directObject, .particle("from"), .indirectObject)
+    ]
+
+    public let synonyms: [String] = []
+
+    public let requiresLight: Bool = true
+
+    // MARK: - Action Processing Methods
+
     public init() {}
 
     /// Validates the "FILL" command.

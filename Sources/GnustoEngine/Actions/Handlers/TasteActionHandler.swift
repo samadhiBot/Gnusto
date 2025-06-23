@@ -7,6 +7,20 @@ import Foundation
 /// more detailed taste descriptions or effects for particular items (e.g., food, potions)
 /// by implementing custom `ItemEventHandler` logic.
 public struct TasteActionHandler: ActionHandler {
+    // MARK: - Verb Definition Properties
+
+    public let verbID: VerbID = .taste
+
+    public let syntax: [SyntaxRule] = [
+        SyntaxRule(.verb, .directObject)
+    ]
+
+    public let synonyms: [String] = ["lick"]
+
+    public let requiresLight: Bool = false
+
+    // MARK: - Action Processing Methods
+
     public init() {}
 
     /// Validates the "TASTE" command.

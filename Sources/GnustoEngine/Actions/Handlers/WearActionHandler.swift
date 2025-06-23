@@ -3,6 +3,22 @@ import Foundation
 /// Handles the "WEAR" command and its synonyms (e.g., "DON"), allowing the player to
 /// equip an item that is wearable.
 public struct WearActionHandler: ActionHandler {
+    // MARK: - Verb Definition Properties
+
+    public let verbID: VerbID = .wear
+
+    public let syntax: [SyntaxRule] = [
+        SyntaxRule(
+            pattern: [.verb, .directObject],
+            directObjectConditions: .allowsMultiple
+        )
+    ]
+
+    public let synonyms: [String] = ["don"]
+
+    public let requiresLight: Bool = true
+
+    // MARK: - Action Processing Methods
     /// Validates the "WEAR" command.
     ///
     /// This method ensures that:

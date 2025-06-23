@@ -3,6 +3,19 @@ import Foundation
 /// Handles the "CLOSE" command, allowing the player to close an item that is openable
 /// and currently open.
 public struct CloseActionHandler: ActionHandler {
+    // MARK: - Verb Definition Properties
+
+    public let verbID: VerbID = .close
+
+    public let syntax: [SyntaxRule] = [
+        SyntaxRule(.verb, .directObject)
+    ]
+
+    public let synonyms: [String] = ["shut"]
+
+    public let requiresLight: Bool = true
+
+    // MARK: - Action Processing Methods
     /// Validates the "CLOSE" command.
     ///
     /// This method ensures that:

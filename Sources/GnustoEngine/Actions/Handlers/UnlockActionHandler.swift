@@ -3,6 +3,21 @@ import Foundation
 /// Handles the "UNLOCK <direct object> WITH <indirect object>" command, allowing the player
 /// to unlock a lockable item using a key.
 public struct UnlockActionHandler: ActionHandler {
+    // MARK: - Verb Definition Properties
+
+    public let verbID: VerbID = .unlock
+
+    public let syntax: [SyntaxRule] = [
+        SyntaxRule(.verb, .directObject),
+        SyntaxRule(.verb, .directObject, .particle("with"), .indirectObject)
+    ]
+
+    public let synonyms: [String] = []
+
+    public let requiresLight: Bool = true
+
+    // MARK: - Action Processing Methods
+
     /// Validates the "UNLOCK" command.
     ///
     /// This method ensures that:

@@ -3,6 +3,21 @@ import Foundation
 /// Handles the "LOCK <direct object> WITH <indirect object>" command, allowing the player
 /// to lock a lockable item using a key.
 public struct LockActionHandler: ActionHandler {
+    // MARK: - Verb Definition Properties
+
+    public let verbID: VerbID = .lock
+
+    public let syntax: [SyntaxRule] = [
+        SyntaxRule(.verb, .directObject),
+        SyntaxRule(.verb, .directObject, .particle("with"), .indirectObject)
+    ]
+
+    public let synonyms: [String] = []
+
+    public let requiresLight: Bool = true
+
+    // MARK: - Action Processing Methods
+
     /// Validates the "LOCK" command.
     ///
     /// This method ensures that:

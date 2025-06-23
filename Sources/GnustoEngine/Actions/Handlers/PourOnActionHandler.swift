@@ -3,6 +3,21 @@ import Foundation
 /// Handles the "POUR ON" command for pouring liquids on objects.
 /// Implements pouring mechanics following ZIL patterns for liquid manipulation.
 public struct PourOnActionHandler: ActionHandler {
+    // MARK: - Verb Definition Properties
+
+    public let verbID: VerbID = .pourOn
+
+    public let syntax: [SyntaxRule] = [
+        SyntaxRule(.verb, .directObject, .particle("on"), .indirectObject),
+        SyntaxRule(.verb, .directObject, .indirectObject)
+    ]
+
+    public let synonyms: [String] = ["spill on"]
+
+    public let requiresLight: Bool = true
+
+    // MARK: - Action Processing Methods
+
     public init() {}
 
     /// Validates the "POUR ON" command.

@@ -3,6 +3,20 @@ import Foundation
 /// Handles the "SQUEEZE" command for squeezing objects.
 /// Implements squeezing mechanics following ZIL patterns for physical interactions.
 public struct SqueezeActionHandler: ActionHandler {
+    // MARK: - Verb Definition Properties
+
+    public let verbID: VerbID = .squeeze
+
+    public let syntax: [SyntaxRule] = [
+        SyntaxRule(.verb, .directObject)
+    ]
+
+    public let synonyms: [String] = ["compress", "press"]
+
+    public let requiresLight: Bool = true
+
+    // MARK: - Action Processing Methods
+
     public init() {}
 
     /// Validates the "SQUEEZE" command.

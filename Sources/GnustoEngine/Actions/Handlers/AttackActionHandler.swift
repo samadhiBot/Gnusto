@@ -3,6 +3,23 @@ import Foundation
 /// Handles the "ATTACK" command and its synonyms (e.g., "FIGHT", "HIT", "KILL").
 /// Implements combat mechanics following ZIL patterns for violence against actors and objects.
 public struct AttackActionHandler: ActionHandler {
+    // MARK: - Verb Definition Properties
+
+    public let verbID: VerbID = .attack
+
+    public let syntax: [SyntaxRule] = [
+        SyntaxRule(.verb, .directObject),
+        SyntaxRule(
+            pattern: [.verb, .directObject, .preposition, .indirectObject],
+            requiredPreposition: "with"
+        ),
+    ]
+
+    public let synonyms: [String] = ["fight", "hit", "kill", "slay", "stab"]
+
+    public let requiresLight: Bool = true
+
+    // MARK: - Action Processing Methods
     public init() {}
 
     /// Validates the "ATTACK" command.

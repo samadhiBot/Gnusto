@@ -3,6 +3,20 @@ import Foundation
 /// Handles the "PRESS" command for pressing buttons, switches, and other pressable objects.
 /// Implements pressing mechanics following ZIL patterns.
 public struct PressActionHandler: ActionHandler {
+    // MARK: - Verb Definition Properties
+
+    public let verbID: VerbID = .press
+
+    public let syntax: [SyntaxRule] = [
+        SyntaxRule(.verb, .directObject)
+    ]
+
+    public let synonyms: [String] = ["push", "depress"]
+
+    public let requiresLight: Bool = true
+
+    // MARK: - Action Processing Methods
+
     public init() {}
 
     /// Validates the "PRESS" command.

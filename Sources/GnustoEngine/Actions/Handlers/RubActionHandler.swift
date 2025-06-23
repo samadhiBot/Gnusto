@@ -3,6 +3,21 @@ import Foundation
 /// Handles the "RUB" command for rubbing objects.
 /// Implements rubbing mechanics following ZIL patterns for physical interactions.
 public struct RubActionHandler: ActionHandler {
+    // MARK: - Verb Definition Properties
+
+    public let verbID: VerbID = .rub
+
+    public let syntax: [SyntaxRule] = [
+        SyntaxRule(.verb, .directObject),
+        SyntaxRule(.verb, .directObject, .particle("with"), .indirectObject)
+    ]
+
+    public let synonyms: [String] = ["polish", "clean"]
+
+    public let requiresLight: Bool = true
+
+    // MARK: - Action Processing Methods
+
     public init() {}
 
     /// Validates the "RUB" command.

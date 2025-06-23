@@ -596,6 +596,11 @@ struct GameEngineTests {
     func testEngineRecordsStateChangesFromActionHandler() async throws {
         // Given: An action handler that changes multiple things
         struct MockMultiChangeHandler: ActionHandler {
+            let verbID: VerbID = .take
+            let syntax: [SyntaxRule] = [SyntaxRule(.verb, .directObject)]
+            let synonyms: [String] = []
+            let requiresLight: Bool = true
+
             let itemIDToModify: ItemID
             let flagToSet: String
 
@@ -1491,6 +1496,11 @@ struct GameEngineTests {
 
         // Create a mock handler that returns the ActionResult
         struct MockResultHandler: ActionHandler {
+            let verbID: VerbID = .take
+            let syntax: [SyntaxRule] = [SyntaxRule(.verb, .directObject)]
+            let synonyms: [String] = []
+            let requiresLight: Bool = true
+
             let result: ActionResult
             func validate(context: ActionContext) async throws { /* No validation needed */  }
             func process(context: ActionContext) async throws -> ActionResult { result }

@@ -5,6 +5,20 @@ import Foundation
 /// This is a humorous command that provides entertaining responses to player attempts
 /// to bite or chew on things. Based on ZIL tradition of atmospheric commands.
 public struct ChompActionHandler: ActionHandler {
+    // MARK: - Verb Definition Properties
+
+    public let verbID: VerbID = .chomp
+
+    public let syntax: [SyntaxRule] = [
+        SyntaxRule(.verb, .directObject)
+    ]
+
+    public let synonyms: [String] = ["bite", "chew"]
+
+    public let requiresLight: Bool = true
+
+    // MARK: - Action Processing Methods
+
     public init() {}
 
     public func validate(

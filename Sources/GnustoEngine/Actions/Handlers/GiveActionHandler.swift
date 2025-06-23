@@ -3,6 +3,21 @@ import Foundation
 /// Handles the "GIVE" command and its synonyms (e.g., "DONATE", "OFFER"), allowing the player
 /// to give items to other actors.
 public struct GiveActionHandler: ActionHandler {
+    // MARK: - Verb Definition Properties
+
+    public let verbID: VerbID = .give
+
+    public let syntax: [SyntaxRule] = [
+        SyntaxRule(.verb, .directObject, .particle("to"), .indirectObject),
+        SyntaxRule(.verb, .indirectObject, .directObject)
+    ]
+
+    public let synonyms: [String] = ["offer", "donate"]
+
+    public let requiresLight: Bool = true
+
+    // MARK: - Action Processing Methods
+
     /// Validates the "GIVE" command.
     ///
     /// This method ensures that:

@@ -3,6 +3,22 @@ import Foundation
 /// Handles the "DROP" command and its synonyms (e.g., "PUT DOWN"), allowing the player
 /// to remove an item from their inventory and place it in the current location.
 public struct DropActionHandler: ActionHandler {
+    // MARK: - Verb Definition Properties
+
+    public let verbID: VerbID = .drop
+
+    public let syntax: [SyntaxRule] = [
+        SyntaxRule(
+            pattern: [.verb, .directObject],
+            directObjectConditions: .allowsMultiple
+        )
+    ]
+
+    public let synonyms: [String] = ["discard"]
+
+    public let requiresLight: Bool = true
+
+    // MARK: - Action Processing Methods
     /// Validates the "DROP" command.
     ///
     /// This method ensures that:

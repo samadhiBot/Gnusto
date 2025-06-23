@@ -3,6 +3,22 @@ import Foundation
 /// Handles the "TIE" command for tying objects together.
 /// Implements tying mechanics following ZIL patterns for object binding and connection.
 public struct TieActionHandler: ActionHandler {
+    // MARK: - Verb Definition Properties
+
+    public let verbID: VerbID = .tie
+
+    public let syntax: [SyntaxRule] = [
+        SyntaxRule(.verb, .directObject),
+        SyntaxRule(.verb, .directObject, .particle("to"), .indirectObject),
+        SyntaxRule(.verb, .directObject, .particle("with"), .indirectObject)
+    ]
+
+    public let synonyms: [String] = ["bind", "fasten"]
+
+    public let requiresLight: Bool = true
+
+    // MARK: - Action Processing Methods
+
     public init() {}
 
     /// Validates the "TIE" command.

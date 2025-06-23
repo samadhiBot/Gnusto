@@ -9,6 +9,24 @@ import Foundation
 ///   it describes the specified item, including its contents if it's an open/transparent
 ///   container or a surface.
 public struct LookActionHandler: ActionHandler {
+    // MARK: - Verb Definition Properties
+
+    public let verbID: VerbID = .look
+
+    public let syntax: [SyntaxRule] = [
+        SyntaxRule(.verb),
+        SyntaxRule(.verb, .directObject),
+        SyntaxRule(
+            pattern: [.verb, .preposition, .directObject],
+            requiredPreposition: "through"
+        ),
+    ]
+
+    public let synonyms: [String] = ["l"]
+
+    public let requiresLight: Bool = false
+
+    // MARK: - Action Processing Methods
     /// Validates the "LOOK" command.
     ///
     /// - If no direct object is provided, validation always succeeds.

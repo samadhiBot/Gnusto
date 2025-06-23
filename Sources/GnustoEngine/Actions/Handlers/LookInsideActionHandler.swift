@@ -4,6 +4,20 @@ import Foundation
 /// This command allows players to look inside containers or examine the contents of objects.
 /// By default, it delegates to examine behavior, but specific items can override this via ItemEventHandlers.
 public struct LookInsideActionHandler: ActionHandler {
+    // MARK: - Verb Definition Properties
+
+    public let verbID: VerbID = .lookInside
+
+    public let syntax: [SyntaxRule] = [
+        SyntaxRule(.verb, .particle("inside"), .directObject),
+        SyntaxRule(.verb, .particle("in"), .directObject)
+    ]
+
+    public let synonyms: [String] = ["peek inside"]
+
+    public let requiresLight: Bool = true
+
+    // MARK: - Action Processing Methods
 
     /// Validates the "LOOK INSIDE" command.
     /// Requires a direct object that must be an item the player can reach.

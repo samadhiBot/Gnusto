@@ -3,6 +3,20 @@ import Foundation
 /// Handles the "TELL" command for telling characters about topics.
 /// Implements communication mechanics following ZIL patterns for character interaction.
 public struct TellActionHandler: ActionHandler {
+    // MARK: - Verb Definition Properties
+
+    public let verbID: VerbID = .tell
+
+    public let syntax: [SyntaxRule] = [
+        SyntaxRule(.verb, .directObject, .particle("about"), .indirectObject)
+    ]
+
+    public let synonyms: [String] = ["inform"]
+
+    public let requiresLight: Bool = true
+
+    // MARK: - Action Processing Methods
+
     public init() {}
 
     /// Validates the "TELL" command.

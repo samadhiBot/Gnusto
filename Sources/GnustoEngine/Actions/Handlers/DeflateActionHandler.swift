@@ -3,6 +3,20 @@ import Foundation
 /// Handles the "DEFLATE" command for deflating previously inflated objects like balloons, rafts, etc.
 /// Implements deflation mechanics following ZIL patterns.
 public struct DeflateActionHandler: ActionHandler {
+    // MARK: - Verb Definition Properties
+
+    public let verbID: VerbID = .deflate
+
+    public let syntax: [SyntaxRule] = [
+        SyntaxRule(.verb, .directObject)
+    ]
+
+    public let synonyms: [String] = []
+
+    public let requiresLight: Bool = true
+
+    // MARK: - Action Processing Methods
+
     public init() {}
 
     /// Validates the "DEFLATE" command.

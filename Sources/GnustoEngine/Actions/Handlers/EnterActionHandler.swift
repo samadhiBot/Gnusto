@@ -3,6 +3,20 @@ import Foundation
 /// Handles the "ENTER" command and its synonyms (e.g., "GO IN", "GET IN").
 /// Implements entering objects and locations following ZIL patterns.
 public struct EnterActionHandler: ActionHandler {
+    // MARK: - Verb Definition Properties
+
+    public let verbID: VerbID = .enter
+
+    public let syntax: [SyntaxRule] = [
+        SyntaxRule(.verb, .directObject)
+    ]
+
+    public let synonyms: [String] = []
+
+    public let requiresLight: Bool = true
+
+    // MARK: - Action Processing Methods
+
     public init() {}
 
     /// Validates the "ENTER" command.

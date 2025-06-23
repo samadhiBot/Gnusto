@@ -7,6 +7,21 @@ import Foundation
 /// `LocationEventHandler` implementations for specific items or locations if special
 /// sounds should be heard.
 public struct ListenActionHandler: ActionHandler {
+    // MARK: - Verb Definition Properties
+
+    public let verbID: VerbID = .listen
+
+    public let syntax: [SyntaxRule] = [
+        SyntaxRule(.verb),
+        SyntaxRule(.verb, .particle("to"), .directObject)
+    ]
+
+    public let synonyms: [String] = []
+
+    public let requiresLight: Bool = false
+
+    // MARK: - Action Processing Methods
+
     public init() {}
 
     /// Validates the "LISTEN" command.

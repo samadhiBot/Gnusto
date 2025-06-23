@@ -11,6 +11,20 @@ import Foundation
 /// This works with the Exit system's `via:` parameter to create flexible
 /// climbing-based movement (stairs, ladders, ropes, etc.).
 public struct ClimbActionHandler: ActionHandler {
+    // MARK: - Verb Definition Properties
+
+    public let verbID: VerbID = .climb
+
+    public let syntax: [SyntaxRule] = [
+        SyntaxRule(.verb, .directObject)
+    ]
+
+    public let synonyms: [String] = ["ascend"]
+
+    public let requiresLight: Bool = true
+
+    // MARK: - Action Processing Methods
+
     /// Validates the "CLIMB" command.
     ///
     /// This method ensures that:
