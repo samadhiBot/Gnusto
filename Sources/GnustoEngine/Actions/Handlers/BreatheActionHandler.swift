@@ -8,7 +8,7 @@ public struct BreatheActionHandler: ActionHandler {
     public let verbID: VerbID = .breathe
 
     public let syntax: [SyntaxRule] = [
-        SyntaxRule(.verb)
+        .match(.verb)
     ]
 
     public let synonyms: [String] = []

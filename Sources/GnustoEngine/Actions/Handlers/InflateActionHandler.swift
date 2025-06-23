@@ -8,8 +8,8 @@ public struct InflateActionHandler: ActionHandler {
     public let verbID: VerbID = .inflate
 
     public let syntax: [SyntaxRule] = [
-        SyntaxRule(.verb, .directObject),
-        SyntaxRule(.verb, .directObject, .particle("with"), .indirectObject)
+        .match(.verb, .directObject),
+        .match(.verb, .directObject, .with, .indirectObject),
     ]
 
     public let synonyms: [String] = ["blow up"]

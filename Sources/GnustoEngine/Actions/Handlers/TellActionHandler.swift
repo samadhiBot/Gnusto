@@ -8,7 +8,7 @@ public struct TellActionHandler: ActionHandler {
     public let verbID: VerbID = .tell
 
     public let syntax: [SyntaxRule] = [
-        SyntaxRule(.verb, .directObject, .particle("about"), .indirectObject)
+        .match(.verb, .directObject, .about, .indirectObject)
     ]
 
     public let synonyms: [String] = ["inform"]

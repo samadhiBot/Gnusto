@@ -8,7 +8,7 @@ public struct KissActionHandler: ActionHandler {
     public let verbID: VerbID = .kiss
 
     public let syntax: [SyntaxRule] = [
-        SyntaxRule(.verb, .directObject)
+        .match(.verb, .directObject)
     ]
 
     public let synonyms: [String] = []
@@ -78,7 +78,7 @@ public struct KissActionHandler: ActionHandler {
 
         // Determine appropriate response based on object type
         let message =
-        // Kissing characters
+            // Kissing characters
             if targetItem.hasFlag(.isCharacter) {
                 if targetItem.hasFlag(.isFighting) {
                     context.message.kissEnemy(enemy: targetItem.withDefiniteArticle)

@@ -12,8 +12,8 @@ public struct SmellActionHandler: ActionHandler {
     public let verbID: VerbID = .smell
 
     public let syntax: [SyntaxRule] = [
-        SyntaxRule(.verb),
-        SyntaxRule(.verb, .directObject)
+        .match(.verb),
+        .match(.verb, .directObject),
     ]
 
     public let synonyms: [String] = ["sniff"]

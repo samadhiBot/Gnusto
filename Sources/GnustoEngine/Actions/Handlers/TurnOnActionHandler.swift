@@ -8,7 +8,7 @@ public struct TurnOnActionHandler: ActionHandler {
     public let verbID: VerbID = .turnOn
 
     public let syntax: [SyntaxRule] = [
-        SyntaxRule(.verb, .directObject)
+        .match(.verb, .directObject)
     ]
 
     public let synonyms: [String] = ["light", "switch on", "turn on"]

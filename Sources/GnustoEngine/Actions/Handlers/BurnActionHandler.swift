@@ -12,8 +12,8 @@ public struct BurnActionHandler: ActionHandler {
     public let verbID: VerbID = .burn
 
     public let syntax: [SyntaxRule] = [
-        SyntaxRule(.verb, .directObject),
-        SyntaxRule(.verb, .directObject, .particle("with"), .indirectObject)
+        .match(.verb, .directObject),
+        .match(.verb, .directObject, .with, .indirectObject),
     ]
 
     public let synonyms: [String] = ["ignite", "light"]

@@ -8,8 +8,8 @@ public struct WaveActionHandler: ActionHandler {
     public let verbID: VerbID = .wave
 
     public let syntax: [SyntaxRule] = [
-        SyntaxRule(.verb, .directObject),
-        SyntaxRule(.verb, .directObject, .particle("at"), .indirectObject)
+        .match(.verb, .directObject),
+        .match(.verb, .directObject, .at, .indirectObject),
     ]
 
     public let synonyms: [String] = ["brandish"]
@@ -65,16 +65,17 @@ public struct WaveActionHandler: ActionHandler {
         let targetItem = try await context.engine.item(targetItemID)
 
         // Determine appropriate response based on object type and properties
-        let message = if !targetItem.hasFlag(.isTakable) {
-            // Fixed objects can't be waved
-            context.message.waveFixedObject(item: targetItem.withDefiniteArticle)
-        } else if targetItem.hasFlag(.isWeapon) {
-            // Weapons are brandished
-            context.message.waveWeapon(item: targetItem.withDefiniteArticle)
-        } else {
-            // Generic waving response for other takable objects
-            context.message.waveObject(item: targetItem.withDefiniteArticle)
-        }
+        let message =
+            if !targetItem.hasFlag(.isTakable) {
+                // Fixed objects can't be waved
+                context.message.waveFixedObject(item: targetItem.withDefiniteArticle)
+            } else if targetItem.hasFlag(.isWeapon) {
+                // Weapons are brandished
+                context.message.waveWeapon(item: targetItem.withDefiniteArticle)
+            } else {
+                // Generic waving response for other takable objects
+                context.message.waveObject(item: targetItem.withDefiniteArticle)
+            }
 
         return ActionResult(
             message: message,

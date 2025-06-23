@@ -10,7 +10,7 @@ public struct RaiseActionHandler: ActionHandler {
     public let verbID: VerbID = .raise
 
     public let syntax: [SyntaxRule] = [
-        SyntaxRule(.verb, .directObject)
+        .match(.verb, .directObject)
     ]
 
     public let synonyms: [String] = ["lift", "hoist"]

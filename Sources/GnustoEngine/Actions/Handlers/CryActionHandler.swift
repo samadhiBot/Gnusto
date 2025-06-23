@@ -10,7 +10,7 @@ public struct CryActionHandler: ActionHandler {
     public let verbID: VerbID = .cry
 
     public let syntax: [SyntaxRule] = [
-        SyntaxRule(.verb)
+        .match(.verb)
     ]
 
     public let synonyms: [String] = ["weep", "sob"]

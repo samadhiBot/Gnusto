@@ -8,7 +8,7 @@ public struct SaveActionHandler: ActionHandler {
     public let verbID: VerbID = .save
 
     public let syntax: [SyntaxRule] = [
-        SyntaxRule(.verb)
+        .match(.verb)
     ]
 
     public let synonyms: [String] = []

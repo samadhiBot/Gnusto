@@ -7,7 +7,7 @@ public struct ScoreActionHandler: ActionHandler {
     public let verbID: VerbID = .score
 
     public let syntax: [SyntaxRule] = [
-        SyntaxRule(.verb)
+        .match(.verb)
     ]
 
     public let synonyms: [String] = []

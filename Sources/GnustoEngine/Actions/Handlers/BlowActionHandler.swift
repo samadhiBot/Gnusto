@@ -8,8 +8,8 @@ public struct BlowActionHandler: ActionHandler {
     public let verbID: VerbID = .blow
 
     public let syntax: [SyntaxRule] = [
-        SyntaxRule(.verb, .directObject),
-        SyntaxRule(.verb, .particle("on"), .directObject)
+        .match(.verb, .directObject),
+        .match(.verb, .on, .directObject),
     ]
 
     public let synonyms: [String] = ["puff"]

@@ -8,7 +8,7 @@ public struct CloseActionHandler: ActionHandler {
     public let verbID: VerbID = .close
 
     public let syntax: [SyntaxRule] = [
-        SyntaxRule(.verb, .directObject)
+        .match(.verb, .directObject)
     ]
 
     public let synonyms: [String] = ["shut"]

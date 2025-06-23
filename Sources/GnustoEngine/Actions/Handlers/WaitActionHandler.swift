@@ -8,7 +8,7 @@ public struct WaitActionHandler: ActionHandler {
     public let verbID: VerbID = .wait
 
     public let syntax: [SyntaxRule] = [
-        SyntaxRule(.verb)
+        .match(.verb)
     ]
 
     public let synonyms: [String] = ["z"]

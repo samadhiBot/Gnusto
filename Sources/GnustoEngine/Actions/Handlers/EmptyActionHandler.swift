@@ -8,8 +8,8 @@ public struct EmptyActionHandler: ActionHandler {
     public let verbID: VerbID = .empty
 
     public let syntax: [SyntaxRule] = [
-        SyntaxRule(.verb, .directObject),
-        SyntaxRule(.verb, .directObject, .particle("into"), .indirectObject)
+        .match(.verb, .directObject),
+        .match(.verb, .directObject, .into, .indirectObject),
     ]
 
     public let synonyms: [String] = ["dump", "pour out"]

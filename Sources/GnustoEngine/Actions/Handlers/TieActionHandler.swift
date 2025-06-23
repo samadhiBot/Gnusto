@@ -8,9 +8,9 @@ public struct TieActionHandler: ActionHandler {
     public let verbID: VerbID = .tie
 
     public let syntax: [SyntaxRule] = [
-        SyntaxRule(.verb, .directObject),
-        SyntaxRule(.verb, .directObject, .particle("to"), .indirectObject),
-        SyntaxRule(.verb, .directObject, .particle("with"), .indirectObject)
+        .match(.verb, .directObject),
+        .match(.verb, .directObject, .to, .indirectObject),
+        .match(.verb, .directObject, .with, .indirectObject),
     ]
 
     public let synonyms: [String] = ["bind", "fasten"]

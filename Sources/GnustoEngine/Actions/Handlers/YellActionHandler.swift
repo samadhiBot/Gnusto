@@ -10,8 +10,8 @@ public struct YellActionHandler: ActionHandler {
     public let verbID: VerbID = .yell
 
     public let syntax: [SyntaxRule] = [
-        SyntaxRule(.verb),
-        SyntaxRule(.verb, .directObject)
+        .match(.verb),
+        .match(.verb, .directObject),
     ]
 
     public let synonyms: [String] = ["shout", "scream", "holler"]

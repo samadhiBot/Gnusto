@@ -8,7 +8,7 @@ public struct SqueezeActionHandler: ActionHandler {
     public let verbID: VerbID = .squeeze
 
     public let syntax: [SyntaxRule] = [
-        SyntaxRule(.verb, .directObject)
+        .match(.verb, .directObject)
     ]
 
     public let synonyms: [String] = ["compress", "press"]

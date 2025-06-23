@@ -8,7 +8,7 @@ public struct OpenActionHandler: ActionHandler {
     public let verbID: VerbID = .open
 
     public let syntax: [SyntaxRule] = [
-        SyntaxRule(.verb, .directObject)
+        .match(.verb, .directObject)
     ]
 
     public let synonyms: [String] = []

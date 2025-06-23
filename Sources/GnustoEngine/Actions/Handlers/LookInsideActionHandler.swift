@@ -9,8 +9,8 @@ public struct LookInsideActionHandler: ActionHandler {
     public let verbID: VerbID = .lookInside
 
     public let syntax: [SyntaxRule] = [
-        SyntaxRule(.verb, .particle("inside"), .directObject),
-        SyntaxRule(.verb, .particle("in"), .directObject)
+        .match(.verb, .inside, .directObject),
+        .match(.verb, .in, .directObject),
     ]
 
     public let synonyms: [String] = ["peek inside"]

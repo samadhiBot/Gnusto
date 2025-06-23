@@ -8,7 +8,7 @@ public struct KickActionHandler: ActionHandler {
     public let verbID: VerbID = .kick
 
     public let syntax: [SyntaxRule] = [
-        SyntaxRule(.verb, .directObject)
+        .match(.verb, .directObject)
     ]
 
     public let synonyms: [String] = []

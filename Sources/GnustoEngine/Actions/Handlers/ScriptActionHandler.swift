@@ -8,7 +8,7 @@ public struct ScriptActionHandler: ActionHandler {
     public let verbID: VerbID = .script
 
     public let syntax: [SyntaxRule] = [
-        SyntaxRule(.verb)
+        .match(.verb)
     ]
 
     public let synonyms: [String] = []

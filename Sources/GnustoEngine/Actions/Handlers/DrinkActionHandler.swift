@@ -8,8 +8,8 @@ public struct DrinkActionHandler: ActionHandler {
     public let verbID: VerbID = .drink
 
     public let syntax: [SyntaxRule] = [
-        SyntaxRule(.verb, .directObject),
-        SyntaxRule(.verb, .directObject, .particle("from"), .indirectObject)
+        .match(.verb, .directObject),
+        .match(.verb, .directObject, .from, .indirectObject),
     ]
 
     public let synonyms: [String] = ["sip", "quaff"]

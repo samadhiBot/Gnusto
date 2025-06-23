@@ -221,7 +221,7 @@ public struct StandardParser: Parser {
             switch matchResult {
             case .success(let command): // Command already contains the correct verb from matchRule
                                         // Rule matched structurally. Now check prepositions.
-                if let requiredPrep = rule.effectiveRequiredPreposition {
+                if let requiredPrep = rule.expectedPreposition {
                     // Rule requires a specific preposition
                     if let inputPrep = inputPreposition {
                         // Input also has a preposition
@@ -508,8 +508,14 @@ public struct StandardParser: Parser {
         }
 
         // Parse multiple noun phrases connected by conjunctions
-        let directObjectPhrases = parseConjunctedNounPhrases(from: directObjectPhraseTokens, vocabulary: vocabulary)
-        let indirectObjectPhrases = parseConjunctedNounPhrases(from: indirectObjectPhraseTokens, vocabulary: vocabulary)
+        let directObjectPhrases = parseConjunctedNounPhrases(
+            from: directObjectPhraseTokens,
+            vocabulary: vocabulary
+        )
+        let indirectObjectPhrases = parseConjunctedNounPhrases(
+            from: indirectObjectPhraseTokens,
+            vocabulary: vocabulary
+        )
 
         // Handle direct object resolution (including ALL and conjunctions)
         var resolvedDirectObjects: [EntityReference] = []

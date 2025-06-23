@@ -8,8 +8,8 @@ public struct PourOnActionHandler: ActionHandler {
     public let verbID: VerbID = .pourOn
 
     public let syntax: [SyntaxRule] = [
-        SyntaxRule(.verb, .directObject, .particle("on"), .indirectObject),
-        SyntaxRule(.verb, .directObject, .indirectObject)
+        .match(.verb, .directObject, .on, .indirectObject),
+        .match(.verb, .directObject, .indirectObject),
     ]
 
     public let synonyms: [String] = ["spill on"]

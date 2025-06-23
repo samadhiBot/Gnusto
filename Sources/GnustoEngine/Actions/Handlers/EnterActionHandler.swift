@@ -8,7 +8,7 @@ public struct EnterActionHandler: ActionHandler {
     public let verbID: VerbID = .enter
 
     public let syntax: [SyntaxRule] = [
-        SyntaxRule(.verb, .directObject)
+        .match(.verb, .directObject)
     ]
 
     public let synonyms: [String] = []

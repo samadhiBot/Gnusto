@@ -35,9 +35,9 @@ public protocol ActionHandler: Sendable {
     /// Syntax patterns that this verb accepts.
     ///
     /// Each `SyntaxRule` defines a valid command structure for this verb, such as:
-    /// - `SyntaxRule(.verb)` for verbs without objects (e.g., "inventory")
-    /// - `SyntaxRule(.verb, .directObject)` for verbs with one object (e.g., "take sword")
-    /// - `SyntaxRule(.verb, .directObject, .preposition("with"), .indirectObject)` for complex patterns
+    /// - `.match(.verb)` for verbs without objects (e.g., "inventory")
+    /// - `.match(.verb, .directObject)` for verbs with one object (e.g., "take sword")
+    /// - `.match(.verb, .directObject, .preposition("with"), .indirectObject)` for complex patterns
     ///
     /// The parser uses these rules to validate and structure player input.
     var syntax: [SyntaxRule] { get }

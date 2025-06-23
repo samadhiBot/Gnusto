@@ -12,8 +12,8 @@ public struct ListenActionHandler: ActionHandler {
     public let verbID: VerbID = .listen
 
     public let syntax: [SyntaxRule] = [
-        SyntaxRule(.verb),
-        SyntaxRule(.verb, .particle("to"), .directObject)
+        .match(.verb),
+        .match(.verb, .to, .directObject),
     ]
 
     public let synonyms: [String] = []

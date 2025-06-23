@@ -8,10 +8,12 @@ public struct GoActionHandler: ActionHandler {
     public let verbID: VerbID = .go
 
     public let syntax: [SyntaxRule] = [
-        SyntaxRule(.verb, .direction)
+        .match(.verb, .direction)
     ]
 
-    public let synonyms: [String] = ["walk", "run", "proceed", "stroll", "hike", "head", "move", "travel"]
+    public let synonyms: [String] = [
+        "walk", "run", "proceed", "stroll", "hike", "head", "move", "travel",
+    ]
 
     public let requiresLight: Bool = false
 

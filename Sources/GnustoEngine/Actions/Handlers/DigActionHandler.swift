@@ -8,9 +8,9 @@ public struct DigActionHandler: ActionHandler {
     public let verbID: VerbID = .dig
 
     public let syntax: [SyntaxRule] = [
-        SyntaxRule(.verb),
-        SyntaxRule(.verb, .directObject),
-        SyntaxRule(.verb, .directObject, .particle("with"), .indirectObject)
+        .match(.verb),
+        .match(.verb, .directObject),
+        .match(.verb, .directObject, .with, .indirectObject),
     ]
 
     public let synonyms: [String] = ["excavate"]

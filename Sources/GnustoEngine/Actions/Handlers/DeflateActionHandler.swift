@@ -8,7 +8,7 @@ public struct DeflateActionHandler: ActionHandler {
     public let verbID: VerbID = .deflate
 
     public let syntax: [SyntaxRule] = [
-        SyntaxRule(.verb, .directObject)
+        .match(.verb, .directObject)
     ]
 
     public let synonyms: [String] = []

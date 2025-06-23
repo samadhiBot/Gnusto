@@ -8,7 +8,7 @@ public struct PullActionHandler: ActionHandler {
     public let verbID: VerbID = .pull
 
     public let syntax: [SyntaxRule] = [
-        SyntaxRule(.verb, .directObjects)
+        .match(.verb, .directObjects)
     ]
 
     public let synonyms: [String] = []

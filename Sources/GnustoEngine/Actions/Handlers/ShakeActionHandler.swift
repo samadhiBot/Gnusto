@@ -8,7 +8,7 @@ public struct ShakeActionHandler: ActionHandler {
     public let verbID: VerbID = .shake
 
     public let syntax: [SyntaxRule] = [
-        SyntaxRule(.verb, .directObject)
+        .match(.verb, .directObject)
     ]
 
     public let synonyms: [String] = ["rattle"]

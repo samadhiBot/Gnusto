@@ -8,7 +8,7 @@ public struct InventoryActionHandler: ActionHandler {
     public let verbID: VerbID = .inventory
 
     public let syntax: [SyntaxRule] = [
-        SyntaxRule(.verb)
+        .match(.verb)
     ]
 
     public let synonyms: [String] = ["i"]

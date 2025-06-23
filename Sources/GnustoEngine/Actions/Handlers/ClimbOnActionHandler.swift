@@ -10,8 +10,8 @@ public struct ClimbOnActionHandler: ActionHandler {
     public let verbID: VerbID = .climbOn
 
     public let syntax: [SyntaxRule] = [
-        SyntaxRule(.verb, .particle("on"), .directObject),
-        SyntaxRule(.verb, .directObject)
+        .match(.verb, .on, .directObject),
+        .match(.verb, .directObject),
     ]
 
     public let synonyms: [String] = ["sit on", "mount"]

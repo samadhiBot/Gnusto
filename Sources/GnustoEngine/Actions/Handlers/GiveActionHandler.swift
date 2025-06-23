@@ -8,8 +8,8 @@ public struct GiveActionHandler: ActionHandler {
     public let verbID: VerbID = .give
 
     public let syntax: [SyntaxRule] = [
-        SyntaxRule(.verb, .directObject, .particle("to"), .indirectObject),
-        SyntaxRule(.verb, .indirectObject, .directObject)
+        .match(.verb, .directObject, .to, .indirectObject),
+        .match(.verb, .indirectObject, .directObject),
     ]
 
     public let synonyms: [String] = ["offer", "donate"]

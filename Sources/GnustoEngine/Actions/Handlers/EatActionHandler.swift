@@ -8,7 +8,7 @@ public struct EatActionHandler: ActionHandler {
     public let verbID: VerbID = .eat
 
     public let syntax: [SyntaxRule] = [
-        SyntaxRule(.verb, .directObject)
+        .match(.verb, .directObject)
     ]
 
     public let synonyms: [String] = ["consume", "devour"]

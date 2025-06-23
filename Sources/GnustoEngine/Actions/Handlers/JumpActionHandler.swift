@@ -8,8 +8,8 @@ public struct JumpActionHandler: ActionHandler {
     public let verbID: VerbID = .jump
 
     public let syntax: [SyntaxRule] = [
-        SyntaxRule(.verb),
-        SyntaxRule(.verb, .directObject)
+        .match(.verb),
+        .match(.verb, .directObject),
     ]
 
     public let synonyms: [String] = ["leap", "hop"]

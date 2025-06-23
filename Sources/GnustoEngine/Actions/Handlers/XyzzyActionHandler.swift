@@ -7,7 +7,7 @@ public struct XyzzyActionHandler: ActionHandler {
     public let verbID: VerbID = .xyzzy
 
     public let syntax: [SyntaxRule] = [
-        SyntaxRule(.verb)
+        .match(.verb)
     ]
 
     public let synonyms: [String] = []

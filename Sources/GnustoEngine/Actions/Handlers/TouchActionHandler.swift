@@ -8,7 +8,7 @@ public struct TouchActionHandler: ActionHandler {
     public let verbID: VerbID = .touch
 
     public let syntax: [SyntaxRule] = [
-        SyntaxRule(.verb, .directObject)
+        .match(.verb, .directObject)
     ]
 
     public let synonyms: [String] = ["feel"]

@@ -8,8 +8,8 @@ public struct AttackActionHandler: ActionHandler {
     public let verbID: VerbID = .attack
 
     public let syntax: [SyntaxRule] = [
-        SyntaxRule(.verb, .directObject),
-        SyntaxRule(.verb, .directObject, .with, .indirectObject),
+        .match(.verb, .directObject),
+        .match(.verb, .directObject, .with, .indirectObject),
     ]
 
     public let synonyms: [String] = ["fight", "hit", "kill", "slay", "stab"]

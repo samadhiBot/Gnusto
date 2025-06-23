@@ -8,7 +8,7 @@ public struct BriefActionHandler: ActionHandler {
     public let verbID: VerbID = .brief
 
     public let syntax: [SyntaxRule] = [
-        SyntaxRule(.verb)
+        .match(.verb)
     ]
 
     public let synonyms: [String] = []

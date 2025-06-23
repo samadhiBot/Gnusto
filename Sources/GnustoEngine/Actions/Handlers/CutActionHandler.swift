@@ -11,8 +11,8 @@ public struct CutActionHandler: ActionHandler {
     public let verbID: VerbID = .cut
 
     public let syntax: [SyntaxRule] = [
-        SyntaxRule(.verb, .directObject),
-        SyntaxRule(.verb, .directObject, .particle("with"), .indirectObject)
+        .match(.verb, .directObject),
+        .match(.verb, .directObject, .with, .indirectObject),
     ]
 
     public let synonyms: [String] = ["slice", "chop"]

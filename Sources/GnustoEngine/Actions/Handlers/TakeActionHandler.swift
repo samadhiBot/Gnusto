@@ -8,8 +8,8 @@ public struct TakeActionHandler: ActionHandler {
     public let verbID: VerbID = .take
 
     public let syntax: [SyntaxRule] = [
-        SyntaxRule(.verb, .directObjects),
-        SyntaxRule(.verb, .directObjects, .from, .indirectObject)
+        .match(.verb, .directObjects),
+        .match(.verb, .directObjects, .from, .indirectObject),
     ]
 
     public let synonyms: [String] = ["get", "grab", "pick"]

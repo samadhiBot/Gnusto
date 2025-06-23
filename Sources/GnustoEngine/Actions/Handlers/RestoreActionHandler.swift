@@ -8,7 +8,7 @@ public struct RestoreActionHandler: ActionHandler {
     public let verbID: VerbID = .restore
 
     public let syntax: [SyntaxRule] = [
-        SyntaxRule(.verb)
+        .match(.verb)
     ]
 
     public let synonyms: [String] = ["load"]

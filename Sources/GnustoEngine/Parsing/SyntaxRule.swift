@@ -10,9 +10,9 @@ import Foundation
 /// required preposition if the pattern includes one.
 ///
 /// For example, a "TAKE" verb might have rules like:
-/// - `SyntaxRule(.verb, .directObject)` for "TAKE APPLE"
-/// - `SyntaxRule(.verb, .directObjects)` for "TAKE ALL" or "TAKE APPLE AND ORANGE"
-/// - `SyntaxRule(.verb, .directObject, .in, .indirectObject)` for "PUT APPLE IN BAG"
+/// - `.match(.verb, .directObject)` for "TAKE APPLE"
+/// - `.match(.verb, .directObjects)` for "TAKE ALL" or "TAKE APPLE AND ORANGE"
+/// - `.match(.verb, .directObject, .in, .indirectObject)` for "PUT APPLE IN BAG"
 ///
 /// Game developers typically define these rules implicitly when creating `VerbDefinition`s
 /// using convenience initializers, or explicitly if more control over the grammar is needed.
@@ -21,12 +21,29 @@ public struct SyntaxRule: Sendable, Equatable, Codable {
     /// For example, `[.verb, .directObject]` or `[.verb, .directObjects, .in, .indirectObject]`.
     public let pattern: [SyntaxTokenType]
 
+    /// Creates a `SyntaxRule` with a specific pattern.
+    ///
+    /// - Parameters:
+    ///   - pattern: An array of `SyntaxTokenType`s defining the rule's structure.
+    public init(pattern: [SyntaxTokenType]) {
+        self.pattern = pattern
+    }
+
+    /// Creates a `SyntaxRule` with the given sequence of `SyntaxTokenType`s.
+    ///
+    /// This is a factory for simple patterns, e.g. `.rule(.verb, .at, .directObject)`
+    ///
+    /// - Parameter pattern: A variadic list of `SyntaxTokenType`s defining the rule's structure.
+    public static func match(_ pattern: SyntaxTokenType...) -> SyntaxRule {
+        .init(pattern: pattern)
+    }
+
     /// Computed property that returns the required preposition for this rule.
     ///
     /// This checks any `.particle(string)` tokens that function as prepositions.
     ///
     /// - Returns: The preposition string, or `nil` if no specific preposition is required.
-    public var effectiveRequiredPreposition: String? {
+    public var expectedPreposition: String? {
         // Then check for particle tokens that are prepositions
         for token in pattern {
             if case .particle(let particle) = token {
@@ -40,36 +57,18 @@ public struct SyntaxRule: Sendable, Equatable, Codable {
         return nil
     }
 
-    // Explicit Codable conformance
-    enum CodingKeys: String, CodingKey {
-        case pattern
-    }
-
-    public init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        pattern = try container.decode([SyntaxTokenType].self, forKey: .pattern)
-    }
-
-    public func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(pattern, forKey: .pattern)
-    }
-
-    /// Creates a `SyntaxRule` with the given sequence of `SyntaxTokenType`s.
-    ///
-    /// This is a convenience initializer for simple patterns.
-    /// Example: `SyntaxRule(.verb, .directObject)`
-    ///
-    /// - Parameter pattern: A variadic list of `SyntaxTokenType`s defining the rule's structure.
-    public init(_ pattern: SyntaxTokenType...) {
-        self = .init(pattern: pattern)
-    }
-
-    /// Creates a `SyntaxRule` with a specific pattern.
-    ///
-    /// - Parameters:
-    ///   - pattern: An array of `SyntaxTokenType`s defining the rule's structure.
-    public init(pattern: [SyntaxTokenType]) {
-        self.pattern = pattern
-    }
+//    // Explicit Codable conformance
+//    enum CodingKeys: String, CodingKey {
+//        case pattern
+//    }
+//
+//    public init(from decoder: Decoder) throws {
+//        let container = try decoder.container(keyedBy: CodingKeys.self)
+//        pattern = try container.decode([SyntaxTokenType].self, forKey: .pattern)
+//    }
+//
+//    public func encode(to encoder: Encoder) throws {
+//        var container = encoder.container(keyedBy: CodingKeys.self)
+//        try container.encode(pattern, forKey: .pattern)
+//    }
 }

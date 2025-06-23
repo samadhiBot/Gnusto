@@ -8,9 +8,9 @@ public struct ExamineActionHandler: ActionHandler {
     public let verbID: VerbID = .examine
 
     public let syntax: [SyntaxRule] = [
-        SyntaxRule(.verb, .directObjects),
-        SyntaxRule(.verb, .in, .directObject),
-        SyntaxRule(.verb, .on, .directObject),
+        .match(.verb, .directObjects),
+        .match(.verb, .in, .directObject),
+        .match(.verb, .on, .directObject),
     ]
 
     public let synonyms: [String] = ["x", "inspect", "look at"]

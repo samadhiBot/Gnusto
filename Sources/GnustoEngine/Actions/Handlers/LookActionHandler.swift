@@ -14,9 +14,9 @@ public struct LookActionHandler: ActionHandler {
     public let verbID: VerbID = .look
 
     public let syntax: [SyntaxRule] = [
-        SyntaxRule(.verb),
-        SyntaxRule(.verb, .directObject),
-        SyntaxRule(.verb, .through, .directObject),
+        .match(.verb),
+        .match(.verb, .directObject),
+        .match(.verb, .through, .directObject),
     ]
 
     public let synonyms: [String] = ["l"]

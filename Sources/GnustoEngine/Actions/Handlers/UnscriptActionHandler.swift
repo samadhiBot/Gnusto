@@ -8,7 +8,7 @@ public struct UnscriptActionHandler: ActionHandler {
     public let verbID: VerbID = .unscript
 
     public let syntax: [SyntaxRule] = [
-        SyntaxRule(.verb)
+        .match(.verb)
     ]
 
     public let synonyms: [String] = []

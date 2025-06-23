@@ -10,7 +10,7 @@ public struct GiggleActionHandler: ActionHandler {
     public let verbID: VerbID = .giggle
 
     public let syntax: [SyntaxRule] = [
-        SyntaxRule(.verb)
+        .match(.verb)
     ]
 
     public let synonyms: [String] = ["chuckle"]

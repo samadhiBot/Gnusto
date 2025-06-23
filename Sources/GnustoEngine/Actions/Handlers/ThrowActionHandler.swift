@@ -8,9 +8,9 @@ public struct ThrowActionHandler: ActionHandler {
     public let verbID: VerbID = .throwItem
 
     public let syntax: [SyntaxRule] = [
-        SyntaxRule(.verb, .directObject),
-        SyntaxRule(.verb, .directObject, .particle("at"), .indirectObject),
-        SyntaxRule(.verb, .directObject, .indirectObject)
+        .match(.verb, .directObject),
+        .match(.verb, .directObject, .at, .indirectObject),
+        .match(.verb, .directObject, .indirectObject),
     ]
 
     public let synonyms: [String] = ["hurl", "toss"]

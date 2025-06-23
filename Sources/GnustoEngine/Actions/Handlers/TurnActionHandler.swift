@@ -8,8 +8,8 @@ public struct TurnActionHandler: ActionHandler {
     public let verbID: VerbID = .turn
 
     public let syntax: [SyntaxRule] = [
-        SyntaxRule(.verb, .directObject),
-        SyntaxRule(.verb, .directObject, .particle("to"), .indirectObject)
+        .match(.verb, .directObject),
+        .match(.verb, .directObject, .to, .indirectObject),
     ]
 
     public let synonyms: [String] = ["rotate", "twist"]

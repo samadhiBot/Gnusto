@@ -10,8 +10,8 @@ public struct CurseActionHandler: ActionHandler {
     public let verbID: VerbID = .curse
 
     public let syntax: [SyntaxRule] = [
-        SyntaxRule(.verb),
-        SyntaxRule(.verb, .directObject)
+        .match(.verb),
+        .match(.verb, .directObject),
     ]
 
     public let synonyms: [String] = ["swear", "damn"]

@@ -245,7 +245,10 @@ struct GameEngineTests {
 
     @Test("Engine Processes Successful Command")
     func testEngineProcessesSuccessfulCommand() async throws {
-        let mockLookHandler = MockActionHandler(verbID: .look, syntax: [SyntaxRule(.verb)])
+        let mockLookHandler = MockActionHandler(
+            verbID: .look,
+            syntax: [.match(.verb)]
+        )
 
         // Initialize room with isLit: true
         let startRoom = Location(
@@ -310,7 +313,10 @@ struct GameEngineTests {
 
     @Test("Engine Processes Multiple Commands")
     func testEngineProcessesMultipleCommands() async throws {
-        let mockLookHandler = MockActionHandler(verbID: .look, syntax: [SyntaxRule(.verb)])
+        let mockLookHandler = MockActionHandler(
+            verbID: .look,
+            syntax: [.match(.verb)]
+        )
         let mockTakeHandler = MockActionHandler(verbID: .take)
 
         // Initialize room with isLit: true
@@ -479,7 +485,10 @@ struct GameEngineTests {
 
     @Test("Engine State Persists Between Turns (Take -> Inventory)")
     func testEngineStatePersistsBetweenTurns() async throws {
-        let mockInventoryHandler = MockActionHandler(verbID: .inventory, syntax: [SyntaxRule(.verb)])
+        let mockInventoryHandler = MockActionHandler(
+            verbID: .inventory,
+            syntax: [.match(.verb)]
+        )
         // Use default TakeActionHandler to test state persistence
 
         // Initialize items with correct properties
@@ -598,7 +607,7 @@ struct GameEngineTests {
         // Given: An action handler that changes multiple things
         struct MockMultiChangeHandler: ActionHandler {
             let verbID: VerbID = VerbID("activate")
-            let syntax: [SyntaxRule] = [SyntaxRule(.verb, .directObject)]
+            let syntax: [SyntaxRule] = [.match(.verb, .directObject)]
             let synonyms: [String] = []
             let requiresLight: Bool = true
 
@@ -1499,7 +1508,7 @@ struct GameEngineTests {
         let testVerb = VerbID("testapply")
         struct MockResultHandler: ActionHandler {
             let verbID: VerbID
-            let syntax: [SyntaxRule] = [SyntaxRule(.verb, .directObject)]
+            let syntax: [SyntaxRule] = [.match(.verb, .directObject)]
             let synonyms: [String] = []
             let requiresLight: Bool = true
 

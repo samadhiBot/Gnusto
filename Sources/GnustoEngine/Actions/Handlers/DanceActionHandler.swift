@@ -11,8 +11,8 @@ public struct DanceActionHandler: ActionHandler {
     public let verbID: VerbID = .dance
 
     public let syntax: [SyntaxRule] = [
-        SyntaxRule(.verb),
-        SyntaxRule(.verb, .particle("with"), .directObject)
+        .match(.verb),
+        .match(.verb, .with, .directObject),
     ]
 
     public let synonyms: [String] = []

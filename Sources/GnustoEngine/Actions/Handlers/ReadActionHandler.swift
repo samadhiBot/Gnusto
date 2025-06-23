@@ -7,7 +7,7 @@ public struct ReadActionHandler: ActionHandler {
     public let verbID: VerbID = .read
 
     public let syntax: [SyntaxRule] = [
-        SyntaxRule(.verb, .directObject)
+        .match(.verb, .directObject)
     ]
 
     public let synonyms: [String] = []

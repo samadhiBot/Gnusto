@@ -10,7 +10,7 @@ public struct SingActionHandler: ActionHandler {
     public let verbID: VerbID = .sing
 
     public let syntax: [SyntaxRule] = [
-        SyntaxRule(.verb)
+        .match(.verb)
     ]
 
     public let synonyms: [String] = []

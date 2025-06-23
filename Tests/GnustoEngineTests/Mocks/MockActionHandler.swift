@@ -38,7 +38,7 @@ actor MockActionHandler: ActionHandler {
     // Initializer for the actor
     init(
         verbID: VerbID = .take,
-        syntax: [SyntaxRule] = [SyntaxRule(.verb, .directObject)],
+        syntax: [SyntaxRule] = [.match(.verb, .directObject)],
         synonyms: [String] = [],
         requiresLight: Bool = true,
         processHandler: (@Sendable (ActionContext) async throws -> ActionResult)? = nil,

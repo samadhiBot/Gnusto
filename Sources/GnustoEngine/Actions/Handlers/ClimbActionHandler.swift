@@ -16,7 +16,7 @@ public struct ClimbActionHandler: ActionHandler {
     public let verbID: VerbID = .climb
 
     public let syntax: [SyntaxRule] = [
-        SyntaxRule(.verb, .directObject)
+        .match(.verb, .directObject)
     ]
 
     public let synonyms: [String] = ["ascend"]
@@ -106,7 +106,8 @@ public struct ClimbActionHandler: ActionHandler {
 
                 // For global objects like stairs, verify they're actually present
                 if targetItem.parent == .nowhere,
-                   currentLocation.localGlobals.contains(targetItemID) == false {
+                    currentLocation.localGlobals.contains(targetItemID) == false
+                {
                     return ActionResult(
                         context.message.youSeeNo(item: targetItem.name)
                     )
@@ -142,7 +143,8 @@ public struct ClimbActionHandler: ActionHandler {
         // No exit uses this object, so handle as regular climbing
 
         // Check if the item is climbable
-        let message = if targetItem.hasFlag(.isClimbable) {
+        let message =
+            if targetItem.hasFlag(.isClimbable) {
                 // Default climbable behavior - can be overridden by specific item handlers
                 context.message.climbSuccess(item: targetItem.withDefiniteArticle)
             } else {

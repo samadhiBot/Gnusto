@@ -10,8 +10,8 @@ public struct LookUnderActionHandler: ActionHandler {
     public let verbID: VerbID = .lookUnder
 
     public let syntax: [SyntaxRule] = [
-        SyntaxRule(.verb, .particle("under"), .directObject),
-        SyntaxRule(.verb, .particle("beneath"), .directObject)
+        .match(.verb, .under, .directObject),
+        .match(.verb, .beneath, .directObject),
     ]
 
     public let synonyms: [String] = ["peek under"]

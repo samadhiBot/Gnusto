@@ -8,7 +8,7 @@ public struct RestartActionHandler: ActionHandler {
     public let verbID: VerbID = .restart
 
     public let syntax: [SyntaxRule] = [
-        SyntaxRule(.verb)
+        .match(.verb)
     ]
 
     public let synonyms: [String] = []
@@ -37,11 +37,12 @@ public struct RestartActionHandler: ActionHandler {
         // In ZIL tradition, RESTART asks for confirmation first
         // For now, we'll implement immediate restart - games can override for confirmation
 
-                // Signal the engine to quit (which will end the current session)
+        // Signal the engine to quit (which will end the current session)
         // The application layer should handle restarting the game
         await context.engine.requestQuit()
 
-        return ActionResult("""
+        return ActionResult(
+            """
             Are you sure you want to restart? This will lose your current progress.
             [Game will restart...]
             """)

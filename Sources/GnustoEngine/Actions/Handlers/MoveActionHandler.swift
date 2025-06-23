@@ -9,8 +9,8 @@ public struct MoveActionHandler: ActionHandler {
     public let verbID: VerbID = .move
 
     public let syntax: [SyntaxRule] = [
-        SyntaxRule(.verb, .directObject),
-        SyntaxRule(.verb, .directObject, .particle("to"), .indirectObject)
+        .match(.verb, .directObject),
+        .match(.verb, .directObject, .to, .indirectObject),
     ]
 
     public let synonyms: [String] = ["shift", "slide"]

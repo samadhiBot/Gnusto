@@ -12,7 +12,7 @@ public struct TasteActionHandler: ActionHandler {
     public let verbID: VerbID = .taste
 
     public let syntax: [SyntaxRule] = [
-        SyntaxRule(.verb, .directObject)
+        .match(.verb, .directObject)
     ]
 
     public let synonyms: [String] = ["lick"]

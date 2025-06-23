@@ -8,9 +8,9 @@ public struct InsertActionHandler: ActionHandler {
     public let verbID: VerbID = .insert
 
     public let syntax: [SyntaxRule] = [
-        SyntaxRule(.verb, .directObject, .particle("into"), .indirectObject),
-        SyntaxRule(.verb, .directObject, .particle("in"), .indirectObject),
-        SyntaxRule(.verb, .directObject, .indirectObject)
+        .match(.verb, .directObject, .into, .indirectObject),
+        .match(.verb, .directObject, .in, .indirectObject),
+        .match(.verb, .directObject, .indirectObject),
     ]
 
     public let synonyms: [String] = ["put in", "place in"]

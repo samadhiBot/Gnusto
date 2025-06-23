@@ -296,14 +296,18 @@ public struct Vocabulary: Codable, Equatable, Sendable {
         var vocab = Vocabulary()
 
         #if DEBUG
+
         vocab.add(
             verb: Verb(
                 id: .debug,
                 synonyms: "db",
-                syntax: [SyntaxRule(.verb, .directObject)],
+                syntax: [
+                    .match(.verb, .directObject)
+                ],
                 requiresLight: false
             )
         )
+
         #endif
 
         // Add game-specific items

@@ -8,7 +8,7 @@ public struct PressActionHandler: ActionHandler {
     public let verbID: VerbID = .press
 
     public let syntax: [SyntaxRule] = [
-        SyntaxRule(.verb, .directObject)
+        .match(.verb, .directObject)
     ]
 
     public let synonyms: [String] = ["push", "depress"]

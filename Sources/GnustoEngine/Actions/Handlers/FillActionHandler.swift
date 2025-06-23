@@ -8,9 +8,9 @@ public struct FillActionHandler: ActionHandler {
     public let verbID: VerbID = .fill
 
     public let syntax: [SyntaxRule] = [
-        SyntaxRule(.verb, .directObject),
-        SyntaxRule(.verb, .directObject, .particle("with"), .indirectObject),
-        SyntaxRule(.verb, .directObject, .particle("from"), .indirectObject)
+        .match(.verb, .directObject),
+        .match(.verb, .directObject, .with, .indirectObject),
+        .match(.verb, .directObject, .from, .indirectObject),
     ]
 
     public let synonyms: [String] = []
@@ -127,15 +127,16 @@ public struct FillActionHandler: ActionHandler {
             let locationItems = await context.engine.items(in: .location(currentLocationID))
             let waterSources = locationItems.filter { $0.hasFlag(.isDrinkable) }
 
-            let message = if waterSources.isEmpty {
-                context.message.noLiquidSourceAvailable()
-            } else {
-                context.message.fillSuccess(
-                    container: containerItem.name,
-                    source: waterSources[0].name
-                )
-                // TODO: In a full implementation, you might create a new liquid item in the container
-            }
+            let message =
+                if waterSources.isEmpty {
+                    context.message.noLiquidSourceAvailable()
+                } else {
+                    context.message.fillSuccess(
+                        container: containerItem.name,
+                        source: waterSources[0].name
+                    )
+                    // TODO: In a full implementation, you might create a new liquid item in the container
+                }
 
             return ActionResult(
                 message: message,

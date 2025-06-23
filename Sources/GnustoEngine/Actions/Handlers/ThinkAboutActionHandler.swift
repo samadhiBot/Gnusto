@@ -8,7 +8,7 @@ public struct ThinkAboutActionHandler: ActionHandler {
     public let verbID: VerbID = .thinkAbout
 
     public let syntax: [SyntaxRule] = [
-        SyntaxRule(.verb, .particle("about"), .directObject)
+        .match(.verb, .about, .directObject)
     ]
 
     public let synonyms: [String] = ["ponder", "consider"]

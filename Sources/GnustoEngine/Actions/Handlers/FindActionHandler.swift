@@ -11,7 +11,7 @@ public struct FindActionHandler: ActionHandler {
     public let verbID: VerbID = .find
 
     public let syntax: [SyntaxRule] = [
-        SyntaxRule(.verb, .directObject)
+        .match(.verb, .directObject)
     ]
 
     public let synonyms: [String] = ["locate", "search for"]

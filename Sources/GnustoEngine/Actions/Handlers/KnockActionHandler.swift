@@ -8,9 +8,9 @@ public struct KnockActionHandler: ActionHandler {
     public let verbID: VerbID = .knock
 
     public let syntax: [SyntaxRule] = [
-        SyntaxRule(.verb),
-        SyntaxRule(.verb, .directObject),
-        SyntaxRule(.verb, .particle("on"), .directObject)
+        .match(.verb),
+        .match(.verb, .directObject),
+        .match(.verb, .on, .directObject),
     ]
 
     public let synonyms: [String] = ["rap", "tap"]
