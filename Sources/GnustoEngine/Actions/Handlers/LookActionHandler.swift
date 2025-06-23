@@ -16,10 +16,7 @@ public struct LookActionHandler: ActionHandler {
     public let syntax: [SyntaxRule] = [
         SyntaxRule(.verb),
         SyntaxRule(.verb, .directObject),
-        SyntaxRule(
-            pattern: [.verb, .preposition, .directObject],
-            requiredPreposition: "through"
-        ),
+        SyntaxRule(.verb, .through, .directObject),
     ]
 
     public let synonyms: [String] = ["l"]

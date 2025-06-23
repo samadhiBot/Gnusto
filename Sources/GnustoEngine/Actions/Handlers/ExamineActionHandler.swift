@@ -12,14 +12,8 @@ public struct ExamineActionHandler: ActionHandler {
             pattern: [.verb, .directObject],
             directObjectConditions: .allowsMultiple
         ),
-        SyntaxRule(
-            pattern: [.verb, .preposition, .directObject],
-            requiredPreposition: "in"
-        ),
-        SyntaxRule(
-            pattern: [.verb, .preposition, .directObject],
-            requiredPreposition: "on"
-        ),
+        SyntaxRule(.verb, .in, .directObject),
+        SyntaxRule(.verb, .on, .directObject),
     ]
 
     public let synonyms: [String] = ["x", "inspect", "look at"]

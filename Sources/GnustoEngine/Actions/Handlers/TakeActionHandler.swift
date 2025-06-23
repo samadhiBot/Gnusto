@@ -13,9 +13,8 @@ public struct TakeActionHandler: ActionHandler {
             directObjectConditions: .allowsMultiple
         ),
         SyntaxRule(
-            pattern: [.verb, .directObject, .preposition, .indirectObject],
-            directObjectConditions: .allowsMultiple,
-            requiredPreposition: "from"
+            pattern: [.verb, .directObject, .from, .indirectObject],
+            directObjectConditions: .allowsMultiple
         )
     ]
 

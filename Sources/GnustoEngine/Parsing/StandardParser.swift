@@ -456,30 +456,6 @@ public struct StandardParser: Parser {
                 // If no direct object found, leave directObjectPhraseTokens empty
                 // Action handlers will provide appropriate error messages
 
-            case .preposition:
-                let currentToken = tokens[tokenCursor]
-                let expectedPrep = rule.effectiveRequiredPreposition
-                let isKnownPrep = vocabulary.prepositions.contains(currentToken)
-
-                // Check if the current token is a known preposition.
-                // The check for *which* specific preposition is required
-                // happens *after* matchRule returns success.
-                guard isKnownPrep else {
-                    let expectedType = expectedPrep ?? "a preposition"
-                    return .failure(
-                        .badGrammar(
-                            "Expected \(expectedType) but found '\(currentToken)'."
-                        )
-                    )
-                }
-
-                // If the rule *does* require a specific preposition, and the current token
-                // *isn't* it, this specific match attempt might be wrong, but don't fail
-                // the entire rule structurally yet. Store the token found.
-                // The calling function (`parse`) will validate if the required one was present.
-                matchedPreposition = currentToken
-                tokenCursor += 1
-
             case .indirectObject:
                  let phraseEndIndex = findEndOfNounPhrase(
                     startIndex: tokenCursor,
@@ -1310,10 +1286,6 @@ public struct StandardParser: Parser {
                 var isBoundaryToken = false
 
                 switch nextExpectedType {
-                case .preposition:
-                    if vocabulary.prepositions.contains(currentToken) {
-                        isBoundaryToken = true
-                    }
                 case .direction:
                     if vocabulary.directions.keys.contains(currentToken) {
                         isBoundaryToken = true

@@ -10,7 +10,8 @@ public struct LaughActionHandler: ActionHandler {
     public let verbID: VerbID = .laugh
 
     public let syntax: [SyntaxRule] = [
-        SyntaxRule(.verb)
+        SyntaxRule(.verb),
+        SyntaxRule(.verb, .at, .directObject),
     ]
 
     public let synonyms: [String] = []

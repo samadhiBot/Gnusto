@@ -9,10 +9,7 @@ public struct AttackActionHandler: ActionHandler {
 
     public let syntax: [SyntaxRule] = [
         SyntaxRule(.verb, .directObject),
-        SyntaxRule(
-            pattern: [.verb, .directObject, .preposition, .indirectObject],
-            requiredPreposition: "with"
-        ),
+        SyntaxRule(.verb, .directObject, .with, .indirectObject),
     ]
 
     public let synonyms: [String] = ["fight", "hit", "kill", "slay", "stab"]
