@@ -145,15 +145,11 @@ struct StandardParserTests {
             ),
         ]
 
-        // 2. Define Game-Specific Verbs (if any) - Most verbs are now defaults
-        // let gameSpecificVerbs: [Verb] = [
-        //     // Example: Add back a verb if its specific syntax/conditions ARE needed for a test
-        //     // and differ from the default (unlikely for most basic tests now).
-        //     // Verb(id: "eat", syntax: [ SyntaxRule(pattern: [.verb, .directObject], directObjectConditions: []) ])
-        //     // NOTE: The test setup previously defined verbs like 'take', 'look', 'go', 'put', 'drop', 'eat'.
-        //     // These are now provided by Vocabulary.defaultVerbs and should NOT be redefined here
-        //     // unless a specific test requires overriding a default rule.
-        // ]
+        // 2. Extract verbs from default action handlers
+        // We need to get the same verbs that a real game would have by using
+        // the GameEngine's default action handlers
+        let defaultActionHandlers = Array(GameEngine.defaultActionHandlers.values)
+        let defaultVerbs = GameEngine.extractVerbDefinitions(from: defaultActionHandlers)
 
         // 3. Define all Locations
         let locations = [
@@ -175,7 +171,7 @@ struct StandardParserTests {
         ]
 
         // 6. Build Vocabulary using defaults + game-specific items/verbs
-        vocabulary = .build(items: allItems, locations: locations)
+        vocabulary = .build(items: allItems, locations: locations, verbs: defaultVerbs)
 
         // 7. Build GameState using the new factory method
         gameState = GameState(

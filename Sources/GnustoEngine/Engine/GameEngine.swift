@@ -57,7 +57,7 @@ public actor GameEngine: Sendable {
     /// directly from handlers, as the engine provides higher-level mechanisms for output
     /// (e.g., the `message` property of an `ActionResult`, or by throwing an
     /// `ActionResponse` which the engine translates to a player-facing message).
-    nonisolated internal let ioHandler: IOHandler
+    nonisolated let ioHandler: IOHandler
 
     /// A utility to determine what items and locations are currently perceivable or
     /// interactable by the player, considering factors like light, containment, and reach.
@@ -217,7 +217,7 @@ public actor GameEngine: Sendable {
     }
 
     /// Extracts verb definitions from action handlers to build vocabulary.
-    private static func extractVerbDefinitions(from handlers: [ActionHandler]) -> [Verb] {
+    static func extractVerbDefinitions(from handlers: [ActionHandler]) -> [Verb] {
         return handlers.map { handler in
             var verb = Verb(
                 id: handler.verbID,
@@ -1058,7 +1058,7 @@ extension GameEngine {
 
     /// Processes the result of an action, applying state changes and printing the message.
     ///
-    /// This internal helper is called after an `ActionHandler` (or an event handler that
+    /// This helper is called after an `ActionHandler` (or an event handler that
     /// returns an `ActionResult`) has processed a command or event. It applies any
     /// `StateChange`s specified in the `ActionResult` to the `gameState` and prints
     /// the `ActionResult.message` to the player via the `IOHandler`.
