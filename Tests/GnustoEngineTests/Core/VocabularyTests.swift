@@ -22,12 +22,25 @@ struct VocabularyTests {
 
         // — Turn On —
         #expect(synonyms["turn on"] == [.turnOn], "Primary 'turn on' should map to itself")
-        #expect(synonyms["light"] == [.turnOn], "'light' should map to 'turn on'")
+        // "light" should map to multiple verbs since it's a synonym for both burn and turnOn
+        let lightMappings = synonyms["light"]
+        #expect(lightMappings != nil, "The word 'light' should have verb mappings")
+        if let mappings = lightMappings {
+            #expect(mappings.contains(.turnOn), "'light' should map to .turnOn verb")
+            #expect(mappings.contains(.burn), "'light' should also map to .burn verb as a synonym")
+        }
         #expect(synonyms["switch on"] == [.turnOn], "'switch on' should map to 'turn on'")
 
         // — Other samples —
-        #expect(synonyms["look"] == [.look], "Primary 'look' should map to itself")
-        #expect(synonyms["l"] == [.look], "'l' should map to 'look'")
+        // "look" should map to multiple verbs since it's a synonym for lookInside and lookUnder
+        let lookMappings = synonyms["look"]
+        #expect(lookMappings != nil, "The word 'look' should have verb mappings")
+        if let mappings = lookMappings {
+            #expect(mappings.contains(.look), "'look' should map to .look verb")
+            #expect(mappings.contains(.lookInside), "'look' should also map to .lookInside verb as a synonym")
+            #expect(mappings.contains(.lookUnder), "'look' should also map to .lookUnder verb as a synonym")
+        }
+        #expect(synonyms["l"] == [.look], "'l' should map only to 'look'")
         #expect(synonyms["examine"] == [.examine], "Primary 'examine' should map to itself")
         #expect(synonyms["x"] == [.examine], "'x' should map to 'examine'")
         #expect(synonyms["inspect"] == [.examine], "'inspect' should map to 'examine'")

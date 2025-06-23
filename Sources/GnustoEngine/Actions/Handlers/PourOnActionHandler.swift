@@ -8,11 +8,12 @@ public struct PourOnActionHandler: ActionHandler {
     public let verbID: VerbID = .pourOn
 
     public let syntax: [SyntaxRule] = [
+        .match(.verb),
+        .match(.verb, .directObject),
         .match(.verb, .directObject, .on, .indirectObject),
-        .match(.verb, .directObject, .indirectObject),
     ]
 
-    public let synonyms: [String] = ["spill on"]
+    public let synonyms: [String] = ["pour", "spill"]
 
     public let requiresLight: Bool = true
 
@@ -33,7 +34,7 @@ public struct PourOnActionHandler: ActionHandler {
         // Pour requires a direct object (what to pour)
         guard let directObjectRef = context.command.directObject else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.doWhat(verb: .pourOn)
+                context.message.doWhat(action: "pour")
             )
         }
         guard case .item(let sourceItemID) = directObjectRef else {

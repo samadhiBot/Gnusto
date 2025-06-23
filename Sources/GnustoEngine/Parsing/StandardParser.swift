@@ -431,10 +431,20 @@ public struct StandardParser: Parser {
         for patternIndex in 1..<rule.pattern.count {
             let tokenType = rule.pattern[patternIndex]
 
+            // Check if we've run out of tokens
             guard tokenCursor < tokens.count else {
-                // If we've run out of tokens, break out and let missing objects be handled by action handlers
-                // This allows commands like "ask" (missing direct object) to be parsed successfully
-                // and provides better user-facing error messages from the action handlers
+                // Different handling based on token type
+                switch tokenType {
+                case .particle(let expectedParticle):
+                    // Particles are structural and required - if missing, this rule fails
+                    return .failure(.badGrammar("Expected '\(expectedParticle)' but reached end of input."))
+                case .directObject, .directObjects, .indirectObject, .indirectObjects, .direction:
+                    // Objects and directions can be missing - let action handlers provide better error messages
+                    break
+                case .verb:
+                    // This shouldn't happen since verb is at index 0
+                    continue
+                }
                 break
             }
 

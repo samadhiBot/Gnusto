@@ -14,7 +14,7 @@ public struct LookUnderActionHandler: ActionHandler {
         .match(.verb, .beneath, .directObject),
     ]
 
-    public let synonyms: [String] = ["peek under"]
+    public let synonyms: [String] = ["look", "peek"]
 
     public let requiresLight: Bool = true
 
@@ -27,7 +27,7 @@ public struct LookUnderActionHandler: ActionHandler {
     public func validate(context: ActionContext) async throws {
         guard let directObjectRef = context.command.directObject else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.doWhat(verb: .lookUnder)
+                context.message.doWhat(action: "look under")
             )
         }
 
