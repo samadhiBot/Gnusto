@@ -17,7 +17,7 @@ public struct ChompActionHandler: ActionHandler {
 
         guard case .item(let targetItemID) = directObjectRef else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.canOnlyActOnItems(verb: "chomp")
+                context.message.thatsNotSomethingYouCan(.chomp)
             )
         }
 
@@ -46,23 +46,20 @@ public struct ChompActionHandler: ActionHandler {
         let targetItem = try await context.engine.item(targetItemID)
 
         // Special responses for different types of items
-        let message: String
-
-        if targetItem.hasFlag(.isEdible) {
-            message = context.message.chompEdible(item: targetItem.withIndefiniteArticle)
-        } else if targetItem.hasFlag(.isPerson) || targetItem.hasFlag(.isCharacter) {
-            message = context.message.chompPerson()
-        } else if targetItem.hasFlag(.isWearable) {
-            message = context.message.chompWearable()
-        } else if targetItem.hasFlag(.isContainer) {
-            message = context.message.chompContainer()
-        } else if targetItem.hasFlag(.isWeapon) {
-            message = context.message.chompWeapon()
-        } else {
-            // Generic responses for other objects
-            let theItem = targetItem.withDefiniteArticle
-            message = context.message.chompTargetResponse(item: theItem)
-        }
+        let message =
+            if targetItem.hasFlag(.isEdible) {
+                context.message.chompEdible(
+                    item: targetItem.withIndefiniteArticle
+                )
+            } else if targetItem.hasFlag(.isPerson) || targetItem.hasFlag(.isCharacter) {
+                context.message.chompCharacter(
+                    targetItem.withDefiniteArticle
+                )
+            } else {
+                context.message.chompTargetResponse(
+                    item: targetItem.withDefiniteArticle
+                )
+            }
 
         // Mark item as touched and update pronouns
         return ActionResult(

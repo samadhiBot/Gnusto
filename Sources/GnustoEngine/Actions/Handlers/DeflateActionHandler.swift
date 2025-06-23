@@ -23,7 +23,7 @@ public struct DeflateActionHandler: ActionHandler {
         }
         guard case .item(let targetItemID) = directObjectRef else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.canOnlyActOnItems(verb: "deflate")
+                context.message.thatsNotSomethingYouCan(.deflate)
             )
         }
 

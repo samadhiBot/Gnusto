@@ -36,7 +36,7 @@ public struct DropActionHandler: ActionHandler {
         }
         guard case .item(let targetItemID) = directObjectRef else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.youCanOnlyActOnItems(verb: "drop")
+                context.message.thatsNotSomethingYouCan(.drop)
             )
         }
 
@@ -99,7 +99,7 @@ public struct DropActionHandler: ActionHandler {
                     continue  // Skip non-items in ALL commands
                 } else {
                     throw ActionResponse.internalEngineError(
-                        context.message.youCanOnlyActOnItems(verb: "drop")
+                        context.message.thatsNotSomethingYouCan(.drop)
                     )
                 }
             }

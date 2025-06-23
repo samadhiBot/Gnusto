@@ -27,7 +27,7 @@ public struct TasteActionHandler: ActionHandler {
         }
         guard case .item(let itemID) = directObjectRef else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.youCanOnlyTasteItems()
+                context.message.thatsNotSomethingYouCan(.taste)
             )
         }
         guard await context.engine.playerCanReach(itemID) else {

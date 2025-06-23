@@ -46,7 +46,7 @@ public struct TakeActionHandler: ActionHandler {
         }
         guard case .item(let targetItemID) = directObjectRef else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.youCanOnlyActOnItems(verb: "take")
+                context.message.thatsNotSomethingYouCan(.take)
             )
         }
 
@@ -57,7 +57,7 @@ public struct TakeActionHandler: ActionHandler {
         if let indirectObjectRef = context.command.indirectObject {
             guard case .item(let containerID) = indirectObjectRef else {
                 throw ActionResponse.prerequisiteNotMet(
-                    context.message.youCanOnlyActOnItems(verb: "take")
+                    context.message.thatsNotSomethingYouCan(.take)
                 )
             }
 

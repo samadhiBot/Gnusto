@@ -32,7 +32,7 @@ public struct LockActionHandler: ActionHandler {
         }
         guard case .item(let targetItemID) = directObjectRef else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.canOnlyActOnItems(verb: "lock")
+                context.message.thatsNotSomethingYouCan(.lock)
             )
         }
         let targetItem = try await context.engine.item(targetItemID)

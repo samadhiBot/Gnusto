@@ -23,7 +23,7 @@ public struct PullActionHandler: ActionHandler {
         }
         guard case .item(let targetItemID) = directObjectRef else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.canOnlyActOnItems(verb: "pull")
+                context.message.thatsNotSomethingYouCan(.pull)
             )
         }
 

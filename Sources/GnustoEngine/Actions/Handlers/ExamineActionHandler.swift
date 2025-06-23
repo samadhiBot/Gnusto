@@ -47,7 +47,7 @@ public struct ExamineActionHandler: ActionHandler {
             return
         default:
             throw ActionResponse.prerequisiteNotMet(
-                context.message.canOnlyActOnItems(verb: "examine")
+                context.message.thatsNotSomethingYouCan(.examine)
             )
         }
     }
@@ -82,7 +82,7 @@ public struct ExamineActionHandler: ActionHandler {
         // For ALL commands, empty directObjects is valid (means nothing to examine)
         if !context.command.isAllCommand {
             guard !context.command.directObjects.isEmpty else {
-                return ActionResult(context.message.canOnlyActOnItems(verb: "examine"))
+                return ActionResult(context.message.thatsNotSomethingYouCan(.examine))
             }
         }
 
@@ -221,7 +221,7 @@ public struct ExamineActionHandler: ActionHandler {
             default:
                 // For ALL commands, skip non-items
                 if !context.command.isAllCommand {
-                    return ActionResult(context.message.canOnlyActOnItems(verb: "examine"))
+                    return ActionResult(context.message.thatsNotSomethingYouCan(.examine))
                 }
             }
         }

@@ -25,7 +25,7 @@ public struct ReadActionHandler: ActionHandler {
         }
         guard case .item(let targetItemID) = directObjectRef else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.youCanOnlyReadItems()
+                context.message.thatsNotSomethingYouCan(.read)
             )
         }
 

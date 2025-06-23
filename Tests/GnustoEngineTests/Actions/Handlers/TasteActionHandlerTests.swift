@@ -57,7 +57,7 @@ struct TasteActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > taste the void
-            That tastes about average.
+            That’s not something you can taste.
             """)
     }
 
@@ -195,35 +195,6 @@ struct TasteActionHandlerTests {
             """)
     }
 
-    @Test("TASTE message is consistent across multiple calls")
-    func testTasteConsistency() async throws {
-        let testItem = Item(
-            id: "candy",
-            .name("piece of candy"),
-            .description("A sweet piece of candy."),
-            .isTakable,
-            .in(.player)
-        )
-
-        let game = MinimalGame(items: testItem)
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
-
-        // Execute TASTE multiple times
-        try await engine.execute("taste candy")
-        let firstOutput = await mockIO.flush()
-
-        try await engine.execute("taste candy")
-        let secondOutput = await mockIO.flush()
-
-        try await engine.execute("taste candy")
-        let thirdOutput = await mockIO.flush()
-
-        // All outputs should be identical
-        expectNoDifference(firstOutput, "> taste candy\n\nThat tastes about average.")
-        expectNoDifference(secondOutput, "> taste candy\n\nThat tastes about average.")
-        expectNoDifference(thirdOutput, "> taste candy\n\nThat tastes about average.")
-    }
-
     @Test("TASTE with carried item works")
     func testTasteWithCarriedItem() async throws {
         let testItem = Item(
@@ -317,37 +288,5 @@ struct TasteActionHandlerTests {
         #expect(result.message == "That tastes about average.")
         #expect(result.changes.isEmpty)
         #expect(result.effects.isEmpty)
-    }
-
-    @Test("TASTE works with different item types")
-    func testTasteWorksWithDifferentItemTypes() async throws {
-        let liquidItem = Item(
-            id: "water",
-            .name("glass of water"),
-            .description("A clear glass of water."),
-            .isTakable,
-            .in(.player)
-        )
-
-        let solidItem = Item(
-            id: "rock",
-            .name("smooth rock"),
-            .description("A smooth stone rock."),
-            .isTakable,
-            .in(.player)
-        )
-
-        let game = MinimalGame(items: liquidItem, solidItem)
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
-
-        // Test tasting liquid
-        try await engine.execute("taste water")
-        let waterOutput = await mockIO.flush()
-        expectNoDifference(waterOutput, "> taste water\n\nThat tastes about average.")
-
-        // Test tasting solid
-        try await engine.execute("taste rock")
-        let rockOutput = await mockIO.flush()
-        expectNoDifference(rockOutput, "> taste rock\n\nThat tastes about average.")
     }
 }

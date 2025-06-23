@@ -24,14 +24,14 @@ public struct GiveActionHandler: ActionHandler {
             }
             guard case .item(let recipientID) = indirectObjectRef else {
                 throw ActionResponse.prerequisiteNotMet(
-                    context.message.youCanOnlyActOnItems(verb: "give")
+                    context.message.thatsNotSomethingYouCan(.give)
                 )
             }
             // Check if recipient exists and is an actor
             let recipient = try await context.engine.item(recipientID)
             guard recipient.hasFlag(.isCharacter) else {
                 throw ActionResponse.prerequisiteNotMet(
-                    context.message.youCanOnlyActOnItems(verb: "give")
+                    context.message.thatsNotSomethingYouCan(.give)
                 )
             }
             return
@@ -59,12 +59,12 @@ public struct GiveActionHandler: ActionHandler {
         }
         guard case .item(let targetItemID) = directObjectRef else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.youCanOnlyActOnItems(verb: "give")
+                context.message.thatsNotSomethingYouCan(.give)
             )
         }
         guard case .item(let recipientID) = indirectObjectRef else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.youCanOnlyActOnItems(verb: "give")
+                context.message.thatsNotSomethingYouCan(.give)
             )
         }
 
@@ -80,7 +80,7 @@ public struct GiveActionHandler: ActionHandler {
         let recipient = try await context.engine.item(recipientID)
         guard recipient.hasFlag(.isCharacter) else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.youCanOnlyActOnItems(verb: "give")
+                context.message.thatsNotSomethingYouCan(.give)
             )
         }
 
@@ -132,7 +132,7 @@ public struct GiveActionHandler: ActionHandler {
                     continue  // Skip non-items in ALL commands
                 } else {
                     return ActionResult(
-                        context.message.youCanOnlyActOnItems(verb: "give")
+                        context.message.thatsNotSomethingYouCan(.give)
                     )
                 }
             }

@@ -27,7 +27,7 @@ public struct TurnOffActionHandler: ActionHandler {
         }
         guard case .item(let targetItemID) = directObjectRef else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.youCanOnlyTurnOffItems()
+                context.message.thatsNotSomethingYouCan(.turnOff)
             )
         }
 

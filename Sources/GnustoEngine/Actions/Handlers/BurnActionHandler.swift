@@ -27,7 +27,7 @@ public struct BurnActionHandler: ActionHandler {
 
         guard case .item(let itemID) = targetObjectID else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.canOnlyActOnItems(verb: "burn")
+                context.message.thatsNotSomethingYouCan(.burn)
             )
         }
 

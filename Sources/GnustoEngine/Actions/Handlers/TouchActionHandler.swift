@@ -24,7 +24,7 @@ public struct TouchActionHandler: ActionHandler {
         }
         guard case .item(let targetItemID) = directObjectRef else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.youCanOnlyTouchItems()
+                context.message.thatsNotSomethingYouCan(.touch)
             )
         }
 

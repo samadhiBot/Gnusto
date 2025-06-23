@@ -33,7 +33,7 @@ public struct RemoveActionHandler: ActionHandler {
         }
         guard case .item(let targetItemID) = directObjectRef else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.canOnlyActOnItems(verb: "remove"))
+                context.message.thatsNotSomethingYouCan(.remove))
         }
 
         // 2. Check if the item exists and is worn by the player
@@ -84,7 +84,7 @@ public struct RemoveActionHandler: ActionHandler {
                     continue  // Skip non-items in ALL commands
                 } else {
                     return ActionResult(
-                        context.message.canOnlyActOnItems(verb: "remove")
+                        context.message.thatsNotSomethingYouCan(.remove)
                     )
                 }
             }
@@ -152,7 +152,7 @@ public struct RemoveActionHandler: ActionHandler {
             if removedItems.isEmpty {
                 context.command.isAllCommand
                     ? context.message.youArentWearingAnything()
-                : context.message.doWhat(verb: .remove)
+                    : context.message.doWhat(verb: .remove)
             } else {
                 context.message.youRemoveMultipleItems(
                     items: removedItems.listWithDefiniteArticles

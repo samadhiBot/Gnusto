@@ -17,7 +17,7 @@ public struct CurseActionHandler: ActionHandler {
 
         guard case .item(let targetItemID) = directObjectRef else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.canOnlyActOnItems(verb: "curse")
+                context.message.thatsNotSomethingYouCan(.curse)
             )
         }
 

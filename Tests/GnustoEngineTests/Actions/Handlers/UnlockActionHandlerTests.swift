@@ -115,7 +115,7 @@ struct UnlockActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > unlock box
-            Unlock it with what?
+            Unlock the box with what?
             """)
 
         // Assert No State Change

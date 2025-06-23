@@ -33,10 +33,10 @@ public struct ThinkAboutActionHandler: ActionHandler {
             guard await context.engine.playerCanReach(targetItemID) else {
                 throw ActionResponse.itemNotAccessible(targetItemID)
             }
-        case .location(_):
+        case .location:
             // For now, only allow thinking about items or the player.
             throw ActionResponse.prerequisiteNotMet(
-                context.message.canOnlyActOnItems(verb: "think about")
+                context.message.thinkAboutLocation()
             )
         }
     }
@@ -74,7 +74,7 @@ public struct ThinkAboutActionHandler: ActionHandler {
                     await context.engine.updatePronouns(to: targetItem),
                 ]
             )
-        case .location(_):
+        case .location:
             // Should be caught by validate if we decide not to support thinking about locations.
             // If supported, a custom message would go here.
             return ActionResult(

@@ -39,7 +39,7 @@ public struct InsertActionHandler: ActionHandler {
             }
             guard case .item(let containerID) = indirectObjectRef else {
                 throw ActionResponse.prerequisiteNotMet(
-                    context.message.youCanOnlyActOnItems(verb: "insert")
+                    context.message.thatsNotSomethingYouCan(.insert)
                 )
             }
             // Check if container exists and is a container
@@ -72,7 +72,7 @@ public struct InsertActionHandler: ActionHandler {
             let itemToInsert = try? await context.engine.item(itemToInsertID)
         else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.youCanOnlyActOnItems(verb: "insert")
+                context.message.thatsNotSomethingYouCan(.insert)
             )
         }
 
@@ -83,7 +83,7 @@ public struct InsertActionHandler: ActionHandler {
         }
         guard case .item(let containerID) = indirectObjectRef else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.youCanOnlyActOnItems(verb: "insert")
+                context.message.thatsNotSomethingYouCan(.insert)
             )
         }
 
@@ -198,7 +198,7 @@ public struct InsertActionHandler: ActionHandler {
                     continue  // Skip non-items in ALL commands
                 } else {
                     return ActionResult(
-                        context.message.canOnlyActOnItems(verb: "insert")
+                        context.message.thatsNotSomethingYouCan(.insert)
                     )
                 }
             }

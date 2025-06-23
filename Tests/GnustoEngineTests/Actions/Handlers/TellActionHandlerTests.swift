@@ -39,7 +39,7 @@ struct TellActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > tell wizard
-            Tell about what?
+            Tell the old wizard about what?
             """)
     }
 
@@ -84,7 +84,8 @@ struct TellActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > tell wizard about crystal
-            Old wizard listens politely to what you say about magic crystal.
+            The old wizard listens politely to what you say about the
+            magic crystal.
             """)
     }
 
@@ -107,7 +108,7 @@ struct TellActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > tell wizard about me
-            Old wizard listens politely to what you say about yourself.
+            The old wizard listens politely to what you say about yourself.
             """)
     }
 
@@ -124,13 +125,13 @@ struct TellActionHandlerTests {
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // When
-        try await engine.execute("tell wizard about room")
+        try await engine.execute("tell the old wizard about the void")
 
         // Then
         let output = await mockIO.flush()
         expectNoDifference(output, """
-            > tell wizard about room
-            Old wizard listens politely to what you say about Void.
+            > tell the old wizard about the void
+            The old wizard listens politely to what you say about Void.
             """)
     }
 
@@ -153,7 +154,7 @@ struct TellActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > tell wizard about wizard
-            You can’t see any wizard here.
+            You can’t see any such thing.
             """)
     }
 }

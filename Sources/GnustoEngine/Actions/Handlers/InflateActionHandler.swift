@@ -23,7 +23,7 @@ public struct InflateActionHandler: ActionHandler {
         }
         guard case .item(let targetItemID) = directObjectRef else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.canOnlyActOnItems(verb: "inflate")
+                context.message.thatsNotSomethingYouCan(.inflate)
             )
         }
 

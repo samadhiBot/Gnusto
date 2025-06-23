@@ -361,13 +361,6 @@ open class MessageProvider: @unchecked Sendable {
         )
     }
 
-    open func canOnlyActOnItems(verb: String) -> String {
-        output(
-            "canOnlyActOnItems(verb: '\(verb)')",
-            "You can only \(verb) items."
-        )
-    }
-
     open func canOnlyDrinkLiquids() -> String {
         output(
             "canOnlyDrinkLiquids()",
@@ -410,10 +403,10 @@ open class MessageProvider: @unchecked Sendable {
         )
     }
 
-    open func chompContainer() -> String {
+    open func characterListens(character: String, topic: String) -> String {
         output(
-            "chompContainer()",
-            "You'd probably break your teeth on that."
+            "characterListens(character: '\(character)', topic: '\(topic)')",
+            "\(character.capitalizedFirst) listens politely to what you say about \(topic)."
         )
     }
 
@@ -424,10 +417,22 @@ open class MessageProvider: @unchecked Sendable {
         )
     }
 
-    open func chompPerson() -> String {
+    open func chompCharacter(_ character: String) -> String {
         output(
-            "chompPerson()",
-            "That would be rude, not to mention dangerous."
+            "chompCharacter(_ character: String)",
+            oneOf(
+                "You chomp \(character) as one might when exploring all new social boundaries.",
+                "You bite \(character) with a zeal for unconventional interaction methods.",
+                "You chomp \(character) with the dauntless intimacy of a truly authentic communicator.",
+                "You bite \(character) in a direct manner that cuts through all social pretense.",
+                "You chomp \(character) with refreshing honesty about your primal instincts.",
+                "You gnaw \(character) in a thinking-outside-the-box kind of a way.",
+                "You bite \(character) with admirable confidence in your interpersonal techniques.",
+                "You chomp \(character) with the thoroughness of someone who's not looking back.",
+                "You gnaw \(character) with a bold authenticity of unfiltered self-expression.",
+                "You bite \(character) and further extend the range in your communication repertoire.",
+                "You bite \(character) despite all of the socializing you received as a child.",
+            )
         )
     }
 
@@ -473,20 +478,6 @@ open class MessageProvider: @unchecked Sendable {
                 "You gnaw \(item) with the methodical approach of a serious researcher.",
                 "You gnaw on \(item) with the persistence of someone who truly believes in their methods.",
             )
-        )
-    }
-
-    open func chompWeapon() -> String {
-        output(
-            "chompWeapon()",
-            "That seems like a good way to hurt yourself."
-        )
-    }
-
-    open func chompWearable() -> String {
-        output(
-            "chompWearable()",
-            "Chewing on clothing is not recommended for your dental health."
         )
     }
 
@@ -1913,6 +1904,28 @@ open class MessageProvider: @unchecked Sendable {
         )
     }
 
+    open func thatsNotSomethingYouCan(_ verb: VerbID) -> String {
+        output(
+            "thatsNotSomethingYouCan(verb: \(verb))",
+            "That's not something you can \(verb.rawValue)."
+        )
+    }
+
+    open func thatsNotSomethingYouCanPutOnThings() -> String {
+        output(
+            "thatsNotSomethingYouCanPutOnThings()",
+            "That's not something you can put on things."
+        )
+    }
+
+    open func thatsNotSomethingYouCanUseAsKey() -> String {
+        output(
+            "thatsNotSomethingYouCanUseAsKey()",
+            "That's not something you can use as a key."
+        )
+    }
+
+
     open func thereIsNothingHereToTake() -> String {
         output(
             "thereIsNothingHereToTake()",
@@ -1930,7 +1943,7 @@ open class MessageProvider: @unchecked Sendable {
     open func thinkAboutLocation() -> String {
         output(
             "thinkAboutLocation()",
-            "You ponder the location, but it remains stubbornly locational."
+            "The more you think, the more it remains stubbornly locational."
         )
     }
 
@@ -2209,111 +2222,6 @@ open class MessageProvider: @unchecked Sendable {
         output(
             "youCannotTakeFromNonContainer(container: \(container))",
             "You can't take things out of \(container)."
-        )
-    }
-
-    open func youCanOnlyActOnItems(verb: String) -> String {
-        output(
-            "youCanOnlyActOnItems(verb: '\(verb)')",
-            "You can only \(verb) items."
-        )
-    }
-
-    open func youCanOnlyMoveItems() -> String {
-        output(
-            "youCanOnlyMoveItems()",
-            "You can only move items."
-        )
-    }
-
-    open func youCanOnlyPutItemsOnThings() -> String {
-        output(
-            "youCanOnlyPutItemsOnThings()",
-            "You can only put items on things."
-        )
-    }
-
-    open func youCanOnlyPutThingsOnSurfaces() -> String {
-        output(
-            "youCanOnlyPutThingsOnSurfaces()",
-            "You can only put things on items (that are surfaces)."
-        )
-    }
-
-    open func youCanOnlyRaiseItems() -> String {
-        output(
-            "youCanOnlyRaiseItems()",
-            "You can only raise items."
-        )
-    }
-
-    open func youCanOnlyReadItems() -> String {
-        output(
-            "youCanOnlyReadItems()",
-            "You can only read items."
-        )
-    }
-
-    open func youCanOnlySmellItems() -> String {
-        output(
-            "youCanOnlySmellItems()",
-            "You can only smell items directly."
-        )
-    }
-
-    open func youCanOnlyTasteItems() -> String {
-        output(
-            "youCanOnlyTasteItems()",
-            "You can only taste items."
-        )
-    }
-
-    open func youCanOnlyTellCharacters() -> String {
-        output(
-            "youCanOnlyTellCharacters()",
-            "You can only tell characters about things."
-        )
-    }
-
-    open func youCanOnlyTouchItems() -> String {
-        output(
-            "youCanOnlyTouchItems()",
-            "You can only touch items."
-        )
-    }
-
-    open func youCanOnlyTurnOffItems() -> String {
-        output(
-            "youCanOnlyTurnOffItems()",
-            "You can only turn off items."
-        )
-    }
-
-    open func youCanOnlyTurnOnItems() -> String {
-        output(
-            "youCanOnlyTurnOnItems()",
-            "You can only turn on items."
-        )
-    }
-
-    open func youCanOnlyUnlockItems() -> String {
-        output(
-            "youCanOnlyUnlockItems()",
-            "You can only unlock items."
-        )
-    }
-
-    open func youCanOnlyUseItemAsKey() -> String {
-        output(
-            "youCanOnlyUseItemAsKey()",
-            "You can only use an item as a key."
-        )
-    }
-
-    open func youCanOnlyWearItems() -> String {
-        output(
-            "youCanOnlyWearItems()",
-            "You can only wear items."
         )
     }
 

@@ -42,7 +42,7 @@ public struct TellActionHandler: ActionHandler {
 
         guard context.command.indirectObject != nil else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.tellCharacterAboutWhat(character: character.name)
+                context.message.tellCharacterAboutWhat(character: character.withDefiniteArticle)
             )
         }
     }
@@ -72,7 +72,7 @@ public struct TellActionHandler: ActionHandler {
         switch indirectObjectRef {
         case .item(let topicItemID):
             let topicItem = try await context.engine.item(topicItemID)
-            topicDescription = topicItem.name
+            topicDescription = topicItem.withDefiniteArticle
         case .player:
             topicDescription = "yourself"
         case .location(let locationID):
@@ -81,24 +81,13 @@ public struct TellActionHandler: ActionHandler {
         }
 
         // Default response - games can override with ItemEventHandlers
-        let message =
-            "\(character.name.capitalizedFirst) listens politely to what you say about \(topicDescription)."
-
         return ActionResult(
-            message: message,
-            changes: [
-                await context.engine.setFlag(.isTouched, on: character),
-                await context.engine.updatePronouns(to: character),
-            ]
+            context.message.characterListens(
+                character: character.withDefiniteArticle,
+                topic: topicDescription
+            ),
+            await context.engine.setFlag(.isTouched, on: character),
+            await context.engine.updatePronouns(to: character),
         )
-    }
-
-    /// Performs any post-processing after the tell action completes.
-    ///
-    /// Currently no post-processing is needed for basic telling.
-    ///
-    /// - Parameter context: The action context for the current action.
-    public func postProcess(context: ActionContext) async throws {
-        // No post-processing needed for tell
     }
 }

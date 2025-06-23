@@ -33,7 +33,7 @@ public struct WearActionHandler: ActionHandler {
         }
         guard case .item(let targetItemID) = directObjectRef else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.youCanOnlyWearItems()
+                context.message.thatsNotSomethingYouCan(.wear)
             )
         }
 
@@ -84,7 +84,7 @@ public struct WearActionHandler: ActionHandler {
                 if context.command.isAllCommand {
                     continue  // Skip non-items in ALL commands
                 } else {
-                    return ActionResult(context.message.youCanOnlyWearItems())
+                    return ActionResult(context.message.thatsNotSomethingYouCan(.wear))
                 }
             }
 
@@ -154,8 +154,9 @@ public struct WearActionHandler: ActionHandler {
         // Generate appropriate message
         let message =
             if wornItems.isEmpty {
-                context.command.isAllCommand ? context.message.nothingHereToWear()
-                                             : context.message.doWhat(verb: .wear)
+                context.command.isAllCommand
+                    ? context.message.nothingHereToWear()
+                    : context.message.doWhat(verb: .wear)
             } else {
                 context.message.youPutOn(item: wornItems.listWithDefiniteArticles)
             }

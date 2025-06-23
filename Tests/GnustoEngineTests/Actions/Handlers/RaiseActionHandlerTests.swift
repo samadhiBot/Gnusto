@@ -82,7 +82,7 @@ struct RaiseActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > raise the void
-            You can only raise items.
+            That’s not something you can raise.
             """)
 
         #expect(await engine.gameState.changeHistory.isEmpty)

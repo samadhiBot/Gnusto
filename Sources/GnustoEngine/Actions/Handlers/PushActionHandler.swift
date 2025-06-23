@@ -32,7 +32,7 @@ public struct PushActionHandler: ActionHandler {
         }
         guard case .item(let targetItemID) = directObjectRef else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.canOnlyActOnItems(verb: "push")
+                context.message.thatsNotSomethingYouCan(.push)
             )
         }
 
@@ -75,7 +75,7 @@ public struct PushActionHandler: ActionHandler {
                     continue  // Skip non-items in ALL commands
                 } else {
                     return ActionResult(
-                        context.message.canOnlyActOnItems(verb: "push")
+                        context.message.thatsNotSomethingYouCan(.push)
                     )
                 }
             }
@@ -131,8 +131,9 @@ public struct PushActionHandler: ActionHandler {
         // Generate appropriate message
         let message =
             if pushedItems.isEmpty {
-                context.command.isAllCommand ? context.message.nothingHereToPush()
-                : context.message.doWhat(verb: .push)
+                context.command.isAllCommand
+                    ? context.message.nothingHereToPush()
+                    : context.message.doWhat(verb: .push)
             } else {
                 context.message.pushSuccess(items: pushedItems.listWithDefiniteArticles)
             }

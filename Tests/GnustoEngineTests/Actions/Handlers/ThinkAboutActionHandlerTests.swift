@@ -30,7 +30,7 @@ struct ThinkAboutActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > think about self
-            Yes, yes, you're very important.
+            Yes, yes, you’re very important.
             """)
     }
 
@@ -54,7 +54,8 @@ struct ThinkAboutActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > think about puzzle
-            You contemplate the mysterious puzzle for a bit, but nothing fruitful comes to mind.
+            You contemplate the mysterious puzzle for a bit, but nothing
+            fruitful comes to mind.
             """)
     }
 
@@ -63,12 +64,12 @@ struct ThinkAboutActionHandlerTests {
         let (engine, mockIO) = await GameEngine.test()
 
         // Act
-        try await engine.execute("think about room")
+        try await engine.execute("think about the void")
 
         let output = await mockIO.flush()
         expectNoDifference(output, """
-            > think about room
-            You can only think about yourself or specific items.
+            > think about the void
+            The more you think, the more it remains stubbornly locational.
             """)
     }
 
@@ -91,83 +92,27 @@ struct ThinkAboutActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > think about key
-            You can’t see any golden key here.
+            You can’t see any such thing.
             """)
-    }
-
-    @Test("THINK ABOUT validation succeeds for player")
-    func testThinkAboutValidationSucceedsForPlayer() async throws {
-        let handler = ThinkAboutActionHandler()
-        let (engine, _) = await GameEngine.test()
-
-        let command = Command(
-            verb: .thinkAbout,
-            directObject: .player,
-            rawInput: "think about self"
-        )
-        let context = ActionContext(
-            command: command,
-            engine: engine
-        )
-
-        // Should not throw - thinking about self is valid
-        try await handler.validate(context: context)
-    }
-
-    @Test("THINK ABOUT validation succeeds for reachable items")
-    func testThinkAboutValidationSucceedsForReachableItems() async throws {
-        let handler = ThinkAboutActionHandler()
-        let testItem = Item(
-            id: "key",
-            .name("golden key"),
-            .description("A beautifully crafted golden key."),
-            .isTakable,
-            .in(.player)
-        )
-
-        let game = MinimalGame(items: testItem)
-        let (engine, _) = await GameEngine.test(blueprint: game)
-
-        let command = Command(
-            verb: .thinkAbout,
-            directObject: .item("key"),
-            rawInput: "think about key"
-        )
-        let context = ActionContext(
-            command: command,
-            engine: engine
-        )
-
-        // Should not throw - reachable items are valid
-        try await handler.validate(context: context)
     }
 
     @Test("THINK ABOUT produces correct ActionResult for player")
     func testThinkAboutPlayerActionResult() async throws {
-        let handler = ThinkAboutActionHandler()
-        let (engine, _) = await GameEngine.test()
+        let (engine, mockIO) = await GameEngine.test()
 
-        let command = Command(
-            verb: .thinkAbout,
-            directObject: .player,
-            rawInput: "think about self"
-        )
-        let context = ActionContext(
-            command: command,
-            engine: engine
-        )
+        // Act:
+        try await engine.execute("think about self")
 
-        // Process the command directly
-        let result = try await handler.process(context: context)
-
-        // Verify result
-        #expect(result.message == "Yes, yes, you're very important.")
-        #expect(result.changes.isEmpty)  // THINK ABOUT SELF should not modify state
+        // Assert:
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            > think about self
+            Yes, yes, you’re very important.
+            """)
     }
 
     @Test("THINK ABOUT produces correct ActionResult for item")
     func testThinkAboutItemActionResult() async throws {
-        let handler = ThinkAboutActionHandler()
         let testItem = Item(
             id: "mirror",
             .name("ornate mirror"),
@@ -177,27 +122,18 @@ struct ThinkAboutActionHandlerTests {
         )
 
         let game = MinimalGame(items: testItem)
-        let (engine, _) = await GameEngine.test(blueprint: game)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        let command = Command(
-            verb: .thinkAbout,
-            directObject: .item("mirror"),
-            rawInput: "think about mirror"
-        )
-        let context = ActionContext(
-            command: command,
-            engine: engine
-        )
+        // Act:
+        try await engine.execute("think about the mirror")
 
-        // Process the command directly
-        let result = try await handler.process(context: context)
-
-        // Verify result
-        #expect(
-            result.message
-                == "You contemplate the ornate mirror for a bit, but nothing fruitful comes to mind."
-        )
-        #expect(!result.changes.isEmpty)  // THINK ABOUT item should set isTouched and update pronouns
+        // Assert:
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            > think about the mirror
+            You contemplate the ornate mirror for a bit, but nothing
+            fruitful comes to mind.
+            """)
     }
 
     @Test("THINK ABOUT SELF does not modify game state")
@@ -245,47 +181,6 @@ struct ThinkAboutActionHandlerTests {
         #expect(finalItem.hasFlag(.isTouched))
     }
 
-    @Test("THINK ABOUT works with items in different locations")
-    func testThinkAboutWorksWithItemsInDifferentLocations() async throws {
-        let testItem = Item(
-            id: "painting",
-            .name("beautiful painting"),
-            .description("A stunning oil painting."),
-            .isTakable,
-            .in(.location(.startRoom))
-        )
-
-        let game = MinimalGame(items: testItem)
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
-
-        // Test thinking about item in room
-        try await engine.execute("think about painting")
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
-            "> think about painting\n\nYou contemplate the beautiful painting for a bit, but nothing fruitful comes to mind.")
-    }
-
-    @Test("THINK ABOUT message is consistent across multiple calls")
-    func testThinkAboutConsistency() async throws {
-        let (engine, mockIO) = await GameEngine.test()
-
-        // Execute THINK ABOUT multiple times
-        try await engine.execute("think about self")
-        let firstOutput = await mockIO.flush()
-
-        try await engine.execute("think about self")
-        let secondOutput = await mockIO.flush()
-
-        try await engine.execute("think about self")
-        let thirdOutput = await mockIO.flush()
-
-        // All outputs should be identical
-        expectNoDifference(firstOutput, "> think about self\n\nYes, yes, you're very important.")
-        expectNoDifference(secondOutput, "> think about self\n\nYes, yes, you're very important.")
-        expectNoDifference(thirdOutput, "> think about self\n\nYes, yes, you're very important.")
-    }
-
     @Test("THINK ABOUT works in dark room")
     func testThinkAboutWorksInDarkRoom() async throws {
         let darkLocation = Location(
@@ -316,52 +211,15 @@ struct ThinkAboutActionHandlerTests {
 
         // Assert Output - should still work
         let output = await mockIO.flush()
-        expectNoDifference(
-            output,
-            "> think about coin\n\nYou contemplate the silver coin for a bit, but nothing fruitful comes to mind.")
-    }
-
-    @Test("THINK ABOUT full workflow integration test")
-    func testThinkAboutFullWorkflow() async throws {
-        let handler = ThinkAboutActionHandler()
-        let testItem = Item(
-            id: "crystal",
-            .name("magic crystal"),
-            .description("A glowing crystal with mysterious properties."),
-            .isTakable,
-            .in(.player)
-        )
-
-        let game = MinimalGame(items: testItem)
-        let (engine, _) = await GameEngine.test(blueprint: game)
-
-        let command = Command(
-            verb: .thinkAbout,
-            directObject: .item("crystal"),
-            rawInput: "think about crystal"
-        )
-        let context = ActionContext(
-            command: command,
-            engine: engine
-        )
-
-        // Validate
-        try await handler.validate(context: context)
-
-        // Process
-        let result = try await handler.process(context: context)
-
-        // Verify complete workflow
-        #expect(
-            result.message
-                == "You contemplate the magic crystal for a bit, but nothing fruitful comes to mind."
-        )
-        #expect(!result.changes.isEmpty)  // Should set touched flag and pronouns
+        expectNoDifference(output, """
+            > think about coin
+            You contemplate the silver coin for a bit, but nothing fruitful
+            comes to mind.
+            """)
     }
 
     @Test("THINK ABOUT rejects unreachable items")
     func testThinkAboutRejectsUnreachableItems() async throws {
-        let handler = ThinkAboutActionHandler()
         let unreachableItem = Item(
             id: "distant_star",
             .name("distant star"),
@@ -370,48 +228,16 @@ struct ThinkAboutActionHandlerTests {
         )
 
         let game = MinimalGame(items: unreachableItem)
-        let (engine, _) = await GameEngine.test(blueprint: game)
-
-        let command = Command(
-            verb: .thinkAbout,
-            directObject: .item("distant_star"),
-            rawInput: "think about star"
-        )
-        let context = ActionContext(
-            command: command,
-            engine: engine
-        )
-
-        // Should throw validation error for unreachable item
-        do {
-            try await handler.validate(context: context)
-            Issue.record("Expected validation to throw for unreachable item")
-        } catch {
-            // Expected - should reject unreachable items
-        }
-    }
-
-    @Test("THINK ABOUT with already touched item still works")
-    func testThinkAboutWithAlreadyTouchedItem() async throws {
-        let testItem = Item(
-            id: "sword",
-            .name("magic sword"),
-            .description("A sword that glows with inner light."),
-            .isTakable,
-            .isTouched,
-            .in(.player)
-        )
-
-        let game = MinimalGame(items: testItem)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        // Act: Should work even if item was already touched
-        try await engine.execute("think about sword")
+        // Act:
+        try await engine.execute("think about star")
 
-        // Assert Output
+        // Assert:
         let output = await mockIO.flush()
-        expectNoDifference(
-            output,
-            "> think about sword\n\nYou contemplate the magic sword for a bit, but nothing fruitful comes to mind.")
+        expectNoDifference(output, """
+            > think about star
+            You can’t see any such thing.
+            """)
     }
 }

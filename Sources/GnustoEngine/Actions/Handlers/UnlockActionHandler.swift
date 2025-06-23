@@ -31,11 +31,10 @@ public struct UnlockActionHandler: ActionHandler {
         }
         guard case .item(let targetItemID) = directObjectRef else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.youCanOnlyUnlockItems()
+                context.message.thatsNotSomethingYouCan(.unlock)
             )
         }
         let targetItem = try await context.engine.item(targetItemID)
-
 
         guard let indirectObjectRef = context.command.indirectObject else {
             throw ActionResponse.prerequisiteNotMet(
@@ -44,7 +43,7 @@ public struct UnlockActionHandler: ActionHandler {
         }
         guard case .item(let keyItemID) = indirectObjectRef else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.youCanOnlyUseItemAsKey()
+                context.message.thatsNotSomethingYouCanUseAsKey()
             )
         }
         let keyItem = try await context.engine.item(keyItemID)

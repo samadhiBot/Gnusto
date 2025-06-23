@@ -31,7 +31,7 @@ public struct TurnOnActionHandler: ActionHandler {
         }
         guard case .item(let targetItemID) = directObjectRef else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.youCanOnlyTurnOnItems()
+                context.message.thatsNotSomethingYouCan(.turnOn)
             )
         }
 

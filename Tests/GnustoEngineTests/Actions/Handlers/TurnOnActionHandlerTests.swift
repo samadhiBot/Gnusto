@@ -174,7 +174,7 @@ struct TurnOnActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > turn on lamp
-            You can’t see any brass lantern here.
+            You can’t see any such thing.
             """)
     }
 

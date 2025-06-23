@@ -290,7 +290,7 @@ struct ThrowActionHandlerTests {
         let result = try await handler.process(context: context)
 
         // Then
-        #expect(result.message!.contains("You can’t throw yourself."))
+        #expect(result.message!.contains("You can't throw yourself."))
     }
 
     @Test("Throw updates state correctly")

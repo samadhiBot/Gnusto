@@ -18,7 +18,7 @@ public struct RaiseActionHandler: ActionHandler {
 
         guard case .item(let targetItemID) = directObjectRef else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.youCanOnlyRaiseItems()
+                context.message.thatsNotSomethingYouCan(.raise)
             )
         }
 

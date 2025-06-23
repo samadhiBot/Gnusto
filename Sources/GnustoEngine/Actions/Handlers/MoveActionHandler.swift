@@ -42,7 +42,7 @@ public struct MoveActionHandler: ActionHandler {
         }
         guard case .item(let targetItemID) = directObjectRef else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.youCanOnlyMoveItems()
+                context.message.thatsNotSomethingYouCan(.move)
             )
         }
 

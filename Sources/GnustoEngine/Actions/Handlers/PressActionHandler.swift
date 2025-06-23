@@ -23,7 +23,7 @@ public struct PressActionHandler: ActionHandler {
         }
         guard case .item(let targetItemID) = directObjectRef else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.canOnlyActOnItems(verb: "press")
+                context.message.thatsNotSomethingYouCan(.press)
             )
         }
 

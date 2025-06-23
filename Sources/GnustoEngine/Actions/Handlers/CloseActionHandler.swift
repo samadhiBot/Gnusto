@@ -27,7 +27,7 @@ public struct CloseActionHandler: ActionHandler {
         }
         guard case .item(let targetItemID) = directObjectRef else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.youCanOnlyActOnItems(verb: "close")
+                context.message.thatsNotSomethingYouCan(.close)
             )
         }
 
