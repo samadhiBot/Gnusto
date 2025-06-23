@@ -892,7 +892,7 @@ struct GameEngineTests {
             commandInput: "go xyzzy",
             commandToParse: command
         )
-        expectNoDifference(output, "Go where?")
+        expectNoDifference(output, "Where do you want to go?")
     }
 
     @Test("ReportActionResponse: .itemNotTakable")
@@ -1286,7 +1286,7 @@ struct GameEngineTests {
             commandInput: "close book",
             commandToParse: command
         )
-        expectNoDifference(output, "The book is not something you can close.")
+        expectNoDifference(output, "You can’t close the book.")
     }
 
     @Test("ReportActionResponse: .itemNotDroppable")
