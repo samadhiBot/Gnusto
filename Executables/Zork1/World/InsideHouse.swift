@@ -335,18 +335,14 @@ extension InsideHouse {
             case VerbID("throw"):
                 let playerLocation = try await engine.playerLocation()
 
-                let changes: [StateChange] = [
+                return ActionResult(
+                    "The lamp has smashed into the floor, and the light has gone out.",
                     // Turn off the lamp's light source
                     try await engine.clearFlag(.isOn, on: .lamp),
                     // Remove the lamp
                     try await engine.move(.lamp, to: .nowhere),
                     // Add broken lamp to current location
-                    try await engine.move(.brokenLamp, to: .location(playerLocation.id)),
-                ].compactMap { $0 }
-
-                return ActionResult(
-                    message: "The lamp has smashed into the floor, and the light has gone out.",
-                    changes: changes
+                    try await engine.move(.brokenLamp, to: .location(playerLocation.id))
                 )
 
             case .light:

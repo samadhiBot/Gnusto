@@ -44,14 +44,12 @@ public struct ScriptActionHandler: ActionHandler {
         // For now, we just set the flag and provide feedback
 
         return ActionResult(
-            message: """
-                Enter a file name.
-                Default is "transcript":
-                [Transcript recording started]
-                """,
-            changes: [
-                await context.engine.setGlobal(.isScripting, to: true)
-            ]
+            """
+            🤡 Enter a file name.
+            Default is "transcript":
+            [Transcript recording started]
+            """,
+            await context.engine.setGlobal(.isScripting, to: true)
         )
     }
 

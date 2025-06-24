@@ -134,13 +134,11 @@ public struct LockActionHandler: ActionHandler {
         }
 
         return ActionResult(
-            message: context.message.lockSuccess(item: targetItem.withDefiniteArticle),
-            changes: [
-                await context.engine.setFlag(.isLocked, on: targetItem),
-                await context.engine.setFlag(.isTouched, on: targetItem),
-                await context.engine.setFlag(.isTouched, on: keyItem),
-                await context.engine.updatePronouns(to: targetItem),
-            ]
+            context.message.lockSuccess(item: targetItem.withDefiniteArticle),
+            await context.engine.setFlag(.isLocked, on: targetItem),
+            await context.engine.setFlag(.isTouched, on: targetItem),
+            await context.engine.setFlag(.isTouched, on: keyItem),
+            await context.engine.updatePronouns(to: targetItem)
         )
     }
 

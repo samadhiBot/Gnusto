@@ -151,11 +151,9 @@ public struct TurnOnActionHandler: ActionHandler {
         }
 
         return ActionResult(
-            message: messageParts.joined(separator: "\n"),
-            changes: [
-                await context.engine.setFlag(.isTouched, on: targetItem),
-                await context.engine.setFlag(.isOn, on: targetItem),
-            ]
+            messageParts.joined(separator: "\n"),
+            await context.engine.setFlag(.isTouched, on: targetItem),
+            await context.engine.setFlag(.isOn, on: targetItem),
         )
     }
 
@@ -170,26 +168,28 @@ public struct TurnOnActionHandler: ActionHandler {
     ///   - targetItem: The flammable item to burn.
     ///   - context: The action context.
     /// - Returns: An `ActionResult` with burn-specific messaging and state changes.
-    private func processBurn(targetItem: Item, context: ActionContext) async throws -> ActionResult
+    private func processBurn(
+        targetItem: Item,
+        context: ActionContext
+    ) async throws -> ActionResult
     {
         // Check if the item is flammable (should always be true in this context)
         if targetItem.hasFlag(.isFlammable) {
             return ActionResult(
-                message: "The \(targetItem.name) catches fire and burns to ashes.",
-                changes: [
-                    await context.engine.setFlag(.isTouched, on: targetItem),
-                    await context.engine.updatePronouns(to: targetItem),
-                    await context.engine.move(targetItem, to: .nowhere),
-                ]
+                context.message.itemBurnsToAshes(item: targetItem.withDefiniteArticle),
+                await context.engine.setFlag(.isTouched, on: targetItem),
+                await context.engine.updatePronouns(to: targetItem),
+                await context.engine.move(targetItem, to: .nowhere),
             )
         } else {
             // Fallback message for non-flammable items (shouldn't reach here due to validation)
             return ActionResult(
-                message: "You can't burn the \(targetItem.name).",
-                changes: [
-                    await context.engine.setFlag(.isTouched, on: targetItem),
-                    await context.engine.updatePronouns(to: targetItem),
-                ]
+                context.message.cannotDoThat(
+                    verb: .burn,
+                    item: targetItem.withDefiniteArticle
+                ),
+                await context.engine.setFlag(.isTouched, on: targetItem),
+                await context.engine.updatePronouns(to: targetItem),
             )
         }
     }

@@ -59,13 +59,11 @@ public struct RaiseActionHandler: ActionHandler {
 
         // Default behavior: You can't raise most things
         return ActionResult(
-            message: context.message.raiseCannotLift(
+            context.message.raiseCannotLift(
                 item: targetItem.withDefiniteArticle
             ),
-            changes: [
-                await context.engine.setFlag(.isTouched, on: targetItem),
-                await context.engine.updatePronouns(to: targetItem),
-            ]
+            await context.engine.setFlag(.isTouched, on: targetItem),
+            await context.engine.updatePronouns(to: targetItem)
         )
     }
 }

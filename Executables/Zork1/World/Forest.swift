@@ -315,39 +315,35 @@ extension Forest {
         }
     }
 
-    static let pileOfLeavesHandler = ItemEventHandler { engine, event -> ActionResult? in
+    static let pileOfLeavesHandler = ItemEventHandler {
+        engine,
+        event -> ActionResult? in
         switch event {
         case .beforeTurn(let command):
             if command.verb == .move {
                 // Check if grate is invisible
                 let grate = try await engine.item(.grate)
                 let isGrateInvisible = grate.hasFlag(.isInvisible)
-                
-                var changes: [StateChange?] = []
-                
-                // Reveal the grate if it's currently invisible
-                if isGrateInvisible {
-                    changes.append(
-                        try await engine.clearFlag(.isInvisible, on: .grate)
-                    )
-                }
 
                 // Update the leaves description to show they've been disturbed
                 let leaves = try await engine.item(.pileOfLeaves)
-                if let leavesChange = await engine.setAttribute(
-                    .firstDescription, on: leaves, to: .string("On the ground is a pile of leaves.")
-                ) {
-                    changes.append(leavesChange)
-                }
 
                 let message =
-                    if isGrateInvisible {
-                        "In disturbing the pile of leaves, a grating is revealed."
-                    } else {
-                        "Done."
-                    }
-
-                return ActionResult(message: message, changes: changes)
+                if isGrateInvisible {
+                    "In disturbing the pile of leaves, a grating is revealed."
+                } else {
+                    "Done."
+                }
+                
+                return ActionResult(
+                    message,
+                    try await engine.clearFlag(.isInvisible, on: .grate),
+                    await engine.setAttribute(
+                        .firstDescription,
+                        on: leaves,
+                        to: .string("On the ground is a pile of leaves.")
+                    )
+                )
             }
             return nil
         case .afterTurn:

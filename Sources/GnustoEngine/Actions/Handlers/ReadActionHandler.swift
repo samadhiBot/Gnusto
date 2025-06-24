@@ -106,20 +106,17 @@ public struct ReadActionHandler: ActionHandler {
         }
 
         // Build final message
-        let message =
-            if needsAutoTake {
-                "(Taken)\n\n\(readText)"
-            } else {
-                readText
-            }
+        let message = if needsAutoTake {
+            "(Taken)\n\n\(readText)"
+        } else {
+            readText
+        }
 
         return ActionResult(
-            message: message,
-            changes: [
-                needsAutoTake ? await context.engine.move(targetItem, to: .player) : nil,
-                await context.engine.setFlag(.isTouched, on: targetItem),
-                await context.engine.updatePronouns(to: targetItem),
-            ]
+            message,
+            needsAutoTake ? await context.engine.move(targetItem, to: .player) : nil,
+            await context.engine.setFlag(.isTouched, on: targetItem),
+            await context.engine.updatePronouns(to: targetItem)
         )
     }
 }

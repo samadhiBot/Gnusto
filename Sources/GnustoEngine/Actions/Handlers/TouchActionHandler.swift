@@ -73,10 +73,8 @@ public struct TouchActionHandler: ActionHandler {
         let targetItem = try await context.engine.item(targetItemID)
 
         return ActionResult(
-            message: "You feel nothing special.",
-            changes: [
-                await context.engine.setFlag(.isTouched, on: targetItem)
-            ]
+            context.message.nothingSpecial(verb: .feel),
+            await context.engine.setFlag(.isTouched, on: targetItem)
         )
     }
 }

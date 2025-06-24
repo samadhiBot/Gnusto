@@ -130,7 +130,7 @@ let temperature: String = try await engine.attribute("temperature", of .cave)
 let item = try engine.item("sword")
 if let change = await engine.setAttribute("sharpness", on: item, to: .int(8)) {
     // Apply through the pipeline (usually in an ActionHandler)
-    return ActionResult(changes: [change], message: "The sword gleams with sharpness.")
+    return ActionResult(changes: [change], message: "🤡 The sword gleams with sharpness.")
 }
 
 // Use convenience builders for common patterns
@@ -139,7 +139,7 @@ if let change = await engine.setDescription(on: item, to: "A gleaming blade") {
 }
 
 if let change = await engine.setAttribute("isOpen", on: door, to: true) {
-    return ActionResult(changes: [change], message: "The door swings open.")
+    return ActionResult(changes: [change], message: "🤡 The door swings open.")
 }
 ```
 
@@ -243,7 +243,7 @@ struct OpenActionHandler: ActionHandler {
         // Return result with state change - the engine will apply it through the pipeline
         return ActionResult(
             changes: [change],
-            message: "You open \(context.engine.theThat(item))."
+            message: "🤡 You open \(context.engine.theThat(item))."
         )
     }
 }
@@ -258,7 +258,7 @@ The dynamic attribute system enables classic interactive fiction patterns:
 ```swift
 // Similar to ZIL's FSET/FCLEAR for OPENBIT
 if let change = await engine.setAttribute("isOpen", on: chest, to: true) {
-    return ActionResult(changes: [change], message: "The chest creaks open.")
+    return ActionResult(changes: [change], message: "🤡 The chest creaks open.")
 }
 ```
 
@@ -290,7 +290,7 @@ let changes = [
 
 return ActionResult(
     changes: changes,
-    message: "The troll collapses, dropping his axe!"
+    message: "🤡 The troll collapses, dropping his axe!"
 )
 ```
 

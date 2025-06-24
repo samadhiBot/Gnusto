@@ -79,20 +79,9 @@ public struct JumpActionHandler: ActionHandler {
             }
 
         return ActionResult(
-            message: message,
-            changes: [
-                await context.engine.setFlag(.isTouched, on: targetItem),
-                await context.engine.updatePronouns(to: targetItem),
-            ]
+            message,
+            await context.engine.setFlag(.isTouched, on: targetItem),
+            await context.engine.updatePronouns(to: targetItem)
         )
-    }
-
-    /// Performs any post-processing after the jump action completes.
-    ///
-    /// Currently no post-processing is needed for basic jumping.
-    ///
-    /// - Parameter context: The action context for the current action.
-    public func postProcess(context: ActionContext) async throws {
-        // No post-processing needed for jump
     }
 }

@@ -113,11 +113,9 @@ public struct FillActionHandler: ActionHandler {
                 }
 
             return ActionResult(
-                message: message,
-                changes: [
-                    await context.engine.setFlag(.isTouched, on: containerItem),
-                    await context.engine.updatePronouns(to: containerItem),
-                ]
+                message,
+                await context.engine.setFlag(.isTouched, on: containerItem),
+                await context.engine.updatePronouns(to: containerItem)
             )
         } else {
             // No source specified - look for water sources in current location
@@ -137,11 +135,9 @@ public struct FillActionHandler: ActionHandler {
                 }
 
             return ActionResult(
-                message: message,
-                changes: [
-                    await context.engine.setFlag(.isTouched, on: containerItem),
-                    await context.engine.updatePronouns(to: containerItem),
-                ]
+                message,
+                await context.engine.setFlag(.isTouched, on: containerItem),
+                await context.engine.updatePronouns(to: containerItem)
             )
         }
     }

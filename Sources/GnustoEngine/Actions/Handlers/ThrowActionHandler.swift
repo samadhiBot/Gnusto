@@ -113,25 +113,21 @@ public struct ThrowActionHandler: ActionHandler {
                 }
 
             return ActionResult(
-                message: message,
-                changes: [
-                    await context.engine.setFlag(.isTouched, on: itemToThrow),
-                    await context.engine.updatePronouns(to: itemToThrow),
-                    await context.engine.move(itemToThrow, to: .location(currentLocationID)),
-                    await context.engine.setFlag(.isTouched, on: targetItem),
-                ]
+                message,
+                await context.engine.setFlag(.isTouched, on: itemToThrow),
+                await context.engine.updatePronouns(to: itemToThrow),
+                await context.engine.move(itemToThrow, to: .location(currentLocationID)),
+                await context.engine.setFlag(.isTouched, on: targetItem)
             )
         } else {
             // General throwing - no specific target
             return ActionResult(
-                message: context.message.throwGeneral(
+                context.message.throwGeneral(
                     item: itemToThrow.withDefiniteArticle
                 ),
-                changes: [
-                    await context.engine.setFlag(.isTouched, on: itemToThrow),
-                    await context.engine.updatePronouns(to: itemToThrow),
-                    await context.engine.move(itemToThrow, to: .location(currentLocationID)),
-                ]
+                await context.engine.setFlag(.isTouched, on: itemToThrow),
+                await context.engine.updatePronouns(to: itemToThrow),
+                await context.engine.move(itemToThrow, to: .location(currentLocationID))
             )
         }
     }

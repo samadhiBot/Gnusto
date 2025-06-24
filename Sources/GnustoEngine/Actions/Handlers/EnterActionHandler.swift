@@ -56,7 +56,10 @@ public struct EnterActionHandler: ActionHandler {
         // Check if item is enterable
         guard targetItem.hasFlag(.isEnterable) else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.cannotEnter(item: targetItem.withDefiniteArticle)
+                context.message.cannotDoThat(
+                    verb: .enter,
+                    item: targetItem.withDefiniteArticle
+                )
             )
         }
     }
@@ -73,27 +76,15 @@ public struct EnterActionHandler: ActionHandler {
 
         // Handle ENTER with no object - find default enterable
         guard let directObjectRef = context.command.directObject else {
-            let enterableItems = await context.engine.items(in: .location(currentLocation.id))
-                .filter { $0.hasFlag(.isEnterable) }
-
-            guard let firstEnterable = enterableItems.first else {
-                throw ActionResponse.prerequisiteNotMet(
-                    context.message.nothingHereToEnter()
-                )
-            }
-
-            return ActionResult(
-                message: "You enter the \(firstEnterable.name).",
-                changes: [
-                    await context.engine.setFlag(.isTouched, on: firstEnterable),
-                    await context.engine.updatePronouns(to: firstEnterable),
-                ]
+            throw ActionResponse.prerequisiteNotMet(
+                context.message.doWhat(verb: .enter)
             )
         }
 
         guard case .item(let targetItemID) = directObjectRef else {
             throw ActionResponse.internalEngineError(
-                "EnterActionHandler: directObject was not an item in process.")
+                "EnterActionHandler: directObject was not an item in process."
+            )
         }
 
         let targetItem = try await context.engine.item(targetItemID)
@@ -129,21 +120,8 @@ public struct EnterActionHandler: ActionHandler {
         }
 
         // No movement enabled - basic enter behavior
-        return ActionResult(
-            message: "You enter the \(targetItem.name).",
-            changes: [
-                await context.engine.setFlag(.isTouched, on: targetItem),
-                await context.engine.updatePronouns(to: targetItem),
-            ]
+        throw ActionResponse.prerequisiteNotMet(
+            context.message.doWhat(verb: .enter)
         )
-    }
-
-    /// Performs any post-processing after the enter action completes.
-    ///
-    /// Currently no post-processing is needed for basic enter behavior.
-    ///
-    /// - Parameter context: The action context for the current action.
-    public func postProcess(context: ActionContext) async throws {
-        // No post-processing needed for enter
     }
 }

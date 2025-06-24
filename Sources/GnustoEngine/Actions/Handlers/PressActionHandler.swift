@@ -71,15 +71,16 @@ public struct PressActionHandler: ActionHandler {
                 // Note: Specific press behavior should be handled by ItemEventHandlers
             } else {
                 // Default behavior: most things can't be pressed effectively
-                context.message.cannotPress(item: targetItem.withDefiniteArticle)
+                context.message.cannotDoThat(
+                    verb: .press,
+                    item: targetItem.withDefiniteArticle
+                )
             }
 
         return ActionResult(
-            message: message,
-            changes: [
-                await context.engine.setFlag(.isTouched, on: targetItem),
-                await context.engine.updatePronouns(to: targetItem),
-            ]
+            message,
+            await context.engine.setFlag(.isTouched, on: targetItem),
+            await context.engine.updatePronouns(to: targetItem)
         )
     }
 

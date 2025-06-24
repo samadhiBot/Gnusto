@@ -48,7 +48,10 @@ public struct DeflateActionHandler: ActionHandler {
         // Check if item is inflatable (which means it can also be deflated)
         guard targetItem.hasFlag(.isInflatable) else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.cannotDeflate(item: targetItem.withDefiniteArticle)
+                context.message.cannotDoThat(
+                    verb: .deflate,
+                    item: targetItem.withDefiniteArticle
+                )
             )
         }
     }

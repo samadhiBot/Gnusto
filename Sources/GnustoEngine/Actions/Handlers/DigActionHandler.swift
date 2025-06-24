@@ -75,7 +75,10 @@ public struct DigActionHandler: ActionHandler {
             let targetItem = try await context.engine.item(targetItemID)
 
             return ActionResult(
-                context.message.cannotDig(item: targetItem.withDefiniteArticle),
+                context.message.cannotDoThat(
+                    verb: .dig,
+                    item: targetItem.withDefiniteArticle
+                ),
                 await context.engine.setFlag(.isTouched, on: targetItem),
                 await context.engine.updatePronouns(to: targetItem),
             )

@@ -22,14 +22,14 @@ struct GameEngineSideEffectsTests {
                 .global,
                 parameters: ["flag": .string("fuseExploded")]
             )
-            return ActionResult(message: "The fuse exploded!", effects: [sideEffect])
+            return ActionResult(message: "🤡 The fuse exploded!", effects: [sideEffect])
         }
 
         let testDaemon = Daemon() { engine in
             // Test daemon action - increment a counter using state changes
             let change = await engine.adjustGlobal("daemonTicks", by: 1)
             return ActionResult(
-                message: "Daemon tick",
+                message: "🤡 Daemon tick",
                 changes: [change]
             )
         }
@@ -38,7 +38,7 @@ struct GameEngineSideEffectsTests {
             // Another test fuse action - return state change via ActionResult
             if let change = await engine.setFlag("messageDelivered") {
                 return ActionResult(
-                    message: "Message delivered!",
+                    message: "🤡 Message delivered!",
                     changes: [change]
                 )
             }
@@ -49,7 +49,7 @@ struct GameEngineSideEffectsTests {
             // Another test daemon action - return state change via ActionResult
             if let change = await engine.setFlag("musicPlaying") {
                 return ActionResult(
-                    message: "Music is playing",
+                    message: "🤡 Music is playing",
                     changes: [change]
                 )
             }
@@ -350,7 +350,7 @@ struct GameEngineSideEffectsTests {
 
         // Create an ActionResult with side effects
         let actionResult = ActionResult(
-            message: "The bomb timer starts ticking...",
+            message: "🤡 The bomb timer starts ticking...",
             effects: [
                 SideEffect.startFuse(testFuseID),
                 SideEffect.runDaemon(testDaemonID),

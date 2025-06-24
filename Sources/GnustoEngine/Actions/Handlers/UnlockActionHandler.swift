@@ -124,7 +124,7 @@ public struct UnlockActionHandler: ActionHandler {
         // Validation ensures the item was locked, so no need to check again here.
 
         return ActionResult(
-            message: "The \(targetItem.name) is now unlocked.",
+            message: "🤡 The \(targetItem.name) is now unlocked.",
             changes: [
                 await context.engine.clearFlag(.isLocked, on: targetItem),
                 await context.engine.setFlag(.isTouched, on: targetItem),

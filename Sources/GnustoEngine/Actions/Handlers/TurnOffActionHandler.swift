@@ -91,14 +91,16 @@ public struct TurnOffActionHandler: ActionHandler {
             case .item(let targetItemID) = directObjectRef
         else {
             throw ActionResponse.internalEngineError(
-                "TurnOff: directObject was not an item in process.")
+                "TurnOff: directObject was not an item in process."
+            )
         }
         let targetItem = try await context.engine.item(targetItemID)
 
         // Check if location became dark
         let isLightSourceBeingTurnedOff = targetItem.hasFlag(.isLightSource)
-        var messageParts: [String] = []
-        messageParts.append("The \(targetItem.name) is now off.")
+        var messageParts = [
+            context.message.lightIsNowOff(item: targetItem.withDefiniteArticle)
+        ]
 
         if isLightSourceBeingTurnedOff {
             let currentLocation = try await context.engine.playerLocation()
@@ -119,17 +121,15 @@ public struct TurnOffActionHandler: ActionHandler {
                 }
 
                 if otherActiveLightSources.isEmpty {
-                    messageParts.append("You are plunged into darkness.")
+                    messageParts.append(context.message.nowDark())
                 }
             }
         }
 
         return ActionResult(
-            message: messageParts.joined(separator: "\n"),
-            changes: [
-                await context.engine.setFlag(.isTouched, on: targetItem),
-                await context.engine.clearFlag(.isOn, on: targetItem),
-            ]
+            messageParts.joined(separator: "\n"),
+            await context.engine.setFlag(.isTouched, on: targetItem),
+            await context.engine.clearFlag(.isOn, on: targetItem)
         )
     }
 }

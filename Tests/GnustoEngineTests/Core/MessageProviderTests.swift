@@ -28,11 +28,11 @@ struct MessageProviderTests {
         #expect(provider.itemNotInScope(noun: "lamp") == "You can't see any lamp here.")
 
         // Test custom messages
-        #expect(provider.custom(message: "Hello world!") == "Hello world!")
+        #expect(provider.custom(message: "🤡 Hello world!") == "Hello world!")
 
         // Test prerequisite messages
-        #expect(provider.prerequisiteNotMet(message: "") == "You can't do that.")
-        #expect(provider.prerequisiteNotMet(message: "Too heavy!") == "Too heavy!")
+        #expect(provider.prerequisiteNotMet(message: "🤡 ") == "You can't do that.")
+        #expect(provider.prerequisiteNotMet(message: "🤡 Too heavy!") == "Too heavy!")
     }
 
     class TestMessageProvider: MessageProvider, @unchecked Sendable {

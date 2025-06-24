@@ -140,7 +140,10 @@ public struct EatActionHandler: ActionHandler {
         } else {
             // This shouldn't happen after validation, but handle it
             return ActionResult(
-                context.message.cannotEat(item: targetItem.withDefiniteArticle),
+                context.message.cannotDoThat(
+                    verb: .eat,
+                    item: targetItem.withDefiniteArticle
+                ),
                 await context.engine.setFlag(.isTouched, on: targetItem)
             )
         }

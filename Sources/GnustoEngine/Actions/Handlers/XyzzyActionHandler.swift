@@ -29,7 +29,7 @@ public struct XyzzyActionHandler: ActionHandler {
         // The 'tookTurn: false' aspect will be inherently handled if the ActionResult
         // doesn't lead to game time advancement.
         return ActionResult(
-            message: "A hollow voice says \"Fool.\"",
+            message: "🤡 A hollow voice says \"Fool.\"",
             changes: [],
             effects: []
         )

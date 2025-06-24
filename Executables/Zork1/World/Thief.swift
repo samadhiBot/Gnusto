@@ -168,9 +168,6 @@ enum Thief {
             return nil
         }
 
-        // Move thief to new location
-        let moveResult = try await engine.move(.thief, to: .location(newLocationID))
-
         // Determine if player sees the movement
         let playerLocation = await engine.playerLocationID
         var message: String?
@@ -184,8 +181,8 @@ enum Thief {
         }
 
         return ActionResult(
-            message: message,
-            changes: [moveResult]
+            message,
+            try await engine.move(.thief, to: .location(newLocationID))
         )
     }
 
@@ -415,15 +412,13 @@ private func attemptSophisticatedTheft(engine: GameEngine) async throws -> Actio
     let targetItem = try await engine.item(targetItemID)
 
     return ActionResult(
-        message: """
-            With lightning-quick reflexes, the thief snatches the \(targetItem.name)
-            from your possession and stuffs it into his bag!
+        """
+        With lightning-quick reflexes, the thief snatches the \(targetItem.name)
+        from your possession and stuffs it into his bag!
 
-            "A fine addition to my collection," he says with a sly grin.
-            """,
-        changes: [
-            try await engine.move(targetItemID, to: .item(.largeBag))
-        ].compactMap { $0 }
+        "A fine addition to my collection," he says with a sly grin.
+        """,
+        try await engine.move(targetItemID, to: .item(.largeBag))
     )
 }
 

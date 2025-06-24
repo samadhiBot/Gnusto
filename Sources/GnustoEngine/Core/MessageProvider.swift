@@ -228,6 +228,13 @@ open class MessageProvider: @unchecked Sendable {
         )
     }
 
+    open func cannotDoThat(verb: VerbID, item: String) -> String {
+        output(
+            "cannotDoThat(verb: \(verb), item: '\(item)')",
+            "You can't \(verb.rawValue) \(item)."
+        )
+    }
+
     open func cannotActWithThat(verb: String) -> String {
         output(
             "cannotActWithThat(verb: '\(verb)')",
@@ -239,20 +246,6 @@ open class MessageProvider: @unchecked Sendable {
         output(
             "cannotAskAboutThat(item: '\(item)')",
             "You can't ask \(item) about that."
-        )
-    }
-
-    open func cannotDeflate(item: String) -> String {
-        output(
-            "cannotDeflate(item: '\(item)')",
-            "You can't deflate \(item)."
-        )
-    }
-
-    open func cannotDig(item: String) -> String {
-        output(
-            "cannotDig(item: '\(item)')",
-            "You can't dig \(item)."
         )
     }
 
@@ -270,13 +263,6 @@ open class MessageProvider: @unchecked Sendable {
         )
     }
 
-    open func cannotEat(item: String) -> String {
-        output(
-            "cannotEat(item: '\(item)')",
-            "You can't eat \(item)."
-        )
-    }
-
     open func cannotEatFromClosed(container: String) -> String {
         output(
             "cannotEatFromClosed(container: \(container))",
@@ -284,38 +270,10 @@ open class MessageProvider: @unchecked Sendable {
         )
     }
 
-    open func cannotEnter(item: String) -> String {
-        output(
-            "cannotEnter(item: '\(item)')",
-            "You can't enter \(item)."
-        )
-    }
-
     open func cannotFillFrom() -> String {
         output(
             "cannotFillFrom()",
             "You can't fill from that."
-        )
-    }
-
-    open func cannotInflate(item: String) -> String {
-        output(
-            "cannotInflate(item: '\(item)')",
-            "You can't inflate \(item)."
-        )
-    }
-
-    open func cannotPress(item: String) -> String {
-        output(
-            "cannotPress(item: '\(item)')",
-            "You can't press \(item)."
-        )
-    }
-
-    open func cannotPull(item: String) -> String {
-        output(
-            "cannotPull(item: '\(item)')",
-            "You can't pull \(item)."
         )
     }
 
@@ -735,7 +693,7 @@ open class MessageProvider: @unchecked Sendable {
 
     open func doWhat(verb: VerbID) -> String {
         output(
-            "doWhat(verb: .\(verb))",
+            "doWhat(verb: \(verb))",
             "\(verb.rawValue.capitalizedFirst) what?"
         )
     }
@@ -914,6 +872,13 @@ open class MessageProvider: @unchecked Sendable {
         output(
             "itemAlreadyOpen(item: '\(item)')",
             "\(item.capitalizedFirst) is already open."
+        )
+    }
+
+    open func itemBurnsToAshes(item: String) -> String {
+        output(
+            "itemBurnsToAshes(item: '\(item)')",
+            "\(item.capitalizedFirst) catches fire and burns to ashes."
         )
     }
 
@@ -1299,6 +1264,13 @@ open class MessageProvider: @unchecked Sendable {
         )
     }
 
+    open func lightIsNowOff(item: String) -> String {
+        output(
+            "lightIsNowOff(item: '\(item)')",
+            "\(item.capitalizedFirst) is now off."
+        )
+    }
+
     open func lockSuccess(item: String) -> String {
         output(
             "lockSuccess(item: '\(item)')",
@@ -1393,6 +1365,13 @@ open class MessageProvider: @unchecked Sendable {
         output(
             "nothingOfInterestUnder(item: '\(item)')",
             "You find nothing of interest under \(item)."
+        )
+    }
+
+    open func nothingSpecial(verb: VerbID) -> String {
+        output(
+            "nothingSpecial(verb: \(verb))",
+            "You \(verb.rawValue) nothing special."
         )
     }
 

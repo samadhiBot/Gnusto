@@ -80,11 +80,9 @@ public struct ThinkActionHandler: ActionHandler {
         case .item(let targetItemID):
             let targetItem = try await context.engine.item(targetItemID)
             return ActionResult(
-                message: context.message.thinkAboutItem(item: targetItem.withDefiniteArticle),
-                changes: [
-                    await context.engine.setFlag(.isTouched, on: targetItem),
-                    await context.engine.updatePronouns(to: targetItem),
-                ]
+                context.message.thinkAboutItem(item: targetItem.withDefiniteArticle),
+                await context.engine.setFlag(.isTouched, on: targetItem),
+                await context.engine.updatePronouns(to: targetItem)
             )
         case .location:
             // Should be caught by validate if we decide not to support thinking about locations.

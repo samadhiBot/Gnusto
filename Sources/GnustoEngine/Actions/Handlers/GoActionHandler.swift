@@ -47,7 +47,7 @@ public struct GoActionHandler: ActionHandler {
 
         // 3. Find Exit
         guard let exit = currentLocation.exits[direction] else {
-            throw ActionResponse.invalidDirection  // Standard message: "You can't go that way."
+            throw ActionResponse.invalidDirection  // Standard message: "🤡 You can't go that way."
         }
 
         // 4. Check Exit Conditions
@@ -120,14 +120,7 @@ public struct GoActionHandler: ActionHandler {
         // Movement itself doesn't usually print a message; the new location description suffices.
         // The context.engine's run loop will trigger describeCurrentLocation after state changes.
         return ActionResult(
-            changes: [
-                StateChange(
-                    entityID: .player,
-                    attribute: .playerLocation,
-                    oldValue: .parentEntity(.location(currentLocation.id)),
-                    newValue: .parentEntity(.location(destinationID))
-                )
-            ]
+            await context.engine.movePlayer(to: destinationID)
         )
     }
 }

@@ -64,20 +64,20 @@ public struct PullActionHandler: ActionHandler {
         let targetItem = try await context.engine.item(targetItemID)
 
         // Check if item is specifically pullable
-        let message =
-            if targetItem.hasFlag(.isPullable) {
-                context.message.pullSuccess(item: targetItem.withDefiniteArticle)
-            } else {
-                // Default behavior: most things can't be pulled effectively
-                context.message.cannotPull(item: targetItem.withDefiniteArticle)
-            }
+        let message = if targetItem.hasFlag(.isPullable) {
+            context.message.pullSuccess(item: targetItem.withDefiniteArticle)
+        } else {
+            // Default behavior: most things can't be pulled effectively
+            context.message.cannotDoThat(
+                verb: .deflate,
+                item: targetItem.withDefiniteArticle
+            )
+        }
 
         return ActionResult(
-            message: message,
-            changes: [
-                await context.engine.setFlag(.isTouched, on: targetItem),
-                await context.engine.updatePronouns(to: targetItem),
-            ]
+            message,
+            await context.engine.setFlag(.isTouched, on: targetItem),
+            await context.engine.updatePronouns(to: targetItem)
         )
     }
 

@@ -85,30 +85,22 @@ public struct TieActionHandler: ActionHandler {
             // Tie X to Y
             let indirectItem = try await context.engine.item(indirectItemID)
 
-            let message = try await handleTyingTogether(
-                targetItem: targetItem,
-                indirectItem: indirectItem,
-                context: context
-            )
-
             return ActionResult(
-                message: message,
-                changes: [
-                    await context.engine.setFlag(.isTouched, on: targetItem),
-                    await context.engine.updatePronouns(to: targetItem),
-                    await context.engine.setFlag(.isTouched, on: indirectItem),
-                ]
+                try await handleTyingTogether(
+                    targetItem: targetItem,
+                    indirectItem: indirectItem,
+                    context: context
+                ),
+                await context.engine.setFlag(.isTouched, on: targetItem),
+                await context.engine.updatePronouns(to: targetItem),
+                await context.engine.setFlag(.isTouched, on: indirectItem)
             )
         } else {
             // Just "TIE X" - tie the object by itself
-            let message = handleTyingAlone(targetItem: targetItem, context: context)
-
             return ActionResult(
-                message: message,
-                changes: [
-                    await context.engine.setFlag(.isTouched, on: targetItem),
-                    await context.engine.updatePronouns(to: targetItem),
-                ]
+                handleTyingAlone(targetItem: targetItem, context: context),
+                await context.engine.setFlag(.isTouched, on: targetItem),
+                await context.engine.updatePronouns(to: targetItem)
             )
         }
     }

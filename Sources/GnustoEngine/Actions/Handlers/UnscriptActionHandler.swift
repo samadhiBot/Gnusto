@@ -42,7 +42,7 @@ public struct UnscriptActionHandler: ActionHandler {
         // For now, we just clear the flag and provide feedback
 
         return ActionResult(
-            message: "[Transcript recording ended]",
+            message: "🤡 [Transcript recording ended]",
             changes: [
                 await context.engine.clearGlobal(.isScripting)
             ]

@@ -47,7 +47,7 @@ struct ActionResultTests {
     // Computed property to create the ActionResult using other instance properties
     private var testResult: ActionResult {
         ActionResult(
-            message: "Test message", // Message as String
+            message: "🤡 Test message", // Message as String
             changes: [change1, change2, change3] // Use instance properties
             // effects: [] // Add if needed
         )
@@ -74,7 +74,7 @@ struct ActionResultTests {
     @Test("ActionResult Initialization - Full")
     func testActionResultFullInitialization() {
         let result = ActionResult(
-            message: "The lamp is now on.",
+            message: "🤡 The lamp is now on.",
             changes: [simpleChange],
             effects: [simpleEffect]
         )
@@ -288,7 +288,7 @@ struct ActionResultTests {
     func testInitializationFromPreviousStyle() {
         // Initialize here where self.change1, self.change2 etc. are accessible
         let resultWithChangesAndEffects = ActionResult(
-            message: "Action succeeded.",
+            message: "🤡 Action succeeded.",
             changes: [change1, change2], // Using the corrected change1/change2
             effects: [sideEffect1]      // Using the corrected sideEffect1
         )
