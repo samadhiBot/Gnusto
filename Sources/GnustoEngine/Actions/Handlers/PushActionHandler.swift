@@ -5,13 +5,11 @@ import Foundation
 public struct PushActionHandler: ActionHandler {
     // MARK: - Verb Definition Properties
 
-    public let verbID: VerbID = .push
-
     public let syntax: [SyntaxRule] = [
         .match(.verb, .directObjects)
     ]
 
-    public let synonyms: [VerbID] = [.shove]
+    public let synonyms: [VerbID] = [.push, .shove]
 
     public let requiresLight: Bool = true
 

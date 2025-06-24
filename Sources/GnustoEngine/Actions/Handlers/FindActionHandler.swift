@@ -8,13 +8,12 @@ import Foundation
 public struct FindActionHandler: ActionHandler {
     // MARK: - Verb Definition Properties
 
-    public let verbID: VerbID = .find
-
     public let syntax: [SyntaxRule] = [
-        .match(.verb, .directObject)
+        .match(.verb, .directObject),
+        .match(.verb(.search), .for, .directObject),
     ]
 
-    public let synonyms: [VerbID] = [.locate, .search for]
+    public let synonyms: [VerbID] = [.find, .locate]
 
     public let requiresLight: Bool = true
 

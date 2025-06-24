@@ -5,15 +5,13 @@ import Foundation
 public struct FillActionHandler: ActionHandler {
     // MARK: - Verb Definition Properties
 
-    public let verbID: VerbID = .fill
-
     public let syntax: [SyntaxRule] = [
         .match(.verb, .directObject),
         .match(.verb, .directObject, .with, .indirectObject),
         .match(.verb, .directObject, .from, .indirectObject),
     ]
 
-    public let synonyms: [VerbID] = []
+    public let synonyms: [VerbID] = [.fill]
 
     public let requiresLight: Bool = true
 

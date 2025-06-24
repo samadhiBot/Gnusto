@@ -9,14 +9,12 @@ import Foundation
 public struct ListenActionHandler: ActionHandler {
     // MARK: - Verb Definition Properties
 
-    public let verbID: VerbID = .listen
-
     public let syntax: [SyntaxRule] = [
         .match(.verb),
         .match(.verb, .to, .directObject),
     ]
 
-    public let synonyms: [VerbID] = []
+    public let synonyms: [VerbID] = [.listen]
 
     public let requiresLight: Bool = false
 

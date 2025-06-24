@@ -7,11 +7,10 @@ import Foundation
 public struct LookUnderActionHandler: ActionHandler {
     // MARK: - Verb Definition Properties
 
-    public let verbID: VerbID = .lookUnder
-
     public let syntax: [SyntaxRule] = [
         .match(.verb, .under, .directObject),
         .match(.verb, .beneath, .directObject),
+        .match(.verb, .below, .directObject),
     ]
 
     public let synonyms: [VerbID] = [.look, .peek]

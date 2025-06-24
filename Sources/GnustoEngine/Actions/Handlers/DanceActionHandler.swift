@@ -8,14 +8,12 @@ import Foundation
 public struct DanceActionHandler: ActionHandler {
     // MARK: - Verb Definition Properties
 
-    public let verbID: VerbID = .dance
-
     public let syntax: [SyntaxRule] = [
         .match(.verb),
         .match(.verb, .with, .directObject),
     ]
 
-    public let synonyms: [VerbID] = []
+    public let synonyms: [VerbID] = [.dance]
 
     public let requiresLight: Bool = false
 

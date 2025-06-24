@@ -13,14 +13,12 @@ import Foundation
 public struct ClimbActionHandler: ActionHandler {
     // MARK: - Verb Definition Properties
 
-    public let verbID: VerbID = .climb
-
     public let syntax: [SyntaxRule] = [
         .match(.verb),
         .match(.verb, .directObject),
     ]
 
-    public let synonyms: [VerbID] = [.ascend]
+    public let synonyms: [VerbID] = [.climb, .ascend]
 
     public let requiresLight: Bool = true
 

@@ -7,14 +7,12 @@ import Foundation
 public struct YellActionHandler: ActionHandler {
     // MARK: - Verb Definition Properties
 
-    public let verbID: VerbID = .yell
-
     public let syntax: [SyntaxRule] = [
         .match(.verb),
         .match(.verb, .at, .directObject),
     ]
 
-    public let synonyms: [VerbID] = [.shout, .scream, .shriek, .holler]
+    public let synonyms: [VerbID] = [.yell, .shout, .scream, .shriek, .holler]
 
     public let requiresLight: Bool = false
 

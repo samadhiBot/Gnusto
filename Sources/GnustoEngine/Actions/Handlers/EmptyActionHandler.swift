@@ -5,14 +5,13 @@ import Foundation
 public struct EmptyActionHandler: ActionHandler {
     // MARK: - Verb Definition Properties
 
-    public let verbID: VerbID = .empty
-
     public let syntax: [SyntaxRule] = [
         .match(.verb, .directObject),
         .match(.verb, .directObject, .into, .indirectObject),
+        .match(.verb, .out, .directObject),
     ]
 
-    public let synonyms: [VerbID] = [.dump, .pour out]
+    public let synonyms: [VerbID] = [.empty, .dump, .pour]
 
     public let requiresLight: Bool = true
 

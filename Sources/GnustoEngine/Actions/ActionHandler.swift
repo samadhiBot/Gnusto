@@ -26,12 +26,6 @@ import Foundation
 public protocol ActionHandler: Sendable {
     // MARK: - Verb Definition Properties
 
-    /// The unique identifier for this verb.
-    ///
-    /// This defines the canonical name for the verb (e.g., "take", "examine", "spellcast").
-    /// The `GameEngine` uses this to register the handler and match parsed commands.
-    var verbID: VerbID { get }
-
     /// Syntax patterns that this verb accepts.
     ///
     /// Each `SyntaxRule` defines a valid command structure for this verb, such as:

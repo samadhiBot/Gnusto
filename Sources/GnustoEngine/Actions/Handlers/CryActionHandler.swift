@@ -7,13 +7,11 @@ import Foundation
 public struct CryActionHandler: ActionHandler {
     // MARK: - Verb Definition Properties
 
-    public let verbID: VerbID = .cry
-
     public let syntax: [SyntaxRule] = [
         .match(.verb)
     ]
 
-    public let synonyms: [VerbID] = [.weep, .sob]
+    public let synonyms: [VerbID] = [.cry, .weep, .sob]
 
     public let requiresLight: Bool = false
 

@@ -5,14 +5,12 @@ import Foundation
 public struct AttackActionHandler: ActionHandler {
     // MARK: - Verb Definition Properties
 
-    public let verbID: VerbID = .attack
-
     public let syntax: [SyntaxRule] = [
         .match(.verb, .directObject),
         .match(.verb, .directObject, .with, .indirectObject),
     ]
 
-    public let synonyms: [VerbID] = [.fight, .hit, .kill, .slay, .stab]
+    public let synonyms: [VerbID] = [.attack, .fight, .hit, .kill, .slay, .stab]
 
     public let requiresLight: Bool = true
 

@@ -5,13 +5,11 @@ import Foundation
 public struct DropActionHandler: ActionHandler {
     // MARK: - Verb Definition Properties
 
-    public let verbID: VerbID = .drop
-
     public let syntax: [SyntaxRule] = [
         .match(.verb, .directObjects)
     ]
 
-    public let synonyms: [VerbID] = [.discard]
+    public let synonyms: [VerbID] = [.drop, .discard]
 
     public let requiresLight: Bool = true
 

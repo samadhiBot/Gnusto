@@ -7,14 +7,12 @@ import Foundation
 public struct LaughActionHandler: ActionHandler {
     // MARK: - Verb Definition Properties
 
-    public let verbID: VerbID = .laugh
-
     public let syntax: [SyntaxRule] = [
         .match(.verb),
         .match(.verb, .at, .directObject),
     ]
 
-    public let synonyms: [VerbID] = []
+    public let synonyms: [VerbID] = [.laugh, .chuckle, .giggle, .snicker, .chortle]
 
     public let requiresLight: Bool = false
 

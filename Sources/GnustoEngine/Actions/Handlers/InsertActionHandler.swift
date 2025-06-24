@@ -5,15 +5,13 @@ import Foundation
 public struct InsertActionHandler: ActionHandler {
     // MARK: - Verb Definition Properties
 
-    public let verbID: VerbID = .insert
-
     public let syntax: [SyntaxRule] = [
         .match(.verb, .directObjects, .in, .indirectObject),
         .match(.verb, .directObjects, .inside, .indirectObject),
         .match(.verb, .directObjects, .into, .indirectObject),
     ]
 
-    public let synonyms: [VerbID] = [.put, .place]
+    public let synonyms: [VerbID] = [.insert, .put, .place]
 
     public let requiresLight: Bool = true
 

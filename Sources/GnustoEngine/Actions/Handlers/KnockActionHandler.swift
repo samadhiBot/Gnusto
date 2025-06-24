@@ -5,15 +5,13 @@ import Foundation
 public struct KnockActionHandler: ActionHandler {
     // MARK: - Verb Definition Properties
 
-    public let verbID: VerbID = .knock
-
     public let syntax: [SyntaxRule] = [
-        .match(.verb),
-        .match(.verb, .directObject),
+        .match(.verb(.knock)),
+        .match(.verb(.tap), .directObject),
         .match(.verb, .on, .directObject),
     ]
 
-    public let synonyms: [VerbID] = [.rap, .tap]
+    public let synonyms: [VerbID] = [.knock, .rap, .tap]
 
     public let requiresLight: Bool = true
 

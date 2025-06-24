@@ -5,14 +5,13 @@ import Foundation
 public struct JumpActionHandler: ActionHandler {
     // MARK: - Verb Definition Properties
 
-    public let verbID: VerbID = .jump
-
     public let syntax: [SyntaxRule] = [
         .match(.verb),
         .match(.verb, .directObject),
+        .match(.verb, .over, .directObject),
     ]
 
-    public let synonyms: [VerbID] = [.leap, .hop]
+    public let synonyms: [VerbID] = [.jump, .leap, .hop]
 
     public let requiresLight: Bool = false
 

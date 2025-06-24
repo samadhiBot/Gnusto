@@ -5,10 +5,7 @@ import Foundation
 public struct AskActionHandler: ActionHandler {
     // MARK: - Verb Definition Properties
 
-    public let verbID: VerbID = .ask
-
     public let syntax: [SyntaxRule] = [
-        .match(.verb),
         .match(.verb, .directObject),
         .match(.verb, .directObject, .about, .indirectObject),
     ]

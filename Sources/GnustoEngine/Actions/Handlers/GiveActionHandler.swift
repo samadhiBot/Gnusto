@@ -5,14 +5,12 @@ import Foundation
 public struct GiveActionHandler: ActionHandler {
     // MARK: - Verb Definition Properties
 
-    public let verbID: VerbID = .give
-
     public let syntax: [SyntaxRule] = [
         .match(.verb, .directObject, .to, .indirectObject),
         .match(.verb, .indirectObject, .directObject),
     ]
 
-    public let synonyms: [VerbID] = [.offer, .donate]
+    public let synonyms: [VerbID] = [.give, .offer, .donate]
 
     public let requiresLight: Bool = true
 

@@ -5,13 +5,11 @@ import Foundation
 public struct KissActionHandler: ActionHandler {
     // MARK: - Verb Definition Properties
 
-    public let verbID: VerbID = .kiss
-
     public let syntax: [SyntaxRule] = [
         .match(.verb, .directObject)
     ]
 
-    public let synonyms: [VerbID] = []
+    public let synonyms: [VerbID] = [.kiss]
 
     public let requiresLight: Bool = true
 

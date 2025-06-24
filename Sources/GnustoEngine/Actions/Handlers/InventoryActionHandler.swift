@@ -5,13 +5,11 @@ import Foundation
 public struct InventoryActionHandler: ActionHandler {
     // MARK: - Verb Definition Properties
 
-    public let verbID: VerbID = .inventory
-
     public let syntax: [SyntaxRule] = [
         .match(.verb)
     ]
 
-    public let synonyms: [VerbID] = [.i]
+    public let synonyms: [VerbID] = [.inventory, "i"]
 
     public let requiresLight: Bool = false
 

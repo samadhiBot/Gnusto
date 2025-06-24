@@ -7,14 +7,13 @@ import Foundation
 public struct CurseActionHandler: ActionHandler {
     // MARK: - Verb Definition Properties
 
-    public let verbID: VerbID = .curse
-
     public let syntax: [SyntaxRule] = [
         .match(.verb),
-        .match(.verb, .directObject),
+        .match(.verb),
+        .match(.verb(.damn), .directObject),
     ]
 
-    public let synonyms: [VerbID] = [.swear, .damn]
+    public let synonyms: [VerbID] = [.curse, .swear]
 
     public let requiresLight: Bool = false
 

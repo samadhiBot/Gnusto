@@ -5,15 +5,12 @@ import Foundation
 public struct ExamineActionHandler: ActionHandler {
     // MARK: - Verb Definition Properties
 
-    public let verbID: VerbID = .examine
-
     public let syntax: [SyntaxRule] = [
         .match(.verb, .directObjects),
-        .match(.verb, .in, .directObject),
-        .match(.verb, .on, .directObject),
+        .match(.verb(.look), .at, .directObjects),
     ]
 
-    public let synonyms: [VerbID] = [.x, .inspect, .look at]
+    public let synonyms: [VerbID] = [.examine, "x", .inspect]
 
     public let requiresLight: Bool = true
 

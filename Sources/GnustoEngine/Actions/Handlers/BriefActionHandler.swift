@@ -5,13 +5,11 @@ import Foundation
 public struct BriefActionHandler: ActionHandler {
     // MARK: - Verb Definition Properties
 
-    public let verbID: VerbID = .brief
-
     public let syntax: [SyntaxRule] = [
         .match(.verb)
     ]
 
-    public let synonyms: [VerbID] = []
+    public let synonyms: [VerbID] = [.brief]
 
     public let requiresLight: Bool = false
 

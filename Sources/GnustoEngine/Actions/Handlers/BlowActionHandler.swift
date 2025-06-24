@@ -5,14 +5,12 @@ import Foundation
 public struct BlowActionHandler: ActionHandler {
     // MARK: - Verb Definition Properties
 
-    public let verbID: VerbID = .blow
-
     public let syntax: [SyntaxRule] = [
         .match(.verb, .directObject),
         .match(.verb, .on, .directObject),
     ]
 
-    public let synonyms: [VerbID] = [.puff]
+    public let synonyms: [VerbID] = [.blow, .puff]
 
     public let requiresLight: Bool = true
 

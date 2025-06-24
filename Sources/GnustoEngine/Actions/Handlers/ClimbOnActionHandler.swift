@@ -7,13 +7,13 @@ import Foundation
 public struct ClimbOnActionHandler: ActionHandler {
     // MARK: - Verb Definition Properties
 
-    public let verbID: VerbID = .climbOn
-
     public let syntax: [SyntaxRule] = [
-        .match(.verb, .on, .directObject),
+        .match(.verb(.climb), .on, .directObject),
+        .match(.verb(.sit), .on, .directObject),
+        .match(.verb(.mount), .directObject),
     ]
 
-    public let synonyms: [VerbID] = [.climb, .sit, .mount]
+    public let synonyms: [VerbID] = []
 
     public let requiresLight: Bool = true
 

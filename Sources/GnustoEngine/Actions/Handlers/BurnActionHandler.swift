@@ -9,14 +9,12 @@ import Foundation
 public struct BurnActionHandler: ActionHandler {
     // MARK: - Verb Definition Properties
 
-    public let verbID: VerbID = .burn
-
     public let syntax: [SyntaxRule] = [
         .match(.verb, .directObject),
         .match(.verb, .directObject, .with, .indirectObject),
     ]
 
-    public let synonyms: [VerbID] = [.ignite, .light]
+    public let synonyms: [VerbID] = [.burn, .ignite, .light]
 
     public let requiresLight: Bool = true
 

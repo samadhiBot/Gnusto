@@ -6,11 +6,9 @@ import Foundation
 public struct LookInsideActionHandler: ActionHandler {
     // MARK: - Verb Definition Properties
 
-    public let verbID: VerbID = .lookInside
-
     public let syntax: [SyntaxRule] = [
-        .match(.verb, .inside, .directObject),
         .match(.verb, .in, .directObject),
+        .match(.verb, .inside, .directObject),
     ]
 
     public let synonyms: [VerbID] = [.look, .peek]

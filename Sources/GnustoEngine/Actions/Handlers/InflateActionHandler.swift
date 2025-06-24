@@ -5,14 +5,16 @@ import Foundation
 public struct InflateActionHandler: ActionHandler {
     // MARK: - Verb Definition Properties
 
-    public let verbID: VerbID = .inflate
+
 
     public let syntax: [SyntaxRule] = [
         .match(.verb, .directObject),
         .match(.verb, .directObject, .with, .indirectObject),
+        .match(.verb(.blow), .up, .directObject),
+        .match(.verb(.blow), .up, .directObject, .with, .indirectObject),
     ]
 
-    public let synonyms: [VerbID] = [.blow up]
+    public let synonyms: [VerbID] = [.inflate]
 
     public let requiresLight: Bool = true
 

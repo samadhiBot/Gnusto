@@ -8,14 +8,12 @@ import Foundation
 public struct CutActionHandler: ActionHandler {
     // MARK: - Verb Definition Properties
 
-    public let verbID: VerbID = .cut
-
     public let syntax: [SyntaxRule] = [
         .match(.verb, .directObject),
         .match(.verb, .directObject, .with, .indirectObject),
     ]
 
-    public let synonyms: [VerbID] = [.slice, .chop]
+    public let synonyms: [VerbID] = [.cut, .slice, .chop]
 
     public let requiresLight: Bool = true
 

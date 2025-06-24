@@ -5,13 +5,11 @@ import Foundation
 public struct CloseActionHandler: ActionHandler {
     // MARK: - Verb Definition Properties
 
-    public let verbID: VerbID = .close
-
     public let syntax: [SyntaxRule] = [
         .match(.verb, .directObject)
     ]
 
-    public let synonyms: [VerbID] = [.shut]
+    public let synonyms: [VerbID] = [.close, .shut]
 
     public let requiresLight: Bool = true
 

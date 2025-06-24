@@ -5,13 +5,11 @@ import Foundation
 public struct HelpActionHandler: ActionHandler {
     // MARK: - Verb Definition Properties
 
-    public let verbID: VerbID = .help
-
     public let syntax: [SyntaxRule] = [
         .match(.verb)
     ]
 
-    public let synonyms: [VerbID] = []
+    public let synonyms: [VerbID] = [.help]
 
     public let requiresLight: Bool = false
 

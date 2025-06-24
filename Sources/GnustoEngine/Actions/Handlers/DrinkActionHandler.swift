@@ -5,14 +5,12 @@ import Foundation
 public struct DrinkActionHandler: ActionHandler {
     // MARK: - Verb Definition Properties
 
-    public let verbID: VerbID = .drink
-
     public let syntax: [SyntaxRule] = [
         .match(.verb, .directObject),
         .match(.verb, .directObject, .from, .indirectObject),
     ]
 
-    public let synonyms: [VerbID] = [.sip, .quaff]
+    public let synonyms: [VerbID] = [.drink, .sip, .quaff]
 
     public let requiresLight: Bool = true
 

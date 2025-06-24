@@ -11,16 +11,11 @@ import Foundation
 public struct LookActionHandler: ActionHandler {
     // MARK: - Verb Definition Properties
 
-    public let verbID: VerbID = .look
-
     public let syntax: [SyntaxRule] = [
         .match(.verb),
-        .match(.verb, .directObject),
-        .match(.verb, .at, .directObject),
-//        .match(.verb, .through, .directObject),
     ]
 
-    public let synonyms: [VerbID] = [.l]
+    public let synonyms: [VerbID] = [.look, "l"]
 
     public let requiresLight: Bool = false
 

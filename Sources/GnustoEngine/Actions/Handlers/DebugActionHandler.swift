@@ -12,13 +12,11 @@ import Foundation
 public struct DebugActionHandler: ActionHandler {
     // MARK: - Verb Definition Properties
 
-    public let verbID: VerbID = .debug
-
     public let syntax: [SyntaxRule] = [
         .match(.verb)
     ]
 
-    public let synonyms: [VerbID] = []
+    public let synonyms: [VerbID] = [.debug]
 
     public let requiresLight: Bool = false
 

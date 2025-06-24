@@ -5,13 +5,11 @@ import Foundation
 public struct PullActionHandler: ActionHandler {
     // MARK: - Verb Definition Properties
 
-    public let verbID: VerbID = .pull
-
     public let syntax: [SyntaxRule] = [
         .match(.verb, .directObjects)
     ]
 
-    public let synonyms: [VerbID] = []
+    public let synonyms: [VerbID] = [.pull]
 
     public let requiresLight: Bool = true
 

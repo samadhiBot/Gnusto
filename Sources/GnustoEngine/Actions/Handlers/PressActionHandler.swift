@@ -5,13 +5,11 @@ import Foundation
 public struct PressActionHandler: ActionHandler {
     // MARK: - Verb Definition Properties
 
-    public let verbID: VerbID = .press
-
     public let syntax: [SyntaxRule] = [
         .match(.verb, .directObject)
     ]
 
-    public let synonyms: [VerbID] = [.push, .depress]
+    public let synonyms: [VerbID] = [.press, .depress, .push]
 
     public let requiresLight: Bool = true
 

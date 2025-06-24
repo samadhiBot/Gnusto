@@ -5,14 +5,12 @@ import Foundation
 public struct GoActionHandler: ActionHandler {
     // MARK: - Verb Definition Properties
 
-    public let verbID: VerbID = .go
-
     public let syntax: [SyntaxRule] = [
         .match(.verb, .direction)
     ]
 
     public let synonyms: [VerbID] = [
-        "walk", "run", "proceed", "stroll", "hike", "head", "move", "travel",
+        .go, .walk, .run, .proceed, .stroll, .hike, .head, .move, .travel,
     ]
 
     public let requiresLight: Bool = false

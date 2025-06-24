@@ -2,10 +2,8 @@ import Foundation
 
 /// Handles the "POUR ON" command for pouring liquids on objects.
 /// Implements pouring mechanics following ZIL patterns for liquid manipulation.
-public struct PourOnActionHandler: ActionHandler {
+public struct PourActionHandler: ActionHandler {
     // MARK: - Verb Definition Properties
-
-    public let verbID: VerbID = .pourOn
 
     public let syntax: [SyntaxRule] = [
         .match(.verb),
@@ -82,7 +80,7 @@ public struct PourOnActionHandler: ActionHandler {
             case .item(let targetItemID) = indirectObjectRef
         else {
             throw ActionResponse.internalEngineError(
-                "PourOnActionHandler: missing required objects in process."
+                "PourActionHandler: missing required objects in process."
             )
         }
 

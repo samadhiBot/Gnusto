@@ -7,14 +7,12 @@ import Foundation
 public struct ChompActionHandler: ActionHandler {
     // MARK: - Verb Definition Properties
 
-    public let verbID: VerbID = .chomp
-
     public let syntax: [SyntaxRule] = [
         .match(.verb, .directObject),
         .match(.verb("chew"))
     ]
 
-    public let synonyms: [VerbID] = [.bite, .chew]
+    public let synonyms: [VerbID] = [.chomp, .bite, .chew]
 
     public let requiresLight: Bool = true
 

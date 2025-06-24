@@ -5,14 +5,12 @@ import Foundation
 public struct BreatheActionHandler: ActionHandler {
     // MARK: - Verb Definition Properties
 
-    public let verbID: VerbID = .breathe
-
     public let syntax: [SyntaxRule] = [
         .match(.verb),
         .match(.verb, .on, .directObject),
     ]
 
-    public let synonyms: [VerbID] = []
+    public let synonyms: [VerbID] = [.breathe]
 
     public let requiresLight: Bool = false
 

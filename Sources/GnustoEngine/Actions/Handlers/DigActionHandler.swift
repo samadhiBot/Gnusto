@@ -5,15 +5,13 @@ import Foundation
 public struct DigActionHandler: ActionHandler {
     // MARK: - Verb Definition Properties
 
-    public let verbID: VerbID = .dig
-
     public let syntax: [SyntaxRule] = [
-        .match(.verb),
+        .match(.verb(.dig)),
         .match(.verb, .directObject),
         .match(.verb, .directObject, .with, .indirectObject),
     ]
 
-    public let synonyms: [VerbID] = [.excavate]
+    public let synonyms: [VerbID] = [.dig, .excavate]
 
     public let requiresLight: Bool = true
 

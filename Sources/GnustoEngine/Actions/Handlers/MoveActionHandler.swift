@@ -6,14 +6,12 @@ import Foundation
 public struct MoveActionHandler: ActionHandler {
     // MARK: - Verb Definition Properties
 
-    public let verbID: VerbID = .move
-
     public let syntax: [SyntaxRule] = [
         .match(.verb, .directObject),
         .match(.verb, .directObject, .to, .indirectObject),
     ]
 
-    public let synonyms: [VerbID] = [.shift, .slide]
+    public let synonyms: [VerbID] = [.move, .shift, .slide]
 
     public let requiresLight: Bool = true
 

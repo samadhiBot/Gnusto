@@ -5,13 +5,11 @@ import Foundation
 public struct EatActionHandler: ActionHandler {
     // MARK: - Verb Definition Properties
 
-    public let verbID: VerbID = .eat
-
     public let syntax: [SyntaxRule] = [
         .match(.verb, .directObject)
     ]
 
-    public let synonyms: [VerbID] = [.consume, .devour]
+    public let synonyms: [VerbID] = [.eat, .consume, .devour]
 
     public let requiresLight: Bool = true
 

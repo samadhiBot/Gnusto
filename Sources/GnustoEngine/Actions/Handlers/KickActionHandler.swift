@@ -5,13 +5,11 @@ import Foundation
 public struct KickActionHandler: ActionHandler {
     // MARK: - Verb Definition Properties
 
-    public let verbID: VerbID = .kick
-
     public let syntax: [SyntaxRule] = [
         .match(.verb, .directObject)
     ]
 
-    public let synonyms: [VerbID] = []
+    public let synonyms: [VerbID] = [.kick]
 
     public let requiresLight: Bool = true
 
