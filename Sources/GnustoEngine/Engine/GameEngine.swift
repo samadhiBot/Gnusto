@@ -95,7 +95,7 @@ public actor GameEngine: Sendable {
     /// These are initialized from the `GameBlueprint`.
     var locationComputers: [LocationID: LocationComputer]
 
-    /// Registered `ActionHandler`s for specific verb commands (e.g., `.take`, `.look`).
+    /// Registered `ActionHandler`s for processing commands.
     /// These are a combination of default engine handlers and custom handlers provided
     /// by the `GameBlueprint`, with custom handlers taking precedence.
     private var actionHandlers: [ActionHandler]
@@ -195,13 +195,14 @@ public actor GameEngine: Sendable {
         self.itemComputers = blueprint.itemComputers
         self.locationComputers = blueprint.locationComputers
 
-        self.actionHandlers = allActionHandlers
-            .merging(Self.defaultActionHandlers) { (custom, _) in custom }
+        // Combine custom and default action handlers, with custom handlers taking precedence
+        let combinedHandlers = allActionHandlers + Self.defaultActionHandlers
+        self.actionHandlers = combinedHandlers
         self.itemEventHandlers = blueprint.itemEventHandlers
         self.locationEventHandlers = blueprint.locationEventHandlers
 
         #if DEBUG
-        self.actionHandlers[.debug] = DebugActionHandler()
+        self.actionHandlers.append(DebugActionHandler())
         #endif
     }
 
@@ -209,18 +210,21 @@ public actor GameEngine: Sendable {
 
     /// Extracts verb definitions from action handlers to build vocabulary.
     static func extractVerbDefinitions(from handlers: [ActionHandler]) -> [Verb] {
-        return handlers.compactMap { handler in
-            guard let primaryVerb = handler.synonyms.first else { return nil }
+        var verbs: [Verb] = []
 
-            var verb = Verb(
-                id: primaryVerb,
-                syntax: handler.syntax,
-                requiresLight: handler.requiresLight
-            )
-            // Skip the first element (primary verb) and use the rest as synonyms
-            verb.synonyms = Set(handler.synonyms.dropFirst().map(\.rawValue))
-            return verb
+        for handler in handlers {
+            // Each handler can contribute multiple verbs
+            for verbID in handler.verbs {
+                let verb = Verb(
+                    id: verbID,
+                    syntax: handler.syntax,
+                    requiresLight: handler.requiresLight
+                )
+                verbs.append(verb)
+            }
         }
+
+        return verbs
     }
 }
 
@@ -682,6 +686,118 @@ extension GameEngine {
 // MARK: - Command Execution
 
 extension GameEngine {
+
+            /// Finds the appropriate action handler for a given command.
+    ///
+    /// This method searches through all registered action handlers to find one that can
+    /// process the given command based on:
+    /// 1. The handler's verb list (if it specifies verbs)
+    /// 2. The handler's syntax rules (for handlers that use specific syntax patterns)
+    ///
+    /// - Parameter command: The command to find a handler for
+    /// - Returns: The action handler that can process this command, or nil if none found
+    private func findActionHandler(for command: Command) -> ActionHandler? {
+        for handler in actionHandlers {
+            // Check if this handler can handle this verb (if it specifies verbs)
+            if !handler.verbs.isEmpty && handler.verbs.contains(command.verb) {
+                return handler
+            }
+
+            // For handlers with empty verbs, check if any syntax rules could match this command
+            if handler.verbs.isEmpty && couldHandlerMatchCommand(handler, command) {
+                return handler
+            }
+        }
+
+        return nil
+    }
+
+    /// Finds action handlers that represent a specific conceptual action.
+    ///
+    /// This allows game logic to check for conceptual actions without worrying about
+    /// the specific verbs used. For example, checking for `.drop` actions regardless
+    /// of whether the player typed "drop", "put", or "place".
+    ///
+    /// - Parameter actionID: The conceptual action to find handlers for
+    /// - Returns: Array of action handlers that represent this conceptual action
+    public func actionHandlers(for actionID: ActionID) -> [ActionHandler] {
+        return actionHandlers.filter { handler in
+            handler.actions.contains(actionID)
+        }
+    }
+
+    /// Checks if a command represents a specific conceptual action.
+    ///
+    /// This is useful for game logic that needs to react to conceptual actions
+    /// regardless of the specific verbs used. For example, checking if the player
+    /// is trying to drop something, regardless of whether they typed "drop lamp",
+    /// "put lamp down", or "place lamp on ground".
+    ///
+    /// - Parameters:
+    ///   - command: The command to check
+    ///   - actionID: The conceptual action to check for
+    /// - Returns: True if the command represents the specified conceptual action
+    public func commandRepresents(_ command: Command, action actionID: ActionID) -> Bool {
+        guard let handler = findActionHandler(for: command) else {
+            return false
+        }
+        return handler.actions.contains(actionID)
+    }
+
+    /// Checks if a handler's syntax rules could potentially match a command.
+    ///
+    /// This performs a basic compatibility check focusing on verb-specific patterns.
+    /// For syntax rules that use `.specificVerb(verbID)`, we check if the command's
+    /// verb matches that specific verbID.
+    ///
+    /// - Parameters:
+    ///   - handler: The action handler to check
+    ///   - command: The command to match against
+    /// - Returns: True if the handler could potentially process this command
+    private func couldHandlerMatchCommand(_ handler: ActionHandler, _ command: Command) -> Bool {
+        for syntaxRule in handler.syntax {
+            if couldSyntaxRuleMatchCommand(syntaxRule, command) {
+                return true
+            }
+        }
+        return false
+    }
+
+    /// Checks if a specific syntax rule could match a command.
+    ///
+    /// This performs basic pattern matching, focusing on verb compatibility.
+    /// For patterns with `.specificVerb(verbID)`, it checks if the command's verb
+    /// matches the required verbID.
+    ///
+    /// - Parameters:
+    ///   - syntaxRule: The syntax rule to check
+    ///   - command: The command to match against
+    /// - Returns: True if the syntax rule could match this command
+    private func couldSyntaxRuleMatchCommand(_ syntaxRule: SyntaxRule, _ command: Command) -> Bool {
+        // Look for specificVerb requirements in the pattern
+        for token in syntaxRule.pattern {
+            switch token {
+            case .specificVerb(let requiredVerbID):
+                // If this pattern requires a specific verb, check if command matches
+                if command.verb != requiredVerbID {
+                    return false  // Command verb doesn't match required verb
+                }
+            case .verb:
+                // Generic .verb token would be handled by verb-based handlers
+                // Syntax-only handlers shouldn't have generic .verb tokens
+                continue
+            default:
+                // Other tokens (directObject, particles, etc.) would need more sophisticated
+                // matching logic, but for now we'll assume they could match
+                continue
+            }
+        }
+
+        // If we get here, either:
+        // 1. All specificVerb requirements were satisfied, or
+        // 2. There were no specificVerb requirements
+        return true
+    }
     /// Executes a parsed game command, orchestrating calls to event handlers and action handlers.
     ///
     /// This is a central method in processing player actions. It performs the following sequence:
@@ -839,12 +955,12 @@ extension GameEngine {
                 return
             }
 
-            // If the room is dark and the verb requires light (and isn't 'turn on'), report error.
-            if !isLit && verb.requiresLight && command.verb != .turnOn {
+            // If the room is dark and the verb requires light (and isn't 'turn'), report error.
+            if !isLit && verb.requiresLight && command.verb != .turn {
                 await report(.roomIsDark)
             } else {
                 // Room is lit OR verb doesn't require light, proceed with default handler execution.
-                guard let verbHandler = actionHandlers[command.verb] else {
+                guard let verbHandler = findActionHandler(for: command) else {
                     // No handler registered for this verb (should match vocabulary definition)
                     logWarning(
                         """

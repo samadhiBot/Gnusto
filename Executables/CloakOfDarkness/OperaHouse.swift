@@ -124,7 +124,7 @@ enum OperaHouse {
         case .beforeTurn(let command):
             switch command.verb {
             case .drop,
-                    .putOn:
+                    .put:
                 guard await engine.playerLocationID == .cloakroom else {
                     throw ActionResponse.prerequisiteNotMet(
                         "This isn't the best place to leave a smart cloak lying around."
@@ -139,7 +139,7 @@ enum OperaHouse {
                 return nil
             }
             switch command.verb {
-            case .drop, .putOn:
+            case .drop, .put:
                 var changes = [
                     try await engine.setFlag(.isLit, on: engine.location(.bar))
                 ]

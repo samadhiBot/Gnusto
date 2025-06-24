@@ -13,6 +13,8 @@ public struct TakeActionHandler: ActionHandler {
 
     public let verbs: [VerbID] = [.take, .get, .grab, .steal]
 
+    public let actions: [ActionID] = [.take]
+
     public let requiresLight: Bool = true
 
     // MARK: - Action Processing Methods

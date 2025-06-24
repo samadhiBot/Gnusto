@@ -11,6 +11,8 @@ public struct TurnOnActionHandler: ActionHandler {
         .match(.turn, .on, .directObject),
     ]
 
+    public let actions: [ActionID] = [.lightSource, .burn]
+
     public let requiresLight: Bool = true
 
     // MARK: - Action Processing Methods

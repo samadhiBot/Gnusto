@@ -42,6 +42,17 @@ public protocol ActionHandler: Sendable {
     /// The parser treats all of the verb synonym as equivalent when matching player input.
     var verbs: [VerbID] { get }
 
+    /// The conceptual actions that this handler represents.
+    ///
+    /// This allows game logic to check for conceptual actions (like `.lightSource` or `.drop`)
+    /// without worrying about the specific verbs used. For example, both "TURN ON LAMP" and
+    /// "LIGHT LAMP" might represent the `.lightSource` action.
+    ///
+    /// A single action handler may represent multiple conceptual actions. For example,
+    /// a TurnActionHandler might handle both `.turn` (for "TURN WHEEL") and `.lightSource`
+    /// (for "TURN ON LAMP") depending on the syntax pattern used.
+    var actions: [ActionID] { get }
+
     /// Whether this verb requires light to execute.
     ///
     /// If `true`, the verb will fail with a "room is dark" message when executed in darkness
@@ -138,6 +149,13 @@ extension ActionHandler {
     ///
     /// Override this property to provide the verbs that can trigger this action handler.
     public var verbs: [VerbID] {
+        []
+    }
+
+    /// Default implementation for `actions`. Returns an empty array.
+    ///
+    /// Override this property to provide the conceptual actions this handler represents.
+    public var actions: [ActionID] {
         []
     }
 

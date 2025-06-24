@@ -344,7 +344,7 @@ extension InsideHouse {
                     changes: changes
                 )
 
-            case .turnOn:
+            case .light:
                 return isBurnedOut ? ActionResult("A burned-out lamp won't light.") : nil
 
             case .turnOff:
@@ -425,7 +425,7 @@ extension InsideHouse {
             case .take:
                 return ActionResult("The rug is extremely heavy and cannot be carried.")
 
-            case .lookUnder:
+            case .look:
                 // Only show trap door if rug hasn't been moved and trap door isn't open
                 if !wasRugMoved && !trapDoorOpen {
                     return ActionResult("""
