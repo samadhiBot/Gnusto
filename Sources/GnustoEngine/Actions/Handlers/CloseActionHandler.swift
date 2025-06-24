@@ -104,12 +104,10 @@ public struct CloseActionHandler: ActionHandler {
 
         // --- Prepare Result ---
         return ActionResult(
-            message: context.message.closed(),
-            changes: [
-                await context.engine.clearFlag(.isOpen, on: targetItem),
-                await context.engine.setFlag(.isTouched, on: targetItem),
-                await context.engine.updatePronouns(to: targetItem),
-            ]
+            context.message.closed(),
+            await context.engine.clearFlag(.isOpen, on: targetItem),
+            await context.engine.setFlag(.isTouched, on: targetItem),
+            await context.engine.updatePronouns(to: targetItem)
         )
     }
 

@@ -25,14 +25,12 @@ public struct BriefActionHandler: ActionHandler {
     /// - Returns: An `ActionResult` containing confirmation message and state changes.
     public func process(context: ActionContext) async throws -> ActionResult {
         return ActionResult(
-            message: """
-                Brief mode is now on. Location descriptions will be
-                shown only when you first enter a location.
-                """,
-            changes: [
-                await context.engine.setGlobal(.isBriefMode, to: true),
-                await context.engine.clearGlobal(.isVerboseMode),
-            ]
+            """
+            Brief mode is now on. Location descriptions will be
+            shown only when you first enter a location.
+            """,
+            await context.engine.setGlobal(.isBriefMode, to: true),
+            await context.engine.clearGlobal(.isVerboseMode)
         )
     }
 }

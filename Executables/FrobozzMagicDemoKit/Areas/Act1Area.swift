@@ -348,15 +348,13 @@ struct Act1Area {
 
         // Move Gnusto from nowhere to the gate area
         return ActionResult(
-            message: """
-                But before you can take a step into Berzio's garden, his little dog Gnusto
-                slips out, dashing between your ankles and into the lane. Overjoyed to have
-                company, she skitters about wriggling this way and that.
-                """,
-            changes: [
-                await engine.setFlag(.gnustoEscaped),
-                await engine.move(gnusto, to: .location(.berziosGate)),
-            ]
+            """
+            But before you can take a step into Berzio's garden, his little dog Gnusto
+            slips out, dashing between your ankles and into the lane. Overjoyed to have
+            company, she skitters about wriggling this way and that.
+            """,
+            await engine.setFlag(.gnustoEscaped),
+            await engine.move(gnusto, to: .location(.berziosGate))
         )
     }
 

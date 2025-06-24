@@ -6,7 +6,8 @@ enum InsideHouse {
     static let attic = Location(
         id: .attic,
         .name("Attic"),
-        .description("""
+        .description(
+            """
             This is the attic. The only exit is a stairway leading down.
             """),
         .exits([
@@ -31,7 +32,8 @@ enum InsideHouse {
     static let livingRoom = Location(
         id: .livingRoom,
         .name("Living Room"),
-        .description("""
+        .description(
+            """
             You are in the living room. There is a doorway to the east, a wooden door with
             strange gothic lettering to the west, which appears to be nailed shut, a trophy case,
             and a large oriental rug in the center of the room.
@@ -158,7 +160,8 @@ extension InsideHouse {
         .isReadable,
         .isTakable,
         .firstDescription("In the trophy case is an ancient parchment which appears to be a map."),
-        .readText("""
+        .readText(
+            """
             The map shows a forest with three clearings. The largest clearing contains
             a house. Three paths leave the large clearing. One of these paths, leading
             southwest, is marked "To Stone Barrow".
@@ -293,12 +296,14 @@ extension InsideHouse {
     static let kitchenComputer = LocationComputer { attributeID, gameState in
         switch attributeID {
         case .description:
-            let windowState = if try gameState.hasFlag(.isOpen, on: .kitchenWindow) {
-                "open"
-            } else {
-                "slightly ajar"
-            }
-            return .string("""
+            let windowState =
+                if try gameState.hasFlag(.isOpen, on: .kitchenWindow) {
+                    "open"
+                } else {
+                    "slightly ajar"
+                }
+            return .string(
+                """
                 You are in the kitchen of the white house. A table seems to
                 have been used recently for the preparation of food. A passage
                 leads to the west and a dark staircase can be seen leading
@@ -310,7 +315,7 @@ extension InsideHouse {
         }
     }
 
-        /// Handles special lamp interactions based on the original ZIL `LANTERN` routine.
+    /// Handles special lamp interactions based on the original ZIL `LANTERN` routine.
     ///
     /// This handler manages lamp behavior including:
     /// - THROW: Smashes lamp and creates broken lamp
@@ -330,13 +335,13 @@ extension InsideHouse {
             case VerbID("throw"):
                 let playerLocation = try await engine.playerLocation()
 
-                                let changes: [StateChange] = [
+                let changes: [StateChange] = [
                     // Turn off the lamp's light source
                     try await engine.clearFlag(.isOn, on: .lamp),
                     // Remove the lamp
                     try await engine.move(.lamp, to: .nowhere),
                     // Add broken lamp to current location
-                    try await engine.move(.brokenLamp, to: .location(playerLocation.id))
+                    try await engine.move(.brokenLamp, to: .location(playerLocation.id)),
                 ].compactMap { $0 }
 
                 return ActionResult(
@@ -351,18 +356,19 @@ extension InsideHouse {
                 return isBurnedOut ? ActionResult("The lamp has already burned out.") : nil
 
             case .examine:
-                let statusMessage = if isBurnedOut {
-                    "has burned out."
-                } else if isOn {
-                    "is on."
-                } else {
-                    "is turned off."
-                }
+                let statusMessage =
+                    if isBurnedOut {
+                        "has burned out."
+                    } else if isOn {
+                        "is on."
+                    } else {
+                        "is turned off."
+                    }
 
                 return ActionResult("The lamp \(statusMessage)")
 
             default:
-                return nil // Let other handlers deal with it
+                return nil  // Let other handlers deal with it
             }
         case .afterTurn:
             return nil
@@ -393,7 +399,8 @@ extension InsideHouse {
                 if wasRugMoved {
                     return ActionResult("\(baseMessage).")
                 } else {
-                    return ActionResult("""
+                    return ActionResult(
+                        """
                         \(baseMessage), but in trying to take it you have
                         noticed an irregularity beneath it.
                         """)
@@ -401,7 +408,8 @@ extension InsideHouse {
 
             case .move, .push:
                 if wasRugMoved {
-                    return ActionResult("""
+                    return ActionResult(
+                        """
                         Having moved the carpet previously, you find it impossible to move
                         it again.
                         """)
@@ -409,16 +417,14 @@ extension InsideHouse {
                     // Move the rug and reveal the trap door
                     let trapDoor = try await engine.item(.trapDoor)
                     return ActionResult(
-                        message: """
-                            With a great effort, the rug is moved to one side of the room,
-                            revealing the dusty cover of a closed trap door.
-                            """,
-                        changes: [
-                            // Mark rug as moved
-                            await engine.setFlag(.rugMoved),
-                            // Make trap door visible
-                            await engine.clearFlag(.isInvisible, on: trapDoor)
-                        ]
+                        """
+                        With a great effort, the rug is moved to one side of the room,
+                        revealing the dusty cover of a closed trap door.
+                        """,
+                        // Mark rug as moved
+                        await engine.setFlag(.rugMoved),
+                        // Make trap door visible
+                        await engine.clearFlag(.isInvisible, on: trapDoor)
                     )
                 }
 
@@ -428,7 +434,8 @@ extension InsideHouse {
             case .look:
                 // Only show trap door if rug hasn't been moved and trap door isn't open
                 if !wasRugMoved && !trapDoorOpen {
-                    return ActionResult("""
+                    return ActionResult(
+                        """
                         Underneath the rug is a closed trap door. As you drop the corner of the
                         rug, the trap door is once again concealed from view.
                         """)
@@ -438,7 +445,8 @@ extension InsideHouse {
 
             case .climbOn:
                 if !wasRugMoved && !trapDoorOpen {
-                    return ActionResult("""
+                    return ActionResult(
+                        """
                         As you sit, you notice an irregularity underneath it. Rather than be
                         uncomfortable, you stand up again.
                         """)
@@ -447,7 +455,7 @@ extension InsideHouse {
                 }
 
             default:
-                return nil // Let other handlers deal with it
+                return nil  // Let other handlers deal with it
             }
         case .afterTurn:
             return nil
@@ -476,13 +484,11 @@ extension InsideHouse {
                 return ActionResult("The door is locked from above.")
             }
             return ActionResult(
-                message: """
-                    The door reluctantly opens to reveal a rickety staircase
-                    descending into darkness.
-                    """,
-                changes: [
-                    try await engine.setFlag(.isOpen, on: .trapDoor)
-                ]
+                """
+                The door reluctantly opens to reveal a rickety staircase
+                descending into darkness.
+                """,
+                try await engine.setFlag(.isOpen, on: .trapDoor)
             )
 
         case .close:
@@ -493,10 +499,8 @@ extension InsideHouse {
                 return ActionResult("You can't close the trap door from below.")
             }
             return ActionResult(
-                message: "The door swings shut and closes.",
-                changes: [
-                    try await engine.clearFlag(.isOpen, on: .trapDoor)
-                ]
+                "The door swings shut and closes.",
+                try await engine.clearFlag(.isOpen, on: .trapDoor)
             )
 
         case .lookUnder:
@@ -573,7 +577,7 @@ extension InsideHouse {
         let monstersInCurrentLocation = currentLocationItems.filter { $0.isMonster }
 
         if !monstersInCurrentLocation.isEmpty {
-            newGlowLevel = 2 // Very bright glow
+            newGlowLevel = 2  // Very bright glow
         } else {
             // Check adjacent locations for monsters
             for (_, exit) in currentLocation.exits {
@@ -584,7 +588,7 @@ extension InsideHouse {
                 let monstersInAdjacentLocation = adjacentLocationItems.filter { $0.isMonster }
 
                 if !monstersInAdjacentLocation.isEmpty {
-                    newGlowLevel = 1 // Faint blue glow
+                    newGlowLevel = 1  // Faint blue glow
                     break
                 }
             }
@@ -594,14 +598,15 @@ extension InsideHouse {
         let currentGlowLevel = await engine.global(.swordGlowLevel) ?? 0
 
         // Determine the glow message based on current level
-        let message = switch newGlowLevel {
-        case 1:
-            "Your sword is glowing with a faint blue glow."
-        case 2:
-            "Your sword is glowing very brightly."
-        default:
-            "" // Level 0 - no message when not glowing
-        }
+        let message =
+            switch newGlowLevel {
+            case 1:
+                "Your sword is glowing with a faint blue glow."
+            case 2:
+                "Your sword is glowing very brightly."
+            default:
+                ""  // Level 0 - no message when not glowing
+            }
 
         // Update the glow level if it changed
         if newGlowLevel != currentGlowLevel {
@@ -624,8 +629,8 @@ extension InsideHouse {
     }
 }
 
-private extension Item {
-    var isMonster: Bool {
+extension Item {
+    fileprivate var isMonster: Bool {
         switch id {
         case .troll, .thief, .cyclops, .bat, .ghosts: true
         default: false

@@ -189,14 +189,12 @@ struct FillOutActionHandler: ActionHandler {
         // Complex form completion logic with multiple steps
         // Each page requires different information
         return ActionResult(
-            message: "You begin the tedious process of form completion...",
-            changes: [
-                StateChange(
-                    entityId: .item("bureaucraticForm"),
-                    attribute: .hasAttribute("progress"),
-                    newValue: .int(currentProgress + 1)
-                )
-            ]
+            "You begin the tedious process of form completion...",
+            StateChange(
+                entityId: .item("bureaucraticForm"),
+                attribute: .hasAttribute("progress"),
+                newValue: .int(currentProgress + 1)
+            )
         )
     }
 }
@@ -333,19 +331,17 @@ struct CastActionHandler: ActionHandler {
         let transferPotency = max(potency / 2, 25) // Initial transfer is half potency
 
         return ActionResult(
-            message: """
-                As you cast the \(spellType) spell, the scroll crumbles to dust as usual. But wait!
-                Something extraordinary happens. Faint letters begin to appear on the stained pages
-                of the notebook, like a developing Polaroid print. The spell is transferring to the paper!
+            """
+            As you cast the \(spellType) spell, the scroll crumbles to dust as usual. But wait!
+            Something extraordinary happens. Faint letters begin to appear on the stained pages
+            of the notebook, like a developing Polaroid print. The spell is transferring to the paper!
 
-                The magical writings glow softly for a moment, then settle into the page. You have
-                discovered something remarkable.
-                """,
-            changes: [
-                StateChange(entityId: .item(scrollID), attribute: .removeFromGame, newValue: true),
-                StateChange(entityId: .item(notebook.id), attribute: .addSpell(spellType), newValue: .int(transferPotency)),
-                StateChange(entityId: .global, attribute: .setFlag("discoveredSpellTransfer"), newValue: true)
-            ],
+            The magical writings glow softly for a moment, then settle into the page. You have
+            discovered something remarkable.
+            """,
+            StateChange(entityId: .item(scrollID), attribute: .removeFromGame, newValue: true),
+            StateChange(entityId: .item(notebook.id), attribute: .addSpell(spellType), newValue: .int(transferPotency)),
+            StateChange(entityId: .global, attribute: .setFlag("discoveredSpellTransfer"), newValue: true),
             effects: [
                 SideEffect(type: .scheduleEvent, targetID: .global, parameters: ["message": "Berzio emerges from the workshop, drawn by the unusual magical resonance."])
             ]

@@ -16,7 +16,7 @@ enum Thief {
         .synonyms("thief", "individual", "person", "man"),
         .adjectives("suspicious", "suspicious-looking", "sneaky"),
         .isCharacter,
-        .strength(3), // Stronger than the troll
+        .strength(3),  // Stronger than the troll
         .in(.location(.roundRoom))
     )
 
@@ -41,7 +41,7 @@ enum Thief {
         .requiresTryTake,
         .omitDescription,
         .isContainer,
-        .capacity(1000), // Large capacity for stolen treasures
+        .capacity(1000),  // Large capacity for stolen treasures
         .in(.item(.thief))
     )
 
@@ -51,7 +51,7 @@ enum Thief {
     static let thiefMovementLocations: [LocationID] = [
         .roundRoom, .northSouthPassage, .deepCanyon, .reservoirSouth,
         .damRoom, .reservoir, .streamView, .mirrorRoomSouth, .windingPassage, .tinyCave,
-        .egyptRoom, .maze1, .maze2, .maze3, .maze4, .maze5
+        .egyptRoom, .maze1, .maze2, .maze3, .maze4, .maze5,
     ]
 
     // MARK: - Event Handlers
@@ -208,7 +208,8 @@ enum Thief {
 
 // MARK: - Command Handling
 
-private func handleThiefCommand(engine: GameEngine, command: Command) async throws -> ActionResult? {
+private func handleThiefCommand(engine: GameEngine, command: Command) async throws -> ActionResult?
+{
     switch command.verb {
     case .tell:
         return ActionResult(
@@ -259,14 +260,12 @@ private func handleGiveToThief(engine: GameEngine, command: Command) async throw
 
     if treasureValue > 0 {
         return ActionResult(
-            message: """
-                The thief examines the \(item.name) with obvious delight and
-                carefully places it in his bag, giving you a grudging nod of
-                acknowledgment.
-                """,
-            changes: [
-                try await engine.move(itemID, to: .item(.largeBag))
-            ].compactMap { $0 }
+            """
+            The thief examines the \(item.name) with obvious delight and
+            carefully places it in his bag, giving you a grudging nod of
+            acknowledgment.
+            """,
+            try await engine.move(itemID, to: .item(.largeBag))
         )
     } else {
         return ActionResult(
@@ -301,11 +300,12 @@ private func evaluateThiefCombat(engine: GameEngine) async throws -> ThiefCombat
     let playerWeapon = await getPlayerBestWeapon(engine: engine)
 
     // Adjust odds based on player's weapon
-    let weaponModifier = if let weapon = playerWeapon {
-        await getWeaponEffectiveness(engine: engine, weapon: weapon)
-    } else {
-        -15 // Unarmed penalty
-    }
+    let weaponModifier =
+        if let weapon = playerWeapon {
+            await getWeaponEffectiveness(engine: engine, weapon: weapon)
+        } else {
+            -15  // Unarmed penalty
+        }
 
     let adjustedOutcome = baseOutcome + weaponModifier
 
@@ -334,59 +334,53 @@ enum ThiefCombatOutcome {
 }
 
 /// Handles the result of combat with the thief
-private func handleThiefCombatResponse(engine: GameEngine, outcome: ThiefCombatOutcome) async throws -> ActionResult {
+private func handleThiefCombatResponse(engine: GameEngine, outcome: ThiefCombatOutcome) async throws
+    -> ActionResult
+{
     switch outcome {
     case .victory(let message):
         return ActionResult(
-            message: """
-                \(message)
+            """
+            \(message)
 
-                Almost as soon as the thief breathes his last breath, a cloud
-                of sinister black fog envelops him, and when the fog lifts,
-                the carcass has disappeared.
+            Almost as soon as the thief breathes his last breath, a cloud
+            of sinister black fog envelops him, and when the fog lifts,
+            the carcass has disappeared.
 
-                His possessions lie scattered on the ground.
-                """,
-            changes: [
-                try await engine.remove(.thief),
-                try await dropThiefPossessions(engine: engine),
-                await updateTreasureScoring(engine: engine)
-            ].compactMap { $0 }
+            His possessions lie scattered on the ground.
+            """,
+            try await engine.remove(.thief),
+            try await dropThiefPossessions(engine: engine),
+            await updateTreasureScoring(engine: engine)
         )
 
     case .partialVictory(let message):
         return ActionResult(
-            message: """
-                \(message)
+            """
+            \(message)
 
-                The thief staggers, blood flowing from his wounds, but he's
-                far from finished. His grip on the stiletto remains firm.
-                """,
-            changes: [
-                try await engine.setFlag(.isFighting, on: .thief)
-            ].compactMap { $0 }
+            The thief staggers, blood flowing from his wounds, but he's
+            far from finished. His grip on the stiletto remains firm.
+            """,
+            try await engine.setFlag(.isFighting, on: .thief)
         )
 
     case .defeat(let message):
         return ActionResult(
-            message: """
-                \(message)
+            """
+            \(message)
 
-                The thief stands over your fallen form, breathing heavily.
-                He quickly rifles through your belongings with professional efficiency.
-                """,
-            changes: [
-                try await engine.setFlag(.isFighting, on: .thief),
-                try await thiefStealsRandomItem(engine: engine)
-            ].compactMap { $0 }
+            The thief stands over your fallen form, breathing heavily.
+            He quickly rifles through your belongings with professional efficiency.
+            """,
+            try await engine.setFlag(.isFighting, on: .thief),
+            try await thiefStealsRandomItem(engine: engine),
         )
 
     case .draw(let message):
         return ActionResult(
-            message: message,
-            changes: [
-                try await engine.setFlag(.isFighting, on: .thief)
-            ].compactMap { $0 }
+            message,
+            try await engine.setFlag(.isFighting, on: .thief)
         )
 
     case .ineffective(let message):
@@ -405,7 +399,7 @@ private func attemptSophisticatedTheft(engine: GameEngine) async throws -> Actio
     let targetableItems = playerItems.compactMap { item -> (ItemID, Int)? in
         let value = evaluateTreasureValue(of: item)
         return value > 0 ? (item.id, value) : nil
-    }.sorted { $0.1 > $1.1 } // Sort by value, highest first
+    }.sorted { $0.1 > $1.1 }  // Sort by value, highest first
 
     guard !targetableItems.isEmpty else { return nil }
 
@@ -455,22 +449,22 @@ private func thiefStealsRandomItem(engine: GameEngine) async throws -> StateChan
 private func evaluateTreasureValue(of item: Item) -> Int {
     // High-value treasures (worth 10+ points in trophy case)
     let highValueTreasures: [ItemID] = [
-        .skull, .potOfGold, .diamond, .bracelet, .platinumBar
+        .skull, .potOfGold, .diamond, .bracelet, .platinumBar,
     ]
 
     // Medium-value treasures (worth 5-9 points in trophy case)
     let mediumValueTreasures: [ItemID] = [
-        .sceptre, .torch, .painting, .chalice, .trident
+        .sceptre, .torch, .painting, .chalice, .trident,
     ]
 
     // Low-value treasures (worth 1-4 points in trophy case)
     let lowValueTreasures: [ItemID] = [
-        .egg, .bagOfCoins, .jade, .bauble
+        .egg, .bagOfCoins, .jade, .bauble,
     ]
 
     // Weapons are always interesting to thieves
     let valuableWeapons: [ItemID] = [
-        .sword, .knife, .axe, .stiletto
+        .sword, .knife, .axe, .stiletto,
     ]
 
     return switch true {
@@ -531,10 +525,10 @@ private func getPlayerBestWeapon(engine: GameEngine) async -> ItemID? {
 /// Gets weapon effectiveness modifier for combat
 private func getWeaponEffectiveness(engine: GameEngine, weapon: ItemID) async -> Int {
     return switch weapon {
-    case .sword: 15      // Best weapon against thief
-    case .knife: 10      // Good for close combat
-    case .axe: 5         // Heavy but slow
-    case .stiletto: 12   // Similar weapon to thief's
+    case .sword: 15  // Best weapon against thief
+    case .knife: 10  // Good for close combat
+    case .axe: 5  // Heavy but slow
+    case .stiletto: 12  // Similar weapon to thief's
     default: 0
     }
 }

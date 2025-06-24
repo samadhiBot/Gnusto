@@ -6,7 +6,8 @@ enum Underground {
     static let cellar: Location = Location(
         id: .cellar,
         .name("Cellar"),
-        .description("""
+        .description(
+            """
             You are in a dark and damp cellar with a narrow passageway leading north, and a
             crawlway to the south. On the west is the bottom of a steep metal ramp which is
             unclimbable.
@@ -24,7 +25,7 @@ enum Underground {
         .name("Complex Junction"),
         .description("This is a complex junction with passages leading in many directions."),
         .exits([
-            .northwest: .to(.roundRoom),
+            .northwest: .to(.roundRoom)
         ])
     )
 
@@ -33,14 +34,15 @@ enum Underground {
         .name("Dead End"),
         .description("You have come to a dead end."),
         .exits([
-            .west: .to(.roundRoom),
+            .west: .to(.roundRoom)
         ])
     )
 
     static let eastOfChasm = Location(
         id: .eastOfChasm,
         .name("East of Chasm"),
-        .description("""
+        .description(
+            """
             You are on the east edge of a chasm, the bottom of which cannot be seen. A narrow
             passage goes north, and the path you are on continues to the east.
             """),
@@ -53,7 +55,8 @@ enum Underground {
     static let eastWestPassage = Location(
         id: .eastWestPassage,
         .name("East-West Passage"),
-        .description("""
+        .description(
+            """
             This is a narrow east-west passageway. There is a narrow stairway leading down at
             the north end of the room.
             """),
@@ -67,7 +70,8 @@ enum Underground {
     static let gallery = Location(
         id: .gallery,
         .name("Gallery"),
-        .description("""
+        .description(
+            """
             This is an art gallery. Most of the paintings have been stolen by vandals with
             exceptional taste. The vandals left through either the north or west exits.
             """),
@@ -82,7 +86,7 @@ enum Underground {
         .name("Maze"),
         .description("This is part of a maze of twisty little passages, all alike."),
         .exits([
-            .east: .to(.trollRoom),
+            .east: .to(.trollRoom)
         ])
     )
 
@@ -91,7 +95,7 @@ enum Underground {
         .name("North-South Passage"),
         .description("This is a long north-south passage."),
         .exits([
-            .south: .to(.roundRoom),
+            .south: .to(.roundRoom)
         ])
     )
 
@@ -100,7 +104,7 @@ enum Underground {
         .name("Northeast Passage"),
         .description("This is a northeast passage."),
         .exits([
-            .southwest: .to(.roundRoom),
+            .southwest: .to(.roundRoom)
         ])
     )
 
@@ -109,7 +113,7 @@ enum Underground {
         .name("Northwest Passage"),
         .description("This is a northwest passage."),
         .exits([
-            .southeast: .to(.roundRoom),
+            .southeast: .to(.roundRoom)
         ])
     )
 
@@ -118,14 +122,15 @@ enum Underground {
         .name("Reservoir"),
         .description("This is a large underground reservoir."),
         .exits([
-            .up: .to(.eastWestPassage),
+            .up: .to(.eastWestPassage)
         ])
     )
 
     static let roundRoom = Location(
         id: .roundRoom,
         .name("Round Room"),
-        .description("""
+        .description(
+            """
             This is a circular stone room with passages in all directions. Several of them
             have unfortunate endings.
             """),
@@ -146,7 +151,7 @@ enum Underground {
         .name("South Passage"),
         .description("This is a south passage."),
         .exits([
-            .north: .to(.roundRoom),
+            .north: .to(.roundRoom)
         ])
     )
 
@@ -155,26 +160,28 @@ enum Underground {
         .name("Southwest Passage"),
         .description("This is a southwest passage."),
         .exits([
-            .northeast: .to(.roundRoom),
+            .northeast: .to(.roundRoom)
         ])
     )
 
     static let steepRamp = Location(
         id: .steepRamp,
         .name("Bottom of Ramp"),
-        .description("""
+        .description(
+            """
             You are at the bottom of a steep metal ramp. The ramp leads up to the west, but it
             is too steep and smooth to climb.
             """),
         .exits([
-            .east: .to(.cellar),
+            .east: .to(.cellar)
         ])
     )
 
     static let studio = Location(
         id: .studio,
         .name("Studio"),
-        .description("""
+        .description(
+            """
             This appears to have been an artist's studio. The walls and floors are splattered
             with paints of 69 different colors. Strangely enough, nothing of value is hanging
             here. At the south end of the room is an open door (also covered with paint). A
@@ -223,11 +230,9 @@ extension Underground {
 
         if isTrapDoorOpen, !isTrapDoorBarred {
             return ActionResult(
-                message: "The trap door crashes shut, and you hear someone barring it.",
-                changes: [
-                    try await engine.clearFlag(.isOpen, on: .trapDoor),
-                    await engine.setFlag(.trapDoorBarred),
-                ]
+                "The trap door crashes shut, and you hear someone barring it.",
+                try await engine.clearFlag(.isOpen, on: .trapDoor),
+                await engine.setFlag(.trapDoorBarred)
             )
         }
 

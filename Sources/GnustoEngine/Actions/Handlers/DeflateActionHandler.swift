@@ -85,12 +85,10 @@ public struct DeflateActionHandler: ActionHandler {
             }
 
         return ActionResult(
-            message: message,
-            changes: [
-                await context.engine.setFlag(.isTouched, on: targetItem),
-                await context.engine.updatePronouns(to: targetItem),
-                await context.engine.clearFlag(.isInflated, on: targetItem),
-            ]
+            message,
+            await context.engine.setFlag(.isTouched, on: targetItem),
+            await context.engine.updatePronouns(to: targetItem),
+            await context.engine.clearFlag(.isInflated, on: targetItem)
         )
     }
 

@@ -100,13 +100,11 @@ public struct EatActionHandler: ActionHandler {
         // Handle direct edible item
         if targetItem.hasFlag(.isEdible) {
             return ActionResult(
-                message: context.message.eatSuccess(
+                context.message.eatSuccess(
                     item: targetItem.withDefiniteArticle
                 ),
-                changes: [
-                    await context.engine.setFlag(.isTouched, on: targetItem),
-                    await context.engine.move(targetItem, to: .nowhere),
-                ]
+                await context.engine.setFlag(.isTouched, on: targetItem),
+                await context.engine.move(targetItem, to: .nowhere)
             )
         }
         // Handle container with edible contents
@@ -125,15 +123,12 @@ public struct EatActionHandler: ActionHandler {
                     )
                 } else {
                     return ActionResult(
-                        message: context.message.eatFromContainer(
+                        context.message.eatFromContainer(
                             food: firstEdible.withDefiniteArticle,
                             container: targetItem.withDefiniteArticle
                         ),
-                        changes: [
-                            await context.engine.setFlag(.isTouched, on: targetItem),
-                            await context.engine.move(firstEdible, to: .nowhere),
-                            await context.engine.updatePronouns(to: firstEdible),
-                        ]
+                        await context.engine.setFlag(.isTouched, on: targetItem),
+                        await context.engine.move(firstEdible, to: .nowhere)
                     )
                 }
             } else {

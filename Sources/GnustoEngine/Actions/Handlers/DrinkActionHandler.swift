@@ -125,45 +125,37 @@ public struct DrinkActionHandler: ActionHandler {
                 // For closed containers, can't drink from them
                 if !targetItem.hasFlag(.isOpen) {
                     return ActionResult(
-                        message: context.message.cannotDrinkFromClosed(
+                        context.message.cannotDrinkFromClosed(
                             container: targetItem.withDefiniteArticle
                         ),
-                        changes: [
-                            await context.engine.setFlag(.isTouched, on: targetItem)
-                        ]
+                        await context.engine.setFlag(.isTouched, on: targetItem)
                     )
                 } else {
                     return ActionResult(
-                        message: context.message.drinkFromContainer(
+                        context.message.drinkFromContainer(
                             liquid: firstDrinkable.withDefiniteArticle,
                             container: targetItem.withDefiniteArticle
                         ),
-                        changes: [
-                            await context.engine.setFlag(.isTouched, on: targetItem),
-                            await context.engine.move(firstDrinkable, to: .nowhere),
-                            await context.engine.updatePronouns(to: firstDrinkable),
-                        ]
+                        await context.engine.setFlag(.isTouched, on: targetItem),
+                        await context.engine.move(firstDrinkable, to: .nowhere),
+                        await context.engine.updatePronouns(to: firstDrinkable)
                     )
                 }
             } else {
                 return ActionResult(
-                    message: context.message.nothingToDrinkIn(
+                    context.message.nothingToDrinkIn(
                         container: targetItem.withDefiniteArticle
                     ),
-                    changes: [
-                        await context.engine.setFlag(.isTouched, on: targetItem)
-                    ]
+                    await context.engine.setFlag(.isTouched, on: targetItem)
                 )
             }
         }
         // Handle direct drinkable item (either isDrinkable or isEdible for ZIL compatibility)
         else if targetItem.hasFlag(.isDrinkable) || targetItem.hasFlag(.isEdible) {
             return ActionResult(
-                message: context.message.drinkSuccess(item: targetItem.withDefiniteArticle),
-                changes: [
-                    await context.engine.setFlag(.isTouched, on: targetItem),
-                    await context.engine.move(targetItem, to: .nowhere),
-                ]
+                context.message.drinkSuccess(item: targetItem.withDefiniteArticle),
+                await context.engine.setFlag(.isTouched, on: targetItem),
+                await context.engine.move(targetItem, to: .nowhere)
             )
         } else {
             // This shouldn't happen after validation, but handle it

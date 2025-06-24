@@ -83,12 +83,10 @@ public struct BurnActionHandler: ActionHandler {
                 item: targetItem.withDefiniteArticle.capitalizedFirst
             )
             return ActionResult(
-                message: message,
-                changes: [
-                    await context.engine.setFlag(.isTouched, on: targetItem),
-                    await context.engine.updatePronouns(to: targetItem),
-                    await context.engine.move(targetItem, to: .nowhere),
-                ]
+                message,
+                await context.engine.setFlag(.isTouched, on: targetItem),
+                await context.engine.updatePronouns(to: targetItem),
+                await context.engine.move(targetItem, to: .nowhere)
             )
         } else {
             // Most items cannot be burned
