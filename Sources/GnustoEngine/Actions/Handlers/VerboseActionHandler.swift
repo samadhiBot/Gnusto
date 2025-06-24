@@ -6,7 +6,7 @@ public struct VerboseActionHandler: ActionHandler {
     // MARK: - Verb Definition Properties
 
     public let syntax: [SyntaxRule] = [
-        .match(.verb(.verbose))
+        .match(.verbose)
     ]
 
     public let requiresLight: Bool = false

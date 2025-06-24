@@ -10,10 +10,10 @@ public struct FindActionHandler: ActionHandler {
 
     public let syntax: [SyntaxRule] = [
         .match(.verb, .directObject),
-        .match(.verb(.search), .for, .directObject),
+        .match(.search, .for, .directObject),
     ]
 
-    public let synonyms: [VerbID] = [.find, .locate]
+    public let verbs: [VerbID] = [.find, .locate]
 
     public let requiresLight: Bool = true
 

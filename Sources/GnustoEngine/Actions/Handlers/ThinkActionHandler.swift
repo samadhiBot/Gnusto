@@ -6,9 +6,9 @@ public struct ThinkActionHandler: ActionHandler {
     // MARK: - Verb Definition Properties
 
     public let syntax: [SyntaxRule] = [
-        .match(.verb(.consider), .directObject),
-        .match(.verb(.ponder), .over, .directObject),
-        .match(.verb(.think), .about, .directObject),
+        .match(.consider, .directObject),
+        .match(.ponder, .over, .directObject),
+        .match(.think, .about, .directObject),
     ]
 
     public let requiresLight: Bool = false

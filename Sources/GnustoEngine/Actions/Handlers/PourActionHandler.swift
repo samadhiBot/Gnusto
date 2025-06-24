@@ -11,7 +11,7 @@ public struct PourActionHandler: ActionHandler {
         .match(.verb, .directObject, .on, .indirectObject),
     ]
 
-    public let synonyms: [VerbID] = [.pour, .spill]
+    public let verbs: [VerbID] = [.pour, .spill]
 
     public let requiresLight: Bool = true
 

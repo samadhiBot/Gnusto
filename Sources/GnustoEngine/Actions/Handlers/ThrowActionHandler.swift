@@ -11,7 +11,7 @@ public struct ThrowActionHandler: ActionHandler {
         .match(.verb, .directObject, .to, .indirectObject),
     ]
 
-    public let synonyms: [VerbID] = [.throw, .hurl, .toss, .chuck]
+    public let verbs: [VerbID] = [.throw, .hurl, .toss, .chuck]
 
     public let requiresLight: Bool = true
 

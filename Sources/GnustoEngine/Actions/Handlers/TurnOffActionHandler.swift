@@ -6,13 +6,13 @@ public struct TurnOffActionHandler: ActionHandler {
     // MARK: - Verb Definition Properties
 
     public let syntax: [SyntaxRule] = [
-        .match(.verb(.blow), .out, .directObject),
-        .match(.verb(.switch), .off, .directObject),
-        .match(.verb(.turn), .off, .directObject),
+        .match(.blow, .out, .directObject),
+        .match(.switch, .off, .directObject),
+        .match(.turn, .off, .directObject),
         .match(.verb, .directObject),
     ]
 
-    public let synonyms: [VerbID] = [.extinguish, .douse]
+    public let verbs: [VerbID] = [.extinguish, .douse]
 
     public let requiresLight: Bool = true
 

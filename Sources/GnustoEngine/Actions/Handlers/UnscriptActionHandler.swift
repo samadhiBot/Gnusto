@@ -6,7 +6,7 @@ public struct UnscriptActionHandler: ActionHandler {
     // MARK: - Verb Definition Properties
 
     public let syntax: [SyntaxRule] = [
-        .match(.verb(.unscript))
+        .match(.unscript)
     ]
 
     public let requiresLight: Bool = false

@@ -8,7 +8,7 @@ public struct ScoreActionHandler: ActionHandler {
         .match(.verb)
     ]
 
-    public let synonyms: [VerbID] = [.score]
+    public let verbs: [VerbID] = [.score]
 
     public let requiresLight: Bool = false
 

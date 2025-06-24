@@ -7,10 +7,10 @@ public struct WearActionHandler: ActionHandler {
 
     public let syntax: [SyntaxRule] = [
         .match(.verb, .directObjects),
-        .match(.verb(.put), .on, .directObjects),
+        .match(.put, .on, .directObjects),
     ]
 
-    public let synonyms: [VerbID] = [.wear, .don]
+    public let verbs: [VerbID] = [.wear, .don]
 
     public let requiresLight: Bool = true
 

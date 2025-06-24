@@ -9,7 +9,7 @@ public struct KickActionHandler: ActionHandler {
         .match(.verb, .directObject)
     ]
 
-    public let synonyms: [VerbID] = [.kick]
+    public let verbs: [VerbID] = [.kick]
 
     public let requiresLight: Bool = true
 

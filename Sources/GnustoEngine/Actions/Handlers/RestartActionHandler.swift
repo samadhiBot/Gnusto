@@ -9,7 +9,7 @@ public struct RestartActionHandler: ActionHandler {
         .match(.verb)
     ]
 
-    public let synonyms: [VerbID] = [.restart]
+    public let verbs: [VerbID] = [.restart]
 
     public let requiresLight: Bool = false
 

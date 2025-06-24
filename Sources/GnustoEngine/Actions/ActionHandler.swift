@@ -31,17 +31,16 @@ public protocol ActionHandler: Sendable {
     /// Each `SyntaxRule` defines a valid command structure for this verb, such as:
     /// - `.match(.verb)` for verbs without objects (e.g., "inventory")
     /// - `.match(.verb, .directObject)` for verbs with one object (e.g., "take sword")
-    /// - `.match(.verb, .directObject, .preposition("with"), .indirectObject)` for complex patterns
+    /// - `.match(.verb, .directObject, .with, .indirectObject)` for complex patterns
+    /// - `.match(.lift, .up, .directObject)` for specific verb matches
     ///
     /// The parser uses these rules to validate and structure player input.
     var syntax: [SyntaxRule] { get }
 
-    /// All words that can trigger this verb, with the primary verb as the first element.
+    /// All words that can match `.verb` in the syntax rules to trigger this action handler.
     ///
-    /// The first element is the primary verb identifier, and subsequent elements are alternative
-    /// words that can trigger this verb (e.g., ["examine", "x", "look at"] for the examine verb).
-    /// The parser treats all synonyms as equivalent when matching player input.
-    var synonyms: [VerbID] { get }
+    /// The parser treats all of the verb synonym as equivalent when matching player input.
+    var verbs: [VerbID] { get }
 
     /// Whether this verb requires light to execute.
     ///
@@ -135,11 +134,10 @@ extension ActionHandler {
         // Default: Do nothing
     }
 
-    /// Default implementation for `synonyms`. Returns an empty array.
+    /// Default implementation for `verbs`. Returns an empty array.
     ///
-    /// Override this property to provide the primary verb and any alternative words that can trigger this verb.
-    /// The first element should be the primary verb identifier.
-    public var synonyms: [VerbID] {
+    /// Override this property to provide the verbs that can trigger this action handler.
+    public var verbs: [VerbID] {
         []
     }
 

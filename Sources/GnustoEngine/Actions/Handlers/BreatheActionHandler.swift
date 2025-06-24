@@ -10,7 +10,7 @@ public struct BreatheActionHandler: ActionHandler {
         .match(.verb, .on, .directObject),
     ]
 
-    public let synonyms: [VerbID] = [.breathe]
+    public let verbs: [VerbID] = [.breathe]
 
     public let requiresLight: Bool = false
 

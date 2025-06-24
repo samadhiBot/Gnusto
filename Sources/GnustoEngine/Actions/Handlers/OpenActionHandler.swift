@@ -9,7 +9,7 @@ public struct OpenActionHandler: ActionHandler {
         .match(.verb, .directObject)
     ]
 
-    public let synonyms: [VerbID] = [.open]
+    public let verbs: [VerbID] = [.open]
 
     public let requiresLight: Bool = true
 

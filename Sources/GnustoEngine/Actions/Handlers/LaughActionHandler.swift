@@ -12,7 +12,7 @@ public struct LaughActionHandler: ActionHandler {
         .match(.verb, .at, .directObject),
     ]
 
-    public let synonyms: [VerbID] = [.laugh, .chuckle, .giggle, .snicker, .chortle]
+    public let verbs: [VerbID] = [.laugh, .chuckle, .giggle, .snicker, .chortle]
 
     public let requiresLight: Bool = false
 

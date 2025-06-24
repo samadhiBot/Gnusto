@@ -10,7 +10,7 @@ public struct AskActionHandler: ActionHandler {
         .match(.verb, .directObject, .about, .indirectObject),
     ]
 
-    public let synonyms: [VerbID] = [.ask, .question]
+    public let verbs: [VerbID] = [.ask, .question]
 
     public let requiresLight: Bool = true
 

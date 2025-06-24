@@ -13,7 +13,7 @@ public struct CutActionHandler: ActionHandler {
         .match(.verb, .directObject, .with, .indirectObject),
     ]
 
-    public let synonyms: [VerbID] = [.cut, .slice, .chop]
+    public let verbs: [VerbID] = [.cut, .slice, .chop]
 
     public let requiresLight: Bool = true
 

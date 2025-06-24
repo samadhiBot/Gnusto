@@ -9,7 +9,7 @@ public struct PressActionHandler: ActionHandler {
         .match(.verb, .directObject)
     ]
 
-    public let synonyms: [VerbID] = [.press, .depress, .push]
+    public let verbs: [VerbID] = [.press, .depress, .push]
 
     public let requiresLight: Bool = true
 

@@ -10,10 +10,10 @@ public struct CurseActionHandler: ActionHandler {
     public let syntax: [SyntaxRule] = [
         .match(.verb),
         .match(.verb),
-        .match(.verb(.damn), .directObject),
+        .match(.damn, .directObject),
     ]
 
-    public let synonyms: [VerbID] = [.curse, .swear]
+    public let verbs: [VerbID] = [.curse, .swear]
 
     public let requiresLight: Bool = false
 

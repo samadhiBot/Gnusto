@@ -16,7 +16,7 @@ public struct DebugActionHandler: ActionHandler {
         .match(.verb)
     ]
 
-    public let synonyms: [VerbID] = [.debug]
+    public let verbs: [VerbID] = [.debug]
 
     public let requiresLight: Bool = false
 

@@ -7,10 +7,10 @@ public struct ExamineActionHandler: ActionHandler {
 
     public let syntax: [SyntaxRule] = [
         .match(.verb, .directObjects),
-        .match(.verb(.look), .at, .directObjects),
+        .match(.look, .at, .directObjects),
     ]
 
-    public let synonyms: [VerbID] = [.examine, "x", .inspect]
+    public let verbs: [VerbID] = [.examine, "x", .inspect]
 
     public let requiresLight: Bool = true
 

@@ -9,10 +9,10 @@ public struct ChompActionHandler: ActionHandler {
 
     public let syntax: [SyntaxRule] = [
         .match(.verb, .directObject),
-        .match(.verb("chew"))
+        .match(.chew),
     ]
 
-    public let synonyms: [VerbID] = [.chomp, .bite, .chew]
+    public let verbs: [VerbID] = [.chomp, .bite, .chew]
 
     public let requiresLight: Bool = true
 

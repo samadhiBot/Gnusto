@@ -8,9 +8,9 @@ public struct ClimbOnActionHandler: ActionHandler {
     // MARK: - Verb Definition Properties
 
     public let syntax: [SyntaxRule] = [
-        .match(.verb(.climb), .on, .directObject),
-        .match(.verb(.sit), .on, .directObject),
-        .match(.verb(.mount), .directObject),
+        .match(.climb, .on, .directObject),
+        .match(.sit, .on, .directObject),
+        .match(.mount, .directObject),
     ]
 
     public let requiresLight: Bool = true

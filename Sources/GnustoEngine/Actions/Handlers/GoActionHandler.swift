@@ -9,7 +9,7 @@ public struct GoActionHandler: ActionHandler {
         .match(.verb, .direction)
     ]
 
-    public let synonyms: [VerbID] = [
+    public let verbs: [VerbID] = [
         .go, .walk, .run, .proceed, .stroll, .hike, .head, .move, .travel,
     ]
 

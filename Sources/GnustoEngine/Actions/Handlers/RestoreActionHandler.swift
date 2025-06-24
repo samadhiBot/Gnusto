@@ -9,7 +9,7 @@ public struct RestoreActionHandler: ActionHandler {
         .match(.verb)
     ]
 
-    public let synonyms: [VerbID] = [.restore, .load]
+    public let verbs: [VerbID] = [.restore, .load]
 
     public let requiresLight: Bool = false
 

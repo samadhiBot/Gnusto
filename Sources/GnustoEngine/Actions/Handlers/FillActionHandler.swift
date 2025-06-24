@@ -11,7 +11,7 @@ public struct FillActionHandler: ActionHandler {
         .match(.verb, .directObject, .from, .indirectObject),
     ]
 
-    public let synonyms: [VerbID] = [.fill]
+    public let verbs: [VerbID] = [.fill]
 
     public let requiresLight: Bool = true
 

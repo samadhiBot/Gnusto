@@ -13,7 +13,7 @@ public struct DanceActionHandler: ActionHandler {
         .match(.verb, .with, .directObject),
     ]
 
-    public let synonyms: [VerbID] = [.dance]
+    public let verbs: [VerbID] = [.dance]
 
     public let requiresLight: Bool = false
 

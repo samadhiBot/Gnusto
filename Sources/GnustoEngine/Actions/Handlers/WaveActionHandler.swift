@@ -7,12 +7,12 @@ public struct WaveActionHandler: ActionHandler {
 
     public let syntax: [SyntaxRule] = [
         .match(.verb, .directObject),
-        .match(.verb(.wave), .at, .directObject),
-        .match(.verb(.wave), .to, .directObject),
+        .match(.wave, .at, .directObject),
+        .match(.wave, .to, .directObject),
         .match(.verb, .directObject, .at, .indirectObject),
     ]
 
-    public let synonyms: [VerbID] = [.wave, .brandish]
+    public let verbs: [VerbID] = [.wave, .brandish]
 
     public let requiresLight: Bool = true
 

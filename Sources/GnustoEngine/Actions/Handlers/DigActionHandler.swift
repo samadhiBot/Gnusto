@@ -6,12 +6,12 @@ public struct DigActionHandler: ActionHandler {
     // MARK: - Verb Definition Properties
 
     public let syntax: [SyntaxRule] = [
-        .match(.verb(.dig)),
+        .match(.dig),
         .match(.verb, .directObject),
         .match(.verb, .directObject, .with, .indirectObject),
     ]
 
-    public let synonyms: [VerbID] = [.dig, .excavate]
+    public let verbs: [VerbID] = [.dig, .excavate]
 
     public let requiresLight: Bool = true
 

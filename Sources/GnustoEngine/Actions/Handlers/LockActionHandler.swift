@@ -10,7 +10,7 @@ public struct LockActionHandler: ActionHandler {
         .match(.verb, .directObject, .with, .indirectObject),
     ]
 
-    public let synonyms: [VerbID] = [.lock]
+    public let verbs: [VerbID] = [.lock]
 
     public let requiresLight: Bool = true
 

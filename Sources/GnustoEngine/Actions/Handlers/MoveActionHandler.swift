@@ -11,7 +11,7 @@ public struct MoveActionHandler: ActionHandler {
         .match(.verb, .directObject, .to, .indirectObject),
     ]
 
-    public let synonyms: [VerbID] = [.move, .shift, .slide]
+    public let verbs: [VerbID] = [.move, .shift, .slide]
 
     public let requiresLight: Bool = true
 

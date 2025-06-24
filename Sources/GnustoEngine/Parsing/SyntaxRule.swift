@@ -25,7 +25,7 @@ public struct SyntaxRule: Sendable, Equatable, Codable {
     ///
     /// - Parameters:
     ///   - pattern: An array of `SyntaxTokenType`s defining the rule's structure.
-    public init(pattern: [SyntaxTokenType]) {
+    init(pattern: [SyntaxTokenType]) {
         self.pattern = pattern
     }
 
@@ -36,6 +36,13 @@ public struct SyntaxRule: Sendable, Equatable, Codable {
     /// - Parameter pattern: A variadic list of `SyntaxTokenType`s defining the rule's structure.
     public static func match(_ pattern: SyntaxTokenType...) -> SyntaxRule {
         .init(pattern: pattern)
+    }
+
+    public static func match(
+        _ verbID: VerbID,
+        _ pattern: SyntaxTokenType...
+    ) -> SyntaxRule {
+        .init(pattern: [.specificVerb(verbID)] + pattern)
     }
 
     /// Computed property that returns the required preposition for this rule.

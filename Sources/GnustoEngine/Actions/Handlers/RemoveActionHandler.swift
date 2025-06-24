@@ -7,10 +7,10 @@ public struct RemoveActionHandler: ActionHandler {
 
     public let syntax: [SyntaxRule] = [
         .match(.verb, .directObjects),
-        .match(.verb(.take), .off, .directObject),
+        .match(.take, .off, .directObject),
     ]
 
-    public let synonyms: [VerbID] = [.remove, .doff]
+    public let verbs: [VerbID] = [.remove, .doff]
 
     public let requiresLight: Bool = false
 

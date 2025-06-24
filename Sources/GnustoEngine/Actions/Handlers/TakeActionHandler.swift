@@ -7,11 +7,11 @@ public struct TakeActionHandler: ActionHandler {
 
     public let syntax: [SyntaxRule] = [
         .match(.verb, .directObjects),
-        .match(.verb(.pick), .up, .directObjects),
+        .match(.pick, .up, .directObjects),
         .match(.verb, .directObjects, .from, .indirectObject),
     ]
 
-    public let synonyms: [VerbID] = [.take, .get, .grab, .steal]
+    public let verbs: [VerbID] = [.take, .get, .grab, .steal]
 
     public let requiresLight: Bool = true
 

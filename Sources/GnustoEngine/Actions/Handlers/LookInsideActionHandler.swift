@@ -11,7 +11,7 @@ public struct LookInsideActionHandler: ActionHandler {
         .match(.verb, .inside, .directObject),
     ]
 
-    public let synonyms: [VerbID] = [.look, .peek]
+    public let verbs: [VerbID] = [.look, .peek]
 
     public let requiresLight: Bool = true
 

@@ -9,7 +9,7 @@ public struct CloseActionHandler: ActionHandler {
         .match(.verb, .directObject)
     ]
 
-    public let synonyms: [VerbID] = [.close, .shut]
+    public let verbs: [VerbID] = [.close, .shut]
 
     public let requiresLight: Bool = true
 

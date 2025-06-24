@@ -6,12 +6,12 @@ public struct KnockActionHandler: ActionHandler {
     // MARK: - Verb Definition Properties
 
     public let syntax: [SyntaxRule] = [
-        .match(.verb(.knock)),
-        .match(.verb(.tap), .directObject),
+        .match(.knock),
+        .match(.tap, .directObject),
         .match(.verb, .on, .directObject),
     ]
 
-    public let synonyms: [VerbID] = [.knock, .rap, .tap]
+    public let verbs: [VerbID] = [.knock, .rap, .tap]
 
     public let requiresLight: Bool = true
 

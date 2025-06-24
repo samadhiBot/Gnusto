@@ -10,7 +10,7 @@ public struct AttackActionHandler: ActionHandler {
         .match(.verb, .directObject, .with, .indirectObject),
     ]
 
-    public let synonyms: [VerbID] = [.attack, .fight, .hit, .kill, .slay, .stab]
+    public let verbs: [VerbID] = [.attack, .fight, .hit, .kill, .slay, .stab]
 
     public let requiresLight: Bool = true
 

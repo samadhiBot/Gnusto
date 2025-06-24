@@ -11,7 +11,7 @@ public struct CryActionHandler: ActionHandler {
         .match(.verb)
     ]
 
-    public let synonyms: [VerbID] = [.cry, .weep, .sob]
+    public let verbs: [VerbID] = [.cry, .weep, .sob]
 
     public let requiresLight: Bool = false
 

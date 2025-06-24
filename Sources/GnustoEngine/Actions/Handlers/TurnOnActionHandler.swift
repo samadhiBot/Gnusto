@@ -6,9 +6,9 @@ public struct TurnOnActionHandler: ActionHandler {
     // MARK: - Verb Definition Properties
 
     public let syntax: [SyntaxRule] = [
-        .match(.verb(.light), .directObject),
-        .match(.verb(.switch), .on, .directObject),
-        .match(.verb(.turn), .on, .directObject),
+        .match(.light, .directObject),
+        .match(.switch, .on, .directObject),
+        .match(.turn, .on, .directObject),
     ]
 
     public let requiresLight: Bool = true

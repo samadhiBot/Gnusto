@@ -8,11 +8,11 @@ public struct InflateActionHandler: ActionHandler {
     public let syntax: [SyntaxRule] = [
         .match(.verb, .directObject),
         .match(.verb, .directObject, .with, .indirectObject),
-        .match(.verb(.blow), .up, .directObject),
-        .match(.verb(.blow), .up, .directObject, .with, .indirectObject),
+        .match(.blow, .up, .directObject),
+        .match(.blow, .up, .directObject, .with, .indirectObject),
     ]
 
-    public let synonyms: [VerbID] = [.inflate]
+    public let verbs: [VerbID] = [.inflate]
 
     public let requiresLight: Bool = true
 
