@@ -3,7 +3,7 @@ import Testing
 
 @testable import GnustoEngine
 
-@Suite("PourOnActionHandler Tests")
+@Suite("PourActionHandler Tests")
 struct PourOnActionHandlerTests {
 
     @Test("Pour validates missing direct object")

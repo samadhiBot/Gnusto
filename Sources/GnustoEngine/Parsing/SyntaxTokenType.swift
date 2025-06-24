@@ -60,6 +60,9 @@ extension SyntaxTokenType {
     /// Expects the particle "behind" (e.g., "LOOK BEHIND DOOR").
     static let behind: SyntaxTokenType = .particle("behind")
 
+    /// Expects the particle "below" (e.g., "LOOK BELOW STAIRS").
+    static let below: SyntaxTokenType = .particle("below")
+
     /// Expects the particle "beneath" (e.g., "LOOK BENEATH THE DOORMAT").
     static let beneath: SyntaxTokenType = .particle("beneath")
 
@@ -89,6 +92,9 @@ extension SyntaxTokenType {
 
     /// Expects the particle "onto" (e.g., "CLIMB ONTO CHAIR").
     static let onto: SyntaxTokenType = .particle("onto")
+
+    /// Expects the particle "out" (e.g., "POUR OUT WATER").
+    static let out: SyntaxTokenType = .particle("out")
 
     /// Expects the particle "over" (e.g., "JUMP OVER FENCE").
     static let over: SyntaxTokenType = .particle("over")
