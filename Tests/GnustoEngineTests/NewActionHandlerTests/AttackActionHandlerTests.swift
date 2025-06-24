@@ -40,7 +40,8 @@ struct AttackActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > attack troll
-            Trying to attack a fierce troll with your bare hands is suicidal.
+            Trying to attack a fierce troll with your bare hands
+            is suicidal.
             """)
 
         let finalState = try await engine.item("troll")
@@ -88,7 +89,7 @@ struct AttackActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > attack dragon with sword
-            You can't.
+            Let’s hope it doesn’t come to that.
             """)
     }
 
@@ -160,7 +161,8 @@ struct AttackActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > hit goblin
-            Trying to attack a sneaky goblin with your bare hands is suicidal.
+            Trying to attack a sneaky goblin with your bare hands
+            is suicidal.
             """)
     }
 
@@ -196,7 +198,8 @@ struct AttackActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > kill spider
-            Trying to attack a giant spider with your bare hands is suicidal.
+            Trying to attack a giant spider with your bare hands
+            is suicidal.
             """)
     }
 
@@ -225,7 +228,7 @@ struct AttackActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > attack
-            What do you want to attack?
+            Attack what?
             """)
     }
 
@@ -267,7 +270,7 @@ struct AttackActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > attack troll
-            You can't see any such thing.
+            You can’t see any such thing.
             """)
     }
 
@@ -312,7 +315,7 @@ struct AttackActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > attack troll with sword
-            You aren't holding the steel sword.
+            You aren’t holding the steel sword.
             """)
     }
 
@@ -349,7 +352,7 @@ struct AttackActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > attack troll
-            It is pitch black. You can't see a thing.
+            It is pitch black. You can’t see a thing.
             """)
     }
 
@@ -386,7 +389,7 @@ struct AttackActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > attack rock
-            I've known strange people, but fighting a large rock?
+            I’ve known strange people, but fighting a large rock?
             """)
 
         let finalState = try await engine.item("rock")
@@ -425,7 +428,8 @@ struct AttackActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > attack warrior
-            Trying to attack a skilled warrior with your bare hands is suicidal.
+            Trying to attack a skilled warrior with your bare hands
+            is suicidal.
             """)
 
         let finalState = try await engine.item("warrior")
@@ -472,7 +476,8 @@ struct AttackActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > attack bandit with stick
-            Trying to attack the dangerous bandit with a wooden stick is suicidal.
+            Trying to attack the dangerous bandit with a wooden stick
+            is suicidal.
             """)
     }
 
@@ -517,7 +522,7 @@ struct AttackActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > attack monster with dagger
-            You can't.
+            Let’s hope it doesn’t come to that.
             """)
 
         let finalState = try await engine.item("monster")
