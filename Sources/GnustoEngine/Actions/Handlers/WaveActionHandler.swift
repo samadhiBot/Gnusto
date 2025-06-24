@@ -65,24 +65,21 @@ public struct WaveActionHandler: ActionHandler {
         let targetItem = try await context.engine.item(targetItemID)
 
         // Determine appropriate response based on object type and properties
-        let message =
-            if !targetItem.hasFlag(.isTakable) {
-                // Fixed objects can't be waved
-                context.message.waveFixedObject(item: targetItem.withDefiniteArticle)
-            } else if targetItem.hasFlag(.isWeapon) {
-                // Weapons are brandished
-                context.message.waveWeapon(item: targetItem.withDefiniteArticle)
-            } else {
-                // Generic waving response for other takable objects
-                context.message.waveObject(item: targetItem.withDefiniteArticle)
-            }
+        let message = if !targetItem.hasFlag(.isTakable) {
+            // Fixed objects can't be waved
+            context.message.waveFixedObject(item: targetItem.withDefiniteArticle)
+        } else if targetItem.hasFlag(.isWeapon) {
+            // Weapons are brandished
+            context.message.waveWeapon(item: targetItem.withDefiniteArticle)
+        } else {
+            // Generic waving response for other takable objects
+            context.message.waveObject(item: targetItem.withDefiniteArticle)
+        }
 
         return ActionResult(
-            message: message,
-            changes: [
-                await context.engine.setFlag(.isTouched, on: targetItem),
-                await context.engine.updatePronouns(to: targetItem),
-            ]
+            message,
+            await context.engine.setFlag(.isTouched, on: targetItem),
+            await context.engine.updatePronouns(to: targetItem)
         )
     }
 }

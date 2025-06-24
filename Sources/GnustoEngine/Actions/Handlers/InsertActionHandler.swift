@@ -321,10 +321,11 @@ public struct InsertActionHandler: ActionHandler {
         // Generate appropriate message
         let message =
             if insertedItems.isEmpty {
-                context.command.isAllCommand
-                    ? context.message.youHaveNothingToPutIn(
-                        container: container.withDefiniteArticle)
-                    : context.message.doWhat(verb: context.command.verb)
+                context.command.isAllCommand ?
+                    context.message.youHaveNothingToPutIn(
+                        container: container.withDefiniteArticle
+                    ) :
+                    context.message.doWhat(verb: context.command.verb)
             } else {
                 context.message.youPutItemInContainer(
                     item: insertedItems.listWithDefiniteArticles,

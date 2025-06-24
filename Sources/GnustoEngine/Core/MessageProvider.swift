@@ -917,6 +917,13 @@ open class MessageProvider: @unchecked Sendable {
         )
     }
 
+    open func itemIsNowUnlocked(item: String) -> String {
+        output(
+            "itemIsNowUnlocked(item: '\(item)')",
+            "\(item.capitalizedFirst) is now unlocked."
+        )
+    }
+
     open func itemIsUnlocked(item: String) -> String {
         output(
             "itemIsUnlocked(item: '\(item)')",
@@ -1557,6 +1564,30 @@ open class MessageProvider: @unchecked Sendable {
         output(
             "putWhatOn(item: '\(item)')",
             "Put what on \(item)?"
+        )
+    }
+
+    open func quitCancelled() -> String {
+        output(
+            "quitCancelled()",
+            "OK, continuing the game."
+        )
+    }
+
+    open func quitConfirmationHelp() -> String {
+        output(
+            "quitConfirmationHelp()",
+            "Please answer yes or no."
+        )
+    }
+
+    open func quitScoreAndPrompt(score: Int, maxScore: Int, moves: Int) -> String {
+        output(
+            "quitScoreAndPrompt(score: \(score), maxScore: \(maxScore), moves: \(moves))",
+            """
+            Your score is \(score) (total of \(maxScore) points), in \(moves) moves.
+            Do you wish to leave the game? (Y is affirmative):
+            """
         )
     }
 
@@ -2207,6 +2238,13 @@ open class MessageProvider: @unchecked Sendable {
         )
     }
 
+    open func youHaveNothingToGive() -> String {
+        output(
+            "youHaveNothingToGive()",
+            "You have nothing to give."
+        )
+    }
+
     open func youHaveNothingToPutIn(container: String) -> String {
         output(
             "youHaveNothingToPutIn(container: \(container))",
@@ -2263,27 +2301,10 @@ open class MessageProvider: @unchecked Sendable {
         )
     }
 
-    open func quitScoreAndPrompt(score: Int, maxScore: Int, moves: Int) -> String {
+    open func xyzzyResponse() -> String {
         output(
-            "quitScoreAndPrompt(score: \(score), maxScore: \(maxScore), moves: \(moves))",
-            """
-            Your score is \(score) (total of \(maxScore) points), in \(moves) moves.
-            Do you wish to leave the game? (Y is affirmative):
-            """
-        )
-    }
-
-    open func quitConfirmationHelp() -> String {
-        output(
-            "quitConfirmationHelp()",
-            "Please answer yes or no."
-        )
-    }
-
-    open func quitCancelled() -> String {
-        output(
-            "quitCancelled()",
-            "OK, continuing the game."
+            "xyzzyResponse()",
+            #"A hollow voice says "Fool.""#
         )
     }
 }

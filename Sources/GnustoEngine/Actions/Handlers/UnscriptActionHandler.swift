@@ -42,19 +42,8 @@ public struct UnscriptActionHandler: ActionHandler {
         // For now, we just clear the flag and provide feedback
 
         return ActionResult(
-            message: "🤡 [Transcript recording ended]",
-            changes: [
-                await context.engine.clearGlobal(.isScripting)
-            ]
+            "🤡 [Transcript recording ended]",
+            await context.engine.clearGlobal(.isScripting)
         )
-    }
-
-    /// Performs any post-processing after the unscript command.
-    ///
-    /// Currently no post-processing is needed for unscript.
-    ///
-    /// - Parameter context: The action context for the current action.
-    public func postProcess(context: ActionContext, result: ActionResult) async throws {
-        // No post-processing needed for unscript
     }
 }

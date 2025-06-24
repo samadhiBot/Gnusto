@@ -206,19 +206,18 @@ public struct GiveActionHandler: ActionHandler {
         }
 
         // Generate appropriate message
-        let message =
-            if givenItems.isEmpty {
-                if context.command.isAllCommand {
-                    "You have nothing to give."
-                } else {
-                    context.message.youDontHaveThat()
-                }
+        let message = if givenItems.isEmpty {
+            if context.command.isAllCommand {
+                context.message.youHaveNothingToGive()
             } else {
-                context.message.itemGivenTo(
-                    item: givenItems.listWithDefiniteArticles,
-                    recipient: recipient.withDefiniteArticle
-                )
+                context.message.youDontHaveThat()
             }
+        } else {
+            context.message.itemGivenTo(
+                item: givenItems.listWithDefiniteArticles,
+                recipient: recipient.withDefiniteArticle
+            )
+        }
 
         return ActionResult(
             message: message,

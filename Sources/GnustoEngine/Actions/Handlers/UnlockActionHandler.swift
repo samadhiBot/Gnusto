@@ -114,7 +114,8 @@ public struct UnlockActionHandler: ActionHandler {
             case .item(let keyItemID) = indirectObjectRef
         else {
             throw ActionResponse.internalEngineError(
-                "Unlock: Indirect object not an item in process.")
+                "Unlock: Indirect object not an item in process."
+            )
         }
 
         // Get snapshots (existence guaranteed by validate)
@@ -124,13 +125,11 @@ public struct UnlockActionHandler: ActionHandler {
         // Validation ensures the item was locked, so no need to check again here.
 
         return ActionResult(
-            message: "🤡 The \(targetItem.name) is now unlocked.",
-            changes: [
-                await context.engine.clearFlag(.isLocked, on: targetItem),
-                await context.engine.setFlag(.isTouched, on: targetItem),
-                await context.engine.setFlag(.isTouched, on: keyItem),
-                await context.engine.updatePronouns(to: targetItem, keyItem),
-            ]
+            context.message.itemIsNowUnlocked(item: targetItem.withDefiniteArticle),
+            await context.engine.clearFlag(.isLocked, on: targetItem),
+            await context.engine.setFlag(.isTouched, on: targetItem),
+            await context.engine.setFlag(.isTouched, on: keyItem),
+            await context.engine.updatePronouns(to: targetItem, keyItem)
         )
     }
 
