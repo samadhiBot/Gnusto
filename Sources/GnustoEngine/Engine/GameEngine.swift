@@ -98,7 +98,7 @@ public actor GameEngine: Sendable {
     /// Registered `ActionHandler`s for specific verb commands (e.g., `.take`, `.look`).
     /// These are a combination of default engine handlers and custom handlers provided
     /// by the `GameBlueprint`, with custom handlers taking precedence.
-    private var actionHandlers = [VerbID: ActionHandler]()
+    private var actionHandlers: [ActionHandler]
 
     /// Custom event handlers for specific items, triggered by events like `beforeTurn`
     /// or `afterTurn`. These are provided by the `GameBlueprint` and are processed by the
@@ -155,19 +155,19 @@ public actor GameEngine: Sendable {
         self.storyTitle = blueprint.storyTitle
 
         // Build action handlers and vocabulary from blueprint
-        let allActionHandlers: [VerbID: ActionHandler]
+        let allActionHandlers: [ActionHandler]
         let gameVocabulary: Vocabulary
 
         if let providedVocabulary = vocabulary {
             // If vocabulary is provided, use it and build handlers separately
             gameVocabulary = providedVocabulary
-            allActionHandlers = Self.buildActionHandlers(from: blueprint.customActionHandlers)
+            allActionHandlers = blueprint.customActionHandlers
         } else {
             // Extract both verb definitions and handlers from ActionHandler instances
-            let customHandlers = Self.buildActionHandlers(from: blueprint.customActionHandlers)
+            let customHandlers = blueprint.customActionHandlers
 
             // Combine custom and default action handlers to extract all verb definitions
-            let allHandlers = blueprint.customActionHandlers + Array(Self.defaultActionHandlers.values)
+            let allHandlers = blueprint.customActionHandlers + Self.defaultActionHandlers
             let allVerbs = Self.extractVerbDefinitions(from: allHandlers)
 
             allActionHandlers = customHandlers
@@ -207,24 +207,18 @@ public actor GameEngine: Sendable {
 
     // MARK: - Action Handler Processing
 
-    /// Builds a dictionary of action handlers from an array of handlers, using their verbIDs as keys.
-    private static func buildActionHandlers(from handlers: [ActionHandler]) -> [VerbID: ActionHandler] {
-        var result: [VerbID: ActionHandler] = [:]
-        for handler in handlers {
-            result[handler.verbID] = handler
-        }
-        return result
-    }
-
     /// Extracts verb definitions from action handlers to build vocabulary.
     static func extractVerbDefinitions(from handlers: [ActionHandler]) -> [Verb] {
-        return handlers.map { handler in
+        return handlers.compactMap { handler in
+            guard let primaryVerb = handler.synonyms.first else { return nil }
+
             var verb = Verb(
-                id: handler.verbID,
+                id: primaryVerb,
                 syntax: handler.syntax,
                 requiresLight: handler.requiresLight
             )
-            verb.synonyms = Set(handler.synonyms)
+            // Skip the first element (primary verb) and use the rest as synonyms
+            verb.synonyms = Set(handler.synonyms.dropFirst().map(\.rawValue))
             return verb
         }
     }
@@ -1177,95 +1171,94 @@ extension GameEngine {
 extension GameEngine {
     /// **Default Handlers**: The engine provides standard handlers for common verbs like
     /// `take`, `drop`, `look`, etc. Games can override these via custom handlers in the `GameBlueprint`.
-    static var defaultActionHandlers: [VerbID: ActionHandler] {
-        var handlers: [VerbID: ActionHandler] = [
-            .ask: AskActionHandler(),
-            .attack: AttackActionHandler(),
-            .blow: BlowActionHandler(),
-            .breathe: BreatheActionHandler(),
-            .brief: BriefActionHandler(),
-            .burn: BurnActionHandler(),
-            .chomp: ChompActionHandler(),
-            .climb: ClimbActionHandler(),
-            .climbOn: ClimbOnActionHandler(),
-            .close: CloseActionHandler(),
-            .cry: CryActionHandler(),
-            .curse: CurseActionHandler(),
-            .cut: CutActionHandler(),
-            .dance: DanceActionHandler(),
-            .debug: DebugActionHandler(),
-            .deflate: DeflateActionHandler(),
-            .dig: DigActionHandler(),
-            .drink: DrinkActionHandler(),
-            .drop: DropActionHandler(),
-            .eat: EatActionHandler(),
-            .empty: EmptyActionHandler(),
-            .enter: EnterActionHandler(),
-            .examine: ExamineActionHandler(),
-            .fill: FillActionHandler(),
-            .find: FindActionHandler(),
-            .giggle: GiggleActionHandler(),
-            .give: GiveActionHandler(),
-            .go: GoActionHandler(),
-            .help: HelpActionHandler(),
-            .inflate: InflateActionHandler(),
-            .insert: InsertActionHandler(),
-            .inventory: InventoryActionHandler(),
-            .jump: JumpActionHandler(),
-            .kick: KickActionHandler(),
-            .kiss: KissActionHandler(),
-            .knock: KnockActionHandler(),
-            .laugh: LaughActionHandler(),
-            .listen: ListenActionHandler(),
-            .lock: LockActionHandler(),
-            .look: LookActionHandler(),
-            .lookInside: LookInsideActionHandler(),
-            .lookUnder: LookUnderActionHandler(),
-            .move: MoveActionHandler(),
-            .open: OpenActionHandler(),
-            .pourOn: PourOnActionHandler(),
-            .press: PressActionHandler(),
-            .pull: PullActionHandler(),
-            .push: PushActionHandler(),
-            .putOn: PutOnActionHandler(),
-            .quit: QuitActionHandler(),
-            .raise: RaiseActionHandler(),
-            .read: ReadActionHandler(),
-            .remove: RemoveActionHandler(),
-            .restart: RestartActionHandler(),
-            .restore: RestoreActionHandler(),
-            .rub: RubActionHandler(),
-            .save: SaveActionHandler(),
-            .score: ScoreActionHandler(),
-            .script: ScriptActionHandler(),
-            .shake: ShakeActionHandler(),
-            .sing: SingActionHandler(),
-            .smell: SmellActionHandler(),
-            .squeeze: SqueezeActionHandler(),
-            .take: TakeActionHandler(),
-            .taste: TasteActionHandler(),
-            .tell: TellActionHandler(),
-            .thinkAbout: ThinkAboutActionHandler(),
-            .throwItem: ThrowActionHandler(),
-            .tie: TieActionHandler(),
-            .touch: TouchActionHandler(),
-            .turn: TurnActionHandler(),
-            .turnOff: TurnOffActionHandler(),
-            .turnOn: TurnOnActionHandler(),
-            .unlock: UnlockActionHandler(),
-            .unscript: UnscriptActionHandler(),
-            .verbose: VerboseActionHandler(),
-            .wait: WaitActionHandler(),
-            .wave: WaveActionHandler(),
-            .wear: WearActionHandler(),
-            .xyzzy: XyzzyActionHandler(),
-            .yell: YellActionHandler(),
+    static var defaultActionHandlers: [ActionHandler] {
+        let handlers: [ActionHandler] = [
+            AskActionHandler(),
+            AttackActionHandler(),
+            BlowActionHandler(),
+            BreatheActionHandler(),
+            BriefActionHandler(),
+            BurnActionHandler(),
+            ChompActionHandler(),
+            ClimbActionHandler(),
+            ClimbOnActionHandler(),
+            CloseActionHandler(),
+            CryActionHandler(),
+            CurseActionHandler(),
+            CutActionHandler(),
+            DanceActionHandler(),
+            DeflateActionHandler(),
+            DigActionHandler(),
+            DrinkActionHandler(),
+            DropActionHandler(),
+            EatActionHandler(),
+            EmptyActionHandler(),
+            EnterActionHandler(),
+            ExamineActionHandler(),
+            FillActionHandler(),
+            FindActionHandler(),
+            GiveActionHandler(),
+            GoActionHandler(),
+            HelpActionHandler(),
+            InflateActionHandler(),
+            InsertActionHandler(),
+            InventoryActionHandler(),
+            JumpActionHandler(),
+            KickActionHandler(),
+            KissActionHandler(),
+            KnockActionHandler(),
+            LaughActionHandler(),
+            ListenActionHandler(),
+            LockActionHandler(),
+            LookActionHandler(),
+            LookInsideActionHandler(),
+            LookUnderActionHandler(),
+            MoveActionHandler(),
+            OpenActionHandler(),
+            PourActionHandler(),
+            PressActionHandler(),
+            PullActionHandler(),
+            PushActionHandler(),
+            PutOnActionHandler(),
+            QuitActionHandler(),
+            RaiseActionHandler(),
+            ReadActionHandler(),
+            RemoveActionHandler(),
+            RestartActionHandler(),
+            RestoreActionHandler(),
+            RubActionHandler(),
+            SaveActionHandler(),
+            ScoreActionHandler(),
+            ScriptActionHandler(),
+            ShakeActionHandler(),
+            SingActionHandler(),
+            SmellActionHandler(),
+            SqueezeActionHandler(),
+            TakeActionHandler(),
+            TasteActionHandler(),
+            TellActionHandler(),
+            ThinkActionHandler(),
+            ThrowActionHandler(),
+            TieActionHandler(),
+            TouchActionHandler(),
+            TurnActionHandler(),
+            TurnOffActionHandler(),
+            TurnOnActionHandler(),
+            UnlockActionHandler(),
+            UnscriptActionHandler(),
+            VerboseActionHandler(),
+            WaitActionHandler(),
+            WaveActionHandler(),
+            WearActionHandler(),
+            XyzzyActionHandler(),
+            YellActionHandler(),
         ]
 
         #if DEBUG
-            handlers[.debug] = DebugActionHandler()
-        #endif
+        return handlers + [DebugActionHandler()]
+        #else
         return handlers
+        #endif
     }
 }
 
