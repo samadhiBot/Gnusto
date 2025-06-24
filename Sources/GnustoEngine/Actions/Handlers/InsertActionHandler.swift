@@ -13,7 +13,7 @@ public struct InsertActionHandler: ActionHandler {
         .match(.verb, .directObjects, .into, .indirectObject),
     ]
 
-    public let synonyms: [String] = ["put", "place"]
+    public let synonyms: [VerbID] = [.put, .place]
 
     public let requiresLight: Bool = true
 

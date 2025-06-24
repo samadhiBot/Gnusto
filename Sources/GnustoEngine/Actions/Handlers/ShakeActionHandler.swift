@@ -11,7 +11,7 @@ public struct ShakeActionHandler: ActionHandler {
         .match(.verb, .directObject)
     ]
 
-    public let synonyms: [String] = ["rattle"]
+    public let synonyms: [VerbID] = [.rattle]
 
     public let requiresLight: Bool = true
 

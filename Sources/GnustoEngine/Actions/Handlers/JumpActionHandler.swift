@@ -12,7 +12,7 @@ public struct JumpActionHandler: ActionHandler {
         .match(.verb, .directObject),
     ]
 
-    public let synonyms: [String] = ["leap", "hop"]
+    public let synonyms: [VerbID] = [.leap, .hop]
 
     public let requiresLight: Bool = false
 

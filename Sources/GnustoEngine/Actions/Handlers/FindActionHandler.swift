@@ -14,7 +14,7 @@ public struct FindActionHandler: ActionHandler {
         .match(.verb, .directObject)
     ]
 
-    public let synonyms: [String] = ["locate", "search for"]
+    public let synonyms: [VerbID] = [.locate, .search for]
 
     public let requiresLight: Bool = true
 

@@ -12,7 +12,7 @@ public struct TellActionHandler: ActionHandler {
         .match(.verb, .directObject, .about, .indirectObject),
     ]
 
-    public let synonyms: [String] = ["inform"]
+    public let synonyms: [VerbID] = [.inform]
 
     public let requiresLight: Bool = true
 

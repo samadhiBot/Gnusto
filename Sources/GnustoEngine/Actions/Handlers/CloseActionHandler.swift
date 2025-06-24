@@ -11,7 +11,7 @@ public struct CloseActionHandler: ActionHandler {
         .match(.verb, .directObject)
     ]
 
-    public let synonyms: [String] = ["shut"]
+    public let synonyms: [VerbID] = [.shut]
 
     public let requiresLight: Bool = true
 

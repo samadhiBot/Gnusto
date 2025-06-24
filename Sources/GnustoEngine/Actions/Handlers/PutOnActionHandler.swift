@@ -11,7 +11,7 @@ public struct PutOnActionHandler: ActionHandler {
         .match(.verb, .directObject, .on, .indirectObject),
     ]
 
-    public let synonyms: [String] = ["put", "place", "set", "balance"]
+    public let synonyms: [VerbID] = [.put, .place, .set, .balance]
 
     public let requiresLight: Bool = true
 

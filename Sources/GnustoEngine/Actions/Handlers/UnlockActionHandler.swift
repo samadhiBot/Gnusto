@@ -12,7 +12,7 @@ public struct UnlockActionHandler: ActionHandler {
         .match(.verb, .directObject, .with, .indirectObject),
     ]
 
-    public let synonyms: [String] = []
+    public let synonyms: [VerbID] = []
 
     public let requiresLight: Bool = true
 

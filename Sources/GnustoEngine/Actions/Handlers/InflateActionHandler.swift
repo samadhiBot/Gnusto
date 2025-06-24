@@ -12,7 +12,7 @@ public struct InflateActionHandler: ActionHandler {
         .match(.verb, .directObject, .with, .indirectObject),
     ]
 
-    public let synonyms: [String] = ["blow up"]
+    public let synonyms: [VerbID] = [.blow up]
 
     public let requiresLight: Bool = true
 

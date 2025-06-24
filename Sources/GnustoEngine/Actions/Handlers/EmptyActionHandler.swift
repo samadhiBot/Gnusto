@@ -12,7 +12,7 @@ public struct EmptyActionHandler: ActionHandler {
         .match(.verb, .directObject, .into, .indirectObject),
     ]
 
-    public let synonyms: [String] = ["dump", "pour out"]
+    public let synonyms: [VerbID] = [.dump, .pour out]
 
     public let requiresLight: Bool = true
 

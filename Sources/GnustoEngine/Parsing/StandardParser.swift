@@ -173,7 +173,11 @@ public struct StandardParser: Parser {
         // ***** REVISED: Fetch rules for ALL matched VerbIDs *****
         var allPotentialRules: [(verb: VerbID, rule: SyntaxRule)] = []
         var verbsWithRules: Set<VerbID> = [] // Track which verbs actually have rules
-        for verb in matchedVerbIDs {
+
+        // Sort matched verbs for deterministic behavior when there are ties
+        let sortedMatchedVerbIDs = matchedVerbIDs.sorted { $0.rawValue < $1.rawValue }
+
+        for verb in sortedMatchedVerbIDs {
             if let verbDef = vocabulary.verbDefinitions[verb] {
                 if !verbDef.syntax.isEmpty {
                     verbsWithRules.insert(verb)
@@ -186,8 +190,8 @@ public struct StandardParser: Parser {
 
         // Handle cases where verb(s) were matched but NONE have rules, and there are extra tokens
         if allPotentialRules.isEmpty && filteredTokens.count > verbTokenCount {
-            // Provide a generic error based on the *first* matched verb ID (arbitrary choice in ambiguity)
-            let firstMatchedID = matchedVerbIDs.first!
+            // Provide a generic error based on the *first* matched verb ID (deterministic choice)
+            let firstMatchedID = sortedMatchedVerbIDs.first!
             return .failure(
                 .badGrammar(
                     "I understand the verb '\(firstMatchedID.rawValue)', but not the rest of that sentence."
@@ -283,16 +287,36 @@ public struct StandardParser: Parser {
             // Handle simple verb-only commands or internal error
              if allPotentialRules.isEmpty && filteredTokens.count == verbTokenCount {
                  // Input was just a verb phrase matching one or more verbs, none of which had rules.
-                 // Pick the first matched verb ID as the canonical one (arbitrary choice).
-                 let firstMatchedID = matchedVerbIDs.first!
+
+                 // Check for perfect tie: multiple verbs matched but none have syntax rules
+                 if sortedMatchedVerbIDs.count > 1 {
+                     let verbList = sortedMatchedVerbIDs.map { $0.rawValue }.joined(separator: ", ")
+                     return .failure(
+                        .badGrammar(
+                            "The word '\(filteredTokens.joined(separator: " "))' could refer to multiple commands (\(verbList)), but none can handle this syntax. Please be more specific."
+                        )
+                     )
+                 }
+
+                 // Single verb with no syntax rules - allow it
+                 let firstMatchedID = sortedMatchedVerbIDs.first!
                  let command = Command(verb: firstMatchedID, rawInput: input)
                  return .success(command)
              } else {
-                 // If we get here, rules existed, but none resulted in success or a recorded error.
-                 // This likely means structural matches occurred, but preposition checks failed,
-                 // or no structural matches occurred at all. bestError should ideally have been set.
-                 // Provide a generic grammar error based on the *first* matched verb ID (arbitrary choice).
-                 let firstMatchedID = matchedVerbIDs.first!
+                 // Rules existed but all failed
+
+                 // Check for perfect tie: multiple verbs tried but all failed validation
+                 if sortedMatchedVerbIDs.count > 1 {
+                     let verbList = sortedMatchedVerbIDs.map { $0.rawValue }.joined(separator: ", ")
+                     return .failure(
+                        .badGrammar(
+                            "The word '\(filteredTokens.first ?? "")' could refer to multiple commands (\(verbList)), but none can handle this syntax. Please be more specific."
+                        )
+                     )
+                 }
+
+                 // Single verb failed - provide the standard error
+                 let firstMatchedID = sortedMatchedVerbIDs.first!
                  return .failure(
                     .badGrammar(
                         "I understood '\(firstMatchedID.rawValue)' but couldn't parse the rest of the sentence with its known grammar rules."
@@ -444,12 +468,23 @@ public struct StandardParser: Parser {
                 case .verb:
                     // This shouldn't happen since verb is at index 0
                     continue
+                case .specificVerb:
+                    // This shouldn't happen since verb is at index 0
+                    continue
                 }
                 break
             }
 
             switch tokenType {
-            case .verb: continue
+            case .verb:
+                continue
+
+            case .specificVerb(let requiredVerbID):
+                // Verify that the command uses the specific verb required by this rule
+                guard verb == requiredVerbID else {
+                    return .failure(.badGrammar("This syntax requires the specific verb '\(requiredVerbID.rawValue)'."))
+                }
+                continue
 
             case .directObject, .directObjects:
                 let phraseEndIndex = findEndOfNounPhrase(
@@ -1284,6 +1319,12 @@ public struct StandardParser: Parser {
                     }
                 case .verb:
                     if vocabulary.verbSynonyms.keys.contains(currentToken) {
+                        isBoundaryToken = true
+                    }
+                case .specificVerb(let requiredVerbID):
+                    // Check if current token matches the required verb
+                    if let verbIDs = vocabulary.verbSynonyms[currentToken],
+                       verbIDs.contains(requiredVerbID) {
                         isBoundaryToken = true
                     }
                 case .particle(let expectedParticle):

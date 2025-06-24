@@ -11,7 +11,7 @@ public struct PressActionHandler: ActionHandler {
         .match(.verb, .directObject)
     ]
 
-    public let synonyms: [String] = ["push", "depress"]
+    public let synonyms: [VerbID] = [.push, .depress]
 
     public let requiresLight: Bool = true
 

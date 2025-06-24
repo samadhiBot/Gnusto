@@ -10,7 +10,7 @@ public struct QuitActionHandler: ActionHandler {
         .match(.verb)
     ]
 
-    public let synonyms: [String] = ["q"]
+    public let synonyms: [VerbID] = [.q]
 
     public let requiresLight: Bool = false
 

@@ -12,7 +12,7 @@ public struct TakeActionHandler: ActionHandler {
         .match(.verb, .directObjects, .from, .indirectObject),
     ]
 
-    public let synonyms: [String] = ["get", "grab", "pick"]
+    public let synonyms: [VerbID] = [.get, .grab, .pick]
 
     public let requiresLight: Bool = true
 

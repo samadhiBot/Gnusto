@@ -13,7 +13,7 @@ public struct RaiseActionHandler: ActionHandler {
         .match(.verb, .directObject)
     ]
 
-    public let synonyms: [String] = ["lift", "hoist"]
+    public let synonyms: [VerbID] = [.lift, .hoist]
 
     public let requiresLight: Bool = true
 

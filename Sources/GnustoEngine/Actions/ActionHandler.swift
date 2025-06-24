@@ -46,7 +46,7 @@ public protocol ActionHandler: Sendable {
     ///
     /// These provide convenient shortcuts for players (e.g., "x" for "examine", "i" for "inventory").
     /// The parser treats synonyms as equivalent to the primary `verbID`.
-    var synonyms: [String] { get }
+    var synonyms: [VerbID] { get }
 
     /// Whether this verb requires light to execute.
     ///

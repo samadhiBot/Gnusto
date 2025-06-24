@@ -12,7 +12,7 @@ public struct ThinkAboutActionHandler: ActionHandler {
         .match(.verb, .about, .directObject),
     ]
 
-    public let synonyms: [String] = ["ponder", "consider"]
+    public let synonyms: [VerbID] = [.ponder, .consider]
 
     public let requiresLight: Bool = false
 

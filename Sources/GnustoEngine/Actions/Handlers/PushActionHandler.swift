@@ -11,7 +11,7 @@ public struct PushActionHandler: ActionHandler {
         .match(.verb, .directObjects)
     ]
 
-    public let synonyms: [String] = ["shove"]
+    public let synonyms: [VerbID] = [.shove]
 
     public let requiresLight: Bool = true
 

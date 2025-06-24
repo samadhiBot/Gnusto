@@ -11,7 +11,7 @@ public struct RestoreActionHandler: ActionHandler {
         .match(.verb)
     ]
 
-    public let synonyms: [String] = ["load"]
+    public let synonyms: [VerbID] = [.load]
 
     public let requiresLight: Bool = false
 

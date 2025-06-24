@@ -14,7 +14,7 @@ public struct LaughActionHandler: ActionHandler {
         .match(.verb, .at, .directObject),
     ]
 
-    public let synonyms: [String] = []
+    public let synonyms: [VerbID] = []
 
     public let requiresLight: Bool = false
 

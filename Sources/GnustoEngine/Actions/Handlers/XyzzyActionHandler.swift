@@ -10,7 +10,7 @@ public struct XyzzyActionHandler: ActionHandler {
         .match(.verb)
     ]
 
-    public let synonyms: [String] = []
+    public let synonyms: [VerbID] = []
 
     public let requiresLight: Bool = false
 

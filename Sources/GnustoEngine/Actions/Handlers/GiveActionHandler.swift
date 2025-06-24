@@ -12,7 +12,7 @@ public struct GiveActionHandler: ActionHandler {
         .match(.verb, .indirectObject, .directObject),
     ]
 
-    public let synonyms: [String] = ["offer", "donate"]
+    public let synonyms: [VerbID] = [.offer, .donate]
 
     public let requiresLight: Bool = true
 

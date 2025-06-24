@@ -8,10 +8,11 @@ public struct RemoveActionHandler: ActionHandler {
     public let verbID: VerbID = .remove
 
     public let syntax: [SyntaxRule] = [
-        .match(.verb, .directObjects)
+        .match(.verb, .directObjects),
+        .match(.verb(.take), .off, .directObject)
     ]
 
-    public let synonyms: [String] = ["take off", "doff"]
+    public let synonyms: [VerbID] = [.take, .doff]
 
     public let requiresLight: Bool = false
 

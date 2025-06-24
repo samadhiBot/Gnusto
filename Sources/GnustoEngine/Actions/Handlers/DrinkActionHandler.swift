@@ -12,7 +12,7 @@ public struct DrinkActionHandler: ActionHandler {
         .match(.verb, .directObject, .from, .indirectObject),
     ]
 
-    public let synonyms: [String] = ["sip", "quaff"]
+    public let synonyms: [VerbID] = [.sip, .quaff]
 
     public let requiresLight: Bool = true
 

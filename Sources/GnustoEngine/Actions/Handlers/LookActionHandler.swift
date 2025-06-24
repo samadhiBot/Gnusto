@@ -20,7 +20,7 @@ public struct LookActionHandler: ActionHandler {
 //        .match(.verb, .through, .directObject),
     ]
 
-    public let synonyms: [String] = ["l"]
+    public let synonyms: [VerbID] = [.l]
 
     public let requiresLight: Bool = false
 

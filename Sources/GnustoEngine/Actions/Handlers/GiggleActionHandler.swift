@@ -13,7 +13,7 @@ public struct GiggleActionHandler: ActionHandler {
         .match(.verb)
     ]
 
-    public let synonyms: [String] = ["chuckle"]
+    public let synonyms: [VerbID] = [.chuckle]
 
     public let requiresLight: Bool = false
 

@@ -9,10 +9,10 @@ public struct BreatheActionHandler: ActionHandler {
 
     public let syntax: [SyntaxRule] = [
         .match(.verb),
-        .match(.verb, .directObject),
+        .match(.verb, .on, .directObject),
     ]
 
-    public let synonyms: [String] = []
+    public let synonyms: [VerbID] = []
 
     public let requiresLight: Bool = false
 

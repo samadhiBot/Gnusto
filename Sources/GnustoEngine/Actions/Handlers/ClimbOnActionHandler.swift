@@ -13,7 +13,7 @@ public struct ClimbOnActionHandler: ActionHandler {
         .match(.verb, .on, .directObject),
     ]
 
-    public let synonyms: [String] = ["climb", "sit", "mount"]
+    public let synonyms: [VerbID] = [.climb, .sit, .mount]
 
     public let requiresLight: Bool = true
 

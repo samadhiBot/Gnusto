@@ -13,7 +13,7 @@ public struct TieActionHandler: ActionHandler {
         .match(.verb, .directObject, .with, .indirectObject),
     ]
 
-    public let synonyms: [String] = ["bind", "fasten"]
+    public let synonyms: [VerbID] = [.bind, .fasten]
 
     public let requiresLight: Bool = true
 

@@ -14,7 +14,7 @@ public struct YellActionHandler: ActionHandler {
         .match(.verb, .at, .directObject),
     ]
 
-    public let synonyms: [String] = ["shout", "scream", "shriek", "holler"]
+    public let synonyms: [VerbID] = [.shout, .scream, .shriek, .holler]
 
     public let requiresLight: Bool = false
 

@@ -11,7 +11,7 @@ public struct TurnOffActionHandler: ActionHandler {
         .match(.verb, .directObject)
     ]
 
-    public let synonyms: [String] = ["extinguish", "douse", "switch off", "blow out", "turn off"]
+    public let synonyms: [VerbID] = [.extinguish, .douse, .switch off, .blow out, .turn off]
 
     public let requiresLight: Bool = true
 

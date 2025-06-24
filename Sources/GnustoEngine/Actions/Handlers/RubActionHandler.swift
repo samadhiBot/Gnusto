@@ -12,7 +12,7 @@ public struct RubActionHandler: ActionHandler {
         .match(.verb, .directObject, .with, .indirectObject),
     ]
 
-    public let synonyms: [String] = ["polish", "clean"]
+    public let synonyms: [VerbID] = [.polish, .clean]
 
     public let requiresLight: Bool = true
 

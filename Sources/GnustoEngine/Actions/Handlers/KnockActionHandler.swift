@@ -13,7 +13,7 @@ public struct KnockActionHandler: ActionHandler {
         .match(.verb, .on, .directObject),
     ]
 
-    public let synonyms: [String] = ["rap", "tap"]
+    public let synonyms: [VerbID] = [.rap, .tap]
 
     public let requiresLight: Bool = true
 

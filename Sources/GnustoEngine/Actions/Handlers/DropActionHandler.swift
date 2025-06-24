@@ -11,7 +11,7 @@ public struct DropActionHandler: ActionHandler {
         .match(.verb, .directObjects)
     ]
 
-    public let synonyms: [String] = ["discard"]
+    public let synonyms: [VerbID] = [.discard]
 
     public let requiresLight: Bool = true
 

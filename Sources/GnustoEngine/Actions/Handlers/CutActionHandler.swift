@@ -15,7 +15,7 @@ public struct CutActionHandler: ActionHandler {
         .match(.verb, .directObject, .with, .indirectObject),
     ]
 
-    public let synonyms: [String] = ["slice", "chop"]
+    public let synonyms: [VerbID] = [.slice, .chop]
 
     public let requiresLight: Bool = true
 

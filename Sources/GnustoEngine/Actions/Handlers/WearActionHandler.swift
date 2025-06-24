@@ -11,7 +11,7 @@ public struct WearActionHandler: ActionHandler {
         .match(.verb, .directObjects)
     ]
 
-    public let synonyms: [String] = ["don"]
+    public let synonyms: [VerbID] = [.don]
 
     public let requiresLight: Bool = true
 

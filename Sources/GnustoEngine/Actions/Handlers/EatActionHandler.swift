@@ -11,7 +11,7 @@ public struct EatActionHandler: ActionHandler {
         .match(.verb, .directObject)
     ]
 
-    public let synonyms: [String] = ["consume", "devour"]
+    public let synonyms: [VerbID] = [.consume, .devour]
 
     public let requiresLight: Bool = true
 

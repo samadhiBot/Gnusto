@@ -16,7 +16,7 @@ public struct BurnActionHandler: ActionHandler {
         .match(.verb, .directObject, .with, .indirectObject),
     ]
 
-    public let synonyms: [String] = ["ignite", "light"]
+    public let synonyms: [VerbID] = [.ignite, .light]
 
     public let requiresLight: Bool = true
 

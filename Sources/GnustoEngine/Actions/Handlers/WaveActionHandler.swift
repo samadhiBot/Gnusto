@@ -12,7 +12,7 @@ public struct WaveActionHandler: ActionHandler {
         .match(.verb, .directObject, .at, .indirectObject),
     ]
 
-    public let synonyms: [String] = ["brandish"]
+    public let synonyms: [VerbID] = [.brandish]
 
     public let requiresLight: Bool = true
 

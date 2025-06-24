@@ -11,7 +11,7 @@ public struct TouchActionHandler: ActionHandler {
         .match(.verb, .directObject)
     ]
 
-    public let synonyms: [String] = ["feel"]
+    public let synonyms: [VerbID] = [.feel]
 
     public let requiresLight: Bool = true
 

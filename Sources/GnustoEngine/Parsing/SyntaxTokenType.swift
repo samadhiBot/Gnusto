@@ -9,6 +9,11 @@ public enum SyntaxTokenType: Sendable, Equatable, Codable {
     /// This is typically the first significant token matched by the parser.
     case verb
 
+    /// Expects a specific verb word (e.g., "CHARGE" in "CHARGE UP CAR").
+    /// This allows syntax rules to be specific to particular verb synonyms.
+    /// The associated `VerbID` value is the specific verb that must be used.
+    case specificVerb(VerbID)
+
     /// Expects a noun phrase that will be identified as the direct object of the
     /// verb (e.g., the "APPLE" in "TAKE APPLE") _or_ the object of a preposition
     /// (e.g. the "ANT" in "YELL AT THE ANT"). Expects a single object.
@@ -76,6 +81,9 @@ extension SyntaxTokenType {
     /// Expects the particle "into" (e.g., "GO INTO CAVE").
     static let into: SyntaxTokenType = .particle("into")
 
+    /// Expects the particle "off" (e.g., "TAKE OFF HAT").
+    static let off: SyntaxTokenType = .particle("off")
+
     /// Expects the particle "on" (e.g., "PUT BOOK ON TABLE").
     static let on: SyntaxTokenType = .particle("on")
 
@@ -99,4 +107,20 @@ extension SyntaxTokenType {
 
     /// Expects the particle "with" (e.g., "UNLOCK DOOR WITH KEY").
     static let with: SyntaxTokenType = .particle("with")
+}
+
+// MARK: - Verb-Specific Matching
+
+extension SyntaxTokenType {
+    /// Creates a syntax token that expects a specific verb word.
+    ///
+    /// This allows syntax rules to be specific to particular verb synonyms.
+    /// For example, `.verb(.charge)` would only match if the player used "charge"
+    /// specifically, not other synonyms for the same verb.
+    ///
+    /// - Parameter verbID: The specific verb ID that must be used
+    /// - Returns: A syntax token that matches only the specified verb
+    public static func verb(_ verbID: VerbID) -> SyntaxTokenType {
+        return .specificVerb(verbID)
+    }
 }

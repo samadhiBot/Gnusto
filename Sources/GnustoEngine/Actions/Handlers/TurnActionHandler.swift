@@ -12,7 +12,7 @@ public struct TurnActionHandler: ActionHandler {
         .match(.verb, .directObject, .to, .indirectObject),
     ]
 
-    public let synonyms: [String] = ["rotate", "twist"]
+    public let synonyms: [VerbID] = [.rotate, .twist]
 
     public let requiresLight: Bool = true
 

@@ -11,7 +11,7 @@ public struct PullActionHandler: ActionHandler {
         .match(.verb, .directObjects)
     ]
 
-    public let synonyms: [String] = []
+    public let synonyms: [VerbID] = []
 
     public let requiresLight: Bool = true
 

@@ -14,7 +14,7 @@ public struct CurseActionHandler: ActionHandler {
         .match(.verb, .directObject),
     ]
 
-    public let synonyms: [String] = ["swear", "damn"]
+    public let synonyms: [VerbID] = [.swear, .damn]
 
     public let requiresLight: Bool = false
 

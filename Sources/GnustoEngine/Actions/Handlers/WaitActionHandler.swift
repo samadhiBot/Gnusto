@@ -11,7 +11,7 @@ public struct WaitActionHandler: ActionHandler {
         .match(.verb)
     ]
 
-    public let synonyms: [String] = ["z"]
+    public let synonyms: [VerbID] = [.z]
 
     public let requiresLight: Bool = false
 
