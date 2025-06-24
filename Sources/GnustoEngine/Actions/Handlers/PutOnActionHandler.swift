@@ -76,7 +76,7 @@ public struct PutOnActionHandler: ActionHandler {
         }
         guard case .item(let surfaceID) = indirectObjectRef else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.thatsNotSomethingYouCan(.putOn)
+                context.message.thatsNotSomethingYouCan(.wear)
             )
         }
 

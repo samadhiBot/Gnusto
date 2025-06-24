@@ -986,63 +986,38 @@ extension GameEngine {
         wasLitBeforeCommand: Bool
     ) async throws {
         // Handle location description after movement or light change
-        let shouldDescribe: Bool
-        let forceFullDescription: Bool
+        var shouldDescribe = false
+        var forceFullDescription = false
 
-        switch command.verb {
-        case .go, .climb:
-            // Check if the player actually moved to a different location
-            let locationAfterCommand = playerLocationID
-            let playerMoved = locationBeforeCommand != locationAfterCommand
-
-            // Handle .onEnter event for new location
-            if playerMoved {
-                // Trigger .onEnter event for the new location
-                if let locationHandler = locationEventHandlers[locationAfterCommand] {
-                    do {
-                        if let result = try await locationHandler.handle(self, .onEnter) {
-                            // Location onEnter handler returned a result, process it
-                            _ = try await processActionResult(result)
-                        }
-                    } catch {
-                        logWarning("Error in location onEnter handler: \(error)")
-                    }
-                    // Check if handler quit the game
-                    if shouldQuit { return }
+        // Handle .onEnter event for new location
+        if locationBeforeCommand != playerLocationID {
+            // Trigger .onEnter event for the new location
+            if let locationHandler = locationEventHandlers[playerLocationID] {
+                if let result = try await locationHandler.handle(self, .onEnter) {
+                    _ = try await processActionResult(result)
                 }
-
-                // Handle lighting transition messages for movement
-                let isLitAfterCommand = await playerLocationIsLit()
-
-                if wasLitBeforeCommand && !isLitAfterCommand {
-                    // Moved from lit to dark - show transition message and darkness message combined
-                    await ioHandler.print(
-                        """
-                        \(messageProvider.nowDark())
-
-                        \(messageProvider.roomIsDark())
-                        """)
-                    shouldDescribe = false  // Don't call describeCurrentLocation since we handled it
-                } else {
-                    shouldDescribe = true  // Normal movement, let describeCurrentLocation handle it
-                }
-            } else {
-                shouldDescribe = false  // No movement occurred
+                // Check if handler quit the game
+                if shouldQuit { return }
             }
+            shouldDescribe = true
+        }
 
-            forceFullDescription = false  // Use visit-based logic for movement
-        case .turnOn, .turnOff:
-            // Only describe if lighting state actually changed
-            let isLitAfterCommand = await playerLocationIsLit()
+        // Handle lighting transition messages for movement
+        let isLitAfterCommand = await playerLocationIsLit()
 
-            // Show description only if:
-            // 1. Room went from dark to lit (turning on light), OR
-            // 2. Room went from lit to dark (turning off light)
-            shouldDescribe = wasLitBeforeCommand != isLitAfterCommand
-            forceFullDescription = true  // Always show full description when lighting changes
-        default:
+        if wasLitBeforeCommand && !isLitAfterCommand {
+            // Moved from lit to dark - show transition message and darkness message combined
+            await ioHandler.print(
+                """
+                \(messageProvider.nowDark())
+
+                \(messageProvider.roomIsDark())
+                """)
             shouldDescribe = false
-            forceFullDescription = false
+            forceFullDescription = true
+        } else if !wasLitBeforeCommand && isLitAfterCommand {
+            shouldDescribe = true
+            forceFullDescription = true
         }
 
         if shouldDescribe {

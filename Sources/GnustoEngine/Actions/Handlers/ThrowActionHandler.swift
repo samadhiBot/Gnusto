@@ -32,7 +32,7 @@ public struct ThrowActionHandler: ActionHandler {
         // Throw requires a direct object (what to throw)
         guard let directObjectRef = context.command.directObject else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.doWhat(verb: context.command.verb.command.verb)
+                context.message.doWhat(verb: context.command.verb)
             )
         }
         guard case .item(let itemToThrowID) = directObjectRef else {
