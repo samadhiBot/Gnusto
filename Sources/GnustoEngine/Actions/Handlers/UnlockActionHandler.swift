@@ -5,14 +5,12 @@ import Foundation
 public struct UnlockActionHandler: ActionHandler {
     // MARK: - Verb Definition Properties
 
-    public let verbID: VerbID = .unlock
-
     public let syntax: [SyntaxRule] = [
         .match(.verb, .directObject),
         .match(.verb, .directObject, .with, .indirectObject),
     ]
 
-    public let synonyms: [VerbID] = []
+    public let synonyms: [VerbID] = [.unlock]
 
     public let requiresLight: Bool = true
 
@@ -41,7 +39,7 @@ public struct UnlockActionHandler: ActionHandler {
         // 1. Validate command structure: Need DO and IO, both must be items
         guard let directObjectRef = context.command.directObject else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.doWhat(verb: .unlock)
+                context.message.doWhat(verb: context.command.verb)
             )
         }
         guard case .item(let targetItemID) = directObjectRef else {

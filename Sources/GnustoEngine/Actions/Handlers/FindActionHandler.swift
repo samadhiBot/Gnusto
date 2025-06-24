@@ -32,7 +32,7 @@ public struct FindActionHandler: ActionHandler {
     public func validate(context: ActionContext) async throws {
         guard context.command.directObject != nil else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.doWhat(verb: .find)
+                context.message.doWhat(verb: context.command.verb)
             )
         }
     }

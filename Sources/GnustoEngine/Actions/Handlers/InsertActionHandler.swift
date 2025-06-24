@@ -48,7 +48,7 @@ public struct InsertActionHandler: ActionHandler {
             // Still need an indirect object (container)
             guard let indirectObjectRef = context.command.indirectObject else {
                 throw ActionResponse.prerequisiteNotMet(
-                    context.message.doWhat(verb: .insert)
+                    context.message.doWhat(verb: context.command.verb)
                 )
             }
             guard case .item(let containerID) = indirectObjectRef else {
@@ -73,12 +73,12 @@ public struct InsertActionHandler: ActionHandler {
         // 1. Validate Direct and Indirect Objects
         guard !context.command.directObjects.isEmpty else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.doWhat(verb: .insert)
+                context.message.doWhat(verb: context.command.verb)
             )
         }
         guard let directObjectRef = context.command.directObject else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.doWhat(verb: .insert)
+                context.message.doWhat(verb: context.command.verb)
             )
         }
         guard
@@ -186,7 +186,7 @@ public struct InsertActionHandler: ActionHandler {
             case .item(let containerID) = indirectObjectRef
         else {
             return ActionResult(
-                context.message.doWhat(verb: .insert)
+                context.message.doWhat(verb: context.command.verb)
             )
         }
 
@@ -196,7 +196,7 @@ public struct InsertActionHandler: ActionHandler {
         if !context.command.isAllCommand {
             guard !context.command.directObjects.isEmpty else {
                 return ActionResult(
-                    context.message.doWhat(verb: .insert)
+                    context.message.doWhat(verb: context.command.verb)
                 )
             }
         }
@@ -324,7 +324,7 @@ public struct InsertActionHandler: ActionHandler {
                 context.command.isAllCommand
                     ? context.message.youHaveNothingToPutIn(
                         container: container.withDefiniteArticle)
-                    : context.message.doWhat(verb: .insert)
+                    : context.message.doWhat(verb: context.command.verb)
             } else {
                 context.message.youPutItemInContainer(
                     item: insertedItems.listWithDefiniteArticles,

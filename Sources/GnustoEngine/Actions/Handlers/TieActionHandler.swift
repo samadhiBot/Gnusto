@@ -5,15 +5,13 @@ import Foundation
 public struct TieActionHandler: ActionHandler {
     // MARK: - Verb Definition Properties
 
-    public let verbID: VerbID = .tie
-
     public let syntax: [SyntaxRule] = [
         .match(.verb, .directObject),
         .match(.verb, .directObject, .to, .indirectObject),
         .match(.verb, .directObject, .with, .indirectObject),
     ]
 
-    public let synonyms: [VerbID] = [.bind, .fasten]
+    public let synonyms: [VerbID] = [.tie, .fasten, .bind]
 
     public let requiresLight: Bool = true
 
@@ -34,7 +32,7 @@ public struct TieActionHandler: ActionHandler {
         // Tie requires a direct object (what to tie)
         guard let directObjectRef = context.command.directObject else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.doWhat(verb: .tie)
+                context.message.doWhat(verb: context.command.verb)
             )
         }
         guard case .item(let targetItemID) = directObjectRef else {

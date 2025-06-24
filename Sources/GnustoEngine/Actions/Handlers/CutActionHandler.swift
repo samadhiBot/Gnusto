@@ -34,7 +34,7 @@ public struct CutActionHandler: ActionHandler {
         // Cut requires a direct object (what to cut)
         guard let directObjectRef = context.command.directObject else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.doWhat(verb: .cut)
+                context.message.doWhat(verb: context.command.verb)
             )
         }
         guard case .item(let targetItemID) = directObjectRef else {

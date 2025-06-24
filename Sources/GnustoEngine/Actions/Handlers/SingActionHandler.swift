@@ -7,13 +7,11 @@ import Foundation
 public struct SingActionHandler: ActionHandler {
     // MARK: - Verb Definition Properties
 
-    public let verbID: VerbID = .sing
-
     public let syntax: [SyntaxRule] = [
         .match(.verb)
     ]
 
-    public let synonyms: [VerbID] = []
+    public let synonyms: [VerbID] = [.sing]
 
     public let requiresLight: Bool = false
 

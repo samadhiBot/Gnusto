@@ -22,7 +22,7 @@ public struct LookInsideActionHandler: ActionHandler {
     public func validate(context: ActionContext) async throws {
         guard let directObjectRef = context.command.directObject else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.doWhat(verb: .lookInside)
+                context.message.doWhat(verb: context.command.verb)
             )
         }
 

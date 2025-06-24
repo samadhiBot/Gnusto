@@ -5,13 +5,11 @@ import Foundation
 public struct ShakeActionHandler: ActionHandler {
     // MARK: - Verb Definition Properties
 
-    public let verbID: VerbID = .shake
-
     public let syntax: [SyntaxRule] = [
         .match(.verb, .directObject)
     ]
 
-    public let synonyms: [VerbID] = [.rattle]
+    public let synonyms: [VerbID] = [.shake, .rattle]
 
     public let requiresLight: Bool = true
 
@@ -30,7 +28,7 @@ public struct ShakeActionHandler: ActionHandler {
         // Shake requires a direct object (what to shake)
         guard let directObjectRef = context.command.directObject else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.doWhat(verb: .shake)
+                context.message.doWhat(verb: context.command.verb)
             )
         }
         guard case .item(let targetItemID) = directObjectRef else {

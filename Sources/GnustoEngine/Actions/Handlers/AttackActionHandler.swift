@@ -30,7 +30,7 @@ public struct AttackActionHandler: ActionHandler {
         // Attack requires a direct object (what to attack)
         guard let directObjectRef = context.command.directObject else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.doWhat(verb: .attack)
+                context.message.doWhat(verb: context.command.verb)
             )
         }
         guard case .item(let targetItemID) = directObjectRef else {

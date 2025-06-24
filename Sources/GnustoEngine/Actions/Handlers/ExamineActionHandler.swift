@@ -36,12 +36,12 @@ public struct ExamineActionHandler: ActionHandler {
 
         // 1. Ensure we have at least one direct object for non-ALL commands
         guard !context.command.directObjects.isEmpty else {
-            throw ActionResponse.custom(context.message.doWhat(verb: .examine))
+            throw ActionResponse.custom(context.message.doWhat(verb: context.command.verb))
         }
 
         // For single object commands, validate the single object
         guard let directObjectRef = context.command.directObject else {
-            throw ActionResponse.custom(context.message.doWhat(verb: .examine))
+            throw ActionResponse.custom(context.message.doWhat(verb: context.command.verb))
         }
 
         switch directObjectRef {
@@ -94,7 +94,9 @@ public struct ExamineActionHandler: ActionHandler {
         // For ALL commands, empty directObjects is valid (means nothing to examine)
         if !context.command.isAllCommand {
             guard !context.command.directObjects.isEmpty else {
-                return ActionResult(context.message.thatsNotSomethingYouCan(.examine))
+                return ActionResult(
+                    context.message.thatsNotSomethingYouCan(.examine)
+                )
             }
         }
 
@@ -233,7 +235,9 @@ public struct ExamineActionHandler: ActionHandler {
             default:
                 // For ALL commands, skip non-items
                 if !context.command.isAllCommand {
-                    return ActionResult(context.message.thatsNotSomethingYouCan(.examine))
+                    return ActionResult(
+                        context.message.thatsNotSomethingYouCan(.examine)
+                    )
                 }
             }
         }

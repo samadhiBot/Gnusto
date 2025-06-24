@@ -5,14 +5,12 @@ import Foundation
 public struct TellActionHandler: ActionHandler {
     // MARK: - Verb Definition Properties
 
-    public let verbID: VerbID = .tell
-
     public let syntax: [SyntaxRule] = [
         .match(.verb, .directObject),
         .match(.verb, .directObject, .about, .indirectObject),
     ]
 
-    public let synonyms: [VerbID] = [.inform]
+    public let synonyms: [VerbID] = [.tell, .inform]
 
     public let requiresLight: Bool = true
 

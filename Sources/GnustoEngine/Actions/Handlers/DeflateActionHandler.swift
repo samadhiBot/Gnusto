@@ -30,7 +30,7 @@ public struct DeflateActionHandler: ActionHandler {
         // Deflate requires a direct object (what to deflate)
         guard let directObjectRef = context.command.directObject else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.doWhat(verb: .deflate)
+                context.message.doWhat(verb: context.command.verb)
             )
         }
         guard case .item(let targetItemID) = directObjectRef else {

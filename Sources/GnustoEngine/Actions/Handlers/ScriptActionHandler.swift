@@ -5,13 +5,11 @@ import Foundation
 public struct ScriptActionHandler: ActionHandler {
     // MARK: - Verb Definition Properties
 
-    public let verbID: VerbID = .script
-
     public let syntax: [SyntaxRule] = [
         .match(.verb)
     ]
 
-    public let synonyms: [VerbID] = []
+    public let synonyms: [VerbID] = [.script]
 
     public let requiresLight: Bool = false
 

@@ -5,13 +5,9 @@ import Foundation
 public struct UnscriptActionHandler: ActionHandler {
     // MARK: - Verb Definition Properties
 
-    public let verbID: VerbID = .unscript
-
     public let syntax: [SyntaxRule] = [
-        .match(.verb)
+        .match(.verb(.unscript))
     ]
-
-    public let synonyms: [VerbID] = []
 
     public let requiresLight: Bool = false
 

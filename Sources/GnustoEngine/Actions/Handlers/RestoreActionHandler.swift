@@ -5,13 +5,11 @@ import Foundation
 public struct RestoreActionHandler: ActionHandler {
     // MARK: - Verb Definition Properties
 
-    public let verbID: VerbID = .restore
-
     public let syntax: [SyntaxRule] = [
         .match(.verb)
     ]
 
-    public let synonyms: [VerbID] = [.load]
+    public let synonyms: [VerbID] = [.restore, .load]
 
     public let requiresLight: Bool = false
 

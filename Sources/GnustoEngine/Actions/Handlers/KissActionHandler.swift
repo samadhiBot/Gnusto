@@ -29,7 +29,7 @@ public struct KissActionHandler: ActionHandler {
         // Kiss requires a direct object (what to kiss)
         guard let directObjectRef = context.command.directObject else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.doWhat(verb: .kiss)
+                context.message.doWhat(verb: context.command.verb)
             )
         }
 
@@ -63,12 +63,14 @@ public struct KissActionHandler: ActionHandler {
         }
 
         if case .player = directObjectRef {
-            return ActionResult(context.message.kissSelf())
+            return ActionResult(
+                context.message.kissSelf()
+            )
         }
 
         guard case .item(let targetItemID) = directObjectRef else {
             return ActionResult(
-                context.message.doWhat(verb: .kiss)
+                context.message.doWhat(verb: context.command.verb)
             )
         }
 

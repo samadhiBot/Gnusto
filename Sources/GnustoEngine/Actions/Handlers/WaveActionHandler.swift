@@ -5,14 +5,14 @@ import Foundation
 public struct WaveActionHandler: ActionHandler {
     // MARK: - Verb Definition Properties
 
-    public let verbID: VerbID = .wave
-
     public let syntax: [SyntaxRule] = [
         .match(.verb, .directObject),
+        .match(.verb(.wave), .at, .directObject),
+        .match(.verb(.wave), .to, .directObject),
         .match(.verb, .directObject, .at, .indirectObject),
     ]
 
-    public let synonyms: [VerbID] = [.brandish]
+    public let synonyms: [VerbID] = [.wave, .brandish]
 
     public let requiresLight: Bool = true
 
@@ -31,7 +31,7 @@ public struct WaveActionHandler: ActionHandler {
         // Wave requires a direct object (what to wave)
         guard let directObjectRef = context.command.directObject else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.doWhat(verb: .wave)
+                context.message.doWhat(verb: context.command.verb)
             )
         }
         guard case .item(let targetItemID) = directObjectRef else {

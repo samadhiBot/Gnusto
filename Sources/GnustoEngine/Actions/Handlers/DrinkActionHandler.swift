@@ -31,7 +31,7 @@ public struct DrinkActionHandler: ActionHandler {
         // Ensure we have a direct object
         guard let directObjectRef = context.command.directObject else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.doWhat(verb: .drink)
+                context.message.doWhat(verb: context.command.verb)
             )
         }
         guard case .item(let targetItemID) = directObjectRef else {

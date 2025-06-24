@@ -32,7 +32,7 @@ public struct EmptyActionHandler: ActionHandler {
         // Empty requires a direct object (what to empty)
         guard let directObjectRef = context.command.directObject else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.doWhat(verb: .empty)
+                context.message.doWhat(verb: context.command.verb)
             )
         }
         guard case .item(let targetItemID) = directObjectRef else {

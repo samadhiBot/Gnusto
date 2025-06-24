@@ -5,14 +5,12 @@ import Foundation
 public struct RemoveActionHandler: ActionHandler {
     // MARK: - Verb Definition Properties
 
-    public let verbID: VerbID = .remove
-
     public let syntax: [SyntaxRule] = [
         .match(.verb, .directObjects),
-        .match(.verb(.take), .off, .directObject)
+        .match(.verb(.take), .off, .directObject),
     ]
 
-    public let synonyms: [VerbID] = [.take, .doff]
+    public let synonyms: [VerbID] = [.remove, .doff]
 
     public let requiresLight: Bool = false
 
@@ -35,14 +33,14 @@ public struct RemoveActionHandler: ActionHandler {
         // 1. Ensure we have at least one direct object for non-ALL commands
         guard !context.command.directObjects.isEmpty else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.doWhat(verb: .remove)
+                context.message.doWhat(verb: context.command.verb)
             )
         }
 
         // For single object commands, validate the single object
         guard let directObjectRef = context.command.directObject else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.doWhat(verb: .remove)
+                context.message.doWhat(verb: context.command.verb)
             )
         }
         guard case .item(let targetItemID) = directObjectRef else {
@@ -82,7 +80,7 @@ public struct RemoveActionHandler: ActionHandler {
         if !context.command.isAllCommand {
             guard !context.command.directObjects.isEmpty else {
                 return ActionResult(
-                    context.message.doWhat(verb: .remove)
+                    context.message.doWhat(verb: context.command.verb)
                 )
             }
         }
@@ -166,7 +164,7 @@ public struct RemoveActionHandler: ActionHandler {
             if removedItems.isEmpty {
                 context.command.isAllCommand
                     ? context.message.youArentWearingAnything()
-                    : context.message.doWhat(verb: .remove)
+                    : context.message.doWhat(verb: context.command.verb)
             } else {
                 context.message.youRemoveMultipleItems(
                     items: removedItems.listWithDefiniteArticles

@@ -4,13 +4,11 @@ import Foundation
 public struct ReadActionHandler: ActionHandler {
     // MARK: - Verb Definition Properties
 
-    public let verbID: VerbID = .read
-
     public let syntax: [SyntaxRule] = [
         .match(.verb, .directObject)
     ]
 
-    public let synonyms: [VerbID] = []
+    public let synonyms: [VerbID] = [.read]
 
     public let requiresLight: Bool = true
 
@@ -33,7 +31,7 @@ public struct ReadActionHandler: ActionHandler {
         // 1. Ensure we have a direct object and it's an item
         guard let directObjectRef = context.command.directObject else {
             throw ActionResponse.custom(
-                context.message.doWhat(verb: .read)
+                context.message.doWhat(verb: context.command.verb)
             )
         }
         guard case .item(let targetItemID) = directObjectRef else {

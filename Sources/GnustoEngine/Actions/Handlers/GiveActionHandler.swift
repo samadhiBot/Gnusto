@@ -53,7 +53,7 @@ public struct GiveActionHandler: ActionHandler {
         // 1. Ensure we have at least one direct object for non-ALL commands
         guard !context.command.directObjects.isEmpty else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.doWhat(verb: .give)
+                context.message.doWhat(verb: context.command.verb)
             )
         }
 
@@ -67,7 +67,7 @@ public struct GiveActionHandler: ActionHandler {
         // For single object commands, validate the single object
         guard let directObjectRef = context.command.directObject else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.doWhat(verb: .give)
+                context.message.doWhat(verb: context.command.verb)
             )
         }
         guard case .item(let targetItemID) = directObjectRef else {
@@ -129,7 +129,7 @@ public struct GiveActionHandler: ActionHandler {
         if !context.command.isAllCommand {
             guard !context.command.directObjects.isEmpty else {
                 return ActionResult(
-                    context.message.doWhat(verb: .give)
+                    context.message.doWhat(verb: context.command.verb)
                 )
             }
         }

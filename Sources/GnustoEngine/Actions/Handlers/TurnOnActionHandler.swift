@@ -5,13 +5,11 @@ import Foundation
 public struct TurnOnActionHandler: ActionHandler {
     // MARK: - Verb Definition Properties
 
-    public let verbID: VerbID = .turnOn
-
     public let syntax: [SyntaxRule] = [
-        .match(.verb, .directObject)
+        .match(.verb(.light), .directObject),
+        .match(.verb(.switch), .on, .directObject),
+        .match(.verb(.turn), .on, .directObject),
     ]
-
-    public let synonyms: [VerbID] = [.light, .switch on, .turn on]
 
     public let requiresLight: Bool = true
 
@@ -39,7 +37,7 @@ public struct TurnOnActionHandler: ActionHandler {
         // 1. Get direct object and ensure it's an item
         guard let directObjectRef = context.command.directObject else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.doWhat(verb: .turnOn)
+                context.message.doWhat(verb: context.command.verb)
             )
         }
         guard case .item(let targetItemID) = directObjectRef else {

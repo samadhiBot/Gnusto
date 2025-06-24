@@ -12,7 +12,7 @@ public struct LookActionHandler: ActionHandler {
     // MARK: - Verb Definition Properties
 
     public let syntax: [SyntaxRule] = [
-        .match(.verb),
+        .match(.verb)
     ]
 
     public let synonyms: [VerbID] = [.look, "l"]
@@ -89,7 +89,9 @@ public struct LookActionHandler: ActionHandler {
             // LOOK (no direct object) - describe the room
             // Check for darkness FIRST
             guard await context.engine.playerLocationIsLit() else {
-                return ActionResult(context.message.roomIsDark())
+                return ActionResult(
+                    context.message.roomIsDark()
+                )
             }
 
             await context.engine.ioHandler.print(

@@ -34,7 +34,7 @@ public struct BurnActionHandler: ActionHandler {
     public func validate(context: ActionContext) async throws {
         guard let targetObjectID = context.command.directObject else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.doWhat(verb: .burn)
+                context.message.doWhat(verb: context.command.verb)
             )
         }
 

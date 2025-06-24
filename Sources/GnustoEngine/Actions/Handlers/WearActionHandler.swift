@@ -5,13 +5,12 @@ import Foundation
 public struct WearActionHandler: ActionHandler {
     // MARK: - Verb Definition Properties
 
-    public let verbID: VerbID = .wear
-
     public let syntax: [SyntaxRule] = [
-        .match(.verb, .directObjects)
+        .match(.verb, .directObjects),
+        .match(.verb(.put), .on, .directObjects),
     ]
 
-    public let synonyms: [VerbID] = [.don]
+    public let synonyms: [VerbID] = [.wear, .don]
 
     public let requiresLight: Bool = true
 
@@ -34,14 +33,14 @@ public struct WearActionHandler: ActionHandler {
         // 1. Ensure we have at least one direct object for non-ALL commands
         guard !context.command.directObjects.isEmpty else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.doWhat(verb: .wear)
+                context.message.doWhat(verb: context.command.verb)
             )
         }
 
         // For single object commands, validate the single object
         guard let directObjectRef = context.command.directObject else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.doWhat(verb: .wear)
+                context.message.doWhat(verb: context.command.verb)
             )
         }
         guard case .item(let targetItemID) = directObjectRef else {
@@ -83,7 +82,9 @@ public struct WearActionHandler: ActionHandler {
         // For ALL commands, empty directObjects is valid (means nothing to wear)
         if !context.command.isAllCommand {
             guard !context.command.directObjects.isEmpty else {
-                return ActionResult(context.message.doWhat(verb: .wear))
+                return ActionResult(
+                    context.message.doWhat(verb: context.command.verb)
+                )
             }
         }
 
@@ -97,7 +98,9 @@ public struct WearActionHandler: ActionHandler {
                 if context.command.isAllCommand {
                     continue  // Skip non-items in ALL commands
                 } else {
-                    return ActionResult(context.message.thatsNotSomethingYouCan(.wear))
+                    return ActionResult(
+                        context.message.thatsNotSomethingYouCan(.wear)
+                    )
                 }
             }
 
@@ -169,7 +172,7 @@ public struct WearActionHandler: ActionHandler {
             if wornItems.isEmpty {
                 context.command.isAllCommand
                     ? context.message.nothingHereToWear()
-                    : context.message.doWhat(verb: .wear)
+                    : context.message.doWhat(verb: context.command.verb)
             } else {
                 context.message.youPutOn(item: wornItems.listWithDefiniteArticles)
             }

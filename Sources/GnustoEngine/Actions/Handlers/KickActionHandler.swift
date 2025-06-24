@@ -29,7 +29,7 @@ public struct KickActionHandler: ActionHandler {
         // Kick requires a direct object (what to kick)
         guard let directObjectRef = context.command.directObject else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.doWhat(verb: .kick)
+                context.message.doWhat(verb: context.command.verb)
             )
         }
         guard case .item(let targetItemID) = directObjectRef else {

@@ -3,8 +3,8 @@ import Testing
 
 @testable import GnustoEngine
 
-@Suite("ThinkAboutActionHandler Tests")
-struct ThinkAboutActionHandlerTests {
+@Suite("ThinkActionHandler Tests")
+struct ThinkActionHandlerTests {
     @Test("THINK ABOUT without object is rejected")
     func testThinkAboutWithoutObject() async throws {
         let (engine, mockIO) = await GameEngine.test()

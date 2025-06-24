@@ -5,13 +5,11 @@ import Foundation
 public struct TouchActionHandler: ActionHandler {
     // MARK: - Verb Definition Properties
 
-    public let verbID: VerbID = .touch
-
     public let syntax: [SyntaxRule] = [
         .match(.verb, .directObject)
     ]
 
-    public let synonyms: [VerbID] = [.feel]
+    public let synonyms: [VerbID] = [.touch, .feel]
 
     public let requiresLight: Bool = true
 
@@ -32,7 +30,7 @@ public struct TouchActionHandler: ActionHandler {
         // 1. Ensure we have a direct object and it's an item
         guard let directObjectRef = context.command.directObject else {
             throw ActionResponse.custom(
-                context.message.doWhat(verb: .touch)
+                context.message.doWhat(verb: context.command.verb)
             )
         }
         guard case .item(let targetItemID) = directObjectRef else {

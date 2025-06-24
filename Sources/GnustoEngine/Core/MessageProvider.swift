@@ -817,24 +817,6 @@ open class MessageProvider: @unchecked Sendable {
         )
     }
 
-    open func giggleResponse() -> String {
-        output(
-            "giggleResponse()",
-            oneOf(
-                "You chortle with the sophisticated humor of someone who gets jokes others don't.",
-                "You chuckle with an admirable lightness of spirit in the face of everything.",
-                "You chuckle with an appreciation for life's subtle ironies.",
-                "You chuckle with the confident amusement of someone in on the cosmic joke.",
-                "You chuckle with the fearless delight of someone who finds things funny that others do not.",
-                "You giggle with a genuine delight that's beautifully unguarded.",
-                "You giggle with refreshing honesty about what you find amusing.",
-                "You snicker with impressive insight into the absurdities around you.",
-                "You snicker with the discerning wit of someone who sees the bigger picture.",
-                "You snicker with the sophisticated appreciation of someone who truly understands irony.",
-            )
-        )
-    }
-
     open func giveToWhom() -> String {
         output(
             "giveToWhom()",
@@ -1289,26 +1271,23 @@ open class MessageProvider: @unchecked Sendable {
             oneOf(
                 "You cackle at the futility of everything.",
                 "You chortle knowingly.",
+                "You chortle with the sophisticated humor of someone who gets jokes others don't.",
                 "You chuckle at the meaninglessness of it all.",
-                "You giggle uncontrollably.",
+                "You chuckle with an admirable lightness of spirit in the face of everything.",
+                "You chuckle with an appreciation for life's subtle ironies.",
+                "You chuckle with the confident amusement of someone in on the cosmic joke.",
+                "You chuckle with the fearless delight of someone who finds things funny that others do not.",
+                "You giggle with a genuine delight that's beautifully unguarded.",
+                "You giggle with refreshing honesty about what you find amusing.",
                 "You laugh at the absurdity of existence.",
                 "You laugh boldly at the forces arrayed against you.",
-                "You laugh brazenly at your predicament.",
-                "You laugh courageously in spite of everything.",
-                "You laugh defiantly at Fate itself.",
-                "You laugh fearlessly at the abyss.",
                 "You laugh heroically at your impossible circumstances.",
                 "You laugh in the face of cosmic indifference.",
-                "You laugh in the face of danger.",
                 "You laugh in the face of overwhelming odds.",
                 "You laugh in the face of your own mortality.",
-                "You laugh with the hollow ring of someone who's given up.",
-                "You laugh with the intensity of someone who's seen too much.",
-                "You let out a mirthless chuckle.",
-                "You snicker mischievously.",
-                "You snort with amusement.",
-                "You titter politely.",
-                "You wheeze with laughter.",
+                "You snicker with impressive insight into the absurdities around you.",
+                "You snicker with the discerning wit of someone who sees the bigger picture.",
+                "You snicker with the sophisticated appreciation of someone who truly understands irony.",
             )
         )
     }

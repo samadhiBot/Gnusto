@@ -5,13 +5,14 @@ import Foundation
 public struct TurnOffActionHandler: ActionHandler {
     // MARK: - Verb Definition Properties
 
-    public let verbID: VerbID = .turnOff
-
     public let syntax: [SyntaxRule] = [
-        .match(.verb, .directObject)
+        .match(.verb(.blow), .out, .directObject),
+        .match(.verb(.switch), .off, .directObject),
+        .match(.verb(.turn), .off, .directObject),
+        .match(.verb, .directObject),
     ]
 
-    public let synonyms: [VerbID] = [.extinguish, .douse, .switch off, .blow out, .turn off]
+    public let synonyms: [VerbID] = [.extinguish, .douse]
 
     public let requiresLight: Bool = true
 
@@ -35,7 +36,7 @@ public struct TurnOffActionHandler: ActionHandler {
         // 1. Get direct object and ensure it's an item
         guard let directObjectRef = context.command.directObject else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.doWhat(verb: .turnOff)
+                context.message.doWhat(verb: context.command.verb)
             )
         }
         guard case .item(let targetItemID) = directObjectRef else {

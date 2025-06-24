@@ -7,13 +7,11 @@ import Foundation
 public struct RaiseActionHandler: ActionHandler {
     // MARK: - Verb Definition Properties
 
-    public let verbID: VerbID = .raise
-
     public let syntax: [SyntaxRule] = [
         .match(.verb, .directObject)
     ]
 
-    public let synonyms: [VerbID] = [.lift, .hoist]
+    public let synonyms: [VerbID] = [.raise, .lift, .hoist]
 
     public let requiresLight: Bool = true
 
@@ -26,7 +24,7 @@ public struct RaiseActionHandler: ActionHandler {
     public func validate(context: ActionContext) async throws {
         guard let directObjectRef = context.command.directObject else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.doWhat(verb: .raise)
+                context.message.doWhat(verb: context.command.verb)
             )
         }
 

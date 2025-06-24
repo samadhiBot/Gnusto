@@ -31,14 +31,14 @@ public struct PushActionHandler: ActionHandler {
         // 1. Ensure we have at least one direct object for non-ALL commands
         guard !context.command.directObjects.isEmpty else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.doWhat(verb: .push)
+                context.message.doWhat(verb: context.command.verb)
             )
         }
 
         // For single object commands, validate the single object
         guard let directObjectRef = context.command.directObject else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.doWhat(verb: .push)
+                context.message.doWhat(verb: context.command.verb)
             )
         }
         guard case .item(let targetItemID) = directObjectRef else {
@@ -70,7 +70,7 @@ public struct PushActionHandler: ActionHandler {
         if !context.command.isAllCommand {
             guard !context.command.directObjects.isEmpty else {
                 return ActionResult(
-                    context.message.doWhat(verb: .push)
+                    context.message.doWhat(verb: context.command.verb)
                 )
             }
         }
@@ -144,7 +144,7 @@ public struct PushActionHandler: ActionHandler {
             if pushedItems.isEmpty {
                 context.command.isAllCommand
                     ? context.message.nothingHereToPush()
-                    : context.message.doWhat(verb: .push)
+                    : context.message.doWhat(verb: context.command.verb)
             } else {
                 context.message.pushSuccess(items: pushedItems.listWithDefiniteArticles)
             }

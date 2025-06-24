@@ -32,7 +32,7 @@ public struct FillActionHandler: ActionHandler {
         // Fill requires a direct object (what to fill)
         guard let directObjectRef = context.command.directObject else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.doWhat(verb: .fill)
+                context.message.doWhat(verb: context.command.verb)
             )
         }
         guard case .item(let containerItemID) = directObjectRef else {

@@ -5,13 +5,11 @@ import Foundation
 public struct SqueezeActionHandler: ActionHandler {
     // MARK: - Verb Definition Properties
 
-    public let verbID: VerbID = .squeeze
-
     public let syntax: [SyntaxRule] = [
         .match(.verb, .directObject)
     ]
 
-    public let synonyms: [VerbID] = [.compress]
+    public let synonyms: [VerbID] = [.squeeze, .compress]
 
     public let requiresLight: Bool = true
 
@@ -31,7 +29,7 @@ public struct SqueezeActionHandler: ActionHandler {
         // Squeeze requires a direct object (what to squeeze)
         guard let directObjectRef = context.command.directObject else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.doWhat(verb: .squeeze)
+                context.message.doWhat(verb: context.command.verb)
             )
         }
         guard case .item(let targetItemID) = directObjectRef else {

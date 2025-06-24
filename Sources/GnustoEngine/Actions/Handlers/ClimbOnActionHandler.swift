@@ -13,8 +13,6 @@ public struct ClimbOnActionHandler: ActionHandler {
         .match(.verb(.mount), .directObject),
     ]
 
-    public let synonyms: [VerbID] = []
-
     public let requiresLight: Bool = true
 
     // MARK: - Action Processing Methods

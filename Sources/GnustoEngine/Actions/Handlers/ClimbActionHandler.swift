@@ -77,7 +77,7 @@ public struct ClimbActionHandler: ActionHandler {
         // Handle CLIMB with no object
         guard let directObjectRef = context.command.directObject else {
             return ActionResult(
-                context.message.doWhat(verb: .climb)
+                context.message.doWhat(verb: context.command.verb)
             )
         }
 

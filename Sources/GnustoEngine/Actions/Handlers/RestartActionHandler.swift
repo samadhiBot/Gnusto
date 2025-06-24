@@ -5,13 +5,11 @@ import Foundation
 public struct RestartActionHandler: ActionHandler {
     // MARK: - Verb Definition Properties
 
-    public let verbID: VerbID = .restart
-
     public let syntax: [SyntaxRule] = [
         .match(.verb)
     ]
 
-    public let synonyms: [VerbID] = []
+    public let synonyms: [VerbID] = [.restart]
 
     public let requiresLight: Bool = false
 

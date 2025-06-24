@@ -5,13 +5,11 @@ import Foundation
 public struct PutOnActionHandler: ActionHandler {
     // MARK: - Verb Definition Properties
 
-    public let verbID: VerbID = .putOn
-
     public let syntax: [SyntaxRule] = [
-        .match(.verb, .directObject, .on, .indirectObject),
+        .match(.verb, .directObject, .on, .indirectObject)
     ]
 
-    public let synonyms: [VerbID] = [.put, .place, .set, .balance]
+    public let synonyms: [VerbID] = [.put, .place, .set, .balance, .hang]
 
     public let requiresLight: Bool = true
 
@@ -48,7 +46,7 @@ public struct PutOnActionHandler: ActionHandler {
                 )
             } else {
                 throw ActionResponse.prerequisiteNotMet(
-                    context.message.doWhat(verb: .putOn)
+                    context.message.doWhat(verb: context.command.verb)
                 )
             }
         }

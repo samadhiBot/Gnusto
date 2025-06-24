@@ -4,13 +4,11 @@ import Foundation
 public struct XyzzyActionHandler: ActionHandler {
     // MARK: - Verb Definition Properties
 
-    public let verbID: VerbID = .xyzzy
-
     public let syntax: [SyntaxRule] = [
         .match(.verb)
     ]
 
-    public let synonyms: [VerbID] = []
+    public let synonyms: [VerbID] = [.xyzzy]
 
     public let requiresLight: Bool = false
 

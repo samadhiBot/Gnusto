@@ -4,13 +4,11 @@ import Foundation
 public struct QuitActionHandler: ActionHandler {
     // MARK: - Verb Definition Properties
 
-    public let verbID: VerbID = .quit
-
     public let syntax: [SyntaxRule] = [
         .match(.verb)
     ]
 
-    public let synonyms: [VerbID] = [.q]
+    public let synonyms: [VerbID] = [.quit, "q"]
 
     public let requiresLight: Bool = false
 
@@ -52,7 +50,9 @@ public struct QuitActionHandler: ActionHandler {
             guard let response = await engine.ioHandler.readLine(prompt: "") else {
                 // Handle EOF/nil input as quit confirmation
                 await engine.requestQuit()
-                return ActionResult(context.message.goodbye())
+                return ActionResult(
+                    context.message.goodbye()
+                )
             }
 
             let trimmedResponse = response.trimmingCharacters(
@@ -62,10 +62,14 @@ public struct QuitActionHandler: ActionHandler {
             if trimmedResponse == "y" || trimmedResponse == "yes" {
                 // User confirmed quit
                 await engine.requestQuit()
-                return ActionResult(context.message.goodbye())
+                return ActionResult(
+                    context.message.goodbye()
+                )
             } else if trimmedResponse == "n" || trimmedResponse == "no" {
                 // User cancelled quit
-                return ActionResult(context.message.quitCancelled())
+                return ActionResult(
+                    context.message.quitCancelled()
+                )
             } else {
                 // Invalid response, ask again
                 await engine.ioHandler.print(

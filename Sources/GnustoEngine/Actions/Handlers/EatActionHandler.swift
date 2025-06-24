@@ -28,7 +28,7 @@ public struct EatActionHandler: ActionHandler {
         // Ensure we have a direct object
         guard let directObjectRef = context.command.directObject else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.doWhat(verb: .eat)
+                context.message.doWhat(verb: context.command.verb)
             )
         }
         guard case .item(let targetItemID) = directObjectRef else {

@@ -5,8 +5,6 @@ import Foundation
 public struct InflateActionHandler: ActionHandler {
     // MARK: - Verb Definition Properties
 
-
-
     public let syntax: [SyntaxRule] = [
         .match(.verb, .directObject),
         .match(.verb, .directObject, .with, .indirectObject),
@@ -35,7 +33,7 @@ public struct InflateActionHandler: ActionHandler {
         // Inflate requires a direct object (what to inflate)
         guard let directObjectRef = context.command.directObject else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.doWhat(verb: .inflate)
+                context.message.doWhat(verb: context.command.verb)
             )
         }
         guard case .item(let targetItemID) = directObjectRef else {

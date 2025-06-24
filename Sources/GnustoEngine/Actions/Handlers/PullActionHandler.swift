@@ -29,7 +29,7 @@ public struct PullActionHandler: ActionHandler {
         // Pull requires a direct object (what to pull)
         guard let directObjectRef = context.command.directObject else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.doWhat(verb: .pull)
+                context.message.doWhat(verb: context.command.verb)
             )
         }
         guard case .item(let targetItemID) = directObjectRef else {

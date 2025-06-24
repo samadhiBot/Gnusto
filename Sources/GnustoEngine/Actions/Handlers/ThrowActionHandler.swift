@@ -5,15 +5,13 @@ import Foundation
 public struct ThrowActionHandler: ActionHandler {
     // MARK: - Verb Definition Properties
 
-    public let verbID: VerbID = .throwItem
-
     public let syntax: [SyntaxRule] = [
         .match(.verb, .directObject),
         .match(.verb, .directObject, .at, .indirectObject),
-        .match(.verb, .directObject, .indirectObject),
+        .match(.verb, .directObject, .to, .indirectObject),
     ]
 
-    public let synonyms: [VerbID] = [.hurl, .toss]
+    public let synonyms: [VerbID] = [.throw, .hurl, .toss, .chuck]
 
     public let requiresLight: Bool = true
 
@@ -34,7 +32,7 @@ public struct ThrowActionHandler: ActionHandler {
         // Throw requires a direct object (what to throw)
         guard let directObjectRef = context.command.directObject else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.doWhat(verb: .throwItem)
+                context.message.doWhat(verb: context.command.verb.command.verb)
             )
         }
         guard case .item(let itemToThrowID) = directObjectRef else {

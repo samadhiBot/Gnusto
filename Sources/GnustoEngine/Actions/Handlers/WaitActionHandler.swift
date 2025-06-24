@@ -5,13 +5,11 @@ import Foundation
 public struct WaitActionHandler: ActionHandler {
     // MARK: - Verb Definition Properties
 
-    public let verbID: VerbID = .wait
-
     public let syntax: [SyntaxRule] = [
         .match(.verb)
     ]
 
-    public let synonyms: [VerbID] = [.z]
+    public let synonyms: [VerbID] = [.wait, "z"]
 
     public let requiresLight: Bool = false
 

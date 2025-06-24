@@ -30,7 +30,7 @@ public struct PressActionHandler: ActionHandler {
         // Press requires a direct object (what to press)
         guard let directObjectRef = context.command.directObject else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.doWhat(verb: .press)
+                context.message.doWhat(verb: context.command.verb)
             )
         }
         guard case .item(let targetItemID) = directObjectRef else {

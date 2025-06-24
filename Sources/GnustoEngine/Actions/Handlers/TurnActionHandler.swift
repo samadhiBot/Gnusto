@@ -5,14 +5,12 @@ import Foundation
 public struct TurnActionHandler: ActionHandler {
     // MARK: - Verb Definition Properties
 
-    public let verbID: VerbID = .turn
-
     public let syntax: [SyntaxRule] = [
         .match(.verb, .directObject),
         .match(.verb, .directObject, .to, .indirectObject),
     ]
 
-    public let synonyms: [VerbID] = [.rotate, .twist]
+    public let synonyms: [VerbID] = [.turn, .rotate, .twist]
 
     public let requiresLight: Bool = true
 
@@ -32,7 +30,7 @@ public struct TurnActionHandler: ActionHandler {
         // Turn requires a direct object (what to turn)
         guard let directObjectRef = context.command.directObject else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.doWhat(verb: .turn)
+                context.message.doWhat(verb: context.command.verb)
             )
         }
         guard case .item(let targetItemID) = directObjectRef else {

@@ -9,14 +9,12 @@ import Foundation
 public struct SmellActionHandler: ActionHandler {
     // MARK: - Verb Definition Properties
 
-    public let verbID: VerbID = .smell
-
     public let syntax: [SyntaxRule] = [
         .match(.verb),
         .match(.verb, .directObject),
     ]
 
-    public let synonyms: [VerbID] = [.sniff]
+    public let synonyms: [VerbID] = [.smell, .sniff]
 
     public let requiresLight: Bool = false
 

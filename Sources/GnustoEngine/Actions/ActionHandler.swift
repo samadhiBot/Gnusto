@@ -8,7 +8,7 @@ import Foundation
 /// handlers) to execute parsed player `Command`s.
 ///
 /// Each `ActionHandler` is completely self-contained, defining both the verb's parsing
-/// rules (via `verbID`, `syntax`, `synonyms`, etc.) and its execution logic. This eliminates
+/// rules (via `synonyms`, `syntax`, etc.) and its execution logic. This eliminates
 /// the need to coordinate changes across multiple files when adding new verbs.
 ///
 /// The handling of an action is divided into three distinct, asynchronous phases:
@@ -36,10 +36,11 @@ public protocol ActionHandler: Sendable {
     /// The parser uses these rules to validate and structure player input.
     var syntax: [SyntaxRule] { get }
 
-    /// Alternative words that can trigger this verb.
+    /// All words that can trigger this verb, with the primary verb as the first element.
     ///
-    /// These provide convenient shortcuts for players (e.g., "x" for "examine", "i" for "inventory").
-    /// The parser treats synonyms as equivalent to the primary `verbID`.
+    /// The first element is the primary verb identifier, and subsequent elements are alternative
+    /// words that can trigger this verb (e.g., ["examine", "x", "look at"] for the examine verb).
+    /// The parser treats all synonyms as equivalent when matching player input.
     var synonyms: [VerbID] { get }
 
     /// Whether this verb requires light to execute.
@@ -136,8 +137,9 @@ extension ActionHandler {
 
     /// Default implementation for `synonyms`. Returns an empty array.
     ///
-    /// Override this property to provide alternative words that can trigger this verb.
-    public var synonyms: [String] {
+    /// Override this property to provide the primary verb and any alternative words that can trigger this verb.
+    /// The first element should be the primary verb identifier.
+    public var synonyms: [VerbID] {
         []
     }
 

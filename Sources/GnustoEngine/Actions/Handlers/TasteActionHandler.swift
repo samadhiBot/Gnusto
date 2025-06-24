@@ -9,13 +9,11 @@ import Foundation
 public struct TasteActionHandler: ActionHandler {
     // MARK: - Verb Definition Properties
 
-    public let verbID: VerbID = .taste
-
     public let syntax: [SyntaxRule] = [
         .match(.verb, .directObject)
     ]
 
-    public let synonyms: [VerbID] = [.lick]
+    public let synonyms: [VerbID] = [.taste, .lick]
 
     public let requiresLight: Bool = false
 
@@ -36,7 +34,7 @@ public struct TasteActionHandler: ActionHandler {
     public func validate(context: ActionContext) async throws {
         guard let directObjectRef = context.command.directObject else {
             throw ActionResponse.custom(
-                context.message.doWhat(verb: .taste)
+                context.message.doWhat(verb: context.command.verb)
             )
         }
         guard case .item(let itemID) = directObjectRef else {

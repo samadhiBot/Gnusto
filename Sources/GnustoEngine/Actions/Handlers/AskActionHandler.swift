@@ -36,7 +36,7 @@ public struct AskActionHandler: ActionHandler {
         }
         guard context.command.indirectObject != nil else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.doWhat(verb: .ask)
+                context.message.doWhat(verb: context.command.verb)
             )
         }
 
