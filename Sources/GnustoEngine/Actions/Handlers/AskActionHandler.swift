@@ -94,17 +94,13 @@ public struct AskActionHandler: ActionHandler {
         }
 
         // Default response - games can override with ItemEventHandlers
-        let message = """
-            \(character.name.capitalizedFirst) doesn't seem to know
-            anything about \(topicDescription).
-            """
-
         return ActionResult(
-            message: message,
-            changes: [
-                await context.engine.setFlag(.isTouched, on: character),
-                await context.engine.updatePronouns(to: character),
-            ]
+            context.message.characterDoesNotSeemToKnow(
+                character: character.withDefiniteArticle,
+                topic: topicDescription
+            ),
+            await context.engine.setFlag(.isTouched, on: character),
+            await context.engine.updatePronouns(to: character)
         )
     }
 }

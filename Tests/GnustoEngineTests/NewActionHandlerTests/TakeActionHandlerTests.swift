@@ -156,9 +156,9 @@ struct TakeActionHandlerTests {
         // Then
         let output = await mockIO.flush()
         expectNoDifference(output, """
-             > steal gem
-             Taken.
-             """)
+            > steal gem
+            Taken.
+            """)
 
         let finalState = try await engine.item("gem")
         #expect(finalState.parent == .player)
@@ -236,9 +236,9 @@ struct TakeActionHandlerTests {
         // Then
         let output = await mockIO.flush()
         expectNoDifference(output, """
-             > take book
-             You already have that.
-             """)
+            > take book
+            You already have that.
+            """)
 
         let finalState = try await engine.item("book")
         #expect(finalState.parent == .player)
@@ -321,9 +321,9 @@ struct TakeActionHandlerTests {
         // Then
         let output = await mockIO.flush()
         expectNoDifference(output, """
-             > take key
-             It is pitch black. You can’t see a thing.
-             """)
+            > take key
+            It is pitch black. You can’t see a thing.
+            """)
 
         let finalState = try await engine.item("key")
         #expect(finalState.parent == .location("darkRoom"))
@@ -366,9 +366,9 @@ struct TakeActionHandlerTests {
         // Verify message
         let output = await mockIO.flush()
         expectNoDifference(output, """
-             > take scroll
-             Taken.
-             """)
+            > take scroll
+            Taken.
+            """)
     }
 
     @Test("Taking item sets touched property")
@@ -405,9 +405,9 @@ struct TakeActionHandlerTests {
 
         let output = await mockIO.flush()
         expectNoDifference(output, """
-             > take crystal
-             Taken.
-             """)
+            > take crystal
+            Taken.
+            """)
     }
 
     // MARK: - ActionID Testing

@@ -1,6 +1,11 @@
-# Action Handler Testing Guide
+---
+description: Writing, editing and testing Action Handlers
+globs:
+alwaysApply: false
+---
+# Action Handler Guide
 
-This document outlines the systematic approach for testing action handlers in the Gnusto Interactive Fiction Engine.
+This document outlines the systematic approach for writing and testing action handlers in the Gnusto Interactive Fiction Engine.
 
 ## Core Testing Principles
 
@@ -72,7 +77,7 @@ func testSomething() async throws {
         """)
 
     // Verify state changes
-    let finalState = await engine.itemSnapshot(with: "testItem")
+    let finalState = try await engine.item("testItem")
     #expect(finalState?.parent == .player)
 }
 ```
@@ -200,7 +205,7 @@ func testTurnOnSetsProperty() async throws {
     try await engine.execute("turn on lamp")
 
     // Then: Lamp should have .isOn property
-    let finalState = await engine.itemSnapshot(with: "lamp")
+    let finalState = try await engine.item("lamp")
     #expect(finalState?.hasProperty(.isOn) == true)
 
     // Verify the message too
@@ -425,7 +430,7 @@ expectNoDifference(output, """
     """)
 
 // State verification
-let finalState = await engine.itemSnapshot(with: "testItem")
+let finalState = try await engine.item("testItem")
 #expect(finalState?.parent == .player)
 ```
 
@@ -459,7 +464,7 @@ let item = try await engine.item("itemID")  // Returns Item, throws if not found
 #expect(item.hasFlag(.isLit) == false)
 
 // ❌ WRONG - Don't use these non-existent methods
-let item = await engine.itemSnapshot(with: "itemID")  // This method doesn't exist!
+let item = try await engine.item("itemID")  // This method doesn't exist!
 ```
 
 ### Item Property/Flag Checking

@@ -403,6 +403,13 @@ open class MessageProvider: @unchecked Sendable {
         )
     }
 
+    open func characterDoesNotSeemToKnow(character: String, topic: String) -> String {
+        output(
+            "characterDoesNotSeemToKnow(character: '\(character)', topic: '\(topic)')",
+            "\(character.capitalizedFirst) doesn't seem to know anything about \(topic)."
+        )
+    }
+
     open func characterListens(character: String, topic: String) -> String {
         output(
             "characterListens(character: '\(character)', topic: '\(topic)')",

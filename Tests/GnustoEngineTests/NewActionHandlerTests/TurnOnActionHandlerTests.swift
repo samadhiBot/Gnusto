@@ -243,9 +243,9 @@ struct TurnOnActionHandlerTests {
         expectNoDifference(output, """
             > turn on lamp
             The brass lamp is now on. You can see your surroundings now.
-            
+
             — Dark Room —
-            
+
             A room that is pitch black if you aren’t carrying a light.
             """)
     }
