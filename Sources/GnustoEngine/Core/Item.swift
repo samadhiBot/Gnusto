@@ -107,6 +107,10 @@ public struct Item: Codable, Identifiable, Sendable {
         attributes[.parentEntity]?.toParentEntity ?? .nowhere
     }
 
+    public var shouldTakeFirst: Bool {
+        parent != .player && hasFlag(.isTakable)
+    }
+
     /// The item's size or bulk, used for capacity calculations when placing it in containers
     /// or for determining if the player can carry it.
     /// Corresponds to the ZIL `SIZE` property.

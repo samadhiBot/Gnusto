@@ -228,8 +228,9 @@ struct DrinkActionHandlerTests {
             output,
             """
             > drink water
-            (Taken)
-            You aren’t holding the glass of water.
+            Taken.
+            
+            You drink the glass of water. It’s quite refreshing.
             """)
     }
 
@@ -370,10 +371,19 @@ struct DrinkActionHandlerTests {
             .name("healing elixir"),
             .description("A shimmering healing elixir."),
             .isDrinkable,
-//            .drinkText("The elixir tastes magical and you feel your strength returning."),
             .isTakable,
             .in(.player)
         )
+
+        let elixirHandler = ItemEventHandler { engine, event in
+            guard case .beforeTurn(let command) = event, command.verb == .drink else {
+                return nil
+            }
+            return ActionResult(
+                "The elixir tastes magical and you feel your strength returning.",
+                try await engine.move("elixir", to: .nowhere)
+            )
+        }
 
         let game = MinimalGame(
             player: Player(in: "testRoom"),

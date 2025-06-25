@@ -150,19 +150,31 @@ public struct DrinkActionHandler: ActionHandler {
                 )
             }
         }
-        // Handle direct drinkable item (either isDrinkable or isEdible for ZIL compatibility)
-        else if targetItem.hasFlag(.isDrinkable) || targetItem.hasFlag(.isEdible) {
-            return ActionResult(
-                context.message.drinkSuccess(item: targetItem.withDefiniteArticle),
-                await context.engine.setFlag(.isTouched, on: targetItem),
-                await context.engine.move(targetItem, to: .nowhere)
-            )
-        } else {
-            // This shouldn't happen after validation, but handle it
+
+        // This shouldn't happen after validation, but handle it
+        guard targetItem.hasFlag(.isDrinkable) || targetItem.hasFlag(.isEdible) else {
             return ActionResult(
                 context.message.cannotDrink(item: targetItem.withDefiniteArticle),
                 await context.engine.setFlag(.isTouched, on: targetItem)
             )
         }
+
+        let drinkSuccess = context.message.drinkSuccess(item: targetItem.withDefiniteArticle)
+
+        let message = if targetItem.shouldTakeFirst {
+            """
+            \(context.message.taken())
+            \(drinkSuccess)
+            """
+        } else {
+            drinkSuccess
+        }
+
+        // Handle direct drinkable item (either isDrinkable or isEdible for ZIL compatibility)
+        return ActionResult(
+            message,
+            await context.engine.setFlag(.isTouched, on: targetItem),
+            await context.engine.move(targetItem, to: .nowhere)
+        )
     }
 }

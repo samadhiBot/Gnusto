@@ -1403,6 +1403,13 @@ open class MessageProvider: @unchecked Sendable {
         )
     }
 
+    open func nothingWrittenOn(item: String) -> String {
+        output(
+            "nothingWrittenOn(item: '\(item)')",
+            "There's nothing written on \(item)."
+        )
+    }
+
     open func nowDark() -> String {
         output(
             "nowDark()",
@@ -1815,7 +1822,7 @@ open class MessageProvider: @unchecked Sendable {
     open func taken() -> String {
         output(
             "taken()",
-            "Taken."
+            "Taken.\n"
         )
     }
 

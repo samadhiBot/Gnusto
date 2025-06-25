@@ -86,35 +86,28 @@ public struct ReadActionHandler: ActionHandler {
         }
         let targetItem = try await context.engine.item(targetItemID)
 
-        // Check if item needs to be auto-taken
-        let isHeld = targetItem.parent == .player
-        let isTakeable = targetItem.hasFlag(.isTakable)
-        let needsAutoTake = !isHeld && isTakeable
-
         // Determine read text
-        let readText: String
-        do {
-            if let textToRead: String = try await context.engine.attribute(
-                .readText, of: targetItem.id
-            ), !textToRead.isEmpty {
-                readText = textToRead
-            } else {
-                readText = "There's nothing written on the \(targetItem.name)."
-            }
-        } catch {
-            readText = "There's nothing written on the \(targetItem.name)."
+        let readText = if let textToRead: String = try await context.engine.attribute(
+            .readText, of: targetItem.id
+        ), !textToRead.isEmpty {
+            textToRead
+        } else {
+            context.message.nothingWrittenOn(item: targetItem.withDefiniteArticle)
         }
 
         // Build final message
-        let message = if needsAutoTake {
-            "(Taken)\n\n\(readText)"
+        let message = if targetItem.shouldTakeFirst {
+            """
+            \(context.message.taken())
+            \(readText)
+            """
         } else {
             readText
         }
 
         return ActionResult(
             message,
-            needsAutoTake ? await context.engine.move(targetItem, to: .player) : nil,
+            targetItem.shouldTakeFirst ? await context.engine.move(targetItem, to: .player) : nil,
             await context.engine.setFlag(.isTouched, on: targetItem),
             await context.engine.updatePronouns(to: targetItem)
         )

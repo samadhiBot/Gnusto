@@ -375,7 +375,7 @@ struct ReadActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > read leaflet
-            (Taken)
+            Taken.
 
             Visit the Grand Underground Adventure!
             """)
@@ -448,7 +448,7 @@ struct ReadActionHandlerTests {
             items: manuscript
         )
 
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+        let (engine, _) = await GameEngine.test(blueprint: game)
 
         // When
         try await engine.execute("read manuscript")
@@ -502,7 +502,7 @@ struct ReadActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > read recipe
-            (Taken)
+            Taken.
 
             Mix flour, eggs, and milk. Bake for 30 minutes.
             """)
@@ -552,6 +552,7 @@ struct ReadActionHandlerTests {
         expectNoDifference(output, """
             > read journal
             Day 1: Started the journey today.
+            
             > read note
             Don’t forget to feed the cat!
             """)
