@@ -79,7 +79,7 @@ public struct BurnActionHandler: ActionHandler {
 
         // Check if the item is flammable
         if targetItem.hasFlag(.isFlammable) {
-            let message = context.message.burnToCatchFire(
+            let message = context.message.itemBurnsToAshes(
                 item: targetItem.withDefiniteArticle.capitalizedFirst
             )
             return ActionResult(

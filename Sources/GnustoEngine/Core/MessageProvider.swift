@@ -214,13 +214,6 @@ open class MessageProvider: @unchecked Sendable {
         )
     }
 
-    open func burnToCatchFire(item: String) -> String {
-        output(
-            "burnToCatchFire(item: '\(item)')",
-            "\(item.capitalizedFirst) catches fire and burns to ashes."
-        )
-    }
-
     open func cannotDoThat(verb: String) -> String {
         output(
             "cannotDoThat(verb: '\(verb)')",
@@ -878,7 +871,7 @@ open class MessageProvider: @unchecked Sendable {
     open func itemBurnsToAshes(item: String) -> String {
         output(
             "itemBurnsToAshes(item: '\(item)')",
-            "\(item.capitalizedFirst) catches fire and burns to ashes."
+            "\(item.capitalizedFirst) catches fire and is consumed."
         )
     }
 

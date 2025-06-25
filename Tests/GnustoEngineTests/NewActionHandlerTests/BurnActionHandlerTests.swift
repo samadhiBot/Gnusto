@@ -40,11 +40,11 @@ struct BurnActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > burn paper
-            The piece of paper catches fire and is consumed!
+            The piece of paper catches fire and is consumed.
             """)
 
-        let finalState = try? await engine.item("paper")
-        #expect(finalState == nil) // Item should be destroyed
+        let finalState = try await engine.item("paper")
+        #expect(finalState.parent == .nowhere) // Item should be removed
     }
 
     @Test("BURN DIRECTOBJECT WITH INDIRECTOBJECT syntax works")
@@ -87,7 +87,7 @@ struct BurnActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > burn paper with match
-            The piece of paper catches fire and is consumed!
+            The piece of paper catches fire and is consumed.
             """)
     }
 
@@ -123,7 +123,7 @@ struct BurnActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > ignite wood
-            The dry wood catches fire and is consumed!
+            The dry wood catches fire and is consumed.
             """)
     }
 
@@ -159,7 +159,7 @@ struct BurnActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > light tinder
-            The dry tinder catches fire and is consumed!
+            The dry tinder catches fire and is consumed.
             """)
     }
 
@@ -304,12 +304,12 @@ struct BurnActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > burn paper
-            The piece of paper catches fire and is consumed!
+            The piece of paper catches fire and is consumed.
             """)
 
         // Verify item was destroyed
-        let finalState = try? await engine.item("paper")
-        #expect(finalState == nil)
+        let finalState = try await engine.item("paper")
+        #expect(finalState.parent == .nowhere)
     }
 
     @Test("Burn non-flammable item gives appropriate message")
@@ -372,7 +372,7 @@ struct BurnActionHandlerTests {
             items: metal
         )
 
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+        let (engine, _) = await GameEngine.test(blueprint: game)
 
         // When
         try await engine.execute("burn metal")
