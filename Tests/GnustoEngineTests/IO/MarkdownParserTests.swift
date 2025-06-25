@@ -1,4 +1,6 @@
+import CustomDump
 import Testing
+
 @testable import GnustoEngine
 
 @Suite("MarkdownParser Tests")
@@ -56,10 +58,10 @@ struct MarkdownParserTests {
     @Test("Orphan prevention - multiple paragraphs")
     func testOrphanPreventionMultipleParagraphs() async throws {
         let input = """
-        This is a very long sentence that should wrap and potentially create an orphan word.
+            This is a very long sentence that should wrap and potentially create an orphan word.
 
-        Another paragraph that might also have orphan issues when wrapped.
-        """
+            Another paragraph that might also have orphan issues when wrapped.
+            """
 
         let result = MarkdownParser.parse(input, columns: 40)
         let paragraphs = result.components(separatedBy: "\n\n")
@@ -99,7 +101,8 @@ struct MarkdownParserTests {
     @Test("Orphan prevention - handles edge cases")
     func testOrphanPreventionEdgeCases() async throws {
         // Test with very short previous line
-        let input = "A very very very very very very very very very very very long sentence that wraps and might create orphan."
+        let input =
+            "A very very very very very very very very very very very long sentence that wraps and might create orphan."
         let result = MarkdownParser.parse(input, columns: 20)
 
         let lines = result.components(separatedBy: "\n")

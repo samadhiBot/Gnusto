@@ -1,4 +1,6 @@
+import CustomDump
 import Testing
+
 @testable import GnustoEngine
 
 struct StandardParserTests {
@@ -167,7 +169,7 @@ struct StandardParserTests {
 
         // 5. Define initial pronouns
         let initialPronouns: [String: Set<EntityReference>] = [
-            "it": [.item("box")] // Let's say "it" initially refers to the box in the room
+            "it": [.item("box")]  // Let's say "it" initially refers to the box in the room
         ]
 
         // 6. Build Vocabulary using defaults + game-specific items/verbs
@@ -187,7 +189,7 @@ struct StandardParserTests {
         #expect(gameState.items["sword"]?.parent == .location(roomID))
         #expect(gameState.items["coin"]?.parent == .item("backpack"))
         #expect(gameState.items["book"]?.parent == .item("table"))
-        #expect(gameState.items["rug"]?.parent == .nowhere) // Globals aren't parented by this initializer
+        #expect(gameState.items["rug"]?.parent == .nowhere)  // Globals aren't parented by this initializer
         #expect(gameState.pronouns["it"] == [.item("box")])
     }
 
@@ -261,7 +263,9 @@ struct StandardParserTests {
                 vocabulary: vocabulary,
                 gameState: gameState
             )
-            #expect(result.isFailure(matching: .badGrammar("Expected a direct object phrase for verb '.examine'.")))
+            #expect(
+                result.isFailure(
+                    matching: .badGrammar("Expected a direct object phrase for verb '.examine'.")))
         }
     }
 
@@ -327,7 +331,7 @@ struct StandardParserTests {
             gameState: gameState
         )
         let command = try result.get()
-        #expect(command.verb == .examine) // Expect examine, not look
+        #expect(command.verb == .examine)  // Expect examine, not look
         #expect(command.directObject == .item("key"))
         #expect(Set(command.directObjectModifiers) == Set(["rusty", "small"]))
         #expect(command.indirectObject == nil)
@@ -472,7 +476,7 @@ struct StandardParserTests {
             gameState: gameState
         )
         let command = try result.get()
-        #expect(command.verb == .examine) // Expect examine, not look
+        #expect(command.verb == .examine)  // Expect examine, not look
         #expect(command.directObject == .item("rug"))
         #expect(command.indirectObject == nil)
     }
@@ -489,7 +493,7 @@ struct StandardParserTests {
         )
         let command = try result.get()
         #expect(command.verb == "take")
-        #expect(command.directObject == .item("lantern")) // Should resolve to the brass one
+        #expect(command.directObject == .item("lantern"))  // Should resolve to the brass one
         #expect(command.directObjectModifiers == ["brass"])
     }
 
@@ -502,8 +506,8 @@ struct StandardParserTests {
             gameState: gameState
         )
         let command = try result.get()
-        #expect(command.verb == .examine) // Expect examine, not look
-        #expect(command.directObject == .item("lantern2")) // Should resolve to the rusty one
+        #expect(command.verb == .examine)  // Expect examine, not look
+        #expect(command.directObject == .item("lantern2"))  // Should resolve to the rusty one
         #expect(command.directObjectModifiers == ["rusty"])
     }
 
@@ -530,7 +534,8 @@ struct StandardParserTests {
             gameState: gameState
         )
         // Should fail because modifiers don't match, not because noun is unknown.
-        #expect(result.isFailure(matching: .modifierMismatch(noun: "lantern", modifiers: ["wooden"])))
+        #expect(
+            result.isFailure(matching: .modifierMismatch(noun: "lantern", modifiers: ["wooden"])))
     }
 
     @Test("Filter Causes Ambiguity (Modifier Not Specified)")
@@ -560,7 +565,7 @@ struct StandardParserTests {
             items: Array(gameState.items.values),
             player: gameState.player,
             vocabulary: vocabulary,
-            pronouns: [:] // Start with empty pronouns
+            pronouns: [:]  // Start with empty pronouns
         )
         let result = parser.parse(
             input: "take it",
@@ -578,7 +583,7 @@ struct StandardParserTests {
             items: Array(gameState.items.values),
             player: gameState.player,
             vocabulary: vocabulary,
-            pronouns: ["it": [.item(lampID)]] // Start with 'it' = lamp
+            pronouns: ["it": [.item(lampID)]]  // Start with 'it' = lamp
         )
 
         // Ensure lamp IS IN SCOPE (room) for setup, the test checks parser result
@@ -590,7 +595,7 @@ struct StandardParserTests {
             gameState: initState
         )
         // This test should actually *pass* now, as the lantern is in scope.
-        let command = try result.get() // Expect success now
+        let command = try result.get()  // Expect success now
         #expect(command.directObject == .item(lampID))
     }
 
@@ -603,7 +608,7 @@ struct StandardParserTests {
             items: Array(gameState.items.values),
             player: gameState.player,
             vocabulary: vocabulary,
-            pronouns: ["it": [.item("orb")]] // Start with 'it' = orb
+            pronouns: ["it": [.item("orb")]]  // Start with 'it' = orb
         )
         #expect(initState.items["orb"]?.parent == .nowhere)
 
@@ -623,7 +628,7 @@ struct StandardParserTests {
             items: Array(gameState.items.values),
             player: gameState.player,
             vocabulary: vocabulary,
-            pronouns: ["it": [.item("sword")]] // Start with 'it' = sword
+            pronouns: ["it": [.item("sword")]]  // Start with 'it' = sword
         )
         // Input uses "examine"
         let result = parser.parse(
@@ -632,7 +637,7 @@ struct StandardParserTests {
             gameState: initState
         )
         let command = try result.get()
-        #expect(command.verb == .examine) // Expect examine, not look
+        #expect(command.verb == .examine)  // Expect examine, not look
         #expect(command.directObject == .item("sword"))
     }
 
@@ -644,7 +649,7 @@ struct StandardParserTests {
             items: Array(gameState.items.values),
             player: gameState.player,
             vocabulary: vocabulary,
-            pronouns: ["it": [.item("note")]] // Start with 'it' = note
+            pronouns: ["it": [.item("note")]]  // Start with 'it' = note
         )
         let result = parser.parse(input: "take it", vocabulary: vocabulary, gameState: initState)
         #expect(result.isFailure(matching: ParseError.pronounRefersToOutOfScopeItem(pronoun: "it")))
@@ -658,10 +663,13 @@ struct StandardParserTests {
             items: Array(gameState.items.values),
             player: gameState.player,
             vocabulary: vocabulary,
-            pronouns: ["it": [.item("key")]] // Start with 'it' = key
+            pronouns: ["it": [.item("key")]]  // Start with 'it' = key
         )
-        let result = parser.parse(input: "take rusty it", vocabulary: vocabulary, gameState: initState)
-        #expect(result.isFailure(matching: ParseError.badGrammar("Pronouns like 'it' usually cannot be modified.")))
+        let result = parser.parse(
+            input: "take rusty it", vocabulary: vocabulary, gameState: initState)
+        #expect(
+            result.isFailure(
+                matching: ParseError.badGrammar("Pronouns like 'it' usually cannot be modified.")))
     }
 
     @Test("Pronoun 'it' as Indirect Object")
@@ -672,9 +680,10 @@ struct StandardParserTests {
             items: Array(gameState.items.values),
             player: gameState.player,
             vocabulary: vocabulary,
-            pronouns: ["it": [.item("sword")]] // Start with 'it' = sword
+            pronouns: ["it": [.item("sword")]]  // Start with 'it' = sword
         )
-        let result = parser.parse(input: "put leaflet on it", vocabulary: vocabulary, gameState: initState)
+        let result = parser.parse(
+            input: "put leaflet on it", vocabulary: vocabulary, gameState: initState)
         let command = try result.get()
         #expect(command.verb == .putOn)
         #expect(command.directObject == .item("leaflet"))
@@ -691,7 +700,7 @@ struct StandardParserTests {
             items: Array(gameState.items.values),
             player: gameState.player,
             vocabulary: vocabulary,
-            pronouns: ["them": [.item("key"), .item("leaflet")]] // Start with 'them'
+            pronouns: ["them": [.item("key"), .item("leaflet")]]  // Start with 'them'
         )
         // Player holds key and leaflet (verified by initialItems setup)
         #expect(initState.items["key"]?.parent == .player)
@@ -720,7 +729,7 @@ struct StandardParserTests {
             items: Array(gameState.items.values),
             player: gameState.player,
             vocabulary: vocabulary,
-            pronouns: ["them": [.item("key"), .item("note")]] // Start with 'them'
+            pronouns: ["them": [.item("key"), .item("note")]]  // Start with 'them'
         )
         // Verify item locations
         #expect(initState.items["key"]?.parent == .player)
@@ -735,7 +744,7 @@ struct StandardParserTests {
         )
         let command = try result.get()
         #expect(command.verb == "drop")
-        #expect(command.directObject == .item("key")) // Successfully resolved to the only one in scope
+        #expect(command.directObject == .item("key"))  // Successfully resolved to the only one in scope
     }
 
     // — Tests for Container Scope —
@@ -808,7 +817,7 @@ struct StandardParserTests {
     @Test("Direct Inventory Item Preferred Over Item In Container")
     func testDirectInventoryPreferredOverContainer() async throws {
         // Create a temporary state where 'key' is held and a temp key is in backpack
-        var itemsDict = gameState.items // Base items copy
+        var itemsDict = gameState.items  // Base items copy
         let tempKeyInBackpack = Item(
             id: "tempKeyInBackpack",
             .name("key"),
@@ -832,10 +841,10 @@ struct StandardParserTests {
         itemsDict[permKey.id] = permKey
         let initState = GameState(
             locations: Array(gameState.locations.values),
-            items: Array(itemsDict.values), // Pass the modified copy's values
+            items: Array(itemsDict.values),  // Pass the modified copy's values
             player: gameState.player,
             vocabulary: vocabulary,
-            pronouns: gameState.pronouns // Use base pronouns
+            pronouns: gameState.pronouns  // Use base pronouns
         )
 
         // Verify setup
@@ -941,16 +950,16 @@ struct StandardParserTests {
     func testNounNotInScope() async {
         // Lamp exists in vocab, but isn't in the room or held by player
         // Create a custom state where the lamp is explicitly out of scope
-        var itemsDict = gameState.items // Base items copy
-        itemsDict[lampID]?.attributes[.parentEntity] = .parentEntity(.nowhere) // Move lamp out of scope
+        var itemsDict = gameState.items  // Base items copy
+        itemsDict[lampID]?.attributes[.parentEntity] = .parentEntity(.nowhere)  // Move lamp out of scope
         let customState = GameState(
             locations: Array(gameState.locations.values),
             items: Array(itemsDict.values),
             player: gameState.player,
             vocabulary: vocabulary,
-            pronouns: gameState.pronouns // Use base pronouns
+            pronouns: gameState.pronouns  // Use base pronouns
         )
-        #expect(customState.items[lampID]?.parent == .nowhere) // Verify setup
+        #expect(customState.items[lampID]?.parent == .nowhere)  // Verify setup
 
         // Run parser with the custom state
         let result = parser.parse(
@@ -973,8 +982,8 @@ struct StandardParserTests {
         )
         let command = try result.get()
         #expect(command.verb == "take")
-        #expect(command.directObject == .item("lantern")) // Noun = lantern
-        #expect(command.directObjectModifiers == ["brass"]) // Mods = [brass]
+        #expect(command.directObject == .item("lantern"))  // Noun = lantern
+        #expect(command.directObjectModifiers == ["brass"])  // Mods = [brass]
     }
 
     @Test("Extract Noun/Mods - With Noise Words")
@@ -987,22 +996,22 @@ struct StandardParserTests {
         )
         let command = try result.get()
         #expect(command.verb == "take")
-        #expect(command.directObject == .item("key")) // Noun = key
-        #expect(command.directObjectModifiers == ["small", "rusty"]) // Mods = [small, rusty], "the" filtered
+        #expect(command.directObject == .item("key"))  // Noun = key
+        #expect(command.directObjectModifiers == ["small", "rusty"])  // Mods = [small, rusty], "the" filtered
     }
 
     @Test("Extract Noun/Mods - Multiple Nouns")
     func testExtractNounModsMultipleNouns() async throws {
         // "put the small box key in lamp"
         // Setup: Make lamp a container for this test to pass resolution
-        var itemsDict = gameState.items // Base items copy
+        var itemsDict = gameState.items  // Base items copy
         itemsDict["lantern"]?.attributes[.isContainer] = true
         let modifiedState = GameState(
             locations: Array(gameState.locations.values),
             items: Array(itemsDict.values),
             player: gameState.player,
             vocabulary: vocabulary,
-            pronouns: gameState.pronouns // Use base pronouns
+            pronouns: gameState.pronouns  // Use base pronouns
         )
 
         let result = parser.parse(
@@ -1047,14 +1056,14 @@ struct StandardParserTests {
     @Test("Extract Noun/Mods - Pronoun")
     func testExtractNounModsPronoun() async throws {
         // "drop it" - assumes 'it' refers to something held (e.g., the key)
-        var itemsDict = gameState.items // Base items copy
-        itemsDict["key"]?.attributes[.parentEntity] = .parentEntity(.player) // Put key in inventory
+        var itemsDict = gameState.items  // Base items copy
+        itemsDict["key"]?.attributes[.parentEntity] = .parentEntity(.player)  // Put key in inventory
         let modifiedState = GameState(
             locations: Array(gameState.locations.values),
             items: Array(itemsDict.values),
             player: gameState.player,
             vocabulary: vocabulary,
-            pronouns: ["it": [.item("key")]] // Set 'it' to key for this state
+            pronouns: ["it": [.item("key")]]  // Set 'it' to key for this state
         )
 
         let result = parser.parse(
@@ -1064,21 +1073,21 @@ struct StandardParserTests {
         )
         let command = try result.get()
         #expect(command.verb == "drop")
-        #expect(command.directObject == .item("key")) // Noun = it (resolved to key)
-        #expect(command.directObjectModifiers == []) // Mods = []
+        #expect(command.directObject == .item("key"))  // Noun = it (resolved to key)
+        #expect(command.directObjectModifiers == [])  // Mods = []
     }
 
     @Test("Extract Noun/Mods - Pronoun With Noise")
     func testExtractNounModsPronounNoise() async throws {
         // "drop the it"
-        var itemsDict = gameState.items // Base items copy
+        var itemsDict = gameState.items  // Base items copy
         itemsDict["key"]?.attributes[.parentEntity] = .parentEntity(.player)
         let modifiedState = GameState(
             locations: Array(gameState.locations.values),
             items: Array(itemsDict.values),
             player: gameState.player,
             vocabulary: vocabulary,
-            pronouns: ["it": [.item("key")]] // Set 'it' to key for this state
+            pronouns: ["it": [.item("key")]]  // Set 'it' to key for this state
         )
 
         let result = parser.parse(
@@ -1088,8 +1097,8 @@ struct StandardParserTests {
         )
         let command = try result.get()
         #expect(command.verb == "drop")
-        #expect(command.directObject == .item("key")) // Noun = it
-        #expect(command.directObjectModifiers == []) // Mods = [], "the" filtered
+        #expect(command.directObject == .item("key"))  // Noun = it
+        #expect(command.directObjectModifiers == [])  // Mods = [], "the" filtered
     }
 
     // MARK: - Direction Parsing Tests
@@ -1108,7 +1117,7 @@ struct StandardParserTests {
             "up": .up, "u": .up,
             "down": .down, "d": .down,
             "in": .inside,
-            "out": .outside
+            "out": .outside,
         ]
 
         for (input, expectedDirection) in directionMap {
@@ -1118,7 +1127,7 @@ struct StandardParserTests {
                 gameState: gameState
             )
             let command = try result.get()
-            #expect(command.verb == "go") // Should assume "go"
+            #expect(command.verb == "go")  // Should assume "go"
             #expect(command.direction == expectedDirection)
             #expect(command.directObject == nil)
             #expect(command.indirectObject == nil)
@@ -1129,7 +1138,7 @@ struct StandardParserTests {
 
     @Test("Parse Go + Direction")
     func testParseGoDirection() async throws {
-         let directionMap: [String: Direction] = [
+        let directionMap: [String: Direction] = [
             "north": .north, "n": .north,
             "south": .south, "s": .south,
             "east": .east, "e": .east,
@@ -1141,7 +1150,7 @@ struct StandardParserTests {
             "up": .up, "u": .up,
             "down": .down, "d": .down,
             "in": .inside,
-            "out": .outside
+            "out": .outside,
         ]
 
         for (directionWord, expectedDirection) in directionMap {
@@ -1169,7 +1178,10 @@ struct StandardParserTests {
             vocabulary: vocabulary,
             gameState: gameState
         )
-        #expect(result.isFailure(matching: .badGrammar("Expected a direction (like north, s, up) but found 'nowhere'.")))
+        #expect(
+            result.isFailure(
+                matching: .badGrammar(
+                    "Expected a direction (like north, s, up) but found 'nowhere'.")))
     }
 
     @Test("Parse Go + Extra Words")
@@ -1180,7 +1192,9 @@ struct StandardParserTests {
             vocabulary: vocabulary,
             gameState: gameState
         )
-        #expect(result.isFailure(matching: .badGrammar("Unexpected words found after command: 'quickly'")))
+        #expect(
+            result.isFailure(
+                matching: .badGrammar("Unexpected words found after command: 'quickly'")))
     }
 
     @Test("Parse Go (No Direction)")
@@ -1191,7 +1205,10 @@ struct StandardParserTests {
             vocabulary: vocabulary,
             gameState: gameState
         )
-        #expect(result.isFailure(matching: .badGrammar("Command seems incomplete, expected more input like 'direction'.")))
+        #expect(
+            result.isFailure(
+                matching: .badGrammar(
+                    "Command seems incomplete, expected more input like 'direction'.")))
     }
 
     // MARK: - Adverb Filtering Tests
@@ -1205,7 +1222,7 @@ struct StandardParserTests {
             ("examine sword thoroughly", .examine, .item("sword")),
             ("drop key quietly", .drop, .item("key")),
             ("listen carefully", .listen, nil),
-            ("wait slowly", .wait, nil)
+            ("wait slowly", .wait, nil),
         ]
 
         for (input, expectedVerb, expectedObject) in testCases {
@@ -1242,7 +1259,7 @@ struct StandardParserTests {
             ("examine carefully sword", .examine, .item("sword")),
             ("examine sword carefully", .examine, .item("sword")),
             ("quickly take sword", .take, .item("sword")),
-            ("take quickly sword", .take, .item("sword"))
+            ("take quickly sword", .take, .item("sword")),
         ]
 
         for (input, expectedVerb, expectedObject) in testCases {
@@ -1260,7 +1277,10 @@ struct StandardParserTests {
     @Test("Parse Commands with All Default Adverbs")
     func testParseCommandsWithAllDefaultAdverbs() async throws {
         // Test all default adverbs from Vocabulary.defaultAdverbs
-        let defaultAdverbs = ["carefully", "gently", "loudly", "quietly", "quickly", "rapidly", "slowly", "softly", "thoroughly", "vigorously"]
+        let defaultAdverbs = [
+            "carefully", "gently", "loudly", "quietly", "quickly", "rapidly", "slowly", "softly",
+            "thoroughly", "vigorously",
+        ]
 
         for adverb in defaultAdverbs {
             let input = "look \(adverb)"
@@ -1300,13 +1320,15 @@ struct StandardParserTests {
 
         switch result {
         case .success(let command):
-            #expect(command.verb.rawValue == "go", "Expected 'go' to be selected first alphabetically")
+            #expect(
+                command.verb.rawValue == "go", "Expected 'go' to be selected first alphabetically")
         case .failure(let error):
-            Issue.record("Expected parser to succeed with deterministic selection, but got error: \(error)")
+            Issue.record(
+                "Expected parser to succeed with deterministic selection, but got error: \(error)")
         }
     }
 
-        @Test("Verb-specific syntax rules")
+    @Test("Verb-specific syntax rules")
     func testVerbSpecificSyntaxRules() async throws {
         // Create a vocabulary with synonyms that map to the same verb
         let chargeVerbID = VerbID("charge")
@@ -1320,7 +1342,7 @@ struct StandardParserTests {
                         // Only "charge" can use this specific syntax
                         SyntaxRule(pattern: [.specificVerb(chargeVerbID), .up, .directObject]),
                         // Both "charge" and "refuel" can use this syntax
-                        SyntaxRule(pattern: [.verb, .directObject])
+                        SyntaxRule(pattern: [.verb, .directObject]),
                     ]
                 )
             ],
@@ -1329,7 +1351,8 @@ struct StandardParserTests {
         )
 
         // Test that "CHARGE UP BATTERY" works
-        let chargeUpResult = parser.parse(input: "charge up battery", vocabulary: testVocabulary, gameState: gameState)
+        let chargeUpResult = parser.parse(
+            input: "charge up battery", vocabulary: testVocabulary, gameState: gameState)
         switch chargeUpResult {
         case .success(let command):
             #expect(command.verb == chargeVerbID, "Expected charge verb")
@@ -1338,8 +1361,9 @@ struct StandardParserTests {
             Issue.record("Expected 'charge up battery' to succeed, but got: \(error)")
         }
 
-                // Test that "REFUEL UP BATTERY" falls back to general syntax
-        let refuelUpResult = parser.parse(input: "refuel up battery", vocabulary: testVocabulary, gameState: gameState)
+        // Test that "REFUEL UP BATTERY" falls back to general syntax
+        let refuelUpResult = parser.parse(
+            input: "refuel up battery", vocabulary: testVocabulary, gameState: gameState)
         switch refuelUpResult {
         case .success(let command):
             // This should fall back to the general .verb syntax, so it should succeed
@@ -1355,11 +1379,13 @@ struct StandardParserTests {
                 Issue.record("Expected direct object to be present")
             }
         case .failure(let error):
-            Issue.record("Expected 'refuel up battery' to succeed with general syntax, but got: \(error)")
+            Issue.record(
+                "Expected 'refuel up battery' to succeed with general syntax, but got: \(error)")
         }
 
         // Test that "REFUEL BATTERY" works (general syntax)
-        let refuelResult = parser.parse(input: "refuel battery", vocabulary: testVocabulary, gameState: gameState)
+        let refuelResult = parser.parse(
+            input: "refuel battery", vocabulary: testVocabulary, gameState: gameState)
         switch refuelResult {
         case .success(let command):
             #expect(command.verb == chargeVerbID, "Expected charge verb")
@@ -1394,7 +1420,10 @@ extension Result where Failure == ParseError {
             return actual == expected
         case (.itemNotInScope(let actual), .itemNotInScope(let expected)):
             return actual == expected
-        case (.modifierMismatch(let actualNoun, let actualMods), .modifierMismatch(let expectedNoun, let expectedMods)):
+        case (
+            .modifierMismatch(let actualNoun, let actualMods),
+            .modifierMismatch(let expectedNoun, let expectedMods)
+        ):
             return actualNoun == expectedNoun && Set(actualMods) == Set(expectedMods)
         case (.ambiguity(let actual), .ambiguity(let expected)):
             return actual == expected
@@ -1404,7 +1433,9 @@ extension Result where Failure == ParseError {
             return actual == expected
         case (.pronounNotSet(let actual), .pronounNotSet(let expected)):
             return actual == expected
-        case (.pronounRefersToOutOfScopeItem(let actual), .pronounRefersToOutOfScopeItem(let expected)):
+        case (
+            .pronounRefersToOutOfScopeItem(let actual), .pronounRefersToOutOfScopeItem(let expected)
+        ):
             return actual == expected
         case (.internalError(let actual), .internalError(let expected)):
             return actual == expected

@@ -1,4 +1,6 @@
+import CustomDump
 import Testing
+
 @testable import GnustoEngine
 
 @Suite("Command Struct Tests")
@@ -49,7 +51,9 @@ struct CommandTests {
     @Test("Command Initialization - Verb + Direct Object + Modifiers")
     func testCommandInitVerbDirectMods() throws {
         let raw = "take shiny lantern"
-        let command = Command(verb: verbTake, directObject: .item(itemLantern), directObjectModifiers: modsShiny, rawInput: raw)
+        let command = Command(
+            verb: verbTake, directObject: .item(itemLantern), directObjectModifiers: modsShiny,
+            rawInput: raw)
 
         #expect(command.verb == verbTake)
         #expect(command.directObject == .item(itemLantern))
@@ -106,8 +110,9 @@ struct CommandTests {
     func testCommandValueSemantics() throws {
         // Since all properties are `let`, Command is implicitly immutable after creation.
         // We just test that assignment creates a true copy.
-        let command1 = Command(verb: verbTake, directObject: .item(itemLantern), rawInput: "take lantern")
-        let command2 = command1 // Creates a copy
+        let command1 = Command(
+            verb: verbTake, directObject: .item(itemLantern), rawInput: "take lantern")
+        let command2 = command1  // Creates a copy
 
         // There's nothing mutable to change in command2, but we verify the copy has the same values.
         #expect(command1.verb == command2.verb)

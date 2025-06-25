@@ -69,7 +69,7 @@ public struct PullActionHandler: ActionHandler {
         } else {
             // Default behavior: most things can't be pulled effectively
             context.message.cannotDoThat(
-                verb: .deflate,
+                verb: .pull,
                 item: targetItem.withDefiniteArticle
             )
         }

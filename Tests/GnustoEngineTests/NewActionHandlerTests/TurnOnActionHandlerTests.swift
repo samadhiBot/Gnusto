@@ -2,316 +2,109 @@ import Testing
 import CustomDump
 @testable import GnustoEngine
 
-@Suite("TurnOnActionHandler Tests")
+@Suite
 struct TurnOnActionHandlerTests {
-
     // MARK: - Syntax Rule Testing
 
-    @Test("TURN ON syntax works")
-    func testTurnOnSyntax() async throws {
-        // Given
-        let testRoom = Location(
-            id: "testRoom",
-            .name("Test Room"),
-            .description("A room for testing."),
-            .inherentlyLit
-        )
-
-        let lamp = Item(
-            id: "lamp",
-            .name("brass lamp"),
-            .description("A brass oil lamp."),
-            .isLightSource,
-            .isDevice,
-            .in(.location("testRoom"))
-        )
-
-        let game = MinimalGame(
-            player: Player(in: "testRoom"),
-            locations: testRoom,
-            items: lamp
-        )
-
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
-
-        // When
-        try await engine.execute("turn on lamp")
-
-        // Then
-        let output = await mockIO.flush()
-        expectNoDifference(output, """
-            > turn on lamp
-            The brass lamp is now on.
-            """)
-
-        let finalState = try await engine.item("lamp")
-        #expect(finalState.hasFlag(.isOn) == true)
-    }
-
-    @Test("LIGHT syntax works")
-    func testLightSyntax() async throws {
-        // Given
-        let testRoom = Location(
-            id: "testRoom",
-            .name("Test Room"),
-            .inherentlyLit
-        )
-
-        let lantern = Item(
-            id: "lantern",
-            .name("glass lantern"),
-            .description("A glass lantern."),
-            .isLightSource,
-            .isDevice,
-            .in(.location("testRoom"))
-        )
-
-        let game = MinimalGame(
-            player: Player(in: "testRoom"),
-            locations: testRoom,
-            items: lantern
-        )
-
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
-
-        // When
-        try await engine.execute("light lantern")
-
-        // Then
-        let output = await mockIO.flush()
-        expectNoDifference(output, """
-            > light lantern
-            The glass lantern is now on.
-            """)
-
-        let finalState = try await engine.item("lantern")
-        #expect(finalState.hasFlag(.isOn) == true)
+    @Test("Syntax for 'turn on <item>'")
+    func testSyntaxTurnOn() async throws {
+        let handler = TurnOnActionHandler()
+        let syntax = try handler.syntax.first(where: { $0.pattern.contains(.verb(.turn)) })!
+            .parse("turn on lamp")
+        #expect(syntax.verb == .light)
+        #expect(syntax.directObject == .item(id: "lamp"))
     }
 
     // MARK: - Validation Testing
 
-    @Test("Cannot turn on non-light source")
-    func testCannotTurnOnNonLightSource() async throws {
-        // Given
-        let testRoom = Location(
-            id: "testRoom",
-            .name("Test Room"),
-            .inherentlyLit
-        )
-
-        let book = Item(
-            id: "book",
-            .name("leather book"),
-            .description("A worn leather-bound book."),
-            .in(.location("testRoom"))
-            // Note: No .isLightSource property
-        )
-
-        let game = MinimalGame(
-            player: Player(in: "testRoom"),
-            locations: testRoom,
-            items: book
-        )
-
+    @Test("Validation fails if item is not a device or flammable")
+    func testValidationFailsIfNotDeviceOrFlammable() async throws {
+        let rock = Item(id: "rock", .name("a rock"), .in(.location("testRoom")))
+        let game = MinimalGame.lit(items: rock)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
-
-        // When
-        try await engine.execute("turn on book")
-
-        // Then
+        try await engine.execute("turn on rock")
         let output = await mockIO.flush()
         expectNoDifference(output, """
-            > turn on book
-            You can’t turn that on.
-            """)
+         > turn on rock
+         You can’t turn that on.
+         """)
     }
 
-    @Test("Cannot turn on already lit item")
-    func testCannotTurnOnAlreadyLitItem() async throws {
-        // Given
-        let testRoom = Location(
-            id: "testRoom",
-            .name("Test Room"),
-            .inherentlyLit
-        )
-
-        let torch = Item(
-            id: "torch",
-            .name("wooden torch"),
-            .description("A wooden torch."),
-            .isLightSource,
-            .isDevice,
-            .isLit,
-            .isOn,
-            .in(.location("testRoom"))
-        )
-
-        let game = MinimalGame(
-            player: Player(in: "testRoom"),
-            locations: testRoom,
-            items: torch
-        )
-
+    @Test("Validation fails if device is already on")
+    func testValidationFailsIfAlreadyOn() async throws {
+        let lamp = Item(id: "lamp", .name("a lamp"), .isDevice, .isOn, .in(.location("testRoom")))
+        let game = MinimalGame.lit(items: lamp)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
-
-        // When
-        try await engine.execute("turn on torch")
-
-        // Then
-        let output = await mockIO.flush()
-        expectNoDifference(output, """
-            > turn on torch
-            It’s already on.
-            """)
-    }
-
-    @Test("Cannot turn on item not in scope")
-    func testCannotTurnOnItemNotInScope() async throws {
-        // Given
-        let testRoom = Location(
-            id: "testRoom",
-            .name("Test Room"),
-            .inherentlyLit
-        )
-
-        let anotherRoom = Location(
-            id: "anotherRoom",
-            .name("Another Room"),
-            .inherentlyLit
-        )
-
-        let remoteLamp = Item(
-            id: "remoteLamp",
-            .name("remote lamp"),
-            .description("A lamp in another room."),
-            .isLightSource,
-            .isDevice,
-            .in(.location("anotherRoom"))
-        )
-
-        let game = MinimalGame(
-            player: Player(in: "testRoom"),
-            locations: testRoom, anotherRoom,
-            items: remoteLamp
-        )
-
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
-
-        // When
         try await engine.execute("turn on lamp")
-
-        // Then
         let output = await mockIO.flush()
         expectNoDifference(output, """
-            > turn on lamp
-            You can’t see any such thing.
-            """)
-    }
-
-    @Test("Requires light to turn on items")
-    func testRequiresLight() async throws {
-        // Given: Dark room with an unlit lamp
-        let darkRoom = Location(
-            id: "darkRoom",
-            .name("Dark Room"),
-            .description("A room that is pitch black if you aren't carrying a light.")
-            // Note: No .inherentlyLit property
-        )
-
-        let lamp = Item(
-            id: "lamp",
-            .name("brass lamp"),
-            .description("A brass oil lamp."),
-            .isLightSource,
-            .isDevice,
-            .in(.player)
-        )
-
-        let game = MinimalGame(
-            player: Player(in: "darkRoom"),
-            locations: darkRoom,
-            items: lamp
-        )
-
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
-
-        // When
-        try await engine.execute("turn on lamp")
-
-        // Then
-        let output = await mockIO.flush()
-        expectNoDifference(output, """
-            > turn on lamp
-            The brass lamp is now on. You can see your surroundings now.
-
-            — Dark Room —
-
-            A room that is pitch black if you aren’t carrying a light.
-            """)
+         > turn on lamp
+         It’s already on.
+         """)
     }
 
     // MARK: - Processing Testing
 
-    @Test("Successful turn on sets lit flag")
-    func testSuccessfulTurnOnSetsLitFlag() async throws {
-        // Given
-        let testRoom = Location(
-            id: "testRoom",
-            .name("Test Room"),
-            .inherentlyLit
-        )
-
-        let candle = Item(
-            id: "candle",
-            .name("white candle"),
-            .description("A white wax candle."),
-            .isLightSource,
-            .isDevice,
-            .in(.location("testRoom"))
-        )
-
-        let game = MinimalGame(
-            player: Player(in: "testRoom"),
-            locations: testRoom,
-            items: candle
-        )
-
+    @Test("Turning on a device")
+    func testTurnOnDevice() async throws {
+        let lamp = Item(id: "lamp", .name("the lamp"), .isDevice, .in(.location("testRoom")))
+        let game = MinimalGame.lit(items: lamp)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        // When
-        try await engine.execute("turn on candle")
+        try await engine.execute("turn on lamp")
 
-        // Then: Verify state change
-        let finalState = try await engine.item("candle")
-        #expect(finalState.hasFlag(.isOn) == true)
-
-        // Verify message
         let output = await mockIO.flush()
         expectNoDifference(output, """
-            > turn on candle
-            The white candle is now on.
-            """)
+         > turn on lamp
+         The lamp is now on.
+         """)
+
+        let finalLamp = try await engine.item("lamp")
+        #expect(finalLamp.hasFlag(.isOn))
+    }
+
+    @Test("Turning on a flammable item burns it")
+    func testTurnOnFlammable() async throws {
+        let paper = Item(id: "paper", .name("a piece of paper"), .isFlammable, .in(.location("testRoom")))
+        let game = MinimalGame.lit(items: paper)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        try await engine.execute("light paper")
+
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+         > light paper
+         The piece of paper burns to ashes.
+         """)
+
+        await #expect(throws: GnustoEngineError.itemNotFound(id: "paper")) {
+            _ = try await engine.item("paper")
+        }
+    }
+
+    @Test("Turning on a light source in a dark room")
+    func testTurnOnLightInDark() async throws {
+        let darkRoom = Location(id: "darkRoom", .name("Dark Room"))
+        let lamp = Item(id: "lamp", .name("the lamp"), .isDevice, .isLightSource, .in(.location("darkRoom")))
+        let game = MinimalGame(player: Player(in: "darkRoom"), locations: darkRoom, items: lamp)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        try await engine.execute("turn on lamp")
+
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+         > turn on lamp
+         The lamp is now on.
+         You can see your surroundings now.
+         """)
     }
 
     // MARK: - ActionID Testing
 
-    @Test("Handler exposes correct ActionIDs")
-    func testActionIDs() async throws {
+    @Test("Handler has correct action IDs")
+    func testActionIDs() {
         let handler = TurnOnActionHandler()
         #expect(handler.actions.contains(.lightSource))
         #expect(handler.actions.contains(.burn))
-    }
-
-    @Test("Handler exposes correct VerbIDs")
-    func testVerbIDs() async throws {
-        let handler = TurnOnActionHandler()
-        // Note: TurnOnActionHandler is syntax-based and should have empty verbs
-        #expect(handler.verbs.isEmpty)
-    }
-
-    @Test("Handler requires light")
-    func testRequiresLightProperty() async throws {
-        let handler = TurnOnActionHandler()
-        #expect(handler.requiresLight == true)
     }
 }

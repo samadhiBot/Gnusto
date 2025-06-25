@@ -1,4 +1,6 @@
+import CustomDump
 import Testing
+
 @testable import GnustoEngine
 
 @Suite("Vocabulary Tests")
@@ -37,8 +39,12 @@ struct VocabularyTests {
         #expect(lookMappings != nil, "The word 'look' should have verb mappings")
         if let mappings = lookMappings {
             #expect(mappings.contains(.look), "'look' should map to .look verb")
-            #expect(mappings.contains(.lookInside), "'look' should also map to .lookInside verb as a synonym")
-            #expect(mappings.contains(.lookUnder), "'look' should also map to .lookUnder verb as a synonym")
+            #expect(
+                mappings.contains(.lookInside),
+                "'look' should also map to .lookInside verb as a synonym")
+            #expect(
+                mappings.contains(.lookUnder),
+                "'look' should also map to .lookUnder verb as a synonym")
         }
         #expect(synonyms["l"] == [.look], "'l' should map only to 'look'")
         #expect(synonyms["examine"] == [.examine], "Primary 'examine' should map to itself")
@@ -79,7 +85,9 @@ struct VocabularyTests {
         #expect(climbMappings != nil, "The word 'climb' should have verb mappings")
         if let mappings = climbMappings {
             #expect(mappings.contains(.climb), "'climb' should map to .climb verb")
-            #expect(mappings.contains(.climbOn), "'climb' should also map to .climbOn verb as a synonym")
+            #expect(
+                mappings.contains(.climbOn), "'climb' should also map to .climbOn verb as a synonym"
+            )
         }
 
         // For verification, check that "sit" (synonym for climbOn) works correctly

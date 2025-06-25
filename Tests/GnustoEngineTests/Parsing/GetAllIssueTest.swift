@@ -1,4 +1,6 @@
+import CustomDump
 import Testing
+
 @testable import GnustoEngine
 
 @Suite("Get All Issue Reproduction Tests")

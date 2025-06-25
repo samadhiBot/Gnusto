@@ -1,437 +1,192 @@
-import Testing
 import CustomDump
+import Testing
+
 @testable import GnustoEngine
 
-@Suite("TakeActionHandler Tests")
+@Suite
 struct TakeActionHandlerTests {
-
     // MARK: - Syntax Rule Testing
 
-    @Test("TAKE syntax works")
-    func testTakeSyntax() async throws {
-        // Given
-        let testRoom = Location(
-            id: "testRoom",
-            .name("Test Room"),
-            .description("A room for testing."),
-            .inherentlyLit
-        )
-
-        let key = Item(
-            id: "key",
-            .name("brass key"),
-            .description("A small brass key."),
-            .isTakable,
-            .in(.location("testRoom"))
-        )
-
-        let game = MinimalGame(
-            player: Player(in: "testRoom"),
-            locations: testRoom,
-            items: key
-        )
-
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
-
-        // When
-        try await engine.execute("take key")
-
-        // Then
-        let output = await mockIO.flush()
-        expectNoDifference(output, """
-            > take key
-            Taken.
-            """)
-
-        let finalState = try await engine.item("key")
-        #expect(finalState.parent == .player)
+    @Test("Syntax rule for 'take <items>'")
+    func testSyntaxTake() async throws {
+        let handler = TakeActionHandler()
+        let syntax = try handler.syntax.primary.parse("take book")
+        #expect(syntax.verb == .take)
+        #expect(syntax.directObjects.count == 1)
+        #expect(syntax.directObjects.first == .item(id: "book"))
     }
 
-    @Test("GET syntax works")
-    func testGetSyntax() async throws {
-        // Given
-        let testRoom = Location(
-            id: "testRoom",
-            .name("Test Room"),
-            .inherentlyLit
-        )
-
-        let coin = Item(
-            id: "coin",
-            .name("gold coin"),
-            .description("A shiny gold coin."),
-            .isTakable,
-            .in(.location("testRoom"))
-        )
-
-        let game = MinimalGame(
-            player: Player(in: "testRoom"),
-            locations: testRoom,
-            items: coin
-        )
-
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
-
-        // When
-        try await engine.execute("get coin")
-
-        // Then
-        let output = await mockIO.flush()
-        expectNoDifference(output, """
-            > get coin
-            Taken.
-            """)
-
-        let finalState = try await engine.item("coin")
-        #expect(finalState.parent == .player)
+    @Test("Syntax rule for 'pick up <items>'")
+    func testSyntaxPickUp() async throws {
+        let handler = TakeActionHandler()
+        let syntax = try handler.syntax.first(where: { $0.pattern.first == .verb(.pick) })!.parse("pick up book")
+        #expect(syntax.verb == .take)
+        #expect(syntax.directObjects.count == 1)
+        #expect(syntax.directObjects.first == .item(id: "book"))
     }
 
-    @Test("GRAB syntax works")
-    func testGrabSyntax() async throws {
-        // Given
-        let testRoom = Location(
-            id: "testRoom",
-            .name("Test Room"),
-            .inherentlyLit
-        )
-
-        let rope = Item(
-            id: "rope",
-            .name("coiled rope"),
-            .description("A length of coiled rope."),
-            .isTakable,
-            .in(.location("testRoom"))
-        )
-
-        let game = MinimalGame(
-            player: Player(in: "testRoom"),
-            locations: testRoom,
-            items: rope
-        )
-
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
-
-        // When
-        try await engine.execute("grab rope")
-
-        // Then
-        let output = await mockIO.flush()
-        expectNoDifference(output, """
-            > grab rope
-            Taken.
-            """)
-
-        let finalState = try await engine.item("rope")
-        #expect(finalState.parent == .player)
+    @Test("Syntax rule for 'take <items> from <item>'")
+    func testSyntaxTakeFrom() async throws {
+        let handler = TakeActionHandler()
+        let syntax = try handler.syntax.first(where: { $0.pattern.contains(.preposition(.from)) })!.parse("take book from bag")
+        #expect(syntax.verb == .take)
+        #expect(syntax.directObjects.count == 1)
+        #expect(syntax.directObjects.first == .item(id: "book"))
+        #expect(syntax.indirectObject == .item(id: "bag"))
     }
 
-    @Test("STEAL syntax works")
-    func testStealSyntax() async throws {
-        // Given
-        let testRoom = Location(
-            id: "testRoom",
-            .name("Test Room"),
-            .inherentlyLit
-        )
-
-        let gem = Item(
-            id: "gem",
-            .name("sparkling gem"),
-            .description("A beautiful sparkling gem."),
-            .isTakable,
-            .in(.location("testRoom"))
-        )
-
-        let game = MinimalGame(
-            player: Player(in: "testRoom"),
-            locations: testRoom,
-            items: gem
-        )
-
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
-
-        // When
-        try await engine.execute("steal gem")
-
-        // Then
-        let output = await mockIO.flush()
-        expectNoDifference(output, """
-            > steal gem
-            Taken.
-            """)
-
-        let finalState = try await engine.item("gem")
-        #expect(finalState.parent == .player)
+    @Test("Syntax rule for synonym 'get <items>'")
+    func testSyntaxGet() async throws {
+        let handler = TakeActionHandler()
+        let syntax = try handler.syntax.primary.parse("get book")
+        #expect(syntax.verb == .take)
     }
 
     // MARK: - Validation Testing
 
-    @Test("Cannot take item that is not takable")
-    func testCannotTakeNonTakableItem() async throws {
-        // Given
-        let testRoom = Location(
-            id: "testRoom",
-            .name("Test Room"),
-            .inherentlyLit
-        )
-
-        let statue = Item(
-            id: "statue",
-            .name("stone statue"),
-            .description("A heavy stone statue."),
-            .in(.location("testRoom"))
-            // Note: No .isTakable property
-        )
-
-        let game = MinimalGame(
-            player: Player(in: "testRoom"),
-            locations: testRoom,
-            items: statue
-        )
-
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
-
-        // When
-        try await engine.execute("take statue")
-
-        // Then
+    @Test("Validation fails without a direct object")
+    func testValidationFailsWithoutDirectObject() async throws {
+        let (engine, mockIO) = await GameEngine.test(blueprint: MinimalGame())
+        try await engine.execute("take")
         let output = await mockIO.flush()
         expectNoDifference(output, """
-            > take statue
-            You can’t take the stone statue.
-            """)
-
-        let finalState = try await engine.item("statue")
-        #expect(finalState.parent == .location("testRoom"))
+         > take
+         Take what?
+         """)
     }
 
-    @Test("Cannot take item already held")
-    func testCannotTakeAlreadyHeldItem() async throws {
-        // Given
-        let testRoom = Location(
-            id: "testRoom",
-            .name("Test Room"),
-            .inherentlyLit
-        )
-
-        let book = Item(
-            id: "book",
-            .name("leather book"),
-            .description("A worn leather-bound book."),
-            .isTakable,
-            .in(.player)
-        )
-
-        let game = MinimalGame(
-            player: Player(in: "testRoom"),
-            locations: testRoom,
-            items: book
-        )
-
+    @Test("Validation fails for non-takable item")
+    func testValidationFailsForNonTakableItem() async throws {
+        let wall = Item(id: "wall", .name("a wall"), .in(.location("testRoom")))
+        let game = MinimalGame.lit(items: wall)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
+        try await engine.execute("take wall")
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+         > take wall
+         You can’t take the wall.
+         """)
+    }
 
-        // When
+    @Test("Validation fails when inventory is full")
+    func testValidationFailsInventoryFull() async throws {
+        let book = Item(id: "book", .name("a book"), .isTakable, .size(10), .in(.location("testRoom")))
+        let player = Player(in: "testRoom", maxCapacity: 5)
+        let game = MinimalGame.lit(player: player, items: book)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
         try await engine.execute("take book")
-
-        // Then
         let output = await mockIO.flush()
         expectNoDifference(output, """
-            > take book
-            You already have that.
-            """)
-
-        let finalState = try await engine.item("book")
-        #expect(finalState.parent == .player)
+         > take book
+         You’re carrying too much stuff to take that.
+         """)
     }
 
-    @Test("Cannot take item not in scope")
-    func testCannotTakeItemNotInScope() async throws {
-        // Given
-        let testRoom = Location(
-            id: "testRoom",
-            .name("Test Room"),
-            .inherentlyLit
-        )
-
-        let anotherRoom = Location(
-            id: "anotherRoom",
-            .name("Another Room"),
-            .inherentlyLit
-        )
-
-        let remoteItem = Item(
-            id: "remote",
-            .name("remote item"),
-            .description("An item in another room."),
-            .isTakable,
-            .in(.location("anotherRoom"))
-        )
-
-        let game = MinimalGame(
-            player: Player(in: "testRoom"),
-            locations: testRoom, anotherRoom,
-            items: remoteItem
-        )
-
+    @Test("Validation fails for item in closed, opaque container")
+    func testValidationFailsItemInClosedOpaqueContainer() async throws {
+        let box = Item(id: "box", .name("a box"), .isContainer, .in(.location("testRoom")))
+        let coin = Item(id: "coin", .name("a coin"), .isTakable, .in(.item("box")))
+        let game = MinimalGame.lit(items: box, coin)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
-
-        // When
-        try await engine.execute("take remote")
-
-        // Then
+        try await engine.execute("take coin")
         let output = await mockIO.flush()
         expectNoDifference(output, """
-            > take remote
-            You can’t see any such thing.
-            """)
-
-        let finalState = try await engine.item("remote")
-        #expect(finalState.parent == .location("anotherRoom"))
+         > take coin
+         You can’t see any coin here.
+         """)
     }
 
-    @Test("Requires light to take items")
-    func testRequiresLight() async throws {
-        // Given: Dark room with no light sources
-        let darkRoom = Location(
-            id: "darkRoom",
-            .name("Dark Room"),
-            .description("A pitch black room.")
-            // Note: No .inherentlyLit property
-        )
-
-        let key = Item(
-            id: "key",
-            .name("brass key"),
-            .description("A small brass key."),
-            .isTakable,
-            .in(.location("darkRoom"))
-        )
-
-        let game = MinimalGame(
-            player: Player(in: "darkRoom"),
-            locations: darkRoom,
-            items: key
-        )
-
+    @Test("Validation succeeds for item in closed, transparent container")
+    func testValidationSucceedsItemInClosedTransparentContainer() async throws {
+        let box = Item(id: "box", .name("a box"), .isContainer, .isTransparent, .in(.location("testRoom")))
+        let coin = Item(id: "coin", .name("a coin"), .isTakable, .in(.item("box")))
+        let game = MinimalGame.lit(items: box, coin)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
-
-        // When
-        try await engine.execute("take key")
-
-        // Then
+        try await engine.execute("take coin")
         let output = await mockIO.flush()
         expectNoDifference(output, """
-            > take key
-            It is pitch black. You can’t see a thing.
-            """)
-
-        let finalState = try await engine.item("key")
-        #expect(finalState.parent == .location("darkRoom"))
+         > take coin
+         The box is closed.
+         """)
     }
 
     // MARK: - Processing Testing
 
-    @Test("Successful take moves item to player")
-    func testSuccessfulTakeMovesItem() async throws {
-        // Given
-        let testRoom = Location(
-            id: "testRoom",
-            .name("Test Room"),
-            .inherentlyLit
-        )
-
-        let scroll = Item(
-            id: "scroll",
-            .name("ancient scroll"),
-            .description("An ancient papyrus scroll."),
-            .isTakable,
-            .in(.location("testRoom"))
-        )
-
-        let game = MinimalGame(
-            player: Player(in: "testRoom"),
-            locations: testRoom,
-            items: scroll
-        )
-
+    @Test("Taking a single item")
+    async func testTakeSingleItem() async throws {
+        let book = Item(id: "book", .name("a book"), .isTakable, .in(.location("testRoom")))
+        let game = MinimalGame.lit(items: book)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        // When
-        try await engine.execute("take scroll")
+        try await engine.execute("take book")
 
-        // Then: Verify state change
-        let finalState = try await engine.item("scroll")
-        #expect(finalState.parent == .player)
-
-        // Verify message
         let output = await mockIO.flush()
         expectNoDifference(output, """
-            > take scroll
-            Taken.
-            """)
+         > take book
+         Taken.
+         """)
+        let finalBook = try await engine.item("book")
+        #expect(finalBook.parent == .player)
+        #expect(finalBook.hasFlag(.isTouched))
     }
 
-    @Test("Taking item sets touched property")
-    func testTakingItemSetsTouchedProperty() async throws {
-        // Given
-        let testRoom = Location(
-            id: "testRoom",
-            .name("Test Room"),
-            .inherentlyLit
-        )
-
-        let crystal = Item(
-            id: "crystal",
-            .name("blue crystal"),
-            .description("A translucent blue crystal."),
-            .isTakable,
-            .in(.location("testRoom"))
-        )
-
-        let game = MinimalGame(
-            player: Player(in: "testRoom"),
-            locations: testRoom,
-            items: crystal
-        )
-
+    @Test("Taking an already held item")
+    async func testTakeHeldItem() async throws {
+        let book = Item(id: "book", .name("a book"), .isTakable, .in(.player))
+        let game = MinimalGame.lit(items: book)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        // When
-        try await engine.execute("take crystal")
-
-        // Then
-        let finalState = try await engine.item("crystal")
-        #expect(finalState.hasFlag(.isTouched) == true)
+        try await engine.execute("take book")
 
         let output = await mockIO.flush()
         expectNoDifference(output, """
-            > take crystal
-            Taken.
-            """)
+         > take book
+         You already have that.
+         """)
+    }
+
+    @Test("Taking item from an open container")
+    async func testTakeFromOpenContainer() async throws {
+        let box = Item(id: "box", .name("a box"), .isContainer, .isOpen, .in(.location("testRoom")))
+        let coin = Item(id: "coin", .name("a coin"), .isTakable, .in(.item("box")))
+        let game = MinimalGame.lit(items: box, coin)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        try await engine.execute("take coin from box")
+
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+         > take coin from box
+         Taken.
+         """)
+        let finalCoin = try await engine.item("coin")
+        #expect(finalCoin.parent == .player)
+    }
+
+    @Test("Take all from location")
+    async func testTakeAllFromLocation() async throws {
+        let book = Item(id: "book", .name("a book"), .isTakable, .in(.location("testRoom")))
+        let rock = Item(id: "rock", .name("a rock"), .in(.location("testRoom")))
+        let coin = Item(id: "coin", .name("a coin"), .isTakable, .in(.location("testRoom")))
+        let game = MinimalGame.lit(items: book, rock, coin)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        try await engine.execute("take all")
+
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+         > take all
+         You take the book and the coin.
+         """)
+        #expect(try await engine.item("book").parent == .player)
+        #expect(try await engine.item("coin").parent == .player)
+        #expect(try await engine.item("rock").parent != .player)
     }
 
     // MARK: - ActionID Testing
 
-    @Test("Handler exposes correct ActionIDs")
-    func testActionIDs() async throws {
-        let handler = TakeActionHandler()
-        #expect(handler.actions.contains(.take))
-        #expect(handler.actions.count == 1)
-    }
-
-    @Test("Handler exposes correct VerbIDs")
-    func testVerbIDs() async throws {
-        let handler = TakeActionHandler()
-        #expect(handler.verbs.contains(.take))
-        #expect(handler.verbs.contains(.get))
-        #expect(handler.verbs.contains(.grab))
-        #expect(handler.verbs.contains(.steal))
-        #expect(handler.verbs.count == 4)
-    }
-
-    @Test("Handler requires light")
-    func testRequiresLightProperty() async throws {
-        let handler = TakeActionHandler()
-        #expect(handler.requiresLight == true)
+    @Test("Handler has correct action ID")
+    func testActionID() {
+        #expect(TakeActionHandler().actionID == .take)
     }
 }

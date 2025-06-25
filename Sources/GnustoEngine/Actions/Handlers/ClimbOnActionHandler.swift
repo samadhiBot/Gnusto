@@ -9,6 +9,7 @@ public struct ClimbOnActionHandler: ActionHandler {
 
     public let syntax: [SyntaxRule] = [
         .match(.climb, .on, .directObject),
+        .match(.get, .on, .directObject),
         .match(.sit, .on, .directObject),
         .match(.mount, .directObject),
     ]
