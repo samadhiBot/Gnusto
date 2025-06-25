@@ -1,0 +1,304 @@
+---
+description:
+globs:
+alwaysApply: true
+---
+# State Change Testing Guide
+
+## Critical Testing Pattern: Using `engine.apply()` for State Changes
+
+**CRITICAL RULE**: When setting up test state that requires modifications to the game state, you MUST use `engine.apply()` to actually register the changes. Methods like `engine.setGlobal()`, `engine.moveItem()`, etc. return `StateChange` objects that are NOT automatically applied.
+
+## Understanding StateChange Objects
+
+The Gnusto engine uses a formal state change pipeline where all modifications to game state flow through `StateChange` objects. These objects represent proposed modifications and must be explicitly applied to take effect.
+
+### The StateChange Lifecycle
+
+1. **Creation**: Action handlers or test setup code creates `StateChange` objects
+2. **Validation**: The engine validates changes against current state (using `oldValue` if provided)
+3. **Application**: Changes are applied to `GameState` and recorded in `changeHistory`
+
+### Common Testing Mistake: Forgetting `engine.apply()`
+
+```swift
+// ❌ WRONG - State change is created but never applied!
+@Test("Global flag affects behavior")
+func testGlobalFlag() async throws {
+    let game = MinimalGame(...)
+    let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+    // This creates a StateChange but doesn't apply it!
+    let stateChange = await engine.setGlobal(.isVerboseMode, to: true)
+    // The game state is unchanged - .isVerboseMode is still false!
+
+    try await engine.execute("look")
+    // Test will fail because verbose mode was never actually enabled
+}
+
+// ✅ RIGHT - State change is created AND applied
+@Test("Global flag affects behavior")
+func testGlobalFlag() async throws {
+    let game = MinimalGame(...)
+    let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+    // Create the state change AND apply it
+    try await engine.apply(
+        engine.setGlobal(.isVerboseMode, to: true)
+    )
+    // Now .isVerboseMode is actually true in the game state
+
+    try await engine.execute("look")
+    // Test will work correctly with verbose mode enabled
+}
+```
+
+## Test Setup Patterns Requiring `engine.apply()`
+
+### Setting Global Flags
+
+```swift
+// ✅ RIGHT - Setting up global state for tests
+@Test("Brief mode affects room descriptions")
+func testBriefMode() async throws {
+    let testRoom = Location(
+        id: "testRoom",
+        .name("Test Room"),
+        .description("A detailed description of the test room."),
+        .inherentlyLit
+    )
+
+    let game = MinimalGame(
+        player: Player(in: "testRoom"),
+        locations: testRoom
+    )
+
+    let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+    // Enable brief mode in the test setup
+    try await engine.apply(
+        engine.setGlobal(.isBriefMode, to: true)
+    )
+
+    // Now commands will use brief mode
+    try await engine.execute("look")
+
+    let output = await mockIO.flush()
+    // Brief mode descriptions will be used
+}
+```
+
+### Moving Items for Test Setup
+
+```swift
+// ✅ RIGHT - Moving items during test setup
+@Test("Action requires item to be held")
+func testRequiresItemHeld() async throws {
+    let testRoom = Location(
+        id: "testRoom",
+        .name("Test Room"),
+        .inherentlyLit
+    )
+
+    let lamp = Item(
+        id: "lamp",
+        .name("brass lamp"),
+        .description("A shiny brass lamp."),
+        .isLightSource,
+        .isDevice,
+        .isTakable,
+        .in(.location("testRoom"))  // Initially in room
+    )
+
+    let game = MinimalGame(
+        player: Player(in: "testRoom"),
+        locations: testRoom,
+        items: lamp
+    )
+
+    let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+    // Move lamp to player's inventory for test setup
+    try await engine.apply(
+        engine.moveItem("lamp", to: .player)
+    )
+
+    // Now the lamp is actually held by the player
+    try await engine.execute("turn on lamp")
+
+    // Test will work correctly because lamp is held
+}
+```
+
+### Setting Item Properties
+
+```swift
+// ✅ RIGHT - Setting item flags during test setup
+@Test("Turn off already lit lamp")
+func testTurnOffLitLamp() async throws {
+    let lamp = Item(
+        id: "lamp",
+        .name("brass lamp"),
+        .isLightSource,
+        .isDevice,
+        .isTakable,
+        .in(.player)
+    )
+
+    let game = MinimalGame(
+        player: Player(in: "testRoom"),
+        locations: Location(id: "testRoom", .inherentlyLit),
+        items: lamp
+    )
+
+    let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+    // Set the lamp to be already lit for this test
+    try await engine.apply(
+        engine.setItemFlag("lamp", .isOn, to: true)
+    )
+
+    // Now we can test turning off an already-lit lamp
+    try await engine.execute("turn off lamp")
+
+    let output = await mockIO.flush()
+    expectNoDifference(output, """
+        > turn off lamp
+        The brass lamp is now off.
+        """)
+}
+```
+
+## Multiple State Changes
+
+When setting up complex test scenarios, you can apply multiple state changes:
+
+```swift
+// ✅ RIGHT - Multiple state changes for complex test setup
+@Test("Complex scenario with multiple state changes")
+func testComplexScenario() async throws {
+    let game = MinimalGame(...)
+    let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+    // Apply multiple state changes to set up the scenario
+    try await engine.apply(
+        engine.setGlobal(.isBriefMode, to: true),
+        engine.moveItem("lamp", to: .player),
+        engine.setItemFlag("lamp", .isOn, to: true),
+        engine.setPlayerScore(50)
+    )
+
+    // Now execute the actual test command
+    try await engine.execute("inventory")
+
+    // All state changes are in effect
+}
+```
+
+## State Verification in Tests
+
+After performing actions, verify state changes using engine query methods:
+
+```swift
+// ✅ RIGHT - Verifying state after actions
+@Test("Turn on lamp sets isOn flag")
+func testTurnOnSetsFlag() async throws {
+    // ... test setup ...
+
+    try await engine.execute("turn on lamp")
+
+    // Verify the state change was applied
+    let finalLamp = try await engine.item("lamp")
+    #expect(finalLamp.hasFlag(.isOn) == true)
+
+    // Also verify output message
+    let output = await mockIO.flush()
+    expectNoDifference(output, """
+        > turn on lamp
+        The brass lamp is now on.
+        """)
+}
+```
+
+## Common State Change Methods
+
+Here are the most commonly used engine methods that return `StateChange` objects requiring `engine.apply()`:
+
+### Global State Changes
+- `engine.setGlobal(flag, to: value)` - Set global flags like `.isBriefMode`, `.isVerboseMode`
+- `engine.setPlayerScore(score)` - Set player score
+- `engine.incrementTurnCount()` - Increment turn counter
+
+### Item State Changes
+- `engine.moveItem(itemID, to: parent)` - Move items between locations/player/containers
+- `engine.setItemFlag(itemID, flag, to: value)` - Set item flags like `.isOn`, `.isLit`, `.isTouched`
+- `engine.setItemProperty(itemID, property, to: value)` - Set item properties
+
+### Location State Changes
+- `engine.setLocationFlag(locationID, flag, to: value)` - Set location flags
+- `engine.setLocationProperty(locationID, property, to: value)` - Set location properties
+
+## Error Handling
+
+The `engine.apply()` method can throw errors if state changes fail validation:
+
+```swift
+// Handle potential validation errors
+do {
+    try await engine.apply(
+        engine.moveItem("heavyStatue", to: .player)
+    )
+} catch {
+    // Handle the error - maybe the item can't be moved
+    print("Failed to move item: \(error)")
+}
+```
+
+## Anti-Patterns to Avoid
+
+### ❌ Don't Forget `engine.apply()`
+
+```swift
+// ❌ WRONG - State change created but never applied
+let stateChange = await engine.setGlobal(.isBriefMode, to: true)
+// Brief mode is still false!
+
+// ❌ WRONG - Storing state change without applying
+let changes = [
+    await engine.setGlobal(.isBriefMode, to: true),
+    await engine.moveItem("lamp", to: .player)
+]
+// None of these changes are applied!
+```
+
+### ❌ Don't Assume State Changes Are Automatic
+
+```swift
+// ❌ WRONG - Assuming method calls modify state directly
+await engine.setGlobal(.isVerboseMode, to: true)
+await engine.moveItem("lamp", to: .player)
+// Neither change is applied - game state is unchanged!
+```
+
+### ❌ Don't Mix Direct State Access with State Changes
+
+```swift
+// ❌ WRONG - Bypassing the state change system
+let gameState = await engine.gameState
+gameState.globals[.isBriefMode] = true  // Don't do this!
+
+// ✅ RIGHT - Use the proper state change pipeline
+try await engine.apply(
+    engine.setGlobal(.isBriefMode, to: true)
+)
+```
+
+## Summary
+
+The key principle is that **all game state modifications must flow through the StateChange pipeline**. Methods like `engine.setGlobal()` create `StateChange` objects but don't automatically apply them. Always use `engine.apply()` to actually register state changes in your tests.
+
+This pattern ensures:
+- State changes are properly validated
+- Changes are recorded in the change history
+- The game state remains consistent
+- Tests accurately reflect real game behavior

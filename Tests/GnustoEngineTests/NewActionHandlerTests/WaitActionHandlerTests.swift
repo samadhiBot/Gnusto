@@ -41,7 +41,6 @@ struct WaitActionHandlerTests {
         let testRoom = Location(
             id: "testRoom",
             .name("Test Room"),
-            .description("A room for testing."),
             .inherentlyLit
         )
 
@@ -123,7 +122,7 @@ struct WaitActionHandlerTests {
 
     @Test("Wait in dark room")
     func testWaitInDarkRoom() async throws {
-        // Given
+        // Given: Dark room without light source
         let darkRoom = Location(
             id: "darkRoom",
             .name("Dark Room"),
@@ -157,24 +156,17 @@ struct WaitActionHandlerTests {
             .inherentlyLit
         )
 
-        let chest = Item(
-            id: "chest",
-            .name("wooden chest"),
-            .description("A large wooden chest."),
+        let item = Item(
+            id: "item",
+            .name("test item"),
+            .description("A test item."),
             .in(.location("testRoom"))
-        )
-
-        let gem = Item(
-            id: "gem",
-            .name("sparkling gem"),
-            .description("A beautiful gem."),
-            .in(.player)
         )
 
         let game = MinimalGame(
             player: Player(in: "testRoom"),
             locations: testRoom,
-            items: chest, gem
+            items: item
         )
 
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
@@ -216,8 +208,10 @@ struct WaitActionHandlerTests {
         expectNoDifference(output, """
             > wait
             Time passes.
+
             > z
             Time passes.
+
             > wait
             Time passes.
             """)
@@ -254,7 +248,7 @@ struct WaitActionHandlerTests {
             items: book, coin
         )
 
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+        let (engine, _) = await GameEngine.test(blueprint: game)
 
         // Capture initial state
         let initialBookState = try await engine.item("book")
@@ -277,23 +271,34 @@ struct WaitActionHandlerTests {
     // MARK: - ActionID Testing
 
     @Test("Handler exposes correct ActionIDs")
-    func testActionIDs() async throws {
+    func testCorrectActionIDs() async throws {
+        // Given
         let handler = WaitActionHandler()
+
+        // When & Then
         // WaitActionHandler doesn't specify actions, so it should be empty
         #expect(handler.actions.isEmpty)
     }
 
     @Test("Handler exposes correct VerbIDs")
-    func testVerbIDs() async throws {
+    func testCorrectVerbIDs() async throws {
+        // Given
         let handler = WaitActionHandler()
-        #expect(handler.verbs.contains(.wait))
-        #expect(handler.verbs.contains(VerbID("z")))
-        #expect(handler.verbs.count == 2)
+
+        // When
+        let verbIDs = handler.verbs
+
+        // Then
+        #expect(verbIDs.contains(.wait))
+        #expect(verbIDs.contains("z"))
     }
 
     @Test("Handler does not require light")
-    func testRequiresLightProperty() async throws {
+    func testHandlerDoesNotRequireLight() async throws {
+        // Given
         let handler = WaitActionHandler()
+
+        // When & Then
         #expect(handler.requiresLight == false)
     }
 }

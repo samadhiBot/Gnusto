@@ -31,8 +31,8 @@ struct BriefActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > brief
-            Brief mode is now on. Location descriptions will be
-            shown only when you first enter a location.
+            Brief mode is now on. Location descriptions will be shown only
+            when you first enter a location.
             """)
     }
 
@@ -55,7 +55,9 @@ struct BriefActionHandlerTests {
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // Ensure we start in verbose mode
-        try await engine.setGlobal(.isVerboseMode, to: true)
+        try await engine.apply(
+            engine.setGlobal(.isVerboseMode, to: true)
+        )
 
         // When
         try await engine.execute("brief")
@@ -64,8 +66,8 @@ struct BriefActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > brief
-            Brief mode is now on. Location descriptions will be
-            shown only when you first enter a location.
+            Brief mode is now on. Location descriptions will be shown only
+            when you first enter a location.
             """)
 
         // Verify state changes
@@ -89,10 +91,12 @@ struct BriefActionHandlerTests {
             locations: testRoom
         )
 
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+        let (engine, _) = await GameEngine.test(blueprint: game)
 
         // Start with verbose mode enabled
-        try await engine.setGlobal(.isVerboseMode, to: true)
+        try await engine.apply(
+            engine.setGlobal(.isVerboseMode, to: true)
+        )
         let isVerboseBeforeBrief = await engine.hasGlobal(.isVerboseMode)
         #expect(isVerboseBeforeBrief == true)
 
@@ -129,8 +133,8 @@ struct BriefActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > brief
-            Brief mode is now on. Location descriptions will be
-            shown only when you first enter a location.
+            Brief mode is now on. Location descriptions will be shown only
+            when you first enter a location.
             """)
 
         // Verify state change occurred
