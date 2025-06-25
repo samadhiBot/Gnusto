@@ -168,7 +168,7 @@ open class MessageProvider: @unchecked Sendable {
     open func blowOnFlammable(item: String) -> String {
         output(
             "blowOnFlammable(item: '\(item)')",
-            "Blowing on \(item) accomplishes nothing."
+            "You blow on \(item), but it doesn't go out."
         )
     }
 
@@ -182,7 +182,7 @@ open class MessageProvider: @unchecked Sendable {
     open func blowOnLightSource(item: String) -> String {
         output(
             "blowOnLightSource(item: '\(item)')",
-            "You blow on \(item), but it doesn't go out."
+            "You blow on \(item), but it remains lit."
         )
     }
 

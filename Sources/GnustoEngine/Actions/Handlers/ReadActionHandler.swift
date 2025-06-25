@@ -27,10 +27,7 @@ public struct ReadActionHandler: ActionHandler {
     ///           `prerequisiteNotMet` (if not an item), `roomIsDark`, `itemNotAccessible`,
     ///           or `itemNotReadable` if any validation condition fails.
     ///           Can also throw errors from `engine.item()` if the item doesn't exist.
-        public func process(
-        command: Command,
-        engine: GameEngine
-    ) async throws -> ActionResult {
+    public func process(command: Command, engine: GameEngine) async throws -> ActionResult {
 
         // 1. Ensure we have a direct object and it's an item
         guard let directObjectRef = command.directObject else {

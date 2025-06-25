@@ -32,10 +32,7 @@ public struct LookActionHandler: ActionHandler {
     /// - Throws: `ActionResponse.prerequisiteNotMet` if the direct object is not an item,
     ///           `ActionResponse.unknownEntity` if the item does not exist, or
     ///           `ActionResponse.itemNotAccessible` if the item cannot be reached.
-        public func process(
-        command: Command,
-        engine: GameEngine
-    ) async throws -> ActionResult {
+    public func process(command: Command, engine: GameEngine) async throws -> ActionResult {
 
         // LOOK (no direct object) always validates.
         guard let directObjectRef = command.directObject else {

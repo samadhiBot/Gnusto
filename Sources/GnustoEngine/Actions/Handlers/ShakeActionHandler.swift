@@ -24,10 +24,7 @@ public struct ShakeActionHandler: ActionHandler {
     ///
     /// - Parameter context: The `ActionContext` for the current action.
     /// - Throws: Various `ActionResponse` errors if validation fails.
-        public func process(
-        command: Command,
-        engine: GameEngine
-    ) async throws -> ActionResult {
+    public func process(command: Command, engine: GameEngine) async throws -> ActionResult {
 
         // Shake requires a direct object (what to shake)
         guard let directObjectRef = command.directObject else {

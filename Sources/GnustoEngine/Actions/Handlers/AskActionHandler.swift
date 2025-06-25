@@ -23,10 +23,7 @@ public struct AskActionHandler: ActionHandler {
     /// Handles asking characters about topics. By default, most characters
     /// don't have specific responses, but game-specific ItemEventHandlers
     /// can provide custom dialogue.
-    public func process(
-        command: Command,
-        engine: GameEngine
-    ) async throws -> ActionResult {
+    public func process(command: Command, engine: GameEngine) async throws -> ActionResult {
         guard let directObjectRef = command.directObject else {
             throw ActionResponse.prerequisiteNotMet(
                 engine.messenger.askWhom()

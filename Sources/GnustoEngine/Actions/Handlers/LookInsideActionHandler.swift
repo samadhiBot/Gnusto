@@ -19,10 +19,7 @@ public struct LookInsideActionHandler: ActionHandler {
 
     /// Validates the "LOOK INSIDE" command.
     /// Requires a direct object that must be an item the player can reach.
-        public func process(
-        command: Command,
-        engine: GameEngine
-    ) async throws -> ActionResult {
+    public func process(command: Command, engine: GameEngine) async throws -> ActionResult {
 
         guard let directObjectRef = command.directObject else {
             throw ActionResponse.prerequisiteNotMet(

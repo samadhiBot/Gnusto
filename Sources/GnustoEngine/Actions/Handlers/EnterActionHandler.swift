@@ -25,10 +25,7 @@ public struct EnterActionHandler: ActionHandler {
     ///
     /// - Parameter context: The `ActionContext` for the current action.
     /// - Throws: Various `ActionResponse` errors if validation fails.
-        public func process(
-        command: Command,
-        engine: GameEngine
-    ) async throws -> ActionResult {
+    public func process(command: Command, engine: GameEngine) async throws -> ActionResult {
 
         // ENTER with no object - look for default enterable in location
         guard let directObjectRef = command.directObject else {

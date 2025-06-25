@@ -42,10 +42,7 @@ public struct InsertActionHandler: ActionHandler {
     ///           `containerIsClosed` (if container is not open),
     ///           `itemTooLargeForContainer` (if item won't fit).
     ///           Can also throw errors from `engine` calls (e.g., `item()`, `fetch()`).
-        public func process(
-        command: Command,
-        engine: GameEngine
-    ) async throws -> ActionResult {
+    public func process(command: Command, engine: GameEngine) async throws -> ActionResult {
 
         // For ALL commands, allow empty directObjects (handled in process method)
         if command.isAllCommand {

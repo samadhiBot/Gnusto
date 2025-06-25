@@ -29,10 +29,7 @@ public struct CloseActionHandler: ActionHandler {
     /// - Throws: Various `ActionResponse` errors if validation fails, such as:
     ///           `prerequisiteNotMet`, `itemNotAccessible`, `itemNotClosable`.
     ///           Can also throw errors from `engine.item()`.
-        public func process(
-        command: Command,
-        engine: GameEngine
-    ) async throws -> ActionResult {
+    public func process(command: Command, engine: GameEngine) async throws -> ActionResult {
 
         // 1. Ensure we have a direct object and it's an item
         guard let directObjectRef = command.directObject else {

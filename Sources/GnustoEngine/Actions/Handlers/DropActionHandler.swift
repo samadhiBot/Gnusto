@@ -26,10 +26,7 @@ public struct DropActionHandler: ActionHandler {
     ///           `prerequisiteNotMet` (for missing object or wrong item type),
     ///           `itemNotHeld` (if the player isn't holding the item).
     ///           Can also throw errors from `engine.item()`.
-        public func process(
-        command: Command,
-        engine: GameEngine
-    ) async throws -> ActionResult {
+    public func process(command: Command, engine: GameEngine) async throws -> ActionResult {
 
         // For ALL commands, allow empty directObjects (handled in process method)
         if command.isAllCommand {

@@ -32,10 +32,7 @@ public struct TurnOffActionHandler: ActionHandler {
     ///           `prerequisiteNotMet` (if not an item or not a device),
     ///           `itemNotAccessible`.
     ///           Can also throw errors from `engine.item()`.
-        public func process(
-        command: Command,
-        engine: GameEngine
-    ) async throws -> ActionResult {
+    public func process(command: Command, engine: GameEngine) async throws -> ActionResult {
 
         // 1. Get direct object and ensure it's an item
         guard let directObjectRef = command.directObject else {

@@ -22,10 +22,7 @@ public struct ClimbOnActionHandler: ActionHandler {
     ///
     /// - Parameter context: The `ActionContext` containing the command and game state.
     /// - Throws: An `ActionResponse` if validation fails.
-        public func process(
-        command: Command,
-        engine: GameEngine
-    ) async throws -> ActionResult {
+    public func process(command: Command, engine: GameEngine) async throws -> ActionResult {
 
         guard let directObjectRef = command.directObject else {
             throw ActionResponse.prerequisiteNotMet(

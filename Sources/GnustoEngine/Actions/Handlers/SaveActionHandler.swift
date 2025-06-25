@@ -18,10 +18,7 @@ public struct SaveActionHandler: ActionHandler {
 
     /// Validates the "SAVE" command.
     /// Save requires no specific validation and always proceeds.
-        public func process(
-        command: Command,
-        engine: GameEngine
-    ) async throws -> ActionResult {
+    public func process(command: Command, engine: GameEngine) async throws -> ActionResult {
 
         // No validation needed for SAVE
     /// Processes the "SAVE" command.

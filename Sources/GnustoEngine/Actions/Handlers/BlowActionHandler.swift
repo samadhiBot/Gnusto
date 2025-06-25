@@ -18,46 +18,16 @@ public struct BlowActionHandler: ActionHandler {
 
     public init() {}
 
-    /// Validates the "BLOW" command.
-    ///
-    /// This method ensures that:
-    /// 1. If a direct object is specified, it exists and is reachable.
-    /// 2. The command is properly formed (can be "blow" alone or "blow object").
-    ///
-    /// - Parameter context: The `ActionContext` for the current action.
-    /// - Throws: Various `ActionResponse` errors if validation fails.
-        public func process(
-        command: Command,
-        engine: GameEngine
-    ) async throws -> ActionResult {
-
-        // Blow can be used without an object (general blowing) or with an object
-        if let directObjectRef = command.directObject {
-            guard case .item(let targetItemID) = directObjectRef else {
-                throw ActionResponse.prerequisiteNotMet(
-                    engine.messenger.thatsNotSomethingYouCan(.blow)
-                )
-            }
-
-            // Check if target exists and is reachable
-            _ = try await engine.item(targetItemID)
-            guard await engine.playerCanReach(targetItemID) else {
-                throw ActionResponse.itemNotAccessible(targetItemID)
-            }
-        }
     /// Processes the "BLOW" command.
     ///
     /// Handles blowing on objects or general blowing. Special items like candles,
     /// fires, or wind instruments can have custom behavior via ItemEventHandlers.
-    ///
-    /// - Parameter context: The `ActionContext` for the current action.
-    /// - Returns: An `ActionResult` with appropriate blow message and state changes.
-        // Handle blowing on a specific object
+    public func process(command: Command, engine: GameEngine) async throws -> ActionResult {
+        // Blow can be used without an object (general blowing) or with an object
         guard
             let directObjectRef = command.directObject,
             case .item(let targetItemID) = directObjectRef
         else {
-            // General blowing without a target
             return ActionResult(
                 engine.messenger.blowGeneral()
             )

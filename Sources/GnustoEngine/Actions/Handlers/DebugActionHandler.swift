@@ -33,10 +33,7 @@ public struct DebugActionHandler: ActionHandler {
     /// - Parameter context: The `ActionContext` for the current action.
     /// - Throws: `ActionResponse.prerequisiteNotMet` if no direct object is provided,
     ///           or `ActionResponse.unknownEntity` if the direct object does not exist.
-        public func process(
-        command: Command,
-        engine: GameEngine
-    ) async throws -> ActionResult {
+    public func process(command: Command, engine: GameEngine) async throws -> ActionResult {
 
         guard let directObjectRef = command.directObject else {
             throw ActionResponse.prerequisiteNotMet(

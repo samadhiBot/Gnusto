@@ -31,10 +31,7 @@ public struct TasteActionHandler: ActionHandler {
     /// - Parameter context: The `ActionContext` for the current action.
     /// - Throws: `ActionResponse.custom` if no direct object is provided, or
     ///           `ActionResponse.prerequisiteNotMet` if the direct object is not an item.
-        public func process(
-        command: Command,
-        engine: GameEngine
-    ) async throws -> ActionResult {
+    public func process(command: Command, engine: GameEngine) async throws -> ActionResult {
 
         guard let directObjectRef = command.directObject else {
             throw ActionResponse.custom(

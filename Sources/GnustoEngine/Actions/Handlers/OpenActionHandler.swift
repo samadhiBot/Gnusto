@@ -33,10 +33,7 @@ public struct OpenActionHandler: ActionHandler {
     ///           `itemNotOpenable` (if item cannot be opened),
     ///           `itemIsLocked` (if item is locked).
     ///           Can also throw errors from `engine.item()`.
-        public func process(
-        command: Command,
-        engine: GameEngine
-    ) async throws -> ActionResult {
+    public func process(command: Command, engine: GameEngine) async throws -> ActionResult {
 
         // Check for multiple objects (not supported by OPEN)
         if command.directObjects.count > 1 {

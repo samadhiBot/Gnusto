@@ -16,10 +16,7 @@ public struct InventoryActionHandler: ActionHandler {
     // MARK: - Action Processing Methods
     /// Validates the "INVENTORY" command.
     /// This action typically requires no specific validation.
-        public func process(
-        command: Command,
-        engine: GameEngine
-    ) async throws -> ActionResult {
+    public func process(command: Command, engine: GameEngine) async throws -> ActionResult {
 
         // No specific validation needed for basic inventory command.
     /// Processes the "INVENTORY" command.

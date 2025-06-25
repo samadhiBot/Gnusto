@@ -26,10 +26,7 @@ public struct TouchActionHandler: ActionHandler {
     ///           `ActionResponse.prerequisiteNotMet` if the direct object is not an item,
     ///           or `ActionResponse.itemNotAccessible` if the item cannot be reached.
     ///           Can also throw errors from `engine.item()` if the item doesn't exist.
-        public func process(
-        command: Command,
-        engine: GameEngine
-    ) async throws -> ActionResult {
+    public func process(command: Command, engine: GameEngine) async throws -> ActionResult {
 
         // 1. Ensure we have a direct object and it's an item
         guard let directObjectRef = command.directObject else {

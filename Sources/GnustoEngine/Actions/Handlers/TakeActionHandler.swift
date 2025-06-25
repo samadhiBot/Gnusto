@@ -40,10 +40,7 @@ public struct TakeActionHandler: ActionHandler {
     ///           `prerequisiteNotMet`, `unknownEntity`, `itemNotAccessible`, `itemNotTakable`,
     ///           `containerIsClosed`, or `playerCannotCarryMore`.
     ///           Can also throw errors from `engine.item()`.
-        public func process(
-        command: Command,
-        engine: GameEngine
-    ) async throws -> ActionResult {
+    public func process(command: Command, engine: GameEngine) async throws -> ActionResult {
 
         // For ALL commands, allow empty directObjects (handled in process method)
         if command.isAllCommand {

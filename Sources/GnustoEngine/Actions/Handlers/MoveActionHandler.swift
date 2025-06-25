@@ -34,10 +34,7 @@ public struct MoveActionHandler: ActionHandler {
     ///           `itemNotAccessible` (if item cannot be reached),
     ///           `itemNotMovable` (if item is fixed scenery).
     ///           Can also throw errors from `engine.item()`.
-        public func process(
-        command: Command,
-        engine: GameEngine
-    ) async throws -> ActionResult {
+    public func process(command: Command, engine: GameEngine) async throws -> ActionResult {
 
         // For ALL commands, allow empty directObjects (handled in process method)
         if command.isAllCommand {

@@ -31,10 +31,7 @@ public struct BurnActionHandler: ActionHandler {
     ///
     /// - Parameter context: The action context containing the command and engine.
     /// - Throws: `ActionError` if validation fails.
-        public func process(
-        command: Command,
-        engine: GameEngine
-    ) async throws -> ActionResult {
+    public func process(command: Command, engine: GameEngine) async throws -> ActionResult {
 
         guard let targetObjectID = command.directObject else {
             throw ActionResponse.prerequisiteNotMet(

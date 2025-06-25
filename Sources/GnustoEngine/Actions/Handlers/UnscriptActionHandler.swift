@@ -18,10 +18,7 @@ public struct UnscriptActionHandler: ActionHandler {
     /// Validates the "UNSCRIPT" command.
     ///
     /// UNSCRIPT requires that scripting is currently active.
-        public func process(
-        command: Command,
-        engine: GameEngine
-    ) async throws -> ActionResult {
+    public func process(command: Command, engine: GameEngine) async throws -> ActionResult {
 
         // Check if scripting is currently active
         if !(await engine.hasGlobal(.isScripting)) {

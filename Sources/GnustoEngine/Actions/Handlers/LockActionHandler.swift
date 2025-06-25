@@ -36,10 +36,7 @@ public struct LockActionHandler: ActionHandler {
     ///           `itemNotLockable` (if target is not lockable),
     ///           `wrongKey` (if the key doesn't match).
     ///           Can also throw errors from `engine.item()`.
-        public func process(
-        command: Command,
-        engine: GameEngine
-    ) async throws -> ActionResult {
+    public func process(command: Command, engine: GameEngine) async throws -> ActionResult {
 
         // 1. Validate command structure: Need DO and IO, both must be items
         guard let directObjectRef = command.directObject else {

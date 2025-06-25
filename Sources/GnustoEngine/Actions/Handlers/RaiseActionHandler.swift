@@ -21,10 +21,7 @@ public struct RaiseActionHandler: ActionHandler {
     ///
     /// - Parameter context: The `ActionContext` containing the command and game state.
     /// - Returns: An `ActionResult` indicating validation success or failure.
-        public func process(
-        command: Command,
-        engine: GameEngine
-    ) async throws -> ActionResult {
+    public func process(command: Command, engine: GameEngine) async throws -> ActionResult {
 
         guard let directObjectRef = command.directObject else {
             throw ActionResponse.prerequisiteNotMet(

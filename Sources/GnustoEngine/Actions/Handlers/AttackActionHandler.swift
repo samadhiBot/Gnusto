@@ -17,51 +17,6 @@ public struct AttackActionHandler: ActionHandler {
     // MARK: - Action Processing Methods
     public init() {}
 
-    /// Validates the "ATTACK" command.
-    ///
-    /// This method ensures that:
-    /// 1. A direct object is specified (what to attack).
-    /// 2. The target item exists and is reachable.
-    /// 3. If an indirect object (weapon) is specified, it exists and is held.
-    ///
-    /// - Parameter context: The `ActionContext` for the current action.
-    /// - Throws: Various `ActionResponse` errors if validation fails.
-        public func process(
-        command: Command,
-        engine: GameEngine
-    ) async throws -> ActionResult {
-
-        // Attack requires a direct object (what to attack)
-        guard let directObjectRef = command.directObject else {
-            throw ActionResponse.prerequisiteNotMet(
-                engine.messenger.doWhat(verb: command.verb)
-            )
-        }
-        guard case .item(let targetItemID) = directObjectRef else {
-            throw ActionResponse.prerequisiteNotMet(
-                engine.messenger.cannotDoThat(verb: "attack")
-            )
-        }
-
-        // Check if target exists and is reachable
-        _ = try await engine.item(targetItemID)
-        guard await engine.playerCanReach(targetItemID) else {
-            throw ActionResponse.itemNotAccessible(targetItemID)
-        }
-
-        // If weapon is specified, validate it
-        if let indirectObjectRef = command.indirectObject {
-            guard case .item(let weaponItemID) = indirectObjectRef else {
-                throw ActionResponse.prerequisiteNotMet(
-                    engine.messenger.cannotActWithThat(verb: "attack")
-                )
-            }
-
-            let weaponItem = try await engine.item(weaponItemID)
-            guard weaponItem.parent == .player else {
-                throw ActionResponse.itemNotHeld(weaponItemID)
-            }
-        }
     /// Processes the "ATTACK" command.
     ///
     /// Handles different attack scenarios following ZIL V-ATTACK logic:
@@ -69,17 +24,48 @@ public struct AttackActionHandler: ActionHandler {
     /// 2. Bare-handed attacks on characters: "Trying to attack a [character] with your bare hands is suicidal."
     /// 3. Non-weapon attacks on characters: "Trying to attack the [character] with a [item] is suicidal."
     /// 4. Weapon attacks: "You can't." (placeholder for combat system)
-    ///
-    /// - Parameter context: The `ActionContext` for the current action.
-    /// - Returns: An `ActionResult` with appropriate combat message and state changes.
-        guard
-            let directObjectRef = command.directObject,
-            case .item(let targetItemID) = directObjectRef
-        else {
-            throw ActionResponse.internalEngineError(
-                "AttackActionHandler: directObject was not an item in process."
+    public func process(command: Command, engine: GameEngine) async throws -> ActionResult {
+        guard let directObjectRef = command.directObject else {
+            throw ActionResponse.prerequisiteNotMet(
+                engine.messenger.doWhat(verb: command.verb)
             )
         }
+
+        guard case .item(let targetItemID) = directObjectRef else {
+            throw ActionResponse.prerequisiteNotMet(
+                engine.messenger.cannotDoThat(verb: "attack")
+            )
+        }
+
+//        let targetItem = try await engine.item(targetItemID)
+//
+//        guard await engine.playerCanReach(targetItemID) else {
+//            throw ActionResponse.itemNotAccessible(targetItemID)
+//        }
+//
+//        if let indirectObjectRef = command.indirectObject {
+//            guard case .item(let weaponItemID) = indirectObjectRef else {
+//                throw ActionResponse.prerequisiteNotMet(
+//                    engine.messenger.cannotActWithThat(verb: "attack")
+//                )
+//            }
+//
+//            let weaponItem = try await engine.item(weaponItemID)
+//            guard weaponItem.parent == .player else {
+//                throw ActionResponse.itemNotHeld(weaponItemID)
+//            }
+//        }
+//    ///
+//    /// - Parameter context: The `ActionContext` for the current action.
+//    /// - Returns: An `ActionResult` with appropriate combat message and state changes.
+//        guard
+//            let directObjectRef = command.directObject,
+//            case .item(let targetItemID) = directObjectRef
+//        else {
+//            throw ActionResponse.internalEngineError(
+//                "AttackActionHandler: directObject was not an item in process."
+//            )
+//        }
 
         let targetItem = try await engine.item(targetItemID)
 
@@ -88,25 +74,36 @@ public struct AttackActionHandler: ActionHandler {
 
         // First check: Is target NOT a character? (ZIL: NOT FSET? PRSO ACTORBIT)
         if !targetItem.hasFlag(.isCharacter) {
-            message = engine.messenger.attackNonCharacter(item: targetItem.withIndefiniteArticle)
+            message = engine.messenger.attackNonCharacter(
+                item: targetItem.withIndefiniteArticle
+            )
         }
+
         // Second check: No weapon specified OR weapon is hands (bare-handed attack)
         else if command.indirectObject == nil {
             message = engine.messenger.attackWithBareHands(
                 character: targetItem.withIndefiniteArticle
             )
         }
+
         // We have a weapon - check if it's a real weapon
         else if let indirectObjectRef = command.indirectObject,
-            case .item(let weaponItemID) = indirectObjectRef
+                case .item(let weaponID) = indirectObjectRef
         {
-            let weaponItem = try await engine.item(weaponItemID)
+            let weapon = try await engine.item(weaponID)
 
-            if !weaponItem.hasFlag(.isWeapon) {
+            if weapon.parent != .player {
+                message = engine.messenger.itemNotHeld(
+                    item: weapon.withDefiniteArticle
+                )
+            }
+
+            else if !weapon.hasFlag(.isWeapon) {
                 message = engine.messenger.attackWithNonWeapon(
                     character: targetItem.withDefiniteArticle,
-                    weapon: weaponItem.withIndefiniteArticle
+                    weapon: weapon.withIndefiniteArticle
                 )
+
             } else {
                 // Real weapon attack - placeholder for combat system
                 message = engine.messenger.attackWithWeapon()

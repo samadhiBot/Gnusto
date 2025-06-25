@@ -24,10 +24,7 @@ public struct ListenActionHandler: ActionHandler {
 
     /// Validates the "LISTEN" command.
     /// Currently, listen requires no specific validation.
-        public func process(
-        command: Command,
-        engine: GameEngine
-    ) async throws -> ActionResult {
+    public func process(command: Command, engine: GameEngine) async throws -> ActionResult {
 
         // No validation needed for LISTEN.
     /// Processes the "LISTEN" command.

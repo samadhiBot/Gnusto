@@ -29,10 +29,7 @@ public struct FindActionHandler: ActionHandler {
     ///
     /// - Parameter context: The action context containing the command and engine.
     /// - Throws: `ActionError` if no direct object is specified.
-        public func process(
-        command: Command,
-        engine: GameEngine
-    ) async throws -> ActionResult {
+    public func process(command: Command, engine: GameEngine) async throws -> ActionResult {
 
         guard command.directObject != nil else {
             throw ActionResponse.prerequisiteNotMet(

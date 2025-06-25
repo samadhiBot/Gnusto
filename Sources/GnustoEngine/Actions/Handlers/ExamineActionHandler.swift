@@ -28,10 +28,7 @@ public struct ExamineActionHandler: ActionHandler {
     ///           `ActionResponse.itemNotAccessible` if an item cannot be reached, or
     ///           `ActionResponse.prerequisiteNotMet` if trying to examine something other
     ///           than an item or the player.
-        public func process(
-        command: Command,
-        engine: GameEngine
-    ) async throws -> ActionResult {
+    public func process(command: Command, engine: GameEngine) async throws -> ActionResult {
 
         // For ALL commands, allow empty directObjects (handled in process method)
         if command.isAllCommand {

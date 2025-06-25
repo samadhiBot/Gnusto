@@ -27,10 +27,7 @@ public struct ThinkActionHandler: ActionHandler {
     ///           `ActionResponse.prerequisiteNotMet` if trying to think about a location,
     ///           `ActionResponse.itemNotAccessible` if an item direct object cannot be reached,
     ///           or errors from `engine.item()` if the item doesn't exist.
-        public func process(
-        command: Command,
-        engine: GameEngine
-    ) async throws -> ActionResult {
+    public func process(command: Command, engine: GameEngine) async throws -> ActionResult {
 
         // 1. Ensure we have a direct object
         guard let directObjectRef = command.directObject else {

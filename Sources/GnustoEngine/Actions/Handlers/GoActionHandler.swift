@@ -33,10 +33,7 @@ public struct GoActionHandler: ActionHandler {
     ///           `prerequisiteNotMet` (if no direction), `invalidDirection` (if no such exit),
     ///           `directionIsBlocked` (if statically blocked or door is locked/closed).
     ///           Can also throw errors from `engine.item()` or `engine.location()`.
-        public func process(
-        command: Command,
-        engine: GameEngine
-    ) async throws -> ActionResult {
+    public func process(command: Command, engine: GameEngine) async throws -> ActionResult {
 
         // 1. Identify Direction
         guard let direction = command.direction else {

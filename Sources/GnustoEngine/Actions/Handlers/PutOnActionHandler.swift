@@ -34,10 +34,7 @@ public struct PutOnActionHandler: ActionHandler {
     ///           `itemNotAccessible` (if surface cannot be reached),
     ///           `targetIsNotASurface` (if indirect object is not a surface).
     ///           Can also throw errors from `engine.item()`.
-        public func process(
-        command: Command,
-        engine: GameEngine
-    ) async throws -> ActionResult {
+    public func process(command: Command, engine: GameEngine) async throws -> ActionResult {
 
         // 1. Validate Direct and Indirect Objects - both must be items
         guard let directObjectRef = command.directObject else {
