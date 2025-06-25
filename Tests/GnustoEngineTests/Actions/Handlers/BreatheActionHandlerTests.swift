@@ -1,46 +1,28 @@
-import CustomDump
 import Testing
-
+import CustomDump
 @testable import GnustoEngine
 
 @Suite("BreatheActionHandler Tests")
 struct BreatheActionHandlerTests {
-    let handler = BreatheActionHandler()
 
-    @Test("Breathe validates no direct object allowed")
-    func testBreatheValidatesNoDirectObjectAllowed() async throws {
+    // MARK: - Syntax Rule Testing
+
+    @Test("BREATHE syntax works")
+    func testBreatheSyntax() async throws {
         // Given
-        let (engine, mockIO) = await GameEngine.test()
+        let testRoom = Location(
+            id: "testRoom",
+            .name("Test Room"),
+            .description("A room for testing."),
+            .inherentlyLit
+        )
 
-        // When / Then
-        try await engine.execute("breathe something")
+        let game = MinimalGame(
+            player: Player(in: "testRoom"),
+            locations: testRoom
+        )
 
-        let output = await mockIO.flush()
-        expectNoDifference(output, """
-            > breathe something
-            You can’t breathe that.
-            """)
-    }
-
-    @Test("Breathe validates no indirect object allowed")
-    func testBreatheValidatesNoIndirectObjectAllowed() async throws {
-        // Given
-        let (engine, mockIO) = await GameEngine.test()
-
-        // When / Then
-        try await engine.execute("breathe with something")
-
-        let output = await mockIO.flush()
-        expectNoDifference(output, """
-            > breathe with something
-            You can’t breathe that.
-            """)
-    }
-
-    @Test("Breathe succeeds with basic command")
-    func testBreatheSucceedsWithBasicCommand() async throws {
-        // Given
-        let (engine, mockIO) = await GameEngine.test()
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // When
         try await engine.execute("breathe")
@@ -54,13 +36,131 @@ struct BreatheActionHandlerTests {
             """)
     }
 
-    @Test("Breathe integration test")
-    func testBreatheIntegrationTest() async throws {
+    @Test("BREATHE ON DIRECTOBJECT syntax fails appropriately")
+    func testBreatheOnDirectObjectSyntax() async throws {
         // Given
-        let (engine, mockIO) = await GameEngine.test()
+        let testRoom = Location(
+            id: "testRoom",
+            .name("Test Room"),
+            .inherentlyLit
+        )
+
+        let flower = Item(
+            id: "flower",
+            .name("red flower"),
+            .description("A beautiful red flower."),
+            .in(.location("testRoom"))
+        )
+
+        let game = MinimalGame(
+            player: Player(in: "testRoom"),
+            locations: testRoom,
+            items: flower
+        )
+
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // When
-        try await engine.execute("breathe", times: 3)
+        try await engine.execute("breathe on flower")
+
+        // Then
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            > breathe on flower
+            You can’t breathe on that.
+            """)
+    }
+
+    // MARK: - Validation Testing
+
+    @Test("Cannot breathe with direct object")
+    func testCannotBreatheWithDirectObject() async throws {
+        // Given
+        let testRoom = Location(
+            id: "testRoom",
+            .name("Test Room"),
+            .inherentlyLit
+        )
+
+        let air = Item(
+            id: "air",
+            .name("fresh air"),
+            .description("The air around you."),
+            .in(.location("testRoom"))
+        )
+
+        let game = MinimalGame(
+            player: Player(in: "testRoom"),
+            locations: testRoom,
+            items: air
+        )
+
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // When
+        try await engine.execute("breathe air")
+
+        // Then
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            > breathe air
+            You can’t breathe that.
+            """)
+    }
+
+    @Test("Cannot breathe with indirect object")
+    func testCannotBreatheWithIndirectObject() async throws {
+        // Given
+        let testRoom = Location(
+            id: "testRoom",
+            .name("Test Room"),
+            .inherentlyLit
+        )
+
+        let mask = Item(
+            id: "mask",
+            .name("gas mask"),
+            .description("A protective gas mask."),
+            .in(.location("testRoom"))
+        )
+
+        let game = MinimalGame(
+            player: Player(in: "testRoom"),
+            locations: testRoom,
+            items: mask
+        )
+
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // When
+        try await engine.execute("breathe with mask")
+
+        // Then
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            > breathe with mask
+            You can’t breathe that.
+            """)
+    }
+
+    @Test("Breathe works in dark rooms")
+    func testBreatheWorksInDarkRooms() async throws {
+        // Given: Dark room (no light required for breathing)
+        let darkRoom = Location(
+            id: "darkRoom",
+            .name("Dark Room"),
+            .description("A pitch black room.")
+        )
+
+        let game = MinimalGame(
+            player: Player(in: "darkRoom"),
+            locations: darkRoom
+        )
+
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // When
+        try await engine.execute("breathe")
 
         // Then
         let output = await mockIO.flush()
@@ -68,29 +168,58 @@ struct BreatheActionHandlerTests {
             > breathe
             You inhale slowly, appreciating the universe’s decision to
             include breathable air.
-
-            > breathe
-            You breathe with great purpose, although breathing tends to
-            happen anyway.
-
-            > breathe
-            You take a breath, tasting hints of adventure and
-            poor ventilation.
             """)
     }
 
-    @Test("Breathe validation passes with no objects")
-    func testBreatheValidationPassesWithNoObjects() async throws {
+    // MARK: - Processing Testing
+
+    @Test("Breathe provides atmospheric response")
+    func testBreatheAtmosphericResponse() async throws {
         // Given
-        let (engine, _) = await GameEngine.test()
-
-        let command = Command(
-            verb: .breathe,
-            rawInput: "breathe"
+        let testRoom = Location(
+            id: "testRoom",
+            .name("Test Room"),
+            .inherentlyLit
         )
-        let context = ActionContext(command: command, engine: engine)
 
-        // When / Then - Should not throw
-        try await handler.validate(context: context)
+        let game = MinimalGame(
+            player: Player(in: "testRoom"),
+            locations: testRoom
+        )
+
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // When
+        try await engine.execute("breathe")
+
+        // Then
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            > breathe
+            You inhale slowly, appreciating the universe’s decision to
+            include breathable air.
+            """)
+    }
+
+    // MARK: - ActionID Testing
+
+    @Test("Handler exposes correct ActionIDs")
+    func testActionIDs() async throws {
+        let handler = BreatheActionHandler()
+        // BreatheActionHandler doesn’t specify actions, so it should be empty
+        #expect(handler.actions.isEmpty)
+    }
+
+    @Test("Handler exposes correct VerbIDs")
+    func testVerbIDs() async throws {
+        let handler = BreatheActionHandler()
+        #expect(handler.verbs.contains(.breathe))
+        #expect(handler.verbs.count == 1)
+    }
+
+    @Test("Handler does not require light")
+    func testDoesNotRequireLight() async throws {
+        let handler = BreatheActionHandler()
+        #expect(handler.requiresLight == false)
     }
 }

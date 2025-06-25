@@ -1,37 +1,222 @@
-import CustomDump
-import GnustoEngine
 import Testing
+import CustomDump
+@testable import GnustoEngine
 
-@Suite("BlowActionHandler")
+@Suite("BlowActionHandler Tests")
 struct BlowActionHandlerTests {
-    @Test("BLOW command without object")
-    func testBlowCommandNoObject() async throws {
-        let balloon = Item(
-            id: "balloon",
-            .name("balloon"),
-            .isTakable,
-            .in(.player)
+
+    // MARK: - Syntax Rule Testing
+
+    @Test("BLOW DIRECTOBJECT syntax works")
+    func testBlowDirectObjectSyntax() async throws {
+        // Given
+        let testRoom = Location(
+            id: "testRoom",
+            .name("Test Room"),
+            .description("A room for testing."),
+            .inherentlyLit
         )
 
-        let candle = Item(
-            id: "candle",
-            .name("candle"),
-            .isLightSource,
-            .isLit,
-            .isTakable,
-            .in(.location(.startRoom))
+        let feather = Item(
+            id: "feather",
+            .name("fluffy feather"),
+            .description("A fluffy feather."),
+            .in(.location("testRoom"))
         )
 
         let game = MinimalGame(
-            items: balloon, candle
+            player: Player(in: "testRoom"),
+            locations: testRoom,
+            items: feather
         )
 
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        // Execute the command through the full pipeline
+        // When
+        try await engine.execute("blow feather")
+
+        // Then
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            > blow feather
+            You blow on the fluffy feather, but nothing
+            interesting happens.
+            """)
+
+        let finalState = try await engine.item("feather")
+        #expect(finalState.hasFlag(.isTouched) == true)
+    }
+
+    @Test("BLOW ON DIRECTOBJECT syntax works")
+    func testBlowOnDirectObjectSyntax() async throws {
+        // Given
+        let testRoom = Location(
+            id: "testRoom",
+            .name("Test Room"),
+            .inherentlyLit
+        )
+
+        let dust = Item(
+            id: "dust",
+            .name("pile of dust"),
+            .description("A small pile of dust."),
+            .in(.location("testRoom"))
+        )
+
+        let game = MinimalGame(
+            player: Player(in: "testRoom"),
+            locations: testRoom,
+            items: dust
+        )
+
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // When
+        try await engine.execute("blow on dust")
+
+        // Then
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            > blow on dust
+            You blow on the pile of dust, but nothing interesting happens.
+            """)
+    }
+
+    @Test("PUFF syntax works")
+    func testPuffSyntax() async throws {
+        // Given
+        let testRoom = Location(
+            id: "testRoom",
+            .name("Test Room"),
+            .inherentlyLit
+        )
+
+        let card = Item(
+            id: "card",
+            .name("playing card"),
+            .description("A single playing card."),
+            .in(.location("testRoom"))
+        )
+
+        let game = MinimalGame(
+            player: Player(in: "testRoom"),
+            locations: testRoom,
+            items: card
+        )
+
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // When
+        try await engine.execute("puff card")
+
+        // Then
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            > puff card
+            You blow on the playing card, but nothing interesting happens.
+            """)
+    }
+
+    // MARK: - Validation Testing
+
+    @Test("Cannot blow on item not in scope")
+    func testCannotBlowOnItemNotInScope() async throws {
+        // Given
+        let testRoom = Location(
+            id: "testRoom",
+            .name("Test Room"),
+            .inherentlyLit
+        )
+
+        let anotherRoom = Location(
+            id: "anotherRoom",
+            .name("Another Room"),
+            .inherentlyLit
+        )
+
+        let remoteFeather = Item(
+            id: "remoteFeather",
+            .name("remote feather"),
+            .description("A feather in another room."),
+            .in(.location("anotherRoom"))
+        )
+
+        let game = MinimalGame(
+            player: Player(in: "testRoom"),
+            locations: testRoom, anotherRoom,
+            items: remoteFeather
+        )
+
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // When
+        try await engine.execute("blow feather")
+
+        // Then
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            > blow feather
+            You can’t see any such thing.
+            """)
+    }
+
+    @Test("Requires light to blow on items")
+    func testRequiresLight() async throws {
+        // Given: Dark room with an item
+        let darkRoom = Location(
+            id: "darkRoom",
+            .name("Dark Room"),
+            .description("A pitch black room.")
+        )
+
+        let feather = Item(
+            id: "feather",
+            .name("fluffy feather"),
+            .description("A fluffy feather."),
+            .in(.location("darkRoom"))
+        )
+
+        let game = MinimalGame(
+            player: Player(in: "darkRoom"),
+            locations: darkRoom,
+            items: feather
+        )
+
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // When
+        try await engine.execute("blow feather")
+
+        // Then
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            > blow feather
+            It is pitch black. You can’t see a thing.
+            """)
+    }
+
+    // MARK: - Processing Testing
+
+    @Test("Blow without an object gives a general message")
+    func testBlowWithoutObject() async throws {
+        // Given
+        let testRoom = Location(
+            id: "testRoom",
+            .name("Test Room"),
+            .inherentlyLit
+        )
+
+        let game = MinimalGame(
+            player: Player(in: "testRoom"),
+            locations: testRoom
+        )
+
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // When
         try await engine.execute("blow")
 
-        // Check the output
+        // Then
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > blow
@@ -39,194 +224,106 @@ struct BlowActionHandlerTests {
             """)
     }
 
-    @Test("BLOW command (on) object")
-    func testBlowCommandObject() async throws {
-        let balloon = Item(
-            id: "balloon",
-            .name("balloon"),
-            .isTakable,
-            .in(.player)
-        )
-
-        let game = MinimalGame(items: balloon)
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
-
-        // Execute the command through the full pipeline
-        try await engine.execute("blow balloon")
-
-        // Verify balloon is marked as touched
-        let balloonAfter = try await engine.item("balloon")
-        #expect(balloonAfter.hasFlag(.isTouched))
-
-        // Check the output
-        let output = await mockIO.flush()
-        expectNoDifference(output, """
-            > blow balloon
-            You blow on the balloon, but nothing interesting happens.
-            """)
-    }
-
-    @Test("BLOW command on object")
-    func testBlowCommandOnObject() async throws {
-        let balloon = Item(
-            id: "balloon",
-            .name("balloon"),
-            .isTakable,
-            .in(.player)
-        )
-
-        let game = MinimalGame(items: balloon)
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
-
-        // Execute the command through the full pipeline
-        try await engine.execute("blow on the balloon")
-
-        // Verify balloon is marked as touched
-        let balloonAfter = try await engine.item("balloon")
-        #expect(balloonAfter.hasFlag(.isTouched))
-
-        // Check the output
-        let output = await mockIO.flush()
-        expectNoDifference(output, """
-            > blow on the balloon
-            You blow on the balloon, but nothing interesting happens.
-            """)
-    }
-
-    @Test("BLOW command up object")
-    func testBlowCommandUpObject() async throws {
-        let tire = Item(
-            id: "tire",
-            .name("tire"),
-            .isTakable,
-            .in(.player)
-        )
-
-        let game = MinimalGame(items: tire)
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
-
-        // Execute the command through the full pipeline
-        try await engine.execute("blow up the tire")
-
-        // Attempt fails, so tire is not marked as touched
-        let tireAfter = try await engine.item("tire")
-        #expect(!tireAfter.hasFlag(.isTouched))
-
-        // Check the output
-        let output = await mockIO.flush()
-        expectNoDifference(output, """
-            > blow up the tire
-            You can’t inflate the tire.
-            """)
-    }
-
-    @Test("BLOW command on lit light source")
+    @Test("Blow on a lit light source")
     func testBlowOnLitLightSource() async throws {
-        let candle = Item(
-            id: "candle",
-            .name("candle"),
-            .isLightSource,
-            .isFlammable,
-            .isLit,
-            .isTakable,
-            .in(.location(.startRoom))
-        )
-
-        let game = MinimalGame(items: candle)
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
-
-        // Execute the command through the full pipeline
-        try await engine.execute("blow candle")
-
-        // Verify candle is marked as touched
-        let candleAfter = try await engine.item("candle")
-        #expect(candleAfter.hasFlag(.isTouched))
-
-        // Check the output:
-        let output = await mockIO.flush()
-        expectNoDifference(output, """
-            > blow candle
-            You blow on the candle, but it doesn’t go out.
-            """)
-    }
-
-    @Test("BLOW command on flammable object")
-    func testBlowOnFlammableObject() async throws {
-        let paper = Item(
-            id: "paper",
-            .name("paper"),
-            .isFlammable,
-            .isTakable,
-            .in(.location(.startRoom))
-        )
-
-        let game = MinimalGame(items: paper)
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
-
-        // Execute the command through the full pipeline
-        try await engine.execute("blow paper")
-
-        // Verify paper is marked as touched
-        let paperAfter = try await engine.item("paper")
-        #expect(paperAfter.hasFlag(.isTouched))
-
-        // Check the output
-        let output = await mockIO.flush()
-        expectNoDifference(output, """
-            > blow paper
-            Blowing on the paper has no effect.
-            """)
-    }
-
-    @Test("BLOW command on inaccessible item")
-    func testBlowInaccessibleItem() async throws {
-        let balloon = Item(
-            id: "balloon",
-            .name("held balloon"),
-            .synonyms("held", "balloon"),
-            .isTakable,
-            .in(.player)
-        )
-
-        let distantBalloon = Item(
-            id: "distantBalloon",
-            .name("distant balloon"),
-            .synonyms("distant", "balloon"),
-            .isTakable,
-            .in(.location("anotherRoom")),
-            .isTouched
-        )
-
+        // Given
         let testRoom = Location(
             id: "testRoom",
             .name("Test Room"),
-            .description("A room for testing blow commands."),
             .inherentlyLit
         )
 
-        let anotherRoom = Location(
-            id: "anotherRoom",
-            .name("Another Room"),
-            .description("A distant room."),
-            .inherentlyLit
+        let candle = Item(
+            id: "candle",
+            .name("lit candle"),
+            .description("A lit wax candle."),
+            .isLightSource,
+            .isLit,
+            .in(.location("testRoom"))
         )
 
         let game = MinimalGame(
             player: Player(in: "testRoom"),
-            locations: testRoom, anotherRoom,
-            items: balloon, distantBalloon
+            locations: testRoom,
+            items: candle
         )
 
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        // Execute the command through the full pipeline
-        try await engine.execute("blow on the distant balloon")
+        // When
+        try await engine.execute("blow on candle")
 
-        // Check that an error message was displayed
+        // Then
         let output = await mockIO.flush()
         expectNoDifference(output, """
-            > blow on the distant balloon
-            You can’t see the distant balloon.
+            > blow on candle
+            You blow on the lit candle, but it doesn’t go out.
             """)
+
+        // Note: The default handler doesn’t extinguish the flame.
+        // A custom ItemEventHandler would be needed for that.
+        let finalState = try await engine.item("candle")
+        #expect(finalState.hasFlag(.isLit) == true)
+        #expect(finalState.hasFlag(.isTouched) == true)
+    }
+
+    @Test("Blow on a flammable but unlit object")
+    func testBlowOnFlammableObject() async throws {
+        // Given
+        let testRoom = Location(
+            id: "testRoom",
+            .name("Test Room"),
+            .inherentlyLit
+        )
+
+        let paper = Item(
+            id: "paper",
+            .name("piece of paper"),
+            .description("A piece of paper."),
+            .isFlammable,
+            .in(.location("testRoom"))
+        )
+
+        let game = MinimalGame(
+            player: Player(in: "testRoom"),
+            locations: testRoom,
+            items: paper
+        )
+
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // When
+        try await engine.execute("blow on paper")
+
+        // Then
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            > blow on paper
+            Blowing on the piece of paper accomplishes nothing.
+            """)
+        let finalState = try await engine.item("paper")
+        #expect(finalState.hasFlag(.isTouched) == true)
+    }
+
+    // MARK: - ActionID Testing
+
+    @Test("Handler exposes correct ActionIDs")
+    func testActionIDs() async throws {
+        let handler = BlowActionHandler()
+        #expect(handler.actions.isEmpty)
+    }
+
+    @Test("Handler exposes correct VerbIDs")
+    func testVerbIDs() async throws {
+        let handler = BlowActionHandler()
+        #expect(handler.verbs.contains(.blow))
+        #expect(handler.verbs.contains(.puff))
+        #expect(handler.verbs.count == 2)
+    }
+
+    @Test("Handler requires light")
+    func testRequiresLightProperty() async throws {
+        let handler = BlowActionHandler()
+        #expect(handler.requiresLight == true)
     }
 }

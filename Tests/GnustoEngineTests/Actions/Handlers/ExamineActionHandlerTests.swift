@@ -5,664 +5,892 @@ import Testing
 
 @Suite("ExamineActionHandler Tests")
 struct ExamineActionHandlerTests {
-    @Test func testExamineSimpleItem() async throws {
-        let itemID: ItemID = "pebble"
-        let item = Item(
-            id: itemID,
-            .name("small pebble"),
-            .description("A smooth, grey pebble."),
-            .in(.player)
-        )
-        let game = MinimalGame(items: item)
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
-        let initialItemState = try await engine.item(itemID)
-        #expect(initialItemState.attributes[.isTouched] != true)
-        #expect(await engine.gameState.changeHistory.isEmpty)
 
-        // Act
-        try await engine.execute("examine pebble")
+    // MARK: - Syntax Rule Testing
 
-        let output = await mockIO.flush()
-        expectNoDifference(output, """
-            > examine pebble
-            A smooth, grey pebble.
-            """)
-
-        let finalItemState = try await engine.item(itemID)
-        #expect(finalItemState.attributes[.isTouched] == true)
-
-        let expectedChanges = expectedExamineChanges(
-            itemID: itemID,
-            initialAttributes: initialItemState.attributes
-        )
-        let changeHistory = await engine.gameState.changeHistory
-        expectNoDifference(changeHistory, expectedChanges)
-    }
-
-    @Test func testExamineItemWithDetailedDescriptionHandler() async throws {
-        let itemID: ItemID = "locket"
-        let item = Item(
-            id: itemID,
-            .name("engraved locket"),
-            .description("A small, tarnished silver locket."),
-            .in(.player)
-        )
-        let game = MinimalGame(items: item)
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
-        let initialItemState = try await engine.item(itemID)
-        #expect(initialItemState.attributes[.isTouched] != true)
-        #expect(await engine.gameState.changeHistory.isEmpty)
-
-        // Act
-        try await engine.execute("examine locket")
-
-        let output = await mockIO.flush()
-        expectNoDifference(output, """
-            > examine locket
-            A small, tarnished silver locket.
-            """)
-
-        let finalItemState = try await engine.item(itemID)
-        #expect(finalItemState.attributes[.isTouched] == true)
-
-        let expectedChanges = expectedExamineChanges(
-            itemID: itemID,
-            initialAttributes: initialItemState.attributes
-        )
-        let changeHistory = await engine.gameState.changeHistory
-        expectNoDifference(changeHistory, expectedChanges)
-    }
-
-    @Test func testExamineItemInRoom() async throws {
-        let itemID: ItemID = "statue"
-        let roomID: LocationID = "garden"
-        let item = Item(
-            id: itemID,
-            .name("stone statue"),
-            .description("A weathered statue of a grue."),
-            .in(.location(roomID))
-        )
-        let room = Location(
-            id: roomID,
-            .name("Garden"),
+    @Test("EXAMINE DIRECTOBJECT syntax works")
+    func testExamineDirectObjectSyntax() async throws {
+        // Given
+        let testRoom = Location(
+            id: "testRoom",
+            .name("Test Room"),
+            .description("A room for testing."),
             .inherentlyLit
         )
+
+        let book = Item(
+            id: "book",
+            .name("leather book"),
+            .description("A worn leather-bound book with mysterious symbols."),
+            .isTakable,
+            .in(.location("testRoom"))
+        )
+
         let game = MinimalGame(
-            player: Player(in: roomID),
-            locations: room,
-            items: item
+            player: Player(in: "testRoom"),
+            locations: testRoom,
+            items: book
         )
+
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
-        let initialItemState = try await engine.item(itemID)
-        #expect(initialItemState.attributes[.isTouched] != true)
-        #expect(await engine.gameState.changeHistory.isEmpty)
 
-        // Act
-        try await engine.execute("examine statue")
+        // When
+        try await engine.execute("examine book")
 
+        // Then
         let output = await mockIO.flush()
-        expectNoDifference(output, """
-            > examine statue
-            A weathered statue of a grue.
+        expectNoDifference(
+            output,
+            """
+            > examine book
+            A worn leather-bound book with mysterious symbols.
             """)
 
-        let finalItemState = try await engine.item(itemID)
-        #expect(finalItemState.attributes[.isTouched] == true)
-
-        let expectedChanges = expectedExamineChanges(
-            itemID: itemID,
-            initialAttributes: initialItemState.attributes
-        )
-        let changeHistory = await engine.gameState.changeHistory
-        expectNoDifference(changeHistory, expectedChanges)
+        let finalState = try await engine.item("book")
+        #expect(finalState.hasFlag(.isTouched) == true)
     }
 
-    @Test func testExamineItemNotInScope() async throws {
-        let itemID: ItemID = "hiddenGem"
-        let item = Item(
-            id: itemID,
-            .name("hidden gem"),
-            .description("Should not see this."),
-            .in(.location("farAwayRoom"))
-        )
-        let startRoom = Location(
-            id: .startRoom,
-            .name("Start Room"),
+    @Test("X syntax works")
+    func testXSyntax() async throws {
+        // Given
+        let testRoom = Location(
+            id: "testRoom",
+            .name("Test Room"),
             .inherentlyLit
         )
-        let farRoom = Location(
-            id: "farAwayRoom",
-            .name("Far Room"),
-            .inherentlyLit
+
+        let gem = Item(
+            id: "gem",
+            .name("sparkling gem"),
+            .description("A beautiful gem that catches the light."),
+            .isTakable,
+            .in(.location("testRoom"))
         )
+
         let game = MinimalGame(
-            locations: startRoom, farRoom,
-            items: item,
+            player: Player(in: "testRoom"),
+            locations: testRoom,
+            items: gem
         )
+
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
-        #expect(await engine.gameState.changeHistory.isEmpty)
 
-        // Act
-        try await engine.execute("examine hidden gem")
+        // When
+        try await engine.execute("x gem")
 
+        // Then
         let output = await mockIO.flush()
-        expectNoDifference(output, """
-            > examine hidden gem
+        expectNoDifference(
+            output,
+            """
+            > x gem
+            A beautiful gem that catches the light.
+            """)
+
+        let finalState = try await engine.item("gem")
+        #expect(finalState.hasFlag(.isTouched) == true)
+    }
+
+    @Test("INSPECT syntax works")
+    func testInspectSyntax() async throws {
+        // Given
+        let testRoom = Location(
+            id: "testRoom",
+            .name("Test Room"),
+            .inherentlyLit
+        )
+
+        let sword = Item(
+            id: "sword",
+            .name("steel sword"),
+            .description("A sharp steel sword with intricate engravings."),
+            .isTakable,
+            .in(.location("testRoom"))
+        )
+
+        let game = MinimalGame(
+            player: Player(in: "testRoom"),
+            locations: testRoom,
+            items: sword
+        )
+
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // When
+        try await engine.execute("inspect sword")
+
+        // Then
+        let output = await mockIO.flush()
+        expectNoDifference(
+            output,
+            """
+            > inspect sword
+            A sharp steel sword with intricate engravings.
+            """)
+    }
+
+    @Test("LOOK AT syntax works")
+    func testLookAtSyntax() async throws {
+        // Given
+        let testRoom = Location(
+            id: "testRoom",
+            .name("Test Room"),
+            .inherentlyLit
+        )
+
+        let painting = Item(
+            id: "painting",
+            .name("oil painting"),
+            .description("A masterful oil painting of a distant landscape."),
+            .in(.location("testRoom"))
+        )
+
+        let game = MinimalGame(
+            player: Player(in: "testRoom"),
+            locations: testRoom,
+            items: painting
+        )
+
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // When
+        try await engine.execute("look at painting")
+
+        // Then
+        let output = await mockIO.flush()
+        expectNoDifference(
+            output,
+            """
+            > look at painting
+            A masterful oil painting of a distant landscape.
+            """)
+    }
+
+    @Test("EXAMINE ALL syntax works")
+    func testExamineAllSyntax() async throws {
+        // Given
+        let testRoom = Location(
+            id: "testRoom",
+            .name("Test Room"),
+            .inherentlyLit
+        )
+
+        let book = Item(
+            id: "book",
+            .name("red book"),
+            .description("A red leather book."),
+            .isTakable,
+            .in(.location("testRoom"))
+        )
+
+        let candle = Item(
+            id: "candle",
+            .name("wax candle"),
+            .description("A simple wax candle."),
+            .isTakable,
+            .in(.location("testRoom"))
+        )
+
+        let game = MinimalGame(
+            player: Player(in: "testRoom"),
+            locations: testRoom,
+            items: book, candle
+        )
+
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // When
+        try await engine.execute("examine all")
+
+        // Then
+        let output = await mockIO.flush()
+        expectNoDifference(
+            output,
+            """
+            > examine all
+            red book: A red leather book.
+            wax candle: A simple wax candle.
+            """)
+    }
+
+    // MARK: - Validation Testing
+
+    @Test("Cannot examine without specifying what")
+    func testCannotExamineWithoutWhat() async throws {
+        // Given
+        let testRoom = Location(
+            id: "testRoom",
+            .name("Test Room"),
+            .inherentlyLit
+        )
+
+        let game = MinimalGame(
+            player: Player(in: "testRoom"),
+            locations: testRoom
+        )
+
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // When
+        try await engine.execute("examine")
+
+        // Then
+        let output = await mockIO.flush()
+        expectNoDifference(
+            output,
+            """
+            > examine
+            Examine what?
+            """)
+    }
+
+    @Test("Cannot examine non-existent item")
+    func testCannotExamineNonExistentItem() async throws {
+        // Given
+        let testRoom = Location(
+            id: "testRoom",
+            .name("Test Room"),
+            .inherentlyLit
+        )
+
+        let game = MinimalGame(
+            player: Player(in: "testRoom"),
+            locations: testRoom
+        )
+
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // When
+        try await engine.execute("examine nonexistent")
+
+        // Then
+        let output = await mockIO.flush()
+        expectNoDifference(
+            output,
+            """
+            > examine nonexistent
             You can’t see any such thing.
             """)
-
-        #expect(await engine.gameState.changeHistory.isEmpty)
-        let itemState = try await engine.item(itemID)
-        #expect(itemState.attributes[.isTouched] != true)
     }
 
-    @Test func testExamineTouchedItemNotInScope() async throws {
-        let itemID: ItemID = "hiddenGem"
-        let item = Item(
-            id: itemID,
-            .name("hidden gem"),
-            .description("Should not see this."),
-            .in(.location("farAwayRoom")),
-            .isTouched
-        )
-        let startRoom = Location(
-            id: .startRoom,
-            .name("Start Room"),
+    @Test("Cannot examine item not in scope")
+    func testCannotExamineItemNotInScope() async throws {
+        // Given
+        let testRoom = Location(
+            id: "testRoom",
+            .name("Test Room"),
             .inherentlyLit
         )
-        let farRoom = Location(
-            id: "farAwayRoom",
-            .name("Far Room"),
+
+        let anotherRoom = Location(
+            id: "anotherRoom",
+            .name("Another Room"),
             .inherentlyLit
         )
+
+        let remoteBook = Item(
+            id: "remoteBook",
+            .name("remote book"),
+            .description("A book in another room."),
+            .in(.location("anotherRoom"))
+        )
+
         let game = MinimalGame(
-            locations: startRoom, farRoom,
-            items: item,
+            player: Player(in: "testRoom"),
+            locations: testRoom, anotherRoom,
+            items: remoteBook
         )
+
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
-        #expect(await engine.gameState.changeHistory.isEmpty)
 
-        // Act
-        try await engine.execute("examine hidden gem")
+        // When
+        try await engine.execute("examine book")
 
+        // Then
         let output = await mockIO.flush()
-        expectNoDifference(output, """
-            > examine hidden gem
-            You can’t see the hidden gem.
-            """)
-
-        #expect(await engine.gameState.changeHistory.isEmpty)
-        let itemState = try await engine.item(itemID)
-        #expect(itemState.attributes[.isTouched] == true)
-    }
-
-    @Test func testExamineNonExistentItem() async throws {
-        let (engine, mockIO) = await GameEngine.test()
-        #expect(await engine.gameState.changeHistory.isEmpty)
-
-        // Act
-        try await engine.execute("examine ghost")
-
-        let output = await mockIO.flush()
-        expectNoDifference(output, """
-            > examine ghost
+        expectNoDifference(
+            output,
+            """
+            > examine book
             You can’t see any such thing.
             """)
-
-        #expect(await engine.gameState.changeHistory.isEmpty)
     }
 
-    @Test func testExamineAmbiguousItem() async throws {
-        let itemID1: ItemID = "redBall"
-        let itemID2: ItemID = "blueBall"
-        let item1 = Item(
-            id: itemID1,
-            .name("red ball"),
-            .description("A red ball."),
-            .in(.player),
-            .adjectives("red"),
-            .synonyms("ball")
+    @Test("Requires light to examine items")
+    func testRequiresLight() async throws {
+        // Given: Dark room with item
+        let darkRoom = Location(
+            id: "darkRoom",
+            .name("Dark Room"),
+            .description("A pitch black room.")
+            // Note: No .inherentlyLit property
         )
-        let item2 = Item(
-            id: itemID2,
-            .name("blue ball"),
-            .description("A blue ball."),
-            .in(.player),
-            .adjectives("blue"),
-            .synonyms("ball")
+
+        let book = Item(
+            id: "book",
+            .name("leather book"),
+            .description("A worn leather book."),
+            .in(.location("darkRoom"))
         )
+
         let game = MinimalGame(
-            items: item1, item2,
+            player: Player(in: "darkRoom"),
+            locations: darkRoom,
+            items: book
         )
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game
-        )
-        #expect(await engine.gameState.changeHistory.isEmpty)
 
-        // Act
-        try await engine.execute("examine ball")
-
-        // Assert: Should get ambiguity error
-        let output = await mockIO.flush()
-        expectNoDifference(output, """
-            > examine ball
-            Which do you mean: the blue ball or the red ball?
-            """)
-    }
-
-    @Test func testExamineSelf() async throws {
-        let (engine, mockIO) = await GameEngine.test()
-        #expect(await engine.gameState.changeHistory.isEmpty)
-
-        // Act
-        try await engine.execute("examine self")
-
-        let output = await mockIO.flush()
-        expectNoDifference(output, """
-            > examine self
-            You are your usual self.
-            """)
-
-        #expect(await engine.gameState.changeHistory.isEmpty)
-    }
-
-    @Test func testExamineItemWithObjectActionOverride() async throws {
-        let item = Item(
-            id: "magicMirror",
-            .name("magic mirror"),
-            .synonyms("mirror"),
-            .description("A dusty old mirror."),
-            .in(.player)
-        )
-        let game = MinimalGame(
-            items: item,
-            itemEventHandlers: [
-                "magicMirror": ItemEventHandler { engine, command in
-                    ActionResult("You see your reflection in the magic mirror.")
-                }
-            ]
-        )
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        let initialItemState = try await engine.item("magicMirror")
-        #expect(initialItemState.attributes[.isTouched] != true)
-        #expect(await engine.gameState.changeHistory.isEmpty)
+        // When
+        try await engine.execute("examine book")
 
-        // Act
-        try await engine.execute("examine mirror")
-
+        // Then
         let output = await mockIO.flush()
-        expectNoDifference(output, """
-            > examine mirror
-            You see your reflection in the magic mirror.
+        expectNoDifference(
+            output,
+            """
+            > examine book
+            It is pitch black. You can’t see a thing.
             """)
-
-        #expect(await engine.gameState.changeHistory.isEmpty)
-        let finalItemState = try await engine.item("magicMirror")
-        #expect(finalItemState.attributes[.isTouched] != true)
     }
 
-    @Test func testExamineSceneryItem() async throws {
-        let itemID: ItemID = "window"
-        let roomID: LocationID = "kitchen"
-        let item = Item(
-            id: itemID,
-            .name("kitchen window"),
-            .description("The window is slightly ajar, but not enough to allow entry."),
-            .in(.location(roomID)),
-            .omitDescription
-        )
-        let room = Location(
-            id: roomID,
-            .name("Kitchen"),
+    // MARK: - Processing Testing
+
+    @Test("Examine self")
+    func testExamineSelf() async throws {
+        // Given
+        let testRoom = Location(
+            id: "testRoom",
+            .name("Test Room"),
             .inherentlyLit
         )
+
         let game = MinimalGame(
-            player: Player(in: roomID),
-            locations: room,
-            items: item
+            player: Player(in: "testRoom"),
+            locations: testRoom
         )
+
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
-        let initialItemState = try await engine.item(itemID)
-        #expect(initialItemState.attributes[.isTouched] != true)
-        #expect(await engine.gameState.changeHistory.isEmpty)
 
-        // Act
-        try await engine.execute("examine window")
+        // When
+        try await engine.execute("examine me")
 
+        // Then
         let output = await mockIO.flush()
-        expectNoDifference(output, """
-            > examine window
-            The window is slightly ajar, but not enough to allow entry.
+        expectNoDifference(
+            output,
+            """
+            > examine me
+            You look about the same as always.
             """)
-
-        let finalItemState = try await engine.item(itemID)
-        #expect(finalItemState.attributes[.isTouched] == true)
-
-        let expectedChanges = expectedExamineChanges(
-            itemID: itemID,
-            initialAttributes: initialItemState.attributes
-        )
-        let changeHistory = await engine.gameState.changeHistory
-        expectNoDifference(changeHistory, expectedChanges)
     }
 
-    @Test("Surface with generic description and items on it")
-    func testExamineSurfaceWithGenericDescription() async throws {
-        // Arrange: Kitchen table with no special description, but items on it
-        let kitchenTable = Item(
-            id: "kitchenTable",
-            .name("kitchen table"),
-            // No custom description - will get generic "You see nothing special about the kitchen table."
-            .in(.location(.startRoom)),
-            .isSurface
+    @Test("Examine readable item shows read text")
+    func testExamineReadableItemShowsReadText() async throws {
+        // Given
+        let testRoom = Location(
+            id: "testRoom",
+            .name("Test Room"),
+            .inherentlyLit
         )
-        let bottle = Item(
-            id: "bottle",
-            .name("glass bottle"),
-            .description("A clear glass bottle."),
-            .in(.item("kitchenTable")),
-            .isTakable,
+
+        let scroll = Item(
+            id: "scroll",
+            .name("ancient scroll"),
+            .description("An ancient parchment scroll."),
+            .isReadable,
+            .readText("The scroll contains mystical runes and arcane symbols."),
+            .in(.location("testRoom"))
+        )
+
+        let game = MinimalGame(
+            player: Player(in: "testRoom"),
+            locations: testRoom,
+            items: scroll
+        )
+
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // When
+        try await engine.execute("examine scroll")
+
+        // Then
+        let output = await mockIO.flush()
+        expectNoDifference(
+            output,
+            """
+            > examine scroll
+            The scroll contains mystical runes and arcane symbols.
+            """)
+    }
+
+    @Test("Examine open container shows contents")
+    func testExamineOpenContainerShowsContents() async throws {
+        // Given
+        let testRoom = Location(
+            id: "testRoom",
+            .name("Test Room"),
+            .inherentlyLit
+        )
+
+        let box = Item(
+            id: "box",
+            .name("wooden box"),
+            .description("A sturdy wooden box."),
             .isContainer,
-            .isTransparent
+            .isOpen,
+            .in(.location("testRoom"))
         )
-        let brownSack = Item(
-            id: "brownSack",
-            .name("brown sack"),
-            .description("A brown sack."),
-            .in(.item("kitchenTable")),
+
+        let gem = Item(
+            id: "gem",
+            .name("ruby gem"),
+            .description("A precious ruby gem."),
             .isTakable,
-            .isContainer
+            .in(.item("box"))
         )
 
-        let initialAttributes = kitchenTable.attributes
+        let coin = Item(
+            id: "coin",
+            .name("gold coin"),
+            .description("A shiny gold coin."),
+            .isTakable,
+            .in(.item("box"))
+        )
 
-        let game = MinimalGame(items: kitchenTable, bottle, brownSack)
+        let game = MinimalGame(
+            player: Player(in: "testRoom"),
+            locations: testRoom,
+            items: box, gem, coin
+        )
+
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        // Act
-        try await engine.execute("examine kitchen table")
+        // When
+        try await engine.execute("examine box")
 
-        // Assert: Should skip generic description and show only what's on the table
+        // Then
         let output = await mockIO.flush()
-        expectNoDifference(output, """
-            > examine kitchen table
-            On the kitchen table are a glass bottle and a brown sack.
+        expectNoDifference(
+            output,
+            """
+            > examine box
+            A sturdy wooden box. The wooden box is open.
+
+            In the wooden box you can see a ruby gem and a gold coin.
             """)
-
-        // Assert Final State (Surface marked touched)
-        let finalItemState = try await engine.item("kitchenTable")
-        #expect(finalItemState.hasFlag(.isTouched) == true, "Surface should be marked touched")
-
-        // Assert Change History
-        let expectedChanges = expectedExamineChanges(
-            itemID: "kitchenTable", initialAttributes: initialAttributes)
-        let changeHistory = await engine.gameState.changeHistory
-        expectNoDifference(changeHistory, expectedChanges)
     }
 
-    @Test("Empty surface with generic description")
-    func testExamineEmptySurfaceWithGenericDescription() async throws {
-        // Arrange: Kitchen table with no special description and no items on it
-        let kitchenTable = Item(
-            id: "kitchenTable",
-            .name("kitchen table"),
-            // No custom description - will get generic "You see nothing special about the kitchen table."
-            .in(.location(.startRoom)),
-            .isSurface
+    @Test("Examine closed container shows closed state")
+    func testExamineClosedContainerShowsClosedState() async throws {
+        // Given
+        let testRoom = Location(
+            id: "testRoom",
+            .name("Test Room"),
+            .inherentlyLit
         )
 
-        let initialAttributes = kitchenTable.attributes
-
-        let game = MinimalGame(items: kitchenTable)
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
-
-        // Act
-        try await engine.execute("examine kitchen table")
-
-        // Assert: Should show generic description since there's nothing on the table
-        let output = await mockIO.flush()
-        expectNoDifference(output, """
-            > examine kitchen table
-            You see nothing special about the kitchen table.
-            """)
-
-        // Assert Final State (Surface marked touched)
-        let finalItemState = try await engine.item("kitchenTable")
-        #expect(finalItemState.hasFlag(.isTouched) == true, "Surface should be marked touched")
-
-        // Assert Change History
-        let expectedChanges = expectedExamineChanges(
-            itemID: "kitchenTable", initialAttributes: initialAttributes)
-        let changeHistory = await engine.gameState.changeHistory
-        expectNoDifference(changeHistory, expectedChanges)
-    }
-
-    @Test("Surface with custom description and items on it")
-    func testExamineSurfaceWithCustomDescription() async throws {
-        // Arrange: Kitchen table with custom description and items on it
-        let kitchenTable = Item(
-            id: "kitchenTable",
-            .name("kitchen table"),
-            .description("A sturdy wooden table with scratches from years of use."),
-            .in(.location(.startRoom)),
-            .isSurface
-        )
-        let bottle = Item(
-            id: "bottle",
-            .name("glass bottle"),
-            .description("A clear glass bottle."),
-            .in(.item("kitchenTable")),
-            .isTakable,
+        let chest = Item(
+            id: "chest",
+            .name("treasure chest"),
+            .description("An ornate treasure chest."),
             .isContainer,
-            .isTransparent
+            // Note: No .isOpen flag - container is closed
+            .in(.location("testRoom"))
         )
-        let brownSack = Item(
-            id: "brownSack",
-            .name("brown sack"),
-            .description("A brown sack."),
-            .in(.item("kitchenTable")),
+
+        let treasure = Item(
+            id: "treasure",
+            .name("golden treasure"),
+            .description("Precious golden treasure."),
             .isTakable,
-            .isContainer
+            .in(.item("chest"))
         )
 
-        let initialAttributes = kitchenTable.attributes
+        let game = MinimalGame(
+            player: Player(in: "testRoom"),
+            locations: testRoom,
+            items: chest, treasure
+        )
 
-        let game = MinimalGame(items: kitchenTable, bottle, brownSack)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        // Act
-        try await engine.execute("examine kitchen table")
+        // When
+        try await engine.execute("examine chest")
 
-        // Assert: Should show custom description followed by surface contents
+        // Then
         let output = await mockIO.flush()
-        expectNoDifference(output, """
-            > examine kitchen table
-            A sturdy wooden table with scratches from years of use. On the
-            kitchen table are a glass bottle and a brown sack.
+        expectNoDifference(
+            output,
+            """
+            > examine chest
+            An ornate treasure chest. The treasure chest is closed.
             """)
-
-        // Assert Final State (Surface marked touched)
-        let finalItemState = try await engine.item("kitchenTable")
-        #expect(finalItemState.hasFlag(.isTouched) == true, "Surface should be marked touched")
-
-        // Assert Change History
-        let expectedChanges = expectedExamineChanges(
-            itemID: "kitchenTable", initialAttributes: initialAttributes)
-        let changeHistory = await engine.gameState.changeHistory
-        expectNoDifference(changeHistory, expectedChanges)
     }
 
-    @Test("Enhanced surface with generic description and firstDescription items")
-    func testExamineEnhancedSurfaceWithGenericDescription() async throws {
-        // Arrange: Kitchen table with no special description, but items with firstDescription
-        let kitchenTable = Item(
-            id: "kitchenTable",
-            .name("kitchen table"),
-            // No custom description - will get generic "You see nothing special about the kitchen table."
-            .in(.location(.startRoom)),
-            .isSurface
+    @Test("Examine surface shows items on it")
+    func testExamineSurfaceShowsItemsOnIt() async throws {
+        // Given
+        let testRoom = Location(
+            id: "testRoom",
+            .name("Test Room"),
+            .inherentlyLit
         )
-        let bottle = Item(
-            id: "bottle",
-            .name("glass bottle"),
-            .description("A clear glass bottle."),
-            .firstDescription("A bottle is sitting on the table."),
-            .in(.item("kitchenTable")),
+
+        let table = Item(
+            id: "table",
+            .name("oak table"),
+            .description("A solid oak table."),
+            .isSurface,
+            .in(.location("testRoom"))
+        )
+
+        let book = Item(
+            id: "book",
+            .name("leather book"),
+            .description("A leather-bound book."),
             .isTakable,
+            .in(.item("table"))
+        )
+
+        let candle = Item(
+            id: "candle",
+            .name("wax candle"),
+            .description("A simple wax candle."),
+            .isTakable,
+            .in(.item("table"))
+        )
+
+        let game = MinimalGame(
+            player: Player(in: "testRoom"),
+            locations: testRoom,
+            items: table, book, candle
+        )
+
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // When
+        try await engine.execute("examine table")
+
+        // Then
+        let output = await mockIO.flush()
+        expectNoDifference(
+            output,
+            """
+            > examine table
+            A solid oak table.
+
+            On the oak table you can see a leather book and a wax candle.
+            """)
+    }
+
+    @Test("Examine empty container")
+    func testExamineEmptyContainer() async throws {
+        // Given
+        let testRoom = Location(
+            id: "testRoom",
+            .name("Test Room"),
+            .inherentlyLit
+        )
+
+        let bag = Item(
+            id: "bag",
+            .name("leather bag"),
+            .description("A worn leather bag."),
             .isContainer,
-            .isTransparent
-        )
-        let water = Item(
-            id: "water",
-            .name("quantity of water"),
-            .description("It’s just water."),
-            .in(.item("bottle")),
-            .isTakable
-        )
-        let brownSack = Item(
-            id: "brownSack",
-            .name("brown sack"),
-            .description("A brown sack."),
-            .firstDescription("On the table is an elongated brown sack, smelling of hot peppers."),
-            .in(.item("kitchenTable")),
-            .isTakable,
-            .isContainer
+            .isOpen,
+            .in(.location("testRoom"))
         )
 
-        let initialAttributes = kitchenTable.attributes
+        let game = MinimalGame(
+            player: Player(in: "testRoom"),
+            locations: testRoom,
+            items: bag
+        )
 
-        let game = MinimalGame(items: kitchenTable, bottle, water, brownSack)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        // Act
-        try await engine.execute("examine kitchen table")
+        // When
+        try await engine.execute("examine bag")
 
-        // Assert: Should skip generic description and show only enhanced item descriptions
+        // Then
         let output = await mockIO.flush()
-        expectNoDifference(output, """
-            > examine kitchen table
-            A bottle is sitting on the table. The glass bottle contains a
-            quantity of water. On the table is an elongated brown sack,
-            smelling of hot peppers.
+        expectNoDifference(
+            output,
+            """
+            > examine bag
+            A worn leather bag. The leather bag is open.
+
+            The leather bag is empty.
             """)
-
-        // Assert Final State (Surface marked touched)
-        let finalItemState = try await engine.item("kitchenTable")
-        #expect(finalItemState.hasFlag(.isTouched) == true, "Surface should be marked touched")
-
-        // Assert Change History
-        let expectedChanges = expectedExamineChanges(
-            itemID: "kitchenTable", initialAttributes: initialAttributes)
-        let changeHistory = await engine.gameState.changeHistory
-        expectNoDifference(changeHistory, expectedChanges)
     }
 
-    @Test("Enhanced surface description with nested containers")
-    func testExamineEnhancedSurface() async throws {
-        // Arrange: Kitchen table with bottle containing water, and brown sack
-        let kitchenTable = Item(
-            id: "kitchenTable",
-            .name("kitchen table"),
-            .description("A wooden table used for food preparation."),
-            .in(.location(.startRoom)),
-            .isSurface
+    @Test("Examine empty surface")
+    func testExamineEmptySurface() async throws {
+        // Given
+        let testRoom = Location(
+            id: "testRoom",
+            .name("Test Room"),
+            .inherentlyLit
         )
-        let bottle = Item(
-            id: "bottle",
-            .name("glass bottle"),
-            .adjectives("clear", "glass"),
-            .description("A clear glass bottle."),
-            .firstDescription("A bottle is sitting on the table."),
-            .in(.item("kitchenTable")),
+
+        let desk = Item(
+            id: "desk",
+            .name("wooden desk"),
+            .description("A simple wooden desk."),
+            .isSurface,
+            .in(.location("testRoom"))
+        )
+
+        let game = MinimalGame(
+            player: Player(in: "testRoom"),
+            locations: testRoom,
+            items: desk
+        )
+
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // When
+        try await engine.execute("examine desk")
+
+        // Then
+        let output = await mockIO.flush()
+        expectNoDifference(
+            output,
+            """
+            > examine desk
+            A simple wooden desk.
+
+            There is nothing on the wooden desk.
+            """)
+    }
+
+    @Test("Examine door shows door state")
+    func testExamineDoorShowsDoorState() async throws {
+        // Given
+        let testRoom = Location(
+            id: "testRoom",
+            .name("Test Room"),
+            .inherentlyLit
+        )
+
+        let door = Item(
+            id: "door",
+            .name("oak door"),
+            .description("A heavy oak door."),
+            .isDoor,
+            .isOpen,
+            .in(.location("testRoom"))
+        )
+
+        let game = MinimalGame(
+            player: Player(in: "testRoom"),
+            locations: testRoom,
+            items: door
+        )
+
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // When
+        try await engine.execute("examine door")
+
+        // Then
+        let output = await mockIO.flush()
+        expectNoDifference(
+            output,
+            """
+            > examine door
+            A heavy oak door. The oak door is open.
+            """)
+    }
+
+    @Test("Updates pronouns to refer to examined item")
+    func testUpdatesPronounsToExaminedItem() async throws {
+        // Given
+        let testRoom = Location(
+            id: "testRoom",
+            .name("Test Room"),
+            .inherentlyLit
+        )
+
+        let book = Item(
+            id: "book",
+            .name("leather book"),
+            .description("A worn leather book."),
             .isTakable,
-            .isTransparent,
-            .isContainer
+            .in(.location("testRoom"))
         )
-        let water = Item(
-            id: "water",
-            .name("quantity of water"),
-            .description("It’s just water."),
-            .synonyms("water", "h2o", "liquid"),
-            .in(.item("bottle")),
-            .isTakable
+
+        let game = MinimalGame(
+            player: Player(in: "testRoom"),
+            locations: testRoom,
+            items: book
         )
-        let brownSack = Item(
-            id: "brownSack",
-            .name("elongated brown sack"),
-            .description("An elongated brown sack, smelling of hot peppers."),
-            .adjectives("brown", "elongated", "smelly"),
-            .synonyms("bag", "sack"),
-            .firstDescription("On the table is an elongated brown sack, smelling of hot peppers."),
-            .in(.item("kitchenTable")),
-            .isTakable,
+
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // When
+        try await engine.execute("examine book")
+        try await engine.execute("take it")
+
+        // Then
+        let output = await mockIO.flush()
+        expectNoDifference(
+            output,
+            """
+            > examine book
+            A worn leather book.
+            > take it
+            Taken.
+            """)
+
+        let finalState = try await engine.item("book")
+        #expect(finalState.parent == .player)
+    }
+
+    @Test("EXAMINE ALL with nothing to examine")
+    func testExamineAllWithNothingToExamine() async throws {
+        // Given
+        let testRoom = Location(
+            id: "testRoom",
+            .name("Test Room"),
+            .inherentlyLit
+        )
+
+        let game = MinimalGame(
+            player: Player(in: "testRoom"),
+            locations: testRoom
+        )
+
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // When
+        try await engine.execute("examine all")
+
+        // Then
+        let output = await mockIO.flush()
+        expectNoDifference(
+            output,
+            """
+            > examine all
+            There is nothing here to examine.
+            """)
+    }
+
+    @Test("Examine IN preposition delegates to look inside")
+    func testExamineInDelegatesToLookInside() async throws {
+        // Given
+        let testRoom = Location(
+            id: "testRoom",
+            .name("Test Room"),
+            .inherentlyLit
+        )
+
+        let box = Item(
+            id: "box",
+            .name("wooden box"),
+            .description("A wooden box."),
             .isContainer,
-            .isOpenable
+            .isOpen,
+            .in(.location("testRoom"))
         )
 
-        let initialAttributes = kitchenTable.attributes
+        let gem = Item(
+            id: "gem",
+            .name("ruby gem"),
+            .description("A precious ruby."),
+            .isTakable,
+            .in(.item("box"))
+        )
 
-        let game = MinimalGame(items: kitchenTable, bottle, water, brownSack)
+        let game = MinimalGame(
+            player: Player(in: "testRoom"),
+            locations: testRoom,
+            items: box, gem
+        )
+
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
-        #expect(try await engine.item("kitchenTable").hasFlag(.isTouched) == false)
-        #expect(await engine.gameState.changeHistory.isEmpty)
 
-        // Act
-        try await engine.execute("examine kitchen table")
+        // When
+        try await engine.execute("examine in box")
 
-        // Assert: Should show enhanced surface description
+        // Then
         let output = await mockIO.flush()
-        expectNoDifference(output, """
-            > examine kitchen table
-            A bottle is sitting on the table. The glass bottle contains a
-            quantity of water. On the table is an elongated brown sack,
-            smelling of hot peppers.
+        expectNoDifference(
+            output,
+            """
+            > examine in box
+            In the wooden box you can see a ruby gem.
             """)
-
-        // Assert Final State (Surface marked touched)
-        let finalItemState = try await engine.item("kitchenTable")
-        #expect(finalItemState.hasFlag(.isTouched) == true, "Surface should be marked touched")
-
-        // Assert Change History
-        let expectedChanges = expectedExamineChanges(
-            itemID: "kitchenTable", initialAttributes: initialAttributes)
-        let changeHistory = await engine.gameState.changeHistory
-        expectNoDifference(changeHistory, expectedChanges)
     }
-}
 
-extension ExamineActionHandlerTests {
-    private func expectedExamineChanges(
-        itemID: ItemID,
-        initialAttributes: [ItemAttributeID: StateValue]
-    ) -> [StateChange] {
-        var changes: [StateChange] = []
-
-        // Item is touched
-        if initialAttributes[.isTouched] != true {
-            changes.append(
-                StateChange(
-                    entityID: .item(itemID),
-                    attribute: .itemAttribute(.isTouched),
-                    oldValue: nil,
-                    newValue: true
-                )
-            )
-        }
-
-        // Pronoun "it" is set to this item
-        // TODO: This might need to be more sophisticated if "them" is possible
-        // or if the existing pronoun was different.
-        changes.append(
-            StateChange(
-                entityID: .global,
-                attribute: .pronounReference(pronoun: "it"),
-                // Old value might be nil or another item, for simplicity in test we assume nil or different
-                // A more robust test might capture the actual old pronoun state.
-                oldValue: nil,  // Assuming it wasn’t set or was different
-                newValue: .entityReferenceSet([.item(itemID)])  // Use .entityReferenceSet
-            )
+    @Test("Examine ON preposition delegates to look inside")
+    func testExamineOnDelegatesToLookInside() async throws {
+        // Given
+        let testRoom = Location(
+            id: "testRoom",
+            .name("Test Room"),
+            .inherentlyLit
         )
-        return changes
+
+        let table = Item(
+            id: "table",
+            .name("wooden table"),
+            .description("A wooden table."),
+            .isSurface,
+            .in(.location("testRoom"))
+        )
+
+        let book = Item(
+            id: "book",
+            .name("red book"),
+            .description("A red book."),
+            .isTakable,
+            .in(.item("table"))
+        )
+
+        let game = MinimalGame(
+            player: Player(in: "testRoom"),
+            locations: testRoom,
+            items: table, book
+        )
+
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // When
+        try await engine.execute("examine on table")
+
+        // Then
+        let output = await mockIO.flush()
+        expectNoDifference(
+            output,
+            """
+            > examine on table
+            On the wooden table you can see a red book.
+            """)
+    }
+
+    // MARK: - ActionID Testing
+
+    @Test("Handler exposes correct ActionIDs")
+    func testActionIDs() async throws {
+        let handler = ExamineActionHandler()
+        // ExamineActionHandler doesn’t specify actions, so it should be empty
+        #expect(handler.actions.isEmpty)
+    }
+
+    @Test("Handler exposes correct VerbIDs")
+    func testVerbIDs() async throws {
+        let handler = ExamineActionHandler()
+        #expect(handler.verbs.contains(.examine))
+        #expect(handler.verbs.contains("x"))
+        #expect(handler.verbs.contains(.inspect))
+        #expect(handler.verbs.count == 3)
+    }
+
+    @Test("Handler requires light")
+    func testRequiresLightProperty() async throws {
+        let handler = ExamineActionHandler()
+        #expect(handler.requiresLight == true)
     }
 }

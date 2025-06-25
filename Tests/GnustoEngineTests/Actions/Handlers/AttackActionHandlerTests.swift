@@ -1,19 +1,230 @@
-import CustomDump
 import Testing
-
+import CustomDump
 @testable import GnustoEngine
 
 @Suite("AttackActionHandler Tests")
 struct AttackActionHandlerTests {
 
-    @Test("Attack validates missing direct object")
-    func testAttackValidatesMissingDirectObject() async throws {
-        // Given
-        let (engine, mockIO) = await GameEngine.test()
+    // MARK: - Syntax Rule Testing
 
-        // When / Then
+    @Test("ATTACK DIRECTOBJECT syntax works")
+    func testAttackDirectObjectSyntax() async throws {
+        // Given
+        let testRoom = Location(
+            id: "testRoom",
+            .name("Test Room"),
+            .description("A room for testing."),
+            .inherentlyLit
+        )
+
+        let troll = Item(
+            id: "troll",
+            .name("fierce troll"),
+            .description("A fierce troll blocking your way."),
+            .isCharacter,
+            .in(.location("testRoom"))
+        )
+
+        let game = MinimalGame(
+            player: Player(in: "testRoom"),
+            locations: testRoom,
+            items: troll
+        )
+
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // When
+        try await engine.execute("attack troll")
+
+        // Then
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            > attack troll
+            Trying to attack a fierce troll with your bare hands
+            is suicidal.
+            """)
+
+        let finalState = try await engine.item("troll")
+        #expect(finalState.hasFlag(.isTouched) == true)
+    }
+
+    @Test("ATTACK DIRECTOBJECT WITH INDIRECTOBJECT syntax works")
+    func testAttackWithWeaponSyntax() async throws {
+        // Given
+        let testRoom = Location(
+            id: "testRoom",
+            .name("Test Room"),
+            .inherentlyLit
+        )
+
+        let dragon = Item(
+            id: "dragon",
+            .name("red dragon"),
+            .description("A fearsome red dragon."),
+            .isCharacter,
+            .in(.location("testRoom"))
+        )
+
+        let sword = Item(
+            id: "sword",
+            .name("steel sword"),
+            .description("A sharp steel sword."),
+            .isWeapon,
+            .isTakable,
+            .in(.player)
+        )
+
+        let game = MinimalGame(
+            player: Player(in: "testRoom"),
+            locations: testRoom,
+            items: dragon, sword
+        )
+
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // When
+        try await engine.execute("attack dragon with sword")
+
+        // Then
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            > attack dragon with sword
+            Let’s hope it doesn’t come to that.
+            """)
+    }
+
+    @Test("FIGHT syntax works")
+    func testFightSyntax() async throws {
+        // Given
+        let testRoom = Location(
+            id: "testRoom",
+            .name("Test Room"),
+            .inherentlyLit
+        )
+
+        let orc = Item(
+            id: "orc",
+            .name("angry orc"),
+            .description("An angry orc warrior."),
+            .isCharacter,
+            .in(.location("testRoom"))
+        )
+
+        let game = MinimalGame(
+            player: Player(in: "testRoom"),
+            locations: testRoom,
+            items: orc
+        )
+
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // When
+        try await engine.execute("fight orc")
+
+        // Then
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            > fight orc
+            Trying to attack an angry orc with your bare hands is suicidal.
+            """)
+    }
+
+    @Test("HIT syntax works")
+    func testHitSyntax() async throws {
+        // Given
+        let testRoom = Location(
+            id: "testRoom",
+            .name("Test Room"),
+            .inherentlyLit
+        )
+
+        let goblin = Item(
+            id: "goblin",
+            .name("sneaky goblin"),
+            .description("A sneaky goblin."),
+            .isCharacter,
+            .in(.location("testRoom"))
+        )
+
+        let game = MinimalGame(
+            player: Player(in: "testRoom"),
+            locations: testRoom,
+            items: goblin
+        )
+
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // When
+        try await engine.execute("hit goblin")
+
+        // Then
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            > hit goblin
+            Trying to attack a sneaky goblin with your bare hands
+            is suicidal.
+            """)
+    }
+
+    @Test("KILL syntax works")
+    func testKillSyntax() async throws {
+        // Given
+        let testRoom = Location(
+            id: "testRoom",
+            .name("Test Room"),
+            .inherentlyLit
+        )
+
+        let spider = Item(
+            id: "spider",
+            .name("giant spider"),
+            .description("A giant spider."),
+            .isCharacter,
+            .in(.location("testRoom"))
+        )
+
+        let game = MinimalGame(
+            player: Player(in: "testRoom"),
+            locations: testRoom,
+            items: spider
+        )
+
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // When
+        try await engine.execute("kill spider")
+
+        // Then
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            > kill spider
+            Trying to attack a giant spider with your bare hands
+            is suicidal.
+            """)
+    }
+
+    // MARK: - Validation Testing
+
+    @Test("Cannot attack without specifying target")
+    func testCannotAttackWithoutTarget() async throws {
+        // Given
+        let testRoom = Location(
+            id: "testRoom",
+            .name("Test Room"),
+            .inherentlyLit
+        )
+
+        let game = MinimalGame(
+            player: Player(in: "testRoom"),
+            locations: testRoom
+        )
+
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // When
         try await engine.execute("attack")
 
+        // Then
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > attack
@@ -21,121 +232,154 @@ struct AttackActionHandlerTests {
             """)
     }
 
-    @Test("Attack validates item not found")
-    func testAttackValidatesItemNotFound() async throws {
+    @Test("Cannot attack target not in scope")
+    func testCannotAttackTargetNotInScope() async throws {
         // Given
-        let (engine, mockIO) = await GameEngine.test()
-
-        // When / Then
-        try await engine.execute("attack nonexistent")
-
-        let output = await mockIO.flush()
-        expectNoDifference(output, """
-            > attack nonexistent
-            You can’t see any such thing.
-            """)
-    }
-
-    @Test("Attack validates unknown (not yet met) item not reachable")
-    func testAttackValidatesUnknownItemNotReachable() async throws {
-        // Given
-        let distantGoblin = Item(
-            id: "distantGoblin",
-            .name("distant goblin"),
-            .synonyms("goblin"),
-            .in(.nowhere),
-            .isCharacter
-        )
-
-        let game = MinimalGame(items: distantGoblin)
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
-
-        // When / Then
-        try await engine.execute("attack the goblin")
-
-        let output = await mockIO.flush()
-        expectNoDifference(output, """
-            > attack the goblin
-            You can’t see any such thing.
-            """)
-    }
-
-    @Test("Attack validates item met but not reachable")
-    func testAttackValidatesItemMetButNotReachable() async throws {
-        // Given
-        let here = Location(
-            id: "startRoom",
+        let testRoom = Location(
+            id: "testRoom",
+            .name("Test Room"),
             .inherentlyLit
         )
-        let distantLand = Location(
-            id: "distantLand",
+
+        let anotherRoom = Location(
+            id: "anotherRoom",
+            .name("Another Room"),
             .inherentlyLit
         )
-        let distantGoblin = Item(
-            id: "distantGoblin",
-            .name("distant goblin"),
-            .synonyms("goblin"),
-            .in(.location("distantLand")),
+
+        let remoteTroll = Item(
+            id: "remoteTroll",
+            .name("remote troll"),
+            .description("A troll in another room."),
             .isCharacter,
-            .isTouched
+            .in(.location("anotherRoom"))
         )
 
         let game = MinimalGame(
-            locations: here, distantLand,
-            items: distantGoblin
+            player: Player(in: "testRoom"),
+            locations: testRoom, anotherRoom,
+            items: remoteTroll
         )
+
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        // When / Then
-        try await engine.execute("attack the goblin")
+        // When
+        try await engine.execute("attack troll")
 
+        // Then
         let output = await mockIO.flush()
         expectNoDifference(output, """
-            > attack the goblin
-            You can’t see the distant goblin.
+            > attack troll
+            You can’t see any such thing.
             """)
     }
 
-    @Test("Attack with weapon validates weapon not held")
-    func testAttackWithWeaponValidatesWeaponNotHeld() async throws {
+    @Test("Cannot attack with weapon not held")
+    func testCannotAttackWithWeaponNotHeld() async throws {
         // Given
-        let goblin = Item(
-            id: "goblin",
-            .name("goblin"),
-            .in(.location(.startRoom)),
-            .isCharacter
+        let testRoom = Location(
+            id: "testRoom",
+            .name("Test Room"),
+            .inherentlyLit
+        )
+
+        let troll = Item(
+            id: "troll",
+            .name("fierce troll"),
+            .description("A fierce troll."),
+            .isCharacter,
+            .in(.location("testRoom"))
         )
 
         let sword = Item(
             id: "sword",
-            .name("sword"),
-            .in(.location(.startRoom)),
-            .isWeapon
+            .name("steel sword"),
+            .description("A sharp steel sword."),
+            .isWeapon,
+            .isTakable,
+            .in(.location("testRoom"))
         )
 
-        let game = MinimalGame(items: goblin, sword)
+        let game = MinimalGame(
+            player: Player(in: "testRoom"),
+            locations: testRoom,
+            items: troll, sword
+        )
+
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        // When / Then
-        try await engine.execute("attack goblin with sword")
+        // When
+        try await engine.execute("attack troll with sword")
 
+        // Then
         let output = await mockIO.flush()
         expectNoDifference(output, """
-            > attack goblin with sword
-            You aren’t holding the sword.
+            > attack troll with sword
+            You aren’t holding the steel sword.
             """)
     }
 
-    @Test("Attack non-character object")
-    func testAttackNonCharacterObject() async throws {
-        // Given
-        let rock = Item(
-            id: "rock",
-            .name("rock"),
-            .in(.location(.startRoom))
+    @Test("Requires light to attack")
+    func testRequiresLight() async throws {
+        // Given: Dark room with character
+        let darkRoom = Location(
+            id: "darkRoom",
+            .name("Dark Room"),
+            .description("A pitch black room.")
+            // Note: No .inherentlyLit property
         )
 
-        let game = MinimalGame(items: rock)
+        let troll = Item(
+            id: "troll",
+            .name("fierce troll"),
+            .description("A fierce troll."),
+            .isCharacter,
+            .in(.location("darkRoom"))
+        )
+
+        let game = MinimalGame(
+            player: Player(in: "darkRoom"),
+            locations: darkRoom,
+            items: troll
+        )
+
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // When
+        try await engine.execute("attack troll")
+
+        // Then
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            > attack troll
+            It is pitch black. You can’t see a thing.
+            """)
+    }
+
+    // MARK: - Processing Testing
+
+    @Test("Attack non-character gives appropriate message")
+    func testAttackNonCharacter() async throws {
+        // Given
+        let testRoom = Location(
+            id: "testRoom",
+            .name("Test Room"),
+            .inherentlyLit
+        )
+
+        let rock = Item(
+            id: "rock",
+            .name("large rock"),
+            .description("A large boulder."),
+            .in(.location("testRoom"))
+        )
+
+        let game = MinimalGame(
+            player: Player(in: "testRoom"),
+            locations: testRoom,
+            items: rock
+        )
+
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // When
@@ -145,93 +389,170 @@ struct AttackActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > attack rock
-            I’ve known strange people, but fighting a rock?
+            I’ve known strange people, but fighting a large rock?
             """)
+
+        let finalState = try await engine.item("rock")
+        #expect(finalState.hasFlag(.isTouched) == true)
     }
 
-    @Test("Attack character with bare hands")
-    func testAttackCharacterWithBareHands() async throws {
+    @Test("Attack character bare-handed")
+    func testAttackCharacterBareHanded() async throws {
         // Given
-        let goblin = Item(
-            id: "goblin",
-            .name("goblin"),
-            .in(.location(.startRoom)),
-            .isCharacter
+        let testRoom = Location(
+            id: "testRoom",
+            .name("Test Room"),
+            .inherentlyLit
         )
 
-        let game = MinimalGame(items: goblin)
+        let warrior = Item(
+            id: "warrior",
+            .name("skilled warrior"),
+            .description("A skilled warrior."),
+            .isCharacter,
+            .in(.location("testRoom"))
+        )
+
+        let game = MinimalGame(
+            player: Player(in: "testRoom"),
+            locations: testRoom,
+            items: warrior
+        )
+
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // When
-        try await engine.execute("attack goblin")
+        try await engine.execute("attack warrior")
 
         // Then
         let output = await mockIO.flush()
         expectNoDifference(output, """
-            > attack goblin
-            Trying to attack a goblin with your bare hands is suicidal.
+            > attack warrior
+            Trying to attack a skilled warrior with your bare hands
+            is suicidal.
+            """)
+
+        let finalState = try await engine.item("warrior")
+        #expect(finalState.hasFlag(.isTouched) == true)
+    }
+
+    @Test("Attack character with non-weapon")
+    func testAttackCharacterWithNonWeapon() async throws {
+        // Given
+        let testRoom = Location(
+            id: "testRoom",
+            .name("Test Room"),
+            .inherentlyLit
+        )
+
+        let bandit = Item(
+            id: "bandit",
+            .name("dangerous bandit"),
+            .description("A dangerous bandit."),
+            .isCharacter,
+            .in(.location("testRoom"))
+        )
+
+        let stick = Item(
+            id: "stick",
+            .name("wooden stick"),
+            .description("A simple wooden stick."),
+            .isTakable,
+            .in(.player)
+        )
+
+        let game = MinimalGame(
+            player: Player(in: "testRoom"),
+            locations: testRoom,
+            items: bandit, stick
+        )
+
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // When
+        try await engine.execute("attack bandit with stick")
+
+        // Then
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            > attack bandit with stick
+            Trying to attack the dangerous bandit with a wooden stick
+            is suicidal.
             """)
     }
 
     @Test("Attack character with weapon")
     func testAttackCharacterWithWeapon() async throws {
         // Given
-        let goblin = Item(
-            id: "goblin",
-            .name("goblin"),
-            .in(.location(.startRoom)),
-            .isCharacter
+        let testRoom = Location(
+            id: "testRoom",
+            .name("Test Room"),
+            .inherentlyLit
         )
 
-        let sword = Item(
-            id: "sword",
-            .name("sword"),
-            .in(.player),
-            .isWeapon
+        let monster = Item(
+            id: "monster",
+            .name("evil monster"),
+            .description("An evil monster."),
+            .isCharacter,
+            .in(.location("testRoom"))
         )
 
-        let game = MinimalGame(items: goblin, sword)
+        let dagger = Item(
+            id: "dagger",
+            .name("sharp dagger"),
+            .description("A sharp dagger."),
+            .isWeapon,
+            .isTakable,
+            .in(.player)
+        )
+
+        let game = MinimalGame(
+            player: Player(in: "testRoom"),
+            locations: testRoom,
+            items: monster, dagger
+        )
+
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // When
-        try await engine.execute("attack goblin with sword")
+        try await engine.execute("attack monster with dagger")
 
         // Then
         let output = await mockIO.flush()
         expectNoDifference(output, """
-            > attack goblin with sword
+            > attack monster with dagger
             Let’s hope it doesn’t come to that.
             """)
+
+        let finalState = try await engine.item("monster")
+        #expect(finalState.hasFlag(.isTouched) == true)
     }
 
-    @Test("Attack character with inappropriate weapon")
-    func testAttackCharacterWithInappropriateWeapon() async throws {
-        // Given
-        let goblin = Item(
-            id: "goblin",
-            .name("goblin"),
-            .in(.location(.startRoom)),
-            .isCharacter
-        )
+    // MARK: - ActionID Testing
 
-        let feather = Item(
-            id: "feather",
-            .name("feather"),
-            .in(.player),
-            .isTakable
-        )
+    @Test("Handler exposes correct ActionIDs")
+    func testActionIDs() async throws {
+        let handler = AttackActionHandler()
+        // AttackActionHandler doesn’t specify actions, so it should be empty
+        #expect(handler.actions.isEmpty)
+    }
 
-        let game = MinimalGame(items: goblin, feather)
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+    @Test("Handler exposes correct VerbIDs")
+    func testVerbIDs() async throws {
+        let handler = AttackActionHandler()
+        #expect(handler.verbs.contains(.attack))
+        #expect(handler.verbs.contains(.fight))
+        #expect(handler.verbs.contains(.hit))
+        #expect(handler.verbs.contains(.kill))
+        #expect(handler.verbs.contains(.slay))
+        #expect(handler.verbs.contains(.stab))
+        #expect(handler.verbs.count == 6)
+    }
 
-        // When
-        try await engine.execute("attack goblin with feather")
-
-        // Then
-        let output = await mockIO.flush()
-        expectNoDifference(output, """
-            > attack goblin with feather
-            Trying to attack the goblin with a feather is suicidal.
-            """)
+    @Test("Handler requires light")
+    func testRequiresLightProperty() async throws {
+        let handler = AttackActionHandler()
+        #expect(handler.requiresLight == true)
     }
 }

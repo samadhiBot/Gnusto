@@ -1,53 +1,218 @@
-import CustomDump
 import Testing
-
+import CustomDump
 @testable import GnustoEngine
 
-/// Tests for the ChompActionHandler.
 @Suite("ChompActionHandler Tests")
 struct ChompActionHandlerTests {
 
-    // MARK: - Test Setup
+    // MARK: - Syntax Rule Testing
 
-    func createTestEngine() async -> (GameEngine, MockIOHandler) {
-        let (engine, mockIO) = await GameEngine.test()
-        return (engine, mockIO)
-    }
+    @Test("CHOMP DIRECTOBJECT syntax works")
+    func testChompDirectObjectSyntax() async throws {
+        // Given
+        let testRoom = Location(
+            id: "testRoom",
+            .name("Test Room"),
+            .description("A room for testing."),
+            .inherentlyLit
+        )
 
-    // MARK: - Tests
+        let apple = Item(
+            id: "apple",
+            .name("red apple"),
+            .description("A juicy red apple."),
+            .isEdible,
+            .in(.location("testRoom"))
+        )
 
-    @Test("CHOMP command")
-    func testChomp() async throws {
-        let (engine, mockIO) = await GameEngine.test()
+        let game = MinimalGame(
+            player: Player(in: "testRoom"),
+            locations: testRoom,
+            items: apple
+        )
 
-        // Act
-        try await engine.execute("chomp", times: 3)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        // Assert
+        // When
+        try await engine.execute("chomp apple")
+
+        // Then
         let output = await mockIO.flush()
         expectNoDifference(output, """
-            > chomp
-            You chomp with a conviction that makes reality itself
-            seem negotiable.
+            > chomp apple
+            You take a bite. It tastes like a red apple.
+            """)
 
-            > chomp
-            You chomp enthusiastically at the air, flexing your impressive
-            jaw strength.
+        let finalState = try await engine.item("apple")
+        #expect(finalState.hasFlag(.isTouched) == true)
+    }
 
-            > chomp
-            You gnash your teeth with the passion of one who believes in
-            their vision.
+    @Test("BITE syntax works")
+    func testBiteSyntax() async throws {
+        // Given
+        let testRoom = Location(
+            id: "testRoom",
+            .name("Test Room"),
+            .inherentlyLit
+        )
+
+        let bread = Item(
+            id: "bread",
+            .name("piece of bread"),
+            .description("A piece of fresh bread."),
+            .isEdible,
+            .in(.location("testRoom"))
+        )
+
+        let game = MinimalGame(
+            player: Player(in: "testRoom"),
+            locations: testRoom,
+            items: bread
+        )
+
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // When
+        try await engine.execute("bite bread")
+
+        // Then
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            > bite bread
+            You take a bite. It tastes like a piece of bread.
             """)
     }
 
-    @Test("CHOMP without object")
-    func testChompWithoutObject() async throws {
-        let (engine, mockIO) = await createTestEngine()
+    @Test("CHEW syntax works")
+    func testChewSyntax() async throws {
+        // Given
+        let testRoom = Location(
+            id: "testRoom",
+            .name("Test Room"),
+            .inherentlyLit
+        )
 
-        // Act
+        let game = MinimalGame(
+            player: Player(in: "testRoom"),
+            locations: testRoom
+        )
+
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // When
+        try await engine.execute("chew")
+
+        // Then
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            > chew
+            You chomp with a conviction that makes reality itself
+            seem negotiable.
+            """)
+    }
+
+    // MARK: - Validation Testing
+
+    @Test("Cannot chomp item not in scope")
+    func testCannotChompItemNotInScope() async throws {
+        // Given
+        let testRoom = Location(
+            id: "testRoom",
+            .name("Test Room"),
+            .inherentlyLit
+        )
+
+        let anotherRoom = Location(
+            id: "anotherRoom",
+            .name("Another Room"),
+            .inherentlyLit
+        )
+
+        let remoteApple = Item(
+            id: "remoteApple",
+            .name("remote apple"),
+            .description("An apple in another room."),
+            .isEdible,
+            .in(.location("anotherRoom"))
+        )
+
+        let game = MinimalGame(
+            player: Player(in: "testRoom"),
+            locations: testRoom, anotherRoom,
+            items: remoteApple
+        )
+
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // When
+        try await engine.execute("chomp apple")
+
+        // Then
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            > chomp apple
+            You can’t see any such thing.
+            """)
+    }
+
+    @Test("Requires light to chomp on items")
+    func testRequiresLight() async throws {
+        // Given: Dark room with an edible item
+        let darkRoom = Location(
+            id: "darkRoom",
+            .name("Dark Room"),
+            .description("A pitch black room.")
+        )
+
+        let apple = Item(
+            id: "apple",
+            .name("red apple"),
+            .description("A juicy red apple."),
+            .isEdible,
+            .in(.location("darkRoom"))
+        )
+
+        let game = MinimalGame(
+            player: Player(in: "darkRoom"),
+            locations: darkRoom,
+            items: apple
+        )
+
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // When
+        try await engine.execute("chomp apple")
+
+        // Then
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            > chomp apple
+            It is pitch black. You can’t see a thing.
+            """)
+    }
+
+    // MARK: - Processing Testing
+
+    @Test("Chomp without object gives general response")
+    func testChompWithoutObject() async throws {
+        // Given
+        let testRoom = Location(
+            id: "testRoom",
+            .name("Test Room"),
+            .inherentlyLit
+        )
+
+        let game = MinimalGame(
+            player: Player(in: "testRoom"),
+            locations: testRoom
+        )
+
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // When
         try await engine.execute("chomp")
 
-        // Assert
+        // Then
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > chomp
@@ -56,19 +221,145 @@ struct ChompActionHandlerTests {
             """)
     }
 
-    @Test("CHOMP with object")
-    func testChompWithObject() async throws {
-        let (engine, mockIO) = await createTestEngine()
+    @Test("Chomp on edible item")
+    func testChompOnEdibleItem() async throws {
+        // Given
+        let testRoom = Location(
+            id: "testRoom",
+            .name("Test Room"),
+            .inherentlyLit
+        )
 
-        // Act
-        try await engine.execute("chomp the pebble")
+        let cookie = Item(
+            id: "cookie",
+            .name("chocolate cookie"),
+            .description("A delicious chocolate cookie."),
+            .isEdible,
+            .in(.location("testRoom"))
+        )
 
-        // Assert
+        let game = MinimalGame(
+            player: Player(in: "testRoom"),
+            locations: testRoom,
+            items: cookie
+        )
+
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // When
+        try await engine.execute("chomp cookie")
+
+        // Then
         let output = await mockIO.flush()
         expectNoDifference(output, """
-            > chomp the pebble
-            You chomp the pebble with the fearless innovation of someone
-            unbound by convention.
+            > chomp cookie
+            You take a bite. It tastes like a chocolate cookie.
             """)
+
+        let finalState = try await engine.item("cookie")
+        #expect(finalState.hasFlag(.isTouched) == true)
+    }
+
+    @Test("Chomp on character")
+    func testChompOnCharacter() async throws {
+        // Given
+        let testRoom = Location(
+            id: "testRoom",
+            .name("Test Room"),
+            .inherentlyLit
+        )
+
+        let castleGuard = Item(
+            id: "guard",
+            .name("castle guard"),
+            .description("A stern castle guard."),
+            .isCharacter,
+            .in(.location("testRoom"))
+        )
+
+        let game = MinimalGame(
+            player: Player(in: "testRoom"),
+            locations: testRoom,
+            items: castleGuard
+        )
+
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // When
+        try await engine.execute("chomp guard")
+
+        // Then
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            > chomp guard
+            You gnaw the castle guard in a thinking-outside-the-box kind of
+            a way.
+            """)
+
+        let finalState = try await engine.item("castleGuard")
+        #expect(finalState.hasFlag(.isTouched) == true)
+    }
+
+    @Test("Chomp on regular item")
+    func testChompOnRegularItem() async throws {
+        // Given
+        let testRoom = Location(
+            id: "testRoom",
+            .name("Test Room"),
+            .inherentlyLit
+        )
+
+        let rock = Item(
+            id: "rock",
+            .name("smooth rock"),
+            .description("A smooth, round rock."),
+            .in(.location("testRoom"))
+        )
+
+        let game = MinimalGame(
+            player: Player(in: "testRoom"),
+            locations: testRoom,
+            items: rock
+        )
+
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // When
+        try await engine.execute("chomp rock")
+
+        // Then
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            > chomp rock
+            You chomp the smooth rock with the fearless innovation of
+            someone unbound by convention.
+            """)
+
+        let finalState = try await engine.item("rock")
+        #expect(finalState.hasFlag(.isTouched) == true)
+    }
+
+    // MARK: - ActionID Testing
+
+    @Test("Handler exposes correct ActionIDs")
+    func testActionIDs() async throws {
+        let handler = ChompActionHandler()
+        // ChompActionHandler doesn’t specify actions, so it should be empty
+        #expect(handler.actions.isEmpty)
+    }
+
+    @Test("Handler exposes correct VerbIDs")
+    func testVerbIDs() async throws {
+        let handler = ChompActionHandler()
+        #expect(handler.verbs.contains(.chomp))
+        #expect(handler.verbs.contains(.bite))
+        #expect(handler.verbs.contains(.chew))
+        #expect(handler.verbs.count == 3)
+    }
+
+    @Test("Handler requires light")
+    func testRequiresLightProperty() async throws {
+        let handler = ChompActionHandler()
+        #expect(handler.requiresLight == true)
     }
 }

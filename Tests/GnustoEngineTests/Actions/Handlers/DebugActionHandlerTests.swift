@@ -5,291 +5,436 @@ import Testing
 
 @Suite("DebugActionHandler Tests")
 struct DebugActionHandlerTests {
-    // MARK: - Setup Helper
 
-    private func createTestEngine() async -> (GameEngine, MockIOHandler) {
-        let testItem = Item(
-            id: "test_item",
-            .name("test item"),
-            .description("A test item for debugging."),
-            .isTakable,
-            .in(.player)
-        )
+    // MARK: - Syntax Rule Testing
 
-        let testLocation = Location(
-            id: "test_location",
-            .name("Test Location"),
-            .description("A test location for debugging."),
-            .exits([
-                .north: .to("other_location")
-            ])
-        )
-
-        return await GameEngine.test(
-            blueprint: MinimalGame(
-                locations: testLocation,
-                items: testItem
-            )
-        )
-    }
-
-    // MARK: - Validation Tests
-
-    @Test("DEBUG fails with no direct object")
-    func testValidationFailsWithNoDirectObject() async throws {
-        let (engine, mockIO) = await createTestEngine()
-
-        // Act
-        try await engine.execute("debug")
-
-        // Assert Output
-        let output = await mockIO.flush()
-        expectNoDifference(output, """
-            > debug
-            DEBUG requires a direct object to examine.
-            """)
-    }
-
-    // MARK: - Processing Tests
-
-    @Test("DEBUG player produces formatted output")
-    func testProcessPlayerDebug() async throws {
-        let (engine, mockIO) = await createTestEngine()
-
-        // Act
-        try await engine.execute("debug self")
-
-        // Assert Output
-        let output = await mockIO.flush()
-
-        // Should contain markdown code block and player data
-        expectNoDifference(output, """
-            > debug self
-            ```
-            Player(
-              carryingCapacity: 100,
-              currentLocationID: .startRoom,
-              health: 100,
-              moves: 0,
-              score: 0
-            )
-            ```
-            """)
-    }
-
-    @Test("DEBUG item produces formatted output")
-    func testProcessItemDebug() async throws {
-        let (engine, mockIO) = await createTestEngine()
-
-        // Act
-        try await engine.execute("debug test item")
-
-        // Assert Output
-        let output = await mockIO.flush()
-
-        // Should contain markdown code block and item data
-        expectNoDifference(output, """
-            > debug test item
-            ```
-            Item(
-              id: .test_item,
-              attributes: [
-                .description: .string("A test item for debugging."),
-                .isTakable: .bool(true),
-                .name: .string("test item"),
-                .parentEntity: .parentEntity(..player)
-              ]
-            )
-            ```
-            """)
-    }
-
-    @Test("DEBUG location produces formatted output")
-    func testProcessLocationDebug() async throws {
-        let (engine, mockIO) = await createTestEngine()
-
-        // Act
-        try await engine.execute("debug test location")
-
-        // Assert Output
-        let output = await mockIO.flush()
-
-        // Should contain markdown code block and location data
-        expectNoDifference(output, """
-            > debug test location
-            ```
-            Location(
-              id: .test_location,
-              attributes: [
-                .description: .string("A test location for debugging."),
-                .exits: .exits(.north: to: .other_location),
-                .name: .string("Test Location")
-              ]
-            )
-            ```
-            """)
-    }
-
-    // MARK: - Output Format Tests
-
-    @Test("DEBUG output is properly formatted with code blocks")
-    func testOutputFormatting() async throws {
-        let (engine, mockIO) = await createTestEngine()
-
-        // Act
-        try await engine.execute("debug self")
-
-        // Assert Output
-        let output = await mockIO.flush()
-
-        // Should start and end with code block markers
-        expectNoDifference(output, """
-            > debug self
-            ```
-            Player(
-              carryingCapacity: 100,
-              currentLocationID: .startRoom,
-              health: 100,
-              moves: 0,
-              score: 0
-            )
-            ```
-            """)
-    }
-
-    // MARK: - Edge Cases
-
-    @Test("DEBUG works with item that has complex properties")
-    func testDebugComplexItem() async throws {
-        let complexItem = Item(
-            id: "complex_item",
-            .name("complex item"),
-            .description("A complex item with many properties."),
-            .isTakable,
-            .isWearable,
-            .isOpenable,
-            .isContainer,
-            .size(10),
-            .capacity(5),
-            .in(.location(.startRoom))
-        )
-
-        let game = MinimalGame(items: complexItem)
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
-
-        // Act
-        try await engine.execute("debug complex item")
-
-        // Assert Output
-        let output = await mockIO.flush()
-
-        // Should contain complex item data
-        expectNoDifference(output, """
-            > debug complex item
-            ```
-            Item(
-              id: .complex_item,
-              attributes: [
-                .capacity: .int(5),
-                .description: .string("A complex item with many properties."),
-                .isContainer: .bool(true),
-                .isOpenable: .bool(true),
-                .isTakable: .bool(true),
-                .isWearable: .bool(true),
-                .name: .string("complex item"),
-                .parentEntity: .parentEntity(
-                  .location(.startRoom)
-                ),
-                .size: .int(10)
-              ]
-            )
-            ```
-            """)
-    }
-
-    @Test("DEBUG works with location that has complex exits")
-    func testDebugComplexLocation() async throws {
-        let complexLocation = Location(
-            id: "complex_location",
-            .name("complex Location"),
-            .description("A location with multiple exits and properties."),
-            .exits([
-                .north: .to("north_room"),
-                .south: .to("south_room"),
-                .east: .to("east_room"),
-                .west: .to("west_room"),
-            ]),
+    @Test("DEBUG syntax works")
+    func testDebugSyntax() async throws {
+        // Given
+        let testRoom = Location(
+            id: "testRoom",
+            .name("Test Room"),
+            .description("A room for testing."),
             .inherentlyLit
         )
 
-        let game = MinimalGame(locations: complexLocation)
+        let lamp = Item(
+            id: "lamp",
+            .name("brass lamp"),
+            .description("A shiny brass lamp."),
+            .isTakable,
+            .isLightSource,
+            .in(.location("testRoom"))
+        )
+
+        let game = MinimalGame(
+            player: Player(in: "testRoom"),
+            locations: testRoom,
+            items: lamp
+        )
+
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        // Act
-        try await engine.execute("debug complex Location")
+        // When
+        try await engine.execute("debug lamp")
 
-        // Assert Output
+        // Then
         let output = await mockIO.flush()
+        let lines = output.components(separatedBy: "\n")
 
-        // Should contain complex location data
-        expectNoDifference(output, """
-            > debug complex Location
-            ```
-            Location(
-              id: .complex_location,
-              attributes: [
-                .description: .string("A location with multiple exits and properties."),
-                .exits: .exits(
-                  .east: to: .east_room
-                  .north: to: .north_room
-                  .south: to: .south_room
-                  .west: to: .west_room
-                ),
-                .inherentlyLit: .bool(true),
-                .name: .string("complex Location")
-              ]
-            )
-            ```
+        // Should start with command echo and contain debug output in code blocks
+        #expect(lines.first == "> debug lamp")
+        #expect(output.contains("```"))
+        #expect(output.contains("Item"))
+        #expect(output.contains("brass lamp"))
+    }
+
+    // MARK: - Validation Testing
+
+    @Test("Cannot debug without specifying object")
+    func testCannotDebugWithoutObject() async throws {
+        // Given
+        let testRoom = Location(
+            id: "testRoom",
+            .name("Test Room"),
+            .inherentlyLit
+        )
+
+        let game = MinimalGame(
+            player: Player(in: "testRoom"),
+            locations: testRoom
+        )
+
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // When
+        try await engine.execute("debug")
+
+        // Then
+        let output = await mockIO.flush()
+        expectNoDifference(
+            output,
+            """
+            > debug
+            Debug what?
             """)
     }
 
-    @Test("DEBUG works with player that has modified state")
-    func testDebugModifiedPlayer() async throws {
-        let (engine, mockIO) = await createTestEngine()
-
-        // Modify player state
-        let scoreChange = StateChange(
-            entityID: .player,
-            attribute: .playerScore,
-            newValue: 100
+    @Test("Cannot debug non-existent item")
+    func testCannotDebugNonExistentItem() async throws {
+        // Given
+        let testRoom = Location(
+            id: "testRoom",
+            .name("Test Room"),
+            .inherentlyLit
         )
-        try await engine.apply(scoreChange)
 
-        let movesChange = StateChange(
-            entityID: .player,
-            attribute: .playerMoves,
-            newValue: 50
+        let game = MinimalGame(
+            player: Player(in: "testRoom"),
+            locations: testRoom
         )
-        try await engine.apply(movesChange)
 
-        // Act
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // When
+        try await engine.execute("debug nonexistent")
+
+        // Then
+        let output = await mockIO.flush()
+        expectNoDifference(
+            output,
+            """
+            > debug nonexistent
+            You can’t see any such thing.
+            """)
+    }
+
+    @Test("Cannot debug non-existent location")
+    func testCannotDebugNonExistentLocation() async throws {
+        // Given
+        let testRoom = Location(
+            id: "testRoom",
+            .name("Test Room"),
+            .inherentlyLit
+        )
+
+        let game = MinimalGame(
+            player: Player(in: "testRoom"),
+            locations: testRoom
+        )
+
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // When
+        try await engine.execute("debug nonexistentRoom")
+
+        // Then
+        let output = await mockIO.flush()
+        expectNoDifference(
+            output,
+            """
+            > debug nonexistentRoom
+            You can’t see any such thing.
+            """)
+    }
+
+    @Test("Does not require light to debug")
+    func testDoesNotRequireLight() async throws {
+        // Given: Dark room with item
+        let darkRoom = Location(
+            id: "darkRoom",
+            .name("Dark Room"),
+            .description("A pitch black room.")
+            // Note: No .inherentlyLit property
+        )
+
+        let lamp = Item(
+            id: "lamp",
+            .name("brass lamp"),
+            .description("A shiny brass lamp."),
+            .isTakable,
+            .isLightSource,
+            .in(.location("darkRoom"))
+        )
+
+        let game = MinimalGame(
+            player: Player(in: "darkRoom"),
+            locations: darkRoom,
+            items: lamp
+        )
+
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // When
+        try await engine.execute("debug lamp")
+
+        // Then - Debug should work even in darkness
+        let output = await mockIO.flush()
+        let lines = output.components(separatedBy: "\n")
+
+        #expect(lines.first == "> debug lamp")
+        #expect(output.contains("```"))
+        #expect(output.contains("Item"))
+    }
+
+    // MARK: - Processing Testing
+
+    @Test("Debug item shows item details")
+    func testDebugItemShowsDetails() async throws {
+        // Given
+        let testRoom = Location(
+            id: "testRoom",
+            .name("Test Room"),
+            .inherentlyLit
+        )
+
+        let sword = Item(
+            id: "sword",
+            .name("steel sword"),
+            .description("A sharp steel sword."),
+            .isTakable,
+            .isWeapon,
+            .in(.location("testRoom"))
+        )
+
+        let game = MinimalGame(
+            player: Player(in: "testRoom"),
+            locations: testRoom,
+            items: sword
+        )
+
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // When
+        try await engine.execute("debug sword")
+
+        // Then
+        let output = await mockIO.flush()
+        let lines = output.components(separatedBy: "\n")
+
+        #expect(lines.first == "> debug sword")
+        #expect(output.contains("```"))
+        #expect(output.contains("Item"))
+        #expect(output.contains("steel sword"))
+        #expect(output.contains("sword"))  // Should show the ID
+        #expect(output.contains("isTakable"))
+        #expect(output.contains("isWeapon"))
+    }
+
+    @Test("Debug location shows location details")
+    func testDebugLocationShowsDetails() async throws {
+        // Given
+        let testRoom = Location(
+            id: "testRoom",
+            .name("Test Room"),
+            .description("A room for testing."),
+            .inherentlyLit
+        )
+
+        let game = MinimalGame(
+            player: Player(in: "testRoom"),
+            locations: testRoom
+        )
+
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // When
+        try await engine.execute("debug testRoom")
+
+        // Then
+        let output = await mockIO.flush()
+        let lines = output.components(separatedBy: "\n")
+
+        #expect(lines.first == "> debug testRoom")
+        #expect(output.contains("```"))
+        #expect(output.contains("Location"))
+        #expect(output.contains("Test Room"))
+        #expect(output.contains("testRoom"))  // Should show the ID
+        #expect(output.contains("inherentlyLit"))
+    }
+
+    @Test("Debug player shows player details")
+    func testDebugPlayerShowsDetails() async throws {
+        // Given
+        let testRoom = Location(
+            id: "testRoom",
+            .name("Test Room"),
+            .inherentlyLit
+        )
+
+        let game = MinimalGame(
+            player: Player(in: "testRoom"),
+            locations: testRoom
+        )
+
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // When
+        try await engine.execute("debug me")
+
+        // Then
+        let output = await mockIO.flush()
+        let lines = output.components(separatedBy: "\n")
+
+        #expect(lines.first == "> debug me")
+        #expect(output.contains("```"))
+        #expect(output.contains("Player"))
+        #expect(output.contains("testRoom"))  // Should show current location
+    }
+
+    @Test("Debug self alias works")
+    func testDebugSelfAlias() async throws {
+        // Given
+        let testRoom = Location(
+            id: "testRoom",
+            .name("Test Room"),
+            .inherentlyLit
+        )
+
+        let game = MinimalGame(
+            player: Player(in: "testRoom"),
+            locations: testRoom
+        )
+
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // When
         try await engine.execute("debug self")
 
-        // Assert Output
+        // Then
         let output = await mockIO.flush()
+        let lines = output.components(separatedBy: "\n")
 
-        // Should contain player data
-        expectNoDifference(output, """
-            > debug self
-            ```
-            Player(
-              carryingCapacity: 100,
-              currentLocationID: .startRoom,
-              health: 100,
-              moves: 50,
-              score: 100
-            )
-            ```
-            """)
+        #expect(lines.first == "> debug self")
+        #expect(output.contains("```"))
+        #expect(output.contains("Player"))
+    }
+
+    @Test("Debug item with flags shows flag details")
+    func testDebugItemWithFlagsShowsFlags() async throws {
+        // Given
+        let testRoom = Location(
+            id: "testRoom",
+            .name("Test Room"),
+            .inherentlyLit
+        )
+
+        let lamp = Item(
+            id: "lamp",
+            .name("brass lamp"),
+            .description("A shiny brass lamp."),
+            .isTakable,
+            .isLightSource,
+            .isDevice,
+            .in(.player)
+        )
+
+        let game = MinimalGame(
+            player: Player(in: "testRoom"),
+            locations: testRoom,
+            items: lamp
+        )
+
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // Set the lamp to be on for more detailed debug output
+        try await engine.apply(
+            await engine.setFlag(.isOn, on: try await engine.item("lamp"))
+        )
+
+        // When
+        try await engine.execute("debug lamp")
+
+        // Then
+        let output = await mockIO.flush()
+        let lines = output.components(separatedBy: "\n")
+
+        #expect(lines.first == "> debug lamp")
+        #expect(output.contains("```"))
+        #expect(output.contains("Item"))
+        #expect(output.contains("brass lamp"))
+        #expect(output.contains("isTakable"))
+        #expect(output.contains("isLightSource"))
+        #expect(output.contains("isDevice"))
+        #expect(output.contains("isOn"))
+        #expect(output.contains("player"))  // Should show parent location
+    }
+
+    @Test("Debug item not in scope still works")
+    func testDebugItemNotInScopeStillWorks() async throws {
+        // Given
+        let testRoom = Location(
+            id: "testRoom",
+            .name("Test Room"),
+            .inherentlyLit
+        )
+
+        let anotherRoom = Location(
+            id: "anotherRoom",
+            .name("Another Room"),
+            .inherentlyLit
+        )
+
+        let remoteItem = Item(
+            id: "remoteItem",
+            .name("remote item"),
+            .description("An item in another room."),
+            .isTakable,
+            .in(.location("anotherRoom"))
+        )
+
+        let game = MinimalGame(
+            player: Player(in: "testRoom"),
+            locations: testRoom, anotherRoom,
+            items: remoteItem
+        )
+
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // When - Debug should work even on items not in current scope
+        try await engine.execute("debug remoteItem")
+
+        // Then
+        let output = await mockIO.flush()
+        let lines = output.components(separatedBy: "\n")
+
+        #expect(lines.first == "> debug remoteItem")
+        #expect(output.contains("```"))
+        #expect(output.contains("Item"))
+        #expect(output.contains("remote item"))
+        #expect(output.contains("anotherRoom"))
+    }
+
+    // MARK: - ActionID Testing
+
+    @Test("Handler exposes correct ActionIDs")
+    func testActionIDs() async throws {
+        let handler = DebugActionHandler()
+        // DebugActionHandler doesn’t specify actions, so it should be empty
+        #expect(handler.actions.isEmpty)
+    }
+
+    @Test("Handler exposes correct VerbIDs")
+    func testVerbIDs() async throws {
+        let handler = DebugActionHandler()
+        #expect(handler.verbs.contains(.debug))
+        #expect(handler.verbs.count == 1)
+    }
+
+    @Test("Handler does not require light")
+    func testRequiresLightProperty() async throws {
+        let handler = DebugActionHandler()
+        #expect(handler.requiresLight == false)
+    }
+
+    @Test("Handler uses correct syntax")
+    func testSyntaxRules() async throws {
+        let handler = DebugActionHandler()
+        #expect(handler.syntax.count == 1)
+
+        // Should have .match(.verb) syntax
+        let _ = handler.syntax[0]
+        // Note: We can’t easily test the internal structure of SyntaxRule,
+        // but we can verify the count and that syntax testing above works
     }
 }

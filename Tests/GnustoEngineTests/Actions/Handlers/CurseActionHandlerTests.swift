@@ -1,59 +1,199 @@
-import CustomDump
 import Testing
-
+import CustomDump
 @testable import GnustoEngine
 
-/// Tests for the CurseActionHandler.
 @Suite("CurseActionHandler Tests")
 struct CurseActionHandlerTests {
-    @Test("CURSE without object")
-    func testCurseWithoutObject() async throws {
-        let (engine, mockIO) = await GameEngine.test()
 
-        // Act
-        try await engine.execute("curse", times: 3)
+    // MARK: - Syntax Rule Testing
 
-        // Assert
+    @Test("CURSE syntax works")
+    func testCurseSyntax() async throws {
+        // Given
+        let testRoom = Location(
+            id: "testRoom",
+            .name("Test Room"),
+            .description("A room for testing."),
+            .inherentlyLit
+        )
+
+        let game = MinimalGame(
+            player: Player(in: "testRoom"),
+            locations: testRoom
+        )
+
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // When
+        try await engine.execute("curse")
+
+        // Then
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > curse
-            You let loose a string of expletives that reveals an impressive
-            technical proficiency.
-
-            > curse
-            You curse with the fluency of one comfortable with all
-            registers of language.
-
-            > curse
-            You unleash expletives with the boldness of one who knows
-            their craft.
+            Such language in a text adventure!
             """)
     }
 
-    @Test("CURSE with object")
-    func testCurseWithObject() async throws {
-        let (engine, mockIO) = await GameEngine.test()
+    @Test("DAMN syntax works")
+    func testDamnSyntax() async throws {
+        // Given
+        let testRoom = Location(
+            id: "testRoom",
+            .name("Test Room"),
+            .inherentlyLit
+        )
 
-        // Act
-        try await engine.execute("curse the pebble")
+        let game = MinimalGame(
+            player: Player(in: "testRoom"),
+            locations: testRoom
+        )
 
-        // Assert
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // When
+        try await engine.execute("damn")
+
+        // Then
         let output = await mockIO.flush()
         expectNoDifference(output, """
-            > curse the pebble
-            You direct profanity at the pebble with that kind of strategic
-            thinking that gets results.
+            > damn
+            Such language in a text adventure!
             """)
     }
 
-    @Test("CURSE validation passes without object")
-    func testCurseValidationWithoutObject() async throws {
-        let (engine, _) = await GameEngine.test()
+    @Test("FUCK syntax works")
+    func testFuckSyntax() async throws {
+        // Given
+        let testRoom = Location(
+            id: "testRoom",
+            .name("Test Room"),
+            .inherentlyLit
+        )
+
+        let game = MinimalGame(
+            player: Player(in: "testRoom"),
+            locations: testRoom
+        )
+
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // When
+        try await engine.execute("fuck")
+
+        // Then
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            > fuck
+            Such language in a text adventure!
+            """)
+    }
+
+    @Test("SHIT syntax works")
+    func testShitSyntax() async throws {
+        // Given
+        let testRoom = Location(
+            id: "testRoom",
+            .name("Test Room"),
+            .inherentlyLit
+        )
+
+        let game = MinimalGame(
+            player: Player(in: "testRoom"),
+            locations: testRoom
+        )
+
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // When
+        try await engine.execute("shit")
+
+        // Then
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            > shit
+            Such language in a text adventure!
+            """)
+    }
+
+    // MARK: - Processing Testing
+
+    @Test("Curse provides atmospheric response")
+    func testCurseAtmosphericResponse() async throws {
+        // Given
+        let testRoom = Location(
+            id: "testRoom",
+            .name("Test Room"),
+            .inherentlyLit
+        )
+
+        let game = MinimalGame(
+            player: Player(in: "testRoom"),
+            locations: testRoom
+        )
+
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // When
+        try await engine.execute("curse")
+
+        // Then
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            > curse
+            Such language in a text adventure!
+            """)
+    }
+
+    @Test("Curse works in dark rooms")
+    func testCurseWorksInDarkRooms() async throws {
+        // Given: Dark room (no light required for cursing)
+        let darkRoom = Location(
+            id: "darkRoom",
+            .name("Dark Room"),
+            .description("A pitch black room.")
+        )
+
+        let game = MinimalGame(
+            player: Player(in: "darkRoom"),
+            locations: darkRoom
+        )
+
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // When
+        try await engine.execute("curse")
+
+        // Then
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            > curse
+            Such language in a text adventure!
+            """)
+    }
+
+    // MARK: - ActionID Testing
+
+    @Test("Handler exposes correct ActionIDs")
+    func testActionIDs() async throws {
         let handler = CurseActionHandler()
-        let command = Command(verb: .curse, rawInput: "curse")
-        let context = ActionContext(command: command, engine: engine)
+        // CurseActionHandler doesn’t specify actions, so it should be empty
+        #expect(handler.actions.isEmpty)
+    }
 
-        // Should not throw
-        try await handler.validate(context: context)
+    @Test("Handler exposes correct VerbIDs")
+    func testVerbIDs() async throws {
+        let handler = CurseActionHandler()
+        #expect(handler.verbs.contains(.curse))
+        #expect(handler.verbs.contains(.damn))
+        #expect(handler.verbs.contains(.fuck))
+        #expect(handler.verbs.contains(.shit))
+        #expect(handler.verbs.count == 4)
+    }
+
+    @Test("Handler does not require light")
+    func testDoesNotRequireLight() async throws {
+        let handler = CurseActionHandler()
+        #expect(handler.requiresLight == false)
     }
 }
