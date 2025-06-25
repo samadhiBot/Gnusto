@@ -23,7 +23,7 @@ struct ReadActionHandlerTests {
             .description("A book full of ancient spells."),
             .isReadable,
             .in(.location("testRoom")),
-            .attributes: [.readText: "The book contains powerful incantations."]
+            .readText("The book contains powerful incantations.")
         )
 
         let game = MinimalGame(
@@ -169,7 +169,7 @@ struct ReadActionHandlerTests {
             .description("A book with strange symbols."),
             .isReadable,
             .in(.location("darkRoom")),
-            .attributes: [.readText: "Ancient runes glow faintly in the darkness."]
+            .readText("Ancient runes glow faintly in the darkness.")
         )
 
         let game = MinimalGame(
@@ -208,7 +208,7 @@ struct ReadActionHandlerTests {
             .description("A weathered parchment scroll."),
             .isReadable,
             .in(.location("testRoom")),
-            .attributes: [.readText: "Here lies the wisdom of the ancients."]
+            .readText("Here lies the wisdom of the ancients.")
         )
 
         let game = MinimalGame(
@@ -281,7 +281,7 @@ struct ReadActionHandlerTests {
             .description("A note that appears blank."),
             .isReadable,
             .in(.location("testRoom")),
-            .attributes: [.readText: ""]
+            .readText("")
         )
 
         let game = MinimalGame(
@@ -319,7 +319,7 @@ struct ReadActionHandlerTests {
             .isReadable,
             .isTakable,
             .in(.player),
-            .attributes: [.readText: "Dear friend, I hope this letter finds you well."]
+            .readText("Dear friend, I hope this letter finds you well.")
         )
 
         let game = MinimalGame(
@@ -357,7 +357,7 @@ struct ReadActionHandlerTests {
             .isReadable,
             .isTakable,
             .in(.location("testRoom")),
-            .attributes: [.readText: "Visit the Grand Underground Adventure!"]
+            .readText("Visit the Grand Underground Adventure!")
         )
 
         let game = MinimalGame(
@@ -399,7 +399,7 @@ struct ReadActionHandlerTests {
             .description("A large wooden sign."),
             .isReadable,
             .in(.location("testRoom")),
-            .attributes: [.readText: "Welcome to the enchanted forest."]
+            .readText("Welcome to the enchanted forest.")
         )
 
         let game = MinimalGame(
@@ -439,7 +439,7 @@ struct ReadActionHandlerTests {
             .description("A yellowed old manuscript."),
             .isReadable,
             .in(.location("testRoom")),
-            .attributes: [.readText: "These are the chronicles of ages past."]
+            .readText("These are the chronicles of ages past.")
         )
 
         let game = MinimalGame(
@@ -484,7 +484,7 @@ struct ReadActionHandlerTests {
             .isReadable,
             .isTakable,
             .in(.item("box")),
-            .attributes: [.readText: "Mix flour, eggs, and milk. Bake for 30 minutes."]
+            .readText("Mix flour, eggs, and milk. Bake for 30 minutes.")
         )
 
         let game = MinimalGame(
@@ -523,7 +523,7 @@ struct ReadActionHandlerTests {
             .description("A well-worn travel journal."),
             .isReadable,
             .in(.location("testRoom")),
-            .attributes: [.readText: "Day 1: Started the journey today."]
+            .readText("Day 1: Started the journey today.")
         )
 
         let note = Item(
@@ -532,7 +532,7 @@ struct ReadActionHandlerTests {
             .description("A yellow sticky note."),
             .isReadable,
             .in(.location("testRoom")),
-            .attributes: [.readText: "Don't forget to feed the cat!"]
+            .readText("Don't forget to feed the cat!")
         )
 
         let game = MinimalGame(

@@ -169,7 +169,7 @@ open class MessageProvider: @unchecked Sendable {
     open func blowOnFlammable(item: String) -> String {
         output(
             "blowOnFlammable(item: '\(item)')",
-            "Blowing on \(item) has no effect."
+            "Blowing on \(item) accomplishes nothing."
         )
     }
 

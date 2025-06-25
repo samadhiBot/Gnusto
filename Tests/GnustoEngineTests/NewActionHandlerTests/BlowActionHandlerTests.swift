@@ -39,7 +39,8 @@ struct BlowActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > blow feather
-            You huff and puff, but nothing happens to the fluffy feather.
+            You blow on the fluffy feather, but nothing
+            interesting happens.
             """)
 
         let finalState = try await engine.item("feather")
@@ -77,7 +78,7 @@ struct BlowActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > blow on dust
-            You huff and puff, but nothing happens to the pile of dust.
+            You blow on the pile of dust, but nothing interesting happens.
             """)
     }
 
@@ -112,7 +113,7 @@ struct BlowActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > puff card
-            You huff and puff, but nothing happens to the playing card.
+            You blow on the playing card, but nothing interesting happens.
             """)
     }
 
@@ -155,7 +156,7 @@ struct BlowActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > blow feather
-            You can't see any such thing.
+            You can’t see any such thing.
             """)
     }
 
@@ -190,7 +191,7 @@ struct BlowActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > blow feather
-            It is pitch black. You can't see a thing.
+            It is pitch black. You can’t see a thing.
             """)
     }
 
@@ -219,7 +220,7 @@ struct BlowActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > blow
-            You huff and you puff, but nothing happens.
+            You blow the air around, but nothing interesting happens.
             """)
     }
 
@@ -256,7 +257,7 @@ struct BlowActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > blow on candle
-            You blow on the lit candle, but nothing happens.
+            You blow on the lit candle, but it doesn’t go out.
             """)
 
         // Note: The default handler doesn't extinguish the flame.

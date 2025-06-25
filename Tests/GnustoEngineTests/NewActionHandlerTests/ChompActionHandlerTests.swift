@@ -267,7 +267,7 @@ struct ChompActionHandlerTests {
             .inherentlyLit
         )
 
-        let guard = Item(
+        let castleGuard = Item(
             id: "guard",
             .name("castle guard"),
             .description("A stern castle guard."),
@@ -278,7 +278,7 @@ struct ChompActionHandlerTests {
         let game = MinimalGame(
             player: Player(in: "testRoom"),
             locations: testRoom,
-            items: guard
+            items: castleGuard
         )
 
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
@@ -293,7 +293,7 @@ struct ChompActionHandlerTests {
             I don't think the castle guard would appreciate that.
             """)
 
-        let finalState = try await engine.item("guard")
+        let finalState = try await engine.item("castleGuard")
         #expect(finalState.hasFlag(.isTouched) == true)
     }
 

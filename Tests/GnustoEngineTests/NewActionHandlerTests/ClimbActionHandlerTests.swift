@@ -303,7 +303,9 @@ struct ClimbActionHandlerTests {
             id: "testRoom",
             .name("Test Room"),
             .inherentlyLit,
-            .exit(.up, to: "upperRoom", via: "stairs")
+            .exits([
+                .up: .to("upperRoom", via: "stairs")
+            ])
         )
 
         let upperRoom = Location(
@@ -341,7 +343,7 @@ struct ClimbActionHandlerTests {
             """)
 
         // Verify player moved
-        let playerLocation = await engine.playerLocationID()
+        let playerLocation = await engine.playerLocationID
         #expect(playerLocation == "upperRoom")
     }
 
