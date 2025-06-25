@@ -31,7 +31,8 @@ struct CryActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > cry
-            You burst into tears.
+            You shed tears with the confident vulnerability of a
+            true empath.
             """)
     }
 
@@ -58,7 +59,8 @@ struct CryActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > weep
-            You burst into tears.
+            You shed tears with the confident vulnerability of a
+            true empath.
             """)
     }
 
@@ -85,13 +87,14 @@ struct CryActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > sob
-            You burst into tears.
+            You shed tears with the confident vulnerability of a
+            true empath.
             """)
     }
 
     // MARK: - Processing Testing
 
-    @Test("Cry provides atmospheric response")
+    @Test("Cry provides varied atmospheric responses")
     func testCryAtmosphericResponse() async throws {
         // Given
         let testRoom = Location(
@@ -108,13 +111,22 @@ struct CryActionHandlerTests {
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // When
-        try await engine.execute("cry")
+        try await engine.execute("cry", times: 3)
 
         // Then
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > cry
-            You burst into tears.
+            You shed tears with the confident vulnerability of a
+            true empath.
+
+            > cry
+            You cry with the authentic passion of someone unafraid to
+            feel deeply.
+
+            > cry
+            You weep beautifully, demonstrating your impressive range
+            of expression.
             """)
     }
 
@@ -141,7 +153,8 @@ struct CryActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > cry
-            You burst into tears.
+            You shed tears with the confident vulnerability of a
+            true empath.
             """)
     }
 

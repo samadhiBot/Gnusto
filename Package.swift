@@ -98,12 +98,11 @@ let package = Package(
             ],
             exclude: [
                 // Temporarily excluding action handler tests while updating architecture
-                "Core/VocabularyTests.swift",
-                "Core/VerbIDTests.swift",
-                "Actions/",
+//                "Core/VocabularyTests.swift",
+//                "Core/VerbIDTests.swift",
                 "IntegrationTests/",
-                "Parsing/StandardParserTests.swift",
-                "Engine/GameEngineTests.swift",
+//                "Parsing/StandardParserTests.swift",
+//                "Engine/GameEngineTests.swift",
             ]
         ),
         .testTarget(

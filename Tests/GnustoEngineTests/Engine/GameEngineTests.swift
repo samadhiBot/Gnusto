@@ -1162,7 +1162,7 @@ struct GameEngineTests {
         let game = MinimalGame(locations: startRoom, items: itemToPut, target)
 
         let command = Command(
-            verb: .putOn,
+            verb: .put,
             directObject: .item("key"),
             indirectObject: .item("rock"),
             preposition: "on",

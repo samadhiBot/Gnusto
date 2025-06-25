@@ -150,8 +150,9 @@ struct StandardParserTests {
         // 2. Extract verbs from default action handlers
         // We need to get the same verbs that a real game would have by using
         // the GameEngine's default action handlers
-        let defaultActionHandlers = Array(GameEngine.defaultActionHandlers.values)
-        let defaultVerbs = GameEngine.extractVerbDefinitions(from: defaultActionHandlers)
+        let defaultVerbs = GameEngine.extractVerbDefinitions(
+            from: GameEngine.defaultActionHandlers
+        )
 
         // 3. Define all Locations
         let locations = [
@@ -431,7 +432,7 @@ struct StandardParserTests {
             gameState: gameState
         )
         let command = try result.get()
-        #expect(command.verb == .putOn)
+        #expect(command.verb == .put)
         #expect(command.directObject == .item("leaflet"))
         #expect(command.directObjectModifiers.isEmpty)
         #expect(command.preposition == "on")
@@ -685,7 +686,7 @@ struct StandardParserTests {
         let result = parser.parse(
             input: "put leaflet on it", vocabulary: vocabulary, gameState: initState)
         let command = try result.get()
-        #expect(command.verb == .putOn)
+        #expect(command.verb == .put)
         #expect(command.directObject == .item("leaflet"))
         #expect(command.preposition == "on")
         #expect(command.indirectObject == .item("sword"))

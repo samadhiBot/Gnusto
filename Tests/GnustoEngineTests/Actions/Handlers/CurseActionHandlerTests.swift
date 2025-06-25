@@ -31,7 +31,8 @@ struct CurseActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > curse
-            Such language in a text adventure!
+            You let loose a string of expletives that reveals an impressive
+            technical proficiency.
             """)
     }
 
@@ -58,7 +59,8 @@ struct CurseActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > damn
-            Such language in a text adventure!
+            You let loose a string of expletives that reveals an impressive
+            technical proficiency.
             """)
     }
 
@@ -85,7 +87,8 @@ struct CurseActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > fuck
-            Such language in a text adventure!
+            You let loose a string of expletives that reveals an impressive
+            technical proficiency.
             """)
     }
 
@@ -112,13 +115,14 @@ struct CurseActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > shit
-            Such language in a text adventure!
+            You let loose a string of expletives that reveals an impressive
+            technical proficiency.
             """)
     }
 
     // MARK: - Processing Testing
 
-    @Test("Curse provides atmospheric response")
+    @Test("Curse provides varied atmospheric responses")
     func testCurseAtmosphericResponse() async throws {
         // Given
         let testRoom = Location(
@@ -135,13 +139,14 @@ struct CurseActionHandlerTests {
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // When
-        try await engine.execute("curse")
+        try await engine.execute("curse", times: 3)
 
         // Then
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > curse
-            Such language in a text adventure!
+            You let loose a string of expletives that reveals an impressive
+            technical proficiency.
             """)
     }
 
@@ -168,7 +173,8 @@ struct CurseActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > curse
-            Such language in a text adventure!
+            You let loose a string of expletives that reveals an impressive
+            technical proficiency.
             """)
     }
 

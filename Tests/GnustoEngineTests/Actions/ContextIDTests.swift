@@ -1,7 +1,8 @@
 import CustomDump
+import Foundation
 import Testing
-@testable import GnustoEngine
 
+@testable import GnustoEngine
 
 struct ContextIDTests {
     
