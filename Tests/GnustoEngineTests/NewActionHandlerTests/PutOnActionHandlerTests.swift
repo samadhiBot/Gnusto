@@ -386,7 +386,7 @@ struct PutOnActionHandlerTests {
             output,
             """
             > put nonexistent on table
-            You can't see any such thing.
+            You can’t see any such thing.
             """)
     }
 
@@ -424,7 +424,7 @@ struct PutOnActionHandlerTests {
             output,
             """
             > put book on nonexistent
-            You can't see any such thing.
+            You can’t see any such thing.
             """)
     }
 
@@ -470,7 +470,7 @@ struct PutOnActionHandlerTests {
             output,
             """
             > put book on table
-            You aren't holding the red book.
+            You aren’t holding the red book.
             """)
     }
 
@@ -522,7 +522,7 @@ struct PutOnActionHandlerTests {
             output,
             """
             > put book on table
-            You can't see any such thing.
+            You can’t see any such thing.
             """)
     }
 
@@ -598,7 +598,7 @@ struct PutOnActionHandlerTests {
             output,
             """
             > put me on table
-            🤡 You can't put yourself on that.
+            🤡 You can’t put yourself on that.
             """)
     }
 
@@ -713,7 +713,7 @@ struct PutOnActionHandlerTests {
             output,
             """
             > put table on table
-            You can't put something on itself.
+            You can’t put something on itself.
             """)
     }
 
@@ -758,7 +758,7 @@ struct PutOnActionHandlerTests {
             output,
             """
             > put book on rock
-            You can't put anything on the large rock.
+            You can’t put anything on the large rock.
             """)
     }
 
@@ -807,7 +807,7 @@ struct PutOnActionHandlerTests {
             output,
             """
             > put box on plate
-            You can't put the wooden box on the dinner plate; the dinner plate is inside the wooden box.
+            You can’t put the wooden box on the dinner plate; the dinner plate is inside the wooden box.
             """)
     }
 
@@ -855,7 +855,7 @@ struct PutOnActionHandlerTests {
             output,
             """
             > put tray on coaster
-            You can't put the serving tray on the drink coaster; the drink coaster is on the serving tray.
+            You can’t put the serving tray on the drink coaster; the drink coaster is on the serving tray.
             """)
     }
 
@@ -902,7 +902,7 @@ struct PutOnActionHandlerTests {
             output,
             """
             > put book on table
-            It is pitch black. You can't see a thing.
+            It is pitch black. You can’t see a thing.
             """)
     }
 
@@ -1391,7 +1391,7 @@ struct PutOnActionHandlerTests {
     @Test("Handler exposes correct ActionIDs")
     func testActionIDs() async throws {
         let handler = PutOnActionHandler()
-        // PutOnActionHandler doesn't specify actions, so it should be empty
+        // PutOnActionHandler doesn’t specify actions, so it should be empty
         #expect(handler.actions.isEmpty)
     }
 

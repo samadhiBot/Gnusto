@@ -262,7 +262,7 @@ struct RestoreActionHandlerTests {
 
     @Test("RESTORE preserves original behavior")
     func testRestorePreservesOriginalBehavior() async throws {
-        // Given: This test verifies that RESTORE doesn't unexpectedly modify
+        // Given: This test verifies that RESTORE doesn’t unexpectedly modify
         // game state in the test environment (in real use, it would replace state)
         let testRoom = Location(
             id: "testRoom",
@@ -319,7 +319,7 @@ struct RestoreActionHandlerTests {
     @Test("Handler exposes correct ActionIDs")
     func testActionIDs() async throws {
         let handler = RestoreActionHandler()
-        // RestoreActionHandler doesn't specify actions, so it should be empty
+        // RestoreActionHandler doesn’t specify actions, so it should be empty
         #expect(handler.actions.isEmpty)
     }
 
@@ -542,7 +542,7 @@ struct RestoreActionHandlerTests {
         try await engine.execute("restore")
 
         // Then: In test environment, RESTORE provides feedback
-        // but doesn't actually modify game state (no saved state to restore from)
+        // but doesn’t actually modify game state (no saved state to restore from)
         let output = await mockIO.flush()
         expectNoDifference(
             output,

@@ -112,7 +112,7 @@ struct ThinkActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > think about puzzle
-            You can't see any such thing.
+            You can’t see any such thing.
             """)
     }
 
@@ -147,7 +147,7 @@ struct ThinkActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > think about riddle
-            It is pitch black. You can't see a thing.
+            It is pitch black. You can’t see a thing.
             """)
     }
 
@@ -244,7 +244,7 @@ struct ThinkActionHandlerTests {
     @Test("Handler exposes correct ActionIDs")
     func testActionIDs() async throws {
         let handler = ThinkActionHandler()
-        // ThinkActionHandler doesn't specify actions, so it should be empty
+        // ThinkActionHandler doesn’t specify actions, so it should be empty
         #expect(handler.actions.isEmpty)
     }
 

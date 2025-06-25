@@ -71,7 +71,7 @@ struct DigActionHandlerTests {
             output,
             """
             > dig dirt
-            You can't dig the pile of dirt.
+            You can’t dig the pile of dirt.
             """)
 
         let finalState = try await engine.item("dirt")
@@ -120,7 +120,7 @@ struct DigActionHandlerTests {
             output,
             """
             > dig ground with shovel
-            You can't dig the hard ground.
+            You can’t dig the hard ground.
             """)
     }
 
@@ -157,7 +157,7 @@ struct DigActionHandlerTests {
             output,
             """
             > excavate mound
-            You can't dig the small mound.
+            You can’t dig the small mound.
             """)
     }
 
@@ -202,7 +202,7 @@ struct DigActionHandlerTests {
             output,
             """
             > dig dirt
-            You can't see any such thing.
+            You can’t see any such thing.
             """)
     }
 
@@ -248,7 +248,7 @@ struct DigActionHandlerTests {
             output,
             """
             > dig dirt with shovel
-            You aren't holding the steel shovel.
+            You aren’t holding the steel shovel.
             """)
     }
 
@@ -286,7 +286,7 @@ struct DigActionHandlerTests {
             output,
             """
             > dig dirt
-            It is pitch black. You can't see a thing.
+            It is pitch black. You can’t see a thing.
             """)
     }
 
@@ -474,7 +474,7 @@ struct DigActionHandlerTests {
             output,
             """
             > dig sand
-            You can't dig the wet sand.
+            You can’t dig the wet sand.
             """)
     }
 
@@ -520,7 +520,7 @@ struct DigActionHandlerTests {
             output,
             """
             > dig hole with pickaxe
-            You can't dig the shallow hole.
+            You can’t dig the shallow hole.
             """)
 
         let finalState = try await engine.item("hole")
@@ -591,7 +591,7 @@ struct DigActionHandlerTests {
     @Test("Handler exposes correct ActionIDs")
     func testActionIDs() async throws {
         let handler = DigActionHandler()
-        // DigActionHandler doesn't specify actions, so it should be empty
+        // DigActionHandler doesn’t specify actions, so it should be empty
         #expect(handler.actions.isEmpty)
     }
 

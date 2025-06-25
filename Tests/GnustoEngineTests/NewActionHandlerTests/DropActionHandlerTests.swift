@@ -194,7 +194,7 @@ struct DropActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > drop book
-            You aren't holding the leather book.
+            You aren’t holding the leather book.
             """)
     }
 
@@ -210,7 +210,7 @@ struct DropActionHandlerTests {
         let cursedItem = Item(
             id: "cursedItem",
             .name("cursed ring"),
-            .description("A ring that won't come off."),
+            .description("A ring that won’t come off."),
             .omitDescription,  // Makes it non-droppable
             .in(.player)
         )
@@ -230,7 +230,7 @@ struct DropActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > drop ring
-            You can't drop the cursed ring.
+            You can’t drop the cursed ring.
             """)
     }
 
@@ -266,7 +266,7 @@ struct DropActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > drop book
-            It is pitch black. You can't see a thing.
+            It is pitch black. You can’t see a thing.
             """)
     }
 
@@ -486,7 +486,7 @@ struct DropActionHandlerTests {
         let nonDroppableItem = Item(
             id: "nonDroppableItem",
             .name("cursed item"),
-            .description("An item that can't be dropped."),
+            .description("An item that can’t be dropped."),
             .omitDescription,  // Makes it non-droppable
             .in(.player)
         )
@@ -520,7 +520,7 @@ struct DropActionHandlerTests {
     @Test("Handler exposes correct ActionIDs")
     func testActionIDs() async throws {
         let handler = DropActionHandler()
-        // DropActionHandler doesn't specify actions, so it should be empty
+        // DropActionHandler doesn’t specify actions, so it should be empty
         #expect(handler.actions.isEmpty)
     }
 

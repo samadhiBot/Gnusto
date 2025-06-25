@@ -233,7 +233,7 @@ struct KnockActionHandlerTests {
             output,
             """
             > knock on door
-            You can't see any such thing.
+            You can’t see any such thing.
             """)
     }
 
@@ -272,7 +272,7 @@ struct KnockActionHandlerTests {
             output,
             """
             > knock on door
-            It is pitch black. You can't see a thing.
+            It is pitch black. You can’t see a thing.
             """)
     }
 
@@ -765,7 +765,7 @@ struct KnockActionHandlerTests {
     @Test("Handler exposes correct ActionIDs")
     func testActionIDs() async throws {
         let handler = KnockActionHandler()
-        // KnockActionHandler doesn't specify actions, so it should be empty
+        // KnockActionHandler doesn’t specify actions, so it should be empty
         #expect(handler.actions.isEmpty)
     }
 

@@ -131,7 +131,7 @@ struct ScoreActionHandlerTests {
         let handler = ScoreActionHandler()
 
         // When & Then
-        // ScoreActionHandler doesn't specify actions, so it should be empty
+        // ScoreActionHandler doesn’t specify actions, so it should be empty
         #expect(handler.actions.isEmpty)
     }
 

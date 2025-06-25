@@ -217,7 +217,7 @@ struct UnlockActionHandlerTests {
             output,
             """
             > unlock box with key
-            You aren't holding the silver key.
+            You aren’t holding the silver key.
             """)
     }
 
@@ -270,7 +270,7 @@ struct UnlockActionHandlerTests {
             output,
             """
             > unlock door with key
-            You can't see any such thing.
+            You can’t see any such thing.
             """)
     }
 
@@ -315,7 +315,7 @@ struct UnlockActionHandlerTests {
             output,
             """
             > unlock table with key
-            You can't unlock the wooden table.
+            You can’t unlock the wooden table.
             """)
     }
 
@@ -411,7 +411,7 @@ struct UnlockActionHandlerTests {
             output,
             """
             > unlock strongbox with key
-            The copper key doesn't fit the iron strongbox.
+            The copper key doesn’t fit the iron strongbox.
             """)
     }
 
@@ -460,7 +460,7 @@ struct UnlockActionHandlerTests {
             output,
             """
             > unlock chest with key
-            It is pitch black. You can't see a thing.
+            It is pitch black. You can’t see a thing.
             """)
     }
 
@@ -668,7 +668,7 @@ struct UnlockActionHandlerTests {
     @Test("Handler exposes correct ActionIDs")
     func testActionIDs() async throws {
         let handler = UnlockActionHandler()
-        // UnlockActionHandler doesn't specify actions, so it should be empty
+        // UnlockActionHandler doesn’t specify actions, so it should be empty
         #expect(handler.actions.isEmpty)
     }
 

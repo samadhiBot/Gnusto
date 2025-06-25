@@ -125,7 +125,7 @@ struct DeflateActionHandlerTests {
             output,
             """
             > deflate balloon
-            You can't see any such thing.
+            You can’t see any such thing.
             """)
     }
 
@@ -162,7 +162,7 @@ struct DeflateActionHandlerTests {
             output,
             """
             > deflate rock
-            You can't deflate the large rock.
+            You can’t deflate the large rock.
             """)
     }
 
@@ -202,7 +202,7 @@ struct DeflateActionHandlerTests {
             output,
             """
             > deflate balloon
-            It is pitch black. You can't see a thing.
+            It is pitch black. You can’t see a thing.
             """)
     }
 
@@ -414,7 +414,7 @@ struct DeflateActionHandlerTests {
     @Test("Handler exposes correct ActionIDs")
     func testActionIDs() async throws {
         let handler = DeflateActionHandler()
-        // DeflateActionHandler doesn't specify actions, so it should be empty
+        // DeflateActionHandler doesn’t specify actions, so it should be empty
         #expect(handler.actions.isEmpty)
     }
 

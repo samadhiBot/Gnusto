@@ -276,7 +276,7 @@ struct WaitActionHandlerTests {
         let handler = WaitActionHandler()
 
         // When & Then
-        // WaitActionHandler doesn't specify actions, so it should be empty
+        // WaitActionHandler doesn’t specify actions, so it should be empty
         #expect(handler.actions.isEmpty)
     }
 

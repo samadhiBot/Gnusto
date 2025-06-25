@@ -43,7 +43,7 @@ struct KissActionHandlerTests {
             output,
             """
             > kiss princess
-            I don't think the beautiful princess would like that.
+            I don’t think the beautiful princess would like that.
             """)
 
         let finalState = try await engine.item("princess")
@@ -121,7 +121,7 @@ struct KissActionHandlerTests {
             output,
             """
             > kiss princess
-            You can't see any such thing.
+            You can’t see any such thing.
             """)
     }
 
@@ -160,7 +160,7 @@ struct KissActionHandlerTests {
             output,
             """
             > kiss stranger
-            It is pitch black. You can't see a thing.
+            It is pitch black. You can’t see a thing.
             """)
     }
 
@@ -229,7 +229,7 @@ struct KissActionHandlerTests {
             output,
             """
             > kiss friend
-            I don't think the old friend would like that.
+            I don’t think the old friend would like that.
             """)
 
         let finalState = try await engine.item("friend")
@@ -271,7 +271,7 @@ struct KissActionHandlerTests {
             output,
             """
             > kiss troll
-            I don't think the angry troll would appreciate that.
+            I don’t think the angry troll would appreciate that.
             """)
 
         let finalState = try await engine.item("enemy")
@@ -356,7 +356,7 @@ struct KissActionHandlerTests {
             output,
             """
             > kiss cat
-            I don't think the fluffy cat would like that.
+            I don’t think the fluffy cat would like that.
             """)
     }
 
@@ -401,7 +401,7 @@ struct KissActionHandlerTests {
             output1,
             """
             > kiss knight
-            I don't think the brave knight would like that.
+            I don’t think the brave knight would like that.
             """)
 
         // When: Kiss object
@@ -516,7 +516,7 @@ struct KissActionHandlerTests {
             output1,
             """
             > kiss merchant
-            I don't think the traveling merchant would like that.
+            I don’t think the traveling merchant would like that.
             """)
 
         // When: Kiss hostile character
@@ -528,7 +528,7 @@ struct KissActionHandlerTests {
             output2,
             """
             > kiss dragon
-            I don't think the fierce dragon would appreciate that.
+            I don’t think the fierce dragon would appreciate that.
             """)
 
         // When: Kiss another friendly character
@@ -540,7 +540,7 @@ struct KissActionHandlerTests {
             output3,
             """
             > kiss fairy
-            I don't think the woodland fairy would like that.
+            I don’t think the woodland fairy would like that.
             """)
 
         // Verify all characters were touched
@@ -613,7 +613,7 @@ struct KissActionHandlerTests {
     @Test("Handler exposes correct ActionIDs")
     func testActionIDs() async throws {
         let handler = KissActionHandler()
-        // KissActionHandler doesn't specify actions, so it should be empty
+        // KissActionHandler doesn’t specify actions, so it should be empty
         #expect(handler.actions.isEmpty)
     }
 

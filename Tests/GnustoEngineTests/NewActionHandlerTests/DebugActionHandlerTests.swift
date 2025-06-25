@@ -105,7 +105,7 @@ struct DebugActionHandlerTests {
             output,
             """
             > debug nonexistent
-            You can't see any such thing.
+            You can’t see any such thing.
             """)
     }
 
@@ -134,7 +134,7 @@ struct DebugActionHandlerTests {
             output,
             """
             > debug nonexistentRoom
-            You can't see any such thing.
+            You can’t see any such thing.
             """)
     }
 
@@ -410,7 +410,7 @@ struct DebugActionHandlerTests {
     @Test("Handler exposes correct ActionIDs")
     func testActionIDs() async throws {
         let handler = DebugActionHandler()
-        // DebugActionHandler doesn't specify actions, so it should be empty
+        // DebugActionHandler doesn’t specify actions, so it should be empty
         #expect(handler.actions.isEmpty)
     }
 
@@ -434,7 +434,7 @@ struct DebugActionHandlerTests {
 
         // Should have .match(.verb) syntax
         let _ = handler.syntax[0]
-        // Note: We can't easily test the internal structure of SyntaxRule,
+        // Note: We can’t easily test the internal structure of SyntaxRule,
         // but we can verify the count and that syntax testing above works
     }
 }

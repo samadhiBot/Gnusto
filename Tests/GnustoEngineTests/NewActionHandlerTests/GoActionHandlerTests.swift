@@ -361,7 +361,7 @@ struct GoActionHandlerTests {
             output,
             """
             > north
-            You can't go that way.
+            You can’t go that way.
             """)
     }
 
@@ -605,7 +605,7 @@ struct GoActionHandlerTests {
             id: "stairs",
             .name("wooden stairs"),
             .description("A set of wooden stairs leading up."),
-            // Note: Not a door, so doesn't need to be open
+            // Note: Not a door, so doesn’t need to be open
             .in(.location("testRoom"))
         )
 
@@ -759,7 +759,7 @@ struct GoActionHandlerTests {
         expectNoDifference(
             output,
             """
-            > north            It is pitch black. You can't see a thing.
+            > north            It is pitch black. You can’t see a thing.
             """)
 
         let playerLocation = await engine.playerLocationID
@@ -879,7 +879,7 @@ struct GoActionHandlerTests {
     @Test("Handler exposes correct ActionIDs")
     func testActionIDs() async throws {
         let handler = GoActionHandler()
-        // GoActionHandler doesn't specify actions, so it should be empty
+        // GoActionHandler doesn’t specify actions, so it should be empty
         #expect(handler.actions.isEmpty)
     }
 

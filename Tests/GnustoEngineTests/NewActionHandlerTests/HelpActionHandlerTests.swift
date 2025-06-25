@@ -66,7 +66,7 @@ struct HelpActionHandlerTests {
         let output = await mockIO.flush()
         #expect(output.contains("> help"))
         #expect(output.contains("This is an interactive fiction game"))
-        // Should not show darkness message since help doesn't require light
+        // Should not show darkness message since help doesn’t require light
         #expect(!output.contains("It is pitch black"))
     }
 
@@ -295,7 +295,7 @@ struct HelpActionHandlerTests {
     @Test("Handler exposes correct ActionIDs")
     func testActionIDs() async throws {
         let handler = HelpActionHandler()
-        // HelpActionHandler doesn't specify actions, so it should be empty
+        // HelpActionHandler doesn’t specify actions, so it should be empty
         #expect(handler.actions.isEmpty)
     }
 

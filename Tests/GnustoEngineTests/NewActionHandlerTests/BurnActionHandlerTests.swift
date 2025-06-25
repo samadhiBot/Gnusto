@@ -230,7 +230,7 @@ struct BurnActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > burn paper
-            You can't see any such thing.
+            You can’t see any such thing.
             """)
     }
 
@@ -266,7 +266,7 @@ struct BurnActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > burn paper
-            It is pitch black. You can't see a thing.
+            It is pitch black. You can’t see a thing.
             """)
     }
 
@@ -343,7 +343,7 @@ struct BurnActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > burn rock
-            You can't burn the large rock.
+            You can’t burn the large rock.
             """)
 
         let finalState = try await engine.item("rock")
@@ -387,7 +387,7 @@ struct BurnActionHandlerTests {
     @Test("Handler exposes correct ActionIDs")
     func testActionIDs() async throws {
         let handler = BurnActionHandler()
-        // BurnActionHandler doesn't specify actions, so it should be empty
+        // BurnActionHandler doesn’t specify actions, so it should be empty
         #expect(handler.actions.isEmpty)
     }
 

@@ -206,7 +206,7 @@ struct LookInsideActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > look in container
-            You can't see any such thing.
+            You can’t see any such thing.
             """)
     }
 
@@ -242,7 +242,7 @@ struct LookInsideActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > look in box
-            It is pitch black. You can't see a thing.
+            It is pitch black. You can’t see a thing.
             """)
     }
 
@@ -537,7 +537,7 @@ struct LookInsideActionHandlerTests {
     @Test("Handler exposes correct ActionIDs")
     func testActionIDs() async throws {
         let handler = LookInsideActionHandler()
-        // LookInsideActionHandler doesn't specify actions, so it should be empty
+        // LookInsideActionHandler doesn’t specify actions, so it should be empty
         #expect(handler.actions.isEmpty)
     }
 

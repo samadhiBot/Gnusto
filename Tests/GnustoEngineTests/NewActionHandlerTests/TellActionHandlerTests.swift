@@ -250,7 +250,7 @@ struct TellActionHandlerTests {
             output,
             """
             > tell rock about secret
-            You can't tell the large rock about that.
+            You can’t tell the large rock about that.
             """)
     }
 
@@ -301,7 +301,7 @@ struct TellActionHandlerTests {
             output,
             """
             > tell wizard about news
-            You can't see any such thing.
+            You can’t see any such thing.
             """)
     }
 
@@ -347,7 +347,7 @@ struct TellActionHandlerTests {
             output,
             """
             > tell wizard about secret
-            It is pitch black. You can't see a thing.
+            It is pitch black. You can’t see a thing.
             """)
     }
 
@@ -560,7 +560,7 @@ struct TellActionHandlerTests {
     @Test("Handler exposes correct ActionIDs")
     func testActionIDs() async throws {
         let handler = TellActionHandler()
-        // TellActionHandler doesn't specify actions, so it should be empty
+        // TellActionHandler doesn’t specify actions, so it should be empty
         #expect(handler.actions.isEmpty)
     }
 

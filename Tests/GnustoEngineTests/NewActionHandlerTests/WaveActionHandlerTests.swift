@@ -271,7 +271,7 @@ struct WaveActionHandlerTests {
             output,
             """
             > wave nonexistent
-            You can't see any such thing.
+            You can’t see any such thing.
             """)
     }
 
@@ -315,7 +315,7 @@ struct WaveActionHandlerTests {
             output,
             """
             > wave banner
-            You can't see any such thing.
+            You can’t see any such thing.
             """)
     }
 
@@ -344,7 +344,7 @@ struct WaveActionHandlerTests {
             output,
             """
             > wave me
-            You can't wave that.
+            You can’t wave that.
             """)
     }
 
@@ -383,7 +383,7 @@ struct WaveActionHandlerTests {
             output,
             """
             > wave wand
-            It is pitch black. You can't see a thing.
+            It is pitch black. You can’t see a thing.
             """)
     }
 
@@ -422,7 +422,7 @@ struct WaveActionHandlerTests {
             output,
             """
             > wave pillar
-            You can't wave the stone pillar.
+            You can’t wave the stone pillar.
             """)
 
         let finalState = try await engine.item("pillar")
@@ -664,7 +664,7 @@ struct WaveActionHandlerTests {
     @Test("Handler exposes correct ActionIDs")
     func testActionIDs() async throws {
         let handler = WaveActionHandler()
-        // WaveActionHandler doesn't specify actions, so it should be empty
+        // WaveActionHandler doesn’t specify actions, so it should be empty
         #expect(handler.actions.isEmpty)
     }
 

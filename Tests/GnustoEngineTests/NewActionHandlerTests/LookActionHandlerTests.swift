@@ -350,7 +350,7 @@ struct LookActionHandlerTests {
             output,
             """
             > look at nonexistent
-            You can't see any such thing.
+            You can’t see any such thing.
             """)
     }
 
@@ -393,7 +393,7 @@ struct LookActionHandlerTests {
             output,
             """
             > look at book
-            You can't see any such thing.
+            You can’t see any such thing.
             """)
     }
 
@@ -454,7 +454,7 @@ struct LookActionHandlerTests {
             output,
             """
             > look
-            It is pitch black. You can't see a thing.
+            It is pitch black. You can’t see a thing.
             """)
     }
 
@@ -718,7 +718,7 @@ struct LookActionHandlerTests {
             """)
     }
 
-    @Test("Look doesn't show items in closed opaque containers")
+    @Test("Look doesn’t show items in closed opaque containers")
     func testLookDoesntShowItemsInClosedOpaqueContainers() async throws {
         // Given
         let testRoom = Location(
@@ -808,7 +808,7 @@ struct LookActionHandlerTests {
             output,
             """
             > look
-            It is pitch black. You can't see a thing.
+            It is pitch black. You can’t see a thing.
             """)
     }
 
@@ -1007,7 +1007,7 @@ struct LookActionHandlerTests {
     @Test("Handler exposes correct ActionIDs")
     func testActionIDs() async throws {
         let handler = LookActionHandler()
-        // LookActionHandler doesn't specify actions, so it should be empty
+        // LookActionHandler doesn’t specify actions, so it should be empty
         #expect(handler.actions.isEmpty)
     }
 

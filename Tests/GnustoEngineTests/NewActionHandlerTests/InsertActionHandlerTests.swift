@@ -372,7 +372,7 @@ struct InsertActionHandlerTests {
             output,
             """
             > insert gem in box
-            You aren't holding the precious gem.
+            You aren’t holding the precious gem.
             """)
     }
 
@@ -517,7 +517,7 @@ struct InsertActionHandlerTests {
             output,
             """
             > insert coin in box
-            You can't see any such thing.
+            You can’t see any such thing.
             """)
     }
 
@@ -557,7 +557,7 @@ struct InsertActionHandlerTests {
             output,
             """
             > insert bag in bag
-            You can't put the magic bag in itself.
+            You can’t put the magic bag in itself.
             """)
     }
 
@@ -607,7 +607,7 @@ struct InsertActionHandlerTests {
             output,
             """
             > insert bag in box
-            You can't put the travel bag in the small box.
+            You can’t put the travel bag in the small box.
             """)
     }
 
@@ -655,7 +655,7 @@ struct InsertActionHandlerTests {
             output,
             """
             > insert coin in box
-            It is pitch black. You can't see a thing.
+            It is pitch black. You can’t see a thing.
             """)
     }
 
@@ -1091,7 +1091,7 @@ struct InsertActionHandlerTests {
     @Test("Handler exposes correct ActionIDs")
     func testActionIDs() async throws {
         let handler = InsertActionHandler()
-        // InsertActionHandler doesn't specify actions, so it should be empty
+        // InsertActionHandler doesn’t specify actions, so it should be empty
         #expect(handler.actions.isEmpty)
     }
 

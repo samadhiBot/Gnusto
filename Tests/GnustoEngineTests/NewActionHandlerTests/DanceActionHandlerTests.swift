@@ -167,7 +167,7 @@ struct DanceActionHandlerTests {
     @Test("Handler exposes correct ActionIDs")
     func testActionIDs() async throws {
         let handler = DanceActionHandler()
-        // DanceActionHandler doesn't specify actions, so it should be empty
+        // DanceActionHandler doesn’t specify actions, so it should be empty
         #expect(handler.actions.isEmpty)
     }
 

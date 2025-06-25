@@ -186,7 +186,7 @@ struct TurnActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > turn dial
-            You can't see any such thing.
+            You can’t see any such thing.
             """)
     }
 
@@ -222,7 +222,7 @@ struct TurnActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > turn handle
-            It is pitch black. You can't see a thing.
+            It is pitch black. You can’t see a thing.
             """)
     }
 
@@ -440,7 +440,7 @@ struct TurnActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > turn guard
-            You can't turn the palace guard.
+            You can’t turn the palace guard.
             """)
     }
 
@@ -511,7 +511,7 @@ struct TurnActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > turn statue
-            You can't turn the marble statue.
+            You can’t turn the marble statue.
             """)
     }
 

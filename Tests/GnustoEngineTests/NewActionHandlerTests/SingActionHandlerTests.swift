@@ -123,7 +123,7 @@ struct SingActionHandlerTests {
     @Test("Handler exposes correct ActionIDs")
     func testActionIDs() async throws {
         let handler = SingActionHandler()
-        // SingActionHandler doesn't specify actions, so it should be empty
+        // SingActionHandler doesn’t specify actions, so it should be empty
         #expect(handler.actions.isEmpty)
     }
 

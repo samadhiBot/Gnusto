@@ -189,7 +189,7 @@ struct DrinkActionHandlerTests {
             output,
             """
             > drink nonexistent
-            You can't see any such thing.
+            You can’t see any such thing.
             """)
     }
 
@@ -228,7 +228,7 @@ struct DrinkActionHandlerTests {
             output,
             """
             > drink water
-            You aren't holding the glass of water.
+            You aren’t holding the glass of water.
             """)
     }
 
@@ -266,7 +266,7 @@ struct DrinkActionHandlerTests {
             output,
             """
             > drink rock
-            You can't drink the large rock.
+            You can’t drink the large rock.
             """)
     }
 
@@ -306,7 +306,7 @@ struct DrinkActionHandlerTests {
             output,
             """
             > drink water
-            It is pitch black. You can't see a thing.
+            It is pitch black. You can’t see a thing.
             """)
     }
 
@@ -498,7 +498,7 @@ struct DrinkActionHandlerTests {
             output,
             """
             > drink bottle
-            You can't drink from the sealed bottle while it's closed.
+            You can’t drink from the sealed bottle while it's closed.
             """)
     }
 

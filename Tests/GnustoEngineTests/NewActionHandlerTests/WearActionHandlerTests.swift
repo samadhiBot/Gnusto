@@ -252,7 +252,7 @@ struct WearActionHandlerTests {
             output,
             """
             > wear hat
-            You aren't holding the fancy hat.
+            You aren’t holding the fancy hat.
             """)
     }
 
@@ -290,7 +290,7 @@ struct WearActionHandlerTests {
             output,
             """
             > wear rock
-            You can't wear the heavy rock.
+            You can’t wear the heavy rock.
             """)
     }
 
@@ -374,7 +374,7 @@ struct WearActionHandlerTests {
             output,
             """
             > wear scarf
-            It is pitch black. You can't see a thing.
+            It is pitch black. You can’t see a thing.
             """)
     }
 
@@ -651,7 +651,7 @@ struct WearActionHandlerTests {
     @Test("Handler exposes correct ActionIDs")
     func testActionIDs() async throws {
         let handler = WearActionHandler()
-        // WearActionHandler doesn't specify actions, so it should be empty
+        // WearActionHandler doesn’t specify actions, so it should be empty
         #expect(handler.actions.isEmpty)
     }
 

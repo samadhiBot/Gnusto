@@ -1630,7 +1630,7 @@ struct GameEngineTests {
         )
     }
 
-    @Test("updatePronounsForMultipleObjects updates both 'it' and 'them' correctly")
+    @Test("updatePronounsForMultipleObjects updates both 'it' and ’them' correctly")
     func testUpdatePronounsForMultipleObjects() async throws {
         let item1 = Item(id: "item1", .name("Item One"))
         let item2 = Item(id: "item2", .name("Item Two"))

@@ -144,7 +144,7 @@ struct SqueezeActionHandlerTests {
             output,
             """
             > squeeze nonexistent
-            You can't see any such thing.
+            You can’t see any such thing.
             """)
     }
 
@@ -188,7 +188,7 @@ struct SqueezeActionHandlerTests {
             output,
             """
             > squeeze pillow
-            You can't see any such thing.
+            You can’t see any such thing.
             """)
     }
 
@@ -217,7 +217,7 @@ struct SqueezeActionHandlerTests {
             output,
             """
             > squeeze me
-            You can't squeeze that.
+            You can’t squeeze that.
             """)
     }
 
@@ -256,7 +256,7 @@ struct SqueezeActionHandlerTests {
             output,
             """
             > squeeze cushion
-            It is pitch black. You can't see a thing.
+            It is pitch black. You can’t see a thing.
             """)
     }
 
@@ -296,7 +296,7 @@ struct SqueezeActionHandlerTests {
             output,
             """
             > squeeze cat
-            The fluffy cat probably wouldn't like that.
+            The fluffy cat probably wouldn’t like that.
             """)
 
         let finalState = try await engine.item("cat")
@@ -578,7 +578,7 @@ struct SqueezeActionHandlerTests {
     @Test("Handler exposes correct ActionIDs")
     func testActionIDs() async throws {
         let handler = SqueezeActionHandler()
-        // SqueezeActionHandler doesn't specify actions, so it should be empty
+        // SqueezeActionHandler doesn’t specify actions, so it should be empty
         #expect(handler.actions.isEmpty)
     }
 

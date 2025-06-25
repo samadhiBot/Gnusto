@@ -147,7 +147,7 @@ struct BriefActionHandlerTests {
     @Test("Handler exposes correct ActionIDs")
     func testActionIDs() async throws {
         let handler = BriefActionHandler()
-        // BriefActionHandler doesn't specify actions, so it should be empty
+        // BriefActionHandler doesn’t specify actions, so it should be empty
         #expect(handler.actions.isEmpty)
     }
 

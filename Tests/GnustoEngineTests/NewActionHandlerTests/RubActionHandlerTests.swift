@@ -92,7 +92,7 @@ struct RubActionHandlerTests {
             output,
             """
             > rub table with cloth
-            Rubbing the wooden table doesn't accomplish anything.
+            Rubbing the wooden table doesn’t accomplish anything.
             """)
 
         let finalState = try await engine.item("table")
@@ -133,7 +133,7 @@ struct RubActionHandlerTests {
             output,
             """
             > polish mirror
-            Rubbing the silver mirror doesn't accomplish anything.
+            Rubbing the silver mirror doesn’t accomplish anything.
             """)
     }
 
@@ -170,7 +170,7 @@ struct RubActionHandlerTests {
             output,
             """
             > clean window
-            Rubbing the dirty window doesn't accomplish anything.
+            Rubbing the dirty window doesn’t accomplish anything.
             """)
     }
 
@@ -230,7 +230,7 @@ struct RubActionHandlerTests {
             output,
             """
             > rub nonexistent
-            You can't see any such thing.
+            You can’t see any such thing.
             """)
     }
 
@@ -273,7 +273,7 @@ struct RubActionHandlerTests {
             output,
             """
             > rub statue
-            You can't see any such thing.
+            You can’t see any such thing.
             """)
     }
 
@@ -302,7 +302,7 @@ struct RubActionHandlerTests {
             output,
             """
             > rub me
-            You can't rub that.
+            You can’t rub that.
             """)
     }
 
@@ -340,7 +340,7 @@ struct RubActionHandlerTests {
             output,
             """
             > rub statue
-            It is pitch black. You can't see a thing.
+            It is pitch black. You can’t see a thing.
             """)
     }
 
@@ -463,7 +463,7 @@ struct RubActionHandlerTests {
             output,
             """
             > rub coin
-            Rubbing the gold coin doesn't accomplish anything.
+            Rubbing the gold coin doesn’t accomplish anything.
             """)
 
         let finalState = try await engine.item("coin")
@@ -503,7 +503,7 @@ struct RubActionHandlerTests {
             output,
             """
             > rub wall
-            Rubbing the stone wall doesn't accomplish anything.
+            Rubbing the stone wall doesn’t accomplish anything.
             """)
 
         let finalState = try await engine.item("wall")
@@ -544,7 +544,7 @@ struct RubActionHandlerTests {
             output,
             """
             > rub ring
-            Rubbing the silver ring doesn't accomplish anything.
+            Rubbing the silver ring doesn’t accomplish anything.
             """)
 
         let finalState = try await engine.item("ring")
@@ -593,7 +593,7 @@ struct RubActionHandlerTests {
             output,
             """
             > rub vase with rag
-            Rubbing the ceramic vase doesn't accomplish anything.
+            Rubbing the ceramic vase doesn’t accomplish anything.
             """)
 
         let finalState = try await engine.item("vase")
@@ -605,7 +605,7 @@ struct RubActionHandlerTests {
     @Test("Handler exposes correct ActionIDs")
     func testActionIDs() async throws {
         let handler = RubActionHandler()
-        // RubActionHandler doesn't specify actions, so it should be empty
+        // RubActionHandler doesn’t specify actions, so it should be empty
         #expect(handler.actions.isEmpty)
     }
 

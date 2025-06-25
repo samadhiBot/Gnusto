@@ -306,7 +306,7 @@ struct TurnOffActionHandlerTests {
             output,
             """
             > turn off nonexistent
-            You can't see any such thing.
+            You can’t see any such thing.
             """)
     }
 
@@ -351,7 +351,7 @@ struct TurnOffActionHandlerTests {
             output,
             """
             > turn off lamp
-            You can't see any such thing.
+            You can’t see any such thing.
             """)
     }
 
@@ -388,7 +388,7 @@ struct TurnOffActionHandlerTests {
             output,
             """
             > turn off rock
-            You can't turn that off.
+            You can’t turn that off.
             """)
     }
 
@@ -583,7 +583,7 @@ struct TurnOffActionHandlerTests {
         #expect(isLit == false)
     }
 
-    @Test("Turn off light source with other light sources present doesn't show darkness")
+    @Test("Turn off light source with other light sources present doesn’t show darkness")
     func testTurnOffLightSourceWithOtherLightSourcesPresent() async throws {
         // Given: Dark room with two light sources
         let darkRoom = Location(
@@ -644,7 +644,7 @@ struct TurnOffActionHandlerTests {
         #expect(isLit == true)
     }
 
-    @Test("Turn off light source in inherently lit room doesn't show darkness")
+    @Test("Turn off light source in inherently lit room doesn’t show darkness")
     func testTurnOffLightSourceInInherentlyLitRoom() async throws {
         // Given: Inherently lit room
         let litRoom = Location(
@@ -848,7 +848,7 @@ struct TurnOffActionHandlerTests {
     @Test("Handler exposes correct ActionIDs")
     func testActionIDs() async throws {
         let handler = TurnOffActionHandler()
-        // TurnOffActionHandler doesn't specify actions, so it should be empty
+        // TurnOffActionHandler doesn’t specify actions, so it should be empty
         #expect(handler.actions.isEmpty)
     }
 

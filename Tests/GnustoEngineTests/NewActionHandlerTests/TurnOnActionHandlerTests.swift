@@ -195,7 +195,7 @@ struct TurnOnActionHandlerTests {
             output,
             """
             > turn on nonexistent
-            You can't see any such thing.
+            You can’t see any such thing.
             """)
     }
 
@@ -240,7 +240,7 @@ struct TurnOnActionHandlerTests {
             output,
             """
             > turn on lamp
-            You can't see any such thing.
+            You can’t see any such thing.
             """)
     }
 
@@ -277,7 +277,7 @@ struct TurnOnActionHandlerTests {
             output,
             """
             > turn on rock
-            You can't turn that on.
+            You can’t turn that on.
             """)
     }
 
@@ -413,7 +413,7 @@ struct TurnOnActionHandlerTests {
             output,
             """
             > turn on radio
-            It is pitch black. You can't see a thing.
+            It is pitch black. You can’t see a thing.
             """)
     }
 
@@ -686,7 +686,7 @@ struct TurnOnActionHandlerTests {
             """)
     }
 
-    @Test("Turn on inherently lit room light source doesn't show illumination message")
+    @Test("Turn on inherently lit room light source doesn’t show illumination message")
     func testTurnOnInInherentlyLitRoom() async throws {
         // Given: Inherently lit room
         let litRoom = Location(

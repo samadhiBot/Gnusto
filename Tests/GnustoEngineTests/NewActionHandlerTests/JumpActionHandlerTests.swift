@@ -67,7 +67,7 @@ struct JumpActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > jump log
-            You can't jump over the fallen log.
+            You can’t jump over the fallen log.
             """)
 
         let finalState = try await engine.item("log")
@@ -106,7 +106,7 @@ struct JumpActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > jump over stream
-            You can't jump over the small stream.
+            You can’t jump over the small stream.
             """)
     }
 
@@ -203,7 +203,7 @@ struct JumpActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > jump obstacle
-            You can't see any such thing.
+            You can’t see any such thing.
             """)
     }
 
@@ -295,7 +295,7 @@ struct JumpActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > jump troll
-            You can't jump the nasty troll.
+            You can’t jump the nasty troll.
             """)
 
         let finalState = try await engine.item("troll")
@@ -333,7 +333,7 @@ struct JumpActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > jump boulder
-            You can't jump over the large boulder.
+            You can’t jump over the large boulder.
             """)
 
         let finalState = try await engine.item("boulder")
@@ -403,7 +403,7 @@ struct JumpActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > jump over puddle
-            You can't jump over the mud puddle.
+            You can’t jump over the mud puddle.
             """)
 
         let finalState = try await engine.item("puddle")
@@ -415,7 +415,7 @@ struct JumpActionHandlerTests {
     @Test("Handler exposes correct ActionIDs")
     func testActionIDs() async throws {
         let handler = JumpActionHandler()
-        // JumpActionHandler doesn't specify actions, so it should be empty
+        // JumpActionHandler doesn’t specify actions, so it should be empty
         #expect(handler.actions.isEmpty)
     }
 

@@ -262,7 +262,7 @@ struct InventoryActionHandlerTests {
         let handler = InventoryActionHandler()
 
         // When & Then
-        // InventoryActionHandler doesn't specify actions, so it should be empty
+        // InventoryActionHandler doesn’t specify actions, so it should be empty
         #expect(handler.actions.isEmpty)
     }
 

@@ -216,7 +216,7 @@ struct LookUnderActionHandlerTests {
             output,
             """
             > look under nonexistent
-            You can't look under that.
+            You can’t look under that.
             """)
     }
 
@@ -259,7 +259,7 @@ struct LookUnderActionHandlerTests {
             output,
             """
             > look under table
-            You can't see any such thing.
+            You can’t see any such thing.
             """)
     }
 
@@ -288,7 +288,7 @@ struct LookUnderActionHandlerTests {
             output,
             """
             > look under testRoom
-            You can't look under that.
+            You can’t look under that.
             """)
     }
 
@@ -317,7 +317,7 @@ struct LookUnderActionHandlerTests {
             output,
             """
             > look under me
-            You can't look under that.
+            You can’t look under that.
             """)
     }
 
@@ -355,7 +355,7 @@ struct LookUnderActionHandlerTests {
             output,
             """
             > look under table
-            It is pitch black. You can't see a thing.
+            It is pitch black. You can’t see a thing.
             """)
     }
 
@@ -627,7 +627,7 @@ struct LookUnderActionHandlerTests {
     @Test("Handler exposes correct ActionIDs")
     func testActionIDs() async throws {
         let handler = LookUnderActionHandler()
-        // LookUnderActionHandler doesn't specify actions, so it should be empty
+        // LookUnderActionHandler doesn’t specify actions, so it should be empty
         #expect(handler.actions.isEmpty)
     }
 

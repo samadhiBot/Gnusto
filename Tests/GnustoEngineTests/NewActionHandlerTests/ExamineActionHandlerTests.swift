@@ -269,7 +269,7 @@ struct ExamineActionHandlerTests {
             output,
             """
             > examine nonexistent
-            You can't see any such thing.
+            You can’t see any such thing.
             """)
     }
 
@@ -312,7 +312,7 @@ struct ExamineActionHandlerTests {
             output,
             """
             > examine book
-            You can't see any such thing.
+            You can’t see any such thing.
             """)
     }
 
@@ -350,7 +350,7 @@ struct ExamineActionHandlerTests {
             output,
             """
             > examine book
-            It is pitch black. You can't see a thing.
+            It is pitch black. You can’t see a thing.
             """)
     }
 
@@ -875,7 +875,7 @@ struct ExamineActionHandlerTests {
     @Test("Handler exposes correct ActionIDs")
     func testActionIDs() async throws {
         let handler = ExamineActionHandler()
-        // ExamineActionHandler doesn't specify actions, so it should be empty
+        // ExamineActionHandler doesn’t specify actions, so it should be empty
         #expect(handler.actions.isEmpty)
     }
 

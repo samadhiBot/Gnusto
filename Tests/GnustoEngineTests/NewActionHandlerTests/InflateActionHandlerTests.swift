@@ -256,7 +256,7 @@ struct InflateActionHandlerTests {
             output,
             """
             > inflate balloon
-            You can't see any such thing.
+            You can’t see any such thing.
             """)
     }
 
@@ -293,7 +293,7 @@ struct InflateActionHandlerTests {
             output,
             """
             > inflate rock
-            You can't inflate the large rock.
+            You can’t inflate the large rock.
             """)
     }
 
@@ -332,7 +332,7 @@ struct InflateActionHandlerTests {
             output,
             """
             > inflate balloon
-            It is pitch black. You can't see a thing.
+            It is pitch black. You can’t see a thing.
             """)
     }
 
@@ -707,7 +707,7 @@ struct InflateActionHandlerTests {
     @Test("Handler exposes correct ActionIDs")
     func testActionIDs() async throws {
         let handler = InflateActionHandler()
-        // InflateActionHandler doesn't specify actions, so it should be empty
+        // InflateActionHandler doesn’t specify actions, so it should be empty
         #expect(handler.actions.isEmpty)
     }
 

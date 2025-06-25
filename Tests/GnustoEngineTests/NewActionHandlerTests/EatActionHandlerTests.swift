@@ -189,7 +189,7 @@ struct EatActionHandlerTests {
             output,
             """
             > eat nonexistent
-            You can't see any such thing.
+            You can’t see any such thing.
             """)
     }
 
@@ -228,7 +228,7 @@ struct EatActionHandlerTests {
             output,
             """
             > eat apple
-            You aren't holding the red apple.
+            You aren’t holding the red apple.
             """)
     }
 
@@ -266,7 +266,7 @@ struct EatActionHandlerTests {
             output,
             """
             > eat rock
-            You can't eat the large rock.
+            You can’t eat the large rock.
             """)
     }
 
@@ -306,7 +306,7 @@ struct EatActionHandlerTests {
             output,
             """
             > eat apple
-            It is pitch black. You can't see a thing.
+            It is pitch black. You can’t see a thing.
             """)
     }
 

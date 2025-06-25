@@ -144,7 +144,7 @@ struct TasteActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > taste cake
-            You can't see any such thing.
+            You can’t see any such thing.
             """)
     }
 
@@ -179,7 +179,7 @@ struct TasteActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > taste bread
-            You can't see any such thing.
+            You can’t see any such thing.
             """)
     }
 

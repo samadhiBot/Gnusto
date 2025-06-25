@@ -194,7 +194,7 @@ struct RestartActionHandlerTests {
     @Test("Handler exposes correct ActionIDs")
     func testActionIDs() async throws {
         let handler = RestartActionHandler()
-        // RestartActionHandler doesn't specify actions, so it should be empty
+        // RestartActionHandler doesn’t specify actions, so it should be empty
         #expect(handler.actions.isEmpty)
     }
 

@@ -226,7 +226,7 @@ struct LockActionHandlerTests {
             output,
             """
             > lock door with key
-            You aren't holding the silver key.
+            You aren’t holding the silver key.
             """)
     }
 
@@ -280,7 +280,7 @@ struct LockActionHandlerTests {
             output,
             """
             > lock door with key
-            You can't see any such thing.
+            You can’t see any such thing.
             """)
     }
 
@@ -325,7 +325,7 @@ struct LockActionHandlerTests {
             output,
             """
             > lock rock with key
-            You can't lock the large rock.
+            You can’t lock the large rock.
             """)
     }
 
@@ -351,7 +351,7 @@ struct LockActionHandlerTests {
         let wrongKey = Item(
             id: "wrongKey",
             .name("wrong key"),
-            .description("A key that doesn't fit."),
+            .description("A key that doesn’t fit."),
             .isTakable,
             .in(.player)
         )
@@ -373,7 +373,7 @@ struct LockActionHandlerTests {
             output,
             """
             > lock door with key
-            The wrong key doesn't fit the secure door.
+            The wrong key doesn’t fit the secure door.
             """)
     }
 
@@ -422,7 +422,7 @@ struct LockActionHandlerTests {
             output,
             """
             > lock door with key
-            It is pitch black. You can't see a thing.
+            It is pitch black. You can’t see a thing.
             """)
     }
 
@@ -770,7 +770,7 @@ struct LockActionHandlerTests {
             output,
             """
             > lock door with stick
-            The wooden stick doesn't fit the heavy door.
+            The wooden stick doesn’t fit the heavy door.
             """)
     }
 
@@ -779,7 +779,7 @@ struct LockActionHandlerTests {
     @Test("Handler exposes correct ActionIDs")
     func testActionIDs() async throws {
         let handler = LockActionHandler()
-        // LockActionHandler doesn't specify actions, so it should be empty
+        // LockActionHandler doesn’t specify actions, so it should be empty
         #expect(handler.actions.isEmpty)
     }
 

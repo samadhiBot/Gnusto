@@ -245,7 +245,7 @@ struct PourActionHandlerTests {
             output,
             """
             > pour nonexistent on plant
-            You can't see any such thing.
+            You can’t see any such thing.
             """)
     }
 
@@ -283,7 +283,7 @@ struct PourActionHandlerTests {
             output,
             """
             > pour water on nonexistent
-            You can't see any such thing.
+            You can’t see any such thing.
             """)
     }
 
@@ -334,7 +334,7 @@ struct PourActionHandlerTests {
             output,
             """
             > pour water on plant
-            You can't see any such thing.
+            You can’t see any such thing.
             """)
     }
 
@@ -386,7 +386,7 @@ struct PourActionHandlerTests {
             output,
             """
             > pour water on plant
-            You can't see any such thing.
+            You can’t see any such thing.
             """)
     }
 
@@ -423,7 +423,7 @@ struct PourActionHandlerTests {
             output,
             """
             > pour testRoom on plant
-            You can't pour that.
+            You can’t pour that.
             """)
     }
 
@@ -461,7 +461,7 @@ struct PourActionHandlerTests {
             output,
             """
             > pour water on testRoom
-            You can't pour the glass of water on that.
+            You can’t pour the glass of water on that.
             """)
     }
 
@@ -498,7 +498,7 @@ struct PourActionHandlerTests {
             output,
             """
             > pour me on plant
-            You can't pour that.
+            You can’t pour that.
             """)
     }
 
@@ -536,7 +536,7 @@ struct PourActionHandlerTests {
             output,
             """
             > pour water on me
-            You can't pour the glass of water on that.
+            You can’t pour the glass of water on that.
             """)
     }
 
@@ -582,7 +582,7 @@ struct PourActionHandlerTests {
             output,
             """
             > pour water on plant
-            It is pitch black. You can't see a thing.
+            It is pitch black. You can’t see a thing.
             """)
     }
 
@@ -737,7 +737,7 @@ struct PourActionHandlerTests {
             output,
             """
             > pour water on water
-            You can't pour the glass of water on itself.
+            You can’t pour the glass of water on itself.
             """)
     }
 
@@ -871,7 +871,7 @@ struct PourActionHandlerTests {
     @Test("Handler exposes correct ActionIDs")
     func testActionIDs() async throws {
         let handler = PourActionHandler()
-        // PourActionHandler doesn't specify actions, so it should be empty
+        // PourActionHandler doesn’t specify actions, so it should be empty
         #expect(handler.actions.isEmpty)
     }
 

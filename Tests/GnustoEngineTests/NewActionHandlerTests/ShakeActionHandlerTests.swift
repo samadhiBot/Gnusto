@@ -149,7 +149,7 @@ struct ShakeActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > shake item
-            You can't see any such thing.
+            You can’t see any such thing.
             """)
     }
 
@@ -184,7 +184,7 @@ struct ShakeActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > shake jar
-            It is pitch black. You can't see a thing.
+            It is pitch black. You can’t see a thing.
             """)
     }
 
@@ -260,7 +260,7 @@ struct ShakeActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > shake tree
-            You can't shake the oak tree.
+            You can’t shake the oak tree.
             """)
     }
 
@@ -296,7 +296,7 @@ struct ShakeActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > shake wizard
-            You don't need to shake the old wizard.
+            You don’t need to shake the old wizard.
             """)
     }
 
@@ -555,7 +555,7 @@ struct ShakeActionHandlerTests {
     @Test("Handler exposes correct ActionIDs")
     func testActionIDs() async throws {
         let handler = ShakeActionHandler()
-        // ShakeActionHandler doesn't specify actions, so it should be empty
+        // ShakeActionHandler doesn’t specify actions, so it should be empty
         #expect(handler.actions.isEmpty)
     }
 

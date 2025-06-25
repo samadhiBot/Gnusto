@@ -189,7 +189,7 @@ struct FindActionHandlerTests {
             output,
             """
             > find gem
-            It is pitch black. You can't see a thing.
+            It is pitch black. You can’t see a thing.
             """)
     }
 
@@ -357,7 +357,7 @@ struct FindActionHandlerTests {
             output,
             """
             > find treasure
-            You can't see any such thing.
+            You can’t see any such thing.
             """)
     }
 
@@ -386,7 +386,7 @@ struct FindActionHandlerTests {
             output,
             """
             > find dragon
-            You can't see any such thing.
+            You can’t see any such thing.
             """)
     }
 
@@ -433,7 +433,7 @@ struct FindActionHandlerTests {
             output,
             """
             > find jewelry
-            You can't see any such thing.
+            You can’t see any such thing.
             """)
     }
 
@@ -595,7 +595,7 @@ struct FindActionHandlerTests {
     @Test("Handler exposes correct ActionIDs")
     func testActionIDs() async throws {
         let handler = FindActionHandler()
-        // FindActionHandler doesn't specify actions, so it should be empty
+        // FindActionHandler doesn’t specify actions, so it should be empty
         #expect(handler.actions.isEmpty)
     }
 

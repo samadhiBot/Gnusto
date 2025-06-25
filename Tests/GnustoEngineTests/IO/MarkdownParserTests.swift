@@ -9,7 +9,7 @@ struct MarkdownParserTests {
     @Test("Orphan prevention - user's specific example")
     func testOrphanPreventionUserExample() {
         // Test the exact example from the user's question
-        let input = "You can't put the bag in the box, because the box is inside the bag."
+        let input = "You can’t put the bag in the box, because the box is inside the bag."
         let result = MarkdownParser.parse(input, columns: 64)
 
         print("Input: \(input)")
@@ -35,7 +35,7 @@ struct MarkdownParserTests {
 
     @Test("Orphan prevention - basic case")
     func testOrphanPrevention() async throws {
-        let input = "You can't put the bag in the box, because the box is inside the bag."
+        let input = "You can’t put the bag in the box, because the box is inside the bag."
         let result = MarkdownParser.parse(input, columns: 64)
 
         // Should prevent single-word orphans

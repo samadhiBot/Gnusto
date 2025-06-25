@@ -177,7 +177,7 @@ struct CurseActionHandlerTests {
     @Test("Handler exposes correct ActionIDs")
     func testActionIDs() async throws {
         let handler = CurseActionHandler()
-        // CurseActionHandler doesn't specify actions, so it should be empty
+        // CurseActionHandler doesn’t specify actions, so it should be empty
         #expect(handler.actions.isEmpty)
     }
 

@@ -154,7 +154,7 @@ struct CloseActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > close door
-            You can't see any such thing.
+            You can’t see any such thing.
             """)
     }
 
@@ -189,7 +189,7 @@ struct CloseActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > close rock
-            You can't close the large rock.
+            You can’t close the large rock.
             """)
     }
 
@@ -226,7 +226,7 @@ struct CloseActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > close chest
-            It is pitch black. You can't see a thing.
+            It is pitch black. You can’t see a thing.
             """)
     }
 
@@ -353,7 +353,7 @@ struct CloseActionHandlerTests {
     @Test("Handler exposes correct ActionIDs")
     func testActionIDs() async throws {
         let handler = CloseActionHandler()
-        // CloseActionHandler doesn't specify actions, so it should be empty
+        // CloseActionHandler doesn’t specify actions, so it should be empty
         #expect(handler.actions.isEmpty)
     }
 

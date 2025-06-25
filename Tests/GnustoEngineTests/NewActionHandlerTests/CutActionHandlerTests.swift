@@ -253,7 +253,7 @@ struct CutActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > cut rope
-            You can't see any such thing.
+            You can’t see any such thing.
             """)
     }
 
@@ -297,7 +297,7 @@ struct CutActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > cut rope with knife
-            You aren't holding the sharp knife.
+            You aren’t holding the sharp knife.
             """)
     }
 
@@ -332,7 +332,7 @@ struct CutActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > cut rope
-            It is pitch black. You can't see a thing.
+            It is pitch black. You can’t see a thing.
             """)
     }
 
@@ -553,7 +553,7 @@ struct CutActionHandlerTests {
     @Test("Handler exposes correct ActionIDs")
     func testActionIDs() async throws {
         let handler = CutActionHandler()
-        // CutActionHandler doesn't specify actions, so it should be empty
+        // CutActionHandler doesn’t specify actions, so it should be empty
         #expect(handler.actions.isEmpty)
     }
 

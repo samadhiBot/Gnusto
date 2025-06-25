@@ -209,7 +209,7 @@ struct XyzzyActionHandlerTests {
             """)
     }
 
-    @Test("XYZZY doesn't modify game state")
+    @Test("XYZZY doesn’t modify game state")
     func testXyzzyNoStateChanges() async throws {
         // Given
         let testRoom = Location(
@@ -268,7 +268,7 @@ struct XyzzyActionHandlerTests {
     @Test("Handler exposes correct ActionIDs")
     func testActionIDs() async throws {
         let handler = XyzzyActionHandler()
-        // XyzzyActionHandler doesn't specify actions, so it should be empty
+        // XyzzyActionHandler doesn’t specify actions, so it should be empty
         #expect(handler.actions.isEmpty)
     }
 

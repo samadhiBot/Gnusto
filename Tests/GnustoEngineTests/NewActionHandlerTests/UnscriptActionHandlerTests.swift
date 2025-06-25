@@ -313,14 +313,14 @@ struct UnscriptActionHandlerTests {
     @Test("Handler exposes correct ActionIDs")
     func testActionIDs() async throws {
         let handler = UnscriptActionHandler()
-        // UnscriptActionHandler doesn't specify actions, so it should be empty
+        // UnscriptActionHandler doesn’t specify actions, so it should be empty
         #expect(handler.actions.isEmpty)
     }
 
     @Test("Handler exposes correct VerbIDs")
     func testVerbIDs() async throws {
         let handler = UnscriptActionHandler()
-        // UnscriptActionHandler uses .unscript in its syntax but doesn't expose verbs
+        // UnscriptActionHandler uses .unscript in its syntax but doesn’t expose verbs
         #expect(handler.verbs.isEmpty)
     }
 

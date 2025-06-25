@@ -182,7 +182,7 @@ struct PressActionHandlerTests {
             output,
             """
             > press nonexistent
-            You can't see any such thing.
+            You can’t see any such thing.
             """)
     }
 
@@ -226,7 +226,7 @@ struct PressActionHandlerTests {
             output,
             """
             > press button
-            You can't see any such thing.
+            You can’t see any such thing.
             """)
     }
 
@@ -323,7 +323,7 @@ struct PressActionHandlerTests {
             output,
             """
             > press button
-            It is pitch black. You can't see a thing.
+            It is pitch black. You can’t see a thing.
             """)
     }
 
@@ -403,7 +403,7 @@ struct PressActionHandlerTests {
             output,
             """
             > press rock
-            You can't press the large rock.
+            You can’t press the large rock.
             """)
 
         let finalState = try await engine.item("rock")
@@ -723,7 +723,7 @@ struct PressActionHandlerTests {
             bookOutput,
             """
             > press book
-            You can't press the old book.
+            You can’t press the old book.
             """)
 
         // When - Press character
@@ -734,7 +734,7 @@ struct PressActionHandlerTests {
             characterOutput,
             """
             > press man
-            You can't press the old man.
+            You can’t press the old man.
             """)
 
         // When - Press device
@@ -745,7 +745,7 @@ struct PressActionHandlerTests {
             deviceOutput,
             """
             > press device
-            You can't press the strange device.
+            You can’t press the strange device.
             """)
     }
 
@@ -754,7 +754,7 @@ struct PressActionHandlerTests {
     @Test("Handler exposes correct ActionIDs")
     func testActionIDs() async throws {
         let handler = PressActionHandler()
-        // PressActionHandler doesn't specify actions, so it should be empty
+        // PressActionHandler doesn’t specify actions, so it should be empty
         #expect(handler.actions.isEmpty)
     }
 

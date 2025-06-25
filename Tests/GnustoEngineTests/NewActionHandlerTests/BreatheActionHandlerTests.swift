@@ -67,7 +67,7 @@ struct BreatheActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > breathe on flower
-            You can't breathe on that.
+            You can’t breathe on that.
             """)
     }
 
@@ -104,7 +104,7 @@ struct BreatheActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > breathe air
-            You can't breathe that.
+            You can’t breathe that.
             """)
     }
 
@@ -139,7 +139,7 @@ struct BreatheActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > breathe with mask
-            You can't breathe that.
+            You can’t breathe that.
             """)
     }
 
@@ -204,7 +204,7 @@ struct BreatheActionHandlerTests {
     @Test("Handler exposes correct ActionIDs")
     func testActionIDs() async throws {
         let handler = BreatheActionHandler()
-        // BreatheActionHandler doesn't specify actions, so it should be empty
+        // BreatheActionHandler doesn’t specify actions, so it should be empty
         #expect(handler.actions.isEmpty)
     }
 

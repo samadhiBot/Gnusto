@@ -277,7 +277,7 @@ struct RemoveActionHandlerTests {
             output,
             """
             > remove hat
-            You aren't wearing the blue hat.
+            You aren’t wearing the blue hat.
             """)
     }
 
@@ -306,7 +306,7 @@ struct RemoveActionHandlerTests {
             output,
             """
             > remove nonexistent
-            You can't see any such thing.
+            You can’t see any such thing.
             """)
     }
 
@@ -350,7 +350,7 @@ struct RemoveActionHandlerTests {
             output,
             """
             > remove robe
-            You can't remove the ceremonial robe.
+            You can’t remove the ceremonial robe.
             """)
     }
 
@@ -620,7 +620,7 @@ struct RemoveActionHandlerTests {
             output,
             """
             > remove all
-            You aren't wearing anything.
+            You aren’t wearing anything.
             """)
     }
 
@@ -690,7 +690,7 @@ struct RemoveActionHandlerTests {
     @Test("Handler exposes correct ActionIDs")
     func testActionIDs() async throws {
         let handler = RemoveActionHandler()
-        // RemoveActionHandler doesn't specify actions, so it should be empty
+        // RemoveActionHandler doesn’t specify actions, so it should be empty
         #expect(handler.actions.isEmpty)
     }
 

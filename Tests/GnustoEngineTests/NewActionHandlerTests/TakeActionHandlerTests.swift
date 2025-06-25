@@ -373,7 +373,7 @@ struct TakeActionHandlerTests {
             output,
             """
             > take nonexistent
-            You can't see any such thing.
+            You can’t see any such thing.
             """)
     }
 
@@ -417,7 +417,7 @@ struct TakeActionHandlerTests {
             output,
             """
             > take book
-            You can't see any such thing.
+            You can’t see any such thing.
             """)
     }
 
@@ -455,7 +455,7 @@ struct TakeActionHandlerTests {
             output,
             """
             > take statue
-            You can't take the stone statue.
+            You can’t take the stone statue.
             """)
     }
 
@@ -540,7 +540,7 @@ struct TakeActionHandlerTests {
             output,
             """
             > take treasure
-            You can't see any such thing.
+            You can’t see any such thing.
             """)
     }
 
@@ -635,7 +635,7 @@ struct TakeActionHandlerTests {
             output,
             """
             > take coin
-            You can't take anything from the large rock.
+            You can’t take anything from the large rock.
             """)
     }
 
@@ -691,7 +691,7 @@ struct TakeActionHandlerTests {
             output,
             """
             > take ring from bag
-            The silver ring isn't in the leather bag.
+            The silver ring isn’t in the leather bag.
             """)
     }
 
@@ -730,7 +730,7 @@ struct TakeActionHandlerTests {
             output,
             """
             > take book
-            It is pitch black. You can't see a thing.
+            It is pitch black. You can’t see a thing.
             """)
     }
 

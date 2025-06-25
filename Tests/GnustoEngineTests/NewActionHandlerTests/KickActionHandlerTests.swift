@@ -39,7 +39,7 @@ struct KickActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > kick rock
-            You can't kick the large rock.
+            You can’t kick the large rock.
             """)
 
         let finalState = try await engine.item("rock")
@@ -112,7 +112,7 @@ struct KickActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > kick rock
-            You can't see any such thing.
+            You can’t see any such thing.
             """)
     }
 
@@ -147,7 +147,7 @@ struct KickActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > kick rock
-            It is pitch black. You can't see a thing.
+            It is pitch black. You can’t see a thing.
             """)
     }
 
@@ -185,7 +185,7 @@ struct KickActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > kick troll
-            You can't kick the nasty troll.
+            You can’t kick the nasty troll.
             """)
 
         let finalState = try await engine.item("troll")
@@ -223,7 +223,7 @@ struct KickActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > kick box
-            You can't kick the wooden box.
+            You can’t kick the wooden box.
             """)
 
         let finalState = try await engine.item("box")
@@ -261,7 +261,7 @@ struct KickActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > kick pebble
-            You can't kick the small pebble.
+            You can’t kick the small pebble.
             """)
     }
 
@@ -297,7 +297,7 @@ struct KickActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > kick ball
-            You can't kick the rubber ball.
+            You can’t kick the rubber ball.
             """)
 
         let finalState = try await engine.item("ball")
@@ -375,9 +375,9 @@ struct KickActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > kick table
-            You can't kick the oak table.
+            You can’t kick the oak table.
             > kick chair
-            You can't kick the wooden chair.
+            You can’t kick the wooden chair.
             """)
 
         let tableState = try await engine.item("table")
@@ -391,7 +391,7 @@ struct KickActionHandlerTests {
     @Test("Handler exposes correct ActionIDs")
     func testActionIDs() async throws {
         let handler = KickActionHandler()
-        // KickActionHandler doesn't specify actions, so it should be empty
+        // KickActionHandler doesn’t specify actions, so it should be empty
         #expect(handler.actions.isEmpty)
     }
 

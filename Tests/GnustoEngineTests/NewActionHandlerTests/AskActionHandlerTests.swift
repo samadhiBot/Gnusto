@@ -433,7 +433,7 @@ struct AskActionHandlerTests {
     @Test("Handler exposes correct ActionIDs")
     func testActionIDs() async throws {
         let handler = AskActionHandler()
-        // AskActionHandler doesn't specify actions, so it should be empty
+        // AskActionHandler doesn’t specify actions, so it should be empty
         #expect(handler.actions.isEmpty)
     }
 

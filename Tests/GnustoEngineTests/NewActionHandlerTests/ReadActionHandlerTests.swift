@@ -115,7 +115,7 @@ struct ReadActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > read book
-            You can't see any such thing.
+            You can’t see any such thing.
             """)
     }
 
@@ -150,7 +150,7 @@ struct ReadActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > read rock
-            You can't read the large rock.
+            You can’t read the large rock.
             """)
     }
 
@@ -187,7 +187,7 @@ struct ReadActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > read book
-            It is pitch black. You can't see a thing.
+            It is pitch black. You can’t see a thing.
             """)
     }
 
@@ -384,7 +384,7 @@ struct ReadActionHandlerTests {
         #expect(finalState.parent == .player)
     }
 
-    @Test("Read non-takable item doesn't auto-take")
+    @Test("Read non-takable item doesn’t auto-take")
     func testReadNonTakableItemDoesntAutoTake() async throws {
         // Given
         let testRoom = Location(
@@ -532,7 +532,7 @@ struct ReadActionHandlerTests {
             .description("A yellow sticky note."),
             .isReadable,
             .in(.location("testRoom")),
-            .readText("Don't forget to feed the cat!")
+            .readText("Don’t forget to feed the cat!")
         )
 
         let game = MinimalGame(
@@ -553,7 +553,7 @@ struct ReadActionHandlerTests {
             > read journal
             Day 1: Started the journey today.
             > read note
-            Don't forget to feed the cat!
+            Don’t forget to feed the cat!
             """)
     }
 
@@ -562,7 +562,7 @@ struct ReadActionHandlerTests {
     @Test("Handler exposes correct ActionIDs")
     func testActionIDs() async throws {
         let handler = ReadActionHandler()
-        // ReadActionHandler doesn't specify actions, so it should be empty
+        // ReadActionHandler doesn’t specify actions, so it should be empty
         #expect(handler.actions.isEmpty)
     }
 

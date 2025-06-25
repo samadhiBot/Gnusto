@@ -189,7 +189,7 @@ struct StandardParserTests {
         #expect(gameState.items["sword"]?.parent == .location(roomID))
         #expect(gameState.items["coin"]?.parent == .item("backpack"))
         #expect(gameState.items["book"]?.parent == .item("table"))
-        #expect(gameState.items["rug"]?.parent == .nowhere)  // Globals aren't parented by this initializer
+        #expect(gameState.items["rug"]?.parent == .nowhere)  // Globals aren’t parented by this initializer
         #expect(gameState.pronouns["it"] == [.item("box")])
     }
 
@@ -527,13 +527,13 @@ struct StandardParserTests {
 
     @Test("Filter Fails (Adjective Mismatch)")
     func testFilterFailsAdjectiveMismatch() async throws {
-        // "lantern" is in scope (brass one), but "wooden" doesn't match.
+        // "lantern" is in scope (brass one), but "wooden" doesn’t match.
         let result = parser.parse(
             input: "take wooden lantern",
             vocabulary: vocabulary,
             gameState: gameState
         )
-        // Should fail because modifiers don't match, not because noun is unknown.
+        // Should fail because modifiers don’t match, not because noun is unknown.
         #expect(
             result.isFailure(matching: .modifierMismatch(noun: "lantern", modifiers: ["wooden"])))
     }
@@ -692,15 +692,15 @@ struct StandardParserTests {
     }
 
     // NEW Test for "them" resolving to multiple in-scope items
-    @Test("Pronoun 'them' Multiple In Scope")
+    @Test("Pronoun ’them' Multiple In Scope")
     func testPronounThemMultipleInScope() async throws {
-        // Initialize game state with 'them' set to key & leaflet (both held)
+        // Initialize game state with ’them' set to key & leaflet (both held)
         let initState = GameState(
             locations: Array(gameState.locations.values),
             items: Array(gameState.items.values),
             player: gameState.player,
             vocabulary: vocabulary,
-            pronouns: ["them": [.item("key"), .item("leaflet")]]  // Start with 'them'
+            pronouns: ["them": [.item("key"), .item("leaflet")]]  // Start with ’them'
         )
         // Player holds key and leaflet (verified by initialItems setup)
         #expect(initState.items["key"]?.parent == .player)
@@ -714,22 +714,22 @@ struct StandardParserTests {
         #expect(
             result.isFailure(
                 matching: ParseError.ambiguousPronounReference(
-                    "Which 'them' do you mean: the key or the leaflet?"
+                    "Which ’them' do you mean: the key or the leaflet?"
                 )
             )
         )
     }
 
     // NEW Test for "them" resolving to one in-scope item
-    @Test("Pronoun 'them' Single In Scope")
+    @Test("Pronoun ’them' Single In Scope")
     func testPronounThemSingleInScope() async throws {
-        // Initialize game state with 'them' set to key (held) & note (out of scope)
+        // Initialize game state with ’them' set to key (held) & note (out of scope)
         let initState = GameState(
             locations: Array(gameState.locations.values),
             items: Array(gameState.items.values),
             player: gameState.player,
             vocabulary: vocabulary,
-            pronouns: ["them": [.item("key"), .item("note")]]  // Start with 'them'
+            pronouns: ["them": [.item("key"), .item("note")]]  // Start with ’them'
         )
         // Verify item locations
         #expect(initState.items["key"]?.parent == .player)
@@ -948,7 +948,7 @@ struct StandardParserTests {
 
     @Test("Noun Not In Scope")
     func testNounNotInScope() async {
-        // Lamp exists in vocab, but isn't in the room or held by player
+        // Lamp exists in vocab, but isn’t in the room or held by player
         // Create a custom state where the lamp is explicitly out of scope
         var itemsDict = gameState.items  // Base items copy
         itemsDict[lampID]?.attributes[.parentEntity] = .parentEntity(.nowhere)  // Move lamp out of scope
@@ -1298,7 +1298,7 @@ struct StandardParserTests {
 
     @Test("Parse Commands with Adverbs and Prepositions")
     func testParseCommandsWithAdverbsAndPrepositions() async throws {
-        // Test that adverbs don't interfere with preposition parsing
+        // Test that adverbs don’t interfere with preposition parsing
         let result = parser.parse(
             input: "put coin carefully in backpack",
             vocabulary: vocabulary,

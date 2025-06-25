@@ -145,7 +145,7 @@ struct SmellActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > smell rose
-            You can't see any such thing.
+            You can’t see any such thing.
             """)
     }
 
@@ -215,7 +215,7 @@ struct SmellActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > smell spice
-            You can't see any such thing.
+            You can’t see any such thing.
             """)
     }
 

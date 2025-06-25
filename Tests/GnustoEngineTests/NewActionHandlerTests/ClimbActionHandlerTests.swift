@@ -150,7 +150,7 @@ struct ClimbActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > climb tree
-            You can't see any such thing.
+            You can’t see any such thing.
             """)
     }
 
@@ -177,7 +177,7 @@ struct ClimbActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > climb me
-            You can't climb yourself.
+            You can’t climb yourself.
             """)
     }
 
@@ -213,7 +213,7 @@ struct ClimbActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > climb tree
-            It is pitch black. You can't see a thing.
+            It is pitch black. You can’t see a thing.
             """)
     }
 
@@ -289,7 +289,7 @@ struct ClimbActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > climb table
-            You can't climb the heavy table.
+            You can’t climb the heavy table.
             """)
 
         let finalState = try await engine.item("table")
@@ -384,7 +384,7 @@ struct ClimbActionHandlerTests {
     @Test("Handler exposes correct ActionIDs")
     func testActionIDs() async throws {
         let handler = ClimbActionHandler()
-        // ClimbActionHandler doesn't specify actions, so it should be empty
+        // ClimbActionHandler doesn’t specify actions, so it should be empty
         #expect(handler.actions.isEmpty)
     }
 

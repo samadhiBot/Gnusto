@@ -280,7 +280,7 @@ struct TieActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > tie rope
-            You can't see any such thing.
+            You can’t see any such thing.
             """)
     }
 
@@ -329,7 +329,7 @@ struct TieActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > tie rope to post
-            You can't see any such thing.
+            You can’t see any such thing.
             """)
     }
 
@@ -366,7 +366,7 @@ struct TieActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > tie rope
-            It is pitch black. You can't see a thing.
+            It is pitch black. You can’t see a thing.
             """)
     }
 
@@ -519,7 +519,7 @@ struct TieActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > tie rope to rope
-            You can't tie long rope to itself.
+            You can’t tie long rope to itself.
             """)
     }
 
@@ -563,7 +563,7 @@ struct TieActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > tie guard to prisoner
-            You can't tie living beings together.
+            You can’t tie living beings together.
             """)
     }
 
@@ -619,7 +619,7 @@ struct TieActionHandlerTests {
     @Test("Handler exposes correct ActionIDs")
     func testActionIDs() async throws {
         let handler = TieActionHandler()
-        // TieActionHandler doesn't specify actions, so it should be empty
+        // TieActionHandler doesn’t specify actions, so it should be empty
         #expect(handler.actions.isEmpty)
     }
 

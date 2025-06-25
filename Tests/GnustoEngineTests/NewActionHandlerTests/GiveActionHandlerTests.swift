@@ -320,7 +320,7 @@ struct GiveActionHandlerTests {
             output,
             """
             > give gem to collector
-            You don't have that.
+            You don’t have that.
             """)
     }
 
@@ -417,7 +417,7 @@ struct GiveActionHandlerTests {
             output,
             """
             > give ring to person
-            You can't see any such thing.
+            You can’t see any such thing.
             """)
     }
 
@@ -464,7 +464,7 @@ struct GiveActionHandlerTests {
             output,
             """
             > give coin to stranger
-            It is pitch black. You can't see a thing.
+            It is pitch black. You can’t see a thing.
             """)
     }
 
@@ -815,7 +815,7 @@ struct GiveActionHandlerTests {
     @Test("Handler exposes correct ActionIDs")
     func testActionIDs() async throws {
         let handler = GiveActionHandler()
-        // GiveActionHandler doesn't specify actions, so it should be empty
+        // GiveActionHandler doesn’t specify actions, so it should be empty
         #expect(handler.actions.isEmpty)
     }
 

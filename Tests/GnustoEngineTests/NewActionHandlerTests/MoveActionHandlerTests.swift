@@ -42,7 +42,7 @@ struct MoveActionHandlerTests {
             output,
             """
             > move box
-            Moving the wooden box doesn't accomplish anything.
+            Moving the wooden box doesn’t accomplish anything.
             """)
 
         let finalState = try await engine.item("box")
@@ -82,7 +82,7 @@ struct MoveActionHandlerTests {
             output,
             """
             > shift stone
-            Moving the large stone doesn't accomplish anything.
+            Moving the large stone doesn’t accomplish anything.
             """)
     }
 
@@ -119,7 +119,7 @@ struct MoveActionHandlerTests {
             output,
             """
             > slide block
-            Moving the ice block doesn't accomplish anything.
+            Moving the ice block doesn’t accomplish anything.
             """)
     }
 
@@ -163,7 +163,7 @@ struct MoveActionHandlerTests {
             output,
             """
             > move chair to table
-            Moving the wooden chair doesn't accomplish anything.
+            Moving the wooden chair doesn’t accomplish anything.
             """)
     }
 
@@ -223,7 +223,7 @@ struct MoveActionHandlerTests {
             output,
             """
             > move nonexistent
-            You can't see any such thing.
+            You can’t see any such thing.
             """)
     }
 
@@ -266,7 +266,7 @@ struct MoveActionHandlerTests {
             output,
             """
             > move box
-            You can't see any such thing.
+            You can’t see any such thing.
             """)
     }
 
@@ -362,7 +362,7 @@ struct MoveActionHandlerTests {
             output,
             """
             > move box
-            It is pitch black. You can't see a thing.
+            It is pitch black. You can’t see a thing.
             """)
     }
 
@@ -408,7 +408,7 @@ struct MoveActionHandlerTests {
             output,
             """
             > move barrel
-            Moving the oak barrel doesn't accomplish anything.
+            Moving the oak barrel doesn’t accomplish anything.
             """)
     }
 
@@ -497,7 +497,7 @@ struct MoveActionHandlerTests {
             output,
             """
             > move book
-            Moving the heavy book doesn't accomplish anything.
+            Moving the heavy book doesn’t accomplish anything.
             """)
 
         let finalState = try await engine.item("book")
@@ -548,7 +548,7 @@ struct MoveActionHandlerTests {
             output,
             """
             > move gem
-            Moving the ruby gem doesn't accomplish anything.
+            Moving the ruby gem doesn’t accomplish anything.
             """)
 
         let finalState = try await engine.item("gem")
@@ -603,7 +603,7 @@ struct MoveActionHandlerTests {
             characterOutput,
             """
             > move wizard
-            Moving the old wizard doesn't accomplish anything.
+            Moving the old wizard doesn’t accomplish anything.
             """)
 
         // When - Move device
@@ -614,7 +614,7 @@ struct MoveActionHandlerTests {
             deviceOutput,
             """
             > move device
-            Moving the mechanical device doesn't accomplish anything.
+            Moving the mechanical device doesn’t accomplish anything.
             """)
 
         // When - Move scenery
@@ -625,7 +625,7 @@ struct MoveActionHandlerTests {
             sceneryOutput,
             """
             > move pillar
-            Moving the stone pillar doesn't accomplish anything.
+            Moving the stone pillar doesn’t accomplish anything.
             """)
     }
 
@@ -779,7 +779,7 @@ struct MoveActionHandlerTests {
     @Test("Handler exposes correct ActionIDs")
     func testActionIDs() async throws {
         let handler = MoveActionHandler()
-        // MoveActionHandler doesn't specify actions, so it should be empty
+        // MoveActionHandler doesn’t specify actions, so it should be empty
         #expect(handler.actions.isEmpty)
     }
 

@@ -42,7 +42,7 @@ struct RaiseActionHandlerTests {
             output,
             """
             > raise box
-            You can't lift the wooden box.
+            You can’t lift the wooden box.
             """)
 
         let finalState = try await engine.item("box")
@@ -82,7 +82,7 @@ struct RaiseActionHandlerTests {
             output,
             """
             > lift stone
-            You can't lift the heavy stone.
+            You can’t lift the heavy stone.
             """)
     }
 
@@ -119,7 +119,7 @@ struct RaiseActionHandlerTests {
             output,
             """
             > hoist beam
-            You can't lift the steel beam.
+            You can’t lift the steel beam.
             """)
     }
 
@@ -179,7 +179,7 @@ struct RaiseActionHandlerTests {
             output,
             """
             > raise nonexistent
-            You can't see any such thing.
+            You can’t see any such thing.
             """)
     }
 
@@ -222,7 +222,7 @@ struct RaiseActionHandlerTests {
             output,
             """
             > raise box
-            You can't see any such thing.
+            You can’t see any such thing.
             """)
     }
 
@@ -318,7 +318,7 @@ struct RaiseActionHandlerTests {
             output,
             """
             > raise box
-            It is pitch black. You can't see a thing.
+            It is pitch black. You can’t see a thing.
             """)
     }
 
@@ -364,7 +364,7 @@ struct RaiseActionHandlerTests {
             output,
             """
             > raise crate
-            You can't lift the wooden crate.
+            You can’t lift the wooden crate.
             """)
     }
 
@@ -453,7 +453,7 @@ struct RaiseActionHandlerTests {
             output,
             """
             > raise weight
-            You can't lift the iron weight.
+            You can’t lift the iron weight.
             """)
 
         let finalState = try await engine.item("weight")
@@ -502,7 +502,7 @@ struct RaiseActionHandlerTests {
             output,
             """
             > raise anvil
-            You can't lift the iron anvil.
+            You can’t lift the iron anvil.
             """)
 
         let finalState = try await engine.item("anvil")
@@ -557,7 +557,7 @@ struct RaiseActionHandlerTests {
             furnitureOutput,
             """
             > raise chair
-            You can't lift the wooden chair.
+            You can’t lift the wooden chair.
             """)
 
         // When - Raise character
@@ -568,7 +568,7 @@ struct RaiseActionHandlerTests {
             characterOutput,
             """
             > raise giant
-            You can't lift the sleeping giant.
+            You can’t lift the sleeping giant.
             """)
 
         // When - Raise device
@@ -579,7 +579,7 @@ struct RaiseActionHandlerTests {
             deviceOutput,
             """
             > raise machine
-            You can't lift the heavy machine.
+            You can’t lift the heavy machine.
             """)
     }
 
@@ -622,7 +622,7 @@ struct RaiseActionHandlerTests {
             featherOutput,
             """
             > raise feather
-            You can't lift the small feather.
+            You can’t lift the small feather.
             """)
 
         // When - Raise large item
@@ -633,7 +633,7 @@ struct RaiseActionHandlerTests {
             boulderOutput,
             """
             > raise boulder
-            You can't lift the massive boulder.
+            You can’t lift the massive boulder.
             """)
     }
 
@@ -670,7 +670,7 @@ struct RaiseActionHandlerTests {
             raiseOutput,
             """
             > raise barrel
-            You can't lift the oak barrel.
+            You can’t lift the oak barrel.
             """)
 
         // Test LIFT
@@ -680,7 +680,7 @@ struct RaiseActionHandlerTests {
             liftOutput,
             """
             > lift barrel
-            You can't lift the oak barrel.
+            You can’t lift the oak barrel.
             """)
 
         // Test HOIST
@@ -690,7 +690,7 @@ struct RaiseActionHandlerTests {
             hoistOutput,
             """
             > hoist barrel
-            You can't lift the oak barrel.
+            You can’t lift the oak barrel.
             """)
     }
 
@@ -699,7 +699,7 @@ struct RaiseActionHandlerTests {
     @Test("Handler exposes correct ActionIDs")
     func testActionIDs() async throws {
         let handler = RaiseActionHandler()
-        // RaiseActionHandler doesn't specify actions, so it should be empty
+        // RaiseActionHandler doesn’t specify actions, so it should be empty
         #expect(handler.actions.isEmpty)
     }
 

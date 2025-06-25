@@ -121,7 +121,7 @@ struct EnterActionHandlerTests {
             output,
             """
             > enter cabin
-            You can't see any such thing.
+            You can’t see any such thing.
             """)
     }
 
@@ -158,7 +158,7 @@ struct EnterActionHandlerTests {
             output,
             """
             > enter rock
-            You can't enter the large rock.
+            You can’t enter the large rock.
             """)
     }
 
@@ -197,7 +197,7 @@ struct EnterActionHandlerTests {
             output,
             """
             > enter tent
-            It is pitch black. You can't see a thing.
+            It is pitch black. You can’t see a thing.
             """)
     }
 
@@ -520,7 +520,7 @@ struct EnterActionHandlerTests {
     @Test("Handler exposes correct ActionIDs")
     func testActionIDs() async throws {
         let handler = EnterActionHandler()
-        // EnterActionHandler doesn't specify actions, so it should be empty
+        // EnterActionHandler doesn’t specify actions, so it should be empty
         #expect(handler.actions.isEmpty)
     }
 

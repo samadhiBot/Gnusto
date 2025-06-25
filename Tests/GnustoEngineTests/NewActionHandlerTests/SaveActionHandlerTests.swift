@@ -183,7 +183,7 @@ struct SaveActionHandlerTests {
             """)
     }
 
-    @Test("SAVE doesn't modify game state")
+    @Test("SAVE doesn’t modify game state")
     func testSaveNoStateChanges() async throws {
         // Given
         let testRoom = Location(
@@ -287,7 +287,7 @@ struct SaveActionHandlerTests {
     @Test("Handler exposes correct ActionIDs")
     func testActionIDs() async throws {
         let handler = SaveActionHandler()
-        // SaveActionHandler doesn't specify actions, so it should be empty
+        // SaveActionHandler doesn’t specify actions, so it should be empty
         #expect(handler.actions.isEmpty)
     }
 

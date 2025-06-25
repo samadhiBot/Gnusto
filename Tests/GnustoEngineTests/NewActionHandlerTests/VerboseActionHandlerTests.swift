@@ -143,7 +143,7 @@ struct VerboseActionHandlerTests {
     @Test("Handler exposes correct ActionIDs")
     func testActionIDs() async throws {
         let handler = VerboseActionHandler()
-        // VerboseActionHandler doesn't specify actions, so it should be empty
+        // VerboseActionHandler doesn’t specify actions, so it should be empty
         #expect(handler.actions.isEmpty)
     }
 

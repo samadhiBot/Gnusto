@@ -260,7 +260,7 @@ struct BlowActionHandlerTests {
             You blow on the lit candle, but it doesn’t go out.
             """)
 
-        // Note: The default handler doesn't extinguish the flame.
+        // Note: The default handler doesn’t extinguish the flame.
         // A custom ItemEventHandler would be needed for that.
         let finalState = try await engine.item("candle")
         #expect(finalState.hasFlag(.isLit) == true)

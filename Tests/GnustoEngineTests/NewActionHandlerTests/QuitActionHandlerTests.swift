@@ -549,7 +549,7 @@ struct QuitActionHandlerTests {
     @Test("Handler exposes correct ActionIDs")
     func testActionIDs() async throws {
         let handler = QuitActionHandler()
-        // QuitActionHandler doesn't specify actions, so it should be empty
+        // QuitActionHandler doesn’t specify actions, so it should be empty
         #expect(handler.actions.isEmpty)
     }
 

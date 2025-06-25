@@ -114,7 +114,7 @@ struct PullActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > pull lever
-            You can't see any such thing.
+            You can’t see any such thing.
             """)
     }
 
@@ -150,7 +150,7 @@ struct PullActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > pull chain
-            It is pitch black. You can't see a thing.
+            It is pitch black. You can’t see a thing.
             """)
     }
 
@@ -226,7 +226,7 @@ struct PullActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > pull rock
-            You can't pull the heavy rock.
+            You can’t pull the heavy rock.
             """)
 
         let finalState = try await engine.item("rock")

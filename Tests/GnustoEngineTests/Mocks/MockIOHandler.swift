@@ -140,7 +140,7 @@ final class MockIOHandler: IOHandler {
                         actualTranscript += "\n"
                         i += 1 // Skip the response since we handled it
                     } else {
-                        // For custom prompts, keep response separate but don't add extra newline
+                        // For custom prompts, keep response separate but don’t add extra newline
                         actualTranscript += response.text
                         if response.newline {
                             actualTranscript += "\n"

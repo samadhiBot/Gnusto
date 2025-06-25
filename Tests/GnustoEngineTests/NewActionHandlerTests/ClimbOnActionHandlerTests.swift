@@ -42,7 +42,7 @@ struct ClimbOnActionHandlerTests {
             output,
             """
             > climb on table
-            You can't climb on the wooden table.
+            You can’t climb on the wooden table.
             """)
 
         let finalState = try await engine.item("table")
@@ -82,7 +82,7 @@ struct ClimbOnActionHandlerTests {
             output,
             """
             > get on chair
-            You can't climb on the comfortable chair.
+            You can’t climb on the comfortable chair.
             """)
     }
 
@@ -119,7 +119,7 @@ struct ClimbOnActionHandlerTests {
             output,
             """
             > sit on bench
-            You can't climb on the stone bench.
+            You can’t climb on the stone bench.
             """)
     }
 
@@ -156,7 +156,7 @@ struct ClimbOnActionHandlerTests {
             output,
             """
             > mount horse
-            You can't climb on the white horse.
+            You can’t climb on the white horse.
             """)
     }
 
@@ -230,7 +230,7 @@ struct ClimbOnActionHandlerTests {
             output,
             """
             > climb on table
-            You can't see any such thing.
+            You can’t see any such thing.
             """)
     }
 
@@ -268,7 +268,7 @@ struct ClimbOnActionHandlerTests {
             output,
             """
             > climb on table
-            It is pitch black. You can't see a thing.
+            It is pitch black. You can’t see a thing.
             """)
     }
 
@@ -311,7 +311,7 @@ struct ClimbOnActionHandlerTests {
             output,
             """
             > climb on stool
-            You can't climb on the wooden stool.
+            You can’t climb on the wooden stool.
             """)
     }
 
@@ -355,7 +355,7 @@ struct ClimbOnActionHandlerTests {
             output1,
             """
             > climb on rock
-            You can't climb on the large rock.
+            You can’t climb on the large rock.
             """)
 
         // When: Climb on tree
@@ -367,7 +367,7 @@ struct ClimbOnActionHandlerTests {
             output2,
             """
             > sit on tree
-            You can't climb on the tall tree.
+            You can’t climb on the tall tree.
             """)
     }
 
@@ -405,7 +405,7 @@ struct ClimbOnActionHandlerTests {
             output,
             """
             > climb on box
-            You can't climb on the small box.
+            You can’t climb on the small box.
             """)
 
         let finalState = try await engine.item("box")
@@ -417,7 +417,7 @@ struct ClimbOnActionHandlerTests {
     @Test("Handler exposes correct ActionIDs")
     func testActionIDs() async throws {
         let handler = ClimbOnActionHandler()
-        // ClimbOnActionHandler doesn't specify actions, so it should be empty
+        // ClimbOnActionHandler doesn’t specify actions, so it should be empty
         #expect(handler.actions.isEmpty)
     }
 

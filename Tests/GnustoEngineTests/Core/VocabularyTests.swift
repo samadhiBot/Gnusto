@@ -9,21 +9,21 @@ struct VocabularyTests {
     @Test("Default verbSynonyms mapping is correct")
     func testDefaultVerbSynonyms() throws {
         // Arrange: Get the default vocabulary used by MinimalGame
-        // Note: We access defaultVerbs directly as MinimalGame isn't customizable here.
+        // Note: We access defaultVerbs directly as MinimalGame isn’t customizable here.
         let defaultActionHandlers = Array(GameEngine.defaultActionHandlers.values)
         let allVerbs = GameEngine.extractVerbDefinitions(from: defaultActionHandlers)
         let defaultGameVocabulary = Vocabulary.build(verbs: allVerbs)
         let synonyms = defaultGameVocabulary.verbSynonyms
 
         // — Turn Off —
-        #expect(synonyms["turn off"] == [.turnOff], "Primary 'turn off' should map to itself")
-        #expect(synonyms["extinguish"] == [.turnOff], "'extinguish' should map to 'turn off'")
-        #expect(synonyms["douse"] == [.turnOff], "'douse' should map to 'turn off'")
-        #expect(synonyms["switch off"] == [.turnOff], "'switch off' should map to 'turn off'")
-        #expect(synonyms["blow out"] == [.turnOff], "'blow out' should map to 'turn off'")
+        #expect(synonyms["turn off"] == [.turnOff], "Primary ’turn off' should map to itself")
+        #expect(synonyms["extinguish"] == [.turnOff], "'extinguish' should map to ’turn off'")
+        #expect(synonyms["douse"] == [.turnOff], "'douse' should map to ’turn off'")
+        #expect(synonyms["switch off"] == [.turnOff], "'switch off' should map to ’turn off'")
+        #expect(synonyms["blow out"] == [.turnOff], "'blow out' should map to ’turn off'")
 
         // — Turn On —
-        #expect(synonyms["turn on"] == [.turnOn], "Primary 'turn on' should map to itself")
+        #expect(synonyms["turn on"] == [.turnOn], "Primary ’turn on' should map to itself")
         // "light" should map to multiple verbs since it's a synonym for both burn and turnOn
         let lightMappings = synonyms["light"]
         #expect(lightMappings != nil, "The word 'light' should have verb mappings")
@@ -31,7 +31,7 @@ struct VocabularyTests {
             #expect(mappings.contains(.turnOn), "'light' should map to .turnOn verb")
             #expect(mappings.contains(.burn), "'light' should also map to .burn verb as a synonym")
         }
-        #expect(synonyms["switch on"] == [.turnOn], "'switch on' should map to 'turn on'")
+        #expect(synonyms["switch on"] == [.turnOn], "'switch on' should map to ’turn on'")
 
         // — Other samples —
         // "look" should map to multiple verbs since it's a synonym for lookInside and lookUnder
@@ -91,7 +91,7 @@ struct VocabularyTests {
         }
 
         // For verification, check that "sit" (synonym for climbOn) works correctly
-        // since it doesn't conflict with an exact ID match
+        // since it doesn’t conflict with an exact ID match
         let sitMappings = synonyms["sit"]
         #expect(sitMappings == [.climbOn], "'sit' should map only to .climbOn")
     }

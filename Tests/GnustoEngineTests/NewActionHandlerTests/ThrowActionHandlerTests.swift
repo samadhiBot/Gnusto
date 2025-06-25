@@ -333,7 +333,7 @@ struct ThrowActionHandlerTests {
             output,
             """
             > throw ball
-            You aren't holding the rubber ball.
+            You aren’t holding the rubber ball.
             """)
     }
 
@@ -362,7 +362,7 @@ struct ThrowActionHandlerTests {
             output,
             """
             > throw nonexistent
-            You can't see any such thing.
+            You can’t see any such thing.
             """)
     }
 
@@ -400,7 +400,7 @@ struct ThrowActionHandlerTests {
             output,
             """
             > throw ball at nonexistent
-            You can't see any such thing.
+            You can’t see any such thing.
             """)
     }
 
@@ -451,7 +451,7 @@ struct ThrowActionHandlerTests {
             output,
             """
             > throw ball at target
-            You can't see any such thing.
+            You can’t see any such thing.
             """)
     }
 
@@ -480,7 +480,7 @@ struct ThrowActionHandlerTests {
             output,
             """
             > throw me
-            You can't throw yourself.
+            You can’t throw yourself.
             """)
     }
 
@@ -518,7 +518,7 @@ struct ThrowActionHandlerTests {
             output,
             """
             > throw ball at me
-            You can't throw at that.
+            You can’t throw at that.
             """)
     }
 
@@ -557,7 +557,7 @@ struct ThrowActionHandlerTests {
             output,
             """
             > throw ball
-            It is pitch black. You can't see a thing.
+            It is pitch black. You can’t see a thing.
             """)
     }
 
@@ -780,7 +780,7 @@ struct ThrowActionHandlerTests {
     @Test("Handler exposes correct ActionIDs")
     func testActionIDs() async throws {
         let handler = ThrowActionHandler()
-        // ThrowActionHandler doesn't specify actions, so it should be empty
+        // ThrowActionHandler doesn’t specify actions, so it should be empty
         #expect(handler.actions.isEmpty)
     }
 

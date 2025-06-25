@@ -150,7 +150,7 @@ struct CryActionHandlerTests {
     @Test("Handler exposes correct ActionIDs")
     func testActionIDs() async throws {
         let handler = CryActionHandler()
-        // CryActionHandler doesn't specify actions, so it should be empty
+        // CryActionHandler doesn’t specify actions, so it should be empty
         #expect(handler.actions.isEmpty)
     }
 

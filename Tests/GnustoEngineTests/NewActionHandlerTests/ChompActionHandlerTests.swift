@@ -150,7 +150,7 @@ struct ChompActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > chomp apple
-            You can't see any such thing.
+            You can’t see any such thing.
             """)
     }
 
@@ -186,7 +186,7 @@ struct ChompActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > chomp apple
-            It is pitch black. You can't see a thing.
+            It is pitch black. You can’t see a thing.
             """)
     }
 
@@ -290,7 +290,7 @@ struct ChompActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > chomp guard
-            I don't think the castle guard would appreciate that.
+            I don’t think the castle guard would appreciate that.
             """)
 
         let finalState = try await engine.item("castleGuard")
@@ -340,7 +340,7 @@ struct ChompActionHandlerTests {
     @Test("Handler exposes correct ActionIDs")
     func testActionIDs() async throws {
         let handler = ChompActionHandler()
-        // ChompActionHandler doesn't specify actions, so it should be empty
+        // ChompActionHandler doesn’t specify actions, so it should be empty
         #expect(handler.actions.isEmpty)
     }
 

@@ -190,7 +190,7 @@ struct PushActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > push button
-            You can't see any such thing.
+            You can’t see any such thing.
             """)
     }
 
@@ -225,7 +225,7 @@ struct PushActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > push lever
-            It is pitch black. You can't see a thing.
+            It is pitch black. You can’t see a thing.
             """)
     }
 

@@ -150,7 +150,7 @@ struct YellActionHandlerTests {
     @Test("Handler exposes correct ActionIDs")
     func testActionIDs() async throws {
         let handler = YellActionHandler()
-        // YellActionHandler doesn't specify actions, so it should be empty
+        // YellActionHandler doesn’t specify actions, so it should be empty
         #expect(handler.actions.isEmpty)
     }
 

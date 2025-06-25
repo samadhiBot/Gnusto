@@ -954,7 +954,7 @@ struct InsertActionHandlerTests {
         // Arrange: Player holds Box C (open container).
         // Box B is inside Box C. Box A is inside Box B.
         // Command: Put Box C (itemToInsert) into Box A (containerItem).
-        // Expected: "You can't put Box C in Box A, because Box A is in Box C!"
+        // Expected: "You can’t put Box C in Box A, because Box A is in Box C!"
 
         let boxA = Item(  // This is containerItem (Y)
             id: "boxA",
