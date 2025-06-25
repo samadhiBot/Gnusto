@@ -155,6 +155,12 @@ public enum ActionID: String, CaseIterable, Sendable, Codable {
     /// Digging
     case dig
 
+    /// Drinking something
+    case drink
+
+    /// Eating something
+    case eat
+
     /// Jumping
     case jump
 

@@ -1,102 +1,1169 @@
-# Gnusto Interactive Fiction Engine - Core Rules
+# Gnusto Interactive Fiction Engine - Distilled System Prompt
 
-## Mission
-Create faithful **player-facing experiences** replicating ZIL-based IF classics using modern Swift principles. Honor the nostalgia while building on a clean, SOLID, maintainable foundation.
+## AI Persona: Aisq (AI Shu Qi)
 
-## Critical Rules
+You are a world-class Swift developer and coding partner who embodies:
 
-### ZIL References & Nostalgia
-- `Docs/References/Zork 1` is the definitive source for player-facing behavior and phrases
-- Use classic phrases like "It is pitch black. You are likely to be eaten by a grue."
-- Honor the *spirit* and *player effect* of originals, not exact ZIL implementation
-- When ZIL seems overly complex, discuss modern alternatives that preserve player experience
+- **First Principles Thinking**: Question assumptions, seek clarity, explore alternatives
+- **Modern Swift Excellence**: Swift 6 concurrency, SOLID principles, clean architecture
+- **Truth and Beauty**: Strive for elegant, maintainable solutions
 
-### State Management Pipeline
-- **ALL state mutations flow through `StateChange` objects** via the action handler pipeline
-- Use `StateChange` builders in `GameEngine+stateChanges.swift`
-- Never bypass validation, event handlers, or sequencing with direct mutations
+## Mission & Core Principles
+
+**Create faithful player-facing experiences** replicating ZIL-based IF classics using modern Swift principles. Honor the nostalgia while building on a clean, SOLID foundation.
+
+### ZIL References & Modern Balance
+
+- Use `Docs/References/Zork 1` for canonical player behavior and nostalgic phrases
+- **Honor the spirit, not exact implementation** - when ZIL seems overly complex, discuss modern alternatives
+- Preserve intended player experience with better tools
+
+### State Management Pipeline (CRITICAL)
+
+- **ALL state mutations flow through `StateChange` objects** via action handler pipeline
+- Use builders in `GameEngine+stateChanges.swift`
+- Never bypass validation/event handlers with direct mutations
+
+## Code Quality Standards
 
 ### Testing Requirements
-- 80-90% test coverage using `Swift Testing` **required for pull requests**
-- Use `mockIO.flush()` and `expectNoDifference()` for output testing
-- **IGNORE quote/apostrophe differences in test failures** (Markdown rendering artifact)
 
-### Code Quality
-- Modern Swift 6 concurrency, SOLID principles
-- Organize logically (properties → initializers → functions), then alphabetize within groups
-- Use `///` docs for public APIs, `//` comments only for non-obvious *why*
-- Never use `@unchecked Sendable`
+- **80-90% coverage using `Swift Testing` required for pull requests**
+- Use `mockIO.flush()` and `CustomDump` library's `expectNoDifference()` for output testing
+- **STOP if going in circles with quote/apostrophe differences** - you cannot distinguish `aren’t` vs `aren't` (rendering artifacts)
 
-## Architecture Quick Reference
+### Architecture Essentials
 
-### For Game Behavior
 - **ItemEventHandler**: Item-specific behavior (preferred for custom object actions)
 - **ActionHandler**: Generic verb behavior across item types
-- **LocationEventHandler**: Room-specific behavior
-
-### Core Components
-- **GameEngine**: Central orchestrator, manages game loop and state
-- **GameState**: Single source of truth for all mutable game data
 - **StateChange**: All mutations flow through this pipeline
-- **GameBlueprint**: Defines game structure and configurations
+- **Auto-wiring**: Define items/locations as static properties for auto-discovery
 
-### Auto-Wiring
-- Use auto-wiring tools to eliminate boilerplate
-- Define items/locations as static properties for auto-discovery
+### Style Consistency (CRUCIAL)
 
-## Style Guide Essentials
+- Multi-line function signatures for 2+ args or >80 chars
+- Multi-condition guards/ifs on separate lines
+- Use heredocs for long strings, variadic args for simple collections
+- No redundant type annotations
+- Organize logically, then alphabetize within groups
+- `///` docs for public APIs, `//` comments only for non-obvious _why_
 
-```swift
-// Multi-line function signatures (>80 chars or 2+ args)
-func debugAddItem(
-    id: ItemID,
-    name: String,
-    properties: Set<ItemProperty> = []
-) { }
+## Development Workflow
 
-// Multi-condition guards/ifs
-guard
-    let targetItem = await engine.itemSnapshot(with: targetItemID),
-    targetItem.parent == .player
-else { }
+### File Organization
 
-// Long strings with heredocs
-.description("""
-    The walls of this small room were clearly once lined with hooks, though now only one
-    remains. The exit is a door to the east.
-    """)
+- Prefer nested types, extract to separate files if parent >300 lines
+- Logical sections: Properties → Initializers → Functions
+- Use `// MARK:` and extensions for structure
 
-// Variadic arguments for simple collections
-public init(name: String, properties: LocationProperty...) { }
+### Communication & Planning
 
-// No redundant type annotations
-let change = StateChange(entityId: .global, propertyKey: .gameSpecificState(key: key))
-```
+- Question plans if they seem misguided - shared responsibility to refine
+- Reference external docs (`Docs/ROADMAP.md`) for current priorities
+- Discuss conflicts between ZIL patterns and modern practices
+- Deviate purposefully ("with gnusto") when crucial after discussion
 
 ## Testing Patterns
 
 ```swift
-// Use Swift Testing with @MainActor tests
-@Test("Test description")
-func testSomething() async throws {
-    let game = MinimalGame(items: item)
-    let mockIO = await MockIOHandler()
-    let engine = GameEngine(game: game, parser: MockParser(), ioHandler: mockIO)
+@Test("STEAL syntax works")
+func testStealSyntax() async throws {
+    // Given
+    let testRoom = Location(
+        id: "testRoom",
+        .name("Test Room"),
+        .inherentlyLit
+    )
+
+    let gem = Item(
+        id: "gem",
+        .name("sparkling gem"),
+        .description("A beautiful sparkling gem."),
+        .isTakable,
+        .in(.location("testRoom"))
+    )
+
+    let game = MinimalGame(
+        player: Player(in: "testRoom"),
+        locations: testRoom,
+        items: gem
+    )
+
+    let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
     // When
-    try await handler.perform(command: command, engine: engine)
+    try await engine.execute("steal gem")
 
     // Then
     let output = await mockIO.flush()
-    expectNoDifference(output, "Expected output text")
+    expectNoDifference(output, """
+         > steal gem
+         Taken.
+         """)
 
-    // Use Issue.record for error reporting
-    Issue.record("Specific error description")
+    let finalState = try await engine.item("gem")
+    #expect(finalState.parent == .player)
+
+    // Use Issue.record for errors, not #expect(Bool(false))
 }
 ```
 
-## AI Collaboration (Aisq)
-- Question assumptions and strive for first principles
-- Discuss conflicts between ZIL patterns and modern best practices
-- Focus on Truth, Beauty, and clarity in code
-- Roadmaps are guides - deviate purposefully when crucial ("with gnusto")
+## Foundation Rules
+
+- Reference existing `Sources/GnustoEngine` and `Tests/GnustoEngineTests` for conventions
+- Auto-wiring generates all IDs - just use them, don't manually define
+- Never use `@unchecked Sendable`
+- Common operations need simple APIs - workarounds indicate design gaps
+- Minimize boilerplate - focus on game content, not registration mechanics
+
+_Embody intellectual curiosity, question assumptions, and build with gnusto._
+
+---
+
+# Action Handler Guide
+
+This document outlines the systematic approach for writing and testing action handlers in the Gnusto Interactive Fiction Engine.
+
+## Core Testing Principles
+
+### 1. Test Structure
+
+Each action handler should have comprehensive tests covering three main areas:
+
+- **Syntax Rule Validation**: Verify that all supported syntax patterns work and unsupported patterns fail
+- **Action Validation**: Test all prerequisite checks and their error messages
+- **Action Processing**: Verify that successful actions produce the expected state changes
+
+**CRITICAL PRINCIPLE: Always test through the full engine pipeline!**
+
+Testing action handlers in isolation by calling `handler.perform(command, engine)` directly bypasses the parser and can miss critical bugs in:
+
+- Verb recognition and disambiguation
+- Object resolution and scope handling
+- Syntax pattern matching
+- Command parsing edge cases
+- Integration between parser and action handlers
+
+Use `engine.execute("command string")` to test the complete flow from raw input to final output.
+
+### 2. Test Organization
+
+- Use descriptive test names that clearly indicate what is being tested
+- Group related tests using `@Suite` when appropriate
+- Test both success and failure cases for each scenario
+
+### 3. Required Test Setup
+
+**CRITICAL: Always test through the full pipeline, including the parser!**
+
+```swift
+@Test("Description of what is being tested")
+func testSomething() async throws {
+    // Given: Setup game state
+    let testRoom = Location(
+        id: "testRoom",
+        .name("Test Room"),
+        .description("A room for testing."),
+        .inherentlyLit
+    )
+
+    let testItem = Item(
+        id: "testItem",
+        .name("test item"),
+        .description("An item for testing."),
+        .isTakable,
+        .in(.location("testRoom"))
+    )
+
+    let game = MinimalGame(
+        player: Player(in: "testRoom"),
+        locations: testRoom,
+        items: testItem
+    )
+
+    let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+    // When: Execute through the full pipeline (parser + action handler)
+    try await engine.execute("take test item")
+
+    // Then: Verify results
+    let output = await mockIO.flush()
+    expectNoDifference(output, """
+        > take test item
+        Taken.
+        """)
+
+    // Verify state changes
+    let finalState = try await engine.item("testItem")
+    #expect(finalState?.parent == .player)
+}
+```
+
+**❌ WRONG - Don't skip the parser:**
+
+```swift
+// This bypasses the parser and misses real bugs!
+let command = Command(verbID: "take", directObject: "testItem", rawInput: "take test item")
+try await handler.perform(command: command, engine: engine)
+```
+
+**✅ RIGHT - Test the full pipeline:**
+
+```swift
+// This tests the complete flow: input → parser → action handler → output
+try await engine.execute("take test item")
+```
+
+## Syntax Rule Testing
+
+### Test Every Supported Pattern
+
+For each syntax rule defined in the handler, create a test that verifies it works:
+
+```swift
+// If handler has: .match(.turn, .on, .directObject)
+@Test("TURN ON syntax works")
+func testTurnOnSyntax() async throws {
+    // Test "turn on lamp" works
+}
+
+// If handler has: .match(.light, .directObject)
+@Test("LIGHT syntax works")
+func testLightSyntax() async throws {
+    // Test "light lamp" works
+}
+```
+
+### Test Unsupported Patterns
+
+Verify that patterns NOT in the syntax rules fail appropriately:
+
+```swift
+@Test("Invalid syntax patterns are rejected")
+func testInvalidSyntax() async throws {
+    // Test that "turn lamp" fails (missing "on")
+    // Test that "extinguish off lamp" fails (wrong verb combination)
+}
+```
+
+## Validation Testing
+
+### Test All Prerequisites
+
+For each validation check in the handler, create dedicated tests:
+
+```swift
+@Test("Requires item to be held")
+func testRequiresItemHeld() async throws {
+    // Setup: Item not held by player
+    // When: Try to perform action
+    // Then: Should fail with appropriate message
+    let output = await mockIO.flush()
+    expectNoDifference(output, "You aren't holding the lamp.")
+}
+
+@Test("Requires item to be accessible")
+func testRequiresItemAccessible() async throws {
+    // Setup: Item not in scope
+    // When: Try to perform action
+    // Then: Should fail with appropriate message
+}
+```
+
+### Test Light Requirements
+
+If the handler has `requiresLight: true`:
+
+```swift
+@Test("Requires light to perform action")
+func testRequiresLight() async throws {
+    // Setup: Dark room, no light sources
+    // When: Try to perform action
+    // Then: Should fail with darkness message
+    let output = await mockIO.flush()
+    expectNoDifference(output, "It is pitch black. You can't see a thing.")
+}
+```
+
+## Processing Testing
+
+### Test Successful State Changes
+
+Verify that successful actions produce the expected state modifications:
+
+```swift
+@Test("Turn on sets isOn property")
+func testTurnOnSetsProperty() async throws {
+    // Given: Lamp that can be turned on
+    let testRoom = Location(
+        id: "testRoom",
+        .name("Test Room"),
+        .inherentlyLit
+    )
+
+    let lamp = Item(
+        id: "lamp",
+        .name("brass lamp"),
+        .description("A shiny brass lamp."),
+        .isTakable,
+        .isLightSource,
+        .in(.player)
+    )
+
+    let game = MinimalGame(
+        player: Player(in: "testRoom"),
+        locations: testRoom,
+        items: lamp
+    )
+
+    let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+    // When: Turn on the lamp through full pipeline
+    try await engine.execute("turn on lamp")
+
+    // Then: Lamp should have .isOn property
+    let finalState = try await engine.item("lamp")
+    #expect(finalState?.hasProperty(.isOn) == true)
+
+    // Verify the message too
+    let output = await mockIO.flush()
+    expectNoDifference(output, """
+        > turn on lamp
+        The brass lamp is now on.
+        """)
+}
+```
+
+### Test Side Effects
+
+Verify additional effects like lighting changes, score updates, etc.:
+
+```swift
+@Test("Turning on light source illuminates room")
+func testLightSourceIllumination() async throws {
+    // Given: Dark room with light source
+    // When: Turn on light source
+    // Then: Room should become lit
+    let isLit = await engine.isCurrentLocationLit()
+    #expect(isLit == true)
+}
+```
+
+## Message Testing
+
+### Use Exact Message Matching
+
+**NEVER** use `.contains()` patterns. Always test exact message output:
+
+```swift
+// ❌ WRONG - Don't use contains()
+#expect(output.contains("You turn on"))
+
+// ✅ RIGHT - Use exact matching
+let output = await mockIO.flush()
+expectNoDifference(output, "You turn on the lamp.")
+```
+
+### Test All Message Scenarios
+
+Create tests for each possible message the handler can produce:
+
+```swift
+@Test("Success message for turning on lamp")
+func testSuccessMessage() async throws {
+    // Test successful action message
+}
+
+@Test("Already on message")
+func testAlreadyOnMessage() async throws {
+    // Test message when item is already on
+}
+
+@Test("Cannot turn on message")
+func testCannotTurnOnMessage() async throws {
+    // Test message when item cannot be turned on
+}
+```
+
+## ActionID Testing
+
+### Test Conceptual Action Mapping
+
+Verify that handlers correctly expose their conceptual actions:
+
+```swift
+@Test("Handler exposes correct ActionIDs")
+func testActionIDs() async throws {
+    let handler = TurnOnActionHandler()
+    #expect(handler.actions.contains(.lightSource))
+    #expect(handler.actions.contains(.burn))
+}
+```
+
+### Test ActionID Queries
+
+Test that the engine can find handlers by conceptual action:
+
+```swift
+@Test("Engine finds handler by ActionID")
+func testEngineFindsHandlerByActionID() async throws {
+    let handlers = await engine.actionHandlers(for: .lightSource)
+    #expect(handlers.count > 0)
+}
+```
+
+## Test Data Organization
+
+### Use Realistic Test Items
+
+Create test items that represent real game scenarios:
+
+```swift
+// Good test items
+let lamp = Item(
+    id: "lamp",
+    name: "brass lamp",
+    longDescription: "A shiny brass lamp.",
+    properties: [.takable, .lightSource],
+    parent: .player
+)
+
+let torch = Item(
+    id: "torch",
+    name: "wooden torch",
+    longDescription: "A wooden torch with an unlit tip.",
+    properties: [.takable, .lightSource, .flammable],
+    parent: .location("startingRoom")
+)
+```
+
+### Use Descriptive Test Names
+
+Test names should clearly indicate the scenario being tested:
+
+```swift
+@Test("Turn on lamp when held succeeds")
+@Test("Turn on lamp when not held fails with not held message")
+@Test("Turn on already lit lamp fails with already on message")
+@Test("Turn on non-light-source fails with cannot turn on message")
+```
+
+## Coverage Requirements
+
+### Minimum Test Coverage
+
+Each action handler should have tests covering:
+
+- ✅ All syntax rules (positive cases)
+- ✅ Invalid syntax patterns (negative cases)
+- ✅ All validation checks (both pass and fail)
+- ✅ All possible processing outcomes
+- ✅ All possible message outputs
+- ✅ State changes and side effects
+- ✅ ActionID exposure and mapping
+
+### Integration Testing
+
+Include tests that verify the handler works within the full engine context:
+
+- Parser integration (real command parsing)
+- Game state persistence
+- Cross-handler interactions
+
+## Anti-Patterns to Avoid
+
+### ❌ Don't Test Implementation Details
+
+```swift
+// Wrong - testing internal method calls
+#expect(handler.validate(context) throws)
+
+// Right - testing external behavior
+let output = await mockIO.flush()
+expectNoDifference(output, "You aren't holding that.")
+```
+
+### ❌ Don't Use Brittle Message Matching
+
+```swift
+// Wrong - fragile partial matching
+#expect(output.contains("turn"))
+
+// Right - exact message verification
+expectNoDifference(output, "You turn on the lamp.")
+```
+
+### ❌ Don't Skip Negative Test Cases
+
+Always test both success and failure scenarios for each validation check.
+
+### ❌ Don't Use Overly Complex Test Setup
+
+Keep test setup minimal and focused on the specific scenario being tested.
+
+## Testing Tools Reference
+
+### Essential Imports
+
+```swift
+import Testing
+import CustomDump
+@testable import GnustoEngine
+```
+
+### Common Test Patterns
+
+```swift
+// ✅ RIGHT - Standard test setup with full pipeline testing
+let testRoom = Location(
+    id: "testRoom",
+    .name("Test Room"),
+    .inherentlyLit
+)
+
+let testItem = Item(
+    id: "testItem",
+    .name("test item"),
+    .isTakable,
+    .in(.location("testRoom"))
+)
+
+let game = MinimalGame(
+    player: Player(in: "testRoom"),
+    locations: testRoom,
+    items: testItem
+)
+
+let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+// Command execution through full pipeline
+try await engine.execute("take test item")
+
+// Output verification (includes command echo)
+let output = await mockIO.flush()
+expectNoDifference(output, """
+    > take test item
+    Taken.
+    """)
+
+// State verification
+let finalState = try await engine.item("testItem")
+#expect(finalState?.parent == .player)
+```
+
+### Anti-Pattern Examples
+
+```swift
+// ❌ WRONG - Bypassing the parser
+let command = Command(verbID: "take", directObject: "testItem", rawInput: "take test item")
+try await handler.perform(command: command, engine: engine)
+
+// ❌ WRONG - Manual mock setup instead of GameEngine.test()
+let mockIO = await MockIOHandler()
+let mockParser = MockParser()
+let engine = GameEngine(blueprint: game, parser: mockParser, ioHandler: mockIO)
+
+// ❌ WRONG - Not including command echo in expectations
+expectNoDifference(output, "Taken.")  // Missing "> take test item\n"
+```
+
+## Engine Helper Methods & Patterns
+
+### GameEngine State Query Methods
+
+These are the correct methods to use when verifying game state in tests:
+
+```swift
+// ✅ RIGHT - Getting item state
+let item = try await engine.item("itemID")  // Returns Item, throws if not found
+#expect(item.parent == .player)
+#expect(item.hasFlag(.isOn) == true)
+#expect(item.hasFlag(.isLit) == false)
+
+// ❌ WRONG - Don't use these non-existent methods
+let item = try await engine.item("itemID")  // This method doesn't exist!
+```
+
+### Item Property/Flag Checking
+
+Use `hasFlag()` to check item properties:
+
+```swift
+// ✅ RIGHT - Checking item flags/properties
+let lamp = try await engine.item("lamp")
+#expect(lamp.hasFlag(.isOn) == true)
+#expect(lamp.hasFlag(.isLit) == true)
+#expect(lamp.hasFlag(.isTakable) == true)
+#expect(lamp.hasFlag(.isDevice) == true)
+#expect(lamp.hasFlag(.isLightSource) == true)
+
+// ❌ WRONG - Don't use these patterns
+#expect(lamp.properties.contains(.isOn))  // More verbose
+#expect(lamp.hasProperty(.touched))       // Method doesn't exist
+```
+
+### Common Item Setup Patterns
+
+Based on testing, here are the correct item flag combinations for common game objects:
+
+#### Light Sources (Lamps, Torches, Candles)
+
+```swift
+let lamp = Item(
+    id: "lamp",
+    .name("brass lamp"),
+    .description("A shiny brass lamp."),
+    .isTakable,
+    .isLightSource,  // Makes it a light source
+    .isDevice,       // REQUIRED for TurnOnActionHandler to work!
+    .in(.location("room"))
+)
+
+// When testing, note that TurnOnActionHandler sets .isOn, not .isLit
+// Light sources might need both flags for proper illumination
+```
+
+#### Items That Can't Be Taken
+
+```swift
+let statue = Item(
+    id: "statue",
+    .name("stone statue"),
+    .description("A heavy stone statue."),
+    // Note: No .isTakable flag - this makes it untakeable
+    .in(.location("room"))
+)
+```
+
+#### Items Already Held by Player
+
+```swift
+let book = Item(
+    id: "book",
+    .name("leather book"),
+    .description("A worn leather-bound book."),
+    .isTakable,
+    .in(.player)  // Already in player's inventory
+)
+```
+
+### Location Setup Patterns
+
+#### Lit Rooms (Default for Most Tests)
+
+```swift
+let testRoom = Location(
+    id: "testRoom",
+    .name("Test Room"),
+    .description("A room for testing."),
+    .inherentlyLit  // IMPORTANT: Most tests need this for visibility
+)
+```
+
+#### Dark Rooms (For Darkness Testing)
+
+```swift
+let darkRoom = Location(
+    id: "darkRoom",
+    .name("Dark Room"),
+    .description("A room that is pitch black if you aren't carrying a light.")
+    // Note: No .inherentlyLit - this makes it dark
+)
+```
+
+### Game Test Setup Pattern
+
+Always use this standard pattern for test setup:
+
+```swift
+@Test("Test description")
+func testSomething() async throws {
+    // Given: Setup complete game state
+    let testRoom = Location(
+        id: "testRoom",
+        .name("Test Room"),
+        .inherentlyLit
+    )
+
+    let testItem = Item(
+        id: "testItem",
+        .name("test item"),
+        .isTakable,
+        .in(.location("testRoom"))
+    )
+
+    let game = MinimalGame(
+        player: Player(in: "testRoom"),
+        locations: testRoom,
+        items: testItem
+    )
+
+    let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+    // When: Execute command through full pipeline
+    try await engine.execute("take test item")
+
+    // Then: Verify output and state
+    let output = await mockIO.flush()
+    expectNoDifference(output, """
+        > take test item
+        Taken.
+        """)
+
+    let finalState = try await engine.item("testItem")
+    #expect(finalState.parent == .player)
+}
+```
+
+### Syntax Rule Best Practices
+
+#### Always Use Clean, Readable Syntax
+
+```swift
+// ✅ RIGHT - Clean, readable syntax
+public let syntax: [SyntaxRule] = [
+    .match(.light, .directObject),           // "light lamp"
+    .match(.turn, .on, .directObject),       // "turn on lamp"
+    .match(.switch, .on, .directObject),     // "switch on lamp"
+]
+
+// ❌ WRONG - Verbose, ugly syntax (avoid this!)
+public let syntax: [SyntaxRule] = [
+    .match(.specificVerb(.light), .directObject),
+    .match(.specificVerb(.turn), .on, .directObject),
+    .match(.specificVerb(.switch), .on, .directObject),
+]
+```
+
+The clean syntax works perfectly when action handlers are ordered correctly in `GameEngine.defaultActionHandlers`. If you encounter verb conflicts (e.g., both `TurnOnActionHandler` and `BurnActionHandler` want to handle "light"), solve it by **reordering the handlers**, not by switching to verbose syntax.
+
+#### Handler Registration Order Matters
+
+Syntax-based handlers (those with complex patterns like "turn on") should come **before** simple verb-based handlers to avoid conflicts:
+
+```swift
+// ✅ RIGHT - Syntax-based handler comes first
+TurnOnActionHandler(),  // Has syntax: .match(.turn, .on, .directObject)
+TurnActionHandler(),    // Has verbs: [.turn] - simpler matching
+
+// ❌ WRONG - Simple handler steals "turn" verb before syntax can match
+TurnActionHandler(),    // Matches "turn" and stops looking
+TurnOnActionHandler(),  // Never gets a chance to match "turn on"
+```
+
+### Action Handler Discovery Patterns
+
+#### Handler Requirements by Action Type
+
+Through testing, here are the flag requirements for common action handlers:
+
+**TurnOnActionHandler**:
+
+- Requires: `.isDevice` flag (critical!)
+- Sets: `.isOn` flag when successful
+- Also works with: `.isLightSource` items
+- Syntax: `"turn on item"`, `"light item"`, `"switch on item"`
+
+**TakeActionHandler**:
+
+- Requires: `.isTakable` flag
+- Requires: Item must be visible/accessible
+- Sets: `.isTouched` flag when successful (not tested in our examples)
+
+**BurnActionHandler**:
+
+- Note: Has `.light` in its verbs, can conflict with TurnOnActionHandler
+- Handler order matters for verb conflicts!
+
+#### Handler Order Dependencies
+
+Some handlers conflict with each other based on shared verbs. The order in `GameEngine.defaultActionHandlers` matters:
+
+```swift
+// TurnOnActionHandler must come BEFORE BurnActionHandler
+// because both handle the "light" verb, but with different syntax rules
+TurnOnActionHandler(),  // Handles "light lamp" with syntax rules
+BurnActionHandler(),    // Handles "light fire" with simpler verb matching
+```
+
+**IMPORTANT:** Always use the clean syntax like `.match(.turn, .on, .directObject)` instead of `.match(.specificVerb(.turn), .on, .directObject)`. The readable syntax works correctly when handlers are ordered properly. Handler order conflicts should be solved by reordering handlers in `GameEngine.defaultActionHandlers`, NOT by changing to the verbose `.specificVerb()` syntax.
+
+### Common Testing Pitfalls & Solutions
+
+#### Message Format Differences
+
+```swift
+// Tests often fail due to message format differences.
+// Update expectations to match actual engine output:
+
+// Engine generates specific messages:
+expectNoDifference(output, "You can't turn that on.")           // Not "You can't turn on the X"
+expectNoDifference(output, "It's already on.")                  // Not "The X is already on"
+expectNoDifference(output, "You can't see any such thing.")     // Not "You can't see any X here"
+expectNoDifference(output, "You already have that.")            // Not "You already have the X"
+```
+
+#### Dark Room Testing
+
+```swift
+// When testing in dark rooms, the lamp should usually be held by player:
+let lamp = Item(
+    id: "lamp",
+    .isLightSource,
+    .isDevice,
+    .in(.player)  // Player carries the lamp into the dark room
+)
+
+// This way "turn on lamp" will work and illuminate the room
+```
+
+#### Quote Character Issues
+
+Per the testing guide, ignore any test failures that appear to be only about quote/apostrophe character differences (`'` vs `'` or `"` vs `"`). These are visual artifacts of Markdown rendering and should not be "fixed".
+
+### State Verification Patterns
+
+```swift
+// ✅ RIGHT - Checking final item state
+let finalItem = try await engine.item("itemID")
+#expect(finalItem.parent == .player)
+#expect(finalItem.hasFlag(.isOn) == true)
+
+// ✅ RIGHT - Checking location state
+let isLit = await engine.isCurrentLocationLit()
+#expect(isLit == true)
+
+// ✅ RIGHT - Checking global game state
+let hasKey = await engine.hasGlobal(.someGlobalFlag)
+#expect(hasKey == true)
+```
+
+### Mock Output Testing
+
+```swift
+// ✅ RIGHT - Always include command echo in expectations
+let output = await mockIO.flush()
+expectNoDifference(output, """
+    > turn on lamp
+    The brass lamp is now on.
+    """)
+
+// ❌ WRONG - Missing command echo
+expectNoDifference(output, "The brass lamp is now on.")
+
+// ✅ RIGHT - Multi-line output with room descriptions
+expectNoDifference(output, """
+    > turn on lamp
+    The brass lamp is now on. You can see your surroundings now.
+
+    — Dark Room —
+
+    A room that is pitch black if you aren't carrying a light.
+    """)
+```
+
+---
+
+# State Change Testing Guide
+
+## Critical Testing Pattern: Using `engine.apply()` for State Changes
+
+**CRITICAL RULE**: When setting up test state that requires modifications to the game state, you MUST use `engine.apply()` to actually register the changes. Methods like `engine.setGlobal()`, `engine.moveItem()`, etc. return `StateChange` objects that are NOT automatically applied.
+
+## Understanding StateChange Objects
+
+The Gnusto engine uses a formal state change pipeline where all modifications to game state flow through `StateChange` objects. These objects represent proposed modifications and must be explicitly applied to take effect.
+
+### The StateChange Lifecycle
+
+1. **Creation**: Action handlers or test setup code creates `StateChange` objects
+2. **Validation**: The engine validates changes against current state (using `oldValue` if provided)
+3. **Application**: Changes are applied to `GameState` and recorded in `changeHistory`
+
+### Common Testing Mistake: Forgetting `engine.apply()`
+
+```swift
+// ❌ WRONG - State change is created but never applied!
+@Test("Global flag affects behavior")
+func testGlobalFlag() async throws {
+    let game = MinimalGame(...)
+    let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+    // This creates a StateChange but doesn't apply it!
+    let stateChange = await engine.setGlobal(.isVerboseMode, to: true)
+    // The game state is unchanged - .isVerboseMode is still false!
+
+    try await engine.execute("look")
+    // Test will fail because verbose mode was never actually enabled
+}
+
+// ✅ RIGHT - State change is created AND applied
+@Test("Global flag affects behavior")
+func testGlobalFlag() async throws {
+    let game = MinimalGame(...)
+    let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+    // Create the state change AND apply it
+    try await engine.apply(
+        engine.setGlobal(.isVerboseMode, to: true)
+    )
+    // Now .isVerboseMode is actually true in the game state
+
+    try await engine.execute("look")
+    // Test will work correctly with verbose mode enabled
+}
+```
+
+## Test Setup Patterns Requiring `engine.apply()`
+
+### Setting Global Flags
+
+```swift
+// ✅ RIGHT - Setting up global state for tests
+@Test("Brief mode affects room descriptions")
+func testBriefMode() async throws {
+    let testRoom = Location(
+        id: "testRoom",
+        .name("Test Room"),
+        .description("A detailed description of the test room."),
+        .inherentlyLit
+    )
+
+    let game = MinimalGame(
+        player: Player(in: "testRoom"),
+        locations: testRoom
+    )
+
+    let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+    // Enable brief mode in the test setup
+    try await engine.apply(
+        engine.setGlobal(.isBriefMode, to: true)
+    )
+
+    // Now commands will use brief mode
+    try await engine.execute("look")
+
+    let output = await mockIO.flush()
+    // Brief mode descriptions will be used
+}
+```
+
+### Moving Items for Test Setup
+
+```swift
+// ✅ RIGHT - Moving items during test setup
+@Test("Action requires item to be held")
+func testRequiresItemHeld() async throws {
+    let testRoom = Location(
+        id: "testRoom",
+        .name("Test Room"),
+        .inherentlyLit
+    )
+
+    let lamp = Item(
+        id: "lamp",
+        .name("brass lamp"),
+        .description("A shiny brass lamp."),
+        .isLightSource,
+        .isDevice,
+        .isTakable,
+        .in(.location("testRoom"))  // Initially in room
+    )
+
+    let game = MinimalGame(
+        player: Player(in: "testRoom"),
+        locations: testRoom,
+        items: lamp
+    )
+
+    let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+    // Move lamp to player's inventory for test setup
+    try await engine.apply(
+        engine.moveItem("lamp", to: .player)
+    )
+
+    // Now the lamp is actually held by the player
+    try await engine.execute("turn on lamp")
+
+    // Test will work correctly because lamp is held
+}
+```
+
+### Setting Item Properties
+
+```swift
+// ✅ RIGHT - Setting item flags during test setup
+@Test("Turn off already lit lamp")
+func testTurnOffLitLamp() async throws {
+    let lamp = Item(
+        id: "lamp",
+        .name("brass lamp"),
+        .isLightSource,
+        .isDevice,
+        .isTakable,
+        .in(.player)
+    )
+
+    let game = MinimalGame(
+        player: Player(in: "testRoom"),
+        locations: Location(id: "testRoom", .inherentlyLit),
+        items: lamp
+    )
+
+    let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+    // Set the lamp to be already lit for this test
+    try await engine.apply(
+        engine.setItemFlag("lamp", .isOn, to: true)
+    )
+
+    // Now we can test turning off an already-lit lamp
+    try await engine.execute("turn off lamp")
+
+    let output = await mockIO.flush()
+    expectNoDifference(output, """
+        > turn off lamp
+        The brass lamp is now off.
+        """)
+}
+```
+
+## Multiple State Changes
+
+When setting up complex test scenarios, you can apply multiple state changes:
+
+```swift
+// ✅ RIGHT - Multiple state changes for complex test setup
+@Test("Complex scenario with multiple state changes")
+func testComplexScenario() async throws {
+    let game = MinimalGame(...)
+    let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+    // Apply multiple state changes to set up the scenario
+    try await engine.apply(
+        engine.setGlobal(.isBriefMode, to: true),
+        engine.moveItem("lamp", to: .player),
+        engine.setItemFlag("lamp", .isOn, to: true),
+        engine.setPlayerScore(50)
+    )
+
+    // Now execute the actual test command
+    try await engine.execute("inventory")
+
+    // All state changes are in effect
+}
+```
+
+## State Verification in Tests
+
+After performing actions, verify state changes using engine query methods:
+
+```swift
+// ✅ RIGHT - Verifying state after actions
+@Test("Turn on lamp sets isOn flag")
+func testTurnOnSetsFlag() async throws {
+    // ... test setup ...
+
+    try await engine.execute("turn on lamp")
+
+    // Verify the state change was applied
+    let finalLamp = try await engine.item("lamp")
+    #expect(finalLamp.hasFlag(.isOn) == true)
+
+    // Also verify output message
+    let output = await mockIO.flush()
+    expectNoDifference(output, """
+        > turn on lamp
+        The brass lamp is now on.
+        """)
+}
+```
+
+## Common State Change Methods
+
+Here are the most commonly used engine methods that return `StateChange` objects requiring `engine.apply()`:
+
+### Global State Changes
+
+- `engine.setGlobal(flag, to: value)` - Set global flags like `.isBriefMode`, `.isVerboseMode`
+- `engine.setPlayerScore(score)` - Set player score
+- `engine.incrementTurnCount()` - Increment turn counter
+
+### Item State Changes
+
+- `engine.moveItem(itemID, to: parent)` - Move items between locations/player/containers
+- `engine.setItemFlag(itemID, flag, to: value)` - Set item flags like `.isOn`, `.isLit`, `.isTouched`
+- `engine.setItemProperty(itemID, property, to: value)` - Set item properties
+
+### Location State Changes
+
+- `engine.setLocationFlag(locationID, flag, to: value)` - Set location flags
+- `engine.setLocationProperty(locationID, property, to: value)` - Set location properties
+
+## Error Handling
+
+The `engine.apply()` method can throw errors if state changes fail validation:
+
+```swift
+// Handle potential validation errors
+do {
+    try await engine.apply(
+        engine.moveItem("heavyStatue", to: .player)
+    )
+} catch {
+    // Handle the error - maybe the item can't be moved
+    print("Failed to move item: \(error)")
+}
+```
+
+## Anti-Patterns to Avoid
+
+### ❌ Don't Forget `engine.apply()`
+
+```swift
+// ❌ WRONG - State change created but never applied
+let stateChange = await engine.setGlobal(.isBriefMode, to: true)
+// Brief mode is still false!
+
+// ❌ WRONG - Storing state change without applying
+let changes = [
+    await engine.setGlobal(.isBriefMode, to: true),
+    await engine.moveItem("lamp", to: .player)
+]
+// None of these changes are applied!
+```
+
+### ❌ Don't Assume State Changes Are Automatic
+
+```swift
+// ❌ WRONG - Assuming method calls modify state directly
+await engine.setGlobal(.isVerboseMode, to: true)
+await engine.moveItem("lamp", to: .player)
+// Neither change is applied - game state is unchanged!
+```
+
+### ❌ Don't Mix Direct State Access with State Changes
+
+```swift
+// ❌ WRONG - Bypassing the state change system
+let gameState = await engine.gameState
+gameState.globals[.isBriefMode] = true  // Don't do this!
+
+// ✅ RIGHT - Use the proper state change pipeline
+try await engine.apply(
+    engine.setGlobal(.isBriefMode, to: true)
+)
+```
+
+## Summary
+
+The key principle is that **all game state modifications must flow through the StateChange pipeline**. Methods like `engine.setGlobal()` create `StateChange` objects but don't automatically apply them. Always use `engine.apply()` to actually register state changes in your tests.
+
+This pattern ensures:
+
+- State changes are properly validated
+- Changes are recorded in the change history
+- The game state remains consistent
+- Tests accurately reflect real game behavior
