@@ -44,7 +44,7 @@ struct DrinkActionHandlerTests {
             output,
             """
             > drink water
-            You drink the glass of water. Refreshing!
+            You drink the glass of water. It’s quite refreshing.
             """)
 
         let finalState = try await engine.item("water")
@@ -87,7 +87,7 @@ struct DrinkActionHandlerTests {
             output,
             """
             > sip coffee
-            You drink the cup of coffee. Refreshing!
+            You drink the cup of coffee. It’s quite refreshing.
             """)
 
         let finalState = try await engine.item("coffee")
@@ -129,7 +129,7 @@ struct DrinkActionHandlerTests {
             output,
             """
             > imbibe potion
-            You drink the magic potion. Refreshing!
+            You drink the magic potion. It’s quite refreshing.
             """)
     }
 
@@ -228,6 +228,7 @@ struct DrinkActionHandlerTests {
             output,
             """
             > drink water
+            (Taken)
             You aren’t holding the glass of water.
             """)
     }
@@ -351,7 +352,7 @@ struct DrinkActionHandlerTests {
             output,
             """
             > drink juice
-            You drink the orange juice. Refreshing!
+            You drink the orange juice. It’s quite refreshing.
             """)
     }
 
@@ -588,11 +589,11 @@ struct DrinkActionHandlerTests {
             output,
             """
             > drink tea
-            You drink the hot tea. Refreshing!
+            You drink the hot tea. It’s quite refreshing.
             > take water
             Taken.
             > drink it
-            You drink the cold water. Refreshing!
+            You drink the cold water. It’s quite refreshing.
             """)
     }
 
@@ -632,7 +633,7 @@ struct DrinkActionHandlerTests {
             output,
             """
             > drink smoothie
-            You drink the fruit smoothie. Refreshing!
+            You drink the fruit smoothie. It’s quite refreshing.
             """)
 
         let finalState = try await engine.item("smoothie")

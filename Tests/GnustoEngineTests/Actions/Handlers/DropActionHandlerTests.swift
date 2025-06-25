@@ -360,7 +360,7 @@ struct DropActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > drop lamp and key and rope
-            You drop the brass lamp, the rusty key, and the thick rope.
+            You drop the rusty key, the brass lamp, and the thick rope.
             """)
 
         let lampState = try await engine.item("lamp")

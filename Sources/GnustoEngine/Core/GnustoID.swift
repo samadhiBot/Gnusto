@@ -74,7 +74,7 @@ public extension GnustoID {
         let rawValue = try container.decode(String.self)
         self.init(rawValue: rawValue)
     }
-    
+
     /// Encodes this ID into the given encoder.
     /// Encodes as a plain string rather than an object with rawValue property.
     /// - Parameter encoder: The encoder to write data to.
@@ -82,14 +82,19 @@ public extension GnustoID {
         var container = encoder.singleValueContainer()
         try container.encode(self.rawValue)
     }
-    
+
+    /// GnustoIDs are case-insensitive when comparing.
+    static func ==(lhs: Self, rhs: Self) -> Bool {
+        lhs.rawValue.lowercased() == rhs.rawValue.lowercased()
+    }
+
     /// Compares two IDs based on their raw values for ordering.
     /// - Parameters:
     ///   - lhs: An ID to compare.
     ///   - rhs: Another ID to compare.
     /// - Returns: `true` if the `rawValue` of `lhs` lexicographically precedes that of `rhs`.
     static func < (lhs: Self, rhs: Self) -> Bool {
-        lhs.rawValue < rhs.rawValue
+        lhs.rawValue.lowercased() < rhs.rawValue.lowercased()
     }
 
     var customDumpDescription: String {

@@ -45,7 +45,7 @@ struct DeflateActionHandlerTests {
             output,
             """
             > deflate balloon
-            The red balloon deflates.
+            You deflate the red balloon.
             """)
 
         let finalState = try await engine.item("balloon")
@@ -250,7 +250,7 @@ struct DeflateActionHandlerTests {
             output,
             """
             > deflate raft
-            The rubber raft deflates.
+            You deflate the rubber raft.
             """)
     }
 
@@ -335,7 +335,7 @@ struct DeflateActionHandlerTests {
             output,
             """
             > deflate balloon
-            The green balloon deflates.
+            You deflate the green balloon.
             """)
 
         let finalState = try await engine.item("balloon")
@@ -387,7 +387,7 @@ struct DeflateActionHandlerTests {
             output1,
             """
             > deflate balloon
-            The yellow balloon deflates.
+            You deflate the yellow balloon.
             """)
 
         // When: Deflate mattress
@@ -399,7 +399,7 @@ struct DeflateActionHandlerTests {
             output2,
             """
             > deflate mattress
-            The air mattress deflates.
+            You deflate the air mattress.
             """)
 
         // Verify both items are deflated

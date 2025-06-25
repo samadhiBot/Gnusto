@@ -647,7 +647,7 @@ open class MessageProvider: @unchecked Sendable {
     open func digWithToolNothing(tool: String) -> String {
         output(
             "digWithToolNothing(tool: '\(tool)')",
-            "You dig with '\(tool)', but find nothing of interest."
+            "You dig with \(tool), but find nothing of interest."
         )
     }
 
@@ -1808,7 +1808,7 @@ open class MessageProvider: @unchecked Sendable {
     open func suggestUsingToolToDig() -> String {
         output(
             "suggestUsingToolToDig()",
-            "You could try using a tool to dig with."
+            "You could try using a tool for digging."
         )
     }
 

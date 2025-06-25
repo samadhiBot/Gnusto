@@ -356,7 +356,7 @@ struct DigActionHandlerTests {
             output,
             """
             > dig
-            You should use a tool to dig.
+            You could try using a tool for digging.
             """)
     }
 
@@ -395,7 +395,7 @@ struct DigActionHandlerTests {
             output,
             """
             > dig with shovel
-            You find nothing with the metal shovel.
+            You dig with the metal shovel, but find nothing of interest.
             """)
     }
 
@@ -433,7 +433,7 @@ struct DigActionHandlerTests {
             output,
             """
             > dig with fork
-            The dinner fork is not suitable for digging.
+            The dinner fork isn’t suitable for digging.
             """)
     }
 
@@ -570,7 +570,7 @@ struct DigActionHandlerTests {
             output1,
             """
             > dig with shovel
-            You find nothing with the old shovel.
+            You dig with the old shovel, but find nothing of interest.
             """)
 
         // When: Dig with inappropriate tool
@@ -582,7 +582,7 @@ struct DigActionHandlerTests {
             output2,
             """
             > dig with spoon
-            The wooden spoon is not suitable for digging.
+            The wooden spoon isn’t suitable for digging.
             """)
     }
 

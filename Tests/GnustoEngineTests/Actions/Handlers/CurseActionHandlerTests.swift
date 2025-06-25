@@ -1,5 +1,6 @@
 import Testing
 import CustomDump
+
 @testable import GnustoEngine
 
 @Suite("CurseActionHandler Tests")
@@ -147,6 +148,14 @@ struct CurseActionHandlerTests {
             > curse
             You let loose a string of expletives that reveals an impressive
             technical proficiency.
+
+            > curse
+            You curse with the fluency of one comfortable with all
+            registers of language.
+
+            > curse
+            You unleash expletives with the boldness of one who knows
+            their craft.
             """)
     }
 
@@ -190,11 +199,13 @@ struct CurseActionHandlerTests {
     @Test("Handler exposes correct VerbIDs")
     func testVerbIDs() async throws {
         let handler = CurseActionHandler()
-        #expect(handler.verbs.contains(.curse))
-        #expect(handler.verbs.contains(.damn))
-        #expect(handler.verbs.contains(.fuck))
-        #expect(handler.verbs.contains(.shit))
-        #expect(handler.verbs.count == 4)
+        expectNoDifference(handler.verbs, [
+            .curse,
+            .swear,
+            .shit,
+            .fuck,
+            .damn,
+        ])
     }
 
     @Test("Handler does not require light")

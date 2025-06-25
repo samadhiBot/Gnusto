@@ -1,5 +1,6 @@
 import Testing
 import CustomDump
+
 @testable import GnustoEngine
 
 @Suite("DanceActionHandler Tests")
@@ -31,7 +32,8 @@ struct DanceActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > dance
-            You dance a little jig.
+            You dance with an interpretive boldness that transcends
+            conventional movement.
             """)
     }
 
@@ -67,13 +69,14 @@ struct DanceActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > dance with partner
-            You dance a little jig.
+            You dance with an interpretive boldness that transcends
+            conventional movement.
             """)
     }
 
     // MARK: - Processing Testing
 
-    @Test("Dance provides atmospheric response")
+    @Test("Dance provides atmospheric responses")
     func testDanceAtmosphericResponse() async throws {
         // Given
         let testRoom = Location(
@@ -90,13 +93,22 @@ struct DanceActionHandlerTests {
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // When
-        try await engine.execute("dance")
+        try await engine.execute("dance", times: 3)
 
         // Then
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > dance
-            You dance a little jig.
+            You dance with an interpretive boldness that transcends
+            conventional movement.
+
+            > dance
+            You dance with admirable commitment to the full spectrum of
+            human motion.
+
+            > dance
+            You dance with the natural grace of one unencumbered by
+            traditional technique.
             """)
     }
 
@@ -123,7 +135,8 @@ struct DanceActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > dance
-            You dance a little jig.
+            You dance with an interpretive boldness that transcends
+            conventional movement.
             """)
     }
 
@@ -158,7 +171,8 @@ struct DanceActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > dance with chair
-            You dance a little jig.
+            You dance with an interpretive boldness that transcends
+            conventional movement.
             """)
     }
 

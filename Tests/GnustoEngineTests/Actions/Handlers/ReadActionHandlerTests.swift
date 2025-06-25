@@ -150,7 +150,7 @@ struct ReadActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > read rock
-            You can’t read the large rock.
+            The large rock isn’t something you can read.
             """)
     }
 
@@ -262,7 +262,7 @@ struct ReadActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > read card
-            There's nothing written on the blank card.
+            There’s nothing written on the blank card.
             """)
     }
 

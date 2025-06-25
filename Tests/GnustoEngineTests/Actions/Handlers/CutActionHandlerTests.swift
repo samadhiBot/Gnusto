@@ -424,7 +424,7 @@ struct CutActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > cut rope with spoon
-            The wooden spoon is not sharp enough to cut with.
+            The wooden spoon isn’t sharp enough to cut anything.
             """)
     }
 
@@ -538,7 +538,7 @@ struct CutActionHandlerTests {
             items: string, knife
         )
 
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+        let (engine, _) = await GameEngine.test(blueprint: game)
 
         // When
         try await engine.execute("cut string")
