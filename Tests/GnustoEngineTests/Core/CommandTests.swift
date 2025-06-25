@@ -114,7 +114,7 @@ struct CommandTests {
             verb: verbTake, directObject: .item(itemLantern), rawInput: "take lantern")
         let command2 = command1  // Creates a copy
 
-        // There's nothing mutable to change in command2, but we verify the copy has the same values.
+        // There’s nothing mutable to change in command2, but we verify the copy has the same values.
         #expect(command1.verb == command2.verb)
         #expect(command1.directObject == command2.directObject)
         #expect(command1.rawInput == command2.rawInput)

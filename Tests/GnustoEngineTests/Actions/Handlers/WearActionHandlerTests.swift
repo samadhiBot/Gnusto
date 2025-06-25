@@ -583,7 +583,7 @@ struct WearActionHandlerTests {
             output,
             """
             > wear all
-            There's nothing here you can wear.
+            There’s nothing here you can wear.
             """)
     }
 

@@ -499,7 +499,7 @@ struct DrinkActionHandlerTests {
             output,
             """
             > drink bottle
-            You can’t drink from the sealed bottle while it's closed.
+            You can’t drink from the sealed bottle while it’s closed.
             """)
     }
 
@@ -539,7 +539,7 @@ struct DrinkActionHandlerTests {
             output,
             """
             > drink cup
-            There's nothing to drink in the empty cup.
+            There’s nothing to drink in the empty cup.
             """)
     }
 

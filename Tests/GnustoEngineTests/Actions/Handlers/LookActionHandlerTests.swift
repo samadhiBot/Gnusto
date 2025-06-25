@@ -416,7 +416,7 @@ struct LookActionHandlerTests {
         // When
         try await engine.execute("look at me")
 
-        // Then - This should work since "me" refers to player, but let's test with room
+        // Then - This should work since "me" refers to player, but let’s test with room
         let output = await mockIO.flush()
         expectNoDifference(
             output,
@@ -772,7 +772,7 @@ struct LookActionHandlerTests {
 
     @Test("Look in room with light source shows room even if light is off")
     func testLookInRoomWithLightSourceShowsRoomEvenIfLightIsOff() async throws {
-        // Given: Room that's lit by light source, but light source is off
+        // Given: Room that’s lit by light source, but light source is off
         let darkRoom = Location(
             id: "darkRoom",
             .name("Dark Room"),

@@ -311,8 +311,8 @@ struct TurnActionHandlerTests {
 
         let shipWheel = Item(
             id: "shipWheel",
-            .name("ship's wheel"),
-            .description("A large wooden ship's wheel."),
+            .name("ship’s wheel"),
+            .description("A large wooden ship’s wheel."),
             .isWheel,
             .in(.location("testRoom"))
         )

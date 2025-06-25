@@ -359,7 +359,7 @@ struct GameEngineSideEffectsTests {
 
         // Process the action result directly (internal engine method)
         let success = try await engine.processActionResult(actionResult)
-        #expect(success == true) // Should return true because there's a message
+        #expect(success == true) // Should return true because there’s a message
 
         // Verify side effects were processed
         let finalState = await engine.gameState
@@ -379,7 +379,7 @@ struct GameEngineSideEffectsTests {
             parameters: ["turns": .string("not_a_number")] // Invalid type
         )
 
-        // Should fall back to definition's initialTurns when parameter is wrong type
+        // Should fall back to definition’s initialTurns when parameter is wrong type
         try await engine.processSideEffects([sideEffect])
 
         let finalState = await engine.gameState

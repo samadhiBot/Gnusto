@@ -16,7 +16,7 @@ struct FormattingTests {
 
         let transcript = await mockIO.flush()
 
-        // Check that there's no double linebreak between introduction and location
+        // Check that there’s no double linebreak between introduction and location
         expectNoDifference(transcript, """
             Zork I: The Great Underground Empire
             

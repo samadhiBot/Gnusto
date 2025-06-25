@@ -31,7 +31,7 @@ struct MessageProviderIntegrationTests {
                     id: "void",
                     .name("Void"),
                     .description("An empty void.")
-                    // No .inherentlyLit, so it's dark by default
+                    // No .inherentlyLit, so it’s dark by default
                 )
             ]
 
@@ -48,7 +48,7 @@ struct MessageProviderIntegrationTests {
 
         #expect(engine.messageProvider.languageCode == "en")
 
-        // Test that the engine's MessageProvider is the custom one
+        // Test that the engine’s MessageProvider is the custom one
         let darknessMessage = engine.messageProvider.roomIsDark()
         #expect(darknessMessage == "TEST: Custom darkness message")
 

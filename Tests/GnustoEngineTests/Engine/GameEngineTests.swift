@@ -20,7 +20,7 @@ struct GameEngineTests {
         let darkRoom = Location(
             id: "darkRoom",
             .name("Pitch Black Room"),
-            .description("It's dark.")
+            .description("It’s dark.")
         )
         let game = MinimalGame(
             player: Player(in: darkRoom.id),
@@ -177,7 +177,7 @@ struct GameEngineTests {
 
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        // Make pebble non-takable in this test's state
+        // Make pebble non-takable in this test’s state
         #expect(game.items.find(.startItem)?.attributes[.isTakable] == nil)
 
         // Configure IO
@@ -437,7 +437,7 @@ struct GameEngineTests {
         let finalMoves = await engine.playerMoves
         #expect(
             finalMoves == 0,
-            "Quit command should not increment moves if it's the first command and handled cleanly")
+            "Quit command should not increment moves if it’s the first command and handled cleanly")
     }
 
     @Test("Engine Handles Nil Input (EOF) Gracefully")
@@ -788,7 +788,7 @@ struct GameEngineTests {
         let stateHolder = TestStateHolder()
         let fuseDef = Fuse(initialTurns: 2) { gameEngineParameter in
             // This closure is @Sendable and runs on the GameEngine actor context.
-            // It captures 'mockIO' (@MainActor) and 'stateHolder' (actor).
+            // It captures 'mockIO' (@MainActor) and ’stateHolder' (actor).
 
             // To call stateHolder.markFlag (TestStateHolder actor)
             await stateHolder.markFlag()
@@ -1734,7 +1734,7 @@ extension GameEngineTests {
             }
             if promptEncountered && call.style != .input && call.style != .statusLine {
                 commandOutput = call.text
-                break  // Found the command's response
+                break  // Found the command’s response
             }
         }
         return commandOutput.trimmingCharacters(in: .whitespacesAndNewlines)

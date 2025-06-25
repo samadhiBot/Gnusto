@@ -313,7 +313,7 @@ struct KnockActionHandlerTests {
             output,
             """
             > knock on door
-            The oak door is open; there's no need to knock.
+            The oak door is open; there’s no need to knock.
             """)
 
         let finalState = try await engine.item("door")
@@ -732,7 +732,7 @@ struct KnockActionHandlerTests {
             output1,
             """
             > knock on open door
-            The open door is open; there's no need to knock.
+            The open door is open; there’s no need to knock.
             """)
 
         // When: Knock on closed door

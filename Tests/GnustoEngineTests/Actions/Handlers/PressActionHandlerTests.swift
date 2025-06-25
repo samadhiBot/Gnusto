@@ -255,7 +255,7 @@ struct PressActionHandlerTests {
             output,
             """
             > press testRoom
-            That's not something you can press.
+            That’s not something you can press.
             """)
     }
 
@@ -284,7 +284,7 @@ struct PressActionHandlerTests {
             output,
             """
             > press me
-            That's not something you can press.
+            That’s not something you can press.
             """)
     }
 

@@ -430,13 +430,13 @@ struct TurnOffActionHandlerTests {
             output,
             """
             > turn off lamp
-            It's already off.
+            It’s already off.
             """)
     }
 
     @Test("Requires light to turn off items")
     func testRequiresLight() async throws {
-        // Given: Dark room with light source that's on
+        // Given: Dark room with light source that’s on
         let darkRoom = Location(
             id: "darkRoom",
             .name("Dark Room"),

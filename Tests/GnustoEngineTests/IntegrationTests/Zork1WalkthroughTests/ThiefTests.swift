@@ -48,7 +48,7 @@ struct ThiefTests {
         let thiefBag = try await engine.item(.largeBag)
         _ = await engine.items(in: .item(.largeBag))  // Check that bag exists and can hold items
 
-        // Verify thief's bag can hold items (even if theft didn’t happen this time)
+        // Verify thief’s bag can hold items (even if theft didn’t happen this time)
         #expect(thiefBag.hasFlag(.isContainer))
     }
 
@@ -112,7 +112,7 @@ struct ThiefTests {
 //        #expect(output.contains("examines the lamp with obvious delight"))
 //        #expect(output.contains("carefully places it in his bag"))
 
-        // Verify lamp is now in thief's bag
+        // Verify lamp is now in thief’s bag
         let lamp = try await engine.item(.lamp)
         #expect(lamp.parent == .item(.largeBag))
     }
@@ -418,7 +418,7 @@ struct ThiefTests {
         )
         _ = await mockIO.flush() // Clear any move message
 
-        // When - move thief back to player's location
+        // When - move thief back to player’s location
         try await engine.apply(
             await engine.move(.thief, to: .location(.roundRoom))
         )
@@ -485,7 +485,7 @@ struct ThiefTests {
         case .location(let locationID):
             #expect(locationID == .roundRoom) // Should drop in current location
         case .nowhere:
-            // Bag might be removed with thief - that's also valid
+            // Bag might be removed with thief - that’s also valid
             break
         default:
             // Bag shouldn’t still be "held" by removed thief
@@ -503,7 +503,7 @@ struct ThiefTests {
 
         let initialScore = await engine.playerScore
 
-        // Put valuable item in thief's bag
+        // Put valuable item in thief’s bag
         try await engine.apply(
             await engine.move(.diamond, to: .item(.largeBag))
         )

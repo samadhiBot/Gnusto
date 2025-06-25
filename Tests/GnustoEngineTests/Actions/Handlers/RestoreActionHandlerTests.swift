@@ -426,7 +426,7 @@ struct RestoreActionHandlerTests {
 
         // Note: In a real implementation, we might need to set up a mock
         // engine that can simulate restore failures, but for now we test
-        // the happy path since the mock engine's restore implementation
+        // the happy path since the mock engine’s restore implementation
         // should succeed
 
         // When

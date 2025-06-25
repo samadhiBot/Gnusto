@@ -43,7 +43,7 @@ struct FindActionHandlerTests {
             output,
             """
             > find book
-            It's right here!
+            It’s right here!
             """)
     }
 
@@ -119,7 +119,7 @@ struct FindActionHandlerTests {
             output,
             """
             > locate coin
-            It's right here!
+            It’s right here!
             """)
     }
 
@@ -266,7 +266,7 @@ struct FindActionHandlerTests {
             output,
             """
             > find table
-            It's right here!
+            It’s right here!
             """)
     }
 
@@ -313,7 +313,7 @@ struct FindActionHandlerTests {
             output,
             """
             > find ring
-            It's right here!
+            It’s right here!
             """)
     }
 
@@ -490,7 +490,7 @@ struct FindActionHandlerTests {
             output2,
             """
             > find statue
-            It's right here!
+            It’s right here!
             """)
     }
 
@@ -536,7 +536,7 @@ struct FindActionHandlerTests {
             output,
             """
             > find paper
-            It's right here!
+            It’s right here!
             """)
     }
 
@@ -574,7 +574,7 @@ struct FindActionHandlerTests {
             output1,
             """
             > find crystal
-            It's right here!
+            It’s right here!
             """)
 
         // When: Use "locate"
@@ -586,7 +586,7 @@ struct FindActionHandlerTests {
             output2,
             """
             > locate crystal
-            It's right here!
+            It’s right here!
             """)
     }
 

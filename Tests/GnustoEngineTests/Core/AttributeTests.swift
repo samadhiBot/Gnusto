@@ -87,7 +87,7 @@ struct AttributeTests {
     
     @Test("locationID getter returns correct LocationID value")
     func testLocationIDGetter() {
-        // Use a custom AttributeID for testing since there's no built-in one for LocationID
+        // Use a custom AttributeID for testing since there’s no built-in one for LocationID
         let customLocationAttr = ItemAttributeID("currentLocation")
         let locationIDAttribute = TestItemAttribute(id: customLocationAttr, rawValue: .locationID("room1"))
         let nonLocationIDAttribute = TestItemAttribute(id: .description, rawValue: .string("test"))

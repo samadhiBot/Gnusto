@@ -295,7 +295,7 @@ struct MoveActionHandlerTests {
             output,
             """
             > move testRoom
-            That's not something you can move.
+            That’s not something you can move.
             """)
     }
 
@@ -324,7 +324,7 @@ struct MoveActionHandlerTests {
             output,
             """
             > move me
-            That's not something you can move.
+            That’s not something you can move.
             """)
     }
 

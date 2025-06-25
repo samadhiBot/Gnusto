@@ -464,7 +464,7 @@ struct PushActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > push all
-            There's nothing here to push.
+            There’s nothing here to push.
             """)
     }
 

@@ -323,7 +323,7 @@ struct MultipleObjectTests {
     func testAllWithNoApplicableItems() async throws {
         let (engine, mockIO) = await GameEngine.test()
 
-        // Act: Execute "take all" when there's nothing to take
+        // Act: Execute "take all" when there’s nothing to take
         try await engine.execute("take all")
 
         // Assert: Should get appropriate message

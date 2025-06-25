@@ -251,7 +251,7 @@ struct RaiseActionHandlerTests {
             output,
             """
             > raise testRoom
-            That's not something you can raise.
+            That’s not something you can raise.
             """)
     }
 
@@ -280,7 +280,7 @@ struct RaiseActionHandlerTests {
             output,
             """
             > raise me
-            That's not something you can raise.
+            That’s not something you can raise.
             """)
     }
 

@@ -379,7 +379,7 @@ struct RemoveActionHandlerTests {
             output,
             """
             > remove me
-            That's not something you can remove.
+            That’s not something you can remove.
             """)
     }
 

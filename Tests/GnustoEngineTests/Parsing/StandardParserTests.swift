@@ -149,7 +149,7 @@ struct StandardParserTests {
 
         // 2. Extract verbs from default action handlers
         // We need to get the same verbs that a real game would have by using
-        // the GameEngine's default action handlers
+        // the GameEngine’s default action handlers
         let defaultVerbs = GameEngine.extractVerbDefinitions(
             from: GameEngine.defaultActionHandlers
         )
@@ -170,7 +170,7 @@ struct StandardParserTests {
 
         // 5. Define initial pronouns
         let initialPronouns: [String: Set<EntityReference>] = [
-            "it": [.item("box")]  // Let's say "it" initially refers to the box in the room
+            "it": [.item("box")]  // Let’s say "it" initially refers to the box in the room
         ]
 
         // 6. Build Vocabulary using defaults + game-specific items/verbs
@@ -425,7 +425,7 @@ struct StandardParserTests {
 
     @Test("Parse Direct from Inventory, Indirect from Location")
     func testParseDirectFromInvIndirectFromLoc() async throws {
-        // 'leaflet' (DO) is in inventory, 'sword' (IO) is in the room
+        // 'leaflet' (DO) is in inventory, ’sword' (IO) is in the room
         let result = parser.parse(
             input: "put leaflet on sword",
             vocabulary: vocabulary,
@@ -456,7 +456,7 @@ struct StandardParserTests {
 
     @Test("Parse Find Direct Object in Location (Item)")
     func testParseDirectObjectInLocationItem() async throws {
-        // Location has 'sword'
+        // Location has ’sword'
         let result = parser.parse(
             input: "take sword",
             vocabulary: vocabulary,
@@ -842,7 +842,7 @@ struct StandardParserTests {
         itemsDict[permKey.id] = permKey
         let initState = GameState(
             locations: Array(gameState.locations.values),
-            items: Array(itemsDict.values),  // Pass the modified copy's values
+            items: Array(itemsDict.values),  // Pass the modified copy’s values
             player: gameState.player,
             vocabulary: vocabulary,
             pronouns: gameState.pronouns  // Use base pronouns
@@ -854,14 +854,14 @@ struct StandardParserTests {
         #expect(initState.items["tempKeyOnGround"]?.parent == .location(.startRoom))
         #expect(initState.items["permKey"]?.parent == .location(.startRoom))
 
-        // Update vocab temporarily ONLY for this test's state
+        // Update vocab temporarily ONLY for this test’s state
         var tempVocabulary = vocabulary
         tempVocabulary.items["key", default: []].insert(tempKeyInBackpack.id)
         tempVocabulary.items["key", default: []].insert(tempKeyOnGround.id)
         tempVocabulary.items["key", default: []].insert(permKey.id)
 
         // Parsing "take key" might become ambiguous IF the parser finds both.
-        // Let's test with the modifier to target the *real* key.
+        // Let’s test with the modifier to target the *real* key.
         let resultSpecific = parser.parse(
             input: "take rusty key",
             vocabulary: tempVocabulary,

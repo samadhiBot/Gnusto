@@ -508,7 +508,7 @@ struct FillActionHandlerTests {
             output,
             """
             > fill bottle from box
-            There's no liquid in the wooden box.
+            There’s no liquid in the wooden box.
             """)
     }
 
@@ -548,7 +548,7 @@ struct FillActionHandlerTests {
             output,
             """
             > fill bucket
-            There's no liquid source available.
+            There’s no liquid source available.
             """)
     }
 

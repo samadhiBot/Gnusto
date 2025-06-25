@@ -299,7 +299,7 @@ struct ReadActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > read note
-            There's nothing written on the empty note.
+            There’s nothing written on the empty note.
             """)
     }
 

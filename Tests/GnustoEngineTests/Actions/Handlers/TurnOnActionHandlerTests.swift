@@ -322,7 +322,7 @@ struct TurnOnActionHandlerTests {
             output,
             """
             > turn on lamp
-            It's already on.
+            It’s already on.
             """)
     }
 

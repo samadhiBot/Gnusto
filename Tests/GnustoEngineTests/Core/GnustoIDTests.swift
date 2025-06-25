@@ -4,7 +4,7 @@ import Foundation
 
 // MARK: - Test ID Type
 
-/// A test ID type that conforms to GnustoID for testing the protocol's default implementations.
+/// A test ID type that conforms to GnustoID for testing the protocol’s default implementations.
 private struct TestID: GnustoID {
     let rawValue: String
     

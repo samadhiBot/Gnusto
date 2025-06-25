@@ -560,7 +560,7 @@ struct PutOnActionHandlerTests {
             output,
             """
             > put testRoom on table
-            That's not something you can put on things.
+            That’s not something you can put on things.
             """)
     }
 
@@ -636,7 +636,7 @@ struct PutOnActionHandlerTests {
             output,
             """
             > put book on testRoom
-            That's not something you can wear.
+            That’s not something you can wear.
             """)
     }
 
@@ -674,7 +674,7 @@ struct PutOnActionHandlerTests {
             output,
             """
             > put book on me
-            That's not something you can wear.
+            That’s not something you can wear.
             """)
     }
 

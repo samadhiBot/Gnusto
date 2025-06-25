@@ -89,7 +89,7 @@ final class MockIOHandler: IOHandler {
         let line = inputQueue[inputIndex]
         inputIndex += 1
 
-        // Record the user's response so it appears in the output
+        // Record the user’s response so it appears in the output
         if let line = line {
             recordedOutput.append(
                 OutputCall(

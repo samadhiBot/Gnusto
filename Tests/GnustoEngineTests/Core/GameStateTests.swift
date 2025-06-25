@@ -360,7 +360,7 @@ struct GameStateTests {
             ),
         )
 
-        // Verify state1's value types remain unchanged
+        // Verify state1’s value types remain unchanged
         let initialPlayer = state1.player // Capture initial player state from state1
         #expect(state1.player == initialPlayer) // state1 player unchanged
         #expect(state2.player != initialPlayer) // state2 player changed
@@ -371,11 +371,11 @@ struct GameStateTests {
         #expect(state1.pronouns == initialPronouns)
         #expect(state2.pronouns == initialPronouns)
 
-        // Verify state1's Item struct is UNCHANGED (because Item is a struct)
+        // Verify state1’s Item struct is UNCHANGED (because Item is a struct)
         #expect(state1.items[Self.itemLantern]?.name == "lantern") // Original name
         #expect(state1.items[Self.itemLantern]?.parent == .nowhere) // Original parent
 
-        // Verify state2's Item struct *is* changed
+        // Verify state2’s Item struct *is* changed
         #expect(state2.items[Self.itemLantern]?.name == "Shiny Lantern")
         #expect(state2.items[Self.itemLantern]?.parent == .player)
 

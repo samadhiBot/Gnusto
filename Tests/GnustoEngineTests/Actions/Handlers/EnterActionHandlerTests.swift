@@ -77,7 +77,7 @@ struct EnterActionHandlerTests {
             output,
             """
             > enter
-            There's nothing here to enter.
+            There’s nothing here to enter.
             """)
     }
 

@@ -6,9 +6,9 @@ import Testing
 @Suite("MarkdownParser Tests")
 struct MarkdownParserTests {
 
-    @Test("Orphan prevention - user's specific example")
+    @Test("Orphan prevention - user’s specific example")
     func testOrphanPreventionUserExample() {
-        // Test the exact example from the user's question
+        // Test the exact example from the user’s question
         let input = "You can’t put the bag in the box, because the box is inside the bag."
         let result = MarkdownParser.parse(input, columns: 64)
 
@@ -29,7 +29,7 @@ struct MarkdownParserTests {
             }
         }
 
-        // Verify the specific expected result from the user's example
+        // Verify the specific expected result from the user’s example
         #expect(result.contains("inside\nthe bag.") || result.contains("is inside\nthe bag."))
     }
 

@@ -270,7 +270,7 @@ struct DeflateActionHandlerTests {
             .isInflatable,
             .isTakable,
             .in(.location("testRoom"))
-            // Note: No .isInflated flag - it's already deflated
+            // Note: No .isInflated flag - it’s already deflated
         )
 
         let game = MinimalGame(

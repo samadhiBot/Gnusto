@@ -365,7 +365,7 @@ struct GiveActionHandlerTests {
             output,
             """
             > give apple to rock
-            That's not something you can give.
+            That’s not something you can give.
             """)
     }
 
