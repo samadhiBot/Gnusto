@@ -1,4 +1,5 @@
 import CustomDump
+import Foundation
 import Testing
 
 @testable import GnustoEngine
