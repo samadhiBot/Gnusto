@@ -42,7 +42,6 @@ struct GoActionHandlerTests {
             output,
             """
             > go north
-
             — North Room —
 
             A room to the north.
@@ -85,7 +84,6 @@ struct GoActionHandlerTests {
             output,
             """
             > walk south
-
             — South Room —
 
             A room to the south.
@@ -128,7 +126,6 @@ struct GoActionHandlerTests {
             output,
             """
             > run east
-
             — East Room —
 
             A room to the east.
@@ -173,7 +170,6 @@ struct GoActionHandlerTests {
             output,
             """
             > north
-
             — North Room —
 
             A room to the north.
@@ -216,7 +212,6 @@ struct GoActionHandlerTests {
             output,
             """
             > n
-
             — North Room —
 
             A room to the north.
@@ -234,10 +229,12 @@ struct GoActionHandlerTests {
             .name("Center Room"),
             .description("A room in the center."),
             .inherentlyLit,
-            .exits([.north: .to("northRoom")]),
-            .exits([.south: .to("southRoom")]),
-            .exits([.east: .to("eastRoom")]),
-            .exits([.west: .to("westRoom")])
+            .exits([
+                .north: .to("northRoom"),
+                .south: .to("southRoom"),
+                .east: .to("eastRoom"),
+                .west: .to("westRoom"),
+            ]),
         )
 
         let northRoom = Location(
@@ -303,7 +300,8 @@ struct GoActionHandlerTests {
         #expect(playerLocation == "westRoom")
 
         // Clear output
-        await mockIO.flush()
+        let output = await mockIO.flush()
+        expectNoDifference(output, "")
     }
 
     // MARK: - Validation Testing
@@ -577,7 +575,6 @@ struct GoActionHandlerTests {
             output,
             """
             > north
-
             — North Room —
 
             A room beyond the door.
@@ -629,7 +626,6 @@ struct GoActionHandlerTests {
             output,
             """
             > up
-
             — Upper Room —
 
             A room upstairs.
@@ -681,7 +677,6 @@ struct GoActionHandlerTests {
             output,
             """
             > north
-
             — End Room —
 
             The destination room.
@@ -722,7 +717,6 @@ struct GoActionHandlerTests {
             output,
             """
             > south
-
             — Lit Room —
 
             A well-lit room.
@@ -765,8 +759,7 @@ struct GoActionHandlerTests {
         expectNoDifference(
             output,
             """
-            > north
-            It is pitch black. You can't see a thing.
+            > north            It is pitch black. You can't see a thing.
             """)
 
         let playerLocation = await engine.playerLocationID
@@ -822,7 +815,6 @@ struct GoActionHandlerTests {
             output,
             """
             > north
-
             — Dark Room —
 
             A room that needs artificial light.
@@ -872,12 +864,10 @@ struct GoActionHandlerTests {
             output,
             """
             > east
-
             — Room B —
 
             The second room.
             > west
-
             — Room A —
 
             The first room.
