@@ -28,30 +28,34 @@ public struct ExamineActionHandler: ActionHandler {
     ///           `ActionResponse.itemNotAccessible` if an item cannot be reached, or
     ///           `ActionResponse.prerequisiteNotMet` if trying to examine something other
     ///           than an item or the player.
-    public func validate(context: ActionContext) async throws {
+        public func process(
+        command: Command,
+        engine: GameEngine
+    ) async throws -> ActionResult {
+
         // For ALL commands, allow empty directObjects (handled in process method)
-        if context.command.isAllCommand {
+        if command.isAllCommand {
             return
         }
 
         // 1. Ensure we have at least one direct object for non-ALL commands
-        guard !context.command.directObjects.isEmpty else {
-            throw ActionResponse.custom(context.message.doWhat(verb: context.command.verb))
+        guard !command.directObjects.isEmpty else {
+            throw ActionResponse.custom(engine.messenger.doWhat(verb: command.verb))
         }
 
         // For single object commands, validate the single object
-        guard let directObjectRef = context.command.directObject else {
-            throw ActionResponse.custom(context.message.doWhat(verb: context.command.verb))
+        guard let directObjectRef = command.directObject else {
+            throw ActionResponse.custom(engine.messenger.doWhat(verb: command.verb))
         }
 
         switch directObjectRef {
         case .item(let targetItemID):
             // 2. Check if item exists
-            guard (try? await context.engine.item(targetItemID)) != nil else {
+            guard (try? await engine.item(targetItemID)) != nil else {
                 throw ActionResponse.unknownEntity(directObjectRef)
             }
             // 3. Check reachability
-            guard await context.engine.playerCanReach(targetItemID) else {
+            guard await engine.playerCanReach(targetItemID) else {
                 throw ActionResponse.itemNotAccessible(targetItemID)
             }
         case .player:
@@ -59,11 +63,9 @@ public struct ExamineActionHandler: ActionHandler {
             return
         default:
             throw ActionResponse.prerequisiteNotMet(
-                context.message.thatsNotSomethingYouCan(.examine)
+                engine.messenger.thatsNotSomethingYouCan(.examine)
             )
         }
-    }
-
     /// Processes the "EXAMINE" command.
     ///
     /// - If the direct object is the player ("EXAMINE SELF"), a standard message is returned.
@@ -84,18 +86,17 @@ public struct ExamineActionHandler: ActionHandler {
     /// - Parameter context: The `ActionContext` for the current action.
     /// - Returns: An `ActionResult` containing the detailed description and any relevant state changes.
     /// - Throws: Can throw errors from engine calls if issues occur (e.g., item not found during processing).
-    public func process(context: ActionContext) async throws -> ActionResult {
         // Check for EXAMINE IN/ON preposition variants - delegate to look-inside behavior
-        if context.command.preposition == "in" || context.command.preposition == "on" {
+        if command.preposition == "in" || command.preposition == "on" {
             let lookInsideHandler = LookInsideActionHandler()
             return try await lookInsideHandler.process(context: context)
         }
 
         // For ALL commands, empty directObjects is valid (means nothing to examine)
-        if !context.command.isAllCommand {
-            guard !context.command.directObjects.isEmpty else {
+        if !command.isAllCommand {
+            guard !command.directObjects.isEmpty else {
                 return ActionResult(
-                    context.message.thatsNotSomethingYouCan(.examine)
+                    engine.messenger.thatsNotSomethingYouCan(.examine)
                 )
             }
         }
@@ -105,16 +106,16 @@ public struct ExamineActionHandler: ActionHandler {
         var examinedItems: [Item] = []
 
         // Process each object individually
-        for directObjectRef in context.command.directObjects {
+        for directObjectRef in command.directObjects {
             switch directObjectRef {
             case .item(let targetItemID):
                 do {
-                    let targetItem = try await context.engine.item(targetItemID)
+                    let targetItem = try await engine.item(targetItemID)
 
                     // Validate this specific item for ALL commands
-                    if context.command.isAllCommand {
+                    if command.isAllCommand {
                         // Check if player can reach the item
-                        guard await context.engine.playerCanReach(targetItemID) else {
+                        guard await engine.playerCanReach(targetItemID) else {
                             continue  // Skip unreachable items in ALL commands
                         }
                     }
@@ -124,7 +125,7 @@ public struct ExamineActionHandler: ActionHandler {
                     // Special case: examining 'self' as an item should not record any state changes
                     if targetItem.id != "self" {
                         // --- State Change: Mark as Touched ---
-                        if let update = await context.engine.setFlag(.isTouched, on: targetItem) {
+                        if let update = await engine.setFlag(.isTouched, on: targetItem) {
                             itemStateChanges.append(update)
                         }
                         // Note: Pronoun updates are handled after processing all items
@@ -135,7 +136,7 @@ public struct ExamineActionHandler: ActionHandler {
 
                     // Priority 1: Readable Text (Check dynamic value)
                     if targetItem.hasFlag(.isReadable),
-                        let readText: String = try? await context.engine.attribute(
+                        let readText: String = try? await engine.attribute(
                             .readText, of: targetItem.id),
                         !readText.isEmpty
                     {
@@ -145,7 +146,7 @@ public struct ExamineActionHandler: ActionHandler {
                     // Smart handling for items that are both containers and surfaces
                     if targetItem.hasFlag(.isContainer) && targetItem.hasFlag(.isSurface) {
                         // Check if surface items have meaningful firstDescriptions
-                        let contents = await context.engine.items(in: .item(targetItem.id))
+                        let contents = await engine.items(in: .item(targetItem.id))
                         let hasFirstDescriptions = contents.contains { item in
                             if let firstDescription = item.attributes[.firstDescription],
                                 case .string(let description) = firstDescription,
@@ -161,7 +162,7 @@ public struct ExamineActionHandler: ActionHandler {
                             try itemMessages.append(
                                 await describeSurface(
                                     targetItem: targetItem,
-                                    engine: context.engine
+                                    engine: engine
                                 )
                             )
                         } else {
@@ -169,7 +170,7 @@ public struct ExamineActionHandler: ActionHandler {
                             try itemMessages.append(
                                 await describeContainerOrDoor(
                                     targetItem: targetItem,
-                                    engine: context.engine
+                                    engine: engine
                                 )
                             )
                         }
@@ -179,7 +180,7 @@ public struct ExamineActionHandler: ActionHandler {
                         try itemMessages.append(
                             await describeContainerOrDoor(
                                 targetItem: targetItem,
-                                engine: context.engine
+                                engine: engine
                             )
                         )
                     }
@@ -188,14 +189,14 @@ public struct ExamineActionHandler: ActionHandler {
                         try itemMessages.append(
                             await describeSurface(
                                 targetItem: targetItem,
-                                engine: context.engine
+                                engine: engine
                             )
                         )
                     }
                     // Priority 4: Dynamic Long Description
                     else {
                         // Use the registry to generate the description using the item ID and key
-                        let (description, _, _) = try await context.engine
+                        let (description, _, _) = try await engine
                             .generateDescriptionWithSourceInfo(
                                 for: targetItem.id,
                                 attributeID: .description
@@ -211,7 +212,7 @@ public struct ExamineActionHandler: ActionHandler {
                     examinedItems.append(targetItem)
 
                     // For multiple objects, prefix with item name
-                    if context.command.isAllCommand || context.command.directObjects.count > 1 {
+                    if command.isAllCommand || command.directObjects.count > 1 {
                         messages.append("- \(targetItem.name.capitalizedFirst): \(message)")
                     } else {
                         messages.append(message)
@@ -219,24 +220,24 @@ public struct ExamineActionHandler: ActionHandler {
 
                 } catch {
                     // For ALL commands, skip items that cause errors
-                    if !context.command.isAllCommand {
+                    if !command.isAllCommand {
                         throw error
                     }
                 }
 
             case .player:
                 // Classic Zork response for EXAMINE SELF
-                if context.command.isAllCommand || context.command.directObjects.count > 1 {
-                    messages.append("- Yourself: \(context.message.examineYourself())")
+                if command.isAllCommand || command.directObjects.count > 1 {
+                    messages.append("- Yourself: \(engine.messenger.examineYourself())")
                 } else {
-                    messages.append(context.message.examineYourself())
+                    messages.append(engine.messenger.examineYourself())
                 }
 
             default:
                 // For ALL commands, skip non-items
-                if !context.command.isAllCommand {
+                if !command.isAllCommand {
                     return ActionResult(
-                        context.message.thatsNotSomethingYouCan(.examine)
+                        engine.messenger.thatsNotSomethingYouCan(.examine)
                     )
                 }
             }
@@ -247,14 +248,14 @@ public struct ExamineActionHandler: ActionHandler {
             let lastItem = examinedItems.last!
             if examinedItems.count > 1 {
                 // For multiple items, update both "it" and "them"
-                let pronounChanges = await context.engine.updatePronounsForMultipleObjects(
+                let pronounChanges = await engine.updatePronounsForMultipleObjects(
                     lastItem: lastItem,
                     allItems: examinedItems
                 )
                 allStateChanges.append(contentsOf: pronounChanges)
             } else {
                 // For single item, use the original method
-                if let pronounChange = await context.engine.updatePronouns(to: lastItem) {
+                if let pronounChange = await engine.updatePronouns(to: lastItem) {
                     allStateChanges.append(pronounChange)
                 }
             }
@@ -262,9 +263,9 @@ public struct ExamineActionHandler: ActionHandler {
 
         // Generate appropriate message
         let finalMessage: String
-        if context.command.isAllCommand {
+        if command.isAllCommand {
             if examinedItems.isEmpty && messages.isEmpty {
-                finalMessage = context.message.nothingHereToExamine()
+                finalMessage = engine.messenger.nothingHereToExamine()
             } else {
                 finalMessage = messages.joined(separator: "\n")
             }

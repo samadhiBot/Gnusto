@@ -32,18 +32,22 @@ public struct GoActionHandler: ActionHandler {
     /// - Throws: Various `ActionResponse` errors if validation fails, such as:
     ///           `prerequisiteNotMet` (if no direction), `invalidDirection` (if no such exit),
     ///           `directionIsBlocked` (if statically blocked or door is locked/closed).
-    ///           Can also throw errors from `context.engine.item()` or `context.engine.location()`.
-    public func validate(context: ActionContext) async throws {
+    ///           Can also throw errors from `engine.item()` or `engine.location()`.
+        public func process(
+        command: Command,
+        engine: GameEngine
+    ) async throws -> ActionResult {
+
         // 1. Identify Direction
-        guard let direction = context.command.direction else {
+        guard let direction = command.direction else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.goWhere()
+                engine.messenger.goWhere()
             )
         }
 
         // 2. Get Current Location data
-        let currentLocationID = await context.engine.playerLocationID
-        let currentLocation = try await context.engine.location(currentLocationID)
+        let currentLocationID = await engine.playerLocationID
+        let currentLocation = try await engine.location(currentLocationID)
 
         // 3. Find Exit
         guard let exit = currentLocation.exits[direction] else {
@@ -65,7 +69,7 @@ public struct GoActionHandler: ActionHandler {
 
         // Continue if exit has a doorID, otherwise validation is done
         guard let doorID = exit.doorID else { return }
-        let door = try await context.engine.item(doorID)
+        let door = try await engine.item(doorID)
 
         // Only apply door validation if this is actually a door
         // Non-door objects (like stairs, ladders, ropes) used via ClimbActionHandler don't need to be "open"
@@ -74,18 +78,16 @@ public struct GoActionHandler: ActionHandler {
         // Check if the door is locked
         if door.hasFlag(.isLocked) {
             throw ActionResponse.directionIsBlocked(
-                context.message.doorIsLocked(door: door.withDefiniteArticle.capitalizedFirst)
+                engine.messenger.doorIsLocked(door: door.withDefiniteArticle.capitalizedFirst)
             )
         }
 
         // Check if the door is open
         guard door.hasFlag(.isOpen) else {
             throw ActionResponse.directionIsBlocked(
-                context.message.doorIsClosed(door: door.withDefiniteArticle.capitalizedFirst)
+                engine.messenger.doorIsClosed(door: door.withDefiniteArticle.capitalizedFirst)
             )
         }
-    }
-
     /// Processes the "GO" command.
     ///
     /// Assuming validation has passed, this action:
@@ -101,26 +103,25 @@ public struct GoActionHandler: ActionHandler {
     /// - Parameter context: The `ActionContext` for the current action.
     /// - Returns: An `ActionResult` with `StateChange`s to move the player.
     /// - Throws: `ActionResponse.internalEngineError` if the exit disappears between validation and
-    ///           process, or errors from `context.engine.location()` / `context.engine.item()`.
-    public func process(context: ActionContext) async throws -> ActionResult {
+    ///           process, or errors from `engine.location()` / `engine.item()`.
         // Validation passed, find exit again (state might have changed, though unlikely for exits)
-        let currentLocation = try await context.engine.playerLocation()
+        let currentLocation = try await engine.playerLocation()
         guard
-            let direction = context.command.direction,
+            let direction = command.direction,
             let exit = currentLocation.exits[direction],
             let destinationID = exit.destinationID
         else {
             // Should not happen if validate passed, but defensive check
             throw ActionResponse.internalEngineError(
-                context.message.internalEngineError()
+                engine.messenger.internalEngineError()
             )
         }
 
         // --- Create Result ---
         // Movement itself doesn't usually print a message; the new location description suffices.
-        // The context.engine's run loop will trigger describeCurrentLocation after state changes.
+        // The engine's run loop will trigger describeCurrentLocation after state changes.
         return ActionResult(
-            await context.engine.movePlayer(to: destinationID)
+            await engine.movePlayer(to: destinationID)
         )
     }
 }

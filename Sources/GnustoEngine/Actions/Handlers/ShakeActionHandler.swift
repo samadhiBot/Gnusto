@@ -24,26 +24,28 @@ public struct ShakeActionHandler: ActionHandler {
     ///
     /// - Parameter context: The `ActionContext` for the current action.
     /// - Throws: Various `ActionResponse` errors if validation fails.
-    public func validate(context: ActionContext) async throws {
+        public func process(
+        command: Command,
+        engine: GameEngine
+    ) async throws -> ActionResult {
+
         // Shake requires a direct object (what to shake)
-        guard let directObjectRef = context.command.directObject else {
+        guard let directObjectRef = command.directObject else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.doWhat(verb: context.command.verb)
+                engine.messenger.doWhat(verb: command.verb)
             )
         }
         guard case .item(let targetItemID) = directObjectRef else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.cannotDoThat(verb: "shake")
+                engine.messenger.cannotDoThat(verb: "shake")
             )
         }
 
         // Check if target exists and is reachable
-        _ = try await context.engine.item(targetItemID)
-        guard await context.engine.playerCanReach(targetItemID) else {
+        _ = try await engine.item(targetItemID)
+        guard await engine.playerCanReach(targetItemID) else {
             throw ActionResponse.itemNotAccessible(targetItemID)
         }
-    }
-
     /// Processes the "SHAKE" command.
     ///
     /// Handles shaking attempts on different types of objects.
@@ -51,47 +53,46 @@ public struct ShakeActionHandler: ActionHandler {
     ///
     /// - Parameter context: The `ActionContext` for the current action.
     /// - Returns: An `ActionResult` with appropriate shaking message and state changes.
-    public func process(context: ActionContext) async throws -> ActionResult {
-        guard let directObjectRef = context.command.directObject,
+        guard let directObjectRef = command.directObject,
             case .item(let targetItemID) = directObjectRef
         else {
             throw ActionResponse.internalEngineError(
                 "ShakeActionHandler: directObject was not an item in process.")
         }
 
-        let targetItem = try await context.engine.item(targetItemID)
+        let targetItem = try await engine.item(targetItemID)
 
         // Determine appropriate response based on object type and properties
         let message =
             if targetItem.hasFlag(.isCharacter) {
                 // Shaking characters might not be appropriate
-                context.message.shakeCharacter(character: targetItem.withDefiniteArticle)
+                engine.messenger.shakeCharacter(character: targetItem.withDefiniteArticle)
             } else if targetItem.hasFlag(.isLiquidContainer) {
                 // Special message for liquid containers
-                context.message.shakeLiquidContainer(item: targetItem.withDefiniteArticle)
+                engine.messenger.shakeLiquidContainer(item: targetItem.withDefiniteArticle)
             } else if targetItem.hasFlag(.isContainer) {
                 // Shaking containers might reveal contents
                 if targetItem.hasFlag(.isOpen) {
-                    context.message.shakeOpenContainer(
+                    engine.messenger.shakeOpenContainer(
                         container: targetItem.withDefiniteArticle
                     )
                 } else {
-                    context.message.shakeClosedContainer(
+                    engine.messenger.shakeClosedContainer(
                         container: targetItem.withDefiniteArticle
                     )
                 }
             } else if targetItem.hasFlag(.isTakable) {
                 // Message for a generic takable object
-                context.message.shakeTakableObject(item: targetItem.withDefiniteArticle)
+                engine.messenger.shakeTakableObject(item: targetItem.withDefiniteArticle)
             } else {
                 // Generic shaking response for objects
-                context.message.shakeFixedObject(item: targetItem.withDefiniteArticle)
+                engine.messenger.shakeFixedObject(item: targetItem.withDefiniteArticle)
             }
 
         return ActionResult(
             message,
-            await context.engine.setFlag(.isTouched, on: targetItem),
-            await context.engine.updatePronouns(to: targetItem)
+            await engine.setFlag(.isTouched, on: targetItem),
+            await engine.updatePronouns(to: targetItem)
         )
     }
 

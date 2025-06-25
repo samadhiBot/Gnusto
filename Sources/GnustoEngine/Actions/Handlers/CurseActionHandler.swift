@@ -25,21 +25,21 @@ public struct CurseActionHandler: ActionHandler {
         context: ActionContext
     ) async throws {
         // If there's a direct object, validate it exists and is reachable
-        guard let directObjectRef = context.command.directObject else {
+        guard let directObjectRef = command.directObject else {
             return  // General cursing is always valid
         }
 
         guard case .item(let targetItemID) = directObjectRef else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.thatsNotSomethingYouCan(.curse)
+                engine.messenger.thatsNotSomethingYouCan(.curse)
             )
         }
 
         // Check if item exists
-        let _ = try await context.engine.item(targetItemID)
+        let _ = try await engine.item(targetItemID)
 
         // Check reachability (you can curse at things you can see)
-        guard await context.engine.playerCanReach(targetItemID) else {
+        guard await engine.playerCanReach(targetItemID) else {
             throw ActionResponse.itemNotAccessible(targetItemID)
         }
     }
@@ -48,19 +48,19 @@ public struct CurseActionHandler: ActionHandler {
         context: ActionContext
     ) async throws -> ActionResult {
         // Handle cursing at a specific object
-        if let directObjectRef = context.command.directObject,
+        if let directObjectRef = command.directObject,
             case .item(let targetItemID) = directObjectRef
         {
-            let targetItem = try await context.engine.item(targetItemID)
+            let targetItem = try await engine.item(targetItemID)
 
-            let message = context.message.curseTargetResponse(
+            let message = engine.messenger.curseTargetResponse(
                 item: targetItem.withDefiniteArticle
             )
             return ActionResult(message)
         } else {
             // General cursing (no object)
             return ActionResult(
-                context.message.curseResponse()
+                engine.messenger.curseResponse()
             )
         }
     }

@@ -20,15 +20,17 @@ public struct ScriptActionHandler: ActionHandler {
     /// Validates the "SCRIPT" command.
     ///
     /// SCRIPT requires no specific validation and can generally be executed.
-    public func validate(context: ActionContext) async throws {
+        public func process(
+        command: Command,
+        engine: GameEngine
+    ) async throws -> ActionResult {
+
         // Check if scripting is already active
-        if await context.engine.hasGlobal(.isScripting) {
+        if await engine.hasGlobal(.isScripting) {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.scriptAlreadyOn()
+                engine.messenger.scriptAlreadyOn()
             )
         }
-    }
-
     /// Processes the "SCRIPT" command.
     ///
     /// Starts recording a transcript of the game session.
@@ -36,7 +38,6 @@ public struct ScriptActionHandler: ActionHandler {
     ///
     /// - Parameter context: The `ActionContext` for the current action.
     /// - Returns: An `ActionResult` containing confirmation message and state changes.
-    public func process(context: ActionContext) async throws -> ActionResult {
         // In a full implementation, this would:
         // 1. Prompt for filename
         // 2. Open transcript file
@@ -49,7 +50,7 @@ public struct ScriptActionHandler: ActionHandler {
             Default is "transcript":
             [Transcript recording started]
             """,
-            await context.engine.setGlobal(.isScripting, to: true)
+            await engine.setGlobal(.isScripting, to: true)
         )
     }
 

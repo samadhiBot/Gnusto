@@ -32,9 +32,13 @@ public struct LookActionHandler: ActionHandler {
     /// - Throws: `ActionResponse.prerequisiteNotMet` if the direct object is not an item,
     ///           `ActionResponse.unknownEntity` if the item does not exist, or
     ///           `ActionResponse.itemNotAccessible` if the item cannot be reached.
-    public func validate(context: ActionContext) async throws {
+        public func process(
+        command: Command,
+        engine: GameEngine
+    ) async throws -> ActionResult {
+
         // LOOK (no direct object) always validates.
-        guard let directObjectRef = context.command.directObject else {
+        guard let directObjectRef = command.directObject else {
             return
         }
 
@@ -42,22 +46,20 @@ public struct LookActionHandler: ActionHandler {
         guard case .item(let targetItemID) = directObjectRef else {
             // For now, only items are supported when a direct object is specified.
             throw ActionResponse.prerequisiteNotMet(
-                context.message.canOnlyLookAtItems()
+                engine.messenger.canOnlyLookAtItems()
             )
         }
 
         // EXAMINE [Item] - Ensure item exists and is reachable
-        guard (try? await context.engine.item(targetItemID)) != nil else {
+        guard (try? await engine.item(targetItemID)) != nil else {
             throw ActionResponse.unknownEntity(directObjectRef)  // Was unknownItem
         }
 
         // Check reachability using ScopeResolver
-        guard await context.engine.playerCanReach(targetItemID) else {
+        guard await engine.playerCanReach(targetItemID) else {
             // Use a standard message even if item technically exists elsewhere
             throw ActionResponse.itemNotAccessible(targetItemID)
         }
-    }
-
     /// Processes the "LOOK" command.
     ///
     /// - **LOOK (no direct object):**
@@ -83,37 +85,36 @@ public struct LookActionHandler: ActionHandler {
     /// - Parameter context: The `ActionContext` for the current action.
     /// - Returns: An `ActionResult` containing the description and any relevant `StateChange`s.
     /// - Throws: `ActionResponse.internalEngineError` or errors from engine calls if issues occur.
-    public func process(context: ActionContext) async throws -> ActionResult {
         // Check if this is LOOK (no direct object) or LOOK AT [object] or LOOK THROUGH [object]
-        if context.command.directObject == nil {
+        if command.directObject == nil {
             // LOOK (no direct object) - describe the room
             // Check for darkness FIRST
-            guard await context.engine.playerLocationIsLit() else {
+            guard await engine.playerLocationIsLit() else {
                 return ActionResult(
-                    context.message.roomIsDark()
+                    engine.messenger.roomIsDark()
                 )
             }
 
-            await context.engine.ioHandler.print(
-                "--- \(try context.engine.playerLocation().name) ---",
+            await engine.ioHandler.print(
+                "--- \(try engine.playerLocation().name) ---",
                 style: .strong
             )
 
             // Location is lit, proceed with description
             return ActionResult(
                 await locationDescription(
-                    try context.engine.playerLocation(),
-                    engine: context.engine,
+                    try engine.playerLocation(),
+                    engine: engine,
                     showVerbose: true
                 )
             )
-        } else if context.command.preposition == "through" {
+        } else if command.preposition == "through" {
             // LOOK THROUGH [Object] - delegate to examine behavior for basic look-through functionality
             // Specific items can override this via ItemEventHandlers (like the kitchen window)
             let examineHandler = ExamineActionHandler()
             return try await examineHandler.process(context: context)
-        } else if context.command.preposition == "in" || context.command.preposition == "inside"
-            || context.command.preposition == "with"
+        } else if command.preposition == "in" || command.preposition == "inside"
+            || command.preposition == "with"
         {
             // LOOK IN/INSIDE/WITH [Object] - delegate to look-inside behavior
             let lookInsideHandler = LookInsideActionHandler()

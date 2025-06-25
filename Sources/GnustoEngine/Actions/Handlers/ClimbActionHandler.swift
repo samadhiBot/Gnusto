@@ -32,9 +32,13 @@ public struct ClimbActionHandler: ActionHandler {
     ///
     /// - Parameter context: The `ActionContext` for the current action.
     /// - Throws: Various `ActionResponse` errors if validation fails.
-    public func validate(context: ActionContext) async throws {
+        public func process(
+        command: Command,
+        engine: GameEngine
+    ) async throws -> ActionResult {
+
         // CLIMB with no object is always valid (will be handled in process)
-        guard let directObjectRef = context.command.directObject else {
+        guard let directObjectRef = command.directObject else {
             return
         }
 
@@ -44,25 +48,23 @@ public struct ClimbActionHandler: ActionHandler {
             targetItemID = itemID
         case .location:
             throw ActionResponse.prerequisiteNotMet(
-                context.message.cannotDoThat(verb: "climb")
+                engine.messenger.cannotDoThat(verb: "climb")
             )
         case .player:
             throw ActionResponse.prerequisiteNotMet(
-                context.message.cannotVerbYourself(verb: "climb")
+                engine.messenger.cannotVerbYourself(verb: "climb")
             )
         }
 
         // Check if the target exists
-        guard (try? await context.engine.item(targetItemID)) != nil else {
+        guard (try? await engine.item(targetItemID)) != nil else {
             throw ActionResponse.itemNotAccessible(targetItemID)
         }
 
         // Check if the target is reachable
-        guard await context.engine.playerCanReach(targetItemID) else {
+        guard await engine.playerCanReach(targetItemID) else {
             throw ActionResponse.itemNotAccessible(targetItemID)
         }
-    }
-
     /// Processes the "CLIMB" command.
     ///
     /// This method handles various climbing scenarios:
@@ -73,24 +75,23 @@ public struct ClimbActionHandler: ActionHandler {
     ///
     /// - Parameter context: The `ActionContext` for the current action.
     /// - Returns: An `ActionResult` containing the message and any relevant state changes.
-    public func process(context: ActionContext) async throws -> ActionResult {
         // Handle CLIMB with no object
-        guard let directObjectRef = context.command.directObject else {
+        guard let directObjectRef = command.directObject else {
             return ActionResult(
-                context.message.doWhat(verb: context.command.verb)
+                engine.messenger.doWhat(verb: command.verb)
             )
         }
 
         guard case .item(let targetItemID) = directObjectRef else {
-            let message = context.message.actionHandlerInternalError(
+            let message = engine.messenger.actionHandlerInternalError(
                 handler: "ClimbActionHandler",
                 details: "directObject was not an item in process"
             )
             throw ActionResponse.internalEngineError(message)
         }
 
-        let targetItem = try await context.engine.item(targetItemID)
-        let currentLocation = try await context.engine.playerLocation()
+        let targetItem = try await engine.item(targetItemID)
+        let currentLocation = try await engine.playerLocation()
 
         // Check if this object enables traversal of any exit in the current location
         // Sort directions to ensure consistent behavior when multiple exits use the same object
@@ -108,7 +109,7 @@ public struct ClimbActionHandler: ActionHandler {
                     currentLocation.localGlobals.contains(targetItemID) == false
                 {
                     return ActionResult(
-                        context.message.youSeeNo(item: targetItem.name)
+                        engine.messenger.youSeeNo(item: targetItem.name)
                     )
                 }
 
@@ -122,7 +123,7 @@ public struct ClimbActionHandler: ActionHandler {
                 let goHandler = GoActionHandler()
                 let goContext = ActionContext(
                     command: goCommand,
-                    engine: context.engine
+                    engine: engine
                 )
 
                 try await goHandler.validate(context: goContext)
@@ -132,8 +133,8 @@ public struct ClimbActionHandler: ActionHandler {
                 return ActionResult(
                     message: goResult.message,
                     changes: [
-                        await context.engine.setFlag(.isTouched, on: targetItem),
-                        await context.engine.updatePronouns(to: targetItem),
+                        await engine.setFlag(.isTouched, on: targetItem),
+                        await engine.updatePronouns(to: targetItem),
                     ] + goResult.changes
                 )
             }
@@ -145,16 +146,16 @@ public struct ClimbActionHandler: ActionHandler {
         let message =
             if targetItem.hasFlag(.isClimbable) {
                 // Default climbable behavior - can be overridden by specific item handlers
-                context.message.climbSuccess(item: targetItem.withDefiniteArticle)
+                engine.messenger.climbSuccess(item: targetItem.withDefiniteArticle)
             } else {
                 // Not climbable
-                context.message.climbFailure(item: targetItem.withDefiniteArticle)
+                engine.messenger.climbFailure(item: targetItem.withDefiniteArticle)
             }
 
         return ActionResult(
             message,
-            await context.engine.setFlag(.isTouched, on: targetItem),
-            await context.engine.updatePronouns(to: targetItem)
+            await engine.setFlag(.isTouched, on: targetItem),
+            await engine.updatePronouns(to: targetItem)
         )
     }
 }

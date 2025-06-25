@@ -14,23 +14,20 @@ public struct BriefActionHandler: ActionHandler {
     public let requiresLight: Bool = false
 
     // MARK: - Action Processing Methods
-    public init() {}
-
-    /// Processes the "BRIEF" command.
+    public init() {/// Processes the "BRIEF" command.
     ///
     /// Sets the game to brief mode, where location descriptions are only shown
     /// when entering a location for the first time or when explicitly looking.
     ///
     /// - Parameter context: The `ActionContext` for the current action.
     /// - Returns: An `ActionResult` containing confirmation message and state changes.
-    public func process(context: ActionContext) async throws -> ActionResult {
         return ActionResult(
             """
             Brief mode is now on. Location descriptions will be
             shown only when you first enter a location.
             """,
-            await context.engine.setGlobal(.isBriefMode, to: true),
-            await context.engine.clearGlobal(.isVerboseMode)
+            await engine.setGlobal(.isBriefMode, to: true),
+            await engine.clearGlobal(.isVerboseMode)
         )
     }
 }

@@ -25,11 +25,15 @@ public struct KissActionHandler: ActionHandler {
     ///
     /// - Parameter context: The `ActionContext` for the current action.
     /// - Throws: Various `ActionResponse` errors if validation fails.
-    public func validate(context: ActionContext) async throws {
+        public func process(
+        command: Command,
+        engine: GameEngine
+    ) async throws -> ActionResult {
+
         // Kiss requires a direct object (what to kiss)
-        guard let directObjectRef = context.command.directObject else {
+        guard let directObjectRef = command.directObject else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.doWhat(verb: context.command.verb)
+                engine.messenger.doWhat(verb: command.verb)
             )
         }
 
@@ -37,17 +41,15 @@ public struct KissActionHandler: ActionHandler {
 
         guard case .item(let targetItemID) = directObjectRef else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.cannotDoThat(verb: "kiss")
+                engine.messenger.cannotDoThat(verb: "kiss")
             )
         }
 
         // Check if target exists and is reachable
-        _ = try await context.engine.item(targetItemID)
-        guard await context.engine.playerCanReach(targetItemID) else {
+        _ = try await engine.item(targetItemID)
+        guard await engine.playerCanReach(targetItemID) else {
             throw ActionResponse.itemNotAccessible(targetItemID)
         }
-    }
-
     /// Processes the "KISS" command.
     ///
     /// Handles kissing attempts on different types of objects and characters.
@@ -55,8 +57,7 @@ public struct KissActionHandler: ActionHandler {
     ///
     /// - Parameter context: The `ActionContext` for the current action.
     /// - Returns: An `ActionResult` with appropriate kissing message and state changes.
-    public func process(context: ActionContext) async throws -> ActionResult {
-        guard let directObjectRef = context.command.directObject else {
+        guard let directObjectRef = command.directObject else {
             throw ActionResponse.internalEngineError(
                 "KissActionHandler: directObject was not an item in process."
             )
@@ -64,36 +65,36 @@ public struct KissActionHandler: ActionHandler {
 
         if case .player = directObjectRef {
             return ActionResult(
-                context.message.kissSelf()
+                engine.messenger.kissSelf()
             )
         }
 
         guard case .item(let targetItemID) = directObjectRef else {
             return ActionResult(
-                context.message.doWhat(verb: context.command.verb)
+                engine.messenger.doWhat(verb: command.verb)
             )
         }
 
-        let targetItem = try await context.engine.item(targetItemID)
+        let targetItem = try await engine.item(targetItemID)
 
         // Determine appropriate response based on object type
         let message =
             // Kissing characters
             if targetItem.hasFlag(.isCharacter) {
                 if targetItem.hasFlag(.isFighting) {
-                    context.message.kissEnemy(enemy: targetItem.withDefiniteArticle)
+                    engine.messenger.kissEnemy(enemy: targetItem.withDefiniteArticle)
                 } else {
-                    context.message.kissCharacter(character: targetItem.withDefiniteArticle)
+                    engine.messenger.kissCharacter(character: targetItem.withDefiniteArticle)
                 }
             } else {
                 // Kissing objects - generic response
-                context.message.kissObject(item: targetItem.withDefiniteArticle)
+                engine.messenger.kissObject(item: targetItem.withDefiniteArticle)
             }
 
         return ActionResult(
             message,
-            await context.engine.setFlag(.isTouched, on: targetItem),
-            await context.engine.updatePronouns(to: targetItem)
+            await engine.setFlag(.isTouched, on: targetItem),
+            await engine.updatePronouns(to: targetItem)
         )
     }
 }

@@ -28,40 +28,42 @@ public struct TieActionHandler: ActionHandler {
     ///
     /// - Parameter context: The `ActionContext` for the current action.
     /// - Throws: Various `ActionResponse` errors if validation fails.
-    public func validate(context: ActionContext) async throws {
+        public func process(
+        command: Command,
+        engine: GameEngine
+    ) async throws -> ActionResult {
+
         // Tie requires a direct object (what to tie)
-        guard let directObjectRef = context.command.directObject else {
+        guard let directObjectRef = command.directObject else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.doWhat(verb: context.command.verb)
+                engine.messenger.doWhat(verb: command.verb)
             )
         }
         guard case .item(let targetItemID) = directObjectRef else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.tieCannotTieThat()
+                engine.messenger.tieCannotTieThat()
             )
         }
 
         // Check if target exists and is reachable
-        _ = try await context.engine.item(targetItemID)
-        guard await context.engine.playerCanReach(targetItemID) else {
+        _ = try await engine.item(targetItemID)
+        guard await engine.playerCanReach(targetItemID) else {
             throw ActionResponse.itemNotAccessible(targetItemID)
         }
 
         // If there's an indirect object, validate it too
-        if let indirectObjectRef = context.command.indirectObject {
+        if let indirectObjectRef = command.indirectObject {
             guard case .item(let indirectItemID) = indirectObjectRef else {
                 throw ActionResponse.prerequisiteNotMet(
-                    context.message.tieCannotTieToThat()
+                    engine.messenger.tieCannotTieToThat()
                 )
             }
 
-            _ = try await context.engine.item(indirectItemID)
-            guard await context.engine.playerCanReach(indirectItemID) else {
+            _ = try await engine.item(indirectItemID)
+            guard await engine.playerCanReach(indirectItemID) else {
                 throw ActionResponse.itemNotAccessible(indirectItemID)
             }
         }
-    }
-
     /// Processes the "TIE" command.
     ///
     /// Handles tying attempts on different types of objects.
@@ -69,21 +71,20 @@ public struct TieActionHandler: ActionHandler {
     ///
     /// - Parameter context: The `ActionContext` for the current action.
     /// - Returns: An `ActionResult` with appropriate tying message and state changes.
-    public func process(context: ActionContext) async throws -> ActionResult {
-        guard let directObjectRef = context.command.directObject,
+        guard let directObjectRef = command.directObject,
             case .item(let targetItemID) = directObjectRef
         else {
             throw ActionResponse.internalEngineError(
                 "TieActionHandler: directObject was not an item in process.")
         }
 
-        let targetItem = try await context.engine.item(targetItemID)
+        let targetItem = try await engine.item(targetItemID)
 
-        if let indirectObjectRef = context.command.indirectObject,
+        if let indirectObjectRef = command.indirectObject,
             case .item(let indirectItemID) = indirectObjectRef
         {
             // Tie X to Y
-            let indirectItem = try await context.engine.item(indirectItemID)
+            let indirectItem = try await engine.item(indirectItemID)
 
             return ActionResult(
                 try await handleTyingTogether(
@@ -91,16 +92,16 @@ public struct TieActionHandler: ActionHandler {
                     indirectItem: indirectItem,
                     context: context
                 ),
-                await context.engine.setFlag(.isTouched, on: targetItem),
-                await context.engine.updatePronouns(to: targetItem),
-                await context.engine.setFlag(.isTouched, on: indirectItem)
+                await engine.setFlag(.isTouched, on: targetItem),
+                await engine.updatePronouns(to: targetItem),
+                await engine.setFlag(.isTouched, on: indirectItem)
             )
         } else {
             // Just "TIE X" - tie the object by itself
             return ActionResult(
                 handleTyingAlone(targetItem: targetItem, context: context),
-                await context.engine.setFlag(.isTouched, on: targetItem),
-                await context.engine.updatePronouns(to: targetItem)
+                await engine.setFlag(.isTouched, on: targetItem),
+                await engine.updatePronouns(to: targetItem)
             )
         }
     }
@@ -113,15 +114,15 @@ public struct TieActionHandler: ActionHandler {
     ) async throws -> String {
         // Check if we're trying to tie something to itself
         if targetItem.id == indirectItem.id {
-            return context.message.tieCannotTieToSelf(item: targetItem.name)
+            return engine.messenger.tieCannotTieToSelf(item: targetItem.name)
         }
 
         // General tying attempts
         if targetItem.hasFlag(.isCharacter) || indirectItem.hasFlag(.isCharacter) {
-            return context.message.tieCannotTieLivingBeings()
+            return engine.messenger.tieCannotTieLivingBeings()
         }
 
-        return context.message.tieNeedsSomethingToTieWith(item: targetItem.name)
+        return engine.messenger.tieNeedsSomethingToTieWith(item: targetItem.name)
     }
 
     /// Handles tying a single object.
@@ -130,14 +131,14 @@ public struct TieActionHandler: ActionHandler {
         context: ActionContext
     ) -> String {
         if targetItem.hasFlag(.isCharacter) {
-            return context.message.tieNeedsSomethingToTieCharacterWith(
+            return engine.messenger.tieNeedsSomethingToTieCharacterWith(
                 character: targetItem.name
             )
         } else if targetItem.hasFlag(.isRope) {
             // Special case: tying a rope-like object creates a knot
-            return context.message.tieKnotInRope(item: targetItem.withDefiniteArticle)
+            return engine.messenger.tieKnotInRope(item: targetItem.withDefiniteArticle)
         } else {
-            return context.message.tieNeedsSomethingToTieWith(
+            return engine.messenger.tieNeedsSomethingToTieWith(
                 item: targetItem.name
             )
         }

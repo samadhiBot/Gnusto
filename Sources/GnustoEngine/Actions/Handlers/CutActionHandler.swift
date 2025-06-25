@@ -30,40 +30,42 @@ public struct CutActionHandler: ActionHandler {
     ///
     /// - Parameter context: The `ActionContext` for the current action.
     /// - Throws: Various `ActionResponse` errors if validation fails.
-    public func validate(context: ActionContext) async throws {
+        public func process(
+        command: Command,
+        engine: GameEngine
+    ) async throws -> ActionResult {
+
         // Cut requires a direct object (what to cut)
-        guard let directObjectRef = context.command.directObject else {
+        guard let directObjectRef = command.directObject else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.doWhat(verb: context.command.verb)
+                engine.messenger.doWhat(verb: command.verb)
             )
         }
         guard case .item(let targetItemID) = directObjectRef else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.cannotDoThat(verb: "cut")
+                engine.messenger.cannotDoThat(verb: "cut")
             )
         }
 
         // Check if target exists and is reachable
-        _ = try await context.engine.item(targetItemID)
-        guard await context.engine.playerCanReach(targetItemID) else {
+        _ = try await engine.item(targetItemID)
+        guard await engine.playerCanReach(targetItemID) else {
             throw ActionResponse.itemNotAccessible(targetItemID)
         }
 
         // If cutting tool is specified, validate it
-        if let indirectObjectRef = context.command.indirectObject {
+        if let indirectObjectRef = command.indirectObject {
             guard case .item(let toolItemID) = indirectObjectRef else {
                 throw ActionResponse.prerequisiteNotMet(
-                    context.message.cannotActWithThat(verb: "cut")
+                    engine.messenger.cannotActWithThat(verb: "cut")
                 )
             }
 
-            let toolItem = try await context.engine.item(toolItemID)
+            let toolItem = try await engine.item(toolItemID)
             guard toolItem.parent == .player else {
                 throw ActionResponse.itemNotHeld(toolItemID)
             }
         }
-    }
-
     /// Processes the "CUT" command.
     ///
     /// Handles cutting attempts with different tools:
@@ -74,44 +76,43 @@ public struct CutActionHandler: ActionHandler {
     ///
     /// - Parameter context: The `ActionContext` for the current action.
     /// - Returns: An `ActionResult` with appropriate cutting message and state changes.
-    public func process(context: ActionContext) async throws -> ActionResult {
-        guard let directObjectRef = context.command.directObject,
+        guard let directObjectRef = command.directObject,
             case .item(let targetItemID) = directObjectRef
         else {
-            let message = context.message.actionHandlerInternalError(
+            let message = engine.messenger.actionHandlerInternalError(
                 handler: "CutActionHandler",
                 details: "directObject was not an item in process"
             )
             throw ActionResponse.internalEngineError(message)
         }
 
-        let targetItem = try await context.engine.item(targetItemID)
+        let targetItem = try await engine.item(targetItemID)
 
         // Determine cutting implement
         let message: String
 
-        if let indirectObjectRef = context.command.indirectObject,
+        if let indirectObjectRef = command.indirectObject,
             case .item(let toolItemID) = indirectObjectRef
         {
 
-            let toolItem = try await context.engine.item(toolItemID)
+            let toolItem = try await engine.item(toolItemID)
 
             if toolItem.hasFlag(.isWeapon) || toolItem.hasFlag(.isTool) {
                 // Successfully cut with appropriate tool
-                message = context.message.cutWithTool(
+                message = engine.messenger.cutWithTool(
                     item: targetItem.withDefiniteArticle,
                     tool: toolItem.withDefiniteArticle
                 )
             } else {
                 // Using an inappropriate implement
-                message = context.message.cutToolNotSharp(
+                message = engine.messenger.cutToolNotSharp(
                     tool: toolItem.withDefiniteArticle.capitalizedFirst
                 )
             }
 
         } else {
             // No tool specified - check if player has cutting implements
-            let playerInventory = await context.engine.playerInventory
+            let playerInventory = await engine.playerInventory
             let cuttingTools = playerInventory.filter {
                 $0.hasFlag(.isWeapon) || $0.hasFlag(.isTool)
             }
@@ -119,19 +120,19 @@ public struct CutActionHandler: ActionHandler {
             if !cuttingTools.isEmpty {
                 let firstTool = cuttingTools.first!
                 // Auto-cut with available tool
-                message = context.message.cutWithAutoTool(
+                message = engine.messenger.cutWithAutoTool(
                     item: targetItem.withDefiniteArticle,
                     tool: firstTool.withDefiniteArticle
                 )
             } else {
-                message = context.message.cutNoSuitableTool()
+                message = engine.messenger.cutNoSuitableTool()
             }
         }
 
         return ActionResult(
             message,
-            await context.engine.setFlag(.isTouched, on: targetItem),
-            await context.engine.updatePronouns(to: targetItem)
+            await engine.setFlag(.isTouched, on: targetItem),
+            await engine.updatePronouns(to: targetItem)
         )
     }
 

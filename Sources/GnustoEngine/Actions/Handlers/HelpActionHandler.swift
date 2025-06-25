@@ -18,10 +18,12 @@ public struct HelpActionHandler: ActionHandler {
 
     /// Validates the "HELP" command.
     /// Help requires no specific validation and always proceeds.
-    public func validate(context: ActionContext) async throws {
-        // No validation needed for HELP
-    }
+        public func process(
+        command: Command,
+        engine: GameEngine
+    ) async throws -> ActionResult {
 
+        // No validation needed for HELP
     /// Processes the "HELP" command.
     ///
     /// Displays basic help information about common interactive fiction commands.
@@ -29,7 +31,6 @@ public struct HelpActionHandler: ActionHandler {
     ///
     /// - Parameter context: The `ActionContext` for the current action.
     /// - Returns: An `ActionResult` containing help text.
-    public func process(context: ActionContext) async throws -> ActionResult {
         let helpText = """
             This is an interactive fiction game. You control the story by typing commands.
 

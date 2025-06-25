@@ -24,21 +24,21 @@ public struct ChompActionHandler: ActionHandler {
         context: ActionContext
     ) async throws {
         // CHOMP without object is always valid (general chomping)
-        guard let directObjectRef = context.command.directObject else {
+        guard let directObjectRef = command.directObject else {
             return
         }
 
         guard case .item(let targetItemID) = directObjectRef else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.thatsNotSomethingYouCan(.chomp)
+                engine.messenger.thatsNotSomethingYouCan(.chomp)
             )
         }
 
         // Check if item exists (engine.item() will throw if not found)
-        let _ = try await context.engine.item(targetItemID)
+        let _ = try await engine.item(targetItemID)
 
         // Check reachability
-        guard await context.engine.playerCanReach(targetItemID) else {
+        guard await engine.playerCanReach(targetItemID) else {
             throw ActionResponse.itemNotAccessible(targetItemID)
         }
     }
@@ -47,29 +47,29 @@ public struct ChompActionHandler: ActionHandler {
         context: ActionContext
     ) async throws -> ActionResult {
         // Handle general chomping (no object)
-        guard let directObjectRef = context.command.directObject,
+        guard let directObjectRef = command.directObject,
             case .item(let targetItemID) = directObjectRef
         else {
             // Get random response from message provider
             return ActionResult(
-                context.message.chompResponse()
+                engine.messenger.chompResponse()
             )
         }
 
-        let targetItem = try await context.engine.item(targetItemID)
+        let targetItem = try await engine.item(targetItemID)
 
         // Special responses for different types of items
         let message =
             if targetItem.hasFlag(.isEdible) {
-                context.message.chompEdible(
+                engine.messenger.chompEdible(
                     item: targetItem.withIndefiniteArticle
                 )
             } else if targetItem.hasFlag(.isPerson) || targetItem.hasFlag(.isCharacter) {
-                context.message.chompCharacter(
+                engine.messenger.chompCharacter(
                     targetItem.withDefiniteArticle
                 )
             } else {
-                context.message.chompTargetResponse(
+                engine.messenger.chompTargetResponse(
                     item: targetItem.withDefiniteArticle
                 )
             }
@@ -77,8 +77,8 @@ public struct ChompActionHandler: ActionHandler {
         // Mark item as touched and update pronouns
         return ActionResult(
             message,
-            await context.engine.setFlag(.isTouched, on: targetItem),
-            await context.engine.updatePronouns(to: targetItem)
+            await engine.setFlag(.isTouched, on: targetItem),
+            await engine.updatePronouns(to: targetItem)
         )
     }
 }

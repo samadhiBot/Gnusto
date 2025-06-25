@@ -34,29 +34,33 @@ public struct TurnOnActionHandler: ActionHandler {
     ///           `custom` (for "Turn on what?" or "It's already on."),
     ///           `prerequisiteNotMet` (if not an item, not a device, and not flammable),
     ///           `itemNotAccessible`.
-    ///           Can also throw errors from `context.engine.item()`.
-    public func validate(context: ActionContext) async throws {
+    ///           Can also throw errors from `engine.item()`.
+        public func process(
+        command: Command,
+        engine: GameEngine
+    ) async throws -> ActionResult {
+
         // 1. Get direct object and ensure it's an item
-        guard let directObjectRef = context.command.directObject else {
+        guard let directObjectRef = command.directObject else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.doWhat(verb: context.command.verb)
+                engine.messenger.doWhat(verb: command.verb)
             )
         }
         guard case .item(let targetItemID) = directObjectRef else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.thatsNotSomethingYouCan(.light)
+                engine.messenger.thatsNotSomethingYouCan(.light)
             )
         }
 
         // 2. Fetch the item snapshot.
-        let targetItem = try await context.engine.item(targetItemID)
+        let targetItem = try await engine.item(targetItemID)
 
         // 3. Verify the item is reachable (with light source exception in dark).
-        let currentLocationID = await context.engine.playerLocationID
+        let currentLocationID = await engine.playerLocationID
         let isHeld = targetItem.parent == .player
         let isInLocation = targetItem.parent == .location(currentLocationID)
         let isLightSource = targetItem.hasFlag(.isLightSource)
-        let roomIsDark = await context.engine.playerLocationIsLit() == false
+        let roomIsDark = await engine.playerLocationIsLit() == false
 
         var isReachable = false
         if isHeld {
@@ -67,7 +71,7 @@ public struct TurnOnActionHandler: ActionHandler {
                 isReachable = true
             } else {
                 // Otherwise, standard reachability check.
-                isReachable = await context.engine.playerCanReach(targetItemID)
+                isReachable = await engine.playerCanReach(targetItemID)
             }
         }
         guard isReachable else {
@@ -80,18 +84,16 @@ public struct TurnOnActionHandler: ActionHandler {
 
         guard isDevice || isFlammable else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.cannotTurnOn()
+                engine.messenger.cannotTurnOn()
             )
         }
 
         // 5. If it's a device, check if it's already on.
         if isDevice && targetItem.hasFlag(.isOn) {
             throw ActionResponse.custom(
-                context.message.alreadyOn()
+                engine.messenger.alreadyOn()
             )
         }
-    }
-
     /// Processes the "TURN ON" command.
     ///
     /// This method intelligently handles both devices and flammable objects:
@@ -112,15 +114,14 @@ public struct TurnOnActionHandler: ActionHandler {
     /// - Parameter context: The `ActionContext` for the current action.
     /// - Returns: An `ActionResult` containing the message and relevant state changes.
     /// - Throws: `ActionResponse.internalEngineError` if the direct object is not an item (this should
-    ///           be caught by `validate`), or errors from `context.engine.item()`.
-    public func process(context: ActionContext) async throws -> ActionResult {
-        guard let directObjectRef = context.command.directObject,
+    ///           be caught by `validate`), or errors from `engine.item()`.
+        guard let directObjectRef = command.directObject,
             case .item(let targetItemID) = directObjectRef
         else {
             throw ActionResponse.internalEngineError(
                 "TurnOn: directObject was not an item in process.")
         }
-        let targetItem = try await context.engine.item(targetItemID)
+        let targetItem = try await engine.item(targetItemID)
 
         let isDevice = targetItem.hasFlag(.isDevice)
         let isFlammable = targetItem.hasFlag(.isFlammable)
@@ -133,7 +134,7 @@ public struct TurnOnActionHandler: ActionHandler {
         // Otherwise, proceed with normal turn-on logic for devices
 
         // Check if room was dark before turning on the light
-        let wasRoomDark = await context.engine.playerLocationIsLit() == false
+        let wasRoomDark = await engine.playerLocationIsLit() == false
         let isLightSource = targetItem.hasFlag(.isLightSource)
 
         var messageParts: [String] = []
@@ -141,7 +142,7 @@ public struct TurnOnActionHandler: ActionHandler {
 
         // Check if turning on this light source illuminated a dark room
         if wasRoomDark && isLightSource {
-            let currentLocation = try await context.engine.playerLocation()
+            let currentLocation = try await engine.playerLocation()
             let locationIsInherentlyLit = currentLocation.hasFlag(.inherentlyLit)
 
             if !locationIsInherentlyLit {
@@ -152,8 +153,8 @@ public struct TurnOnActionHandler: ActionHandler {
 
         return ActionResult(
             messageParts.joined(separator: "\n"),
-            await context.engine.setFlag(.isTouched, on: targetItem),
-            await context.engine.setFlag(.isOn, on: targetItem),
+            await engine.setFlag(.isTouched, on: targetItem),
+            await engine.setFlag(.isOn, on: targetItem),
         )
     }
 
@@ -176,20 +177,20 @@ public struct TurnOnActionHandler: ActionHandler {
         // Check if the item is flammable (should always be true in this context)
         if targetItem.hasFlag(.isFlammable) {
             return ActionResult(
-                context.message.itemBurnsToAshes(item: targetItem.withDefiniteArticle),
-                await context.engine.setFlag(.isTouched, on: targetItem),
-                await context.engine.updatePronouns(to: targetItem),
-                await context.engine.move(targetItem, to: .nowhere),
+                engine.messenger.itemBurnsToAshes(item: targetItem.withDefiniteArticle),
+                await engine.setFlag(.isTouched, on: targetItem),
+                await engine.updatePronouns(to: targetItem),
+                await engine.move(targetItem, to: .nowhere),
             )
         } else {
             // Fallback message for non-flammable items (shouldn't reach here due to validation)
             return ActionResult(
-                context.message.cannotDoThat(
+                engine.messenger.cannotDoThat(
                     verb: .burn,
                     item: targetItem.withDefiniteArticle
                 ),
-                await context.engine.setFlag(.isTouched, on: targetItem),
-                await context.engine.updatePronouns(to: targetItem),
+                await engine.setFlag(.isTouched, on: targetItem),
+                await engine.updatePronouns(to: targetItem),
             )
         }
     }

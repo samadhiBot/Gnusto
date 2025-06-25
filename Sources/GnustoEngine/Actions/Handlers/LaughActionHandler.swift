@@ -24,7 +24,7 @@ public struct LaughActionHandler: ActionHandler {
         context: ActionContext
     ) async throws -> ActionResult {
         ActionResult(
-            context.message.laughResponse()
+            engine.messenger.laughResponse()
         )
     }
 }

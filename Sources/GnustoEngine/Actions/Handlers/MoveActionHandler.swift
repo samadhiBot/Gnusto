@@ -33,45 +33,47 @@ public struct MoveActionHandler: ActionHandler {
     ///           `prerequisiteNotMet` (for missing object or wrong item type),
     ///           `itemNotAccessible` (if item cannot be reached),
     ///           `itemNotMovable` (if item is fixed scenery).
-    ///           Can also throw errors from `context.engine.item()`.
-    public func validate(context: ActionContext) async throws {
+    ///           Can also throw errors from `engine.item()`.
+        public func process(
+        command: Command,
+        engine: GameEngine
+    ) async throws -> ActionResult {
+
         // For ALL commands, allow empty directObjects (handled in process method)
-        if context.command.isAllCommand {
+        if command.isAllCommand {
             return
         }
 
         // 1. Ensure we have at least one direct object for non-ALL commands
-        guard !context.command.directObjects.isEmpty else {
+        guard !command.directObjects.isEmpty else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.doWhat(verb: context.command.verb)
+                engine.messenger.doWhat(verb: command.verb)
             )
         }
 
         // For single object commands, validate the single object
-        guard let directObjectRef = context.command.directObject else {
+        guard let directObjectRef = command.directObject else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.doWhat(verb: context.command.verb)
+                engine.messenger.doWhat(verb: command.verb)
             )
         }
         guard case .item(let targetItemID) = directObjectRef else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.thatsNotSomethingYouCan(.move)
+                engine.messenger.thatsNotSomethingYouCan(.move)
             )
         }
 
         // 2. Check if item exists
-        _ = try await context.engine.item(targetItemID)
+        _ = try await engine.item(targetItemID)
 
         // 3. Check reachability using ScopeResolver
-        guard await context.engine.playerCanReach(targetItemID) else {
+        guard await engine.playerCanReach(targetItemID) else {
             throw ActionResponse.itemNotAccessible(targetItemID)
         }
 
         // 4. Check if the item can be moved (not immovable scenery)
         // Some scenery items might be movable (like a pile of leaves), others are not
         // We'll let the process method handle the specific logic for what happens when moved
-    }
-
     /// Processes the "MOVE" command.
     ///
     /// For each item to be moved:
@@ -86,10 +88,9 @@ public struct MoveActionHandler: ActionHandler {
     /// - Parameter context: The `ActionContext` for the current action.
     /// - Returns: An `ActionResult` containing a message and any relevant `StateChange`s.
     /// - Throws: `ActionResponse.internalEngineError` if direct object is not an item.
-    public func process(context: ActionContext) async throws -> ActionResult {
         // For ALL commands, empty directObjects is valid (means nothing to move)
-        if !context.command.isAllCommand {
-            guard !context.command.directObjects.isEmpty else {
+        if !command.isAllCommand {
+            guard !command.directObjects.isEmpty else {
                 throw ActionResponse.internalEngineError("Move: no direct objects in process.")
             }
         }
@@ -99,9 +100,9 @@ public struct MoveActionHandler: ActionHandler {
         var lastMovedItem: Item?
 
         // Process each object individually
-        for directObjectRef in context.command.directObjects {
+        for directObjectRef in command.directObjects {
             guard case .item(let targetItemID) = directObjectRef else {
-                if context.command.isAllCommand {
+                if command.isAllCommand {
                     continue  // Skip non-items in ALL commands
                 } else {
                     throw ActionResponse.internalEngineError(
@@ -110,12 +111,12 @@ public struct MoveActionHandler: ActionHandler {
             }
 
             do {
-                let targetItem = try await context.engine.item(targetItemID)
+                let targetItem = try await engine.item(targetItemID)
 
                 // Validate this specific item for ALL commands
-                if context.command.isAllCommand {
+                if command.isAllCommand {
                     // Check if player can reach the item
-                    guard await context.engine.playerCanReach(targetItemID) else {
+                    guard await engine.playerCanReach(targetItemID) else {
                         continue  // Skip unreachable items in ALL commands
                     }
                 }
@@ -127,7 +128,7 @@ public struct MoveActionHandler: ActionHandler {
                 var itemStateChanges: [StateChange] = []
 
                 // Change 1: Set `.isTouched` flag if not already set
-                if let touchedChange = await context.engine.setFlag(.isTouched, on: targetItem) {
+                if let touchedChange = await engine.setFlag(.isTouched, on: targetItem) {
                     itemStateChanges.append(touchedChange)
                 }
 
@@ -137,7 +138,7 @@ public struct MoveActionHandler: ActionHandler {
 
             } catch {
                 // For ALL commands, skip items that cause errors
-                if !context.command.isAllCommand {
+                if !command.isAllCommand {
                     throw error
                 }
             }
@@ -147,14 +148,14 @@ public struct MoveActionHandler: ActionHandler {
         if let lastItem = lastMovedItem {
             if movedItems.count > 1 {
                 // For multiple items, update both "it" and "them"
-                let pronounChanges = await context.engine.updatePronounsForMultipleObjects(
+                let pronounChanges = await engine.updatePronounsForMultipleObjects(
                     lastItem: lastItem,
                     allItems: movedItems
                 )
                 allStateChanges.append(contentsOf: pronounChanges)
             } else {
                 // For single item, use the original method
-                if let pronounChange = await context.engine.updatePronouns(to: lastItem) {
+                if let pronounChange = await engine.updatePronouns(to: lastItem) {
                     allStateChanges.append(pronounChange)
                 }
             }
@@ -162,7 +163,7 @@ public struct MoveActionHandler: ActionHandler {
 
         // Generate appropriate message
         let message =
-            if context.command.isAllCommand {
+            if command.isAllCommand {
                 if movedItems.isEmpty {
                     "There is nothing here to move."
                 } else {

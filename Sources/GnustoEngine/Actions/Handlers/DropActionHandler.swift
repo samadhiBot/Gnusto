@@ -25,34 +25,38 @@ public struct DropActionHandler: ActionHandler {
     /// - Throws: Various `ActionResponse` errors if validation fails, such as:
     ///           `prerequisiteNotMet` (for missing object or wrong item type),
     ///           `itemNotHeld` (if the player isn't holding the item).
-    ///           Can also throw errors from `context.engine.item()`.
-    public func validate(context: ActionContext) async throws {
+    ///           Can also throw errors from `engine.item()`.
+        public func process(
+        command: Command,
+        engine: GameEngine
+    ) async throws -> ActionResult {
+
         // For ALL commands, allow empty directObjects (handled in process method)
-        if context.command.isAllCommand {
+        if command.isAllCommand {
             return
         }
 
         // 1. Ensure we have at least one direct object for non-ALL commands
-        guard !context.command.directObjects.isEmpty else {
+        guard !command.directObjects.isEmpty else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.doWhat(verb: context.command.verb)
+                engine.messenger.doWhat(verb: command.verb)
             )
         }
 
         // For single object commands, validate the single object
-        guard let directObjectRef = context.command.directObject else {
+        guard let directObjectRef = command.directObject else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.doWhat(verb: context.command.verb)
+                engine.messenger.doWhat(verb: command.verb)
             )
         }
         guard case .item(let targetItemID) = directObjectRef else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.thatsNotSomethingYouCan(.drop)
+                engine.messenger.thatsNotSomethingYouCan(.drop)
             )
         }
 
         // 2. Check if item exists and is held by player
-        let targetItem = try await context.engine.item(targetItemID)
+        let targetItem = try await engine.item(targetItemID)
         guard targetItem.parent == .player else {
             throw ActionResponse.itemNotHeld(targetItemID)
         }
@@ -66,8 +70,6 @@ public struct DropActionHandler: ActionHandler {
         guard !targetItem.hasFlag(.omitDescription) else {
             throw ActionResponse.itemNotDroppable(targetItemID)
         }
-    }
-
     /// Processes the "DROP" command.
     ///
     /// Assuming basic validation has passed, this action performs the following:
@@ -85,13 +87,12 @@ public struct DropActionHandler: ActionHandler {
     /// - Parameter context: The `ActionContext` for the current action.
     /// - Returns: An `ActionResult` containing a message and any relevant `StateChange`s.
     /// - Throws: `ActionResponse.internalEngineError` if direct object is not an item (should be
-    ///           caught by validate), or errors from `context.engine.item()`.
-    public func process(context: ActionContext) async throws -> ActionResult {
+    ///           caught by validate), or errors from `engine.item()`.
         // For ALL commands, empty directObjects is valid (means nothing to drop)
-        if !context.command.isAllCommand {
-            guard !context.command.directObjects.isEmpty else {
+        if !command.isAllCommand {
+            guard !command.directObjects.isEmpty else {
                 throw ActionResponse.internalEngineError(
-                    context.message.internalEngineError()
+                    engine.messenger.internalEngineError()
                 )
             }
         }
@@ -101,36 +102,36 @@ public struct DropActionHandler: ActionHandler {
         var lastDroppedItem: Item?
 
         // Get current location for dropping items
-        let currentLocationID = await context.engine.playerLocationID
+        let currentLocationID = await engine.playerLocationID
 
         // Process each object individually
-        for directObjectRef in context.command.directObjects {
+        for directObjectRef in command.directObjects {
             guard case .item(let targetItemID) = directObjectRef else {
-                if context.command.isAllCommand {
+                if command.isAllCommand {
                     continue  // Skip non-items in ALL commands
                 } else {
                     throw ActionResponse.internalEngineError(
-                        context.message.thatsNotSomethingYouCan(.drop)
+                        engine.messenger.thatsNotSomethingYouCan(.drop)
                     )
                 }
             }
 
             do {
-                let targetItem = try await context.engine.item(targetItemID)
+                let targetItem = try await engine.item(targetItemID)
 
                 // Check if player is actually holding this item
                 guard targetItem.parent == .player else {
-                    if context.command.isAllCommand {
+                    if command.isAllCommand {
                         continue  // Skip items not held in ALL commands
                     } else {
                         return ActionResult(
-                            context.message.youArentHoldingThat()
+                            engine.messenger.youArentHoldingThat()
                         )
                     }
                 }
 
                 // Validate this specific item for ALL commands
-                if context.command.isAllCommand {
+                if command.isAllCommand {
                     // Check if item is droppable (not scenery/fixed)
                     guard !targetItem.hasFlag(.omitDescription) else {
                         continue  // Skip non-droppable items in ALL commands
@@ -138,7 +139,7 @@ public struct DropActionHandler: ActionHandler {
                 }
 
                 // Validate this specific item for ALL commands
-                if context.command.isAllCommand {
+                if command.isAllCommand {
                     // Check if item is droppable (not scenery/fixed)
                     guard !targetItem.hasFlag(.omitDescription) else {
                         continue  // Skip non-droppable items in ALL commands
@@ -149,12 +150,12 @@ public struct DropActionHandler: ActionHandler {
                 var itemStateChanges: [StateChange] = []
 
                 // Change 1: Move item to current location
-                let moveChange = await context.engine.move(
+                let moveChange = await engine.move(
                     targetItem, to: .location(currentLocationID))
                 itemStateChanges.append(moveChange)
 
                 // Change 2: Set `.isTouched` flag if not already set
-                if let touchedChange = await context.engine.setFlag(.isTouched, on: targetItem) {
+                if let touchedChange = await engine.setFlag(.isTouched, on: targetItem) {
                     itemStateChanges.append(touchedChange)
                 }
 
@@ -164,7 +165,7 @@ public struct DropActionHandler: ActionHandler {
 
             } catch {
                 // For ALL commands, skip items that cause errors
-                if !context.command.isAllCommand {
+                if !command.isAllCommand {
                     throw error
                 }
             }
@@ -174,14 +175,14 @@ public struct DropActionHandler: ActionHandler {
         if let lastItem = lastDroppedItem {
             if droppedItems.count > 1 {
                 // For multiple items, update both "it" and "them"
-                let pronounChanges = await context.engine.updatePronounsForMultipleObjects(
+                let pronounChanges = await engine.updatePronounsForMultipleObjects(
                     lastItem: lastItem,
                     allItems: droppedItems
                 )
                 allStateChanges.append(contentsOf: pronounChanges)
             } else {
                 // For single item, use the original method
-                if let pronounChange = await context.engine.updatePronouns(to: lastItem) {
+                if let pronounChange = await engine.updatePronouns(to: lastItem) {
                     allStateChanges.append(pronounChange)
                 }
             }
@@ -189,23 +190,23 @@ public struct DropActionHandler: ActionHandler {
 
         // Clear .isWorn flag for all dropped items (after pronoun update to match expected order)
         for droppedItem in droppedItems {
-            if let wornChange = await context.engine.clearFlag(.isWorn, on: droppedItem) {
+            if let wornChange = await engine.clearFlag(.isWorn, on: droppedItem) {
                 allStateChanges.append(wornChange)
             }
         }
 
         // Generate appropriate message
         let message =
-            if context.command.isAllCommand {
+            if command.isAllCommand {
                 if droppedItems.isEmpty {
                     "You have nothing to drop."
                 } else {
-                    context.message.youDropMultipleItems(
+                    engine.messenger.youDropMultipleItems(
                         items: droppedItems.listWithDefiniteArticles
                     )
                 }
             } else {
-                context.message.dropped()
+                engine.messenger.dropped()
             }
 
         return ActionResult(

@@ -26,23 +26,25 @@ public struct BlowActionHandler: ActionHandler {
     ///
     /// - Parameter context: The `ActionContext` for the current action.
     /// - Throws: Various `ActionResponse` errors if validation fails.
-    public func validate(context: ActionContext) async throws {
+        public func process(
+        command: Command,
+        engine: GameEngine
+    ) async throws -> ActionResult {
+
         // Blow can be used without an object (general blowing) or with an object
-        if let directObjectRef = context.command.directObject {
+        if let directObjectRef = command.directObject {
             guard case .item(let targetItemID) = directObjectRef else {
                 throw ActionResponse.prerequisiteNotMet(
-                    context.message.thatsNotSomethingYouCan(.blow)
+                    engine.messenger.thatsNotSomethingYouCan(.blow)
                 )
             }
 
             // Check if target exists and is reachable
-            _ = try await context.engine.item(targetItemID)
-            guard await context.engine.playerCanReach(targetItemID) else {
+            _ = try await engine.item(targetItemID)
+            guard await engine.playerCanReach(targetItemID) else {
                 throw ActionResponse.itemNotAccessible(targetItemID)
             }
         }
-    }
-
     /// Processes the "BLOW" command.
     ///
     /// Handles blowing on objects or general blowing. Special items like candles,
@@ -50,42 +52,41 @@ public struct BlowActionHandler: ActionHandler {
     ///
     /// - Parameter context: The `ActionContext` for the current action.
     /// - Returns: An `ActionResult` with appropriate blow message and state changes.
-    public func process(context: ActionContext) async throws -> ActionResult {
         // Handle blowing on a specific object
         guard
-            let directObjectRef = context.command.directObject,
+            let directObjectRef = command.directObject,
             case .item(let targetItemID) = directObjectRef
         else {
             // General blowing without a target
             return ActionResult(
-                context.message.blowGeneral()
+                engine.messenger.blowGeneral()
             )
         }
 
-        let targetItem = try await context.engine.item(targetItemID)
+        let targetItem = try await engine.item(targetItemID)
 
         // Default behavior for blowing on objects
         let message =
             if targetItem.hasFlag(.isLightSource) && targetItem.hasFlag(.isLit) {
                 // Blowing on lit light sources might extinguish them
-                context.message.blowOnLightSource(
+                engine.messenger.blowOnLightSource(
                     item: targetItem.withDefiniteArticle
                 )
             } else if targetItem.hasFlag(.isFlammable) {
                 // Specific extinguishing behavior should use TurnOffActionHandler or custom logic
-                context.message.blowOnFlammable(
+                engine.messenger.blowOnFlammable(
                     item: targetItem.withDefiniteArticle
                 )
             } else {
-                context.message.blowOnGeneric(
+                engine.messenger.blowOnGeneric(
                     item: targetItem.withDefiniteArticle
                 )
             }
 
         return ActionResult(
             message,
-            await context.engine.setFlag(.isTouched, on: targetItem),
-            await context.engine.updatePronouns(to: targetItem),
+            await engine.setFlag(.isTouched, on: targetItem),
+            await engine.updatePronouns(to: targetItem),
         )
     }
 }

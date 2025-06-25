@@ -25,21 +25,23 @@ public struct BreatheActionHandler: ActionHandler {
     ///
     /// - Parameter context: The `ActionContext` for the current action.
     /// - Throws: `ActionResponse.prerequisiteNotMet` if objects are specified.
-    public func validate(context: ActionContext) async throws {
+        public func process(
+        command: Command,
+        engine: GameEngine
+    ) async throws -> ActionResult {
+
         // Breathe should not take any objects
-        if context.command.directObject != nil {
+        if command.directObject != nil {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.cannotDoThat(verb: "breathe")
+                engine.messenger.cannotDoThat(verb: "breathe")
             )
         }
 
-        if context.command.indirectObject != nil {
+        if command.indirectObject != nil {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.cannotDoThat(verb: "breathe")
+                engine.messenger.cannotDoThat(verb: "breathe")
             )
         }
-    }
-
     /// Processes the "BREATHE" command.
     ///
     /// Provides varied atmospheric responses based on the current game state.
@@ -47,10 +49,9 @@ public struct BreatheActionHandler: ActionHandler {
     ///
     /// - Parameter context: The `ActionContext` for the current action.
     /// - Returns: An `ActionResult` with an atmospheric message.
-    public func process(context: ActionContext) async throws -> ActionResult {
         // Get random response from message provider
         return ActionResult(
-            context.message.breatheResponse()
+            engine.messenger.breatheResponse()
         )
     }
 

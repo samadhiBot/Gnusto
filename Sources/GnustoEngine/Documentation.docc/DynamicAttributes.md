@@ -228,7 +228,7 @@ let change = await engine.setAttribute("material", on: armor, to: "steel")
 ```swift
 struct OpenActionHandler: ActionHandler {
     func process(context: ActionContext) async throws -> ActionResult {
-        let item = try context.engine.item(context.command.directObjectID)
+        let item = try engine.item(command.directObjectID)
 
         // Validate the item can be opened
         guard item.hasProperty(.isOpenable) else {
@@ -236,14 +236,14 @@ struct OpenActionHandler: ActionHandler {
         }
 
         // Create state change using builder
-        guard let change = await context.engine.setAttribute("isOpen", on: item, to: true) else {
+        guard let change = await engine.setAttribute("isOpen", on: item, to: true) else {
             throw ActionResponse.itemAlreadyOpen(item)
         }
 
         // Return result with state change - the engine will apply it through the pipeline
         return ActionResult(
             changes: [change],
-            message: "🤡 You open \(context.engine.theThat(item))."
+            message: "🤡 You open \(engine.theThat(item))."
         )
     }
 }

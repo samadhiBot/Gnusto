@@ -18,15 +18,17 @@ public struct UnscriptActionHandler: ActionHandler {
     /// Validates the "UNSCRIPT" command.
     ///
     /// UNSCRIPT requires that scripting is currently active.
-    public func validate(context: ActionContext) async throws {
+        public func process(
+        command: Command,
+        engine: GameEngine
+    ) async throws -> ActionResult {
+
         // Check if scripting is currently active
-        if !(await context.engine.hasGlobal(.isScripting)) {
+        if !(await engine.hasGlobal(.isScripting)) {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.scriptNotOn()
+                engine.messenger.scriptNotOn()
             )
         }
-    }
-
     /// Processes the "UNSCRIPT" command.
     ///
     /// Stops recording the transcript of the game session.
@@ -34,7 +36,6 @@ public struct UnscriptActionHandler: ActionHandler {
     ///
     /// - Parameter context: The `ActionContext` for the current action.
     /// - Returns: An `ActionResult` containing confirmation message and state changes.
-    public func process(context: ActionContext) async throws -> ActionResult {
         // In a full implementation, this would:
         // 1. Close the transcript file
         // 2. Stop recording input/output
@@ -43,7 +44,7 @@ public struct UnscriptActionHandler: ActionHandler {
 
         return ActionResult(
             "🤡 [Transcript recording ended]",
-            await context.engine.clearGlobal(.isScripting)
+            await engine.clearGlobal(.isScripting)
         )
     }
 }

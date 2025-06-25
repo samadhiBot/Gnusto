@@ -23,49 +23,50 @@ public struct LookUnderActionHandler: ActionHandler {
     ///
     /// - Parameter context: The `ActionContext` containing the command and game state.
     /// - Returns: An `ActionResult` indicating validation success or failure.
-    public func validate(context: ActionContext) async throws {
-        guard let directObjectRef = context.command.directObject else {
+        public func process(
+        command: Command,
+        engine: GameEngine
+    ) async throws -> ActionResult {
+
+        guard let directObjectRef = command.directObject else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.doWhat(action: "look under")
+                engine.messenger.doWhat(action: "look under")
             )
         }
 
         guard case .item(let targetItemID) = directObjectRef else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.cannotDoThat(verb: "look under")
+                engine.messenger.cannotDoThat(verb: "look under")
             )
         }
 
         // Check if item exists and is reachable
-        guard (try? await context.engine.item(targetItemID)) != nil else {
+        guard (try? await engine.item(targetItemID)) != nil else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.cannotDoThat(verb: "look under")
+                engine.messenger.cannotDoThat(verb: "look under")
             )
         }
 
-        guard await context.engine.playerCanReach(targetItemID) else {
+        guard await engine.playerCanReach(targetItemID) else {
             throw ActionResponse.itemNotAccessible(targetItemID)
         }
-    }
-
     /// Processes the look under action.
     ///
     /// - Parameter context: The `ActionContext` containing the command and game state.
     /// - Returns: An `ActionResult` with the action outcome.
-    public func process(context: ActionContext) async throws -> ActionResult {
-        guard case .item(let targetItemID) = context.command.directObject else {
+        guard case .item(let targetItemID) = command.directObject else {
             throw ActionResponse.internalEngineError(
                 "LookUnder: directObject was not an item in process."
             )
         }
 
-        let targetItem = try await context.engine.item(targetItemID)
+        let targetItem = try await engine.item(targetItemID)
 
         // Default behavior: You can't see anything of interest under most things
         return ActionResult(
-            context.message.nothingOfInterestUnder(item: targetItem.withDefiniteArticle),
-            await context.engine.setFlag(.isTouched, on: targetItem),
-            await context.engine.updatePronouns(to: targetItem)
+            engine.messenger.nothingOfInterestUnder(item: targetItem.withDefiniteArticle),
+            await engine.setFlag(.isTouched, on: targetItem),
+            await engine.updatePronouns(to: targetItem)
         )
     }
 }

@@ -28,28 +28,32 @@ public struct CloseActionHandler: ActionHandler {
     /// - Parameter context: The `ActionContext` for the current action.
     /// - Throws: Various `ActionResponse` errors if validation fails, such as:
     ///           `prerequisiteNotMet`, `itemNotAccessible`, `itemNotClosable`.
-    ///           Can also throw errors from `context.engine.item()`.
-    public func validate(context: ActionContext) async throws {
+    ///           Can also throw errors from `engine.item()`.
+        public func process(
+        command: Command,
+        engine: GameEngine
+    ) async throws -> ActionResult {
+
         // 1. Ensure we have a direct object and it's an item
-        guard let directObjectRef = context.command.directObject else {
+        guard let directObjectRef = command.directObject else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.doWhat(verb: context.command.verb)
+                engine.messenger.doWhat(verb: command.verb)
             )
         }
         guard case .item(let targetItemID) = directObjectRef else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.thatsNotSomethingYouCan(.close)
+                engine.messenger.thatsNotSomethingYouCan(.close)
             )
         }
 
         // 2. Check if item exists
-        guard let targetItem = try? await context.engine.item(targetItemID) else {
+        guard let targetItem = try? await engine.item(targetItemID) else {
             // Standard approach: If parser resolved it, but it's gone, treat as inaccessible.
             throw ActionResponse.itemNotAccessible(targetItemID)
         }
 
         // 3. Check reachability using ScopeResolver
-        guard await context.engine.playerCanReach(targetItemID) else {
+        guard await engine.playerCanReach(targetItemID) else {
             throw ActionResponse.itemNotAccessible(targetItemID)
         }
 
@@ -59,14 +63,12 @@ public struct CloseActionHandler: ActionHandler {
         }
 
         // 5. Check if already closed (using dynamic property)
-        guard try await context.engine.hasFlag(.isOpen, on: targetItemID) else {
+        guard try await engine.hasFlag(.isOpen, on: targetItemID) else {
             // Let process handle the specific message "That's already closed."
             return
         }
 
         // Note: Closing doesn't usually depend on locked status.
-    }
-
     /// Processes the "CLOSE" command.
     ///
     /// Assuming basic validation has passed, this action performs the following:
@@ -81,33 +83,32 @@ public struct CloseActionHandler: ActionHandler {
     ///
     /// - Parameter context: The `ActionContext` for the current action.
     /// - Returns: An `ActionResult` containing a message and any relevant `StateChange`s.
-    /// - Throws: Errors from `context.engine.item()` or `context.engine.fetch()`.
-    public func process(context: ActionContext) async throws -> ActionResult {
+    /// - Throws: Errors from `engine.item()` or `engine.fetch()`.
         guard
-            let directObjectRef = context.command.directObject,
+            let directObjectRef = command.directObject,
             case .item(let targetItemID) = directObjectRef
         else {
             // This case should ideally be caught by the validate function.
             return ActionResult(
-                context.message.youCantDoThat()
+                engine.messenger.youCantDoThat()
             )
         }
 
-        let targetItem = try await context.engine.item(targetItemID)
+        let targetItem = try await engine.item(targetItemID)
 
         // Handle "already closed" case detected (but not thrown) in validate
-        guard try await context.engine.hasFlag(.isOpen, on: targetItem.id) else {
+        guard try await engine.hasFlag(.isOpen, on: targetItem.id) else {
             return ActionResult(
-                context.message.itemAlreadyClosed(item: targetItem.withDefiniteArticle)
+                engine.messenger.itemAlreadyClosed(item: targetItem.withDefiniteArticle)
             )
         }
 
         // --- Prepare Result ---
         return ActionResult(
-            context.message.closed(),
-            await context.engine.clearFlag(.isOpen, on: targetItem),
-            await context.engine.setFlag(.isTouched, on: targetItem),
-            await context.engine.updatePronouns(to: targetItem)
+            engine.messenger.closed(),
+            await engine.clearFlag(.isOpen, on: targetItem),
+            await engine.setFlag(.isTouched, on: targetItem),
+            await engine.updatePronouns(to: targetItem)
         )
     }
 

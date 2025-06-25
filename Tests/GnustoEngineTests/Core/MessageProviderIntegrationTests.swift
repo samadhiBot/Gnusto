@@ -35,7 +35,7 @@ struct MessageProviderIntegrationTests {
                 )
             ]
 
-            let messageProvider: MessageProvider = TestMessageProvider()
+            let messenger: MessageProvider = TestMessageProvider()
         }
 
         let game = TestGame()
@@ -46,10 +46,10 @@ struct MessageProviderIntegrationTests {
             parser: mockParser
         )
 
-        #expect(engine.messageProvider.languageCode == "en")
+        #expect(engine.messenger.languageCode == "en")
 
         // Test that the engine’s MessageProvider is the custom one
-        let darknessMessage = engine.messageProvider.roomIsDark()
+        let darknessMessage = engine.messenger.roomIsDark()
         #expect(darknessMessage == "TEST: Custom darkness message")
 
         // Test darkness message in actual engine behavior

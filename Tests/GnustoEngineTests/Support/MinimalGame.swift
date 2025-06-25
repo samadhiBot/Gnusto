@@ -18,7 +18,7 @@ public struct MinimalGame: GameBlueprint {
     public var daemons: [DaemonID: Daemon]
     public var itemComputers: [ItemID: ItemComputer]
     public var locationComputers: [LocationID: LocationComputer]
-    public var messageProvider: MessageProvider
+    public var messenger: MessageProvider
 
     public init(
         player: Player = Player(in: LocationID("startRoom")),
@@ -31,7 +31,7 @@ public struct MinimalGame: GameBlueprint {
         daemons: [DaemonID: Daemon] = [:],
         itemComputers: [ItemID: ItemComputer] = [:],
         locationComputers: [LocationID: LocationComputer] = [:],
-        messageProvider: MessageProvider? = nil
+        messenger: MessageProvider? = nil
     ) {
         self.player = player
         self.items = items.isEmpty ? [
@@ -57,7 +57,7 @@ public struct MinimalGame: GameBlueprint {
         self.daemons = daemons
         self.itemComputers = itemComputers
         self.locationComputers = locationComputers
-        self.messageProvider = messageProvider ?? MessageProvider(
+        self.messenger = messenger ?? MessageProvider(
             randomNumberGenerator: SeededGenerator()
         )
     }
@@ -75,7 +75,7 @@ public struct MinimalGame: GameBlueprint {
         daemons: [DaemonID: Daemon] = [:],
         itemComputers: [ItemID: ItemComputer] = [:],
         locationComputers: [LocationID: LocationComputer] = [:],
-        messageProvider: MessageProvider? = nil
+        messenger: MessageProvider? = nil
     ) {
         self.player = player
         self.items = items.isEmpty ? [
@@ -101,7 +101,7 @@ public struct MinimalGame: GameBlueprint {
         self.daemons = daemons
         self.itemComputers = itemComputers
         self.locationComputers = locationComputers
-        self.messageProvider = messageProvider ?? MessageProvider(
+        self.messenger = messenger ?? MessageProvider(
             randomNumberGenerator: SeededGenerator()
         )
     }

@@ -25,26 +25,28 @@ public struct PullActionHandler: ActionHandler {
     ///
     /// - Parameter context: The `ActionContext` for the current action.
     /// - Throws: Various `ActionResponse` errors if validation fails.
-    public func validate(context: ActionContext) async throws {
+        public func process(
+        command: Command,
+        engine: GameEngine
+    ) async throws -> ActionResult {
+
         // Pull requires a direct object (what to pull)
-        guard let directObjectRef = context.command.directObject else {
+        guard let directObjectRef = command.directObject else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.doWhat(verb: context.command.verb)
+                engine.messenger.doWhat(verb: command.verb)
             )
         }
         guard case .item(let targetItemID) = directObjectRef else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.thatsNotSomethingYouCan(.pull)
+                engine.messenger.thatsNotSomethingYouCan(.pull)
             )
         }
 
         // Check if target exists and is reachable
-        _ = try await context.engine.item(targetItemID)
-        guard await context.engine.playerCanReach(targetItemID) else {
+        _ = try await engine.item(targetItemID)
+        guard await engine.playerCanReach(targetItemID) else {
             throw ActionResponse.itemNotAccessible(targetItemID)
         }
-    }
-
     /// Processes the "PULL" command.
     ///
     /// Handles pulling objects. Most objects cannot be pulled, but some specific
@@ -53,22 +55,21 @@ public struct PullActionHandler: ActionHandler {
     ///
     /// - Parameter context: The `ActionContext` for the current action.
     /// - Returns: An `ActionResult` with appropriate pull message and state changes.
-    public func process(context: ActionContext) async throws -> ActionResult {
-        guard let directObjectRef = context.command.directObject,
+        guard let directObjectRef = command.directObject,
             case .item(let targetItemID) = directObjectRef
         else {
             throw ActionResponse.internalEngineError(
                 "PullActionHandler: directObject was not an item in process.")
         }
 
-        let targetItem = try await context.engine.item(targetItemID)
+        let targetItem = try await engine.item(targetItemID)
 
         // Check if item is specifically pullable
         let message = if targetItem.hasFlag(.isPullable) {
-            context.message.pullSuccess(item: targetItem.withDefiniteArticle)
+            engine.messenger.pullSuccess(item: targetItem.withDefiniteArticle)
         } else {
             // Default behavior: most things can't be pulled effectively
-            context.message.cannotDoThat(
+            engine.messenger.cannotDoThat(
                 verb: .pull,
                 item: targetItem.withDefiniteArticle
             )
@@ -76,8 +77,8 @@ public struct PullActionHandler: ActionHandler {
 
         return ActionResult(
             message,
-            await context.engine.setFlag(.isTouched, on: targetItem),
-            await context.engine.updatePronouns(to: targetItem)
+            await engine.setFlag(.isTouched, on: targetItem),
+            await engine.updatePronouns(to: targetItem)
         )
     }
 

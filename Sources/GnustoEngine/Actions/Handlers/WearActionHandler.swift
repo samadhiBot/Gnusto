@@ -24,35 +24,39 @@ public struct WearActionHandler: ActionHandler {
     ///
     /// - Parameter context: The `ActionContext` for the current action.
     /// - Throws: Various `ActionResponse` errors if validation fails.
-    public func validate(context: ActionContext) async throws {
+        public func process(
+        command: Command,
+        engine: GameEngine
+    ) async throws -> ActionResult {
+
         // For ALL commands, allow empty directObjects (handled in process method)
-        if context.command.isAllCommand {
+        if command.isAllCommand {
             return
         }
 
         // 1. Ensure we have at least one direct object for non-ALL commands
-        guard !context.command.directObjects.isEmpty else {
+        guard !command.directObjects.isEmpty else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.doWhat(verb: context.command.verb)
+                engine.messenger.doWhat(verb: command.verb)
             )
         }
 
         // For single object commands, validate the single object
-        guard let directObjectRef = context.command.directObject else {
+        guard let directObjectRef = command.directObject else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.doWhat(verb: context.command.verb)
+                engine.messenger.doWhat(verb: command.verb)
             )
         }
         guard case .item(let targetItemID) = directObjectRef else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.thatsNotSomethingYouCan(.wear)
+                engine.messenger.thatsNotSomethingYouCan(.wear)
             )
         }
 
         // 2. Check if the item exists and is held by the player
-        let targetItem = try await context.engine.item(targetItemID)
+        let targetItem = try await engine.item(targetItemID)
 
-        guard await context.engine.playerIsHolding(targetItemID) else {
+        guard await engine.playerIsHolding(targetItemID) else {
             throw ActionResponse.itemNotHeld(targetItemID)
         }
 
@@ -65,8 +69,6 @@ public struct WearActionHandler: ActionHandler {
         guard !targetItem.hasFlag(.isWorn) else {
             throw ActionResponse.itemIsAlreadyWorn(targetItemID)
         }
-    }
-
     /// Processes the "WEAR" command.
     ///
     /// For each item to be worn:
@@ -78,12 +80,11 @@ public struct WearActionHandler: ActionHandler {
     ///
     /// - Parameter context: The `ActionContext` for the current action.
     /// - Returns: An `ActionResult` containing the message and relevant state changes.
-    public func process(context: ActionContext) async throws -> ActionResult {
         // For ALL commands, empty directObjects is valid (means nothing to wear)
-        if !context.command.isAllCommand {
-            guard !context.command.directObjects.isEmpty else {
+        if !command.isAllCommand {
+            guard !command.directObjects.isEmpty else {
                 return ActionResult(
-                    context.message.doWhat(verb: context.command.verb)
+                    engine.messenger.doWhat(verb: command.verb)
                 )
             }
         }
@@ -93,24 +94,24 @@ public struct WearActionHandler: ActionHandler {
         var lastWornItem: Item?
 
         // Process each object individually
-        for directObjectRef in context.command.directObjects {
+        for directObjectRef in command.directObjects {
             guard case .item(let targetItemID) = directObjectRef else {
-                if context.command.isAllCommand {
+                if command.isAllCommand {
                     continue  // Skip non-items in ALL commands
                 } else {
                     return ActionResult(
-                        context.message.thatsNotSomethingYouCan(.wear)
+                        engine.messenger.thatsNotSomethingYouCan(.wear)
                     )
                 }
             }
 
             do {
-                let targetItem = try await context.engine.item(targetItemID)
+                let targetItem = try await engine.item(targetItemID)
 
                 // Validate this specific item for ALL commands
-                if context.command.isAllCommand {
+                if command.isAllCommand {
                     // Check if player is holding the item
-                    guard await context.engine.playerIsHolding(targetItemID) else {
+                    guard await engine.playerIsHolding(targetItemID) else {
                         continue  // Skip items not held in ALL commands
                     }
 
@@ -129,12 +130,12 @@ public struct WearActionHandler: ActionHandler {
                 var itemStateChanges: [StateChange] = []
 
                 // Change 1: Set .isWorn flag
-                if let wornChange = await context.engine.setFlag(.isWorn, on: targetItem) {
+                if let wornChange = await engine.setFlag(.isWorn, on: targetItem) {
                     itemStateChanges.append(wornChange)
                 }
 
                 // Change 2: Set .isTouched flag if not already set
-                if let touchedChange = await context.engine.setFlag(.isTouched, on: targetItem) {
+                if let touchedChange = await engine.setFlag(.isTouched, on: targetItem) {
                     itemStateChanges.append(touchedChange)
                 }
 
@@ -144,7 +145,7 @@ public struct WearActionHandler: ActionHandler {
 
             } catch {
                 // For ALL commands, skip items that cause errors
-                if !context.command.isAllCommand {
+                if !command.isAllCommand {
                     throw error
                 }
             }
@@ -154,14 +155,14 @@ public struct WearActionHandler: ActionHandler {
         if let lastItem = lastWornItem {
             if wornItems.count > 1 {
                 // For multiple items, update both "it" and "them"
-                let pronounChanges = await context.engine.updatePronounsForMultipleObjects(
+                let pronounChanges = await engine.updatePronounsForMultipleObjects(
                     lastItem: lastItem,
                     allItems: wornItems
                 )
                 allStateChanges.append(contentsOf: pronounChanges)
             } else {
                 // For single item, use the original method
-                if let pronounChange = await context.engine.updatePronouns(to: lastItem) {
+                if let pronounChange = await engine.updatePronouns(to: lastItem) {
                     allStateChanges.append(pronounChange)
                 }
             }
@@ -170,11 +171,11 @@ public struct WearActionHandler: ActionHandler {
         // Generate appropriate message
         let message =
             if wornItems.isEmpty {
-                context.command.isAllCommand
-                    ? context.message.nothingHereToWear()
-                    : context.message.doWhat(verb: context.command.verb)
+                command.isAllCommand
+                    ? engine.messenger.nothingHereToWear()
+                    : engine.messenger.doWhat(verb: command.verb)
             } else {
-                context.message.youPutOn(item: wornItems.listWithDefiniteArticles)
+                engine.messenger.youPutOn(item: wornItems.listWithDefiniteArticles)
             }
 
         return ActionResult(

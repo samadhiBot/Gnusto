@@ -26,26 +26,28 @@ public struct TurnActionHandler: ActionHandler {
     ///
     /// - Parameter context: The `ActionContext` for the current action.
     /// - Throws: Various `ActionResponse` errors if validation fails.
-    public func validate(context: ActionContext) async throws {
+        public func process(
+        command: Command,
+        engine: GameEngine
+    ) async throws -> ActionResult {
+
         // Turn requires a direct object (what to turn)
-        guard let directObjectRef = context.command.directObject else {
+        guard let directObjectRef = command.directObject else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.doWhat(verb: context.command.verb)
+                engine.messenger.doWhat(verb: command.verb)
             )
         }
         guard case .item(let targetItemID) = directObjectRef else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.cannotDoThat(verb: "turn")
+                engine.messenger.cannotDoThat(verb: "turn")
             )
         }
 
         // Check if target exists and is reachable
-        _ = try await context.engine.item(targetItemID)
-        guard await context.engine.playerCanReach(targetItemID) else {
+        _ = try await engine.item(targetItemID)
+        guard await engine.playerCanReach(targetItemID) else {
             throw ActionResponse.itemNotAccessible(targetItemID)
         }
-    }
-
     /// Processes the "TURN" command.
     ///
     /// Handles turning attempts on different types of objects.
@@ -53,48 +55,47 @@ public struct TurnActionHandler: ActionHandler {
     ///
     /// - Parameter context: The `ActionContext` for the current action.
     /// - Returns: An `ActionResult` with appropriate turning message and state changes.
-    public func process(context: ActionContext) async throws -> ActionResult {
-        guard let directObjectRef = context.command.directObject,
+        guard let directObjectRef = command.directObject,
             case .item(let targetItemID) = directObjectRef
         else {
             throw ActionResponse.internalEngineError(
                 "TurnActionHandler: directObject was not an item in process.")
         }
 
-        let targetItem = try await context.engine.item(targetItemID)
+        let targetItem = try await engine.item(targetItemID)
 
         // Determine appropriate response based on object type
         let message =
             if targetItem.hasFlag(.isCharacter) {
                 // Can't turn characters
-                context.message.turnCharacter(character: targetItem.withDefiniteArticle)
+                engine.messenger.turnCharacter(character: targetItem.withDefiniteArticle)
             } else if targetItem.hasFlag(.isKey) {
                 // Keys need to be used with something
-                context.message.turnKey(item: targetItem.withDefiniteArticle)
+                engine.messenger.turnKey(item: targetItem.withDefiniteArticle)
             } else if targetItem.hasFlag(.isDial) {
                 // Dials click into position
-                context.message.turnDial(item: targetItem.withDefiniteArticle)
+                engine.messenger.turnDial(item: targetItem.withDefiniteArticle)
             } else if targetItem.hasFlag(.isKnob) {
                 // Knobs click into position
-                context.message.turnKnob(item: targetItem.withDefiniteArticle)
+                engine.messenger.turnKnob(item: targetItem.withDefiniteArticle)
             } else if targetItem.hasFlag(.isWheel) {
                 // Wheels rotate with effort
-                context.message.turnWheel(item: targetItem.withDefiniteArticle)
+                engine.messenger.turnWheel(item: targetItem.withDefiniteArticle)
             } else if targetItem.hasFlag(.isHandle) {
                 // Handles move with grinding sound
-                context.message.turnHandle(item: targetItem.withDefiniteArticle)
+                engine.messenger.turnHandle(item: targetItem.withDefiniteArticle)
             } else if targetItem.hasFlag(.isTakable) {
                 // Regular takable objects can be turned in hands
-                context.message.turnRegularObject(item: targetItem.withDefiniteArticle)
+                engine.messenger.turnRegularObject(item: targetItem.withDefiniteArticle)
             } else {
                 // Fixed objects can't be turned
-                context.message.turnFixedObject(item: targetItem.withDefiniteArticle)
+                engine.messenger.turnFixedObject(item: targetItem.withDefiniteArticle)
             }
 
         return ActionResult(
             message,
-            await context.engine.setFlag(.isTouched, on: targetItem),
-            await context.engine.updatePronouns(to: targetItem)
+            await engine.setFlag(.isTouched, on: targetItem),
+            await engine.updatePronouns(to: targetItem)
         )
     }
 

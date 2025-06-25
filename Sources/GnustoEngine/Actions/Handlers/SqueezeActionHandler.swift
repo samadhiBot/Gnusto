@@ -25,26 +25,28 @@ public struct SqueezeActionHandler: ActionHandler {
     ///
     /// - Parameter context: The `ActionContext` for the current action.
     /// - Throws: Various `ActionResponse` errors if validation fails.
-    public func validate(context: ActionContext) async throws {
+        public func process(
+        command: Command,
+        engine: GameEngine
+    ) async throws -> ActionResult {
+
         // Squeeze requires a direct object (what to squeeze)
-        guard let directObjectRef = context.command.directObject else {
+        guard let directObjectRef = command.directObject else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.doWhat(verb: context.command.verb)
+                engine.messenger.doWhat(verb: command.verb)
             )
         }
         guard case .item(let targetItemID) = directObjectRef else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.cannotDoThat(verb: "squeeze")
+                engine.messenger.cannotDoThat(verb: "squeeze")
             )
         }
 
         // Check if target exists and is reachable
-        _ = try await context.engine.item(targetItemID)
-        guard await context.engine.playerCanReach(targetItemID) else {
+        _ = try await engine.item(targetItemID)
+        guard await engine.playerCanReach(targetItemID) else {
             throw ActionResponse.itemNotAccessible(targetItemID)
         }
-    }
-
     /// Processes the "SQUEEZE" command.
     ///
     /// Handles squeezing attempts on different types of objects.
@@ -52,30 +54,29 @@ public struct SqueezeActionHandler: ActionHandler {
     ///
     /// - Parameter context: The `ActionContext` for the current action.
     /// - Returns: An `ActionResult` with appropriate squeezing message and state changes.
-    public func process(context: ActionContext) async throws -> ActionResult {
-        guard let directObjectRef = context.command.directObject,
+        guard let directObjectRef = command.directObject,
             case .item(let targetItemID) = directObjectRef
         else {
             throw ActionResponse.internalEngineError(
                 "SqueezeActionHandler: directObject was not an item in process.")
         }
 
-        let targetItem = try await context.engine.item(targetItemID)
+        let targetItem = try await engine.item(targetItemID)
 
         // Determine appropriate response based on object type and properties
         let message =
             if targetItem.hasFlag(.isCharacter) {
                 // Squeezing characters - not advisable
-                context.message.squeezeCharacter(character: targetItem.withDefiniteArticle)
+                engine.messenger.squeezeCharacter(character: targetItem.withDefiniteArticle)
             } else {
                 // Generic squeezing response for objects
-                context.message.squeezeItem(item: targetItem.withDefiniteArticle)
+                engine.messenger.squeezeItem(item: targetItem.withDefiniteArticle)
             }
 
         return ActionResult(
             message,
-            await context.engine.setFlag(.isTouched, on: targetItem),
-            await context.engine.updatePronouns(to: targetItem)
+            await engine.setFlag(.isTouched, on: targetItem),
+            await engine.updatePronouns(to: targetItem)
         )
     }
 }

@@ -26,26 +26,28 @@ public struct RubActionHandler: ActionHandler {
     ///
     /// - Parameter context: The `ActionContext` for the current action.
     /// - Throws: Various `ActionResponse` errors if validation fails.
-    public func validate(context: ActionContext) async throws {
+        public func process(
+        command: Command,
+        engine: GameEngine
+    ) async throws -> ActionResult {
+
         // Rub requires a direct object (what to rub)
-        guard let directObjectRef = context.command.directObject else {
+        guard let directObjectRef = command.directObject else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.doWhat(verb: context.command.verb)
+                engine.messenger.doWhat(verb: command.verb)
             )
         }
         guard case .item(let targetItemID) = directObjectRef else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.cannotDoThat(verb: "rub")
+                engine.messenger.cannotDoThat(verb: "rub")
             )
         }
 
         // Check if target exists and is reachable
-        _ = try await context.engine.item(targetItemID)
-        guard await context.engine.playerCanReach(targetItemID) else {
+        _ = try await engine.item(targetItemID)
+        guard await engine.playerCanReach(targetItemID) else {
             throw ActionResponse.itemNotAccessible(targetItemID)
         }
-    }
-
     /// Processes the "RUB" command.
     ///
     /// Handles rubbing attempts on different types of objects.
@@ -53,36 +55,35 @@ public struct RubActionHandler: ActionHandler {
     ///
     /// - Parameter context: The `ActionContext` for the current action.
     /// - Returns: An `ActionResult` with appropriate rubbing message and state changes.
-    public func process(context: ActionContext) async throws -> ActionResult {
-        guard let directObjectRef = context.command.directObject,
+        guard let directObjectRef = command.directObject,
             case .item(let targetItemID) = directObjectRef
         else {
             throw ActionResponse.internalEngineError(
                 "RubActionHandler: directObject was not an item in process.")
         }
 
-        let targetItem = try await context.engine.item(targetItemID)
+        let targetItem = try await engine.item(targetItemID)
 
         // Determine appropriate response based on object type
         let message =
             if targetItem.hasFlag(.isCharacter) {
                 // Rubbing characters might not be appropriate
-                context.message.rubCharacter(character: targetItem.withDefiniteArticle)
+                engine.messenger.rubCharacter(character: targetItem.withDefiniteArticle)
             } else if targetItem.hasFlag(.isLightSource) {
                 // Special message for light sources (lamps, lanterns)
-                context.message.rubLamp(item: targetItem.withDefiniteArticle)
+                engine.messenger.rubLamp(item: targetItem.withDefiniteArticle)
             } else if targetItem.hasFlag(.isTakable) {
                 // Message for a generic takable object
-                context.message.rubTakableObject(item: targetItem.withDefiniteArticle)
+                engine.messenger.rubTakableObject(item: targetItem.withDefiniteArticle)
             } else {
                 // Generic rubbing response for objects
-                context.message.rubGenericObject(item: targetItem.withDefiniteArticle)
+                engine.messenger.rubGenericObject(item: targetItem.withDefiniteArticle)
             }
 
         return ActionResult(
             message,
-            await context.engine.setFlag(.isTouched, on: targetItem),
-            await context.engine.updatePronouns(to: targetItem)
+            await engine.setFlag(.isTouched, on: targetItem),
+            await engine.updatePronouns(to: targetItem)
         )
     }
 

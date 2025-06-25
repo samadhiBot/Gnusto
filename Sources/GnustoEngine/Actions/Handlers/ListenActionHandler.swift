@@ -24,10 +24,12 @@ public struct ListenActionHandler: ActionHandler {
 
     /// Validates the "LISTEN" command.
     /// Currently, listen requires no specific validation.
-    public func validate(context: ActionContext) async throws {
-        // No validation needed for LISTEN.
-    }
+        public func process(
+        command: Command,
+        engine: GameEngine
+    ) async throws -> ActionResult {
 
+        // No validation needed for LISTEN.
     /// Processes the "LISTEN" command.
     ///
     /// This action typically results in a message indicating that nothing unusual is heard.
@@ -35,9 +37,8 @@ public struct ListenActionHandler: ActionHandler {
     ///
     /// - Parameter context: The `ActionContext` for the current action.
     /// - Returns: An `ActionResult` with a default message.
-    public func process(context: ActionContext) async throws -> ActionResult {
         return ActionResult(
-            context.message.youHearNothingUnusual()
+            engine.messenger.youHearNothingUnusual()
         )
     }
 }

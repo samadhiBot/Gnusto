@@ -25,29 +25,31 @@ public struct TouchActionHandler: ActionHandler {
     /// - Throws: `ActionResponse.custom` if no direct object is provided,
     ///           `ActionResponse.prerequisiteNotMet` if the direct object is not an item,
     ///           or `ActionResponse.itemNotAccessible` if the item cannot be reached.
-    ///           Can also throw errors from `context.engine.item()` if the item doesn't exist.
-    public func validate(context: ActionContext) async throws {
+    ///           Can also throw errors from `engine.item()` if the item doesn't exist.
+        public func process(
+        command: Command,
+        engine: GameEngine
+    ) async throws -> ActionResult {
+
         // 1. Ensure we have a direct object and it's an item
-        guard let directObjectRef = context.command.directObject else {
+        guard let directObjectRef = command.directObject else {
             throw ActionResponse.custom(
-                context.message.doWhat(verb: context.command.verb)
+                engine.messenger.doWhat(verb: command.verb)
             )
         }
         guard case .item(let targetItemID) = directObjectRef else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.thatsNotSomethingYouCan(.touch)
+                engine.messenger.thatsNotSomethingYouCan(.touch)
             )
         }
 
         // 2. Check if item exists (engine.item() will throw if not found)
-        let _ = try await context.engine.item(targetItemID)
+        let _ = try await engine.item(targetItemID)
 
         // 3. Check reachability
-        guard await context.engine.playerCanReach(targetItemID) else {
+        guard await engine.playerCanReach(targetItemID) else {
             throw ActionResponse.itemNotAccessible(targetItemID)
         }
-    }
-
     /// Processes the "TOUCH" command.
     ///
     /// Assuming validation has passed, this action:
@@ -62,19 +64,18 @@ public struct TouchActionHandler: ActionHandler {
     /// - Returns: An `ActionResult` containing a default message and potentially a `StateChange`
     ///   to mark the item as touched.
     /// - Throws: `ActionResponse.internalEngineError` if the direct object is unexpectedly not an item.
-    ///           Can also throw errors from `context.engine.item()` if the item doesn't exist.
-    public func process(context: ActionContext) async throws -> ActionResult {
-        guard let directObjectRef = context.command.directObject,
+    ///           Can also throw errors from `engine.item()` if the item doesn't exist.
+        guard let directObjectRef = command.directObject,
             case .item(let targetItemID) = directObjectRef
         else {
             throw ActionResponse.internalEngineError(
                 "Touch: directObject was not an item in process.")
         }
-        let targetItem = try await context.engine.item(targetItemID)
+        let targetItem = try await engine.item(targetItemID)
 
         return ActionResult(
-            context.message.nothingSpecial(verb: .feel),
-            await context.engine.setFlag(.isTouched, on: targetItem)
+            engine.messenger.nothingSpecial(verb: .feel),
+            await engine.setFlag(.isTouched, on: targetItem)
         )
     }
 }

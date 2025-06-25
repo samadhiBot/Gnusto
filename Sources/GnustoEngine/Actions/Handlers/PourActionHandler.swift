@@ -28,44 +28,46 @@ public struct PourActionHandler: ActionHandler {
     ///
     /// - Parameter context: The `ActionContext` for the current action.
     /// - Throws: Various `ActionResponse` errors if validation fails.
-    public func validate(context: ActionContext) async throws {
+        public func process(
+        command: Command,
+        engine: GameEngine
+    ) async throws -> ActionResult {
+
         // Pour requires a direct object (what to pour)
-        guard let directObjectRef = context.command.directObject else {
+        guard let directObjectRef = command.directObject else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.doWhat(action: "pour")
+                engine.messenger.doWhat(action: "pour")
             )
         }
         guard case .item(let sourceItemID) = directObjectRef else {
-            throw ActionResponse.prerequisiteNotMet(context.message.pourCannotPourThat())
+            throw ActionResponse.prerequisiteNotMet(engine.messenger.pourCannotPourThat())
         }
 
-        let sourceItem = try await context.engine.item(sourceItemID)
+        let sourceItem = try await engine.item(sourceItemID)
 
         // Pour requires an indirect object (what to pour on)
-        guard let indirectObjectRef = context.command.indirectObject else {
+        guard let indirectObjectRef = command.indirectObject else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.pourItemOnWhat(item: sourceItem.withDefiniteArticle)
+                engine.messenger.pourItemOnWhat(item: sourceItem.withDefiniteArticle)
             )
         }
         guard case .item(let targetItemID) = indirectObjectRef else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.pourCannotPourItemOnThat(item: sourceItem.withDefiniteArticle)
+                engine.messenger.pourCannotPourItemOnThat(item: sourceItem.withDefiniteArticle)
             )
         }
 
         // Check if source exists and is reachable
-        _ = try await context.engine.item(sourceItemID)
-        guard await context.engine.playerCanReach(sourceItemID) else {
+        _ = try await engine.item(sourceItemID)
+        guard await engine.playerCanReach(sourceItemID) else {
             throw ActionResponse.itemNotAccessible(sourceItemID)
         }
 
         // Check if target exists and is reachable
-        _ = try await context.engine.item(targetItemID)
-        guard await context.engine.playerCanReach(targetItemID) else {
+        _ = try await engine.item(targetItemID)
+        guard await engine.playerCanReach(targetItemID) else {
             throw ActionResponse.itemNotAccessible(targetItemID)
         }
-    }
-
     /// Processes the "POUR ON" command.
     ///
     /// Handles pouring attempts with different types of liquids and targets.
@@ -73,10 +75,9 @@ public struct PourActionHandler: ActionHandler {
     ///
     /// - Parameter context: The `ActionContext` for the current action.
     /// - Returns: An `ActionResult` with appropriate pouring message and state changes.
-    public func process(context: ActionContext) async throws -> ActionResult {
-        guard let directObjectRef = context.command.directObject,
+        guard let directObjectRef = command.directObject,
             case .item(let sourceItemID) = directObjectRef,
-            let indirectObjectRef = context.command.indirectObject,
+            let indirectObjectRef = command.indirectObject,
             case .item(let targetItemID) = indirectObjectRef
         else {
             throw ActionResponse.internalEngineError(
@@ -84,25 +85,25 @@ public struct PourActionHandler: ActionHandler {
             )
         }
 
-        let sourceItem = try await context.engine.item(sourceItemID)
-        let targetItem = try await context.engine.item(targetItemID)
+        let sourceItem = try await engine.item(sourceItemID)
+        let targetItem = try await engine.item(targetItemID)
 
         if sourceItem.id == targetItem.id {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.pourCannotPourItself(
+                engine.messenger.pourCannotPourItself(
                     item: sourceItem.withDefiniteArticle
                 )
             )
         }
 
         return ActionResult(
-            context.message.pourItemOn(
+            engine.messenger.pourItemOn(
                 item: sourceItem.withDefiniteArticle,
                 target: targetItem.withDefiniteArticle
             ),
-            await context.engine.setFlag(.isTouched, on: sourceItem),
-            await context.engine.setFlag(.isTouched, on: targetItem),
-            await context.engine.updatePronouns(to: sourceItem, targetItem),
+            await engine.setFlag(.isTouched, on: sourceItem),
+            await engine.setFlag(.isTouched, on: targetItem),
+            await engine.updatePronouns(to: sourceItem, targetItem),
         )
     }
 }

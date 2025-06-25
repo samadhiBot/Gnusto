@@ -26,36 +26,38 @@ public struct DeflateActionHandler: ActionHandler {
     ///
     /// - Parameter context: The `ActionContext` for the current action.
     /// - Throws: Various `ActionResponse` errors if validation fails.
-    public func validate(context: ActionContext) async throws {
+        public func process(
+        command: Command,
+        engine: GameEngine
+    ) async throws -> ActionResult {
+
         // Deflate requires a direct object (what to deflate)
-        guard let directObjectRef = context.command.directObject else {
+        guard let directObjectRef = command.directObject else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.doWhat(verb: context.command.verb)
+                engine.messenger.doWhat(verb: command.verb)
             )
         }
         guard case .item(let targetItemID) = directObjectRef else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.thatsNotSomethingYouCan(.deflate)
+                engine.messenger.thatsNotSomethingYouCan(.deflate)
             )
         }
 
         // Check if target exists and is reachable
-        let targetItem = try await context.engine.item(targetItemID)
-        guard await context.engine.playerCanReach(targetItemID) else {
+        let targetItem = try await engine.item(targetItemID)
+        guard await engine.playerCanReach(targetItemID) else {
             throw ActionResponse.itemNotAccessible(targetItemID)
         }
 
         // Check if item is inflatable (which means it can also be deflated)
         guard targetItem.hasFlag(.isInflatable) else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.cannotDoThat(
+                engine.messenger.cannotDoThat(
                     verb: .deflate,
                     item: targetItem.withDefiniteArticle
                 )
             )
         }
-    }
-
     /// Processes the "DEFLATE" command.
     ///
     /// Handles deflating objects. If the object is not currently inflated, provides
@@ -64,34 +66,33 @@ public struct DeflateActionHandler: ActionHandler {
     ///
     /// - Parameter context: The `ActionContext` for the current action.
     /// - Returns: An `ActionResult` with appropriate deflate message and state changes.
-    public func process(context: ActionContext) async throws -> ActionResult {
-        guard let directObjectRef = context.command.directObject,
+        guard let directObjectRef = command.directObject,
             case .item(let targetItemID) = directObjectRef
         else {
-            let message = context.message.actionHandlerInternalError(
+            let message = engine.messenger.actionHandlerInternalError(
                 handler: "DeflateActionHandler",
                 details: "directObject was not an item in process"
             )
             throw ActionResponse.internalEngineError(message)
         }
 
-        let targetItem = try await context.engine.item(targetItemID)
+        let targetItem = try await engine.item(targetItemID)
 
         // Check if currently inflated
-        let isCurrentlyInflated = try await context.engine.hasFlag(.isInflated, on: targetItemID)
+        let isCurrentlyInflated = try await engine.hasFlag(.isInflated, on: targetItemID)
 
         let message =
             if !isCurrentlyInflated {
-                context.message.itemNotInflated(item: targetItem.withDefiniteArticle)
+                engine.messenger.itemNotInflated(item: targetItem.withDefiniteArticle)
             } else {
-                context.message.deflateSuccess(item: targetItem.withDefiniteArticle)
+                engine.messenger.deflateSuccess(item: targetItem.withDefiniteArticle)
             }
 
         return ActionResult(
             message,
-            await context.engine.setFlag(.isTouched, on: targetItem),
-            await context.engine.updatePronouns(to: targetItem),
-            await context.engine.clearFlag(.isInflated, on: targetItem)
+            await engine.setFlag(.isTouched, on: targetItem),
+            await engine.updatePronouns(to: targetItem),
+            await engine.clearFlag(.isInflated, on: targetItem)
         )
     }
 

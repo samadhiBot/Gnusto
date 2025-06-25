@@ -25,17 +25,21 @@ public struct EnterActionHandler: ActionHandler {
     ///
     /// - Parameter context: The `ActionContext` for the current action.
     /// - Throws: Various `ActionResponse` errors if validation fails.
-    public func validate(context: ActionContext) async throws {
+        public func process(
+        command: Command,
+        engine: GameEngine
+    ) async throws -> ActionResult {
+
         // ENTER with no object - look for default enterable in location
-        guard let directObjectRef = context.command.directObject else {
+        guard let directObjectRef = command.directObject else {
             // Look for enterable objects in current location
-            let currentLocation = try await context.engine.playerLocation()
-            let enterableItems = await context.engine.items(in: .location(currentLocation.id))
+            let currentLocation = try await engine.playerLocation()
+            let enterableItems = await engine.items(in: .location(currentLocation.id))
                 .filter { $0.hasFlag(.isEnterable) }
 
             if enterableItems.isEmpty {
                 throw ActionResponse.prerequisiteNotMet(
-                    context.message.nothingHereToEnter()
+                    engine.messenger.nothingHereToEnter()
                 )
             }
             return  // Will handle selection in process
@@ -43,27 +47,25 @@ public struct EnterActionHandler: ActionHandler {
 
         guard case .item(let targetItemID) = directObjectRef else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.cannotDoThat(verb: "enter")
+                engine.messenger.cannotDoThat(verb: "enter")
             )
         }
 
         // Check if target exists and is reachable
-        let targetItem = try await context.engine.item(targetItemID)
-        guard await context.engine.playerCanReach(targetItemID) else {
+        let targetItem = try await engine.item(targetItemID)
+        guard await engine.playerCanReach(targetItemID) else {
             throw ActionResponse.itemNotAccessible(targetItemID)
         }
 
         // Check if item is enterable
         guard targetItem.hasFlag(.isEnterable) else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.cannotDoThat(
+                engine.messenger.cannotDoThat(
                     verb: .enter,
                     item: targetItem.withDefiniteArticle
                 )
             )
         }
-    }
-
     /// Processes the "ENTER" command.
     ///
     /// Handles entering objects or finding default enterable objects.
@@ -71,13 +73,12 @@ public struct EnterActionHandler: ActionHandler {
     ///
     /// - Parameter context: The `ActionContext` for the current action.
     /// - Returns: An `ActionResult` with appropriate enter message and state changes.
-    public func process(context: ActionContext) async throws -> ActionResult {
-        let currentLocation = try await context.engine.playerLocation()
+        let currentLocation = try await engine.playerLocation()
 
         // Handle ENTER with no object - find default enterable
-        guard let directObjectRef = context.command.directObject else {
+        guard let directObjectRef = command.directObject else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.doWhat(verb: .enter)
+                engine.messenger.doWhat(verb: .enter)
             )
         }
 
@@ -87,7 +88,7 @@ public struct EnterActionHandler: ActionHandler {
             )
         }
 
-        let targetItem = try await context.engine.item(targetItemID)
+        let targetItem = try await engine.item(targetItemID)
 
         // Check if this object enables traversal (like GO command)
         for (direction, exit) in currentLocation.exits {
@@ -102,7 +103,7 @@ public struct EnterActionHandler: ActionHandler {
                 let goHandler = GoActionHandler()
                 let goContext = ActionContext(
                     command: goCommand,
-                    engine: context.engine
+                    engine: engine
                 )
 
                 try await goHandler.validate(context: goContext)
@@ -112,8 +113,8 @@ public struct EnterActionHandler: ActionHandler {
                 return ActionResult(
                     message: goResult.message,
                     changes: [
-                        await context.engine.setFlag(.isTouched, on: targetItem),
-                        await context.engine.updatePronouns(to: targetItem),
+                        await engine.setFlag(.isTouched, on: targetItem),
+                        await engine.updatePronouns(to: targetItem),
                     ] + goResult.changes
                 )
             }
@@ -121,7 +122,7 @@ public struct EnterActionHandler: ActionHandler {
 
         // No movement enabled - basic enter behavior
         throw ActionResponse.prerequisiteNotMet(
-            context.message.doWhat(verb: .enter)
+            engine.messenger.doWhat(verb: .enter)
         )
     }
 }

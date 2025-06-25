@@ -22,13 +22,12 @@ public struct ScoreActionHandler: ActionHandler {
     ///
     /// - Parameter context: The `ActionContext` for the current action.
     /// - Returns: An `ActionResult` containing the player's score and move count.
-    public func process(context: ActionContext) async throws -> ActionResult {
         // Fetch current score and turn count
-        let currentScore = await context.engine.playerScore
-        let turnCount = await context.engine.playerMoves
+        let currentScore = await engine.playerScore
+        let turnCount = await engine.playerMoves
 
         return ActionResult(
-            context.message.currentScore(score: currentScore, moves: turnCount)
+            engine.messenger.currentScore(score: currentScore, moves: turnCount)
         )
     }
 

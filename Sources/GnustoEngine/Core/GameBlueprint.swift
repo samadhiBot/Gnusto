@@ -169,12 +169,12 @@ public protocol GameBlueprint: Sendable {
     ///
     /// Example:
     /// ```swift
-    /// var messageProvider: MessageProvider {
+    /// var messenger: MessageProvider {
     ///     // Custom provider for a horror-themed game
     ///     HorrorMessageProvider()
     /// }
     /// ```
-    var messageProvider: MessageProvider { get }
+    var messenger: MessageProvider { get }
 }
 
 // MARK: - Default implementations
@@ -216,7 +216,7 @@ extension GameBlueprint {
         [:]
     }
 
-    public var messageProvider: MessageProvider {
+    public var messenger: MessageProvider {
         MessageProvider()
     }
 }

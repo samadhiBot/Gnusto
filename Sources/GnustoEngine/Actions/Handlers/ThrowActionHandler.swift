@@ -28,40 +28,42 @@ public struct ThrowActionHandler: ActionHandler {
     ///
     /// - Parameter context: The `ActionContext` for the current action.
     /// - Throws: Various `ActionResponse` errors if validation fails.
-    public func validate(context: ActionContext) async throws {
+        public func process(
+        command: Command,
+        engine: GameEngine
+    ) async throws -> ActionResult {
+
         // Throw requires a direct object (what to throw)
-        guard let directObjectRef = context.command.directObject else {
+        guard let directObjectRef = command.directObject else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.doWhat(verb: context.command.verb)
+                engine.messenger.doWhat(verb: command.verb)
             )
         }
         guard case .item(let itemToThrowID) = directObjectRef else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.cannotDoThat(verb: "throw")
+                engine.messenger.cannotDoThat(verb: "throw")
             )
         }
 
         // Check if item exists and is held
-        let itemToThrow = try await context.engine.item(itemToThrowID)
+        let itemToThrow = try await engine.item(itemToThrowID)
         guard itemToThrow.parent == .player else {
             throw ActionResponse.itemNotHeld(itemToThrowID)
         }
 
         // If a target is specified, validate it
-        if let indirectObjectRef = context.command.indirectObject {
+        if let indirectObjectRef = command.indirectObject {
             guard case .item(let targetItemID) = indirectObjectRef else {
                 throw ActionResponse.prerequisiteNotMet(
-                    context.message.cannotActWithThat(verb: "throw at")
+                    engine.messenger.cannotActWithThat(verb: "throw at")
                 )
             }
 
-            _ = try await context.engine.item(targetItemID)
-            guard await context.engine.playerCanReach(targetItemID) else {
+            _ = try await engine.item(targetItemID)
+            guard await engine.playerCanReach(targetItemID) else {
                 throw ActionResponse.itemNotAccessible(targetItemID)
             }
         }
-    }
-
     /// Processes the "THROW" command.
     ///
     /// Handles different throwing scenarios:
@@ -70,8 +72,7 @@ public struct ThrowActionHandler: ActionHandler {
     ///
     /// - Parameter context: The `ActionContext` for the current action.
     /// - Returns: An `ActionResult` with appropriate throwing message and state changes.
-    public func process(context: ActionContext) async throws -> ActionResult {
-        guard let directObjectRef = context.command.directObject else {
+        guard let directObjectRef = command.directObject else {
             throw ActionResponse.internalEngineError(
                 "ThrowActionHandler: directObject was nil in process."
             )
@@ -80,7 +81,7 @@ public struct ThrowActionHandler: ActionHandler {
         // Handle self reference
         if case .player = directObjectRef {
             return ActionResult(
-                context.message.cannotVerbYourself(verb: "throw")
+                engine.messenger.cannotVerbYourself(verb: "throw")
             )
         }
 
@@ -90,23 +91,23 @@ public struct ThrowActionHandler: ActionHandler {
             )
         }
 
-        let itemToThrow = try await context.engine.item(itemToThrowID)
-        let currentLocationID = await context.engine.playerLocationID
+        let itemToThrow = try await engine.item(itemToThrowID)
+        let currentLocationID = await engine.playerLocationID
 
         // Handle specific target throwing
-        if let indirectObjectRef = context.command.indirectObject,
+        if let indirectObjectRef = command.indirectObject,
             case .item(let targetItemID) = indirectObjectRef
         {
-            let targetItem = try await context.engine.item(targetItemID)
+            let targetItem = try await engine.item(targetItemID)
 
             let message =
                 if targetItem.hasFlag(.isCharacter) {
-                    context.message.throwAtCharacter(
+                    engine.messenger.throwAtCharacter(
                         item: itemToThrow.withDefiniteArticle,
                         character: targetItem.withDefiniteArticle
                     )
                 } else {
-                    context.message.throwAtObject(
+                    engine.messenger.throwAtObject(
                         item: itemToThrow.withDefiniteArticle,
                         target: targetItem.withDefiniteArticle
                     )
@@ -114,20 +115,20 @@ public struct ThrowActionHandler: ActionHandler {
 
             return ActionResult(
                 message,
-                await context.engine.setFlag(.isTouched, on: itemToThrow),
-                await context.engine.updatePronouns(to: itemToThrow),
-                await context.engine.move(itemToThrow, to: .location(currentLocationID)),
-                await context.engine.setFlag(.isTouched, on: targetItem)
+                await engine.setFlag(.isTouched, on: itemToThrow),
+                await engine.updatePronouns(to: itemToThrow),
+                await engine.move(itemToThrow, to: .location(currentLocationID)),
+                await engine.setFlag(.isTouched, on: targetItem)
             )
         } else {
             // General throwing - no specific target
             return ActionResult(
-                context.message.throwGeneral(
+                engine.messenger.throwGeneral(
                     item: itemToThrow.withDefiniteArticle
                 ),
-                await context.engine.setFlag(.isTouched, on: itemToThrow),
-                await context.engine.updatePronouns(to: itemToThrow),
-                await context.engine.move(itemToThrow, to: .location(currentLocationID))
+                await engine.setFlag(.isTouched, on: itemToThrow),
+                await engine.updatePronouns(to: itemToThrow),
+                await engine.move(itemToThrow, to: .location(currentLocationID))
             )
         }
     }

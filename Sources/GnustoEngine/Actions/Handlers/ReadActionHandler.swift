@@ -26,30 +26,34 @@ public struct ReadActionHandler: ActionHandler {
     /// - Throws: Various `ActionResponse` errors such as `custom` (for missing direct object),
     ///           `prerequisiteNotMet` (if not an item), `roomIsDark`, `itemNotAccessible`,
     ///           or `itemNotReadable` if any validation condition fails.
-    ///           Can also throw errors from `context.engine.item()` if the item doesn't exist.
-    public func validate(context: ActionContext) async throws {
+    ///           Can also throw errors from `engine.item()` if the item doesn't exist.
+        public func process(
+        command: Command,
+        engine: GameEngine
+    ) async throws -> ActionResult {
+
         // 1. Ensure we have a direct object and it's an item
-        guard let directObjectRef = context.command.directObject else {
+        guard let directObjectRef = command.directObject else {
             throw ActionResponse.custom(
-                context.message.doWhat(verb: context.command.verb)
+                engine.messenger.doWhat(verb: command.verb)
             )
         }
         guard case .item(let targetItemID) = directObjectRef else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.thatsNotSomethingYouCan(.read)
+                engine.messenger.thatsNotSomethingYouCan(.read)
             )
         }
 
         // 2. Check if item exists
-        let targetItem = try await context.engine.item(targetItemID)
+        let targetItem = try await engine.item(targetItemID)
 
         // 3. Check if room is lit (unless item provides light)
-        guard await context.engine.playerLocationIsLit() else {
+        guard await engine.playerLocationIsLit() else {
             throw ActionResponse.roomIsDark
         }
 
         // 4. Check reachability
-        guard await context.engine.playerCanReach(targetItemID) else {
+        guard await engine.playerCanReach(targetItemID) else {
             throw ActionResponse.itemNotAccessible(targetItemID)
         }
 
@@ -57,8 +61,6 @@ public struct ReadActionHandler: ActionHandler {
         guard targetItem.hasFlag(.isReadable) else {
             throw ActionResponse.itemNotReadable(targetItemID)
         }
-    }
-
     /// Processes the "READ" command.
     ///
     /// Assuming validation has passed, this action:
@@ -68,7 +70,7 @@ public struct ReadActionHandler: ActionHandler {
     /// 3. Creates a `StateChange` to set the `.isTouched` flag on the target item, if not already set.
     /// 4. Updates pronouns to refer to this item.
     /// 5. Attempts to fetch the readable text from the item's dynamic attributes using
-    ///    the `.readText` key via `context.engine.fetch()`.
+    ///    the `.readText` key via `engine.fetch()`.
     /// 6. If text is found and is not empty, it's returned as the message. Otherwise, a default
     ///    message indicating nothing is written on the item is used.
     ///
@@ -76,29 +78,28 @@ public struct ReadActionHandler: ActionHandler {
     /// - Returns: An `ActionResult` containing the text read from the item (or a default message)
     ///            and any relevant `StateChange`s (e.g., auto-taking, setting `.isTouched`, updating pronouns).
     /// - Throws: `ActionResponse.internalEngineError` if the direct object is unexpectedly not an item.
-    ///           Can also throw errors from `context.engine.item()` or `context.engine.fetch()`.
-    public func process(context: ActionContext) async throws -> ActionResult {
-        guard let directObjectRef = context.command.directObject,
+    ///           Can also throw errors from `engine.item()` or `engine.fetch()`.
+        guard let directObjectRef = command.directObject,
             case .item(let targetItemID) = directObjectRef
         else {
             throw ActionResponse.internalEngineError(
                 "Read: directObject was not an item in process.")
         }
-        let targetItem = try await context.engine.item(targetItemID)
+        let targetItem = try await engine.item(targetItemID)
 
         // Determine read text
-        let readText = if let textToRead: String = try await context.engine.attribute(
+        let readText = if let textToRead: String = try await engine.attribute(
             .readText, of: targetItem.id
         ), !textToRead.isEmpty {
             textToRead
         } else {
-            context.message.nothingWrittenOn(item: targetItem.withDefiniteArticle)
+            engine.messenger.nothingWrittenOn(item: targetItem.withDefiniteArticle)
         }
 
         // Build final message
         let message = if targetItem.shouldTakeFirst {
             """
-            \(context.message.taken())
+            \(engine.messenger.taken())
             \(readText)
             """
         } else {
@@ -107,9 +108,9 @@ public struct ReadActionHandler: ActionHandler {
 
         return ActionResult(
             message,
-            targetItem.shouldTakeFirst ? await context.engine.move(targetItem, to: .player) : nil,
-            await context.engine.setFlag(.isTouched, on: targetItem),
-            await context.engine.updatePronouns(to: targetItem)
+            targetItem.shouldTakeFirst ? await engine.move(targetItem, to: .player) : nil,
+            await engine.setFlag(.isTouched, on: targetItem),
+            await engine.updatePronouns(to: targetItem)
         )
     }
 }

@@ -33,20 +33,24 @@ public struct PutOnActionHandler: ActionHandler {
     ///           `itemNotHeld` (if item to put is not held),
     ///           `itemNotAccessible` (if surface cannot be reached),
     ///           `targetIsNotASurface` (if indirect object is not a surface).
-    ///           Can also throw errors from `context.engine.item()`.
-    public func validate(context: ActionContext) async throws {
+    ///           Can also throw errors from `engine.item()`.
+        public func process(
+        command: Command,
+        engine: GameEngine
+    ) async throws -> ActionResult {
+
         // 1. Validate Direct and Indirect Objects - both must be items
-        guard let directObjectRef = context.command.directObject else {
-            if let indirectObjectRef = context.command.indirectObject,
+        guard let directObjectRef = command.directObject else {
+            if let indirectObjectRef = command.indirectObject,
                 case .item(let surfaceID) = indirectObjectRef
             {
-                let surfaceItem = try await context.engine.item(surfaceID)
+                let surfaceItem = try await engine.item(surfaceID)
                 throw ActionResponse.prerequisiteNotMet(
-                    context.message.putWhatOn(item: surfaceItem.withDefiniteArticle)
+                    engine.messenger.putWhatOn(item: surfaceItem.withDefiniteArticle)
                 )
             } else {
                 throw ActionResponse.prerequisiteNotMet(
-                    context.message.doWhat(verb: context.command.verb)
+                    engine.messenger.doWhat(verb: command.verb)
                 )
             }
         }
@@ -57,7 +61,7 @@ public struct PutOnActionHandler: ActionHandler {
             itemToPutID = itemID
         case .location:
             throw ActionResponse.prerequisiteNotMet(
-                context.message.thatsNotSomethingYouCanPutOnThings()
+                engine.messenger.thatsNotSomethingYouCanPutOnThings()
             )
         case .player:
             throw ActionResponse.prerequisiteNotMet(
@@ -65,38 +69,38 @@ public struct PutOnActionHandler: ActionHandler {
             )
         }
 
-        guard let indirectObjectRef = context.command.indirectObject else {
+        guard let indirectObjectRef = command.indirectObject else {
             // Fetch item name for a more informative message if indirect object is missing.
-            let itemToPut = try await context.engine.item(itemToPutID)
+            let itemToPut = try await engine.item(itemToPutID)
             throw ActionResponse.prerequisiteNotMet(
-                context.message.putOnWhat(
+                engine.messenger.putOnWhat(
                     item: itemToPut.withDefiniteArticle
                 )
             )
         }
         guard case .item(let surfaceID) = indirectObjectRef else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.thatsNotSomethingYouCan(.wear)
+                engine.messenger.thatsNotSomethingYouCan(.wear)
             )
         }
 
         // 2. Get Items (existence should be implicitly validated by parser/scope or engine.item() will throw)
-        let itemToPut = try await context.engine.item(itemToPutID)
-        let surfaceItem = try await context.engine.item(surfaceID)
+        let itemToPut = try await engine.item(itemToPutID)
+        let surfaceItem = try await engine.item(surfaceID)
 
         // 3. Perform Basic Checks
-        guard await context.engine.playerIsHolding(itemToPutID) else {
+        guard await engine.playerIsHolding(itemToPutID) else {
             throw ActionResponse.itemNotHeld(itemToPutID)
         }
 
-        guard await context.engine.playerCanReach(surfaceID) else {
+        guard await engine.playerCanReach(surfaceID) else {
             throw ActionResponse.itemNotAccessible(surfaceID)
         }
 
         // Prevent putting item onto itself
         if itemToPutID == surfaceID {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.putCannotPutOnSelf()
+                engine.messenger.putCannotPutOnSelf()
             )
         }
 
@@ -113,14 +117,14 @@ public struct PutOnActionHandler: ActionHandler {
                         "in"
                     }
                 throw ActionResponse.prerequisiteNotMet(
-                    context.message.putCannotPutCircular(
+                    engine.messenger.putCannotPutCircular(
                         item: itemToPut.withDefiniteArticle,
                         container: surfaceItem.withDefiniteArticle,
                         preposition: preposition
                     )
                 )
             }
-            let parentItem = try await context.engine.item(parentItemID)
+            let parentItem = try await engine.item(parentItemID)
             currentParent = parentItem.parent
         }
 
@@ -129,8 +133,6 @@ public struct PutOnActionHandler: ActionHandler {
             throw ActionResponse.targetIsNotASurface(surfaceID)
         }
         // TODO: Add surface capacity/volume checks?
-    }
-
     /// Processes the "PUT ... ON" command.
     ///
     /// Assuming validation has passed, this action performs the following:
@@ -144,17 +146,16 @@ public struct PutOnActionHandler: ActionHandler {
     /// - Parameter context: The `ActionContext` for the current action.
     /// - Returns: An `ActionResult` containing the message and relevant state changes.
     /// - Throws: `ActionResponse.internalEngineError` if direct or indirect objects are not items
-    ///           (this should be caught by `validate`), or errors from `context.engine.item()`.
-    public func process(context: ActionContext) async throws -> ActionResult {
+    ///           (this should be caught by `validate`), or errors from `engine.item()`.
         // Direct and Indirect objects are guaranteed to be items by validate.
-        guard let directObjectRef = context.command.directObject,
+        guard let directObjectRef = command.directObject,
             case .item(let itemToPutID) = directObjectRef
         else {
             throw ActionResponse.internalEngineError(
                 "PutOn: Direct object not an item in process."
             )
         }
-        guard let indirectObjectRef = context.command.indirectObject,
+        guard let indirectObjectRef = command.indirectObject,
             case .item(let surfaceID) = indirectObjectRef
         else {
             throw ActionResponse.internalEngineError(
@@ -163,18 +164,18 @@ public struct PutOnActionHandler: ActionHandler {
         }
 
         // Get snapshots (existence guaranteed by validate)
-        let itemToPut = try await context.engine.item(itemToPutID)
-        let surface = try await context.engine.item(surfaceID)
+        let itemToPut = try await engine.item(itemToPutID)
+        let surface = try await engine.item(surfaceID)
 
         return ActionResult(
-            context.message.youPutItemOnSurface(
+            engine.messenger.youPutItemOnSurface(
                 item: itemToPut.withDefiniteArticle,
                 surface: surface.withDefiniteArticle
             ),
-            await context.engine.move(itemToPut, to: .item(surface.id)),
-            await context.engine.setFlag(.isTouched, on: itemToPut),
-            await context.engine.setFlag(.isTouched, on: surface),
-            await context.engine.updatePronouns(to: itemToPut),
+            await engine.move(itemToPut, to: .item(surface.id)),
+            await engine.setFlag(.isTouched, on: itemToPut),
+            await engine.setFlag(.isTouched, on: surface),
+            await engine.updatePronouns(to: itemToPut),
         )
     }
 }

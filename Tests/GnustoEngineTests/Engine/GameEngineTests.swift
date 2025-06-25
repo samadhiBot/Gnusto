@@ -616,7 +616,7 @@ struct GameEngineTests {
 
             func process(context: ActionContext) async throws -> ActionResult {
                 // Use snapshot for checks
-                let item = try await context.engine.item(itemIDToModify)
+                let item = try await engine.item(itemIDToModify)
 
                 // Define multiple changes
                 let change1 = StateChange(
@@ -636,7 +636,7 @@ struct GameEngineTests {
                 // Get old flag value from snapshot using GlobalID and engine helper
                 let flagID = GlobalID(rawValue: flagToSet)
                 // Use the engine context to check the flag state before the change
-                let actualOldFlagValue: Bool? = await context.engine.global(flagID)
+                let actualOldFlagValue: Bool? = await engine.global(flagID)
                 let flagOldValueState: StateValue? = actualOldFlagValue.map(StateValue.bool)
 
                 let change3 = StateChange(

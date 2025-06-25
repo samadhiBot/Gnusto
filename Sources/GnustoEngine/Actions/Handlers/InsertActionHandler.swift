@@ -41,68 +41,72 @@ public struct InsertActionHandler: ActionHandler {
     ///           `itemNotAccessible` (if container cannot be reached),
     ///           `containerIsClosed` (if container is not open),
     ///           `itemTooLargeForContainer` (if item won't fit).
-    ///           Can also throw errors from `context.engine` calls (e.g., `item()`, `fetch()`).
-    public func validate(context: ActionContext) async throws {
+    ///           Can also throw errors from `engine` calls (e.g., `item()`, `fetch()`).
+        public func process(
+        command: Command,
+        engine: GameEngine
+    ) async throws -> ActionResult {
+
         // For ALL commands, allow empty directObjects (handled in process method)
-        if context.command.isAllCommand {
+        if command.isAllCommand {
             // Still need an indirect object (container)
-            guard let indirectObjectRef = context.command.indirectObject else {
+            guard let indirectObjectRef = command.indirectObject else {
                 throw ActionResponse.prerequisiteNotMet(
-                    context.message.doWhat(verb: context.command.verb)
+                    engine.messenger.doWhat(verb: command.verb)
                 )
             }
             guard case .item(let containerID) = indirectObjectRef else {
                 throw ActionResponse.prerequisiteNotMet(
-                    context.message.thatsNotSomethingYouCan(.insert)
+                    engine.messenger.thatsNotSomethingYouCan(.insert)
                 )
             }
             // Check if container exists and is a container
-            let containerItem = try await context.engine.item(containerID)
+            let containerItem = try await engine.item(containerID)
             guard containerItem.hasFlag(.isContainer) else {
                 throw ActionResponse.targetIsNotAContainer(containerID)
             }
-            guard await context.engine.playerCanReach(containerID) else {
+            guard await engine.playerCanReach(containerID) else {
                 throw ActionResponse.itemNotAccessible(containerID)
             }
-            guard try await context.engine.hasFlag(.isOpen, on: containerID) else {
+            guard try await engine.hasFlag(.isOpen, on: containerID) else {
                 throw ActionResponse.containerIsClosed(containerID)
             }
             return
         }
 
         // 1. Validate Direct and Indirect Objects
-        guard !context.command.directObjects.isEmpty else {
+        guard !command.directObjects.isEmpty else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.doWhat(verb: context.command.verb)
+                engine.messenger.doWhat(verb: command.verb)
             )
         }
-        guard let directObjectRef = context.command.directObject else {
+        guard let directObjectRef = command.directObject else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.doWhat(verb: context.command.verb)
+                engine.messenger.doWhat(verb: command.verb)
             )
         }
         guard
             case .item(let itemToInsertID) = directObjectRef,
-            let itemToInsert = try? await context.engine.item(itemToInsertID)
+            let itemToInsert = try? await engine.item(itemToInsertID)
         else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.thatsNotSomethingYouCan(.insert)
+                engine.messenger.thatsNotSomethingYouCan(.insert)
             )
         }
 
-        guard let indirectObjectRef = context.command.indirectObject else {
+        guard let indirectObjectRef = command.indirectObject else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.insertWhere(item: itemToInsert.withDefiniteArticle)
+                engine.messenger.insertWhere(item: itemToInsert.withDefiniteArticle)
             )
         }
         guard case .item(let containerID) = indirectObjectRef else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.thatsNotSomethingYouCan(.insert)
+                engine.messenger.thatsNotSomethingYouCan(.insert)
             )
         }
 
         // 2. Get Items (existence validated by directObjectRef/indirectObjectRef checks if entities exist)
-        let containerItem = try await context.engine.item(containerID)
+        let containerItem = try await engine.item(containerID)
 
         // 3. Perform Basic Checks
         guard itemToInsert.parent == .player else {
@@ -114,14 +118,14 @@ public struct InsertActionHandler: ActionHandler {
             throw ActionResponse.targetIsNotAContainer(itemToInsertID)
         }
 
-        guard await context.engine.playerCanReach(containerID) else {
+        guard await engine.playerCanReach(containerID) else {
             throw ActionResponse.itemNotAccessible(containerID)
         }
 
         // Prevent putting item inside/onto itself
         if itemToInsertID == containerID {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.cannotPutItemInItself(item: itemToInsert.withDefiniteArticle)
+                engine.messenger.cannotPutItemInItself(item: itemToInsert.withDefiniteArticle)
             )
         }
 
@@ -130,13 +134,13 @@ public struct InsertActionHandler: ActionHandler {
         while case .item(let parentItemID) = currentParent {
             if parentItemID == itemToInsertID {
                 throw ActionResponse.prerequisiteNotMet(
-                    context.message.cannotPutContainerInContained(
+                    engine.messenger.cannotPutContainerInContained(
                         parent: itemToInsert.withDefiniteArticle,
                         child: containerItem.withDefiniteArticle
                     )
                 )
             }
-            let parentItem = try await context.engine.item(parentItemID)
+            let parentItem = try await engine.item(parentItemID)
             currentParent = parentItem.parent
         }
 
@@ -145,7 +149,7 @@ public struct InsertActionHandler: ActionHandler {
             throw ActionResponse.targetIsNotAContainer(containerID)
         }
         // Check dynamic property for open state
-        guard try await context.engine.hasFlag(.isOpen, on: containerID) else {
+        guard try await engine.hasFlag(.isOpen, on: containerID) else {
             throw ActionResponse.containerIsClosed(containerID)
         }
 
@@ -153,7 +157,7 @@ public struct InsertActionHandler: ActionHandler {
         // Check if container has limited capacity (capacity >= 0)
         if containerItem.capacity >= 0 {
             // Fix: Calculate load manually
-            let itemsInside = await context.engine.items(in: .item(containerID))
+            let itemsInside = await engine.items(in: .item(containerID))
             let currentLoad = itemsInside.reduce(0) { $0 + $1.size }
             let itemSize = itemToInsert.size
             if currentLoad + itemSize > containerItem.capacity {
@@ -163,8 +167,6 @@ public struct InsertActionHandler: ActionHandler {
                 )
             }
         }
-    }
-
     /// Processes the "INSERT ... INTO/IN" command.
     ///
     /// Assuming validation has passed, this action performs the following:
@@ -179,24 +181,23 @@ public struct InsertActionHandler: ActionHandler {
     /// - Parameter context: The `ActionContext` for the current action.
     /// - Returns: An `ActionResult` containing the message and relevant state changes.
     /// - Throws: `ActionResponse.internalEngineError` if direct or indirect objects are not items
-    ///           (this should be caught by `validate`), or errors from `context.engine.item()`.
-    public func process(context: ActionContext) async throws -> ActionResult {
+    ///           (this should be caught by `validate`), or errors from `engine.item()`.
         // Get the container
-        guard let indirectObjectRef = context.command.indirectObject,
+        guard let indirectObjectRef = command.indirectObject,
             case .item(let containerID) = indirectObjectRef
         else {
             return ActionResult(
-                context.message.doWhat(verb: context.command.verb)
+                engine.messenger.doWhat(verb: command.verb)
             )
         }
 
-        let container = try await context.engine.item(containerID)
+        let container = try await engine.item(containerID)
 
         // For ALL commands, empty directObjects is valid (means nothing to insert)
-        if !context.command.isAllCommand {
-            guard !context.command.directObjects.isEmpty else {
+        if !command.isAllCommand {
+            guard !command.directObjects.isEmpty else {
                 return ActionResult(
-                    context.message.doWhat(verb: context.command.verb)
+                    engine.messenger.doWhat(verb: command.verb)
                 )
             }
         }
@@ -206,22 +207,22 @@ public struct InsertActionHandler: ActionHandler {
         var lastInsertedItem: Item?
 
         // Process each object individually
-        for directObjectRef in context.command.directObjects {
+        for directObjectRef in command.directObjects {
             guard case .item(let itemToInsertID) = directObjectRef else {
-                if context.command.isAllCommand {
+                if command.isAllCommand {
                     continue  // Skip non-items in ALL commands
                 } else {
                     return ActionResult(
-                        context.message.thatsNotSomethingYouCan(.insert)
+                        engine.messenger.thatsNotSomethingYouCan(.insert)
                     )
                 }
             }
 
             do {
-                let itemToInsert = try await context.engine.item(itemToInsertID)
+                let itemToInsert = try await engine.item(itemToInsertID)
 
                 // Validate this specific item for ALL commands
-                if context.command.isAllCommand {
+                if command.isAllCommand {
                     // Check if player has this item
                     guard itemToInsert.parent == .player else {
                         continue  // Skip items not held in ALL commands
@@ -245,7 +246,7 @@ public struct InsertActionHandler: ActionHandler {
                             isCircular = true
                             break
                         }
-                        let parentItem = try await context.engine.item(parentItemID)
+                        let parentItem = try await engine.item(parentItemID)
                         currentParent = parentItem.parent
                     }
                     if isCircular {
@@ -254,7 +255,7 @@ public struct InsertActionHandler: ActionHandler {
 
                     // Capacity Check
                     if container.capacity >= 0 {
-                        let itemsInside = await context.engine.items(in: .item(containerID))
+                        let itemsInside = await engine.items(in: .item(containerID))
                         let currentLoad = itemsInside.reduce(0) { $0 + $1.size }
                         let itemSize = itemToInsert.size
                         if currentLoad + itemSize > container.capacity {
@@ -278,7 +279,7 @@ public struct InsertActionHandler: ActionHandler {
                     ))
 
                 // Change 2: Mark item touched
-                if let update = await context.engine.setFlag(.isTouched, on: itemToInsert) {
+                if let update = await engine.setFlag(.isTouched, on: itemToInsert) {
                     itemStateChanges.append(update)
                 }
 
@@ -288,7 +289,7 @@ public struct InsertActionHandler: ActionHandler {
 
             } catch {
                 // For ALL commands, skip items that cause errors
-                if !context.command.isAllCommand {
+                if !command.isAllCommand {
                     throw error
                 }
             }
@@ -296,7 +297,7 @@ public struct InsertActionHandler: ActionHandler {
 
         // Mark container touched if any items were inserted
         if !insertedItems.isEmpty {
-            if let update = await context.engine.setFlag(.isTouched, on: container) {
+            if let update = await engine.setFlag(.isTouched, on: container) {
                 allStateChanges.append(update)
             }
         }
@@ -305,14 +306,14 @@ public struct InsertActionHandler: ActionHandler {
         if let lastItem = lastInsertedItem {
             if insertedItems.count > 1 {
                 // For multiple items, update both "it" and "them"
-                let pronounChanges = await context.engine.updatePronounsForMultipleObjects(
+                let pronounChanges = await engine.updatePronounsForMultipleObjects(
                     lastItem: lastItem,
                     allItems: insertedItems
                 )
                 allStateChanges.append(contentsOf: pronounChanges)
             } else {
                 // For single item, use the original method
-                if let pronounChange = await context.engine.updatePronouns(to: lastItem) {
+                if let pronounChange = await engine.updatePronouns(to: lastItem) {
                     allStateChanges.append(pronounChange)
                 }
             }
@@ -321,13 +322,13 @@ public struct InsertActionHandler: ActionHandler {
         // Generate appropriate message
         let message =
             if insertedItems.isEmpty {
-                context.command.isAllCommand ?
-                    context.message.youHaveNothingToPutIn(
+                command.isAllCommand ?
+                    engine.messenger.youHaveNothingToPutIn(
                         container: container.withDefiniteArticle
                     ) :
-                    context.message.doWhat(verb: context.command.verb)
+                    engine.messenger.doWhat(verb: command.verb)
             } else {
-                context.message.youPutItemInContainer(
+                engine.messenger.youPutItemInContainer(
                     item: insertedItems.listWithDefiniteArticles,
                     container: container.withDefiniteArticle
                 )

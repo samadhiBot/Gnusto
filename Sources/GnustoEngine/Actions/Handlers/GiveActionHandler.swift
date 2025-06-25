@@ -26,83 +26,85 @@ public struct GiveActionHandler: ActionHandler {
     ///
     /// - Parameter context: The `ActionContext` for the current action.
     /// - Throws: Various `ActionResponse` errors if validation fails.
-    public func validate(context: ActionContext) async throws {
+        public func process(
+        command: Command,
+        engine: GameEngine
+    ) async throws -> ActionResult {
+
         // For ALL commands, allow empty directObjects (handled in process method)
-        if context.command.isAllCommand {
+        if command.isAllCommand {
             // Still need an indirect object (recipient)
-            guard let indirectObjectRef = context.command.indirectObject else {
+            guard let indirectObjectRef = command.indirectObject else {
                 throw ActionResponse.prerequisiteNotMet(
-                    context.message.giveToWhom()
+                    engine.messenger.giveToWhom()
                 )
             }
             guard case .item(let recipientID) = indirectObjectRef else {
                 throw ActionResponse.prerequisiteNotMet(
-                    context.message.thatsNotSomethingYouCan(.give)
+                    engine.messenger.thatsNotSomethingYouCan(.give)
                 )
             }
             // Check if recipient exists and is an actor
-            let recipient = try await context.engine.item(recipientID)
+            let recipient = try await engine.item(recipientID)
             guard recipient.hasFlag(.isCharacter) else {
                 throw ActionResponse.prerequisiteNotMet(
-                    context.message.thatsNotSomethingYouCan(.give)
+                    engine.messenger.thatsNotSomethingYouCan(.give)
                 )
             }
             return
         }
 
         // 1. Ensure we have at least one direct object for non-ALL commands
-        guard !context.command.directObjects.isEmpty else {
+        guard !command.directObjects.isEmpty else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.doWhat(verb: context.command.verb)
+                engine.messenger.doWhat(verb: command.verb)
             )
         }
 
         // 2. Ensure we have an indirect object
-        guard let indirectObjectRef = context.command.indirectObject else {
+        guard let indirectObjectRef = command.indirectObject else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.giveToWhom()
+                engine.messenger.giveToWhom()
             )
         }
 
         // For single object commands, validate the single object
-        guard let directObjectRef = context.command.directObject else {
+        guard let directObjectRef = command.directObject else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.doWhat(verb: context.command.verb)
+                engine.messenger.doWhat(verb: command.verb)
             )
         }
         guard case .item(let targetItemID) = directObjectRef else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.thatsNotSomethingYouCan(.give)
+                engine.messenger.thatsNotSomethingYouCan(.give)
             )
         }
         guard case .item(let recipientID) = indirectObjectRef else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.thatsNotSomethingYouCan(.give)
+                engine.messenger.thatsNotSomethingYouCan(.give)
             )
         }
 
         // 3. Check if item exists and player has it
-        let targetItem = try await context.engine.item(targetItemID)
+        let targetItem = try await engine.item(targetItemID)
         guard targetItem.parent == .player else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.youDontHaveThat()
+                engine.messenger.youDontHaveThat()
             )
         }
 
         // 4. Check if recipient exists and is an actor
-        let recipient = try await context.engine.item(recipientID)
+        let recipient = try await engine.item(recipientID)
         guard recipient.hasFlag(.isCharacter) else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.thatsNotSomethingYouCan(.give)
+                engine.messenger.thatsNotSomethingYouCan(.give)
             )
         }
 
         // 5. Check if recipient is reachable
-        guard await context.engine.playerCanReach(recipientID) else {
+        guard await engine.playerCanReach(recipientID) else {
             throw ActionResponse.itemNotAccessible(recipientID)
         }
-    }
-
     /// Processes the "GIVE" command.
     ///
     /// For each item to be given:
@@ -113,23 +115,22 @@ public struct GiveActionHandler: ActionHandler {
     ///
     /// - Parameter context: The `ActionContext` for the current action.
     /// - Returns: An `ActionResult` containing a message and any relevant `StateChange`s.
-    public func process(context: ActionContext) async throws -> ActionResult {
         // Get the recipient
-        guard let indirectObjectRef = context.command.indirectObject,
+        guard let indirectObjectRef = command.indirectObject,
             case .item(let recipientID) = indirectObjectRef
         else {
             return ActionResult(
-                context.message.giveToWhom()
+                engine.messenger.giveToWhom()
             )
         }
 
-        let recipient = try await context.engine.item(recipientID)
+        let recipient = try await engine.item(recipientID)
 
         // For ALL commands, empty directObjects is valid (means nothing to give)
-        if !context.command.isAllCommand {
-            guard !context.command.directObjects.isEmpty else {
+        if !command.isAllCommand {
+            guard !command.directObjects.isEmpty else {
                 return ActionResult(
-                    context.message.doWhat(verb: context.command.verb)
+                    engine.messenger.doWhat(verb: command.verb)
                 )
             }
         }
@@ -139,27 +140,27 @@ public struct GiveActionHandler: ActionHandler {
         var lastGivenItem: Item?
 
         // Process each object individually
-        for directObjectRef in context.command.directObjects {
+        for directObjectRef in command.directObjects {
             guard case .item(let targetItemID) = directObjectRef else {
-                if context.command.isAllCommand {
+                if command.isAllCommand {
                     continue  // Skip non-items in ALL commands
                 } else {
                     return ActionResult(
-                        context.message.thatsNotSomethingYouCan(.give)
+                        engine.messenger.thatsNotSomethingYouCan(.give)
                     )
                 }
             }
 
             do {
-                let targetItem = try await context.engine.item(targetItemID)
+                let targetItem = try await engine.item(targetItemID)
 
                 // Check if player has this item
                 guard targetItem.parent == .player else {
-                    if context.command.isAllCommand {
+                    if command.isAllCommand {
                         continue  // Skip items not held in ALL commands
                     } else {
                         return ActionResult(
-                            context.message.youDontHaveThat()
+                            engine.messenger.youDontHaveThat()
                         )
                     }
                 }
@@ -168,11 +169,11 @@ public struct GiveActionHandler: ActionHandler {
                 var itemStateChanges: [StateChange] = []
 
                 // Change 1: Move item to recipient
-                let moveChange = await context.engine.move(targetItem, to: .item(recipientID))
+                let moveChange = await engine.move(targetItem, to: .item(recipientID))
                 itemStateChanges.append(moveChange)
 
                 // Change 2: Set `.isTouched` flag if not already set
-                if let touchedChange = await context.engine.setFlag(.isTouched, on: targetItem) {
+                if let touchedChange = await engine.setFlag(.isTouched, on: targetItem) {
                     itemStateChanges.append(touchedChange)
                 }
 
@@ -182,7 +183,7 @@ public struct GiveActionHandler: ActionHandler {
 
             } catch {
                 // For ALL commands, skip items that cause errors
-                if !context.command.isAllCommand {
+                if !command.isAllCommand {
                     throw error
                 }
             }
@@ -192,14 +193,14 @@ public struct GiveActionHandler: ActionHandler {
         if let lastItem = lastGivenItem {
             if givenItems.count > 1 {
                 // For multiple items, update both "it" and "them"
-                let pronounChanges = await context.engine.updatePronounsForMultipleObjects(
+                let pronounChanges = await engine.updatePronounsForMultipleObjects(
                     lastItem: lastItem,
                     allItems: givenItems
                 )
                 allStateChanges.append(contentsOf: pronounChanges)
             } else {
                 // For single item, use the original method
-                if let pronounChange = await context.engine.updatePronouns(to: lastItem) {
+                if let pronounChange = await engine.updatePronouns(to: lastItem) {
                     allStateChanges.append(pronounChange)
                 }
             }
@@ -207,13 +208,13 @@ public struct GiveActionHandler: ActionHandler {
 
         // Generate appropriate message
         let message = if givenItems.isEmpty {
-            if context.command.isAllCommand {
-                context.message.youHaveNothingToGive()
+            if command.isAllCommand {
+                engine.messenger.youHaveNothingToGive()
             } else {
-                context.message.youDontHaveThat()
+                engine.messenger.youDontHaveThat()
             }
         } else {
-            context.message.itemGivenTo(
+            engine.messenger.itemGivenTo(
                 item: givenItems.listWithDefiniteArticles,
                 recipient: recipient.withDefiniteArticle
             )

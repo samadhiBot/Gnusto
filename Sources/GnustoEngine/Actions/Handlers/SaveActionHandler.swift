@@ -18,10 +18,12 @@ public struct SaveActionHandler: ActionHandler {
 
     /// Validates the "SAVE" command.
     /// Save requires no specific validation and always proceeds.
-    public func validate(context: ActionContext) async throws {
-        // No validation needed for SAVE
-    }
+        public func process(
+        command: Command,
+        engine: GameEngine
+    ) async throws -> ActionResult {
 
+        // No validation needed for SAVE
     /// Processes the "SAVE" command.
     ///
     /// Attempts to save the current game state. The actual save mechanism
@@ -29,17 +31,16 @@ public struct SaveActionHandler: ActionHandler {
     ///
     /// - Parameter context: The `ActionContext` for the current action.
     /// - Returns: An `ActionResult` containing save confirmation or error message.
-    public func process(context: ActionContext) async throws -> ActionResult {
         do {
             // Request the engine to save the game
-            try await context.engine.saveGame()
+            try await engine.saveGame()
             return ActionResult(
-                context.message.gameSaved()
+                engine.messenger.gameSaved()
             )
         } catch {
             // If save fails, provide appropriate error message
             return ActionResult(
-                context.message.saveFailed(error: error.localizedDescription)
+                engine.messenger.saveFailed(error: error.localizedDescription)
             )
         }
     }

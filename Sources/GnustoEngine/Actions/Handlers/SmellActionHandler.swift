@@ -28,18 +28,20 @@ public struct SmellActionHandler: ActionHandler {
     ///
     /// - Parameter context: The `ActionContext` for the current action.
     /// - Throws: `ActionResponse.prerequisiteNotMet` if the direct object is not an item.
-    public func validate(context: ActionContext) async throws {
+        public func process(
+        command: Command,
+        engine: GameEngine
+    ) async throws -> ActionResult {
+
         // If a direct object is provided, it should be an item.
         guard
-            let directObjectRef = context.command.directObject,
+            let directObjectRef = command.directObject,
             case .item(let itemID) = directObjectRef
         else { return }
 
-        guard await context.engine.playerCanReach(itemID) else {
+        guard await engine.playerCanReach(itemID) else {
             throw ActionResponse.itemNotAccessible(itemID)
         }
-    }
-
     /// Processes the "SMELL" command.
     ///
     /// - If a direct object (which must be an item, due to `validate`) is specified,
@@ -52,21 +54,20 @@ public struct SmellActionHandler: ActionHandler {
     ///
     /// - Parameter context: The `ActionContext` for the current action.
     /// - Returns: An `ActionResult` with a default smell-related message.
-    public func process(context: ActionContext) async throws -> ActionResult {
         let message: String
-        if let directObjectRef = context.command.directObject {
+        if let directObjectRef = command.directObject {
             switch directObjectRef {
             case .item(let itemID):
-                let item = try await context.engine.item(itemID)
-                message = context.message.smellsAverage(item: item.withDefiniteArticle)
+                let item = try await engine.item(itemID)
+                message = engine.messenger.smellsAverage(item: item.withDefiniteArticle)
             case .location(let locationID):
-                _ = try await context.engine.location(locationID)
-                message = context.message.smellNothingUnusual()
+                _ = try await engine.location(locationID)
+                message = engine.messenger.smellNothingUnusual()
             case .player:
-                message = context.message.smellMyself()
+                message = engine.messenger.smellMyself()
             }
         } else {
-            message = context.message.smellNothingUnusual()
+            message = engine.messenger.smellNothingUnusual()
         }
 
         return ActionResult(message)

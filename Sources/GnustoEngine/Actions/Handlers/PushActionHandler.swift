@@ -22,40 +22,42 @@ public struct PushActionHandler: ActionHandler {
     ///
     /// - Parameter context: The `ActionContext` for the current action.
     /// - Throws: Various `ActionResponse` errors if validation fails.
-    public func validate(context: ActionContext) async throws {
+        public func process(
+        command: Command,
+        engine: GameEngine
+    ) async throws -> ActionResult {
+
         // For ALL commands, allow empty directObjects (handled in process method)
-        if context.command.isAllCommand {
+        if command.isAllCommand {
             return
         }
 
         // 1. Ensure we have at least one direct object for non-ALL commands
-        guard !context.command.directObjects.isEmpty else {
+        guard !command.directObjects.isEmpty else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.doWhat(verb: context.command.verb)
+                engine.messenger.doWhat(verb: command.verb)
             )
         }
 
         // For single object commands, validate the single object
-        guard let directObjectRef = context.command.directObject else {
+        guard let directObjectRef = command.directObject else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.doWhat(verb: context.command.verb)
+                engine.messenger.doWhat(verb: command.verb)
             )
         }
         guard case .item(let targetItemID) = directObjectRef else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.thatsNotSomethingYouCan(.push)
+                engine.messenger.thatsNotSomethingYouCan(.push)
             )
         }
 
         // 2. Check if item exists
-        _ = try await context.engine.item(targetItemID)
+        _ = try await engine.item(targetItemID)
 
         // 3. Check reachability
-        guard await context.engine.playerCanReach(targetItemID) else {
+        guard await engine.playerCanReach(targetItemID) else {
             throw ActionResponse.itemNotAccessible(targetItemID)
         }
-    }
-
     /// Processes the "PUSH" command.
     ///
     /// For each item to be pushed:
@@ -65,12 +67,11 @@ public struct PushActionHandler: ActionHandler {
     ///
     /// - Parameter context: The `ActionContext` for the current action.
     /// - Returns: An `ActionResult` containing a message and any relevant `StateChange`s.
-    public func process(context: ActionContext) async throws -> ActionResult {
         // For ALL commands, empty directObjects is valid (means nothing to push)
-        if !context.command.isAllCommand {
-            guard !context.command.directObjects.isEmpty else {
+        if !command.isAllCommand {
+            guard !command.directObjects.isEmpty else {
                 return ActionResult(
-                    context.message.doWhat(verb: context.command.verb)
+                    engine.messenger.doWhat(verb: command.verb)
                 )
             }
         }
@@ -80,24 +81,24 @@ public struct PushActionHandler: ActionHandler {
         var lastPushedItem: Item?
 
         // Process each object individually
-        for directObjectRef in context.command.directObjects {
+        for directObjectRef in command.directObjects {
             guard case .item(let targetItemID) = directObjectRef else {
-                if context.command.isAllCommand {
+                if command.isAllCommand {
                     continue  // Skip non-items in ALL commands
                 } else {
                     return ActionResult(
-                        context.message.thatsNotSomethingYouCan(.push)
+                        engine.messenger.thatsNotSomethingYouCan(.push)
                     )
                 }
             }
 
             do {
-                let targetItem = try await context.engine.item(targetItemID)
+                let targetItem = try await engine.item(targetItemID)
 
                 // Validate this specific item for ALL commands
-                if context.command.isAllCommand {
+                if command.isAllCommand {
                     // Check if player can reach the item
-                    guard await context.engine.playerCanReach(targetItemID) else {
+                    guard await engine.playerCanReach(targetItemID) else {
                         continue  // Skip unreachable items in ALL commands
                     }
                 }
@@ -106,7 +107,7 @@ public struct PushActionHandler: ActionHandler {
                 var itemStateChanges: [StateChange] = []
 
                 // Change 1: Set `.isTouched` flag if not already set
-                if let touchedChange = await context.engine.setFlag(.isTouched, on: targetItem) {
+                if let touchedChange = await engine.setFlag(.isTouched, on: targetItem) {
                     itemStateChanges.append(touchedChange)
                 }
 
@@ -116,7 +117,7 @@ public struct PushActionHandler: ActionHandler {
 
             } catch {
                 // For ALL commands, skip items that cause errors
-                if !context.command.isAllCommand {
+                if !command.isAllCommand {
                     throw error
                 }
             }
@@ -126,14 +127,14 @@ public struct PushActionHandler: ActionHandler {
         if let lastItem = lastPushedItem {
             if pushedItems.count > 1 {
                 // For multiple items, update both "it" and "them"
-                let pronounChanges = await context.engine.updatePronounsForMultipleObjects(
+                let pronounChanges = await engine.updatePronounsForMultipleObjects(
                     lastItem: lastItem,
                     allItems: pushedItems
                 )
                 allStateChanges.append(contentsOf: pronounChanges)
             } else {
                 // For single item, use the original method
-                if let pronounChange = await context.engine.updatePronouns(to: lastItem) {
+                if let pronounChange = await engine.updatePronouns(to: lastItem) {
                     allStateChanges.append(pronounChange)
                 }
             }
@@ -142,11 +143,11 @@ public struct PushActionHandler: ActionHandler {
         // Generate appropriate message
         let message =
             if pushedItems.isEmpty {
-                context.command.isAllCommand
-                    ? context.message.nothingHereToPush()
-                    : context.message.doWhat(verb: context.command.verb)
+                command.isAllCommand
+                    ? engine.messenger.nothingHereToPush()
+                    : engine.messenger.doWhat(verb: command.verb)
             } else {
-                context.message.pushSuccess(items: pushedItems.listWithDefiniteArticles)
+                engine.messenger.pushSuccess(items: pushedItems.listWithDefiniteArticles)
             }
 
         return ActionResult(

@@ -31,22 +31,24 @@ public struct TasteActionHandler: ActionHandler {
     /// - Parameter context: The `ActionContext` for the current action.
     /// - Throws: `ActionResponse.custom` if no direct object is provided, or
     ///           `ActionResponse.prerequisiteNotMet` if the direct object is not an item.
-    public func validate(context: ActionContext) async throws {
-        guard let directObjectRef = context.command.directObject else {
+        public func process(
+        command: Command,
+        engine: GameEngine
+    ) async throws -> ActionResult {
+
+        guard let directObjectRef = command.directObject else {
             throw ActionResponse.custom(
-                context.message.doWhat(verb: context.command.verb)
+                engine.messenger.doWhat(verb: command.verb)
             )
         }
         guard case .item(let itemID) = directObjectRef else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.thatsNotSomethingYouCan(.taste)
+                engine.messenger.thatsNotSomethingYouCan(.taste)
             )
         }
-        guard await context.engine.playerCanReach(itemID) else {
+        guard await engine.playerCanReach(itemID) else {
             throw ActionResponse.itemNotAccessible(itemID)
         }
-    }
-
     /// Processes the "TASTE" command.
     ///
     /// Assuming validation has passed (meaning a direct object, which is an item, was specified),
@@ -55,11 +57,10 @@ public struct TasteActionHandler: ActionHandler {
     ///
     /// - Parameter context: The `ActionContext` for the current action.
     /// - Returns: An `ActionResult` with a default taste-related message.
-    public func process(context: ActionContext) async throws -> ActionResult {
         // Validate ensures directObject is an item if present.
         // Generic response. Tasting specific items (like food) would need custom logic.
         return ActionResult(
-            context.message.tastesAverage()
+            engine.messenger.tastesAverage()
         )
     }
 }

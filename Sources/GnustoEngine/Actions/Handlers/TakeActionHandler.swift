@@ -39,51 +39,55 @@ public struct TakeActionHandler: ActionHandler {
     /// - Throws: Various `ActionResponse` errors if validation fails, such as:
     ///           `prerequisiteNotMet`, `unknownEntity`, `itemNotAccessible`, `itemNotTakable`,
     ///           `containerIsClosed`, or `playerCannotCarryMore`.
-    ///           Can also throw errors from `context.engine.item()`.
-    public func validate(context: ActionContext) async throws {
+    ///           Can also throw errors from `engine.item()`.
+        public func process(
+        command: Command,
+        engine: GameEngine
+    ) async throws -> ActionResult {
+
         // For ALL commands, allow empty directObjects (handled in process method)
-        if context.command.isAllCommand {
+        if command.isAllCommand {
             return
         }
 
         // 1. Ensure we have at least one direct object for non-ALL commands
-        guard !context.command.directObjects.isEmpty else {
+        guard !command.directObjects.isEmpty else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.doWhat(verb: context.command.verb)
+                engine.messenger.doWhat(verb: command.verb)
             )
         }
 
         // For single object commands, validate the single object
-        guard let directObjectRef = context.command.directObject else {
+        guard let directObjectRef = command.directObject else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.doWhat(verb: context.command.verb)
+                engine.messenger.doWhat(verb: command.verb)
             )
         }
         guard case .item(let targetItemID) = directObjectRef else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.thatsNotSomethingYouCan(.take)
+                engine.messenger.thatsNotSomethingYouCan(.take)
             )
         }
 
         // 2. Check if item exists
-        let targetItem = try await context.engine.item(targetItemID)
+        let targetItem = try await engine.item(targetItemID)
 
         // 3. If this is a "take X from Y" command, validate the indirect object
-        if let indirectObjectRef = context.command.indirectObject {
+        if let indirectObjectRef = command.indirectObject {
             guard case .item(let containerID) = indirectObjectRef else {
                 throw ActionResponse.prerequisiteNotMet(
-                    context.message.thatsNotSomethingYouCan(.take)
+                    engine.messenger.thatsNotSomethingYouCan(.take)
                 )
             }
 
-            let container = try await context.engine.item(containerID)
+            let container = try await engine.item(containerID)
 
             // Check if the target item is actually in the specified container
             guard case .item(let actualParentID) = targetItem.parent,
                 actualParentID == containerID
             else {
                 throw ActionResponse.prerequisiteNotMet(
-                    context.message.takeItemNotInContainer(
+                    engine.messenger.takeItemNotInContainer(
                         item: targetItem.withDefiniteArticle,
                         container: container.withDefiniteArticle
                     )
@@ -101,14 +105,14 @@ public struct TakeActionHandler: ActionHandler {
 
         // 5. Check if item is inside something invalid (non-container/non-surface)
         if case .item(let parentID) = targetItem.parent {
-            let parentItem = try await context.engine.item(parentID)
+            let parentItem = try await engine.item(parentID)
 
             // Fail only if the parent is NOT a container and NOT a surface.
             // We allow taking from *closed* containers here; reachability handles closed state later.
             guard parentItem.hasFlag(.isContainer) || parentItem.hasFlag(.isSurface) else {
                 // Custom message similar to Zork's, using the plain name.
                 throw ActionResponse.prerequisiteNotMet(
-                    context.message.takeItemFromNonContainer(
+                    engine.messenger.takeItemFromNonContainer(
                         nonContainer: parentItem.withDefiniteArticle
                     )
                 )
@@ -117,7 +121,7 @@ public struct TakeActionHandler: ActionHandler {
 
         // 6. Handle specific container closed errors before general unreachability
         if case .item(let parentID) = targetItem.parent {
-            let container = try await context.engine.item(parentID)
+            let container = try await engine.item(parentID)
             if container.hasFlag(.isContainer) && !container.hasFlag(.isOpen) {
                 if targetItem.hasFlag(.isTouched) || container.hasFlag(.isTransparent) {
                     throw ActionResponse.containerIsClosed(parentID)
@@ -128,7 +132,7 @@ public struct TakeActionHandler: ActionHandler {
         }
 
         // 7. Check reachability using ScopeResolver (general check)
-        guard await context.engine.playerCanReach(targetItemID) else {
+        guard await engine.playerCanReach(targetItemID) else {
             throw ActionResponse.itemNotAccessible(targetItemID)
         }
 
@@ -138,11 +142,9 @@ public struct TakeActionHandler: ActionHandler {
         }
 
         // 9. Check capacity
-        guard await context.engine.playerCanCarry(targetItem) else {
+        guard await engine.playerCanCarry(targetItem) else {
             throw ActionResponse.playerCannotCarryMore
         }
-    }
-
     /// Processes the "TAKE" command.
     ///
     /// Assuming basic validation has passed, this action performs the following:
@@ -160,13 +162,12 @@ public struct TakeActionHandler: ActionHandler {
     /// - Parameter context: The `ActionContext` for the current action.
     /// - Returns: An `ActionResult` containing a message and any relevant `StateChange`s.
     /// - Throws: `ActionResponse.internalEngineError` if direct object is not an item (should be
-    ///           caught by validate), or errors from `context.engine.item()`.
-    public func process(context: ActionContext) async throws -> ActionResult {
+    ///           caught by validate), or errors from `engine.item()`.
         // For ALL commands, empty directObjects is valid (means nothing to take)
-        if !context.command.isAllCommand {
-            guard !context.command.directObjects.isEmpty else {
+        if !command.isAllCommand {
+            guard !command.directObjects.isEmpty else {
                 throw ActionResponse.internalEngineError(
-                    context.message.internalEngineError()
+                    engine.messenger.internalEngineError()
                 )
             }
         }
@@ -177,48 +178,48 @@ public struct TakeActionHandler: ActionHandler {
         var lastTakenItem: Item?
 
         // Process each object individually
-        for directObjectRef in context.command.directObjects {
+        for directObjectRef in command.directObjects {
             guard case .item(let targetItemID) = directObjectRef else {
-                if context.command.isAllCommand {
+                if command.isAllCommand {
                     continue  // Skip non-items in ALL commands
                 } else {
                     throw ActionResponse.internalEngineError(
-                        context.message.internalEngineError()
+                        engine.messenger.internalEngineError()
                     )
                 }
             }
 
             do {
-                let targetItem = try await context.engine.item(targetItemID)
+                let targetItem = try await engine.item(targetItemID)
 
                 // Check if player already has this item
                 if targetItem.parent == .player {
-                    if context.command.isAllCommand {
+                    if command.isAllCommand {
                         continue  // Skip items already held in ALL commands
                     } else {
                         return ActionResult(
-                            context.message.youAlreadyHaveThat()
+                            engine.messenger.youAlreadyHaveThat()
                         )
                     }
                 }
 
                 // Validate this specific item for ALL commands
-                if context.command.isAllCommand {
+                if command.isAllCommand {
                     // Check if item is takable
                     guard targetItem.hasFlag(.isTakable) else {
                         continue  // Skip non-takable items in ALL commands
                     }
 
                     // Check if player can reach the item
-                    guard await context.engine.playerCanReach(targetItemID) else {
+                    guard await engine.playerCanReach(targetItemID) else {
                         continue  // Skip unreachable items in ALL commands
                     }
 
                     // Check capacity
-                    guard await context.engine.playerCanCarry(targetItem) else {
+                    guard await engine.playerCanCarry(targetItem) else {
                         if takenItems.isEmpty {
                             messages.append(
-                                context.message.playerCannotCarryMore()
+                                engine.messenger.playerCannotCarryMore()
                             )
                         }
                         break  // Stop processing if capacity is exceeded
@@ -229,11 +230,11 @@ public struct TakeActionHandler: ActionHandler {
                 var itemStateChanges: [StateChange] = []
 
                 // Change 1: Parent
-                let moveChange = await context.engine.move(targetItem, to: .player)
+                let moveChange = await engine.move(targetItem, to: .player)
                 itemStateChanges.append(moveChange)
 
                 // Change 2: Set `.isTouched` flag if not already set
-                if let touchedChange = await context.engine.setFlag(.isTouched, on: targetItem) {
+                if let touchedChange = await engine.setFlag(.isTouched, on: targetItem) {
                     itemStateChanges.append(touchedChange)
                 }
 
@@ -243,7 +244,7 @@ public struct TakeActionHandler: ActionHandler {
 
             } catch {
                 // For ALL commands, skip items that cause errors
-                if !context.command.isAllCommand {
+                if !command.isAllCommand {
                     throw error
                 }
             }
@@ -253,14 +254,14 @@ public struct TakeActionHandler: ActionHandler {
         if let lastItem = lastTakenItem {
             if takenItems.count > 1 {
                 // For multiple items, update both "it" and "them"
-                let pronounChanges = await context.engine.updatePronounsForMultipleObjects(
+                let pronounChanges = await engine.updatePronounsForMultipleObjects(
                     lastItem: lastItem,
                     allItems: takenItems
                 )
                 allStateChanges.append(contentsOf: pronounChanges)
             } else {
                 // For single item, use the original method
-                if let pronounChange = await context.engine.updatePronouns(to: lastItem) {
+                if let pronounChange = await engine.updatePronouns(to: lastItem) {
                     allStateChanges.append(pronounChange)
                 }
             }
@@ -268,16 +269,16 @@ public struct TakeActionHandler: ActionHandler {
 
         // Generate appropriate message
         let message =
-            if context.command.isAllCommand {
+            if command.isAllCommand {
                 if takenItems.isEmpty {
-                    context.message.thereIsNothingHereToTake()
+                    engine.messenger.thereIsNothingHereToTake()
                 } else {
-                    context.message.youTakeMultipleItems(
+                    engine.messenger.youTakeMultipleItems(
                         items: takenItems.listWithDefiniteArticles
                     )
                 }
             } else {
-                context.message.taken()
+                engine.messenger.taken()
             }
 
         return ActionResult(

@@ -33,10 +33,14 @@ public struct DebugActionHandler: ActionHandler {
     /// - Parameter context: The `ActionContext` for the current action.
     /// - Throws: `ActionResponse.prerequisiteNotMet` if no direct object is provided,
     ///           or `ActionResponse.unknownEntity` if the direct object does not exist.
-    public func validate(context: ActionContext) async throws {
-        guard let directObjectRef = context.command.directObject else {
+        public func process(
+        command: Command,
+        engine: GameEngine
+    ) async throws -> ActionResult {
+
+        guard let directObjectRef = command.directObject else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.debugRequiresObject()
+                engine.messenger.debugRequiresObject()
             )
         }
 
@@ -44,16 +48,14 @@ public struct DebugActionHandler: ActionHandler {
         case .player:
             return  // Player is always a valid entity for DEBUG.
         case .item(let itemID):
-            guard (try? await context.engine.item(itemID)) != nil else {
+            guard (try? await engine.item(itemID)) != nil else {
                 throw ActionResponse.unknownEntity(directObjectRef)
             }
         case .location(let locationID):
-            guard (try? await context.engine.location(locationID)) != nil else {
+            guard (try? await engine.location(locationID)) != nil else {
                 throw ActionResponse.unknownEntity(directObjectRef)
             }
         }
-    }
-
     /// Processes the "DEBUG" command.
     ///
     /// Assuming validation has passed, this action retrieves the specified entity
@@ -65,10 +67,9 @@ public struct DebugActionHandler: ActionHandler {
     /// - Throws: `ActionResponse.prerequisiteNotMet` if no direct object is provided (though
     ///           this should ideally be caught by `validate`), or `ActionResponse.unknownEntity`
     ///           if the entity does not exist in the snapshot.
-    public func process(context: ActionContext) async throws -> ActionResult {
-        guard let directObjectRef = context.command.directObject else {
+        guard let directObjectRef = command.directObject else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.debugRequiresObject()
+                engine.messenger.debugRequiresObject()
             )
         }
 
@@ -76,16 +77,16 @@ public struct DebugActionHandler: ActionHandler {
 
         switch directObjectRef {
         case .player:
-            await customDump(context.engine.gameState.player, to: &target)
+            await customDump(engine.gameState.player, to: &target)
 
         case .item(let itemID):
-            guard let item = await context.engine.gameState.items[itemID] else {
+            guard let item = await engine.gameState.items[itemID] else {
                 throw ActionResponse.unknownEntity(directObjectRef)
             }
             customDump(item, to: &target)
 
         case .location(let locationID):
-            guard let location = await context.engine.gameState.locations[locationID] else {
+            guard let location = await engine.gameState.locations[locationID] else {
                 throw ActionResponse.unknownEntity(directObjectRef)
             }
             customDump(location, to: &target)

@@ -24,7 +24,7 @@ public struct YellActionHandler: ActionHandler {
         context: ActionContext
     ) async throws -> ActionResult {
         ActionResult(
-            context.message.yellResponse()
+            engine.messenger.yellResponse()
         )
     }
 }

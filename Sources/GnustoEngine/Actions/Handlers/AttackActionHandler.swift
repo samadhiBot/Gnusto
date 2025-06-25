@@ -26,40 +26,42 @@ public struct AttackActionHandler: ActionHandler {
     ///
     /// - Parameter context: The `ActionContext` for the current action.
     /// - Throws: Various `ActionResponse` errors if validation fails.
-    public func validate(context: ActionContext) async throws {
+        public func process(
+        command: Command,
+        engine: GameEngine
+    ) async throws -> ActionResult {
+
         // Attack requires a direct object (what to attack)
-        guard let directObjectRef = context.command.directObject else {
+        guard let directObjectRef = command.directObject else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.doWhat(verb: context.command.verb)
+                engine.messenger.doWhat(verb: command.verb)
             )
         }
         guard case .item(let targetItemID) = directObjectRef else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.cannotDoThat(verb: "attack")
+                engine.messenger.cannotDoThat(verb: "attack")
             )
         }
 
         // Check if target exists and is reachable
-        _ = try await context.engine.item(targetItemID)
-        guard await context.engine.playerCanReach(targetItemID) else {
+        _ = try await engine.item(targetItemID)
+        guard await engine.playerCanReach(targetItemID) else {
             throw ActionResponse.itemNotAccessible(targetItemID)
         }
 
         // If weapon is specified, validate it
-        if let indirectObjectRef = context.command.indirectObject {
+        if let indirectObjectRef = command.indirectObject {
             guard case .item(let weaponItemID) = indirectObjectRef else {
                 throw ActionResponse.prerequisiteNotMet(
-                    context.message.cannotActWithThat(verb: "attack")
+                    engine.messenger.cannotActWithThat(verb: "attack")
                 )
             }
 
-            let weaponItem = try await context.engine.item(weaponItemID)
+            let weaponItem = try await engine.item(weaponItemID)
             guard weaponItem.parent == .player else {
                 throw ActionResponse.itemNotHeld(weaponItemID)
             }
         }
-    }
-
     /// Processes the "ATTACK" command.
     ///
     /// Handles different attack scenarios following ZIL V-ATTACK logic:
@@ -70,9 +72,8 @@ public struct AttackActionHandler: ActionHandler {
     ///
     /// - Parameter context: The `ActionContext` for the current action.
     /// - Returns: An `ActionResult` with appropriate combat message and state changes.
-    public func process(context: ActionContext) async throws -> ActionResult {
         guard
-            let directObjectRef = context.command.directObject,
+            let directObjectRef = command.directObject,
             case .item(let targetItemID) = directObjectRef
         else {
             throw ActionResponse.internalEngineError(
@@ -80,45 +81,45 @@ public struct AttackActionHandler: ActionHandler {
             )
         }
 
-        let targetItem = try await context.engine.item(targetItemID)
+        let targetItem = try await engine.item(targetItemID)
 
         // Follow ZIL V-ATTACK logic exactly
         let message: String
 
         // First check: Is target NOT a character? (ZIL: NOT FSET? PRSO ACTORBIT)
         if !targetItem.hasFlag(.isCharacter) {
-            message = context.message.attackNonCharacter(item: targetItem.withIndefiniteArticle)
+            message = engine.messenger.attackNonCharacter(item: targetItem.withIndefiniteArticle)
         }
         // Second check: No weapon specified OR weapon is hands (bare-handed attack)
-        else if context.command.indirectObject == nil {
-            message = context.message.attackWithBareHands(
+        else if command.indirectObject == nil {
+            message = engine.messenger.attackWithBareHands(
                 character: targetItem.withIndefiniteArticle
             )
         }
         // We have a weapon - check if it's a real weapon
-        else if let indirectObjectRef = context.command.indirectObject,
+        else if let indirectObjectRef = command.indirectObject,
             case .item(let weaponItemID) = indirectObjectRef
         {
-            let weaponItem = try await context.engine.item(weaponItemID)
+            let weaponItem = try await engine.item(weaponItemID)
 
             if !weaponItem.hasFlag(.isWeapon) {
-                message = context.message.attackWithNonWeapon(
+                message = engine.messenger.attackWithNonWeapon(
                     character: targetItem.withDefiniteArticle,
                     weapon: weaponItem.withIndefiniteArticle
                 )
             } else {
                 // Real weapon attack - placeholder for combat system
-                message = context.message.attackWithWeapon()
+                message = engine.messenger.attackWithWeapon()
             }
         } else {
             // Fallback case
-            message = context.message.attackWithWeapon()
+            message = engine.messenger.attackWithWeapon()
         }
 
         return ActionResult(
             message,
-            await context.engine.setFlag(.isTouched, on: targetItem),
-            await context.engine.updatePronouns(to: targetItem),
+            await engine.setFlag(.isTouched, on: targetItem),
+            await engine.updatePronouns(to: targetItem),
         )
     }
 }

@@ -32,32 +32,36 @@ public struct OpenActionHandler: ActionHandler {
     ///           `itemNotAccessible` (if item cannot be reached),
     ///           `itemNotOpenable` (if item cannot be opened),
     ///           `itemIsLocked` (if item is locked).
-    ///           Can also throw errors from `context.engine.item()`.
-    public func validate(context: ActionContext) async throws {
+    ///           Can also throw errors from `engine.item()`.
+        public func process(
+        command: Command,
+        engine: GameEngine
+    ) async throws -> ActionResult {
+
         // Check for multiple objects (not supported by OPEN)
-        if context.command.directObjects.count > 1 {
+        if command.directObjects.count > 1 {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.multipleObjectsNotSupported(verb: "open")
+                engine.messenger.multipleObjectsNotSupported(verb: "open")
             )
         }
 
         // 2. Ensure we have a direct object and it's an item
-        guard let directObjectRef = context.command.directObject else {
+        guard let directObjectRef = command.directObject else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.doWhat(verb: context.command.verb)
+                engine.messenger.doWhat(verb: command.verb)
             )
         }
         guard case .item(let targetItemID) = directObjectRef else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.thatsNotSomethingYouCan(.open)
+                engine.messenger.thatsNotSomethingYouCan(.open)
             )
         }
 
         // 3. Check if item exists and is accessible using ScopeResolver
-        let targetItem = try await context.engine.item(targetItemID)
+        let targetItem = try await engine.item(targetItemID)
 
         // Use ScopeResolver to determine reachability
-        guard await context.engine.playerCanReach(targetItemID) else {
+        guard await engine.playerCanReach(targetItemID) else {
             throw ActionResponse.itemNotAccessible(targetItemID)
         }
 
@@ -70,8 +74,6 @@ public struct OpenActionHandler: ActionHandler {
         if targetItem.hasFlag(.isLocked) {
             throw ActionResponse.itemIsLocked(targetItemID)
         }
-    }
-
     /// Processes the "OPEN" command.
     ///
     /// This action performs the following:
@@ -91,50 +93,49 @@ public struct OpenActionHandler: ActionHandler {
     /// - Returns: An `ActionResult` containing the message and relevant state changes.
     /// - Throws: `ActionResponse.internalEngineError` if the direct object is not an item
     ///           (this should be caught by `validate`), `ActionResponse.itemAlreadyOpen` if the item
-    ///           is already open, or errors from `context.engine` calls.
-    public func process(context: ActionContext) async throws -> ActionResult {
-        guard let directObjectRef = context.command.directObject,
+    ///           is already open, or errors from `engine` calls.
+        guard let directObjectRef = command.directObject,
             case .item(let targetItemID) = directObjectRef
         else {
             // Should not be reached if validate is correct.
             throw ActionResponse.internalEngineError(
-                context.message.internalEngineError()
+                engine.messenger.internalEngineError()
             )
         }
 
-        let targetItem = try await context.engine.item(targetItemID)
+        let targetItem = try await engine.item(targetItemID)
 
         // Check if already open
-        if try await context.engine.hasFlag(.isOpen, on: targetItem.id) {
+        if try await engine.hasFlag(.isOpen, on: targetItem.id) {
             throw ActionResponse.itemAlreadyOpen(targetItemID)
         }
 
         // Check if container has items inside to announce what's revealed
         let message: String
         if targetItem.hasFlag(.isContainer) {
-            let itemsInside = await context.engine.items(in: .item(targetItemID))
+            let itemsInside = await engine.items(in: .item(targetItemID))
             if !itemsInside.isEmpty {
                 // Announce what's revealed: "Opening the small mailbox reveals a leaflet."
                 let itemList = itemsInside.sorted().listWithIndefiniteArticles
-                message = context.message.openingRevealsContents(
+                message = engine.messenger.openingRevealsContents(
                     container: targetItem.withDefiniteArticle,
                     contents: itemList
                 )
             } else {
                 // Container is empty, use simple message
-                message = context.message.opened(item: targetItem.withDefiniteArticle)
+                message = engine.messenger.opened(item: targetItem.withDefiniteArticle)
             }
         } else {
             // Not a container, use simple message
-            message = context.message.opened(item: targetItem.withDefiniteArticle)
+            message = engine.messenger.opened(item: targetItem.withDefiniteArticle)
         }
 
         // Prepare the result
         return ActionResult(
             message,
-            await context.engine.setFlag(.isOpen, on: targetItem),
-            await context.engine.setFlag(.isTouched, on: targetItem),
-            await context.engine.updatePronouns(to: targetItem)
+            await engine.setFlag(.isOpen, on: targetItem),
+            await engine.setFlag(.isTouched, on: targetItem),
+            await engine.updatePronouns(to: targetItem)
         )
     }
 

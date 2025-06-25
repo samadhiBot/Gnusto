@@ -16,10 +16,12 @@ public struct VerboseActionHandler: ActionHandler {
 
     /// Validates the "VERBOSE" command.
     /// Verbose requires no specific validation and always proceeds.
-    public func validate(context: ActionContext) async throws {
-        // No validation needed for VERBOSE
-    }
+        public func process(
+        command: Command,
+        engine: GameEngine
+    ) async throws -> ActionResult {
 
+        // No validation needed for VERBOSE
     /// Processes the "VERBOSE" command.
     ///
     /// Sets the game to verbose mode, where full location descriptions are shown
@@ -27,11 +29,10 @@ public struct VerboseActionHandler: ActionHandler {
     ///
     /// - Parameter context: The `ActionContext` for the current action.
     /// - Returns: An `ActionResult` containing confirmation message and state changes.
-    public func process(context: ActionContext) async throws -> ActionResult {
         return ActionResult(
-            context.message.maximumVerbosity(),
-            await context.engine.setGlobal(.isVerboseMode, to: true),
-            await context.engine.clearGlobal(.isBriefMode)
+            engine.messenger.maximumVerbosity(),
+            await engine.setGlobal(.isVerboseMode, to: true),
+            await engine.clearGlobal(.isBriefMode)
         )
     }
 

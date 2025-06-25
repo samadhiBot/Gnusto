@@ -27,26 +27,28 @@ public struct WaveActionHandler: ActionHandler {
     ///
     /// - Parameter context: The `ActionContext` for the current action.
     /// - Throws: Various `ActionResponse` errors if validation fails.
-    public func validate(context: ActionContext) async throws {
+        public func process(
+        command: Command,
+        engine: GameEngine
+    ) async throws -> ActionResult {
+
         // Wave requires a direct object (what to wave)
-        guard let directObjectRef = context.command.directObject else {
+        guard let directObjectRef = command.directObject else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.doWhat(verb: context.command.verb)
+                engine.messenger.doWhat(verb: command.verb)
             )
         }
         guard case .item(let targetItemID) = directObjectRef else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.cannotDoThat(verb: "wave")
+                engine.messenger.cannotDoThat(verb: "wave")
             )
         }
 
         // Check if target exists and is reachable
-        _ = try await context.engine.item(targetItemID)
-        guard await context.engine.playerCanReach(targetItemID) else {
+        _ = try await engine.item(targetItemID)
+        guard await engine.playerCanReach(targetItemID) else {
             throw ActionResponse.itemNotAccessible(targetItemID)
         }
-    }
-
     /// Processes the "WAVE" command.
     ///
     /// Handles waving attempts on different types of objects.
@@ -54,32 +56,31 @@ public struct WaveActionHandler: ActionHandler {
     ///
     /// - Parameter context: The `ActionContext` for the current action.
     /// - Returns: An `ActionResult` with appropriate waving message and state changes.
-    public func process(context: ActionContext) async throws -> ActionResult {
-        guard let directObjectRef = context.command.directObject,
+        guard let directObjectRef = command.directObject,
             case .item(let targetItemID) = directObjectRef
         else {
             throw ActionResponse.internalEngineError(
                 "WaveActionHandler: directObject was not an item in process.")
         }
 
-        let targetItem = try await context.engine.item(targetItemID)
+        let targetItem = try await engine.item(targetItemID)
 
         // Determine appropriate response based on object type and properties
         let message = if !targetItem.hasFlag(.isTakable) {
             // Fixed objects can't be waved
-            context.message.waveFixedObject(item: targetItem.withDefiniteArticle)
+            engine.messenger.waveFixedObject(item: targetItem.withDefiniteArticle)
         } else if targetItem.hasFlag(.isWeapon) {
             // Weapons are brandished
-            context.message.waveWeapon(item: targetItem.withDefiniteArticle)
+            engine.messenger.waveWeapon(item: targetItem.withDefiniteArticle)
         } else {
             // Generic waving response for other takable objects
-            context.message.waveObject(item: targetItem.withDefiniteArticle)
+            engine.messenger.waveObject(item: targetItem.withDefiniteArticle)
         }
 
         return ActionResult(
             message,
-            await context.engine.setFlag(.isTouched, on: targetItem),
-            await context.engine.updatePronouns(to: targetItem)
+            await engine.setFlag(.isTouched, on: targetItem),
+            await engine.updatePronouns(to: targetItem)
         )
     }
 }

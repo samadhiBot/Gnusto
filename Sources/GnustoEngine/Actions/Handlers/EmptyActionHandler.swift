@@ -28,22 +28,26 @@ public struct EmptyActionHandler: ActionHandler {
     ///
     /// - Parameter context: The `ActionContext` for the current action.
     /// - Throws: Various `ActionResponse` errors if validation fails.
-    public func validate(context: ActionContext) async throws {
+        public func process(
+        command: Command,
+        engine: GameEngine
+    ) async throws -> ActionResult {
+
         // Empty requires a direct object (what to empty)
-        guard let directObjectRef = context.command.directObject else {
+        guard let directObjectRef = command.directObject else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.doWhat(verb: context.command.verb)
+                engine.messenger.doWhat(verb: command.verb)
             )
         }
         guard case .item(let targetItemID) = directObjectRef else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.canOnlyEmptyContainers()
+                engine.messenger.canOnlyEmptyContainers()
             )
         }
 
         // Check if target exists and is reachable
-        let targetItem = try await context.engine.item(targetItemID)
-        guard await context.engine.playerCanReach(targetItemID) else {
+        let targetItem = try await engine.item(targetItemID)
+        guard await engine.playerCanReach(targetItemID) else {
             throw ActionResponse.itemNotAccessible(targetItemID)
         }
 
@@ -53,11 +57,9 @@ public struct EmptyActionHandler: ActionHandler {
         }
 
         // Check if container is open (can't empty closed containers)
-        guard try await context.engine.hasFlag(.isOpen, on: targetItemID) else {
+        guard try await engine.hasFlag(.isOpen, on: targetItemID) else {
             throw ActionResponse.containerIsClosed(targetItemID)
         }
-    }
-
     /// Processes the "EMPTY" command.
     ///
     /// Empties the contents of a container by moving all contained items to the
@@ -65,38 +67,37 @@ public struct EmptyActionHandler: ActionHandler {
     ///
     /// - Parameter context: The `ActionContext` for the current action.
     /// - Returns: An `ActionResult` with appropriate empty message and state changes.
-    public func process(context: ActionContext) async throws -> ActionResult {
-        guard let directObjectRef = context.command.directObject,
+        guard let directObjectRef = command.directObject,
             case .item(let targetItemID) = directObjectRef
         else {
             throw ActionResponse.internalEngineError(
                 "EmptyActionHandler: directObject was not an item in process.")
         }
 
-        let targetItem = try await context.engine.item(targetItemID)
+        let targetItem = try await engine.item(targetItemID)
 
         // Get current contents of the container
-        let contents = await context.engine.items(in: .item(targetItemID))
+        let contents = await engine.items(in: .item(targetItemID))
 
         let message: String
         var contentMoveChanges: [StateChange?] = []
 
         if contents.isEmpty {
-            message = context.message.containerAlreadyEmpty(
+            message = engine.messenger.containerAlreadyEmpty(
                 container: targetItem.withDefiniteArticle.capitalizedFirst
             )
         } else {
             // Get current location to move items to
-            let currentLocationID = await context.engine.playerLocationID
+            let currentLocationID = await engine.playerLocationID
 
             // Collect move changes for all contents
             for item in contents {
                 contentMoveChanges.append(
-                    await context.engine.move(item, to: .location(currentLocationID))
+                    await engine.move(item, to: .location(currentLocationID))
                 )
             }
 
-            message = context.message.emptySuccess(
+            message = engine.messenger.emptySuccess(
                 container: targetItem.withDefiniteArticle,
                 items: contents.listWithIndefiniteArticles,
                 count: contents.count
@@ -106,8 +107,8 @@ public struct EmptyActionHandler: ActionHandler {
         return ActionResult(
             message: message,
             changes: [
-                await context.engine.setFlag(.isTouched, on: targetItem),
-                await context.engine.updatePronouns(to: targetItem),
+                await engine.setFlag(.isTouched, on: targetItem),
+                await engine.updatePronouns(to: targetItem),
             ] + contentMoveChanges
         )
     }

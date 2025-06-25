@@ -27,27 +27,31 @@ public struct DrinkActionHandler: ActionHandler {
     ///
     /// - Parameter context: The `ActionContext` for the current action.
     /// - Throws: Various `ActionResponse` errors if validation fails.
-    public func validate(context: ActionContext) async throws {
+        public func process(
+        command: Command,
+        engine: GameEngine
+    ) async throws -> ActionResult {
+
         // Ensure we have a direct object
-        guard let directObjectRef = context.command.directObject else {
+        guard let directObjectRef = command.directObject else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.doWhat(verb: context.command.verb)
+                engine.messenger.doWhat(verb: command.verb)
             )
         }
         guard case .item(let targetItemID) = directObjectRef else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.canOnlyDrinkLiquids()
+                engine.messenger.canOnlyDrinkLiquids()
             )
         }
 
         // Check if item exists
-        let targetItem = try await context.engine.item(targetItemID)
+        let targetItem = try await engine.item(targetItemID)
 
         // Check if the item is directly drinkable (either isDrinkable or isEdible for ZIL compatibility)
         if targetItem.hasFlag(.isDrinkable) || targetItem.hasFlag(.isEdible) {
             // Check if item is inside a closed container
             if case .item(let parentID) = targetItem.parent {
-                let container = try await context.engine.item(parentID)
+                let container = try await engine.item(parentID)
                 if container.hasFlag(.isContainer) && !container.hasFlag(.isOpen) {
                     if targetItem.hasFlag(.isTouched) || container.hasFlag(.isTransparent) {
                         throw ActionResponse.containerIsClosed(parentID)
@@ -58,7 +62,7 @@ public struct DrinkActionHandler: ActionHandler {
             }
 
             // Direct drinkable item - check reachability
-            guard await context.engine.playerCanReach(targetItemID) else {
+            guard await engine.playerCanReach(targetItemID) else {
                 throw ActionResponse.itemNotAccessible(targetItemID)
             }
             return
@@ -67,7 +71,7 @@ public struct DrinkActionHandler: ActionHandler {
         // If not directly drinkable, check if it's a container with drinkable contents
         if targetItem.hasFlag(.isContainer) {
             // Check if container is reachable
-            guard await context.engine.playerCanReach(targetItemID) else {
+            guard await engine.playerCanReach(targetItemID) else {
                 throw ActionResponse.itemNotAccessible(targetItemID)
             }
 
@@ -77,13 +81,13 @@ public struct DrinkActionHandler: ActionHandler {
             }
 
             // Check if container has drinkable contents (either isDrinkable or isEdible for ZIL compatibility)
-            let containerContents = await context.engine.items(in: .item(targetItemID))
+            let containerContents = await engine.items(in: .item(targetItemID))
             let drinkableContents = containerContents.filter {
                 $0.hasFlag(.isDrinkable) || $0.hasFlag(.isEdible)
             }
 
             guard !drinkableContents.isEmpty else {
-                let message = context.message.nothingToDrinkIn(
+                let message = engine.messenger.nothingToDrinkIn(
                     container: targetItem.withDefiniteArticle
                 )
                 throw ActionResponse.prerequisiteNotMet(message)
@@ -93,10 +97,8 @@ public struct DrinkActionHandler: ActionHandler {
 
         // Item is neither drinkable nor a container with drinkables
         throw ActionResponse.prerequisiteNotMet(
-            context.message.cannotDrink(item: targetItem.withDefiniteArticle)
+            engine.messenger.cannotDrink(item: targetItem.withDefiniteArticle)
         )
-    }
-
     /// Processes the "DRINK" command.
     ///
     /// Handles consuming liquids either directly or from containers.
@@ -104,19 +106,18 @@ public struct DrinkActionHandler: ActionHandler {
     ///
     /// - Parameter context: The `ActionContext` for the current action.
     /// - Returns: An `ActionResult` with appropriate message and state changes.
-    public func process(context: ActionContext) async throws -> ActionResult {
-        guard let directObjectRef = context.command.directObject,
+        guard let directObjectRef = command.directObject,
             case .item(let targetItemID) = directObjectRef
         else {
             throw ActionResponse.internalEngineError(
                 "DrinkActionHandler: directObject was not an item in process.")
         }
 
-        let targetItem = try await context.engine.item(targetItemID)
+        let targetItem = try await engine.item(targetItemID)
 
         // Handle container first (prioritize over direct drinkable)
         if targetItem.hasFlag(.isContainer) {
-            let containerContents = await context.engine.items(in: .item(targetItemID))
+            let containerContents = await engine.items(in: .item(targetItemID))
             let drinkableContents = containerContents.filter {
                 $0.hasFlag(.isDrinkable) || $0.hasFlag(.isEdible)
             }
@@ -125,28 +126,28 @@ public struct DrinkActionHandler: ActionHandler {
                 // For closed containers, can't drink from them
                 if !targetItem.hasFlag(.isOpen) {
                     return ActionResult(
-                        context.message.cannotDrinkFromClosed(
+                        engine.messenger.cannotDrinkFromClosed(
                             container: targetItem.withDefiniteArticle
                         ),
-                        await context.engine.setFlag(.isTouched, on: targetItem)
+                        await engine.setFlag(.isTouched, on: targetItem)
                     )
                 } else {
                     return ActionResult(
-                        context.message.drinkFromContainer(
+                        engine.messenger.drinkFromContainer(
                             liquid: firstDrinkable.withDefiniteArticle,
                             container: targetItem.withDefiniteArticle
                         ),
-                        await context.engine.setFlag(.isTouched, on: targetItem),
-                        await context.engine.move(firstDrinkable, to: .nowhere),
-                        await context.engine.updatePronouns(to: firstDrinkable)
+                        await engine.setFlag(.isTouched, on: targetItem),
+                        await engine.move(firstDrinkable, to: .nowhere),
+                        await engine.updatePronouns(to: firstDrinkable)
                     )
                 }
             } else {
                 return ActionResult(
-                    context.message.nothingToDrinkIn(
+                    engine.messenger.nothingToDrinkIn(
                         container: targetItem.withDefiniteArticle
                     ),
-                    await context.engine.setFlag(.isTouched, on: targetItem)
+                    await engine.setFlag(.isTouched, on: targetItem)
                 )
             }
         }
@@ -154,16 +155,16 @@ public struct DrinkActionHandler: ActionHandler {
         // This shouldn't happen after validation, but handle it
         guard targetItem.hasFlag(.isDrinkable) || targetItem.hasFlag(.isEdible) else {
             return ActionResult(
-                context.message.cannotDrink(item: targetItem.withDefiniteArticle),
-                await context.engine.setFlag(.isTouched, on: targetItem)
+                engine.messenger.cannotDrink(item: targetItem.withDefiniteArticle),
+                await engine.setFlag(.isTouched, on: targetItem)
             )
         }
 
-        let drinkSuccess = context.message.drinkSuccess(item: targetItem.withDefiniteArticle)
+        let drinkSuccess = engine.messenger.drinkSuccess(item: targetItem.withDefiniteArticle)
 
         let message = if targetItem.shouldTakeFirst {
             """
-            \(context.message.taken())
+            \(engine.messenger.taken())
             \(drinkSuccess)
             """
         } else {
@@ -173,8 +174,8 @@ public struct DrinkActionHandler: ActionHandler {
         // Handle direct drinkable item (either isDrinkable or isEdible for ZIL compatibility)
         return ActionResult(
             message,
-            await context.engine.setFlag(.isTouched, on: targetItem),
-            await context.engine.move(targetItem, to: .nowhere)
+            await engine.setFlag(.isTouched, on: targetItem),
+            await engine.move(targetItem, to: .nowhere)
         )
     }
 }

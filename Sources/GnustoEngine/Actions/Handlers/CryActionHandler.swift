@@ -24,7 +24,7 @@ public struct CryActionHandler: ActionHandler {
     ) async throws -> ActionResult {
         // Get random response from message provider
         return ActionResult(
-            context.message.cryResponse()
+            engine.messenger.cryResponse()
         )
     }
 }

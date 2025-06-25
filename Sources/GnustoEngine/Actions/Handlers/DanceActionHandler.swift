@@ -26,7 +26,7 @@ public struct DanceActionHandler: ActionHandler {
     ) async throws -> ActionResult {
         // Get random response from message provider
         ActionResult(
-            context.message.danceResponse()
+            engine.messenger.danceResponse()
         )
     }
 }

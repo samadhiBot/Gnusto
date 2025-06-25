@@ -173,13 +173,13 @@ let workshopAmbience = Daemon(id: "workshopAmbience", frequency: 5) { engine in
 ```swift
 struct FillOutActionHandler: ActionHandler {
     func validate(context: ActionContext) async throws {
-        guard let directObject = context.command.directObject,
+        guard let directObject = command.directObject,
               case .item(let itemID) = directObject,
               itemID == "bureaucraticForm" else {
             throw ActionResponse.prerequisiteNotMet("Fill out what? You need the proper forms.")
         }
 
-        let formProgress = await context.engine.getItemAttribute(itemID, "progress")?.toInt ?? 0
+        let formProgress = await engine.getItemAttribute(itemID, "progress")?.toInt ?? 0
         guard formProgress < 17 else {
             throw ActionResponse.prerequisiteNotMet("The form is already completely filled out.")
         }
@@ -201,7 +201,7 @@ struct FillOutActionHandler: ActionHandler {
 
 struct ReciteActionHandler: ActionHandler {
     func validate(context: ActionContext) async throws {
-        let hasOath = await context.engine.getGlobalFlag("knowsFlatheadOath")
+        let hasOath = await engine.getGlobalFlag("knowsFlatheadOath")
         guard hasOath else {
             throw ActionResponse.prerequisiteNotMet("You don't know the Flathead Oath of Allegiance. Perhaps you should ask about it first.")
         }
@@ -288,32 +288,32 @@ The discovery phase showcases the engine's most sophisticated features:
 ```swift
 struct CastActionHandler: ActionHandler {
     func validate(context: ActionContext) async throws {
-        guard let directObject = context.command.directObject,
+        guard let directObject = command.directObject,
               case .item(let scrollID) = directObject else {
             throw ActionResponse.prerequisiteNotMet("Cast what? You need to specify a scroll.")
         }
 
-        let isScroll = await context.engine.hasItemProperty(scrollID, .scroll)
+        let isScroll = await engine.hasItemProperty(scrollID, .scroll)
         guard isScroll else {
             throw ActionResponse.prerequisiteNotMet("You can only cast spells from scrolls.")
         }
 
-        let isMemorized = await context.engine.getItemAttribute(scrollID, "memorized")?.toBool ?? false
+        let isMemorized = await engine.getItemAttribute(scrollID, "memorized")?.toBool ?? false
         guard isMemorized else {
             throw ActionResponse.prerequisiteNotMet("You must first memorize the spell before casting it.")
         }
     }
 
     func process(context: ActionContext) async throws -> ActionResult {
-        guard case .item(let scrollID) = context.command.directObject else {
+        guard case .item(let scrollID) = command.directObject else {
             throw ActionResponse.internalEngineError("Validated item disappeared")
         }
 
-        let spellType = await context.engine.getItemAttribute(scrollID, "spellType")?.toString ?? "unknown"
-        let potency = await context.engine.getItemAttribute(scrollID, "potency")?.toInt ?? 50
+        let spellType = await engine.getItemAttribute(scrollID, "spellType")?.toString ?? "unknown"
+        let potency = await engine.getItemAttribute(scrollID, "potency")?.toInt ?? 50
 
         // Check for nearby impregnated paper (the magic happens here!)
-        let nearbyItems = await context.engine.itemsInCurrentLocation()
+        let nearbyItems = await engine.itemsInCurrentLocation()
         let impregnatedNotebook = nearbyItems.first { item in
             item.hasAttribute("butterStained") &&
             item.hasAttribute("preserveStained") &&

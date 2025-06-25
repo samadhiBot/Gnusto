@@ -26,12 +26,16 @@ public struct ThinkActionHandler: ActionHandler {
     /// - Throws: `ActionResponse.custom` if no direct object is provided,
     ///           `ActionResponse.prerequisiteNotMet` if trying to think about a location,
     ///           `ActionResponse.itemNotAccessible` if an item direct object cannot be reached,
-    ///           or errors from `context.engine.item()` if the item doesn't exist.
-    public func validate(context: ActionContext) async throws {
+    ///           or errors from `engine.item()` if the item doesn't exist.
+        public func process(
+        command: Command,
+        engine: GameEngine
+    ) async throws -> ActionResult {
+
         // 1. Ensure we have a direct object
-        guard let directObjectRef = context.command.directObject else {
+        guard let directObjectRef = command.directObject else {
             throw ActionResponse.custom(
-                context.message.doWhat(action: "think about")
+                engine.messenger.doWhat(action: "think about")
             )
         }
 
@@ -40,19 +44,17 @@ public struct ThinkActionHandler: ActionHandler {
             return  // Thinking about self is always valid.
         case .item(let targetItemID):
             // 2. Check if item exists
-            let _ = try await context.engine.item(targetItemID)  // Will throw if not found
+            let _ = try await engine.item(targetItemID)  // Will throw if not found
             // 3. Check reachability
-            guard await context.engine.playerCanReach(targetItemID) else {
+            guard await engine.playerCanReach(targetItemID) else {
                 throw ActionResponse.itemNotAccessible(targetItemID)
             }
         case .location:
             // For now, only allow thinking about items or the player.
             throw ActionResponse.prerequisiteNotMet(
-                context.message.thinkAboutLocation()
+                engine.messenger.thinkAboutLocation()
             )
         }
-    }
-
     /// Processes the "THINK ABOUT" command.
     ///
     /// Assuming validation has passed:
@@ -65,9 +67,8 @@ public struct ThinkActionHandler: ActionHandler {
     /// - Returns: An `ActionResult` with a message reflecting the player's thoughts and any
     ///   relevant `StateChange`s (e.g., setting `.isTouched`, updating pronouns).
     /// - Throws: `ActionResponse.internalEngineError` if the direct object is unexpectedly nil,
-    ///           or errors from `context.engine.item()` if an item doesn't exist.
-    public func process(context: ActionContext) async throws -> ActionResult {
-        guard let directObjectRef = context.command.directObject else {
+    ///           or errors from `engine.item()` if an item doesn't exist.
+        guard let directObjectRef = command.directObject else {
             // Should be caught by validate.
             throw ActionResponse.internalEngineError("ThinkAbout: directObject was nil in process.")
         }
@@ -75,20 +76,20 @@ public struct ThinkActionHandler: ActionHandler {
         switch directObjectRef {
         case .player:
             return ActionResult(
-                context.message.thinkAboutSelf()
+                engine.messenger.thinkAboutSelf()
             )
         case .item(let targetItemID):
-            let targetItem = try await context.engine.item(targetItemID)
+            let targetItem = try await engine.item(targetItemID)
             return ActionResult(
-                context.message.thinkAboutItem(item: targetItem.withDefiniteArticle),
-                await context.engine.setFlag(.isTouched, on: targetItem),
-                await context.engine.updatePronouns(to: targetItem)
+                engine.messenger.thinkAboutItem(item: targetItem.withDefiniteArticle),
+                await engine.setFlag(.isTouched, on: targetItem),
+                await engine.updatePronouns(to: targetItem)
             )
         case .location:
             // Should be caught by validate if we decide not to support thinking about locations.
             // If supported, a custom message would go here.
             return ActionResult(
-                context.message.thinkAboutLocation()
+                engine.messenger.thinkAboutLocation()
             )
         }
     }

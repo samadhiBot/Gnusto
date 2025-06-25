@@ -26,25 +26,27 @@ public struct JumpActionHandler: ActionHandler {
     ///
     /// - Parameter context: The `ActionContext` for the current action.
     /// - Throws: Various `ActionResponse` errors if validation fails.
-    public func validate(context: ActionContext) async throws {
+        public func process(
+        command: Command,
+        engine: GameEngine
+    ) async throws -> ActionResult {
+
         // JUMP with no object is always valid (general jumping)
-        guard let directObjectRef = context.command.directObject else {
+        guard let directObjectRef = command.directObject else {
             return
         }
 
         guard case .item(let targetItemID) = directObjectRef else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.cannotDoThat(verb: "jump")
+                engine.messenger.cannotDoThat(verb: "jump")
             )
         }
 
         // Check if target exists and is reachable
-        _ = try await context.engine.item(targetItemID)
-        guard await context.engine.playerCanReach(targetItemID) else {
+        _ = try await engine.item(targetItemID)
+        guard await engine.playerCanReach(targetItemID) else {
             throw ActionResponse.itemNotAccessible(targetItemID)
         }
-    }
-
     /// Processes the "JUMP" command.
     ///
     /// Handles jumping in place or jumping over objects.
@@ -52,12 +54,11 @@ public struct JumpActionHandler: ActionHandler {
     ///
     /// - Parameter context: The `ActionContext` for the current action.
     /// - Returns: An `ActionResult` with appropriate jump message and state changes.
-    public func process(context: ActionContext) async throws -> ActionResult {
         // Handle JUMP with no object - general jumping
-        guard let directObjectRef = context.command.directObject else {
+        guard let directObjectRef = command.directObject else {
             // General jumping - use random response from MessageProvider
             return ActionResult(
-                context.message.jumpResponse()
+                engine.messenger.jumpResponse()
             )
         }
 
@@ -66,22 +67,22 @@ public struct JumpActionHandler: ActionHandler {
                 "JumpActionHandler: directObject was not an item in process.")
         }
 
-        let targetItem = try await context.engine.item(targetItemID)
+        let targetItem = try await engine.item(targetItemID)
 
         // Determine appropriate response based on object type
         let message =
             if targetItem.hasFlag(.isCharacter) {
                 // Can't jump characters
-                context.message.jumpCharacter(character: targetItem.withDefiniteArticle)
+                engine.messenger.jumpCharacter(character: targetItem.withDefiniteArticle)
             } else {
                 // Generic jumping response for objects
-                context.message.jumpLargeObject(item: targetItem.withDefiniteArticle)
+                engine.messenger.jumpLargeObject(item: targetItem.withDefiniteArticle)
             }
 
         return ActionResult(
             message,
-            await context.engine.setFlag(.isTouched, on: targetItem),
-            await context.engine.updatePronouns(to: targetItem)
+            await engine.setFlag(.isTouched, on: targetItem),
+            await engine.updatePronouns(to: targetItem)
         )
     }
 }

@@ -31,29 +31,31 @@ public struct BurnActionHandler: ActionHandler {
     ///
     /// - Parameter context: The action context containing the command and engine.
     /// - Throws: `ActionError` if validation fails.
-    public func validate(context: ActionContext) async throws {
-        guard let targetObjectID = context.command.directObject else {
+        public func process(
+        command: Command,
+        engine: GameEngine
+    ) async throws -> ActionResult {
+
+        guard let targetObjectID = command.directObject else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.doWhat(verb: context.command.verb)
+                engine.messenger.doWhat(verb: command.verb)
             )
         }
 
         guard case .item(let itemID) = targetObjectID else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.thatsNotSomethingYouCan(.burn)
+                engine.messenger.thatsNotSomethingYouCan(.burn)
             )
         }
 
         // Check if the item exists and is accessible
-        guard (try? await context.engine.item(itemID)) != nil else {
+        guard (try? await engine.item(itemID)) != nil else {
             throw ActionResponse.unknownEntity(targetObjectID)
         }
 
-        guard await context.engine.playerCanReach(itemID) else {
+        guard await engine.playerCanReach(itemID) else {
             throw ActionResponse.itemNotAccessible(itemID)
         }
-    }
-
     /// Processes the "BURN" command.
     ///
     /// This action performs the following:
@@ -66,34 +68,33 @@ public struct BurnActionHandler: ActionHandler {
     ///
     /// - Parameter context: The action context for the current action.
     /// - Returns: An `ActionResult` containing the burn result and any state changes.
-    public func process(context: ActionContext) async throws -> ActionResult {
-        guard let targetObjectID = context.command.directObject,
+        guard let targetObjectID = command.directObject,
             case .item(let itemID) = targetObjectID
         else {
             return ActionResult(
-                context.message.cannotDoThat(verb: "burn")
+                engine.messenger.cannotDoThat(verb: "burn")
             )
         }
 
-        let targetItem = try await context.engine.item(itemID)
+        let targetItem = try await engine.item(itemID)
 
         // Check if the item is flammable
         if targetItem.hasFlag(.isFlammable) {
-            let message = context.message.itemBurnsToAshes(
+            let message = engine.messenger.itemBurnsToAshes(
                 item: targetItem.withDefiniteArticle.capitalizedFirst
             )
             return ActionResult(
                 message,
-                await context.engine.setFlag(.isTouched, on: targetItem),
-                await context.engine.updatePronouns(to: targetItem),
-                await context.engine.move(targetItem, to: .nowhere)
+                await engine.setFlag(.isTouched, on: targetItem),
+                await engine.updatePronouns(to: targetItem),
+                await engine.move(targetItem, to: .nowhere)
             )
         } else {
             // Most items cannot be burned
             return ActionResult(
-                context.message.burnCannotBurn(item: targetItem.withDefiniteArticle),
-                await context.engine.setFlag(.isTouched, on: targetItem),
-                await context.engine.updatePronouns(to: targetItem)
+                engine.messenger.burnCannotBurn(item: targetItem.withDefiniteArticle),
+                await engine.setFlag(.isTouched, on: targetItem),
+                await engine.updatePronouns(to: targetItem)
             )
         }
     }

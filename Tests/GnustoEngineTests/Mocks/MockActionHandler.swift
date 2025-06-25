@@ -56,7 +56,7 @@ actor MockActionHandler: ActionHandler {
 
     func validate(context: ActionContext) async throws {
         validateCalled = true
-        lastCommandReceived = context.command
+        lastCommandReceived = command
         if throwFrom == .validate, let error = errorToThrow {
             throw error
         }
@@ -65,7 +65,7 @@ actor MockActionHandler: ActionHandler {
 
     func process(context: ActionContext) async throws -> ActionResult {
         processCalled = true
-        lastCommandReceived = context.command
+        lastCommandReceived = command
 
         if let handler = processHandler {
             return try await handler(context)

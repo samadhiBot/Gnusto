@@ -31,43 +31,45 @@ public struct TurnOffActionHandler: ActionHandler {
     ///           `custom` (for "Turn off what?" or "It's already off."),
     ///           `prerequisiteNotMet` (if not an item or not a device),
     ///           `itemNotAccessible`.
-    ///           Can also throw errors from `context.engine.item()`.
-    public func validate(context: ActionContext) async throws {
+    ///           Can also throw errors from `engine.item()`.
+        public func process(
+        command: Command,
+        engine: GameEngine
+    ) async throws -> ActionResult {
+
         // 1. Get direct object and ensure it's an item
-        guard let directObjectRef = context.command.directObject else {
+        guard let directObjectRef = command.directObject else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.doWhat(verb: context.command.verb)
+                engine.messenger.doWhat(verb: command.verb)
             )
         }
         guard case .item(let targetItemID) = directObjectRef else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.thatsNotSomethingYouCan(.extinguish)
+                engine.messenger.thatsNotSomethingYouCan(.extinguish)
             )
         }
 
         // 2. Fetch the item snapshot.
-        let targetItem = try await context.engine.item(targetItemID)
+        let targetItem = try await engine.item(targetItemID)
 
         // 3. Verify the item is reachable.
-        guard await context.engine.playerCanReach(targetItemID) else {
+        guard await engine.playerCanReach(targetItemID) else {
             throw ActionResponse.itemNotAccessible(targetItemID)
         }
 
         // 4. Check if the item has the `.device` property.
         guard targetItem.hasFlag(.isDevice) else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.cannotTurnOff()
+                engine.messenger.cannotTurnOff()
             )
         }
 
         // 5. Check if the item is already off (lacks `.on`).
         guard targetItem.hasFlag(.isOn) else {
             throw ActionResponse.custom(
-                context.message.alreadyOff()
+                engine.messenger.alreadyOff()
             )
         }
-    }
-
     /// Processes the "TURN OFF" command.
     ///
     /// Assuming basic validation has passed (the item is a reachable device and is currently on),
@@ -84,33 +86,32 @@ public struct TurnOffActionHandler: ActionHandler {
     /// - Parameter context: The `ActionContext` for the current action.
     /// - Returns: An `ActionResult` containing the message and relevant state changes.
     /// - Throws: `ActionResponse.internalEngineError` if the direct object is not an item (this should
-    ///           be caught by `validate`), or errors from `context.engine` calls (e.g., fetching items
+    ///           be caught by `validate`), or errors from `engine` calls (e.g., fetching items
     ///           or player location).
-    public func process(context: ActionContext) async throws -> ActionResult {
-        guard let directObjectRef = context.command.directObject,
+        guard let directObjectRef = command.directObject,
             case .item(let targetItemID) = directObjectRef
         else {
             throw ActionResponse.internalEngineError(
                 "TurnOff: directObject was not an item in process."
             )
         }
-        let targetItem = try await context.engine.item(targetItemID)
+        let targetItem = try await engine.item(targetItemID)
 
         // Check if location became dark
         let isLightSourceBeingTurnedOff = targetItem.hasFlag(.isLightSource)
         var messageParts = [
-            context.message.lightIsNowOff(item: targetItem.withDefiniteArticle)
+            engine.messenger.lightIsNowOff(item: targetItem.withDefiniteArticle)
         ]
 
         if isLightSourceBeingTurnedOff {
-            let currentLocation = try await context.engine.playerLocation()
+            let currentLocation = try await engine.playerLocation()
 
             // Is the room inherently lit?
             let locationIsInherentlyLit = currentLocation.hasFlag(.inherentlyLit)
 
             if !locationIsInherentlyLit {
                 // Check for other active light sources (inventory or location)
-                let allItems = await context.engine.gameState.items.values
+                let allItems = await engine.gameState.items.values
                 let otherActiveLightSources = allItems.filter { item in
                     guard item.id != targetItem.id else { return false }
                     let isInPlayerInventory = item.parent == .player
@@ -121,15 +122,15 @@ public struct TurnOffActionHandler: ActionHandler {
                 }
 
                 if otherActiveLightSources.isEmpty {
-                    messageParts.append(context.message.nowDark())
+                    messageParts.append(engine.messenger.nowDark())
                 }
             }
         }
 
         return ActionResult(
             messageParts.joined(separator: "\n"),
-            await context.engine.setFlag(.isTouched, on: targetItem),
-            await context.engine.clearFlag(.isOn, on: targetItem)
+            await engine.setFlag(.isTouched, on: targetItem),
+            await engine.clearFlag(.isOn, on: targetItem)
         )
     }
 }

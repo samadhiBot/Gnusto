@@ -19,51 +19,52 @@ public struct LookInsideActionHandler: ActionHandler {
 
     /// Validates the "LOOK INSIDE" command.
     /// Requires a direct object that must be an item the player can reach.
-    public func validate(context: ActionContext) async throws {
-        guard let directObjectRef = context.command.directObject else {
+        public func process(
+        command: Command,
+        engine: GameEngine
+    ) async throws -> ActionResult {
+
+        guard let directObjectRef = command.directObject else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.doWhat(verb: context.command.verb)
+                engine.messenger.doWhat(verb: command.verb)
             )
         }
 
         guard case .item(let targetItemID) = directObjectRef else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.canOnlyLookInsideItems()
+                engine.messenger.canOnlyLookInsideItems()
             )
         }
 
         // Ensure item exists and is reachable
-        guard (try? await context.engine.item(targetItemID)) != nil else {
+        guard (try? await engine.item(targetItemID)) != nil else {
             throw ActionResponse.unknownEntity(directObjectRef)
         }
 
-        guard await context.engine.playerCanReach(targetItemID) else {
+        guard await engine.playerCanReach(targetItemID) else {
             throw ActionResponse.itemNotAccessible(targetItemID)
         }
-    }
-
     /// Processes the "LOOK INSIDE" command.
     /// By default, delegates to examine behavior with special focus on container contents.
-    public func process(context: ActionContext) async throws -> ActionResult {
-        guard let directObjectRef = context.command.directObject,
+        guard let directObjectRef = command.directObject,
             case .item(let targetItemID) = directObjectRef
         else {
             throw ActionResponse.internalEngineError("Validation should have caught this")
         }
 
-        let targetItem = try await context.engine.item(targetItemID)
+        let targetItem = try await engine.item(targetItemID)
 
         // Determine the message based on whether item is a container
         let message: String
         if targetItem.hasFlag(.isContainer) {
             // For containers, provide container-specific messaging
-            let isOpen = try await context.engine.hasFlag(.isOpen, on: targetItem.id)
+            let isOpen = try await engine.hasFlag(.isOpen, on: targetItem.id)
 
             if !isOpen {
                 message = "The \(targetItem.name) is closed."
             } else {
                 // Show container contents
-                let items = await context.engine.items(in: .item(targetItem.id))
+                let items = await engine.items(in: .item(targetItem.id))
                 if items.isEmpty {
                     message = "The \(targetItem.name) is empty."
                 } else {
@@ -73,7 +74,7 @@ public struct LookInsideActionHandler: ActionHandler {
             }
         } else {
             // For non-containers, delegate to examine behavior
-            let description = try await context.engine.generateDescription(
+            let description = try await engine.generateDescription(
                 for: targetItem.id,
                 attributeID: .description
             )
@@ -87,8 +88,8 @@ public struct LookInsideActionHandler: ActionHandler {
 
         return ActionResult(
             message,
-            await context.engine.setFlag(.isTouched, on: targetItem),
-            await context.engine.updatePronouns(to: targetItem)
+            await engine.setFlag(.isTouched, on: targetItem),
+            await engine.updatePronouns(to: targetItem)
         )
     }
 }

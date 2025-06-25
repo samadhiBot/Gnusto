@@ -67,14 +67,6 @@ open class MessageProvider: @unchecked Sendable {
         )
     }
 
-    open func actionHandlerMissingObjects(handler: String) -> String {
-        output(
-            "actionHandlerMissingObjects(handler: '\(handler)')",
-            "A strange buzzing sound indicates something is wrong with \(handler).",
-            .warning
-        )
-    }
-
     open func alreadyHeld(item: String) -> String {
         output(
             "alreadyHeld(item: '\(item)')",
@@ -114,6 +106,13 @@ open class MessageProvider: @unchecked Sendable {
         output(
             "ambiguousPronounReference(text: '\(text)')",
             text
+        )
+    }
+
+    open func anySomething(_ text: String) -> String {
+        output(
+            "anySomething(text: '\(text)')",
+            "any \(text)"
         )
     }
 
@@ -2165,6 +2164,13 @@ open class MessageProvider: @unchecked Sendable {
                 "You yell enthusiastically while reality politely ignores you",
                 "You yell with conviction about nothing at all.",
             )
+        )
+    }
+
+    open func you() -> String {
+        output(
+            "you()",
+            "you"
         )
     }
 

@@ -153,7 +153,7 @@ extension GameEngine {
         // 1. Check for light
         guard await playerLocationIsLit() else {
             // It's dark!
-            let darknessMessage = messageProvider.roomIsDark()
+            let darknessMessage = messenger.roomIsDark()
             await ioHandler.print(darknessMessage)
             // Do not describe the room or list items.
             return
@@ -199,7 +199,7 @@ extension GameEngine {
         // 1. Check for light
         guard await playerLocationIsLit() else {
             // It's dark!
-            await ioHandler.print(messageProvider.roomIsDark())
+            await ioHandler.print(messenger.roomIsDark())
             return
         }
 

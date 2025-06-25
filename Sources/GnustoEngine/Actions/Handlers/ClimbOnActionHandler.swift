@@ -22,49 +22,50 @@ public struct ClimbOnActionHandler: ActionHandler {
     ///
     /// - Parameter context: The `ActionContext` containing the command and game state.
     /// - Throws: An `ActionResponse` if validation fails.
-    public func validate(context: ActionContext) async throws {
-        guard let directObjectRef = context.command.directObject else {
+        public func process(
+        command: Command,
+        engine: GameEngine
+    ) async throws -> ActionResult {
+
+        guard let directObjectRef = command.directObject else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.doWhat(action: "climb on")
+                engine.messenger.doWhat(action: "climb on")
             )
         }
 
         guard case .item(let targetItemID) = directObjectRef else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.cannotDoThat(verb: "climb on")
+                engine.messenger.cannotDoThat(verb: "climb on")
             )
         }
 
         // Check if item exists and is reachable
-        guard (try? await context.engine.item(targetItemID)) != nil else {
+        guard (try? await engine.item(targetItemID)) != nil else {
             throw ActionResponse.itemNotAccessible(targetItemID)
         }
 
-        guard await context.engine.playerCanReach(targetItemID) else {
+        guard await engine.playerCanReach(targetItemID) else {
             throw ActionResponse.itemNotAccessible(targetItemID)
         }
-    }
-
     /// Processes the climb on action.
     ///
     /// - Parameter context: The `ActionContext` containing the command and game state.
     /// - Returns: An `ActionResult` with the action outcome.
-    public func process(context: ActionContext) async throws -> ActionResult {
-        guard case .item(let targetItemID) = context.command.directObject else {
-            let message = context.message.actionHandlerInternalError(
+        guard case .item(let targetItemID) = command.directObject else {
+            let message = engine.messenger.actionHandlerInternalError(
                 handler: "ClimbOnActionHandler",
                 details: "directObject was not an item in process"
             )
             throw ActionResponse.internalEngineError(message)
         }
 
-        let targetItem = try await context.engine.item(targetItemID)
+        let targetItem = try await engine.item(targetItemID)
 
         // Default behavior: You can't climb on most things
         return ActionResult(
-            context.message.climbOnFailure(item: targetItem.withDefiniteArticle),
-            await context.engine.setFlag(.isTouched, on: targetItem),
-            await context.engine.updatePronouns(to: targetItem)
+            engine.messenger.climbOnFailure(item: targetItem.withDefiniteArticle),
+            await engine.setFlag(.isTouched, on: targetItem),
+            await engine.updatePronouns(to: targetItem)
         )
     }
 }

@@ -23,7 +23,7 @@ public struct SingActionHandler: ActionHandler {
         context: ActionContext
     ) async throws -> ActionResult {
         ActionResult(
-            context.message.singResponse()
+            engine.messenger.singResponse()
         )
     }
 }

@@ -67,7 +67,7 @@ public actor GameEngine: Sendable {
 
     /// The message provider for localized and customizable game text.
     /// Derived from the `GameBlueprint` used to initialize the engine.
-    public nonisolated let messageProvider: MessageProvider
+    public nonisolated let messenger: MessageProvider
 
     /// A random number generator used throughout the game for various randomization needs.
     ///
@@ -149,7 +149,7 @@ public actor GameEngine: Sendable {
         self.fuses = blueprint.fuses
         self.introduction = blueprint.introduction
         self.maximumScore = blueprint.maximumScore
-        self.messageProvider = blueprint.messageProvider
+        self.messenger = blueprint.messenger
         self.randomNumberGenerator = randomNumberGenerator
         self.release = blueprint.release
         self.storyTitle = blueprint.storyTitle
@@ -202,7 +202,7 @@ public actor GameEngine: Sendable {
         self.locationEventHandlers = blueprint.locationEventHandlers
 
         #if DEBUG
-        self.actionHandlers.append(DebugActionHandler())
+            self.actionHandlers.append(DebugActionHandler())
         #endif
     }
 
@@ -352,86 +352,89 @@ extension GameEngine {
     /// `.internalEngineError` or `.stateValidationFailed`.
     func report(_ response: ActionResponse) async {
         // Determine the user-facing message using MessageProvider
-        let message = switch response {
-        case .containerIsClosed(let item):
-            messageProvider.containerIsClosed(item: theThat(item))
-        case .containerIsOpen(let item):
-            messageProvider.containerIsOpen(item: theThat(item))
-        case .custom(let message):
-            messageProvider.custom(message: message)
-        case .directionIsBlocked(let reason):
-            messageProvider.directionIsBlocked(reason: reason)
-        case .internalEngineError:
-            messageProvider.internalEngineError()
-        case .invalidDirection:
-            messageProvider.invalidDirection()
-        case .invalidIndirectObject(let objectName):
-            messageProvider.invalidIndirectObject(object: theThat(objectName))
-        case .invalidValue:
-            messageProvider.internalEngineError()
-        case .itemAlreadyClosed(let item):
-            messageProvider.itemAlreadyClosed(item: theThat(item))
-        case .itemAlreadyOpen(let item):
-            messageProvider.itemAlreadyOpen(item: theThat(item))
-        case .itemIsAlreadyWorn(let item):
-            messageProvider.itemIsAlreadyWorn(item: theThat(item))
-        case .itemIsLocked(let item):
-            messageProvider.itemIsLocked(item: theThat(item))
-        case .itemIsNotWorn(let item):
-            messageProvider.itemIsNotWorn(item: theThat(item))
-        case .itemIsUnlocked(let item):
-            messageProvider.itemIsUnlocked(item: theThat(item))
-        case .itemNotAccessible(let item):
-            messageProvider.itemNotAccessible(item: anySuch(item))
-        case .itemNotClosable(let item):
-            messageProvider.itemNotClosable(item: theThat(item))
-        case .itemNotDroppable(let item):
-            messageProvider.itemNotDroppable(item: theThat(item))
-        case .itemNotEdible(let item):
-            messageProvider.itemNotEdible(item: theThat(item))
-        case .itemNotHeld(let item):
-            messageProvider.itemNotHeld(item: theThat(item))
-        case .itemNotInContainer(let item, let container):
-            messageProvider.itemNotInContainer(item: theThat(item), container: theThat(container))
-        case .itemNotLockable(let item):
-            messageProvider.itemNotLockable(item: theThat(item))
-        case .itemNotOnSurface(let item, let surface):
-            messageProvider.itemNotOnSurface(item: theThat(item), surface: theThat(surface))
-        case .itemNotOpenable(let item):
-            messageProvider.itemNotOpenable(item: theThat(item))
-        case .itemNotReadable(let item):
-            messageProvider.itemNotReadable(item: theThat(item))
-        case .itemNotRemovable(let item):
-            messageProvider.itemNotRemovable(item: theThat(item))
-        case .itemNotTakable(let item):
-            messageProvider.itemNotTakable(item: theThat(item))
-        case .itemNotUnlockable(let item):
-            messageProvider.itemNotUnlockable(item: theThat(item))
-        case .itemNotWearable(let item):
-            messageProvider.itemNotWearable(item: theThat(item))
-        case .itemTooLargeForContainer(let item, let container):
-            messageProvider.itemTooLargeForContainer(item: theThat(item), container: theThat(container))
-        case .playerCannotCarryMore:
-            messageProvider.playerCannotCarryMore()
-        case .prerequisiteNotMet(let customMessage):
-            messageProvider.prerequisiteNotMet(message: customMessage)
-        case .roomIsDark:
-            messageProvider.roomIsDark()
-        case .stateValidationFailed:
-            messageProvider.stateValidationFailed()
-        case .targetIsNotAContainer(let item):
-            messageProvider.targetIsNotAContainer(item: theThat(item))
-        case .targetIsNotASurface(let item):
-            messageProvider.targetIsNotASurface(item: theThat(item))
-        case .toolMissing(let tool):
-            messageProvider.toolMissing(tool: tool)
-        case .unknownEntity:
-            messageProvider.unknownEntity()
-        case .unknownVerb(let verb):
-            messageProvider.unknownVerb(verb: verb)
-        case .wrongKey(let keyID, let lockID):
-            messageProvider.wrongKey(key: theThat(keyID), lock: theThat(lockID))
-        }
+        let message =
+            switch response {
+            case .containerIsClosed(let item):
+                messenger.containerIsClosed(item: theThat(item))
+            case .containerIsOpen(let item):
+                messenger.containerIsOpen(item: theThat(item))
+            case .custom(let message):
+                messenger.custom(message: message)
+            case .directionIsBlocked(let reason):
+                messenger.directionIsBlocked(reason: reason)
+            case .internalEngineError:
+                messenger.internalEngineError()
+            case .invalidDirection:
+                messenger.invalidDirection()
+            case .invalidIndirectObject(let objectName):
+                messenger.invalidIndirectObject(object: theThat(objectName))
+            case .invalidValue:
+                messenger.internalEngineError()
+            case .itemAlreadyClosed(let item):
+                messenger.itemAlreadyClosed(item: theThat(item))
+            case .itemAlreadyOpen(let item):
+                messenger.itemAlreadyOpen(item: theThat(item))
+            case .itemIsAlreadyWorn(let item):
+                messenger.itemIsAlreadyWorn(item: theThat(item))
+            case .itemIsLocked(let item):
+                messenger.itemIsLocked(item: theThat(item))
+            case .itemIsNotWorn(let item):
+                messenger.itemIsNotWorn(item: theThat(item))
+            case .itemIsUnlocked(let item):
+                messenger.itemIsUnlocked(item: theThat(item))
+            case .itemNotAccessible(let item):
+                messenger.itemNotAccessible(item: anySuch(item))
+            case .itemNotClosable(let item):
+                messenger.itemNotClosable(item: theThat(item))
+            case .itemNotDroppable(let item):
+                messenger.itemNotDroppable(item: theThat(item))
+            case .itemNotEdible(let item):
+                messenger.itemNotEdible(item: theThat(item))
+            case .itemNotHeld(let item):
+                messenger.itemNotHeld(item: theThat(item))
+            case .itemNotInContainer(let item, let container):
+                messenger.itemNotInContainer(
+                    item: theThat(item), container: theThat(container))
+            case .itemNotLockable(let item):
+                messenger.itemNotLockable(item: theThat(item))
+            case .itemNotOnSurface(let item, let surface):
+                messenger.itemNotOnSurface(item: theThat(item), surface: theThat(surface))
+            case .itemNotOpenable(let item):
+                messenger.itemNotOpenable(item: theThat(item))
+            case .itemNotReadable(let item):
+                messenger.itemNotReadable(item: theThat(item))
+            case .itemNotRemovable(let item):
+                messenger.itemNotRemovable(item: theThat(item))
+            case .itemNotTakable(let item):
+                messenger.itemNotTakable(item: theThat(item))
+            case .itemNotUnlockable(let item):
+                messenger.itemNotUnlockable(item: theThat(item))
+            case .itemNotWearable(let item):
+                messenger.itemNotWearable(item: theThat(item))
+            case .itemTooLargeForContainer(let item, let container):
+                messenger.itemTooLargeForContainer(
+                    item: theThat(item), container: theThat(container))
+            case .playerCannotCarryMore:
+                messenger.playerCannotCarryMore()
+            case .prerequisiteNotMet(let customMessage):
+                messenger.prerequisiteNotMet(message: customMessage)
+            case .roomIsDark:
+                messenger.roomIsDark()
+            case .stateValidationFailed:
+                messenger.stateValidationFailed()
+            case .targetIsNotAContainer(let item):
+                messenger.targetIsNotAContainer(item: theThat(item))
+            case .targetIsNotASurface(let item):
+                messenger.targetIsNotASurface(item: theThat(item))
+            case .toolMissing(let tool):
+                messenger.toolMissing(tool: tool)
+            case .unknownEntity:
+                messenger.unknownEntity()
+            case .unknownVerb(let verb):
+                messenger.unknownVerb(verb: verb)
+            case .wrongKey(let keyID, let lockID):
+                messenger.wrongKey(key: theThat(keyID), lock: theThat(lockID))
+            }
 
         await ioHandler.print(message)
 
@@ -460,30 +463,31 @@ extension GameEngine {
     /// into textual feedback for the player when their input cannot be understood.
     /// For `.internalError` cases, it also logs detailed information.
     func report(parseError: ParseError) async {
-        let message = switch parseError {
-        case .emptyInput:
-            messageProvider.emptyInput()
-        case .unknownVerb(let verb):
-            messageProvider.parseUnknownVerb(verb: verb)
-        case .unknownNoun(let noun):
-            messageProvider.unknownNoun(noun: noun)
-        case .itemNotInScope(let noun):
-            messageProvider.itemNotInScope(noun: noun)
-        case .modifierMismatch(let noun, let modifiers):
-            messageProvider.modifierMismatch(noun: noun, modifiers: modifiers)
-        case .ambiguity(let text):
-            messageProvider.ambiguity(text: text)
-        case .ambiguousPronounReference(let text):
-            messageProvider.ambiguousPronounReference(text: text)
-        case .badGrammar(let text):
-            messageProvider.badGrammar(text: text)
-        case .pronounNotSet(let pronoun):
-            messageProvider.pronounNotSet(pronoun: pronoun)
-        case .pronounRefersToOutOfScopeItem(let pronoun):
-            messageProvider.pronounRefersToOutOfScopeItem(pronoun: pronoun)
-        case .internalError:
-            messageProvider.internalParseError()
-        }
+        let message =
+            switch parseError {
+            case .emptyInput:
+                messenger.emptyInput()
+            case .unknownVerb(let verb):
+                messenger.parseUnknownVerb(verb: verb)
+            case .unknownNoun(let noun):
+                messenger.unknownNoun(noun: noun)
+            case .itemNotInScope(let noun):
+                messenger.itemNotInScope(noun: noun)
+            case .modifierMismatch(let noun, let modifiers):
+                messenger.modifierMismatch(noun: noun, modifiers: modifiers)
+            case .ambiguity(let text):
+                messenger.ambiguity(text: text)
+            case .ambiguousPronounReference(let text):
+                messenger.ambiguousPronounReference(text: text)
+            case .badGrammar(let text):
+                messenger.badGrammar(text: text)
+            case .pronounNotSet(let pronoun):
+                messenger.pronounNotSet(pronoun: pronoun)
+            case .pronounRefersToOutOfScopeItem(let pronoun):
+                messenger.pronounRefersToOutOfScopeItem(pronoun: pronoun)
+            case .internalError:
+                messenger.internalParseError()
+            }
 
         await ioHandler.print(message)
 
@@ -589,8 +593,7 @@ extension GameEngine {
         // --- Process Fuses ---
         // Explicitly define the action type to match Fuse.action
         typealias FuseActionType = @Sendable (GameEngine) async -> ActionResult?
-        var expiredFuseIDsToExecute:
-            [(id: FuseID, action: FuseActionType, definition: Fuse)] = []
+        var expiredFuseIDsToExecute: [(id: FuseID, action: FuseActionType, definition: Fuse)] = []
 
         // Iterate over a copy of keys from gameState.activeFuses for safe modification
         let activeFuseIDsInState = Array(gameState.activeFuses.keys)
@@ -687,7 +690,7 @@ extension GameEngine {
 
 extension GameEngine {
 
-            /// Finds the appropriate action handler for a given command.
+    /// Finds the appropriate action handler for a given command.
     ///
     /// This method searches through all registered action handlers to find one that can
     /// process the given command based on:
@@ -846,7 +849,8 @@ extension GameEngine {
                 // Call handler, pass command using correct enum case syntax
                 if let result = try await locationHandler.handle(self, .beforeTurn(command)) {
                     // Room handler returned a result, process it
-                    if try await processActionResult(result) {
+                    if let message = try await processActionResult(result) {
+                        await ioHandler.print(message)
                         return  // Room handler handled everything
                     }
                 }
@@ -869,7 +873,8 @@ extension GameEngine {
                 // Pass the engine and the event to the handler
                 if let result = try await itemHandler.handle(self, .beforeTurn(command)) {
                     // Object handler returned a result, process it
-                    if try await processActionResult(result) {
+                    if let message = try await processActionResult(result) {
+                        await ioHandler.print(message)
                         return  // Object handler handled everything
                     }
                 }
@@ -882,15 +887,18 @@ extension GameEngine {
         // 1b. Check Direct Objects Handlers (plural) for multi-item commands
         if !actionHandled, actionResponse == nil, !command.directObjects.isEmpty {
             for directObjectRef in command.directObjects {
-                guard case .item(let doItemID) = directObjectRef,
-                      let itemHandler = itemEventHandlers[doItemID] else {
+                guard
+                    case .item(let doItemID) = directObjectRef,
+                    let itemHandler = itemEventHandlers[doItemID]
+                else {
                     continue
                 }
 
                 do {
                     if let result = try await itemHandler.handle(self, .beforeTurn(command)) {
                         // Object handler returned a result, process it
-                        if try await processActionResult(result) {
+                        if let message = try await processActionResult(result) {
+                            await ioHandler.print(message)
                             return  // Object handler handled everything
                         }
                     }
@@ -913,7 +921,8 @@ extension GameEngine {
             do {
                 if let result = try await itemHandler.handle(self, .beforeTurn(command)) {
                     // Object handler returned a result, process it
-                    if try await processActionResult(result) {
+                    if let message = try await processActionResult(result) {
+                        await ioHandler.print(message)
                         return  // Object handler handled everything
                     }
                 }
@@ -971,23 +980,25 @@ extension GameEngine {
                     return
                 }
 
-                // --- Execute Handler (New Logic) ---
+                // --- Execute Handler ---
                 do {
-                    // Create the context for this action using a snapshot
-                    let context = ActionContext(
+                    // Use the unified process method (handles both validation and execution)
+                    let result = try await verbHandler.process(
                         command: command,
                         engine: self
                     )
 
-                    // Directly use the enhanced handler pipeline
-                    try await verbHandler.validate(context: context)
-                    let result = try await verbHandler.process(context: context)
-
                     // Process the result (apply changes, print message)
-                    _ = try await processActionResult(result)
+                    if let message = try await processActionResult(result) {
+                        await ioHandler.print(message)
+                    }
 
                     // Call postProcess (even if default is empty)
-                    try await verbHandler.postProcess(context: context, result: result)
+                    try await verbHandler.postProcess(
+                        command: command,
+                        engine: self,
+                        result: result
+                    )
 
                 } catch let actionResponse as ActionResponse {
                     // Catch ActionResponse specifically for reporting
@@ -995,23 +1006,25 @@ extension GameEngine {
                 } catch {
                     // Catch any other unexpected errors from handlers
                     logError("Unexpected error during handler execution: \(error)")
-                    await ioHandler.print("An unexpected problem occurred.")
+                    await ioHandler.print(
+                        messenger.internalEngineError()
+                    )
                 }
                 // --- End Execute Handler ---
             }
         }
-        // If actionHandled is true and error is nil, the object handler succeeded silently (or printed its own msg).
 
         // --- Item AfterTurn Hooks ---
 
         // 1. Check Direct Object AfterTurn Handler (singular)
         if case .item(let doItemID) = command.directObject,
-            let itemHandler = itemEventHandlers[doItemID]
+           let itemHandler = itemEventHandlers[doItemID]
         {
             do {
                 if let result = try await itemHandler.handle(self, .afterTurn(command)),
-                    try await processActionResult(result)
+                   let message = try await processActionResult(result)
                 {
+                    await ioHandler.print(message)
                     return
                 }
             } catch {
@@ -1023,15 +1036,18 @@ extension GameEngine {
         // 1b. Check Direct Objects AfterTurn Handlers (plural) for multi-item commands
         if !command.directObjects.isEmpty {
             for directObjectRef in command.directObjects {
-                guard case .item(let doItemID) = directObjectRef,
-                      let itemHandler = itemEventHandlers[doItemID] else {
+                guard
+                    case .item(let doItemID) = directObjectRef,
+                    let itemHandler = itemEventHandlers[doItemID]
+                else {
                     continue
                 }
 
                 do {
                     if let result = try await itemHandler.handle(self, .afterTurn(command)),
-                        try await processActionResult(result)
+                       let message = try await processActionResult(result)
                     {
+                        await ioHandler.print(message)
                         return
                     }
                 } catch {
@@ -1044,12 +1060,13 @@ extension GameEngine {
 
         // 2. Check Indirect Object AfterTurn Handler
         if case .item(let ioItemID) = command.indirectObject,
-            let itemHandler = itemEventHandlers[ioItemID]
+           let itemHandler = itemEventHandlers[ioItemID]
         {
             do {
                 if let result = try await itemHandler.handle(self, .afterTurn(command)),
-                    try await processActionResult(result)
+                   let message = try await processActionResult(result)
                 {
+                    await ioHandler.print(message)
                     return
                 }
             } catch {
@@ -1063,8 +1080,9 @@ extension GameEngine {
             do {
                 // Call handler, ignore return value, use correct enum case syntax
                 if let result = try await locationHandler.handle(self, .afterTurn(command)),
-                    try await processActionResult(result)
+                   let message = try await processActionResult(result)
                 {
+                    await ioHandler.print(message)
                     return
                 }
             } catch {
@@ -1125,9 +1143,9 @@ extension GameEngine {
             // Moved from lit to dark - show transition message and darkness message combined
             await ioHandler.print(
                 """
-                \(messageProvider.nowDark())
+                \(messenger.nowDark())
 
-                \(messageProvider.roomIsDark())
+                \(messenger.roomIsDark())
                 """)
             shouldDescribe = false
             forceFullDescription = true
@@ -1149,10 +1167,9 @@ extension GameEngine {
     /// the `ActionResult.message` to the player via the `IOHandler`.
     ///
     /// - Parameter result: The `ActionResult` returned by an action or event handler.
-    /// - Returns: `true` if the `ActionResult` contained a message that was printed,
-    ///   `false` otherwise.
+    /// - Returns: The optional `ActionResult` message.
     /// - Throws: Re-throws errors encountered during state application.
-    func processActionResult(_ result: ActionResult) async throws -> Bool {
+    func processActionResult(_ result: ActionResult) async throws -> String? {
         // 1. Apply State Changes
         // Errors during apply will propagate up.
         for change in result.changes {
@@ -1184,13 +1201,8 @@ extension GameEngine {
             }
         }
 
-        // 3. Print Result Message
-        if let message = result.message {
-            await ioHandler.print(message)
-            return true
-        } else {
-            return false
-        }
+        // 3. Return the result message
+        return result.message
     }
 
     /// Applies a `StateChange` with dynamic validation, respecting the action pipeline.
@@ -1206,7 +1218,8 @@ extension GameEngine {
         // Perform dynamic validation for item and location attributes
         switch change.attribute {
         case .itemAttribute(let key):
-            guard case .item(let itemID) = change.entityID else {
+            guard
+                case .item(let itemID) = change.entityID else {
                 throw ActionResponse.internalEngineError(
                     "Invalid entity ID for itemAttribute: expected .item"
                 )
@@ -1227,7 +1240,8 @@ extension GameEngine {
             }
 
         case .locationAttribute(let key):
-            guard case .location(let locationID) = change.entityID else {
+            guard
+                case .location(let locationID) = change.entityID else {
                 throw ActionResponse.internalEngineError(
                     "Invalid entity ID for locationAttribute: expected .location"
                 )
@@ -1346,9 +1360,9 @@ extension GameEngine {
         ]
 
         #if DEBUG
-        return handlers + [DebugActionHandler()]
+            return handlers + [DebugActionHandler()]
         #else
-        return handlers
+            return handlers
         #endif
     }
 }

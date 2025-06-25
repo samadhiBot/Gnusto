@@ -27,26 +27,28 @@ public struct KnockActionHandler: ActionHandler {
     ///
     /// - Parameter context: The `ActionContext` for the current action.
     /// - Throws: Various `ActionResponse` errors if validation fails.
-    public func validate(context: ActionContext) async throws {
+        public func process(
+        command: Command,
+        engine: GameEngine
+    ) async throws -> ActionResult {
+
         // Knock requires a direct object (what to knock on)
-        guard let directObjectRef = context.command.directObject else {
+        guard let directObjectRef = command.directObject else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.knockOnWhat()
+                engine.messenger.knockOnWhat()
             )
         }
         guard case .item(let targetItemID) = directObjectRef else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.cannotDoThat(verb: "knock on")
+                engine.messenger.cannotDoThat(verb: "knock on")
             )
         }
 
         // Check if target exists and is reachable
-        _ = try await context.engine.item(targetItemID)
-        guard await context.engine.playerCanReach(targetItemID) else {
+        _ = try await engine.item(targetItemID)
+        guard await engine.playerCanReach(targetItemID) else {
             throw ActionResponse.itemNotAccessible(targetItemID)
         }
-    }
-
     /// Processes the "KNOCK" command.
     ///
     /// Handles knocking attempts on different types of objects.
@@ -54,39 +56,38 @@ public struct KnockActionHandler: ActionHandler {
     ///
     /// - Parameter context: The `ActionContext` for the current action.
     /// - Returns: An `ActionResult` with appropriate knocking message and state changes.
-    public func process(context: ActionContext) async throws -> ActionResult {
-        guard let directObjectRef = context.command.directObject,
+        guard let directObjectRef = command.directObject,
             case .item(let targetItemID) = directObjectRef
         else {
             throw ActionResponse.internalEngineError(
                 "KnockActionHandler: directObject was not an item in process.")
         }
 
-        let targetItem = try await context.engine.item(targetItemID)
+        let targetItem = try await engine.item(targetItemID)
 
         // Determine appropriate response based on object type
         let message =
             if targetItem.hasFlag(.isDoor) {
                 // Knocking on doors
                 if targetItem.hasFlag(.isOpen) {
-                    context.message.knockOnOpenDoor(door: targetItem.withDefiniteArticle)
+                    engine.messenger.knockOnOpenDoor(door: targetItem.withDefiniteArticle)
                 } else if targetItem.hasFlag(.isLocked) {
-                    context.message.knockOnLockedDoor(door: targetItem.withDefiniteArticle)
+                    engine.messenger.knockOnLockedDoor(door: targetItem.withDefiniteArticle)
                 } else {
-                    context.message.knockOnClosedDoor(door: targetItem.withDefiniteArticle)
+                    engine.messenger.knockOnClosedDoor(door: targetItem.withDefiniteArticle)
                 }
             } else if targetItem.hasFlag(.isContainer) {
                 // Knocking on containers
-                context.message.knockOnContainer(container: targetItem.withDefiniteArticle)
+                engine.messenger.knockOnContainer(container: targetItem.withDefiniteArticle)
             } else {
                 // Generic knocking response for objects
-                context.message.knockOnGenericObject(item: targetItem.withDefiniteArticle)
+                engine.messenger.knockOnGenericObject(item: targetItem.withDefiniteArticle)
             }
 
         return ActionResult(
             message,
-            await context.engine.setFlag(.isTouched, on: targetItem),
-            await context.engine.updatePronouns(to: targetItem)
+            await engine.setFlag(.isTouched, on: targetItem),
+            await engine.updatePronouns(to: targetItem)
         )
     }
 

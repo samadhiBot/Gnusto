@@ -29,14 +29,16 @@ public struct FindActionHandler: ActionHandler {
     ///
     /// - Parameter context: The action context containing the command and engine.
     /// - Throws: `ActionError` if no direct object is specified.
-    public func validate(context: ActionContext) async throws {
-        guard context.command.directObject != nil else {
+        public func process(
+        command: Command,
+        engine: GameEngine
+    ) async throws -> ActionResult {
+
+        guard command.directObject != nil else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.doWhat(verb: context.command.verb)
+                engine.messenger.doWhat(verb: command.verb)
             )
         }
-    }
-
     /// Processes the "FIND" command.
     ///
     /// This action provides different responses based on the target object's state:
@@ -47,43 +49,42 @@ public struct FindActionHandler: ActionHandler {
     ///
     /// - Parameter context: The action context for the current action.
     /// - Returns: An `ActionResult` containing the appropriate response message.
-    public func process(context: ActionContext) async throws -> ActionResult {
-        guard let targetObjectID = context.command.directObject,
+        guard let targetObjectID = command.directObject,
             case .item(let itemID) = targetObjectID
         else {
             return ActionResult(
-                context.message.unknownEntity()
+                engine.messenger.unknownEntity()
             )
         }
 
         // Check if the item exists in the game
-        guard let targetItem = try? await context.engine.item(itemID) else {
+        guard let targetItem = try? await engine.item(itemID) else {
             return ActionResult(
-                context.message.unknownEntity()
+                engine.messenger.unknownEntity()
             )
         }
 
         // Check if the player is holding it
         if targetItem.parent == .player {
             return ActionResult(
-                context.message.youHaveIt()
+                engine.messenger.youHaveIt()
             )
         }
 
         // Check if the item is visible in the current scope
-        let currentLocation = await context.engine.playerLocationID
-        let scopeResolver = ScopeResolver(engine: context.engine)
+        let currentLocation = await engine.playerLocationID
+        let scopeResolver = ScopeResolver(engine: engine)
         let itemsInScope = await scopeResolver.itemsInScopeFor(locationID: currentLocation)
 
         if itemsInScope.contains(itemID) {
             return ActionResult(
-                context.message.itsRightHere()
+                engine.messenger.itsRightHere()
             )
         }
 
         // Item exists but isn't visible
         return ActionResult(
-            context.message.unknownEntity()
+            engine.messenger.unknownEntity()
         )
     }
 }

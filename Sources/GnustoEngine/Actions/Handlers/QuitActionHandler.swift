@@ -17,10 +17,12 @@ public struct QuitActionHandler: ActionHandler {
 
     /// Validates the "QUIT" command.
     /// Currently, quit requires no specific validation and always proceeds.
-    public func validate(context: ActionContext) async throws {
-        // No validation needed for QUIT.
-    }
+        public func process(
+        command: Command,
+        engine: GameEngine
+    ) async throws -> ActionResult {
 
+        // No validation needed for QUIT.
     /// Processes the "QUIT" command.
     ///
     /// This action displays the player's current score and move count, then prompts
@@ -29,14 +31,13 @@ public struct QuitActionHandler: ActionHandler {
     ///
     /// - Parameter context: The `ActionContext` for the current action.
     /// - Returns: An `ActionResult` containing the appropriate message.
-    public func process(context: ActionContext) async throws -> ActionResult {
-        let engine = context.engine
+        let engine = engine
         let currentScore = await engine.playerScore
         let currentMoves = await engine.playerMoves
         let maxScore = engine.maximumScore
 
         // Display score and prompt for confirmation
-        let promptMessage = context.message.quitScoreAndPrompt(
+        let promptMessage = engine.messenger.quitScoreAndPrompt(
             score: currentScore,
             maxScore: maxScore,
             moves: currentMoves
@@ -51,7 +52,7 @@ public struct QuitActionHandler: ActionHandler {
                 // Handle EOF/nil input as quit confirmation
                 await engine.requestQuit()
                 return ActionResult(
-                    context.message.goodbye()
+                    engine.messenger.goodbye()
                 )
             }
 
@@ -63,17 +64,17 @@ public struct QuitActionHandler: ActionHandler {
                 // User confirmed quit
                 await engine.requestQuit()
                 return ActionResult(
-                    context.message.goodbye()
+                    engine.messenger.goodbye()
                 )
             } else if trimmedResponse == "n" || trimmedResponse == "no" {
                 // User cancelled quit
                 return ActionResult(
-                    context.message.quitCancelled()
+                    engine.messenger.quitCancelled()
                 )
             } else {
                 // Invalid response, ask again
                 await engine.ioHandler.print(
-                    context.message.quitConfirmationHelp() + " ",
+                    engine.messenger.quitConfirmationHelp() + " ",
                     style: .normal,
                     newline: false
                 )

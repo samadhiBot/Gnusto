@@ -35,42 +35,46 @@ public struct LockActionHandler: ActionHandler {
     ///           `itemNotAccessible` (if target cannot be reached),
     ///           `itemNotLockable` (if target is not lockable),
     ///           `wrongKey` (if the key doesn't match).
-    ///           Can also throw errors from `context.engine.item()`.
-    public func validate(context: ActionContext) async throws {
+    ///           Can also throw errors from `engine.item()`.
+        public func process(
+        command: Command,
+        engine: GameEngine
+    ) async throws -> ActionResult {
+
         // 1. Validate command structure: Need DO and IO, both must be items
-        guard let directObjectRef = context.command.directObject else {
+        guard let directObjectRef = command.directObject else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.doWhat(verb: context.command.verb)
+                engine.messenger.doWhat(verb: command.verb)
             )
         }
         guard case .item(let targetItemID) = directObjectRef else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.thatsNotSomethingYouCan(.lock)
+                engine.messenger.thatsNotSomethingYouCan(.lock)
             )
         }
-        let targetItem = try await context.engine.item(targetItemID)
+        let targetItem = try await engine.item(targetItemID)
 
-        guard let indirectObjectRef = context.command.indirectObject else {
+        guard let indirectObjectRef = command.indirectObject else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.lockWithWhat(item: targetItem.withDefiniteArticle)
+                engine.messenger.lockWithWhat(item: targetItem.withDefiniteArticle)
             )
         }
         guard case .item(let keyItemID) = indirectObjectRef else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.canOnlyUseItemAsKey()
+                engine.messenger.canOnlyUseItemAsKey()
             )
         }
 
         // 2. Get item snapshots (existence should be implicitly validated by parser/scope resolver before this point)
         // If items don't exist, engine.item() will throw, which is an acceptable failure.
         // Alternatively, could add explicit unknownEntity checks here if desired.
-        let keyItem = try await context.engine.item(keyItemID)
+        let keyItem = try await engine.item(keyItemID)
 
         // 3. Check reachability
         guard keyItem.parent == .player else {
             throw ActionResponse.itemNotHeld(keyItemID)
         }
-        guard await context.engine.playerCanReach(targetItemID) else {
+        guard await engine.playerCanReach(targetItemID) else {
             throw ActionResponse.itemNotAccessible(targetItemID)
         }
 
@@ -87,8 +91,6 @@ public struct LockActionHandler: ActionHandler {
         guard targetItem.attributes[.lockKey] == .itemID(keyItemID) else {
             throw ActionResponse.wrongKey(keyID: keyItemID, lockID: targetItemID)
         }
-    }
-
     /// Processes the "LOCK" command.
     ///
     /// This action performs the following:
@@ -107,38 +109,37 @@ public struct LockActionHandler: ActionHandler {
     /// - Parameter context: The `ActionContext` for the current action.
     /// - Returns: An `ActionResult` containing the message and relevant state changes.
     /// - Throws: `ActionResponse.internalEngineError` if direct or indirect objects are not items
-    ///           (this should be caught by `validate`), or errors from `context.engine.item()`.
-    public func process(context: ActionContext) async throws -> ActionResult {
+    ///           (this should be caught by `validate`), or errors from `engine.item()`.
         // Direct and Indirect objects are guaranteed to be items by validate.
-        guard let directObjectRef = context.command.directObject,
+        guard let directObjectRef = command.directObject,
             case .item(let targetItemID) = directObjectRef
         else {
             throw ActionResponse.internalEngineError("Lock: Direct object not an item in process.")
         }
-        guard let indirectObjectRef = context.command.indirectObject,
+        guard let indirectObjectRef = command.indirectObject,
             case .item(let keyItemID) = indirectObjectRef
         else {
             throw ActionResponse.internalEngineError(
                 "Lock: Indirect object not an item in process.")
         }
 
-        let targetItem = try await context.engine.item(targetItemID)
-        let keyItem = try await context.engine.item(keyItemID)
+        let targetItem = try await engine.item(targetItemID)
+        let keyItem = try await engine.item(keyItemID)
 
         // Handle case: Already locked (validation allows this to pass through).
         if targetItem.hasFlag(.isLocked) {
-            let message = context.message.alreadyLocked(
+            let message = engine.messenger.alreadyLocked(
                 item: targetItem.withDefiniteArticle.capitalizedFirst
             )
             return ActionResult(message)
         }
 
         return ActionResult(
-            context.message.lockSuccess(item: targetItem.withDefiniteArticle),
-            await context.engine.setFlag(.isLocked, on: targetItem),
-            await context.engine.setFlag(.isTouched, on: targetItem),
-            await context.engine.setFlag(.isTouched, on: keyItem),
-            await context.engine.updatePronouns(to: targetItem)
+            engine.messenger.lockSuccess(item: targetItem.withDefiniteArticle),
+            await engine.setFlag(.isLocked, on: targetItem),
+            await engine.setFlag(.isTouched, on: targetItem),
+            await engine.setFlag(.isTouched, on: keyItem),
+            await engine.updatePronouns(to: targetItem)
         )
     }
 

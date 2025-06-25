@@ -28,22 +28,26 @@ public struct FillActionHandler: ActionHandler {
     ///
     /// - Parameter context: The `ActionContext` for the current action.
     /// - Throws: Various `ActionResponse` errors if validation fails.
-    public func validate(context: ActionContext) async throws {
+        public func process(
+        command: Command,
+        engine: GameEngine
+    ) async throws -> ActionResult {
+
         // Fill requires a direct object (what to fill)
-        guard let directObjectRef = context.command.directObject else {
+        guard let directObjectRef = command.directObject else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.doWhat(verb: context.command.verb)
+                engine.messenger.doWhat(verb: command.verb)
             )
         }
         guard case .item(let containerItemID) = directObjectRef else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message.cannotDoThat(verb: "fill")
+                engine.messenger.cannotDoThat(verb: "fill")
             )
         }
 
         // Check if container exists and is reachable
-        let containerItem = try await context.engine.item(containerItemID)
-        guard await context.engine.playerCanReach(containerItemID) else {
+        let containerItem = try await engine.item(containerItemID)
+        guard await engine.playerCanReach(containerItemID) else {
             throw ActionResponse.itemNotAccessible(containerItemID)
         }
 
@@ -58,20 +62,18 @@ public struct FillActionHandler: ActionHandler {
         }
 
         // If a source is specified, validate it
-        if let indirectObjectRef = context.command.indirectObject {
+        if let indirectObjectRef = command.indirectObject {
             guard case .item(let sourceItemID) = indirectObjectRef else {
                 throw ActionResponse.prerequisiteNotMet(
-                    context.message.cannotFillFrom()
+                    engine.messenger.cannotFillFrom()
                 )
             }
 
-            _ = try await context.engine.item(sourceItemID)
-            guard await context.engine.playerCanReach(sourceItemID) else {
+            _ = try await engine.item(sourceItemID)
+            guard await engine.playerCanReach(sourceItemID) else {
                 throw ActionResponse.itemNotAccessible(sourceItemID)
             }
         }
-    }
-
     /// Processes the "FILL" command.
     ///
     /// Handles container filling with different scenarios:
@@ -81,53 +83,52 @@ public struct FillActionHandler: ActionHandler {
     ///
     /// - Parameter context: The `ActionContext` for the current action.
     /// - Returns: An `ActionResult` with appropriate filling message and state changes.
-    public func process(context: ActionContext) async throws -> ActionResult {
-        guard let directObjectRef = context.command.directObject,
+        guard let directObjectRef = command.directObject,
             case .item(let containerItemID) = directObjectRef
         else {
-            let message = context.message.actionHandlerInternalError(
+            let message = engine.messenger.actionHandlerInternalError(
                 handler: "FillActionHandler",
                 details: "directObject was not an item in process"
             )
             throw ActionResponse.internalEngineError(message)
         }
 
-        let containerItem = try await context.engine.item(containerItemID)
+        let containerItem = try await engine.item(containerItemID)
 
         // Handle filling from specified source
-        if let indirectObjectRef = context.command.indirectObject,
+        if let indirectObjectRef = command.indirectObject,
             case .item(let sourceItemID) = indirectObjectRef
         {
-            let sourceItem = try await context.engine.item(sourceItemID)
+            let sourceItem = try await engine.item(sourceItemID)
 
             // Check if source has drinkable liquid or is a water source
             let message =
                 if sourceItem.hasFlag(.isDrinkable) {
-                    context.message.fillSuccess(
+                    engine.messenger.fillSuccess(
                         container: containerItem.name,
                         source: sourceItem.name
                     )
                     // TODO: In a full implementation, you might create a new liquid item in the container
                 } else {
-                    context.message.noLiquidInSource(source: sourceItem.name)
+                    engine.messenger.noLiquidInSource(source: sourceItem.name)
                 }
 
             return ActionResult(
                 message,
-                await context.engine.setFlag(.isTouched, on: containerItem),
-                await context.engine.updatePronouns(to: containerItem)
+                await engine.setFlag(.isTouched, on: containerItem),
+                await engine.updatePronouns(to: containerItem)
             )
         } else {
             // No source specified - look for water sources in current location
-            let currentLocationID = await context.engine.playerLocationID
-            let locationItems = await context.engine.items(in: .location(currentLocationID))
+            let currentLocationID = await engine.playerLocationID
+            let locationItems = await engine.items(in: .location(currentLocationID))
             let waterSources = locationItems.filter { $0.hasFlag(.isDrinkable) }
 
             let message =
                 if waterSources.isEmpty {
-                    context.message.noLiquidSourceAvailable()
+                    engine.messenger.noLiquidSourceAvailable()
                 } else {
-                    context.message.fillSuccess(
+                    engine.messenger.fillSuccess(
                         container: containerItem.name,
                         source: waterSources[0].name
                     )
@@ -136,8 +137,8 @@ public struct FillActionHandler: ActionHandler {
 
             return ActionResult(
                 message,
-                await context.engine.setFlag(.isTouched, on: containerItem),
-                await context.engine.updatePronouns(to: containerItem)
+                await engine.setFlag(.isTouched, on: containerItem),
+                await engine.updatePronouns(to: containerItem)
             )
         }
     }
