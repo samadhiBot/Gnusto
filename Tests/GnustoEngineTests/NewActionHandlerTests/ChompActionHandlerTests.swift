@@ -40,7 +40,7 @@ struct ChompActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > chomp apple
-            You chomp on a red apple. It's quite tasty!
+            You take a bite. It tastes like a red apple.
             """)
 
         let finalState = try await engine.item("apple")
@@ -79,7 +79,7 @@ struct ChompActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > bite bread
-            You chomp on a piece of bread. It's quite tasty!
+            You take a bite. It tastes like a piece of bread.
             """)
     }
 
@@ -106,7 +106,8 @@ struct ChompActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > chew
-            You chew thoughtfully on nothing.
+            You chomp with a conviction that makes reality itself
+            seem negotiable.
             """)
     }
 
@@ -215,7 +216,8 @@ struct ChompActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > chomp
-            You chomp thoughtfully on nothing.
+            You chomp with a conviction that makes reality itself
+            seem negotiable.
             """)
     }
 
@@ -251,7 +253,7 @@ struct ChompActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > chomp cookie
-            You chomp on a chocolate cookie. It's quite tasty!
+            You take a bite. It tastes like a chocolate cookie.
             """)
 
         let finalState = try await engine.item("cookie")
@@ -290,7 +292,8 @@ struct ChompActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > chomp guard
-            I don’t think the castle guard would appreciate that.
+            You gnaw the castle guard in a thinking-outside-the-box kind of
+            a way.
             """)
 
         let finalState = try await engine.item("castleGuard")
@@ -328,7 +331,8 @@ struct ChompActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > chomp rock
-            You gnaw on the smooth rock, but it's not very satisfying.
+            You chomp the smooth rock with the fearless innovation of
+            someone unbound by convention.
             """)
 
         let finalState = try await engine.item("rock")

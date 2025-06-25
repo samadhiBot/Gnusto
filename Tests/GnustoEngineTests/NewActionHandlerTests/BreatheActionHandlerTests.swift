@@ -166,7 +166,8 @@ struct BreatheActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > breathe
-            You breathe deeply. The air tastes fresh and clean.
+            You inhale slowly, appreciating the universe’s decision to
+            include breathable air.
             """)
     }
 
@@ -195,7 +196,8 @@ struct BreatheActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > breathe
-            You breathe deeply. The air tastes fresh and clean.
+            You inhale slowly, appreciating the universe’s decision to
+            include breathable air.
             """)
     }
 
