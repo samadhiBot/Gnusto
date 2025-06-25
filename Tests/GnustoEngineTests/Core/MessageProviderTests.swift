@@ -13,25 +13,25 @@ struct MessageProviderTests {
         #expect(provider.languageCode == "en")
 
         // Test system messages
-        #expect(provider.roomIsDark() == "It is pitch black. You can’t see a thing.")
+        #expect(provider.roomIsDark() == "It is pitch black. You can't see a thing.")
         #expect(provider.nowDark() == "You are plunged into darkness.")
         #expect(provider.nowLit() == "You can see your surroundings now.")
 
         // Test action response messages
         #expect(provider.playerCannotCarryMore() == "Your hands are full.")
-        #expect(provider.itemNotTakable(item: "the rock") == "You can’t take the rock.")
+        #expect(provider.itemNotTakable(item: "the rock") == "You can't take the rock.")
         #expect(provider.itemAlreadyOpen(item: "the door") == "The door is already open.")
 
         // Test parse error messages
         #expect(provider.emptyInput() == "I beg your pardon?")
-        #expect(provider.parseUnknownVerb(verb: "xyzzy") == "I don’t know the verb 'xyzzy'.")
-        #expect(provider.itemNotInScope(noun: "lamp") == "You can’t see any lamp here.")
+        #expect(provider.parseUnknownVerb(verb: "xyzzy") == "I don't know the verb 'xyzzy'.")
+        #expect(provider.itemNotInScope(noun: "lamp") == "You can't see any lamp here.")
 
         // Test custom messages
         #expect(provider.custom(message: "Hello world!") == "Hello world!")
 
         // Test prerequisite messages
-        #expect(provider.prerequisiteNotMet(message: "") == "You can’t do that.")
+        #expect(provider.prerequisiteNotMet(message: "") == "You can't do that.")
         #expect(provider.prerequisiteNotMet(message: "Too heavy!") == "Too heavy!")
     }
 
@@ -114,7 +114,7 @@ struct MessageProviderTests {
         #expect(provider.emptyInput() == "¿Perdón?")
 
         // Test fallback to English for unimplemented
-        #expect(provider.itemNotDroppable(item: "the rock") == "You can’t drop the rock.")
+        #expect(provider.itemNotDroppable(item: "the rock") == "You can't drop the rock.")
     }
 }
 
