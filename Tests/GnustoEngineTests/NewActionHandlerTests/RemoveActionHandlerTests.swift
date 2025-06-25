@@ -37,7 +37,7 @@ struct RemoveActionHandlerTests {
 
         // Set up: Hat must be worn first
         try await engine.apply(
-            engine.setItemFlag("hat", .isWorn, to: true)
+            engine.setFlag(.isWorn, on: "hat")
         )
 
         // When
@@ -86,7 +86,7 @@ struct RemoveActionHandlerTests {
 
         // Set up: Cloak must be worn first
         try await engine.apply(
-            engine.setItemFlag("cloak", .isWorn, to: true)
+            engine.setFlag(.isWorn, on: "cloak")
         )
 
         // When
@@ -133,7 +133,7 @@ struct RemoveActionHandlerTests {
 
         // Set up: Shoes must be worn first
         try await engine.apply(
-            engine.setItemFlag("shoes", .isWorn, to: true)
+            engine.setFlag(.isWorn, on: "shoes")
         )
 
         // When
@@ -189,8 +189,8 @@ struct RemoveActionHandlerTests {
 
         // Set up: Both items must be worn first
         try await engine.apply(
-            engine.setItemFlag("hat", .isWorn, to: true),
-            engine.setItemFlag("gloves", .isWorn, to: true)
+            engine.setFlag(.isWorn, on: "hat"),
+            engine.setFlag(.isWorn, on: "gloves")
         )
 
         // When
@@ -338,7 +338,7 @@ struct RemoveActionHandlerTests {
 
         // Set up: Item must be worn first
         try await engine.apply(
-            engine.setItemFlag("fixedItem", .isWorn, to: true)
+            engine.setFlag(.isWorn, on: "fixedItem")
         )
 
         // When
@@ -413,7 +413,7 @@ struct RemoveActionHandlerTests {
 
         // Set up: Jacket must be worn first
         try await engine.apply(
-            engine.setItemFlag("jacket", .isWorn, to: true)
+            engine.setFlag(.isWorn, on: "jacket")
         )
 
         // When
@@ -481,9 +481,9 @@ struct RemoveActionHandlerTests {
 
         // Set up: All items must be worn first
         try await engine.apply(
-            engine.setItemFlag("coat", .isWorn, to: true),
-            engine.setItemFlag("scarf", .isWorn, to: true),
-            engine.setItemFlag("mittens", .isWorn, to: true)
+            engine.setFlag(.isWorn, on: "coat"),
+            engine.setFlag(.isWorn, on: "scarf"),
+            engine.setFlag(.isWorn, on: "mittens")
         )
 
         // When
@@ -558,9 +558,9 @@ struct RemoveActionHandlerTests {
 
         // Set up: All items must be worn first
         try await engine.apply(
-            engine.setItemFlag("shirt", .isWorn, to: true),
-            engine.setItemFlag("pants", .isWorn, to: true),
-            engine.setItemFlag("watch", .isWorn, to: true)
+            engine.setFlag(.isWorn, on: "shirt"),
+            engine.setFlag(.isWorn, on: "pants"),
+            engine.setFlag(.isWorn, on: "watch")
         )
 
         // When
@@ -661,8 +661,8 @@ struct RemoveActionHandlerTests {
 
         // Set up: Both items must be worn first
         try await engine.apply(
-            engine.setItemFlag("removableHat", .isWorn, to: true),
-            engine.setItemFlag("fixedRing", .isWorn, to: true)
+            engine.setFlag(.isWorn, on: "removableHat"),
+            engine.setFlag(.isWorn, on: "fixedRing")
         )
 
         // When

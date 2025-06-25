@@ -26,7 +26,7 @@ struct QuitActionHandlerTests {
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // Set up mock to respond "yes" to quit confirmation
-        await mockIO.setQueuedInputs(["yes"])
+        await mockIO.enqueueInput("yes")
 
         // When
         try await engine.execute("quit")
@@ -61,7 +61,7 @@ struct QuitActionHandlerTests {
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // Set up mock to respond "y" to quit confirmation
-        await mockIO.setQueuedInputs(["y"])
+        await mockIO.enqueueInput("y")
 
         // When
         try await engine.execute("q")
@@ -95,7 +95,7 @@ struct QuitActionHandlerTests {
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // Set up mock to respond "yes" to quit confirmation
-        await mockIO.setQueuedInputs(["yes"])
+        await mockIO.enqueueInput("yes")
 
         // When
         try await engine.execute("quit")
@@ -125,7 +125,7 @@ struct QuitActionHandlerTests {
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // Set up mock to respond "yes" to quit confirmation
-        await mockIO.setQueuedInputs(["yes"])
+        await mockIO.enqueueInput("yes")
 
         // When
         try await engine.execute("quit")
@@ -154,7 +154,7 @@ struct QuitActionHandlerTests {
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // Set up mock to respond "yes" to quit confirmation
-        await mockIO.setQueuedInputs(["yes"])
+        await mockIO.enqueueInput("yes")
 
         // When
         try await engine.execute("quit")
@@ -171,8 +171,8 @@ struct QuitActionHandlerTests {
             """)
 
         // Game should be marked for quit
-        let isQuitting = await engine.isQuitting
-        #expect(isQuitting == true)
+        let shouldQuit = await engine.shouldQuit
+        #expect(shouldQuit == true)
     }
 
     @Test("Quit confirmation with y quits game")
@@ -192,7 +192,7 @@ struct QuitActionHandlerTests {
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // Set up mock to respond "y" to quit confirmation
-        await mockIO.setQueuedInputs(["y"])
+        await mockIO.enqueueInput("y")
 
         // When
         try await engine.execute("quit")
@@ -208,8 +208,8 @@ struct QuitActionHandlerTests {
             Goodbye.
             """)
 
-        let isQuitting = await engine.isQuitting
-        #expect(isQuitting == true)
+        let shouldQuit = await engine.shouldQuit
+        #expect(shouldQuit == true)
     }
 
     @Test("Quit confirmation with no cancels quit")
@@ -229,7 +229,7 @@ struct QuitActionHandlerTests {
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // Set up mock to respond "no" to quit confirmation
-        await mockIO.setQueuedInputs(["no"])
+        await mockIO.enqueueInput("no")
 
         // When
         try await engine.execute("quit")
@@ -246,8 +246,8 @@ struct QuitActionHandlerTests {
             """)
 
         // Game should NOT be marked for quit
-        let isQuitting = await engine.isQuitting
-        #expect(isQuitting == false)
+        let shouldQuit = await engine.shouldQuit
+        #expect(shouldQuit == false)
     }
 
     @Test("Quit confirmation with n cancels quit")
@@ -267,7 +267,7 @@ struct QuitActionHandlerTests {
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // Set up mock to respond "n" to quit confirmation
-        await mockIO.setQueuedInputs(["n"])
+        await mockIO.enqueueInput("n")
 
         // When
         try await engine.execute("quit")
@@ -283,8 +283,8 @@ struct QuitActionHandlerTests {
             OK.
             """)
 
-        let isQuitting = await engine.isQuitting
-        #expect(isQuitting == false)
+        let shouldQuit = await engine.shouldQuit
+        #expect(shouldQuit == false)
     }
 
     @Test("Quit handles invalid response then valid response")
@@ -304,7 +304,7 @@ struct QuitActionHandlerTests {
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // Set up mock to respond with invalid then valid response
-        await mockIO.setQueuedInputs(["maybe", "yes"])
+        await mockIO.enqueueInput("maybe", "yes")
 
         // When
         try await engine.execute("quit")
@@ -321,8 +321,8 @@ struct QuitActionHandlerTests {
             Goodbye.
             """)
 
-        let isQuitting = await engine.isQuitting
-        #expect(isQuitting == true)
+        let shouldQuit = await engine.shouldQuit
+        #expect(shouldQuit == true)
     }
 
     @Test("Quit handles multiple invalid responses")
@@ -342,7 +342,7 @@ struct QuitActionHandlerTests {
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // Set up mock to respond with multiple invalid then valid response
-        await mockIO.setQueuedInputs(["invalid", "wrong", "no"])
+        await mockIO.enqueueInput("invalid", "wrong", "no")
 
         // When
         try await engine.execute("quit")
@@ -360,8 +360,8 @@ struct QuitActionHandlerTests {
             OK.
             """)
 
-        let isQuitting = await engine.isQuitting
-        #expect(isQuitting == false)
+        let shouldQuit = await engine.shouldQuit
+        #expect(shouldQuit == false)
     }
 
     @Test("Quit displays current score and moves")
@@ -382,7 +382,7 @@ struct QuitActionHandlerTests {
 
         // Set some score and execute some moves
         try await engine.apply(
-            await engine.setPlayerScore(25)
+            await engine.updatePlayerScore(by: 25)
         )
 
         // Execute a few commands to increase move count
@@ -392,7 +392,7 @@ struct QuitActionHandlerTests {
         _ = await mockIO.flush()
 
         // Set up mock to respond "yes" to quit confirmation
-        await mockIO.setQueuedInputs(["yes"])
+        await mockIO.enqueueInput("yes")
 
         // When
         try await engine.execute("quit")
@@ -418,14 +418,13 @@ struct QuitActionHandlerTests {
         // Create a game with maximum score
         let game = MinimalGame(
             player: Player(in: "testRoom"),
-            locations: testRoom,
-            maximumScore: 100
+            locations: testRoom
         )
 
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // Set up mock to respond "yes" to quit confirmation
-        await mockIO.setQueuedInputs(["yes"])
+        await mockIO.enqueueInput("yes")
 
         // When
         try await engine.execute("quit")
@@ -436,7 +435,7 @@ struct QuitActionHandlerTests {
             output,
             """
             > quit
-            Your score is 0 of 100, in 1 move.
+            Your score is 0 of 10, in 1 move.
             Do you really want to quit? yes
             Goodbye.
             """)
@@ -458,10 +457,6 @@ struct QuitActionHandlerTests {
 
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        // Set up mock to return nil (EOF) for input
-        await mockIO.setQueuedInputs([])
-        await mockIO.simulateEOF()
-
         // When
         try await engine.execute("quit")
 
@@ -471,8 +466,8 @@ struct QuitActionHandlerTests {
         // Should quit on EOF
         #expect(output.contains("Goodbye"))
 
-        let isQuitting = await engine.isQuitting
-        #expect(isQuitting == true)
+        let shouldQuit = await engine.shouldQuit
+        #expect(shouldQuit == true)
     }
 
     @Test("Quit response is case insensitive")
@@ -492,7 +487,7 @@ struct QuitActionHandlerTests {
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // Set up mock to respond with uppercase
-        await mockIO.setQueuedInputs(["YES"])
+        await mockIO.enqueueInput("YES")
 
         // When
         try await engine.execute("quit")
@@ -508,8 +503,8 @@ struct QuitActionHandlerTests {
             Goodbye.
             """)
 
-        let isQuitting = await engine.isQuitting
-        #expect(isQuitting == true)
+        let shouldQuit = await engine.shouldQuit
+        #expect(shouldQuit == true)
     }
 
     @Test("Quit handles whitespace in response")
@@ -529,7 +524,7 @@ struct QuitActionHandlerTests {
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // Set up mock to respond with whitespace around answer
-        await mockIO.setQueuedInputs(["  no  "])
+        await mockIO.enqueueInput("  no  ")
 
         // When
         try await engine.execute("quit")
@@ -545,8 +540,8 @@ struct QuitActionHandlerTests {
             OK.
             """)
 
-        let isQuitting = await engine.isQuitting
-        #expect(isQuitting == false)
+        let shouldQuit = await engine.shouldQuit
+        #expect(shouldQuit == false)
     }
 
     // MARK: - ActionID Testing

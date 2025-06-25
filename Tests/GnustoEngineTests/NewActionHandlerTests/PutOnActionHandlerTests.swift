@@ -1355,7 +1355,7 @@ struct PutOnActionHandlerTests {
 
         // Move coin back to player for next test
         try await engine.apply(
-            await engine.moveItem("coin", to: .player)
+            await engine.move("coin", to: .player)
         )
 
         // When - Put on pedestal
@@ -1371,7 +1371,7 @@ struct PutOnActionHandlerTests {
 
         // Move coin back to player for next test
         try await engine.apply(
-            await engine.moveItem("coin", to: .player)
+            await engine.move("coin", to: .player)
         )
 
         // When - Put on mantle

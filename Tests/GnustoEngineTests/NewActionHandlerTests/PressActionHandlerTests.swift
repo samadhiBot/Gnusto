@@ -59,8 +59,8 @@ struct PressActionHandlerTests {
             .inherentlyLit
         )
 
-        let switch = Item(
-            id: "switch",
+        let lightSwitch = Item(
+            id: "lightSwitch",
             .name("light switch"),
             .description("A standard light switch."),
             .isPressable,
@@ -70,7 +70,7 @@ struct PressActionHandlerTests {
         let game = MinimalGame(
             player: Player(in: "testRoom"),
             locations: testRoom,
-            items: switch
+            items: lightSwitch
         )
 
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
@@ -472,8 +472,8 @@ struct PressActionHandlerTests {
             .in(.location("testRoom"))
         )
 
-        let switch = Item(
-            id: "switch",
+        let lightSwitch = Item(
+            id: "lightSwitch",
             .name("power switch"),
             .description("A main power switch."),
             .isPressable,
@@ -483,7 +483,7 @@ struct PressActionHandlerTests {
         let game = MinimalGame(
             player: Player(in: "testRoom"),
             locations: testRoom,
-            items: button, switch
+            items: button, lightSwitch
         )
 
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
