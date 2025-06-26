@@ -19,13 +19,13 @@ public struct Verb: GnustoID {
     /// For example, "get", "take", "grab" might all have the `.take` intent.
     public let intents: [Intent]
 
-    @available(*, deprecated, renamed: "init(id:intents:)")
     /// Initializes a `Verb` with a raw string value and no intents.
     ///
     /// This initializer is deprecated. Use `init(id:intents:)` instead to properly
     /// associate the verb with its conceptual actions.
     ///
     /// - Parameter rawValue: The unique string identifier for the verb.
+    @available(*, deprecated, renamed: "init(id:intents:)")
     public init(rawValue: String) {
         assert(rawValue.isNotEmpty, "Verb ID cannot be empty")
         self.rawValue = rawValue
