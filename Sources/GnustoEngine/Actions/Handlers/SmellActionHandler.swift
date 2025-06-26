@@ -14,7 +14,7 @@ public struct SmellActionHandler: ActionHandler {
         .match(.verb, .directObject),
     ]
 
-    public let verbs: [VerbID] = [.smell, .sniff]
+    public let verbs: [Verb] = [.smell, .sniff]
 
     public let requiresLight: Bool = false
 

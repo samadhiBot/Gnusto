@@ -11,7 +11,7 @@ public struct JumpActionHandler: ActionHandler {
         .match(.verb, .over, .directObject),
     ]
 
-    public let verbs: [VerbID] = [.jump, .leap, .hop]
+    public let verbs: [Verb] = [.jump, .leap, .hop]
 
     public let requiresLight: Bool = false
 

@@ -12,7 +12,7 @@
 - [x] ✅ **Automatic ID constant generation**
   - ✅ Scan `Location(id: .someID, ...)` patterns and generate `LocationID.someID` extensions
   - ✅ Scan `Item(id: .someID, ...)` patterns and generate `ItemID.someID` extensions
-  - ✅ Support `GlobalID`, `FuseID`, `DaemonID`, and custom `VerbID` generation
+  - ✅ Support `GlobalID`, `FuseID`, `DaemonID`, and custom `Verb` generation
 - [x] ✅ **Complete GameBlueprint integration**
   - ✅ Auto-aggregate all items and locations from multiple area files
   - ✅ Auto-wire event handlers with proper scoping

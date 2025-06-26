@@ -99,7 +99,7 @@ let package = Package(
             exclude: [
                 // Temporarily excluding action handler tests while updating architecture
 //                "Core/VocabularyTests.swift",
-//                "Core/VerbIDTests.swift",
+//                "Core/VerbTests.swift",
                 "IntegrationTests/",
 //                "Parsing/StandardParserTests.swift",
 //                "Engine/GameEngineTests.swift",

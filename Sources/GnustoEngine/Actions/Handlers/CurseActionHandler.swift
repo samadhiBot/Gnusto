@@ -12,7 +12,7 @@ public struct CurseActionHandler: ActionHandler {
         .match(.damn, .directObject),
     ]
 
-    public let verbs: [VerbID] = [.curse, .swear, .shit, .fuck, .damn]
+    public let verbs: [Verb] = [.curse, .swear, .shit, .fuck, .damn]
 
     public let requiresLight: Bool = false
 

@@ -9,7 +9,7 @@ public struct DeflateActionHandler: ActionHandler {
         .match(.verb, .directObject)
     ]
 
-    public let verbs: [VerbID] = [.deflate]
+    public let verbs: [Verb] = [.deflate]
 
     public let requiresLight: Bool = true
 

@@ -551,17 +551,17 @@ struct EatActionHandlerTests {
         #expect(finalState.parent == .nowhere)
     }
 
-    // MARK: - ActionID Testing
+    // MARK: - Intent Testing
 
-    @Test("Handler exposes correct ActionIDs")
-    func testActionIDs() async throws {
+    @Test("Handler exposes correct Intents")
+    func testIntents() async throws {
         let handler = EatActionHandler()
         #expect(handler.actions.contains(.eat))
         #expect(handler.actions.count == 1)
     }
 
-    @Test("Handler exposes correct VerbIDs")
-    func testVerbIDs() async throws {
+    @Test("Handler exposes correct Verbs")
+    func testVerbs() async throws {
         let handler = EatActionHandler()
         #expect(handler.verbs.contains(.eat))
         #expect(handler.verbs.contains(.consume))

@@ -13,7 +13,7 @@ public struct FindActionHandler: ActionHandler {
         .match(.search, .for, .directObject),
     ]
 
-    public let verbs: [VerbID] = [.find, .locate]
+    public let verbs: [Verb] = [.find, .locate]
 
     public let requiresLight: Bool = true
 

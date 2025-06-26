@@ -12,7 +12,7 @@ public struct YellActionHandler: ActionHandler {
         .match(.verb, .at, .directObject),
     ]
 
-    public let verbs: [VerbID] = [.yell, .shout, .scream, .shriek, .holler]
+    public let verbs: [Verb] = [.yell, .shout, .scream, .shriek, .holler]
 
     public let requiresLight: Bool = false
 

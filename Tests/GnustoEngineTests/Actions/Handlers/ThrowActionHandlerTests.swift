@@ -775,17 +775,17 @@ struct ThrowActionHandlerTests {
         #expect(finalBall2.parent == .location("testRoom"))
     }
 
-    // MARK: - ActionID Testing
+    // MARK: - Intent Testing
 
-    @Test("Handler exposes correct ActionIDs")
-    func testActionIDs() async throws {
+    @Test("Handler exposes correct Intents")
+    func testIntents() async throws {
         let handler = ThrowActionHandler()
         // ThrowActionHandler doesn’t specify actions, so it should be empty
         #expect(handler.actions.isEmpty)
     }
 
-    @Test("Handler exposes correct VerbIDs")
-    func testVerbIDs() async throws {
+    @Test("Handler exposes correct Verbs")
+    func testVerbs() async throws {
         let handler = ThrowActionHandler()
         #expect(handler.verbs.contains(.throw))
         #expect(handler.verbs.contains(.hurl))

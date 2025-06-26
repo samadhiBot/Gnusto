@@ -92,7 +92,7 @@ struct CodeGeneratorTests {
         #expect(generatedCode.contains("extension GlobalID {"))
         #expect(generatedCode.contains("extension FuseID {"))
         #expect(generatedCode.contains("extension DaemonID {"))
-        #expect(generatedCode.contains("extension VerbID {"))
+        #expect(generatedCode.contains("extension Verb {"))
 
         // Should contain all expected constants
         #expect(generatedCode.contains("static let room = LocationID(\"room\")"))
@@ -100,6 +100,6 @@ struct CodeGeneratorTests {
         #expect(generatedCode.contains("static let score = GlobalID(\"score\")"))
         #expect(generatedCode.contains("static let bomb = FuseID(\"bomb\")"))
         #expect(generatedCode.contains("static let timer = DaemonID(\"timer\")"))
-        #expect(generatedCode.contains("static let dance = VerbID(\"dance\")"))
+        #expect(generatedCode.contains("static let dance = Verb(\"dance\")"))
     }
 }

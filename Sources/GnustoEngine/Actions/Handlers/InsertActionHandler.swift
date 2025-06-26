@@ -11,7 +11,7 @@ public struct InsertActionHandler: ActionHandler {
         .match(.verb, .directObjects, .into, .indirectObject),
     ]
 
-    public let verbs: [VerbID] = [.insert, .put, .place]
+    public let verbs: [Verb] = [.insert, .put, .place]
 
     public let requiresLight: Bool = true
 

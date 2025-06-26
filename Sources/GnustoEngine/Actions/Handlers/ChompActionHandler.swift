@@ -12,7 +12,7 @@ public struct ChompActionHandler: ActionHandler {
         .match(.verb),
     ]
 
-    public let verbs: [VerbID] = [.chomp, .bite, .chew]
+    public let verbs: [Verb] = [.chomp, .bite, .chew]
 
     public let requiresLight: Bool = true
 

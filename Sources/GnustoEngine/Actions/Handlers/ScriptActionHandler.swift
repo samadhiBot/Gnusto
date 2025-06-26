@@ -9,7 +9,7 @@ public struct ScriptActionHandler: ActionHandler {
         .match(.verb)
     ]
 
-    public let verbs: [VerbID] = [.script]
+    public let verbs: [Verb] = [.script]
 
     public let requiresLight: Bool = false
 

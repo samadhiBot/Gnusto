@@ -9,7 +9,7 @@ public struct WaitActionHandler: ActionHandler {
         .match(.verb)
     ]
 
-    public let verbs: [VerbID] = [.wait, "z"]
+    public let verbs: [Verb] = [.wait, "z"]
 
     public let requiresLight: Bool = false
 

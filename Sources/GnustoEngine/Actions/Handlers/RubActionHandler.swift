@@ -10,7 +10,7 @@ public struct RubActionHandler: ActionHandler {
         .match(.verb, .directObject, .with, .indirectObject),
     ]
 
-    public let verbs: [VerbID] = [.rub, .polish, .clean]
+    public let verbs: [Verb] = [.rub, .polish, .clean]
 
     public let requiresLight: Bool = true
 

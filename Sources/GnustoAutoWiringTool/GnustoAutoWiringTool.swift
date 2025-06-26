@@ -116,7 +116,7 @@ extension GnustoAutoWiringTool {
         print("  🌐 GlobalIDs: \(gameData.globalIDs.sorted().joined(separator: ", "))")
         print("  🧨 FuseIDs: \(gameData.fuseIDs.sorted().joined(separator: ", "))")
         print("  👿 DaemonIDs: \(gameData.daemonIDs.sorted().joined(separator: ", "))")
-        print("  🎯 Custom VerbIDs: \(gameData.verbIDs.sorted().joined(separator: ", "))")
+        print("  🎯 Custom Verbs: \(gameData.verbIDs.sorted().joined(separator: ", "))")
         print("  🎪 GameBlueprint Types: \(gameData.gameBlueprintTypes.sorted().joined(separator: ", "))")
         print("  🏠 Game Area Types: \(gameData.gameAreaTypes.sorted().joined(separator: ", "))")
         print("  🎭 Item Event Handlers: \(gameData.itemEventHandlers.sorted().joined(separator: ", "))")

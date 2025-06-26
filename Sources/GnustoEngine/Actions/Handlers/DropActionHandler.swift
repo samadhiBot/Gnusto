@@ -9,7 +9,7 @@ public struct DropActionHandler: ActionHandler {
         .match(.verb, .directObjects)
     ]
 
-    public let verbs: [VerbID] = [.drop, .discard]
+    public let verbs: [Verb] = [.drop, .discard]
 
     public let requiresLight: Bool = true
 

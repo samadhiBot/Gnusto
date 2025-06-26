@@ -9,7 +9,7 @@ public struct ShakeActionHandler: ActionHandler {
         .match(.verb, .directObject)
     ]
 
-    public let verbs: [VerbID] = [.shake, .rattle]
+    public let verbs: [Verb] = [.shake, .rattle]
 
     public let requiresLight: Bool = true
 

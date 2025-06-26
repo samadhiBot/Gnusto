@@ -9,7 +9,7 @@ public struct EatActionHandler: ActionHandler {
         .match(.verb, .directObject)
     ]
 
-    public let verbs: [VerbID] = [.eat, .consume, .devour]
+    public let verbs: [Verb] = [.eat, .consume, .devour]
 
     public let requiresLight: Bool = true
 

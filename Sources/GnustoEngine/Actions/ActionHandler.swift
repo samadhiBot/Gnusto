@@ -41,7 +41,7 @@ public protocol ActionHandler: Sendable {
     /// All words that can match `.verb` in the syntax rules to trigger this action handler.
     ///
     /// The parser treats all of the verb synonym as equivalent when matching player input.
-    var verbs: [VerbID] { get }
+    var verbs: [Verb] { get }
 
     /// The conceptual actions that this handler represents.
     ///
@@ -52,7 +52,7 @@ public protocol ActionHandler: Sendable {
     /// A single action handler may represent multiple conceptual actions. For example,
     /// a TurnActionHandler might handle both `.turn` (for "TURN WHEEL") and `.lightSource`
     /// (for "TURN ON LAMP") depending on the syntax pattern used.
-    var actions: [ActionID] { get }
+    var actions: [Intent] { get }
 
     /// Whether this verb requires light to execute.
     ///
@@ -123,14 +123,14 @@ extension ActionHandler {
     /// Default implementation for `verbs`. Returns an empty array.
     ///
     /// Override this property to provide the verbs that can trigger this action handler.
-    public var verbs: [VerbID] {
+    public var verbs: [Verb] {
         []
     }
 
     /// Default implementation for `actions`. Returns an empty array.
     ///
     /// Override this property to provide the conceptual actions this handler represents.
-    public var actions: [ActionID] {
+    public var actions: [Intent] {
         []
     }
 

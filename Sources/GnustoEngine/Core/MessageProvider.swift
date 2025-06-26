@@ -241,7 +241,7 @@ open class MessageProvider: @unchecked Sendable {
         )
     }
 
-    open func cannotDoThat(verb: VerbID, item: String) -> String {
+    open func cannotDoThat(verb: Verb, item: String) -> String {
         output(
             "cannotDoThat(verb: \(verb), item: '\(item)')",
             "You can't \(verb.rawValue) \(item)."
@@ -704,7 +704,7 @@ open class MessageProvider: @unchecked Sendable {
         )
     }
 
-    open func doWhat(verb: VerbID) -> String {
+    open func doWhat(verb: Verb) -> String {
         output(
             "doWhat(verb: \(verb))",
             "\(verb.rawValue.capitalizedFirst) what?"
@@ -1388,7 +1388,7 @@ open class MessageProvider: @unchecked Sendable {
         )
     }
 
-    open func nothingSpecial(verb: VerbID) -> String {
+    open func nothingSpecial(verb: Verb) -> String {
         output(
             "nothingSpecial(verb: \(verb))",
             "You \(verb.rawValue) nothing special."
@@ -1888,7 +1888,7 @@ open class MessageProvider: @unchecked Sendable {
         )
     }
 
-    open func thatsNotSomethingYouCan(_ verb: VerbID) -> String {
+    open func thatsNotSomethingYouCan(_ verb: Verb) -> String {
         output(
             "thatsNotSomethingYouCan(verb: \(verb))",
             "That's not something you can \(verb.rawValue)."

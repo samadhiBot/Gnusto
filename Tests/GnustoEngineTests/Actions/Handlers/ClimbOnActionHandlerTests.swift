@@ -412,17 +412,17 @@ struct ClimbOnActionHandlerTests {
         #expect(finalState.hasFlag(.isTouched) == true)
     }
 
-    // MARK: - ActionID Testing
+    // MARK: - Intent Testing
 
-    @Test("Handler exposes correct ActionIDs")
-    func testActionIDs() async throws {
+    @Test("Handler exposes correct Intents")
+    func testIntents() async throws {
         let handler = ClimbOnActionHandler()
         // ClimbOnActionHandler doesn’t specify actions, so it should be empty
         #expect(handler.actions.isEmpty)
     }
 
-    @Test("Handler exposes correct VerbIDs")
-    func testVerbIDs() async throws {
+    @Test("Handler exposes correct Verbs")
+    func testVerbs() async throws {
         let handler = ClimbOnActionHandler()
         #expect(handler.verbs.contains(.climb))
         #expect(handler.verbs.contains(.get))

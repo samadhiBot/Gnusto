@@ -9,7 +9,7 @@ public struct BriefActionHandler: ActionHandler {
         .match(.verb)
     ]
 
-    public let verbs: [VerbID] = [.brief]
+    public let verbs: [Verb] = [.brief]
 
     public let requiresLight: Bool = false
 

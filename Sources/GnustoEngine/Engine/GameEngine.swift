@@ -722,7 +722,7 @@ extension GameEngine {
     ///
     /// - Parameter actionID: The conceptual action to find handlers for
     /// - Returns: Array of action handlers that represent this conceptual action
-    public func actionHandlers(for actionID: ActionID) -> [ActionHandler] {
+    public func actionHandlers(for actionID: Intent) -> [ActionHandler] {
         return actionHandlers.filter { handler in
             handler.actions.contains(actionID)
         }
@@ -739,7 +739,7 @@ extension GameEngine {
     ///   - command: The command to check
     ///   - actionID: The conceptual action to check for
     /// - Returns: True if the command represents the specified conceptual action
-    public func commandRepresents(_ command: Command, action actionID: ActionID) -> Bool {
+    public func commandRepresents(_ command: Command, action actionID: Intent) -> Bool {
         guard let handler = findActionHandler(for: command) else {
             return false
         }
@@ -835,9 +835,9 @@ extension GameEngine {
 
         for token in syntaxRule.pattern {
             switch token {
-            case .specificVerb(let requiredVerbID):
+            case .specificVerb(let requiredVerb):
                 // Specific verb requirement - must match exactly
-                if command.verb == requiredVerbID {
+                if command.verb == requiredVerb {
                     score = 200  // High score for specific verb match
                     hasVerbToken = true
                 } else {

@@ -9,7 +9,7 @@ import Foundation
 /// `Hashable`, `Comparable`, `Codable`, `ExpressibleByStringLiteral`, and `Sendable`.
 ///
 /// This protocol eliminates code duplication across ID types like `ItemID`, `LocationID`,
-/// `VerbID`, `DaemonID`, `FuseID`, `GlobalID`, `AttributeID`, and `ContextID`.
+/// `Verb`, `DaemonID`, `FuseID`, `GlobalID`, `AttributeID`, and `ContextID`.
 ///
 /// ## Usage
 ///

@@ -532,17 +532,17 @@ struct LookInsideActionHandlerTests {
             """)
     }
 
-    // MARK: - ActionID Testing
+    // MARK: - Intent Testing
 
-    @Test("Handler exposes correct ActionIDs")
-    func testActionIDs() async throws {
+    @Test("Handler exposes correct Intents")
+    func testIntents() async throws {
         let handler = LookInsideActionHandler()
         // LookInsideActionHandler doesn’t specify actions, so it should be empty
         #expect(handler.actions.isEmpty)
     }
 
-    @Test("Handler exposes correct VerbIDs")
-    func testVerbIDs() async throws {
+    @Test("Handler exposes correct Verbs")
+    func testVerbs() async throws {
         let handler = LookInsideActionHandler()
         #expect(handler.verbs.contains(.look))
         #expect(handler.verbs.contains(.peek))

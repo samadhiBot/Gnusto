@@ -10,7 +10,7 @@ public struct DrinkActionHandler: ActionHandler {
         .match(.verb, .directObject, .from, .indirectObject),
     ]
 
-    public let verbs: [VerbID] = [.drink, .sip, .quaff, .imbibe]
+    public let verbs: [Verb] = [.drink, .sip, .quaff, .imbibe]
 
     public let requiresLight: Bool = true
 

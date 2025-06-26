@@ -10,7 +10,7 @@ public struct RemoveActionHandler: ActionHandler {
         .match(.take, .off, .directObject),
     ]
 
-    public let verbs: [VerbID] = [.remove, .doff]
+    public let verbs: [Verb] = [.remove, .doff]
 
     public let requiresLight: Bool = false
 

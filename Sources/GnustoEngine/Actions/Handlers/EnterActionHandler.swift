@@ -9,7 +9,7 @@ public struct EnterActionHandler: ActionHandler {
         .match(.verb, .directObject)
     ]
 
-    public let verbs: [VerbID] = [.enter]
+    public let verbs: [Verb] = [.enter]
 
     public let requiresLight: Bool = true
 

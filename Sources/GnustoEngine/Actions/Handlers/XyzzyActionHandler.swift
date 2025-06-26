@@ -8,7 +8,7 @@ public struct XyzzyActionHandler: ActionHandler {
         .match(.verb)
     ]
 
-    public let verbs: [VerbID] = [.xyzzy]
+    public let verbs: [Verb] = [.xyzzy]
 
     public let requiresLight: Bool = false
 

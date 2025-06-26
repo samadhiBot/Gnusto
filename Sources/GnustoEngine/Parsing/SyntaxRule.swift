@@ -39,7 +39,7 @@ public struct SyntaxRule: Sendable, Equatable, Codable {
     }
 
     public static func match(
-        _ verbID: VerbID,
+        _ verbID: Verb,
         _ pattern: SyntaxTokenType...
     ) -> SyntaxRule {
         .init(pattern: [.specificVerb(verbID)] + pattern)

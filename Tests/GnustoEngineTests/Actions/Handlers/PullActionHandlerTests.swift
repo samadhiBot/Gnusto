@@ -441,16 +441,16 @@ struct PullActionHandlerTests {
             """)
     }
 
-    // MARK: - ActionID Testing
+    // MARK: - Intent Testing
 
-    @Test("Handler exposes correct ActionIDs")
-    func testActionIDs() async throws {
+    @Test("Handler exposes correct Intents")
+    func testIntents() async throws {
         let handler = PullActionHandler()
         #expect(handler.actions.isEmpty)
     }
 
-    @Test("Handler exposes correct VerbIDs")
-    func testVerbIDs() async throws {
+    @Test("Handler exposes correct Verbs")
+    func testVerbs() async throws {
         let handler = PullActionHandler()
         #expect(handler.verbs.contains(.pull))
         #expect(handler.verbs.count == 1)

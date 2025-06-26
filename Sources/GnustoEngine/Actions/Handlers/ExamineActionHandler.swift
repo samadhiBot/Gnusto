@@ -10,7 +10,7 @@ public struct ExamineActionHandler: ActionHandler {
         .match(.look, .at, .directObjects),
     ]
 
-    public let verbs: [VerbID] = [.examine, "x", .inspect]
+    public let verbs: [Verb] = [.examine, "x", .inspect]
 
     public let requiresLight: Bool = true
 

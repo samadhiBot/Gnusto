@@ -13,7 +13,7 @@ public struct TasteActionHandler: ActionHandler {
         .match(.verb, .directObject)
     ]
 
-    public let verbs: [VerbID] = [.taste, .lick]
+    public let verbs: [Verb] = [.taste, .lick]
 
     public let requiresLight: Bool = false
 

@@ -605,7 +605,7 @@ struct GameEngineTests {
     func testEngineRecordsStateChangesFromActionHandler() async throws {
         // Given: An action handler that changes multiple things
         struct MockMultiChangeHandler: ActionHandler {
-            let verbID: VerbID = VerbID("activate")
+            let verbID: Verb = Verb("activate")
             let syntax: [SyntaxRule] = [.match(.verb, .directObject)]
             let synonyms: [String] = []
             let requiresLight: Bool = true
@@ -1504,9 +1504,9 @@ struct GameEngineTests {
         )
 
         // Create a mock handler that returns the ActionResult
-        let testVerb = VerbID("testapply")
+        let testVerb = Verb("testapply")
         struct MockResultHandler: ActionHandler {
-            let verbID: VerbID
+            let verbID: Verb
             let syntax: [SyntaxRule] = [.match(.verb, .directObject)]
             let synonyms: [String] = []
             let requiresLight: Bool = true

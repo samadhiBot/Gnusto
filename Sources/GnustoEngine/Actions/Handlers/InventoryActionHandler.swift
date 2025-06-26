@@ -9,7 +9,7 @@ public struct InventoryActionHandler: ActionHandler {
         .match(.verb)
     ]
 
-    public let verbs: [VerbID] = [.inventory, "i"]
+    public let verbs: [Verb] = [.inventory, "i"]
 
     public let requiresLight: Bool = false
 

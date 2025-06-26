@@ -2,8 +2,8 @@
 public struct Vocabulary: Codable, Equatable, Sendable {
     // MARK: - Properties
 
-    /// Maps VerbIDs to their full definitions (including synonyms, syntax, requiresLight).
-    public var verbDefinitions: [VerbID: Verb]
+    /// Maps Verbs to their full definitions (including synonyms, syntax, requiresLight).
+    public var verbs: [Verb]
 
     /// Maps known nouns (including synonyms) to the Set of ItemIDs they can refer to.
     /// Example: `["lantern": ["lantern", "lantern2"], "lamp": ["lantern", "lantern2"]]`
@@ -46,11 +46,11 @@ public struct Vocabulary: Codable, Equatable, Sendable {
     public var conjunctions: Set<String>
 
     /// Computed property to get the verb synonym mapping needed by the parser.
-    /// Maps a synonym string (lowercase) to the Set of VerbIDs it can represent.
+    /// Maps a synonym string (lowercase) to the Set of Verbs it can represent.
     /// When multiple verbs match, all potential matches are included so the parser can
     /// use syntax rules to determine the best match.
-    public var verbSynonyms: [String: Set<VerbID>] {
-        var mapping: [String: Set<VerbID>] = [:]
+    public var verbSynonyms: [String: Set<Verb>] {
+        var mapping: [String: Set<Verb>] = [:]
 
         // Build the mapping without prioritization - include all possible matches
         for verb in verbDefinitions.values {
@@ -88,7 +88,7 @@ public struct Vocabulary: Codable, Equatable, Sendable {
 
     /// Initializes a vocabulary with pre-populated dictionaries and sets.
     public init(
-        verbDefinitions: [VerbID: Verb] = [:], // Use verbDefinitions
+        verbDefinitions: [Verb: Verb] = [:], // Use verbDefinitions
         items: [String: Set<ItemID>] = [:],
         adjectives: [String: Set<ItemID>] = [:],
         locationNames: [String: LocationID] = [:], // Added parameter
@@ -360,7 +360,7 @@ public struct Vocabulary: Codable, Equatable, Sendable {
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         // Decode verbDefinitions or default to empty
-        verbDefinitions = try container.decodeIfPresent([VerbID: Verb].self, forKey: .verbDefinitions) ?? [:]
+        verbDefinitions = try container.decodeIfPresent([Verb: Verb].self, forKey: .verbDefinitions) ?? [:]
         items = try container.decode([String: Set<ItemID>].self, forKey: .items)
         adjectives = try container.decode([String: Set<ItemID>].self, forKey: .adjectives)
         locationNames = try container.decodeIfPresent([String: LocationID].self, forKey: .locationNames) ?? [:] // Decode new property

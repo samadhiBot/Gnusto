@@ -332,7 +332,7 @@ extension InsideHouse {
             let isOn = try await engine.hasFlag(.isOn, on: .lamp)
 
             switch command.verb {
-            case VerbID("throw"):
+            case Verb("throw"):
                 let playerLocation = try await engine.playerLocation()
 
                 return ActionResult(

@@ -68,7 +68,7 @@ public struct MinimalGame: GameBlueprint {
         player: Player = Player(in: LocationID("startRoom")),
         locations: Location...,
         items: Item...,
-        customActionHandlers: [VerbID: ActionHandler],
+        customActionHandlers: [Verb: ActionHandler],
         itemEventHandlers: [ItemID: ItemEventHandler] = [:],
         locationEventHandlers: [LocationID: LocationEventHandler] = [:],
         fuses: [FuseID: Fuse] = [:],

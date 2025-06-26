@@ -12,7 +12,7 @@ import PackagePlugin
 /// - `GlobalID("key")` or global state patterns → `GlobalID.key`
 /// - `Fuse(id: .someID, ...)` → `FuseID.someID`
 /// - `Daemon(id: .someID, ...)` → `DaemonID.someID`
-/// - Custom `VerbID("verb")` patterns → `VerbID.verb`
+/// - Custom `Verb("verb")` patterns → `Verb.verb`
 ///
 /// **Event Handler Discovery:**
 /// - `let itemNameHandler = ItemEventHandler { ... }`

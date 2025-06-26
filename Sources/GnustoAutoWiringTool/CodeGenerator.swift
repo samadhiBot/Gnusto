@@ -81,9 +81,9 @@ struct CodeGenerator {
         }
 
         if !gameData.verbIDs.isEmpty {
-            output.append("extension VerbID {")
+            output.append("extension Verb {")
             for verbID in gameData.verbIDs.sorted() {
-                output.append("    static let \(verbID) = VerbID(\"\(verbID)\")")
+                output.append("    static let \(verbID) = Verb(\"\(verbID)\")")
             }
             output.append("}")
             output.append("")

@@ -14,7 +14,7 @@ public struct ListenActionHandler: ActionHandler {
         .match(.verb, .to, .directObject),
     ]
 
-    public let verbs: [VerbID] = [.listen]
+    public let verbs: [Verb] = [.listen]
 
     public let requiresLight: Bool = false
 

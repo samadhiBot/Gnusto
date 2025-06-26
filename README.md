@@ -170,7 +170,7 @@ The project is organized with a clean separation between the core engine and exa
 - **Sendable Throughout:** Full Swift 6 concurrency compliance with `Sendable` types
 - **State Change Pipeline:** All mutations flow through `StateChange` objects for proper validation and event handling
 - **Protocol-Oriented Design:** Extensible architecture using protocols like `ActionHandler`, `IOHandler`, and `GameBlueprint`
-- **Type Safety:** Strong typing with specialized ID types (`ItemID`, `LocationID`, `VerbID`) prevents common errors
+- **Type Safety:** Strong typing with specialized ID types (`ItemID`, `LocationID`, `Verb`) prevents common errors
 
 ### Game World Model
 

@@ -8,7 +8,7 @@ public struct ReadActionHandler: ActionHandler {
         .match(.verb, .directObject)
     ]
 
-    public let verbs: [VerbID] = [.read]
+    public let verbs: [Verb] = [.read]
 
     public let requiresLight: Bool = true
 

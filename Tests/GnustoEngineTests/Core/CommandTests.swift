@@ -7,9 +7,9 @@ import Testing
 struct CommandTests {
 
     // — Test Setup —
-    let verbGo: VerbID = "go"
-    let verbTake: VerbID = "take"
-    let verbPut: VerbID = "put"
+    let verbGo: Verb = "go"
+    let verbTake: Verb = "take"
+    let verbPut: Verb = "put"
 
     let itemLantern: ItemID = "lantern"
     let itemCase: ItemID = "case"

@@ -43,10 +43,10 @@ extension DaemonID {
     static let ambientSound = DaemonID("ambientSound")
 }
 
-// From: VerbID("custom") for game-specific verbs
+// From: Verb("custom") for game-specific verbs
 // Generates:
-extension VerbID {
-    static let custom = VerbID("custom")
+extension Verb {
+    static let custom = Verb("custom")
 }
 ```
 
@@ -194,7 +194,7 @@ The plugin recognizes these patterns automatically:
 
 - `GlobalID("key")` and global state dictionary usage
 - `FuseID("timer")` and `DaemonID("background")`
-- `VerbID("custom")` for game-specific verbs
+- `Verb("custom")` for game-specific verbs
 
 ### Event Handler Patterns
 
@@ -254,10 +254,10 @@ The plugin filters out standard engine verbs and only generates constants for yo
 
 ```swift
 // This won't generate an extension (standard verb):
-VerbID("take")
+Verb("take")
 
-// This will generate VerbID.cast:
-VerbID("cast")
+// This will generate Verb.cast:
+Verb("cast")
 ```
 
 ## Output Location

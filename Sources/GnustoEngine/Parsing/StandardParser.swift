@@ -73,7 +73,7 @@ public struct StandardParser: Parser {
     ///                pronoun meanings, items visible or accessible to the player).
     /// - Returns: A `Result` which is either:
     ///   - `.success(Command)`: If parsing was successful. The returned `Command` object
-    ///     encapsulates the player's understood intent, including the identified `VerbID`,
+    ///     encapsulates the player's understood intent, including the identified `Verb`,
     ///     resolved `EntityReference`s for direct and/or indirect objects (if any),
     ///     any recognized modifiers (adjectives), the preposition used (if any),
     ///     and the direction (for movement commands). This `Command` is then ready for
@@ -110,9 +110,9 @@ public struct StandardParser: Parser {
            let direction = vocabulary.directions[directionWord]
         {
             // Assume a default movement verb like 'go'
-            let defaultGoVerbID = VerbID.go
+            let defaultGoVerb = Verb.go
             let command = Command(
-                verb: defaultGoVerbID,
+                verb: defaultGoVerb,
                 direction: direction,
                 rawInput: input
             )
@@ -125,14 +125,14 @@ public struct StandardParser: Parser {
         }
 
         // 6. Identify Verb (handling multi-word synonyms)
-        var matchedVerbIDs: Set<VerbID> = [] // Store all potential verb IDs
+        var matchedVerbs: Set<Verb> = [] // Store all potential verb IDs
         var verbTokenCount = 0
         var verbStartIndex = 0
 
         // Iterate through possible starting positions for the verb
         for i in 0..<filteredTokens.count {
             var longestMatchLength = 0
-            var potentialMatchIDs: Set<VerbID> = [] // Track IDs for the current longest match length
+            var potentialMatchIDs: Set<Verb> = [] // Track IDs for the current longest match length
 
             // Check token sequences starting from index i
             for length in (1...min(4, filteredTokens.count - i)).reversed() { // Check up to 4-word verbs, reversed for longest match first
@@ -140,17 +140,17 @@ public struct StandardParser: Parser {
                 let verbPhrase = subSequence.joined(separator: " ")
 
                 // Look up the set of verbs associated with this phrase
-                if let foundVerbIDs = vocabulary.verbSynonyms[verbPhrase] { // Now returns Set<VerbID>?
+                if let foundVerbs = vocabulary.verbSynonyms[verbPhrase] { // Now returns Set<Verb>?
                     // Found potential matches
                     if length > longestMatchLength {
                         // New longest length found, clear previous shorter matches and start fresh
                         longestMatchLength = length
-                        potentialMatchIDs = foundVerbIDs // Assign the whole set
+                        potentialMatchIDs = foundVerbs // Assign the whole set
                         verbTokenCount = length // Store the length of this match
                         verbStartIndex = i // Store the start index
                     } else if length == longestMatchLength {
                         // Same length as the current longest, add these IDs to the set
-                        potentialMatchIDs.formUnion(foundVerbIDs) // Use formUnion to add all IDs
+                        potentialMatchIDs.formUnion(foundVerbs) // Use formUnion to add all IDs
                     }
                     // If length < longestMatchLength, ignore (we only want the longest matches)
                 }
@@ -158,26 +158,26 @@ public struct StandardParser: Parser {
 
             // If we found any matches of the longest possible length starting at index i, use them and stop searching
             if longestMatchLength > 0 {
-                matchedVerbIDs = potentialMatchIDs // Assign the set of IDs found at the longest length
+                matchedVerbs = potentialMatchIDs // Assign the set of IDs found at the longest length
                 // verbTokenCount and verbStartIndex are already set when longestMatchLength was updated
                 break // Found the first (and longest) verb match group, stop outer loop
             }
         }
 
         // Ensure at least one verb was matched
-        guard !matchedVerbIDs.isEmpty else {
+        guard !matchedVerbs.isEmpty else {
             // No known single or multi-word verb/synonym found
             return .failure(.unknownVerb(filteredTokens.first ?? filteredTokens.joined(separator: " "))) // Use first word as guess
         }
 
-        // ***** REVISED: Fetch rules for ALL matched VerbIDs *****
-        var allPotentialRules: [(verb: VerbID, rule: SyntaxRule)] = []
-        var verbsWithRules: Set<VerbID> = [] // Track which verbs actually have rules
+        // ***** REVISED: Fetch rules for ALL matched Verbs *****
+        var allPotentialRules: [(verb: Verb, rule: SyntaxRule)] = []
+        var verbsWithRules: Set<Verb> = [] // Track which verbs actually have rules
 
         // Sort matched verbs for deterministic behavior when there are ties
-        let sortedMatchedVerbIDs = matchedVerbIDs.sorted { $0.rawValue < $1.rawValue }
+        let sortedMatchedVerbs = matchedVerbs.sorted { $0.rawValue < $1.rawValue }
 
-        for verb in sortedMatchedVerbIDs {
+        for verb in sortedMatchedVerbs {
             if let verbDef = vocabulary.verbDefinitions[verb] {
                 if !verbDef.syntax.isEmpty {
                     verbsWithRules.insert(verb)
@@ -191,7 +191,7 @@ public struct StandardParser: Parser {
         // Handle cases where verb(s) were matched but NONE have rules, and there are extra tokens
         if allPotentialRules.isEmpty && filteredTokens.count > verbTokenCount {
             // Provide a generic error based on the *first* matched verb ID (deterministic choice)
-            let firstMatchedID = sortedMatchedVerbIDs.first!
+            let firstMatchedID = sortedMatchedVerbs.first!
             return .failure(
                 .badGrammar(
                     "I understand the verb '\(firstMatchedID.rawValue)', but not the rest of that sentence."
@@ -289,8 +289,8 @@ public struct StandardParser: Parser {
                  // Input was just a verb phrase matching one or more verbs, none of which had rules.
 
                  // Check for perfect tie: multiple verbs matched but none have syntax rules
-                 if sortedMatchedVerbIDs.count > 1 {
-                     let verbList = sortedMatchedVerbIDs.map { $0.rawValue }.joined(separator: ", ")
+                 if sortedMatchedVerbs.count > 1 {
+                     let verbList = sortedMatchedVerbs.map { $0.rawValue }.joined(separator: ", ")
                      return .failure(
                         .badGrammar(
                             "The word '\(filteredTokens.joined(separator: " "))' could refer to multiple commands (\(verbList)), but none can handle this syntax. Please be more specific."
@@ -299,15 +299,15 @@ public struct StandardParser: Parser {
                  }
 
                  // Single verb with no syntax rules - allow it
-                 let firstMatchedID = sortedMatchedVerbIDs.first!
+                 let firstMatchedID = sortedMatchedVerbs.first!
                  let command = Command(verb: firstMatchedID, rawInput: input)
                  return .success(command)
              } else {
                  // Rules existed but all failed
 
                  // Check for perfect tie: multiple verbs tried but all failed validation
-                 if sortedMatchedVerbIDs.count > 1 {
-                     let verbList = sortedMatchedVerbIDs.map { $0.rawValue }.joined(separator: ", ")
+                 if sortedMatchedVerbs.count > 1 {
+                     let verbList = sortedMatchedVerbs.map { $0.rawValue }.joined(separator: ", ")
                      return .failure(
                         .badGrammar(
                             "The word '\(filteredTokens.first ?? "")' could refer to multiple commands (\(verbList)), but none can handle this syntax. Please be more specific."
@@ -316,7 +316,7 @@ public struct StandardParser: Parser {
                  }
 
                  // Single verb failed - provide the standard error
-                 let firstMatchedID = sortedMatchedVerbIDs.first!
+                 let firstMatchedID = sortedMatchedVerbs.first!
                  return .failure(
                     .badGrammar(
                         "I understood '\(firstMatchedID.rawValue)' but couldn't parse the rest of the sentence with its known grammar rules."
@@ -441,7 +441,7 @@ public struct StandardParser: Parser {
         tokens: [String],
         verbStartIndex: Int,
         verbTokenCount: Int,
-        verb: VerbID,
+        verb: Verb,
         vocabulary: Vocabulary,
         gameState: GameState,
         originalInput: String
@@ -479,10 +479,10 @@ public struct StandardParser: Parser {
             case .verb:
                 continue
 
-            case .specificVerb(let requiredVerbID):
+            case .specificVerb(let requiredVerb):
                 // Verify that the command uses the specific verb required by this rule
-                guard verb == requiredVerbID else {
-                    return .failure(.badGrammar("This syntax requires the specific verb '\(requiredVerbID.rawValue)'."))
+                guard verb == requiredVerb else {
+                    return .failure(.badGrammar("This syntax requires the specific verb '\(requiredVerb.rawValue)'."))
                 }
                 continue
 
@@ -854,7 +854,7 @@ public struct StandardParser: Parser {
     /// Resolves a noun phrase (noun + modifiers) to a specific EntityReference within the game context.
     func resolveObject(
         noun: String,
-        verb: VerbID,
+        verb: Verb,
         modifiers: [String],
         in gameState: GameState,
         using vocabulary: Vocabulary
@@ -1138,7 +1138,7 @@ public struct StandardParser: Parser {
 
     /// Resolves ALL keywords to multiple objects based on verb and conditions.
     func resolveAllObjects(
-        verb: VerbID,
+        verb: Verb,
         modifiers: [String],
         in gameState: GameState,
         using vocabulary: Vocabulary
@@ -1321,10 +1321,10 @@ public struct StandardParser: Parser {
                     if vocabulary.verbSynonyms.keys.contains(currentToken) {
                         isBoundaryToken = true
                     }
-                case .specificVerb(let requiredVerbID):
+                case .specificVerb(let requiredVerb):
                     // Check if current token matches the required verb
                     if let verbIDs = vocabulary.verbSynonyms[currentToken],
-                       verbIDs.contains(requiredVerbID) {
+                       verbIDs.contains(requiredVerb) {
                         isBoundaryToken = true
                     }
                 case .particle(let expectedParticle):

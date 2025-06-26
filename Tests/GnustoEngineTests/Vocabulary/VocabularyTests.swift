@@ -228,8 +228,8 @@ struct VocabularyTests {
         vocab.add(verb: verb2)
 
         #expect(vocab.verbDefinitions.count == 1)
-        #expect(vocab.verbDefinitions[VerbID("test")] == verb2)
-        #expect(vocab.verbDefinitions[VerbID("test")]?.synonyms == ["new"])
+        #expect(vocab.verbDefinitions[Verb("test")] == verb2)
+        #expect(vocab.verbDefinitions[Verb("test")]?.synonyms == ["new"])
     }
 
     // MARK: - Adding Items Tests
@@ -392,9 +392,9 @@ struct VocabularyTests {
         let synonymMapping = vocab.verbSynonyms
 
         // All should be lowercase in mapping
-        #expect(synonymMapping["examine"]?.contains(VerbID("EXAMINE")) == true)
-        #expect(synonymMapping["x"]?.contains(VerbID("EXAMINE")) == true)
-        #expect(synonymMapping["look at"]?.contains(VerbID("EXAMINE")) == true)
+        #expect(synonymMapping["examine"]?.contains(Verb("EXAMINE")) == true)
+        #expect(synonymMapping["x"]?.contains(Verb("EXAMINE")) == true)
+        #expect(synonymMapping["look at"]?.contains(Verb("EXAMINE")) == true)
 
         // Uppercase keys should not exist
         #expect(synonymMapping["EXAMINE"] == nil)

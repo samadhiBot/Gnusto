@@ -268,10 +268,10 @@ struct WaitActionHandlerTests {
         #expect(initialPlayerLocation == finalPlayerLocation)
     }
 
-    // MARK: - ActionID Testing
+    // MARK: - Intent Testing
 
-    @Test("Handler exposes correct ActionIDs")
-    func testCorrectActionIDs() async throws {
+    @Test("Handler exposes correct Intents")
+    func testCorrectIntents() async throws {
         // Given
         let handler = WaitActionHandler()
 
@@ -280,8 +280,8 @@ struct WaitActionHandlerTests {
         #expect(handler.actions.isEmpty)
     }
 
-    @Test("Handler exposes correct VerbIDs")
-    func testCorrectVerbIDs() async throws {
+    @Test("Handler exposes correct Verbs")
+    func testCorrectVerbs() async throws {
         // Given
         let handler = WaitActionHandler()
 

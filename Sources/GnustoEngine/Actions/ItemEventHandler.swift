@@ -56,7 +56,7 @@ public enum ItemEvent: Sendable {
      */
 
     public func whenBeforeTurn(
-        verb verbID: VerbID,
+        verb verbID: Verb,
         result: () -> ActionResult?
     ) -> ActionResult? {
         if case .beforeTurn(let command) = self, command.verb == verbID {

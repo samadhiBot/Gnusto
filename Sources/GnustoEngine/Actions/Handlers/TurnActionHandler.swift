@@ -10,7 +10,7 @@ public struct TurnActionHandler: ActionHandler {
         .match(.verb, .directObject, .to, .indirectObject),
     ]
 
-    public let verbs: [VerbID] = [.turn, .rotate, .twist]
+    public let verbs: [Verb] = [.turn, .rotate, .twist]
 
     public let requiresLight: Bool = true
 

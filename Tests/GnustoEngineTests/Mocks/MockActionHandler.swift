@@ -5,7 +5,7 @@ import Foundation
 actor MockActionHandler: ActionHandler {
     // MARK: - ActionHandler Protocol Properties
 
-    nonisolated let verbID: VerbID
+    nonisolated let verbID: Verb
 
     nonisolated let syntax: [SyntaxRule]
 
@@ -30,7 +30,7 @@ actor MockActionHandler: ActionHandler {
 
     // Initializer for the actor
     init(
-        verbID: VerbID = .take,
+        verbID: Verb = .take,
         syntax: [SyntaxRule] = [.match(.verb, .directObject)],
         synonyms: [String] = [],
         requiresLight: Bool = true,

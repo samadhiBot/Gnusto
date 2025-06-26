@@ -8,7 +8,7 @@ public struct QuitActionHandler: ActionHandler {
         .match(.verb)
     ]
 
-    public let verbs: [VerbID] = [.quit, "q"]
+    public let verbs: [Verb] = [.quit, "q"]
 
     public let requiresLight: Bool = false
 

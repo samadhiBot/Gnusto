@@ -270,7 +270,7 @@ extension OutsideHouse {
             let insideHouseLocations: Set<LocationID> = [.kitchen, .livingRoom, .attic]
             if insideHouseLocations.contains(currentLocation) {
                 switch command.verb {
-                case VerbID("find"):
+                case Verb("find"):
                     return ActionResult("Why not find your brains?")
                 // TODO: Handle WALK-AROUND verb when available
                 default:
@@ -285,7 +285,7 @@ extension OutsideHouse {
             if !atHouseLocations.contains(currentLocation) {
                 // Player is not at the house
                 switch command.verb {
-                case VerbID("find"):
+                case Verb("find"):
                     if currentLocation == .gratingClearing {
                         return ActionResult("It seems to be to the west.")
                     } else {
@@ -298,7 +298,7 @@ extension OutsideHouse {
 
             // Player is at the house (at one of the four sides)
             switch command.verb {
-            case VerbID("find"):
+            case Verb("find"):
                 return ActionResult("It's right here! Are you blind or something?")
 
             // TODO: Handle WALK-AROUND verb when available
@@ -332,7 +332,7 @@ extension OutsideHouse {
                     return ActionResult("I can't see how to get in from here.")
                 }
 
-            case VerbID("burn"):
+            case Verb("burn"):
                 return ActionResult("You must be joking.")
 
             default:

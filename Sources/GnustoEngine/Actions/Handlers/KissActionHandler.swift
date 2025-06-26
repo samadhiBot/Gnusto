@@ -9,7 +9,7 @@ public struct KissActionHandler: ActionHandler {
         .match(.verb, .directObject)
     ]
 
-    public let verbs: [VerbID] = [.kiss]
+    public let verbs: [Verb] = [.kiss]
 
     public let requiresLight: Bool = true
 

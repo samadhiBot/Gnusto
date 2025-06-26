@@ -11,7 +11,7 @@ public struct DigActionHandler: ActionHandler {
         .match(.verb, .directObject, .with, .indirectObject),
     ]
 
-    public let verbs: [VerbID] = [.dig, .excavate]
+    public let verbs: [Verb] = [.dig, .excavate]
 
     public let requiresLight: Bool = true
 

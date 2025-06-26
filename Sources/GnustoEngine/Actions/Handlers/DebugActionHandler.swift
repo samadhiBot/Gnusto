@@ -16,7 +16,7 @@ public struct DebugActionHandler: ActionHandler {
         .match(.verb, .directObject)
     ]
 
-    public let verbs: [VerbID] = [.debug]
+    public let verbs: [Verb] = [.debug]
 
     public let requiresLight: Bool = false
 

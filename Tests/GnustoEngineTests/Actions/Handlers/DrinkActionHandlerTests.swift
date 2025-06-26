@@ -650,17 +650,17 @@ struct DrinkActionHandlerTests {
         #expect(finalState.parent == .nowhere)
     }
 
-    // MARK: - ActionID Testing
+    // MARK: - Intent Testing
 
-    @Test("Handler exposes correct ActionIDs")
-    func testActionIDs() async throws {
+    @Test("Handler exposes correct Intents")
+    func testIntents() async throws {
         let handler = DrinkActionHandler()
         #expect(handler.actions.contains(.drink))
         #expect(handler.actions.count == 1)
     }
 
-    @Test("Handler exposes correct VerbIDs")
-    func testVerbIDs() async throws {
+    @Test("Handler exposes correct Verbs")
+    func testVerbs() async throws {
         let handler = DrinkActionHandler()
         #expect(handler.verbs.contains(.drink))
         #expect(handler.verbs.contains(.sip))

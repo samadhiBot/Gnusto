@@ -9,9 +9,9 @@ struct VerbTests {
 
     // MARK: - Test Setup
 
-    let verbIDTake: VerbID = "take"
+    let verbIDTake: Verb = "take"
     let synonymsTake: Set<String> = ["get", "pick up"]
-    let verbIDLook: VerbID = "look"
+    let verbIDLook: Verb = "look"
 
     func createTakeVerb() -> Verb {
         Verb(id: "take", synonyms: "get", "pick up")
@@ -347,7 +347,7 @@ struct VerbTests {
 
     @Test("Verbs work as dictionary values")
     func testVerbsAsDictionaryValues() throws {
-        let verbDict: [VerbID: Verb] = [
+        let verbDict: [Verb: Verb] = [
             .take: createTakeVerb(),
             .look: createLookVerb(),
         ]

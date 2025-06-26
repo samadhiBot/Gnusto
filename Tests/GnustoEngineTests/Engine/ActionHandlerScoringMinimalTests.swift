@@ -13,7 +13,7 @@ struct ActionHandlerScoringMinimalTests {
 
     /// Simple handler that matches basic verb with direct object
     private struct BasicTakeHandler: ActionHandler {
-        let verbs: [VerbID] = [.take]
+        let verbs: [Verb] = [.take]
         let syntax: [SyntaxRule] = [.match(.verb, .directObject)]
         let requiresLight: Bool = false
 
@@ -24,7 +24,7 @@ struct ActionHandlerScoringMinimalTests {
 
     /// Handler with specific verb requirement (higher specificity)
     private struct SpecificTakeHandler: ActionHandler {
-        let verbs: [VerbID] = []
+        let verbs: [Verb] = []
         let syntax: [SyntaxRule] = [.match(.take, .directObject)]
         let requiresLight: Bool = false
 
@@ -35,7 +35,7 @@ struct ActionHandlerScoringMinimalTests {
 
     /// Handler with particle requirement
     private struct TurnOnHandler: ActionHandler {
-        let verbs: [VerbID] = [.turn]
+        let verbs: [Verb] = [.turn]
         let syntax: [SyntaxRule] = [.match(.verb, .on, .directObject)]
         let requiresLight: Bool = false
 
@@ -99,7 +99,7 @@ struct ActionHandlerScoringMinimalTests {
 
         /// Basic turn handler without particle
         struct BasicTurnHandler: ActionHandler {
-            let verbs: [VerbID] = [.turn]
+            let verbs: [Verb] = [.turn]
             let syntax: [SyntaxRule] = [.match(.verb, .directObject)]
             let requiresLight: Bool = false
 
@@ -229,7 +229,7 @@ struct ActionHandlerScoringMinimalTests {
     func testMultipleSyntaxRules() async throws {
         /// Handler with multiple syntax patterns
         struct MultiSyntaxHandler: ActionHandler {
-            let verbs: [VerbID] = [.turn]
+            let verbs: [Verb] = [.turn]
             let syntax: [SyntaxRule] = [
                 .match(.verb, .directObject),  // Score: 100 + 5 + 10 = 115
                 .match(.verb, .on, .directObject),  // Score: 100 + 5 + 10 + 20 = 135

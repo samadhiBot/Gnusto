@@ -11,7 +11,7 @@ public struct ThinkActionHandler: ActionHandler {
         .match(.think, .about, .directObject),
     ]
 
-    public let verbs: [VerbID] = [.think, .consider, .ponder]
+    public let verbs: [Verb] = [.think, .consider, .ponder]
 
     public let requiresLight: Bool = false
 

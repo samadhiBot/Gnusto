@@ -13,7 +13,7 @@ public struct LookUnderActionHandler: ActionHandler {
         .match(.verb, .below, .directObject),
     ]
 
-    public let verbs: [VerbID] = [.look, .peek]
+    public let verbs: [Verb] = [.look, .peek]
 
     public let requiresLight: Bool = true
 

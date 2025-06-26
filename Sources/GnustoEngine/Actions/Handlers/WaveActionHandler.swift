@@ -12,7 +12,7 @@ public struct WaveActionHandler: ActionHandler {
         .match(.verb, .directObject, .at, .indirectObject),
     ]
 
-    public let verbs: [VerbID] = [.wave, .brandish]
+    public let verbs: [Verb] = [.wave, .brandish]
 
     public let requiresLight: Bool = true
 

@@ -11,7 +11,7 @@ public struct KnockActionHandler: ActionHandler {
         .match(.verb, .on, .directObject),
     ]
 
-    public let verbs: [VerbID] = [.knock, .rap, .tap]
+    public let verbs: [Verb] = [.knock, .rap, .tap]
 
     public let requiresLight: Bool = true
 

@@ -11,7 +11,7 @@ struct ActionHandlerScoringTests {
 
     /// Mock handler that accepts any verb with basic syntax
     private struct GenericVerbHandler: ActionHandler {
-        let verbs: [VerbID] = [.take]
+        let verbs: [Verb] = [.take]
         let syntax: [SyntaxRule] = [.match(.verb, .directObject)]
         let requiresLight: Bool = false
 
@@ -22,7 +22,7 @@ struct ActionHandlerScoringTests {
 
     /// Mock handler with specific verb requirement
     private struct SpecificVerbHandler: ActionHandler {
-        let verbs: [VerbID] = []  // No verbs - relies on syntax rules
+        let verbs: [Verb] = []  // No verbs - relies on syntax rules
         let syntax: [SyntaxRule] = [.match(.take, .directObject)]
         let requiresLight: Bool = false
 
@@ -33,7 +33,7 @@ struct ActionHandlerScoringTests {
 
     /// Mock handler with particle requirement
     private struct ParticleHandler: ActionHandler {
-        let verbs: [VerbID] = [.turn]
+        let verbs: [Verb] = [.turn]
         let syntax: [SyntaxRule] = [.match(.verb, .on, .directObject)]
         let requiresLight: Bool = false
 
@@ -44,7 +44,7 @@ struct ActionHandlerScoringTests {
 
     /// Mock handler with multiple object requirement
     private struct MultiObjectHandler: ActionHandler {
-        let verbs: [VerbID] = [.take]
+        let verbs: [Verb] = [.take]
         let syntax: [SyntaxRule] = [.match(.verb, .directObjects)]
         let requiresLight: Bool = false
 
@@ -55,7 +55,7 @@ struct ActionHandlerScoringTests {
 
     /// Mock handler with indirect object requirement
     private struct IndirectObjectHandler: ActionHandler {
-        let verbs: [VerbID] = [.put]
+        let verbs: [Verb] = [.put]
         let syntax: [SyntaxRule] = [.match(.verb, .directObject, .in, .indirectObject)]
         let requiresLight: Bool = false
 
@@ -66,7 +66,7 @@ struct ActionHandlerScoringTests {
 
     /// Mock handler with direction requirement
     private struct DirectionHandler: ActionHandler {
-        let verbs: [VerbID] = [.go]
+        let verbs: [Verb] = [.go]
         let syntax: [SyntaxRule] = [.match(.verb, .direction)]
         let requiresLight: Bool = false
 
@@ -250,7 +250,7 @@ struct ActionHandlerScoringTests {
 
         // Handler that matches but with lower specificity
         struct LowerSpecHandler: ActionHandler {
-            let verbs: [VerbID] = [.take]
+            let verbs: [Verb] = [.take]
             let syntax: [SyntaxRule] = [.match(.verb, .directObject)]
             let requiresLight: Bool = false
 
@@ -261,7 +261,7 @@ struct ActionHandlerScoringTests {
 
         // Handler that matches with higher specificity
         struct HigherSpecHandler: ActionHandler {
-            let verbs: [VerbID] = []
+            let verbs: [Verb] = []
             let syntax: [SyntaxRule] = [.match(.take, .directObject)]
             let requiresLight: Bool = false
 
@@ -362,7 +362,7 @@ struct ActionHandlerScoringTests {
 
         // Handler that matches but without particle requirement
         struct SimpleHandler: ActionHandler {
-            let verbs: [VerbID] = [.put]
+            let verbs: [Verb] = [.put]
             let syntax: [SyntaxRule] = [.match(.verb, .directObject)]
             let requiresLight: Bool = false
 
@@ -413,7 +413,7 @@ struct ActionHandlerScoringTests {
 
         // Handler that matches go verb but doesn't expect direction
         struct SimpleGoHandler: ActionHandler {
-            let verbs: [VerbID] = [.go]
+            let verbs: [Verb] = [.go]
             let syntax: [SyntaxRule] = [.match(.verb)]
             let requiresLight: Bool = false
 
@@ -451,7 +451,7 @@ struct ActionHandlerScoringTests {
     @Test("Handler with no verbs and no syntax scores zero")
     func testEmptyHandlerScoring() async throws {
         struct EmptyHandler: ActionHandler {
-            let verbs: [VerbID] = []
+            let verbs: [Verb] = []
             let syntax: [SyntaxRule] = []
             let requiresLight: Bool = false
 
@@ -492,7 +492,7 @@ struct ActionHandlerScoringTests {
     @Test("Handler with verbs but no matching verb scores zero")
     func testNonMatchingVerbScoring() async throws {
         struct WrongVerbHandler: ActionHandler {
-            let verbs: [VerbID] = [.drop]  // Handler for "drop" but command is "take"
+            let verbs: [Verb] = [.drop]  // Handler for "drop" but command is "take"
             let syntax: [SyntaxRule] = [.match(.verb, .directObject)]
             let requiresLight: Bool = false
 
@@ -541,7 +541,7 @@ struct ActionHandlerScoringTests {
     @Test("Multiple syntax rules - best matching rule wins")
     func testMultipleSyntaxRules() async throws {
         struct MultiSyntaxHandler: ActionHandler {
-            let verbs: [VerbID] = [.turn]
+            let verbs: [Verb] = [.turn]
             let syntax: [SyntaxRule] = [
                 .match(.verb, .directObject),  // Score: 100 + 5 + 10 = 115
                 .match(.verb, .on, .directObject),  // Score: 100 + 5 + 10 + 20 = 135
@@ -594,7 +594,7 @@ struct ActionHandlerScoringTests {
     @Test("Case insensitive particle matching")
     func testCaseInsensitiveParticles() async throws {
         struct CaseSensitiveHandler: ActionHandler {
-            let verbs: [VerbID] = [.turn]
+            let verbs: [Verb] = [.turn]
             let syntax: [SyntaxRule] = [.match(.verb, .on, .directObject)]
             let requiresLight: Bool = false
 

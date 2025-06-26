@@ -1217,7 +1217,7 @@ struct StandardParserTests {
     @Test("Parse Commands with Adverbs - Basic Verbs")
     func testParseCommandsWithAdverbs() async throws {
         // Test that adverbs are filtered out and commands work normally
-        let testCases: [(input: String, expectedVerb: VerbID, expectedObject: EntityReference?)] = [
+        let testCases: [(input: String, expectedVerb: Verb, expectedObject: EntityReference?)] = [
             ("look carefully", .look, nil),
             ("take sword quickly", .take, .item("sword")),
             ("examine sword thoroughly", .examine, .item("sword")),
@@ -1255,7 +1255,7 @@ struct StandardParserTests {
     @Test("Parse Commands with Adverbs in Different Positions")
     func testParseCommandsWithAdverbsInDifferentPositions() async throws {
         // Test adverbs in various positions
-        let testCases: [(input: String, expectedVerb: VerbID, expectedObject: EntityReference?)] = [
+        let testCases: [(input: String, expectedVerb: Verb, expectedObject: EntityReference?)] = [
             ("carefully examine sword", .examine, .item("sword")),
             ("examine carefully sword", .examine, .item("sword")),
             ("examine sword carefully", .examine, .item("sword")),
@@ -1332,16 +1332,16 @@ struct StandardParserTests {
     @Test("Verb-specific syntax rules")
     func testVerbSpecificSyntaxRules() async throws {
         // Create a vocabulary with synonyms that map to the same verb
-        let chargeVerbID = VerbID("charge")
+        let chargeVerb = Verb("charge")
 
         let testVocabulary = Vocabulary(
             verbDefinitions: [
-                chargeVerbID: Verb(
-                    id: chargeVerbID,
+                chargeVerb: Verb(
+                    id: chargeVerb,
                     synonyms: "charge", "refuel",
                     syntax: [
                         // Only "charge" can use this specific syntax
-                        SyntaxRule(pattern: [.specificVerb(chargeVerbID), .up, .directObject]),
+                        SyntaxRule(pattern: [.specificVerb(chargeVerb), .up, .directObject]),
                         // Both "charge" and "refuel" can use this syntax
                         SyntaxRule(pattern: [.verb, .directObject]),
                     ]
@@ -1356,7 +1356,7 @@ struct StandardParserTests {
             input: "charge up battery", vocabulary: testVocabulary, gameState: gameState)
         switch chargeUpResult {
         case .success(let command):
-            #expect(command.verb == chargeVerbID, "Expected charge verb")
+            #expect(command.verb == chargeVerb, "Expected charge verb")
             #expect(command.rawInput == "charge up battery", "Expected raw input preserved")
         case .failure(let error):
             Issue.record("Expected 'charge up battery' to succeed, but got: \(error)")
@@ -1368,7 +1368,7 @@ struct StandardParserTests {
         switch refuelUpResult {
         case .success(let command):
             // This should fall back to the general .verb syntax, so it should succeed
-            #expect(command.verb == chargeVerbID, "Expected charge verb")
+            #expect(command.verb == chargeVerb, "Expected charge verb")
             if let directObj = command.directObject {
                 switch directObj {
                 case .item(let itemID):
@@ -1389,7 +1389,7 @@ struct StandardParserTests {
             input: "refuel battery", vocabulary: testVocabulary, gameState: gameState)
         switch refuelResult {
         case .success(let command):
-            #expect(command.verb == chargeVerbID, "Expected charge verb")
+            #expect(command.verb == chargeVerb, "Expected charge verb")
             if let directObj = command.directObject {
                 switch directObj {
                 case .item(let itemID):

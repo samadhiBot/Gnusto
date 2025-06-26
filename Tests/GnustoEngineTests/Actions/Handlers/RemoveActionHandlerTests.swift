@@ -685,17 +685,17 @@ struct RemoveActionHandlerTests {
         #expect(finalRing.hasFlag(.isWorn) == true)  // Still worn
     }
 
-    // MARK: - ActionID Testing
+    // MARK: - Intent Testing
 
-    @Test("Handler exposes correct ActionIDs")
-    func testActionIDs() async throws {
+    @Test("Handler exposes correct Intents")
+    func testIntents() async throws {
         let handler = RemoveActionHandler()
         // RemoveActionHandler doesn’t specify actions, so it should be empty
         #expect(handler.actions.isEmpty)
     }
 
-    @Test("Handler exposes correct VerbIDs")
-    func testVerbIDs() async throws {
+    @Test("Handler exposes correct Verbs")
+    func testVerbs() async throws {
         let handler = RemoveActionHandler()
         #expect(handler.verbs.contains(.remove))
         #expect(handler.verbs.contains(.doff))

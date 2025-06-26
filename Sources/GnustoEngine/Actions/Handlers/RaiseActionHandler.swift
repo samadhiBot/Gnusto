@@ -11,7 +11,7 @@ public struct RaiseActionHandler: ActionHandler {
         .match(.verb, .directObject)
     ]
 
-    public let verbs: [VerbID] = [.raise, .lift, .hoist]
+    public let verbs: [Verb] = [.raise, .lift, .hoist]
 
     public let requiresLight: Bool = true
 

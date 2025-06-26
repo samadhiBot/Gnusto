@@ -10,7 +10,7 @@ public struct BlowActionHandler: ActionHandler {
         .match(.verb, .on, .directObject),
     ]
 
-    public let verbs: [VerbID] = [.blow, .puff]
+    public let verbs: [Verb] = [.blow, .puff]
 
     public let requiresLight: Bool = true
 

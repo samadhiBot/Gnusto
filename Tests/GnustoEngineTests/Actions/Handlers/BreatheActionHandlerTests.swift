@@ -201,17 +201,17 @@ struct BreatheActionHandlerTests {
             """)
     }
 
-    // MARK: - ActionID Testing
+    // MARK: - Intent Testing
 
-    @Test("Handler exposes correct ActionIDs")
-    func testActionIDs() async throws {
+    @Test("Handler exposes correct Intents")
+    func testIntents() async throws {
         let handler = BreatheActionHandler()
         // BreatheActionHandler doesn’t specify actions, so it should be empty
         #expect(handler.actions.isEmpty)
     }
 
-    @Test("Handler exposes correct VerbIDs")
-    func testVerbIDs() async throws {
+    @Test("Handler exposes correct Verbs")
+    func testVerbs() async throws {
         let handler = BreatheActionHandler()
         #expect(handler.verbs.contains(.breathe))
         #expect(handler.verbs.count == 1)

@@ -9,7 +9,7 @@ public struct PutOnActionHandler: ActionHandler {
         .match(.verb, .directObject, .on, .indirectObject)
     ]
 
-    public let verbs: [VerbID] = [.put, .place, .set, .balance, .hang]
+    public let verbs: [Verb] = [.put, .place, .set, .balance, .hang]
 
     public let requiresLight: Bool = true
 

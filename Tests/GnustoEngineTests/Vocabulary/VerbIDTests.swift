@@ -4,42 +4,42 @@ import Testing
 
 @testable import GnustoEngine
 
-@Suite("VerbID Tests")
-struct VerbIDTests {
+@Suite("Verb Tests")
+struct VerbTests {
 
     // MARK: - Basic Functionality Tests
 
-    @Test("VerbID initialization with raw value")
-    func testVerbIDInitialization() throws {
-        let verbID = VerbID(rawValue: "test")
+    @Test("Verb initialization with raw value")
+    func testVerbInitialization() throws {
+        let verbID = Verb(rawValue: "test")
         #expect(verbID.rawValue == "test")
     }
 
-    @Test("VerbID Initialization with Special Characters")
+    @Test("Verb Initialization with Special Characters")
     func testSpecialCharacterInitialization() throws {
-        let id: VerbID = "verb_with-special.chars@123"
+        let id: Verb = "verb_with-special.chars@123"
         #expect(id.rawValue == "verb_with-special.chars@123")
     }
 
-    @Test("VerbID Initialization with Unicode")
+    @Test("Verb Initialization with Unicode")
     func testUnicodeInitialization() throws {
-        let id: VerbID = "🎮动作"
+        let id: Verb = "🎮动作"
         #expect(id.rawValue == "🎮动作")
     }
 
-    @Test("VerbID initialization with empty string assertion")
-    func testVerbIDEmptyStringAssertion() throws {
+    @Test("Verb initialization with empty string assertion")
+    func testVerbEmptyStringAssertion() throws {
         // Note: This would assert in debug builds, but we can't easily test assertions
         // Just verify that non-empty strings work
-        let verbID = VerbID(rawValue: "valid")
+        let verbID = Verb(rawValue: "valid")
         #expect(verbID.rawValue == "valid")
     }
 
     // MARK: - GnustoID Conformance Tests
 
-    @Test("VerbID conforms to GnustoID")
+    @Test("Verb conforms to GnustoID")
     func testGnustoIDConformance() throws {
-        let verbID = VerbID(rawValue: "take")
+        let verbID = Verb(rawValue: "take")
 
         // Test that it can be used as a GnustoID
         func acceptsGnustoID<T: GnustoID>(_ id: T) -> String {
@@ -55,230 +55,230 @@ struct VerbIDTests {
     @Test("All static verbs have expected raw values")
     func testStaticVerbDefinitions() throws {
         // Test core action verbs
-        #expect(VerbID.take.rawValue == "take")
-        #expect(VerbID.drop.rawValue == "drop")
-        #expect(VerbID.get.rawValue == "get")
-        #expect(VerbID.give.rawValue == "give")
-        #expect(VerbID.put.rawValue == "put")
-        #expect(VerbID.look.rawValue == "look")
-        #expect(VerbID.examine.rawValue == "examine")
-        #expect(VerbID.go.rawValue == "go")
-        #expect(VerbID.enter.rawValue == "enter")
-        #expect(VerbID.open.rawValue == "open")
-        #expect(VerbID.close.rawValue == "close")
+        #expect(Verb.take.rawValue == "take")
+        #expect(Verb.drop.rawValue == "drop")
+        #expect(Verb.get.rawValue == "get")
+        #expect(Verb.give.rawValue == "give")
+        #expect(Verb.put.rawValue == "put")
+        #expect(Verb.look.rawValue == "look")
+        #expect(Verb.examine.rawValue == "examine")
+        #expect(Verb.go.rawValue == "go")
+        #expect(Verb.enter.rawValue == "enter")
+        #expect(Verb.open.rawValue == "open")
+        #expect(Verb.close.rawValue == "close")
 
         // Test movement verbs
-        #expect(VerbID.climb.rawValue == "climb")
-        #expect(VerbID.jump.rawValue == "jump")
-        #expect(VerbID.run.rawValue == "run")
-        #expect(VerbID.walk.rawValue == "walk")
-        #expect(VerbID.ascend.rawValue == "ascend")
+        #expect(Verb.climb.rawValue == "climb")
+        #expect(Verb.jump.rawValue == "jump")
+        #expect(Verb.run.rawValue == "run")
+        #expect(Verb.walk.rawValue == "walk")
+        #expect(Verb.ascend.rawValue == "ascend")
 
         // Test interaction verbs
-        #expect(VerbID.push.rawValue == "push")
-        #expect(VerbID.pull.rawValue == "pull")
-        #expect(VerbID.turn.rawValue == "turn")
-        #expect(VerbID.move.rawValue == "move")
-        #expect(VerbID.lift.rawValue == "lift")
-        #expect(VerbID.touch.rawValue == "touch")
-        #expect(VerbID.feel.rawValue == "feel")
+        #expect(Verb.push.rawValue == "push")
+        #expect(Verb.pull.rawValue == "pull")
+        #expect(Verb.turn.rawValue == "turn")
+        #expect(Verb.move.rawValue == "move")
+        #expect(Verb.lift.rawValue == "lift")
+        #expect(Verb.touch.rawValue == "touch")
+        #expect(Verb.feel.rawValue == "feel")
 
         // Test light-related verbs
-        #expect(VerbID.light.rawValue == "light")
-        #expect(VerbID.burn.rawValue == "burn")
-        #expect(VerbID.extinguish.rawValue == "extinguish")
-        #expect(VerbID.ignite.rawValue == "ignite")
+        #expect(Verb.light.rawValue == "light")
+        #expect(Verb.burn.rawValue == "burn")
+        #expect(Verb.extinguish.rawValue == "extinguish")
+        #expect(Verb.ignite.rawValue == "ignite")
 
         // Test violence verbs
-        #expect(VerbID.attack.rawValue == "attack")
-        #expect(VerbID.kill.rawValue == "kill")
-        #expect(VerbID.fight.rawValue == "fight")
-        #expect(VerbID.hit.rawValue == "hit")
-        #expect(VerbID.kick.rawValue == "kick")
-        #expect(VerbID.stab.rawValue == "stab")
-        #expect(VerbID.slay.rawValue == "slay")
+        #expect(Verb.attack.rawValue == "attack")
+        #expect(Verb.kill.rawValue == "kill")
+        #expect(Verb.fight.rawValue == "fight")
+        #expect(Verb.hit.rawValue == "hit")
+        #expect(Verb.kick.rawValue == "kick")
+        #expect(Verb.stab.rawValue == "stab")
+        #expect(Verb.slay.rawValue == "slay")
 
         // Test consumption verbs
-        #expect(VerbID.eat.rawValue == "eat")
-        #expect(VerbID.drink.rawValue == "drink")
-        #expect(VerbID.taste.rawValue == "taste")
-        #expect(VerbID.consume.rawValue == "consume")
-        #expect(VerbID.devour.rawValue == "devour")
-        #expect(VerbID.bite.rawValue == "bite")
-        #expect(VerbID.chew.rawValue == "chew")
-        #expect(VerbID.chomp.rawValue == "chomp")
-        #expect(VerbID.imbibe.rawValue == "imbibe")
-        #expect(VerbID.quaff.rawValue == "quaff")
-        #expect(VerbID.sip.rawValue == "sip")
+        #expect(Verb.eat.rawValue == "eat")
+        #expect(Verb.drink.rawValue == "drink")
+        #expect(Verb.taste.rawValue == "taste")
+        #expect(Verb.consume.rawValue == "consume")
+        #expect(Verb.devour.rawValue == "devour")
+        #expect(Verb.bite.rawValue == "bite")
+        #expect(Verb.chew.rawValue == "chew")
+        #expect(Verb.chomp.rawValue == "chomp")
+        #expect(Verb.imbibe.rawValue == "imbibe")
+        #expect(Verb.quaff.rawValue == "quaff")
+        #expect(Verb.sip.rawValue == "sip")
 
         // Test communication verbs
-        #expect(VerbID.ask.rawValue == "ask")
-        #expect(VerbID.tell.rawValue == "tell")
-        #expect(VerbID.shout.rawValue == "shout")
-        #expect(VerbID.yell.rawValue == "yell")
-        #expect(VerbID.scream.rawValue == "scream")
-        #expect(VerbID.holler.rawValue == "holler")
-        #expect(VerbID.shriek.rawValue == "shriek")
+        #expect(Verb.ask.rawValue == "ask")
+        #expect(Verb.tell.rawValue == "tell")
+        #expect(Verb.shout.rawValue == "shout")
+        #expect(Verb.yell.rawValue == "yell")
+        #expect(Verb.scream.rawValue == "scream")
+        #expect(Verb.holler.rawValue == "holler")
+        #expect(Verb.shriek.rawValue == "shriek")
 
         // Test game control verbs
-        #expect(VerbID.save.rawValue == "save")
-        #expect(VerbID.restore.rawValue == "restore")
-        #expect(VerbID.restart.rawValue == "restart")
-        #expect(VerbID.quit.rawValue == "quit")
-        #expect(VerbID.score.rawValue == "score")
-        #expect(VerbID.inventory.rawValue == "inventory")
-        #expect(VerbID.help.rawValue == "help")
-        #expect(VerbID.brief.rawValue == "brief")
-        #expect(VerbID.verbose.rawValue == "verbose")
-        #expect(VerbID.script.rawValue == "script")
-        #expect(VerbID.unscript.rawValue == "unscript")
+        #expect(Verb.save.rawValue == "save")
+        #expect(Verb.restore.rawValue == "restore")
+        #expect(Verb.restart.rawValue == "restart")
+        #expect(Verb.quit.rawValue == "quit")
+        #expect(Verb.score.rawValue == "score")
+        #expect(Verb.inventory.rawValue == "inventory")
+        #expect(Verb.help.rawValue == "help")
+        #expect(Verb.brief.rawValue == "brief")
+        #expect(Verb.verbose.rawValue == "verbose")
+        #expect(Verb.script.rawValue == "script")
+        #expect(Verb.unscript.rawValue == "unscript")
 
         // Test special/magical verbs
-        #expect(VerbID.xyzzy.rawValue == "xyzzy")
+        #expect(Verb.xyzzy.rawValue == "xyzzy")
 
         // Test profanity verbs
-        #expect(VerbID.fuck.rawValue == "fuck")
-        #expect(VerbID.shit.rawValue == "shit")
-        #expect(VerbID.damn.rawValue == "damn")
-        #expect(VerbID.curse.rawValue == "curse")
-        #expect(VerbID.swear.rawValue == "swear")
+        #expect(Verb.fuck.rawValue == "fuck")
+        #expect(Verb.shit.rawValue == "shit")
+        #expect(Verb.damn.rawValue == "damn")
+        #expect(Verb.curse.rawValue == "curse")
+        #expect(Verb.swear.rawValue == "swear")
     }
 
     @Test("Throwing and manipulation verbs")
     func testThrowingAndManipulationVerbs() throws {
-        #expect(VerbID.throw.rawValue == "throw")
-        #expect(VerbID.toss.rawValue == "toss")
-        #expect(VerbID.hurl.rawValue == "hurl")
-        #expect(VerbID.chuck.rawValue == "chuck")
-        #expect(VerbID.brandish.rawValue == "brandish")
-        #expect(VerbID.wave.rawValue == "wave")
-        #expect(VerbID.shake.rawValue == "shake")
-        #expect(VerbID.rattle.rawValue == "rattle")
-        #expect(VerbID.squeeze.rawValue == "squeeze")
-        #expect(VerbID.compress.rawValue == "compress")
-        #expect(VerbID.press.rawValue == "press")
+        #expect(Verb.throw.rawValue == "throw")
+        #expect(Verb.toss.rawValue == "toss")
+        #expect(Verb.hurl.rawValue == "hurl")
+        #expect(Verb.chuck.rawValue == "chuck")
+        #expect(Verb.brandish.rawValue == "brandish")
+        #expect(Verb.wave.rawValue == "wave")
+        #expect(Verb.shake.rawValue == "shake")
+        #expect(Verb.rattle.rawValue == "rattle")
+        #expect(Verb.squeeze.rawValue == "squeeze")
+        #expect(Verb.compress.rawValue == "compress")
+        #expect(Verb.press.rawValue == "press")
     }
 
     @Test("Sensory and observation verbs")
     func testSensoryVerbs() throws {
-        #expect(VerbID.listen.rawValue == "listen")
-        #expect(VerbID.smell.rawValue == "smell")
-        #expect(VerbID.sniff.rawValue == "sniff")
-        #expect(VerbID.peek.rawValue == "peek")
-        #expect(VerbID.inspect.rawValue == "inspect")
-        #expect(VerbID.search.rawValue == "search")
-        #expect(VerbID.find.rawValue == "find")
-        #expect(VerbID.locate.rawValue == "locate")
+        #expect(Verb.listen.rawValue == "listen")
+        #expect(Verb.smell.rawValue == "smell")
+        #expect(Verb.sniff.rawValue == "sniff")
+        #expect(Verb.peek.rawValue == "peek")
+        #expect(Verb.inspect.rawValue == "inspect")
+        #expect(Verb.search.rawValue == "search")
+        #expect(Verb.find.rawValue == "find")
+        #expect(Verb.locate.rawValue == "locate")
     }
 
     @Test("Emotional and expressive verbs")
     func testEmotionalVerbs() throws {
-        #expect(VerbID.laugh.rawValue == "laugh")
-        #expect(VerbID.giggle.rawValue == "giggle")
-        #expect(VerbID.chuckle.rawValue == "chuckle")
-        #expect(VerbID.snicker.rawValue == "snicker")
-        #expect(VerbID.chortle.rawValue == "chortle")
-        #expect(VerbID.cry.rawValue == "cry")
-        #expect(VerbID.sob.rawValue == "sob")
-        #expect(VerbID.weep.rawValue == "weep")
-        #expect(VerbID.sing.rawValue == "sing")
-        #expect(VerbID.hum.rawValue == "hum")
-        #expect(VerbID.dance.rawValue == "dance")
+        #expect(Verb.laugh.rawValue == "laugh")
+        #expect(Verb.giggle.rawValue == "giggle")
+        #expect(Verb.chuckle.rawValue == "chuckle")
+        #expect(Verb.snicker.rawValue == "snicker")
+        #expect(Verb.chortle.rawValue == "chortle")
+        #expect(Verb.cry.rawValue == "cry")
+        #expect(Verb.sob.rawValue == "sob")
+        #expect(Verb.weep.rawValue == "weep")
+        #expect(Verb.sing.rawValue == "sing")
+        #expect(Verb.hum.rawValue == "hum")
+        #expect(Verb.dance.rawValue == "dance")
     }
 
     @Test("Mechanical and technical verbs")
     func testMechanicalVerbs() throws {
-        #expect(VerbID.switch.rawValue == "switch")
-        #expect(VerbID.rotate.rawValue == "rotate")
-        #expect(VerbID.twist.rawValue == "twist")
-        #expect(VerbID.set.rawValue == "set")
-        #expect(VerbID.lock.rawValue == "lock")
-        #expect(VerbID.unlock.rawValue == "unlock")
-        #expect(VerbID.fasten.rawValue == "fasten")
-        #expect(VerbID.tie.rawValue == "tie")
-        #expect(VerbID.bind.rawValue == "bind")
-        #expect(VerbID.hang.rawValue == "hang")
-        #expect(VerbID.load.rawValue == "load")
+        #expect(Verb.switch.rawValue == "switch")
+        #expect(Verb.rotate.rawValue == "rotate")
+        #expect(Verb.twist.rawValue == "twist")
+        #expect(Verb.set.rawValue == "set")
+        #expect(Verb.lock.rawValue == "lock")
+        #expect(Verb.unlock.rawValue == "unlock")
+        #expect(Verb.fasten.rawValue == "fasten")
+        #expect(Verb.tie.rawValue == "tie")
+        #expect(Verb.bind.rawValue == "bind")
+        #expect(Verb.hang.rawValue == "hang")
+        #expect(Verb.load.rawValue == "load")
     }
 
     @Test("Destructive and construction verbs")
     func testDestructiveVerbs() throws {
-        #expect(VerbID.cut.rawValue == "cut")
-        #expect(VerbID.slice.rawValue == "slice")
-        #expect(VerbID.chop.rawValue == "chop")
-        #expect(VerbID.dig.rawValue == "dig")
-        #expect(VerbID.excavate.rawValue == "excavate")
-        #expect(VerbID.prune.rawValue == "prune")
+        #expect(Verb.cut.rawValue == "cut")
+        #expect(Verb.slice.rawValue == "slice")
+        #expect(Verb.chop.rawValue == "chop")
+        #expect(Verb.dig.rawValue == "dig")
+        #expect(Verb.excavate.rawValue == "excavate")
+        #expect(Verb.prune.rawValue == "prune")
     }
 
     @Test("Liquid and container verbs")
     func testLiquidAndContainerVerbs() throws {
-        #expect(VerbID.fill.rawValue == "fill")
-        #expect(VerbID.empty.rawValue == "empty")
-        #expect(VerbID.pour.rawValue == "pour")
-        #expect(VerbID.spill.rawValue == "spill")
-        #expect(VerbID.douse.rawValue == "douse")
-        #expect(VerbID.insert.rawValue == "insert")
-        #expect(VerbID.place.rawValue == "place")
-        #expect(VerbID.remove.rawValue == "remove")
+        #expect(Verb.fill.rawValue == "fill")
+        #expect(Verb.empty.rawValue == "empty")
+        #expect(Verb.pour.rawValue == "pour")
+        #expect(Verb.spill.rawValue == "spill")
+        #expect(Verb.douse.rawValue == "douse")
+        #expect(Verb.insert.rawValue == "insert")
+        #expect(Verb.place.rawValue == "place")
+        #expect(Verb.remove.rawValue == "remove")
     }
 
     @Test("Body and physical action verbs")
     func testPhysicalActionVerbs() throws {
-        #expect(VerbID.breathe.rawValue == "breathe")
-        #expect(VerbID.blow.rawValue == "blow")
-        #expect(VerbID.puff.rawValue == "puff")
-        #expect(VerbID.kiss.rawValue == "kiss")
-        #expect(VerbID.lick.rawValue == "lick")
-        #expect(VerbID.sit.rawValue == "sit")
-        #expect(VerbID.leap.rawValue == "leap")
-        #expect(VerbID.hop.rawValue == "hop")
+        #expect(Verb.breathe.rawValue == "breathe")
+        #expect(Verb.blow.rawValue == "blow")
+        #expect(Verb.puff.rawValue == "puff")
+        #expect(Verb.kiss.rawValue == "kiss")
+        #expect(Verb.lick.rawValue == "lick")
+        #expect(Verb.sit.rawValue == "sit")
+        #expect(Verb.leap.rawValue == "leap")
+        #expect(Verb.hop.rawValue == "hop")
     }
 
     @Test("Clothing and wearable verbs")
     func testClothingVerbs() throws {
-        #expect(VerbID.wear.rawValue == "wear")
-        #expect(VerbID.don.rawValue == "don")
-        #expect(VerbID.doff.rawValue == "doff")
-        #expect(VerbID.remove.rawValue == "remove")
+        #expect(Verb.wear.rawValue == "wear")
+        #expect(Verb.don.rawValue == "don")
+        #expect(Verb.doff.rawValue == "doff")
+        #expect(Verb.remove.rawValue == "remove")
     }
 
     @Test("Maintenance and care verbs")
     func testMaintenanceVerbs() throws {
-        #expect(VerbID.clean.rawValue == "clean")
-        #expect(VerbID.polish.rawValue == "polish")
-        #expect(VerbID.rub.rawValue == "rub")
+        #expect(Verb.clean.rawValue == "clean")
+        #expect(Verb.polish.rawValue == "polish")
+        #expect(Verb.rub.rawValue == "rub")
     }
 
     @Test("Mental and cognitive verbs")
     func testMentalVerbs() throws {
-        #expect(VerbID.think.rawValue == "think")
-        #expect(VerbID.consider.rawValue == "consider")
-        #expect(VerbID.ponder.rawValue == "ponder")
+        #expect(Verb.think.rawValue == "think")
+        #expect(Verb.consider.rawValue == "consider")
+        #expect(Verb.ponder.rawValue == "ponder")
     }
 
     // MARK: - Equatable Conformance Tests
 
-    @Test("VerbID equality works correctly")
+    @Test("Verb equality works correctly")
     func testEquatableConformance() throws {
-        let verb1 = VerbID(rawValue: "take")
-        let verb2 = VerbID(rawValue: "take")
-        let verb3 = VerbID(rawValue: "drop")
+        let verb1 = Verb(rawValue: "take")
+        let verb2 = Verb(rawValue: "take")
+        let verb3 = Verb(rawValue: "drop")
 
         #expect(verb1 == verb2)
         #expect(verb1 != verb3)
         #expect(verb2 != verb3)
 
         // Test static instances
-        #expect(VerbID.take == VerbID.take)
-        #expect(VerbID.take != VerbID.drop)
+        #expect(Verb.take == Verb.take)
+        #expect(Verb.take != Verb.drop)
     }
 
-    @Test("VerbID Case Insensitivity")
+    @Test("Verb Case Insensitivity")
     func testCaseSensitivity() throws {
-        let id1: VerbID = "Take"
-        let id2: VerbID = "take"
-        let id3: VerbID = "TAKE"
+        let id1: Verb = "Take"
+        let id2: Verb = "take"
+        let id3: Verb = "TAKE"
 
         #expect(id1 == id2)
         #expect(id1 == id3)
@@ -287,23 +287,23 @@ struct VerbIDTests {
 
     // MARK: - Hashable Conformance Tests
 
-    @Test("VerbID is properly hashable")
+    @Test("Verb is properly hashable")
     func testHashableConformance() throws {
-        let verb1 = VerbID(rawValue: "take")
-        let verb2 = VerbID(rawValue: "take")
-        let verb3 = VerbID(rawValue: "drop")
+        let verb1 = Verb(rawValue: "take")
+        let verb2 = Verb(rawValue: "take")
+        let verb3 = Verb(rawValue: "drop")
 
         // Test hash consistency
         #expect(verb1.hashValue == verb2.hashValue)
 
         // Test usage in Set
-        let verbSet: Set<VerbID> = [verb1, verb2, verb3]
+        let verbSet: Set<Verb> = [verb1, verb2, verb3]
         #expect(verbSet.count == 2)  // verb1 and verb2 should be the same
         #expect(verbSet.contains(verb1))
         #expect(verbSet.contains(verb3))
 
         // Test usage as dictionary keys
-        var verbDict: [VerbID: String] = [:]
+        var verbDict: [Verb: String] = [:]
         verbDict[.take] = "to take"
         verbDict[.drop] = "to drop"
         verbDict[.give] = "to give"
@@ -314,9 +314,9 @@ struct VerbIDTests {
         #expect(verbDict.count == 3)
     }
 
-    @Test("VerbID Set Operations")
+    @Test("Verb Set Operations")
     func testSetOperations() throws {
-        let verbSet: Set<VerbID> = [
+        let verbSet: Set<Verb> = [
             "go",
             "look",
             "go", // Duplicate should be ignored
@@ -332,11 +332,11 @@ struct VerbIDTests {
 
     // MARK: - Comparable Tests
 
-    @Test("VerbID Comparability")
+    @Test("Verb Comparability")
     func testComparability() throws {
-        let id1: VerbID = "apple"
-        let id2: VerbID = "banana"
-        let id3: VerbID = "cherry"
+        let id1: Verb = "apple"
+        let id2: Verb = "banana"
+        let id3: Verb = "cherry"
 
         #expect(id1 < id2)
         #expect(id2 < id3)
@@ -345,45 +345,45 @@ struct VerbIDTests {
         #expect(!(id3 < id2))
     }
 
-    @Test("VerbID Sorting")
+    @Test("Verb Sorting")
     func testSorting() throws {
-        let unsortedIDs: [VerbID] = ["zebra", "apple", "monkey", "banana"]
+        let unsortedIDs: [Verb] = ["zebra", "apple", "monkey", "banana"]
         let sortedIDs = unsortedIDs.sorted()
 
-        let expectedOrder: [VerbID] = ["apple", "banana", "monkey", "zebra"]
+        let expectedOrder: [Verb] = ["apple", "banana", "monkey", "zebra"]
         #expect(sortedIDs == expectedOrder)
     }
 
-    @Test("VerbID Sorting with Numbers and Letters")
+    @Test("Verb Sorting with Numbers and Letters")
     func testSortingWithNumbersAndLetters() throws {
-        let unsortedIDs: [VerbID] = ["verb10", "verb2", "verb1", "verbA"]
+        let unsortedIDs: [Verb] = ["verb10", "verb2", "verb1", "verbA"]
         let sortedIDs = unsortedIDs.sorted()
 
         // String sorting: numbers come before letters, but "10" < "2" lexicographically
-        let expectedOrder: [VerbID] = ["verb1", "verb10", "verb2", "verbA"]
+        let expectedOrder: [Verb] = ["verb1", "verb10", "verb2", "verbA"]
         #expect(sortedIDs == expectedOrder)
     }
 
     // MARK: - Codable Conformance Tests
 
-    @Test("VerbID encodes and decodes correctly")
+    @Test("Verb encodes and decodes correctly")
     func testCodableConformance() throws {
         let encoder = JSONEncoder()
         let decoder = JSONDecoder()
 
-        let originalVerb = VerbID.take
+        let originalVerb = Verb.take
         let encoded = try encoder.encode(originalVerb)
-        let decoded = try decoder.decode(VerbID.self, from: encoded)
+        let decoded = try decoder.decode(Verb.self, from: encoded)
 
         #expect(decoded == originalVerb)
         #expect(decoded.rawValue == "take")
     }
 
-    @Test("VerbID encodes to expected JSON format")
+    @Test("Verb encodes to expected JSON format")
     func testJSONEncoding() throws {
         let encoder = JSONEncoder()
 
-        let takeVerb = VerbID.take
+        let takeVerb = Verb.take
         let encoded = try encoder.encode(takeVerb)
         let jsonString = String(data: encoded, encoding: .utf8)
 
@@ -391,39 +391,39 @@ struct VerbIDTests {
         #expect(jsonString?.contains("\"take\"") == true)
     }
 
-    @Test("VerbID decodes from various JSON formats")
+    @Test("Verb decodes from various JSON formats")
     func testJSONDecoding() throws {
         let decoder = JSONDecoder()
 
         // Test decoding from simple string
         let jsonData = "\"examine\"".data(using: .utf8)!
-        let decoded = try decoder.decode(VerbID.self, from: jsonData)
+        let decoded = try decoder.decode(Verb.self, from: jsonData)
         #expect(decoded.rawValue == "examine")
-        #expect(decoded == VerbID.examine)
+        #expect(decoded == Verb.examine)
     }
 
-    @Test("Multiple VerbIDs in collections")
-    func testVerbIDsInCollections() throws {
+    @Test("Multiple Verbs in collections")
+    func testVerbsInCollections() throws {
         let encoder = JSONEncoder()
         let decoder = JSONDecoder()
 
-        let verbs = [VerbID.take, VerbID.drop, VerbID.examine]
+        let verbs = [Verb.take, Verb.drop, Verb.examine]
         let encoded = try encoder.encode(verbs)
-        let decoded = try decoder.decode([VerbID].self, from: encoded)
+        let decoded = try decoder.decode([Verb].self, from: encoded)
 
         expectNoDifference(decoded, verbs)
     }
 
     // MARK: - ExpressibleByStringLiteral Tests
 
-    @Test("VerbID can be created from string literals")
+    @Test("Verb can be created from string literals")
     func testStringLiteralConformance() throws {
-        let verbID: VerbID = "customVerb"
+        let verbID: Verb = "customVerb"
         #expect(verbID.rawValue == "customVerb")
 
         // Test that static verbs work with string literal comparison
-        let takeVerb: VerbID = "take"
-        #expect(takeVerb == VerbID.take)
+        let takeVerb: Verb = "take"
+        #expect(takeVerb == Verb.take)
     }
 
     // MARK: - Static Verb Completeness Tests
@@ -431,7 +431,7 @@ struct VerbIDTests {
     @Test("All expected game control verbs are defined")
     func testGameControlVerbsCompleteness() throws {
         // Test that common IF game control verbs are available
-        let gameControlVerbs: [VerbID] = [
+        let gameControlVerbs: [Verb] = [
             .inventory, .look, .examine, .help, .quit, .save, .restore,
             .restart, .score, .brief, .verbose, .script, .unscript,
         ]
@@ -443,7 +443,7 @@ struct VerbIDTests {
 
     @Test("All expected movement verbs are defined")
     func testMovementVerbsCompleteness() throws {
-        let movementVerbs: [VerbID] = [
+        let movementVerbs: [Verb] = [
             .go, .walk, .run, .climb, .jump, .enter, .ascend,
             .travel, .proceed, .head, .stroll, .hike,
         ]
@@ -455,7 +455,7 @@ struct VerbIDTests {
 
     @Test("All expected object manipulation verbs are defined")
     func testObjectManipulationVerbsCompleteness() throws {
-        let manipulationVerbs: [VerbID] = [
+        let manipulationVerbs: [Verb] = [
             .take, .get, .grab, .drop, .put, .give, .throw, .toss,
             .push, .pull, .move, .lift, .raise, .place,
         ]
@@ -467,10 +467,10 @@ struct VerbIDTests {
 
     // MARK: - Sendable Conformance Tests
 
-    @Test("VerbID is Sendable")
+    @Test("Verb is Sendable")
     func testSendableConformance() async throws {
-        // Test that VerbID can be safely passed between actors
-        let verbID = VerbID.take
+        // Test that Verb can be safely passed between actors
+        let verbID = Verb.take
 
         await withCheckedContinuation { continuation in
             Task {
@@ -482,9 +482,9 @@ struct VerbIDTests {
 
     // MARK: - Custom String Convertible Tests
 
-    @Test("VerbID string representation")
+    @Test("Verb string representation")
     func testStringRepresentation() throws {
-        let verbID = VerbID.take
+        let verbID = Verb.take
         let description = String(describing: verbID)
 
         expectNoDifference(description, ".take")
@@ -492,29 +492,29 @@ struct VerbIDTests {
 
     // MARK: - CustomDumpStringConvertible Tests
 
-    @Test("VerbID CustomDumpStringConvertible")
+    @Test("Verb CustomDumpStringConvertible")
     func testCustomDumpStringConvertible() throws {
-        let id: VerbID = "take"
+        let id: Verb = "take"
         #expect(id.description == ".take")
     }
 
-    @Test("VerbID CustomDumpStringConvertible with Special Characters")
+    @Test("Verb CustomDumpStringConvertible with Special Characters")
     func testCustomDumpStringConvertibleWithSpecialCharacters() throws {
-        let id: VerbID = "verb_with-special.chars@123"
+        let id: Verb = "verb_with-special.chars@123"
         #expect(id.description == ".verb_with-special.chars@123")
     }
 
     // MARK: - Performance Tests
 
-    @Test("VerbID creation and comparison performance")
+    @Test("Verb creation and comparison performance")
     func testPerformance() throws {
-        // Test that VerbID operations are efficient
+        // Test that Verb operations are efficient
         let iterations = 1000
         let startTime = Date()
 
         for i in 0..<iterations {
-            let verbID = VerbID(rawValue: "test\(i)")
-            let isEqual = verbID == VerbID(rawValue: "test\(i)")
+            let verbID = Verb(rawValue: "test\(i)")
+            let isEqual = verbID == Verb(rawValue: "test\(i)")
             #expect(isEqual)
         }
 
@@ -527,19 +527,19 @@ struct VerbIDTests {
 
     // MARK: - Edge Cases Tests
 
-    @Test("VerbID Very Long String")
+    @Test("Verb Very Long String")
     func testVeryLongString() throws {
         let longString = String(repeating: "a", count: 10000)
-        let id = VerbID(longString)
+        let id = Verb(longString)
         #expect(id.rawValue == longString)
     }
 
-    @Test("VerbID Whitespace Handling")
+    @Test("Verb Whitespace Handling")
     func testWhitespaceHandling() throws {
-        let id1: VerbID = " leadingSpace"
-        let id2: VerbID = "trailingSpace "
-        let id3: VerbID = " spaces "
-        let id4: VerbID = "no\tTab\nNewline"
+        let id1: Verb = " leadingSpace"
+        let id2: Verb = "trailingSpace "
+        let id3: Verb = " spaces "
+        let id4: Verb = "no\tTab\nNewline"
 
         #expect(id1.rawValue == " leadingSpace")
         #expect(id2.rawValue == "trailingSpace ")
@@ -554,28 +554,28 @@ struct VerbIDTests {
 
     // MARK: - String Interpolation Tests
 
-    @Test("VerbID String Interpolation")
+    @Test("Verb String Interpolation")
     func testStringInterpolation() throws {
-        let id: VerbID = "take"
+        let id: Verb = "take"
         let message = "The verb is \(id)"
         #expect(message == "The verb is .take")
     }
 
     // MARK: - Array and Collection Tests
 
-    @Test("VerbID Array Operations")
+    @Test("Verb Array Operations")
     func testArrayOperations() throws {
-        var verbs: [VerbID] = [.take, .drop]
+        var verbs: [Verb] = [.take, .drop]
         verbs.append(.examine)
         verbs.insert(.look, at: 1)
 
-        let expectedVerbs: [VerbID] = [.take, .look, .drop, .examine]
+        let expectedVerbs: [Verb] = [.take, .look, .drop, .examine]
         #expect(verbs == expectedVerbs)
     }
 
-    @Test("VerbID Dictionary Keys")
+    @Test("Verb Dictionary Keys")
     func testDictionaryKeys() throws {
-        var verbDescriptions: [VerbID: String] = [:]
+        var verbDescriptions: [Verb: String] = [:]
         verbDescriptions[.take] = "Pick up an object"
         verbDescriptions[.drop] = "Put down an object"
 
@@ -586,12 +586,12 @@ struct VerbIDTests {
 
     // MARK: - Mixed Usage Tests
 
-    @Test("VerbID Mixed Literal and Constant Usage")
+    @Test("Verb Mixed Literal and Constant Usage")
     func testMixedUsage() throws {
-        let customVerb: VerbID = "customAction"
-        let standardVerb = VerbID.take
+        let customVerb: Verb = "customAction"
+        let standardVerb = Verb.take
 
-        let verbSet: Set<VerbID> = [customVerb, standardVerb, .drop, "anotherCustom"]
+        let verbSet: Set<Verb> = [customVerb, standardVerb, .drop, "anotherCustom"]
 
         #expect(verbSet.count == 4)
         #expect(verbSet.contains(customVerb))

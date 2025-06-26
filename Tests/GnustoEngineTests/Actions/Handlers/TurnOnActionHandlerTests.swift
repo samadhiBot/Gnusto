@@ -727,18 +727,18 @@ struct TurnOnActionHandlerTests {
             """)
     }
 
-    // MARK: - ActionID Testing
+    // MARK: - Intent Testing
 
-    @Test("Handler exposes correct ActionIDs")
-    func testActionIDs() async throws {
+    @Test("Handler exposes correct Intents")
+    func testIntents() async throws {
         let handler = TurnOnActionHandler()
         #expect(handler.actions.contains(.lightSource))
         #expect(handler.actions.contains(.burn))
         #expect(handler.actions.count == 2)
     }
 
-    @Test("Handler exposes correct VerbIDs")
-    func testVerbIDs() async throws {
+    @Test("Handler exposes correct Verbs")
+    func testVerbs() async throws {
         let handler = TurnOnActionHandler()
         // TurnOnActionHandler uses syntax rules, not verbs array
         #expect(handler.verbs.isEmpty)

@@ -11,9 +11,9 @@ public struct TakeActionHandler: ActionHandler {
         .match(.verb, .directObjects, .from, .indirectObject),
     ]
 
-    public let verbs: [VerbID] = [.take, .get, .grab, .steal]
+    public let verbs: [Verb] = [.take, .get, .grab, .steal]
 
-    public let actions: [ActionID] = [.take]
+    public let actions: [Intent] = [.take]
 
     public let requiresLight: Bool = true
 

@@ -11,7 +11,7 @@ public struct SingActionHandler: ActionHandler {
         .match(.verb)
     ]
 
-    public let verbs: [VerbID] = [.sing]
+    public let verbs: [Verb] = [.sing]
 
     public let requiresLight: Bool = false
 

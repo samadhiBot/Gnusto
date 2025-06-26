@@ -9,7 +9,7 @@ public struct SaveActionHandler: ActionHandler {
         .match(.verb)
     ]
 
-    public let verbs: [VerbID] = [.save]
+    public let verbs: [Verb] = [.save]
 
     public let requiresLight: Bool = false
 

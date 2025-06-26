@@ -12,7 +12,7 @@ public struct TurnOffActionHandler: ActionHandler {
         .match(.verb, .directObject),
     ]
 
-    public let verbs: [VerbID] = [.extinguish, .douse]
+    public let verbs: [Verb] = [.extinguish, .douse]
 
     public let requiresLight: Bool = true
 

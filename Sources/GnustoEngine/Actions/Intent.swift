@@ -2,14 +2,14 @@ import Foundation
 
 /// Represents conceptual actions that can be performed in the game, independent of the specific verbs used.
 ///
-/// While `VerbID` represents the specific words players can type (like "turn", "light", "extinguish"),
-/// `ActionID` represents the conceptual action being performed (like `.lightSource` or `.extinguish`).
+/// While `Verb` represents the specific words players can type (like "turn", "light", "extinguish"),
+/// `Intent` represents the conceptual action being performed (like `.lightSource` or `.extinguish`).
 /// This separation allows game logic to check for conceptual actions without worrying about the
 /// specific verb synonyms used.
 ///
 /// For example, both "LIGHT LAMP" and "TURN ON LAMP" might represent the `.lightSource` action,
 /// while "EXTINGUISH LAMP", "TURN OFF LAMP", and "DOUSE LAMP" might all represent the `.extinguish` action.
-public enum ActionID: String, CaseIterable, Sendable, Codable {
+public enum Intent: String, CaseIterable, Sendable, Codable {
     // MARK: - Movement & Navigation
 
     /// Moving from one location to another

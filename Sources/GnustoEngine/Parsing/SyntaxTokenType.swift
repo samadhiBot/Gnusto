@@ -11,8 +11,8 @@ public enum SyntaxTokenType: Sendable, Equatable, Codable {
 
     /// Expects a specific verb word (e.g., "CHARGE" in "CHARGE UP CAR").
     /// This allows syntax rules to be specific to particular verb synonyms.
-    /// The associated `VerbID` value is the specific verb that must be used.
-    case specificVerb(VerbID)
+    /// The associated `Verb` value is the specific verb that must be used.
+    case specificVerb(Verb)
 
     /// Expects a noun phrase that will be identified as the direct object of the
     /// verb (e.g., the "APPLE" in "TAKE APPLE") _or_ the object of a preposition
@@ -126,7 +126,7 @@ extension SyntaxTokenType {
     ///
     /// - Parameter verbID: The specific verb ID that must be used
     /// - Returns: A syntax token that matches only the specified verb
-    public static func verb(_ verbID: VerbID) -> SyntaxTokenType {
+    public static func verb(_ verbID: Verb) -> SyntaxTokenType {
         return .specificVerb(verbID)
     }
 }

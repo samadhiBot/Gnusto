@@ -9,7 +9,7 @@ public struct SqueezeActionHandler: ActionHandler {
         .match(.verb, .directObject)
     ]
 
-    public let verbs: [VerbID] = [.squeeze, .compress]
+    public let verbs: [Verb] = [.squeeze, .compress]
 
     public let requiresLight: Bool = true
 

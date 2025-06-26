@@ -9,7 +9,7 @@ public struct PushActionHandler: ActionHandler {
         .match(.verb, .directObjects)
     ]
 
-    public let verbs: [VerbID] = [.push, .shove]
+    public let verbs: [Verb] = [.push, .shove]
 
     public let requiresLight: Bool = true
 

@@ -10,7 +10,7 @@ public struct TellActionHandler: ActionHandler {
         .match(.verb, .directObject, .about, .indirectObject),
     ]
 
-    public let verbs: [VerbID] = [.tell, .inform]
+    public let verbs: [Verb] = [.tell, .inform]
 
     public let requiresLight: Bool = true
 

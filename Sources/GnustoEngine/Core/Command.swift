@@ -69,9 +69,9 @@ public struct Command: Equatable, Sendable {
     /// This is useful for debugging, logging, or displaying exact player input in messages.
     public let rawInput: String
 
-    /// The primary `VerbID` identified by the parser as the core action the player
+    /// The primary `Verb` identified by the parser as the core action the player
     /// intends to perform (e.g., `.take`, `.look`, `.go`).
-    public let verb: VerbID
+    public let verb: Verb
 
     // --- Initialization ---
     
@@ -81,7 +81,7 @@ public struct Command: Equatable, Sendable {
     /// interpret a player's input. Game developers typically don't create `Command` objects directly.
     ///
     /// - Parameters:
-    ///   - verb: The `VerbID` of the main action.
+    ///   - verb: The `Verb` of the main action.
     ///   - directObject: The resolved `EntityReference` for the direct object, if any.
     ///   - directObjectModifiers: Modifiers for the direct object.
     ///   - indirectObject: The resolved `EntityReference` for the indirect object, if any.
@@ -90,7 +90,7 @@ public struct Command: Equatable, Sendable {
     ///   - direction: The `Direction` specified, if any.
     ///   - rawInput: The original player input string.
     public init(
-        verb: VerbID,
+        verb: Verb,
         directObject: EntityReference? = nil,
         directObjectModifiers: [String] = [],
         indirectObject: EntityReference? = nil,
@@ -115,7 +115,7 @@ public struct Command: Equatable, Sendable {
     /// This initializer is used when parsing ALL commands or other multi-object scenarios.
     ///
     /// - Parameters:
-    ///   - verb: The `VerbID` of the main action.
+    ///   - verb: The `Verb` of the main action.
     ///   - directObjects: Array of resolved `EntityReference`s for direct objects.
     ///   - directObjectModifiers: Modifiers for the direct objects.
     ///   - indirectObjects: Array of resolved `EntityReference`s for indirect objects.
@@ -125,7 +125,7 @@ public struct Command: Equatable, Sendable {
     ///   - direction: The `Direction` specified, if any.
     ///   - rawInput: The original player input string.
     public init(
-        verb: VerbID,
+        verb: Verb,
         directObjects: [EntityReference] = [],
         directObjectModifiers: [String] = [],
         indirectObjects: [EntityReference] = [],

@@ -10,7 +10,7 @@ public struct WearActionHandler: ActionHandler {
         .match(.put, .on, .directObjects),
     ]
 
-    public let verbs: [VerbID] = [.wear, .don]
+    public let verbs: [Verb] = [.wear, .don]
 
     public let requiresLight: Bool = true
 
