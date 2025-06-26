@@ -55,107 +55,108 @@ public struct FillActionHandler: ActionHandler {
 
         // Check if container is already full
         let containerContents = await engine.items(in: .item(containerItemID))
-        if containerItem.capacity >= 0 {
-            let currentLoad = containerContents.reduce(0) { $0 + $1.size }
-            if currentLoad >= containerItem.capacity {
-                return ActionResult(
-                    engine.messenger.containerAlreadyFull(
-                        container: containerItem.withDefiniteArticle
-                    ),
-                    await engine.setFlag(.isTouched, on: containerItem),
-                    await engine.updatePronouns(to: containerItem)
-                )
-            }
-        }
+//        if containerItem.capacity >= 0 {
+//            let currentLoad = containerContents.reduce(0) { $0 + $1.size }
+//            if currentLoad >= containerItem.capacity {
+//                return ActionResult(
+//                    engine.messenger.containerAlreadyFull(
+//                        container: containerItem.withDefiniteArticle
+//                    ),
+//                    await engine.setFlag(.isTouched, on: containerItem),
+//                    await engine.updatePronouns(to: containerItem)
+//                )
+//            }
+//        }
 
         var additionalStateChanges: [StateChange] = []
 
         // Handle filling from specified source
-        if let indirectObjectRef = command.indirectObject {
-            guard case .item(let sourceItemID) = indirectObjectRef else {
-                throw ActionResponse.prerequisiteNotMet(
-                    engine.messenger.cannotFillFrom()
-                )
-            }
-
-            let sourceItem = try await engine.item(sourceItemID)
-            guard await engine.playerCanReach(sourceItemID) else {
-                throw ActionResponse.itemNotAccessible(sourceItemID)
-            }
-
-            // Mark source as touched
-            if let sourceTouchedChange = await engine.setFlag(.isTouched, on: sourceItem) {
-                additionalStateChanges.append(sourceTouchedChange)
-            }
-
-            // Check if source has liquid or is a water source
-            if sourceItem.hasFlag(.isWaterSource) {
-                // Infinite water source (well, tap, stream)
-                let message = engine.messenger.fillFromWaterSource(
-                    container: containerItem.withDefiniteArticle,
-                    source: sourceItem.withDefiniteArticle
-                )
-
-                return ActionResult(
-                    message,
-                    await engine.setFlag(.isTouched, on: containerItem),
-                    await engine.updatePronouns(to: containerItem),
-                    additionalStateChanges
-                )
-            } else if sourceItem.hasFlag(.isContainer) && sourceItem.hasFlag(.isOpen) {
-                // Fill from another container
-                let sourceContents = await engine.items(in: .item(sourceItemID))
-                let liquidItems = sourceContents.filter { $0.hasFlag(.isDrinkable) }
-
-                guard let liquid = liquidItems.first else {
-                    throw ActionResponse.prerequisiteNotMet(
-                        engine.messenger.noLiquidInContainer(
-                            container: sourceItem.withDefiniteArticle
-                        )
-                    )
-                }
-
-                // Move liquid from source to target container
-                let moveLiquidChange = await engine.move(liquid, to: .item(containerItemID))
-                additionalStateChanges.append(moveLiquidChange)
-
-                return ActionResult(
-                    engine.messenger.fillFromContainer(
-                        container: containerItem.withDefiniteArticle,
-                        source: sourceItem.withDefiniteArticle,
-                        liquid: liquid.withIndefiniteArticle
-                    ),
-                    await engine.setFlag(.isTouched, on: containerItem),
-                    await engine.updatePronouns(to: containerItem),
-                    additionalStateChanges
-                )
-            } else {
-                throw ActionResponse.prerequisiteNotMet(
-                    engine.messenger.cannotFillFromThat(
-                        source: sourceItem.withDefiniteArticle
-                    )
-                )
-            }
-        } else {
-            // No source specified - look for water sources in current location
-            let currentLocationID = await engine.playerLocationID
-            let locationItems = await engine.items(in: .location(currentLocationID))
-            let waterSources = locationItems.filter { $0.hasFlag(.isWaterSource) }
-
-            if let waterSource = waterSources.first {
-                return ActionResult(
-                    engine.messenger.fillFromWaterSource(
-                        container: containerItem.withDefiniteArticle,
-                        source: waterSource.withDefiniteArticle
-                    ),
-                    await engine.setFlag(.isTouched, on: containerItem),
-                    await engine.updatePronouns(to: containerItem)
-                )
-            } else {
-                throw ActionResponse.prerequisiteNotMet(
-                    engine.messenger.noWaterSourceAvailable()
-                )
-            }
-        }
+//        if let indirectObjectRef = command.indirectObject {
+//            guard case .item(let sourceItemID) = indirectObjectRef else {
+//                throw ActionResponse.prerequisiteNotMet(
+//                    engine.messenger.cannotFillFrom()
+//                )
+//            }
+//
+//            let sourceItem = try await engine.item(sourceItemID)
+//            guard await engine.playerCanReach(sourceItemID) else {
+//                throw ActionResponse.itemNotAccessible(sourceItemID)
+//            }
+//
+//            // Mark source as touched
+//            if let sourceTouchedChange = await engine.setFlag(.isTouched, on: sourceItem) {
+//                additionalStateChanges.append(sourceTouchedChange)
+//            }
+//
+//            // Check if source has liquid or is a water source
+//            if sourceItem.hasFlag(.isWaterSource) {
+//                // Infinite water source (well, tap, stream)
+//                let message = engine.messenger.fillFromWaterSource(
+//                    container: containerItem.withDefiniteArticle,
+//                    source: sourceItem.withDefiniteArticle
+//                )
+//
+//                return ActionResult(
+//                    message,
+//                    await engine.setFlag(.isTouched, on: containerItem),
+//                    await engine.updatePronouns(to: containerItem),
+//                    additionalStateChanges
+//                )
+//            } else if sourceItem.hasFlag(.isContainer) && sourceItem.hasFlag(.isOpen) {
+//                // Fill from another container
+//                let sourceContents = await engine.items(in: .item(sourceItemID))
+//                let liquidItems = sourceContents.filter { $0.hasFlag(.isDrinkable) }
+//
+//                guard let liquid = liquidItems.first else {
+//                    throw ActionResponse.prerequisiteNotMet(
+//                        engine.messenger.noLiquidInContainer(
+//                            container: sourceItem.withDefiniteArticle
+//                        )
+//                    )
+//                }
+//
+//                // Move liquid from source to target container
+//                let moveLiquidChange = await engine.move(liquid, to: .item(containerItemID))
+//                additionalStateChanges.append(moveLiquidChange)
+//
+//                return ActionResult(
+//                    engine.messenger.fillFromContainer(
+//                        container: containerItem.withDefiniteArticle,
+//                        source: sourceItem.withDefiniteArticle,
+//                        liquid: liquid.withIndefiniteArticle
+//                    ),
+//                    await engine.setFlag(.isTouched, on: containerItem),
+//                    await engine.updatePronouns(to: containerItem),
+//                    additionalStateChanges
+//                )
+//            } else {
+//                throw ActionResponse.prerequisiteNotMet(
+//                    engine.messenger.cannotFillFromThat(
+//                        source: sourceItem.withDefiniteArticle
+//                    )
+//                )
+//            }
+//        } else {
+//            // No source specified - look for water sources in current location
+//            let currentLocationID = await engine.playerLocationID
+//            let locationItems = await engine.items(in: .location(currentLocationID))
+//            let waterSources = locationItems.filter { $0.hasFlag(.isWaterSource) }
+//
+//            if let waterSource = waterSources.first {
+//                return ActionResult(
+//                    engine.messenger.fillFromWaterSource(
+//                        container: containerItem.withDefiniteArticle,
+//                        source: waterSource.withDefiniteArticle
+//                    ),
+//                    await engine.setFlag(.isTouched, on: containerItem),
+//                    await engine.updatePronouns(to: containerItem)
+//                )
+//            } else {
+//                throw ActionResponse.prerequisiteNotMet(
+//                    engine.messenger.noWaterSourceAvailable()
+//                )
+//            }
+//        }
+        return ActionResult("🤡 fill action handler")
     }
 }

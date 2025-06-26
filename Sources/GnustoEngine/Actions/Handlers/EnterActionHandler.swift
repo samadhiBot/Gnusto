@@ -44,9 +44,10 @@ public struct EnterActionHandler: ActionHandler {
             } else {
                 // Multiple enterable items - ask for clarification
                 throw ActionResponse.prerequisiteNotMet(
-                    engine.messenger.whichToEnter(
-                        items: enterableItems.listWithDefiniteArticles
-                    )
+                    "🤡 engine.messenger.whichToEnter"
+//                    engine.messenger.whichToEnter(
+//                        items: enterableItems.listWithDefiniteArticles
+//                    )
                 )
             }
         }
@@ -122,7 +123,7 @@ public struct EnterActionHandler: ActionHandler {
         if targetItem.hasFlag(.isContainer) && targetItem.hasFlag(.isOpen) {
             // Enter the container (move player inside)
             return ActionResult(
-                engine.messenger.enterContainer(container: targetItem.withDefiniteArticle),
+                "🤡 engine.messenger.enterContainer(container: targetItem.withDefiniteArticle)",
                 await engine.setFlag(.isTouched, on: targetItem),
                 await engine.updatePronouns(to: targetItem),
                 await engine.movePlayer(to: .item(targetItem.id))
@@ -133,7 +134,7 @@ public struct EnterActionHandler: ActionHandler {
         } else {
             // Default enter behavior - just provide a message
             return ActionResult(
-                engine.messenger.enterGeneric(item: targetItem.withDefiniteArticle),
+                "🤡 engine.messenger.enterGeneric(item: targetItem.withDefiniteArticle)",
                 await engine.setFlag(.isTouched, on: targetItem),
                 await engine.updatePronouns(to: targetItem)
             )

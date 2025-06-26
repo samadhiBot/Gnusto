@@ -39,7 +39,8 @@ public struct LaughActionHandler: ActionHandler {
             }
 
             return ActionResult(
-                engine.messenger.laughAtSomething(target: targetItem.withDefiniteArticle),
+                "🤡 engine.messenger.laughAtSomething(target: targetItem.withDefiniteArticle)",
+//                engine.messenger.laughAtSomething(target: targetItem.withDefiniteArticle),
                 await engine.setFlag(.isTouched, on: targetItem),
                 await engine.updatePronouns(to: targetItem)
             )

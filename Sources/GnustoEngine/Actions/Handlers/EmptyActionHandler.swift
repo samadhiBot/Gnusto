@@ -70,7 +70,7 @@ public struct EmptyActionHandler: ActionHandler {
                 // "EMPTY X INTO Y" syntax
                 guard case .item(let destinationItemID) = indirectObjectRef else {
                     throw ActionResponse.prerequisiteNotMet(
-                        engine.messenger.cannotEmptyIntoThat()
+                        "🤡 engine.messenger.cannotEmptyIntoThat()"
                     )
                 }
 

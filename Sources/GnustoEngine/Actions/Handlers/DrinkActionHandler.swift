@@ -42,27 +42,27 @@ public struct DrinkActionHandler: ActionHandler {
         }
 
         // Handle "drink X from Y" syntax
-        if let indirectObjectRef = command.indirectObject {
-            guard case .item(let containerID) = indirectObjectRef else {
-                throw ActionResponse.prerequisiteNotMet(
-                    engine.messenger.cannotDoThat(verb: "drink")
-                )
-            }
-
-            let container = try await engine.item(containerID)
-
-            // Verify the liquid is actually in the specified container
-            guard case .item(let actualParentID) = targetItem.parent,
-                actualParentID == containerID
-            else {
-                throw ActionResponse.prerequisiteNotMet(
-                    engine.messenger.liquidNotInContainer(
-                        liquid: targetItem.withDefiniteArticle,
-                        container: container.withDefiniteArticle
-                    )
-                )
-            }
-        }
+//        if let indirectObjectRef = command.indirectObject {
+//            guard case .item(let containerID) = indirectObjectRef else {
+//                throw ActionResponse.prerequisiteNotMet(
+//                    engine.messenger.cannotDoThat(verb: "drink")
+//                )
+//            }
+//
+//            let container = try await engine.item(containerID)
+//
+//            // Verify the liquid is actually in the specified container
+//            guard case .item(let actualParentID) = targetItem.parent,
+//                actualParentID == containerID
+//            else {
+//                throw ActionResponse.prerequisiteNotMet(
+//                    engine.messenger.liquidNotInContainer(
+//                        liquid: targetItem.withDefiniteArticle,
+//                        container: container.withDefiniteArticle
+//                    )
+//                )
+//            }
+//        }
 
         // Handle direct drinkable item
         if targetItem.hasFlag(.isDrinkable) || targetItem.hasFlag(.isEdible) {

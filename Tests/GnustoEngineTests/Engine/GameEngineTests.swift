@@ -141,8 +141,7 @@ struct GameEngineTests {
     func testEngineHandlesActionResponse() async throws {
         let mockTakeHandler = MockActionHandler(
             verbID: .take,
-            errorToThrow: .itemNotTakable("startItem"),
-            throwFrom: .process
+            errorToThrow: .itemNotTakable("startItem")
         )
         // Initialize pebble without .isTakable
         let pebble = Item(
@@ -614,7 +613,7 @@ struct GameEngineTests {
             let itemIDToModify: ItemID
             let flagToSet: String
 
-            func process(context: ActionContext) async throws -> ActionResult {
+            func process(command: Command, engine: GameEngine) async throws -> ActionResult {
                 // Use snapshot for checks
                 let item = try await engine.item(itemIDToModify)
 
@@ -1513,9 +1512,8 @@ struct GameEngineTests {
             let requiresLight: Bool = true
 
             let result: ActionResult
-            func validate(context: ActionContext) async throws { /* No validation needed */  }
-            func process(context: ActionContext) async throws -> ActionResult { result }
-            func postProcess(context: ActionContext, result: ActionResult) async throws
+            func process(command: Command, engine: GameEngine) async throws -> ActionResult { result }
+            func postProcess(command: Command, engine: GameEngine, result: ActionResult) async throws
             { /* No post-processing needed */  }
         }
 

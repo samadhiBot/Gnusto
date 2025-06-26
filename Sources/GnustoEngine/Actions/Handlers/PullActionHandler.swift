@@ -97,25 +97,26 @@ public struct PullActionHandler: ActionHandler {
         }
 
         // Generate appropriate message based on whether items are pullable
-        let message =
-            if pulledItems.isEmpty {
-                command.isAllCommand
-                    ? engine.messenger.nothingHereToPull()
-                    : engine.messenger.doWhat(verb: command.verb)
-            } else if pulledItems.count == 1 {
-                let item = pulledItems[0]
-                if item.hasFlag(.isPullable) {
-                    engine.messenger.pullSuccess(item: item.withDefiniteArticle)
-                } else {
-                    engine.messenger.cannotDoThat(
-                        verb: .pull,
-                        item: item.withDefiniteArticle
-                    )
-                }
-            } else {
-                // Multiple items - provide general response
-                engine.messenger.pullMultipleItems(items: pulledItems.listWithDefiniteArticles)
-            }
+//        let message =
+//            if pulledItems.isEmpty {
+//                command.isAllCommand
+//                    ? engine.messenger.nothingHereToPull()
+//                    : engine.messenger.doWhat(verb: command.verb)
+//            } else if pulledItems.count == 1 {
+//                let item = pulledItems[0]
+//                if item.hasFlag(.isPullable) {
+//                    engine.messenger.pullSuccess(item: item.withDefiniteArticle)
+//                } else {
+//                    engine.messenger.cannotDoThat(
+//                        verb: .pull,
+//                        item: item.withDefiniteArticle
+//                    )
+//                }
+//            } else {
+//                // Multiple items - provide general response
+//                engine.messenger.pullMultipleItems(items: pulledItems.listWithDefiniteArticles)
+//            }
+        let message = "🤡 `pull` placeholder for \(pulledItems.listWithDefiniteArticles)"
 
         return ActionResult(
             message: message,

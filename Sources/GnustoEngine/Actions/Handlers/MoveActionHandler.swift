@@ -100,24 +100,25 @@ public struct MoveActionHandler: ActionHandler {
         }
 
         // Generate appropriate message
-        let message =
-            if command.isAllCommand {
-                if movedItems.isEmpty {
-                    engine.messenger.nothingHereToMove()
-                } else {
-                    engine.messenger.moveMultipleItems(items: movedItems.listWithDefiniteArticles)
-                }
-            } else if let movedItem = movedItems.first {
-                // Check if item has special move behavior
-                if movedItem.hasFlag(.isMovable) {
-                    engine.messenger.moveSuccess(item: movedItem.withDefiniteArticle)
-                } else {
-                    // Default behavior: most things can't be meaningfully moved
-                    engine.messenger.moveNoEffect(item: movedItem.withDefiniteArticle)
-                }
-            } else {
-                engine.messenger.doWhat(verb: command.verb)
-            }
+//        let message =
+//            if command.isAllCommand {
+//                if movedItems.isEmpty {
+//                    engine.messenger.nothingHereToMove()
+//                } else {
+//                    engine.messenger.moveMultipleItems(items: movedItems.listWithDefiniteArticles)
+//                }
+//            } else if let movedItem = movedItems.first {
+//                // Check if item has special move behavior
+//                if movedItem.hasFlag(.isMovable) {
+//                    engine.messenger.moveSuccess(item: movedItem.withDefiniteArticle)
+//                } else {
+//                    // Default behavior: most things can't be meaningfully moved
+//                    engine.messenger.moveNoEffect(item: movedItem.withDefiniteArticle)
+//                }
+//            } else {
+//                engine.messenger.doWhat(verb: command.verb)
+//            }
+        let message = "🤡 `move` placeholder for \(movedItems.listWithDefiniteArticles)"
 
         return ActionResult(
             message: message,

@@ -328,13 +328,8 @@ struct SaveActionHandlerTests {
             rawInput: "save"
         )
 
-        let context = ActionContext(
-            command: command,
-            engine: engine
-        )
-
         // When/Then: Should not throw
-        try await handler.validate(context: context)
+        let result = try await handler.process(command: command, engine: engine)
     }
 
     @Test("Handler process returns correct result")
@@ -359,13 +354,8 @@ struct SaveActionHandlerTests {
             rawInput: "save"
         )
 
-        let context = ActionContext(
-            command: command,
-            engine: engine
-        )
-
         // When
-        let result = try await handler.process(context: context)
+        let result = try await handler.process(command: command, engine: engine)
 
         // Then
         #expect(result.message == "Game saved.")

@@ -3,7 +3,7 @@ import Foundation
 
 /// A mock implementation of the `ActionHandler` protocol for testing purposes.
 actor MockActionHandler: ActionHandler {
-        // MARK: - ActionHandler Protocol Properties
+    // MARK: - ActionHandler Protocol Properties
 
     nonisolated let verbID: VerbID
 
@@ -16,17 +16,10 @@ actor MockActionHandler: ActionHandler {
     // MARK: - Mock Properties
 
     /// A closure to execute when `process` is called. Allows custom logic or error throwing.
-    let processHandler: (@Sendable (ActionContext) async throws -> ActionResult)?
+    let processHandler: (@Sendable (Command, GameEngine) async throws -> ActionResult)?
 
     /// A predefined error to throw immediately when `process` (or `validate`) is called.
     let errorToThrow: ActionResponse?
-    /// Where the error should be thrown from.
-    let throwFrom: ThrowPhase
-
-    enum ThrowPhase {
-        case validate
-        case process
-    }
 
     /// A flag to record if `validate` was called.
     private(set) var validateCalled: Bool = false
@@ -41,9 +34,8 @@ actor MockActionHandler: ActionHandler {
         syntax: [SyntaxRule] = [.match(.verb, .directObject)],
         synonyms: [String] = [],
         requiresLight: Bool = true,
-        processHandler: (@Sendable (ActionContext) async throws -> ActionResult)? = nil,
-        errorToThrow: ActionResponse? = nil,
-        throwFrom: ThrowPhase = .process // Default to throwing from process
+        processHandler: (@Sendable (Command, GameEngine) async throws -> ActionResult)? = nil,
+        errorToThrow: ActionResponse? = nil
     ) {
         self.verbID = verbID
         self.syntax = syntax
@@ -51,25 +43,15 @@ actor MockActionHandler: ActionHandler {
         self.requiresLight = requiresLight
         self.processHandler = processHandler
         self.errorToThrow = errorToThrow
-        self.throwFrom = throwFrom
     }
 
-    func validate(context: ActionContext) async throws {
-        validateCalled = true
-        lastCommandReceived = command
-        if throwFrom == .validate, let error = errorToThrow {
-            throw error
-        }
-        // Otherwise, default validation passes
-    }
-
-    func process(context: ActionContext) async throws -> ActionResult {
+    func process(command: Command, engine: GameEngine) async throws -> ActionResult {
         processCalled = true
         lastCommandReceived = command
 
         if let handler = processHandler {
-            return try await handler(context)
-        } else if throwFrom == .process, let error = errorToThrow {
+            return try await handler(command, engine)
+        } else if let error = errorToThrow {
             throw error
         }
 
@@ -77,7 +59,7 @@ actor MockActionHandler: ActionHandler {
         return ActionResult("Mock action succeeded.")
     }
 
-    func postProcess(context: ActionContext, result: ActionResult) async throws {
+    func postProcess(command: Command, engine: GameEngine, result: ActionResult) async throws {
         // Implementation needed
     }
 

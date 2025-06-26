@@ -358,8 +358,8 @@ struct GameEngineSideEffectsTests {
         )
 
         // Process the action result directly (internal engine method)
-        let success = try await engine.processActionResult(actionResult)
-        #expect(success == true) // Should return true because there’s a message
+        let message = try await engine.processActionResult(actionResult)
+        #expect(message == "")
 
         // Verify side effects were processed
         let finalState = await engine.gameState

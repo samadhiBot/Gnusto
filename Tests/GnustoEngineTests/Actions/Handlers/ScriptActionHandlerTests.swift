@@ -332,13 +332,8 @@ struct ScriptActionHandlerTests {
             rawInput: "script"
         )
 
-        let context = ActionContext(
-            command: command,
-            engine: engine
-        )
-
         // When/Then: Should not throw
-        try await handler.validate(context: context)
+        let result = try await handler.process(command: command, engine: engine)
     }
 
     @Test("Handler validation fails when already scripting")
@@ -368,14 +363,9 @@ struct ScriptActionHandlerTests {
             rawInput: "script"
         )
 
-        let context = ActionContext(
-            command: command,
-            engine: engine
-        )
-
         // When/Then: Should throw
         await #expect(throws: ActionResponse.self) {
-            try await handler.validate(context: context)
+            let result = try await handler.process(command: command, engine: engine)
         }
     }
 
@@ -401,13 +391,8 @@ struct ScriptActionHandlerTests {
             rawInput: "script"
         )
 
-        let context = ActionContext(
-            command: command,
-            engine: engine
-        )
-
         // When
-        let result = try await handler.process(context: context)
+        let result = try await handler.process(command: command, engine: engine)
 
         // Then
         expectNoDifference(result.message, "")

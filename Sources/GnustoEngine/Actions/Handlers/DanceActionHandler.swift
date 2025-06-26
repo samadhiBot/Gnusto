@@ -40,7 +40,7 @@ public struct DanceActionHandler: ActionHandler {
             }
 
             return ActionResult(
-                engine.messenger.danceWithSomething(partner: targetItem.withDefiniteArticle),
+                "🤡 engine.messenger.danceWithSomething(partner: targetItem.withDefiniteArticle)",
                 await engine.setFlag(.isTouched, on: targetItem),
                 await engine.updatePronouns(to: targetItem)
             )

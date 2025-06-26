@@ -172,20 +172,7 @@ let workshopAmbience = Daemon(id: "workshopAmbience", frequency: 5) { engine in
 
 ```swift
 struct FillOutActionHandler: ActionHandler {
-    func validate(context: ActionContext) async throws {
-        guard let directObject = command.directObject,
-              case .item(let itemID) = directObject,
-              itemID == "bureaucraticForm" else {
-            throw ActionResponse.prerequisiteNotMet("Fill out what? You need the proper forms.")
-        }
-
-        let formProgress = await engine.getItemAttribute(itemID, "progress")?.toInt ?? 0
-        guard formProgress < 17 else {
-            throw ActionResponse.prerequisiteNotMet("The form is already completely filled out.")
-        }
-    }
-
-    func process(context: ActionContext) async throws -> ActionResult {
+    func process(command: Command, engine: GameEngine) async throws -> ActionResult {
         // Complex form completion logic with multiple steps
         // Each page requires different information
         return ActionResult(

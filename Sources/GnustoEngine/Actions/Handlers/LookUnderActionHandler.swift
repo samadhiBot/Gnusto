@@ -45,23 +45,24 @@ public struct LookUnderActionHandler: ActionHandler {
         }
 
         // Determine appropriate message based on object type
-        let message =
-            if targetItem.hasFlag(.isCharacter) {
-                // Looking under characters - not appropriate
-                engine.messenger.cannotLookUnderCharacter(
-                    character: targetItem.withDefiniteArticle
-                )
-            } else if targetItem.hasFlag(.isSurface) || targetItem.hasFlag(.isContainer) {
-                // Some items might have things hidden underneath
-                engine.messenger.nothingOfInterestUnder(
-                    item: targetItem.withDefiniteArticle
-                )
-            } else {
-                // Default behavior for most objects
-                engine.messenger.nothingOfInterestUnder(
-                    item: targetItem.withDefiniteArticle
-                )
-            }
+//        let message =
+//            if targetItem.hasFlag(.isCharacter) {
+//                // Looking under characters - not appropriate
+//                engine.messenger.cannotLookUnderCharacter(
+//                    character: targetItem.withDefiniteArticle
+//                )
+//            } else if targetItem.hasFlag(.isSurface) || targetItem.hasFlag(.isContainer) {
+//                // Some items might have things hidden underneath
+//                engine.messenger.nothingOfInterestUnder(
+//                    item: targetItem.withDefiniteArticle
+//                )
+//            } else {
+//                // Default behavior for most objects
+//                engine.messenger.nothingOfInterestUnder(
+//                    item: targetItem.withDefiniteArticle
+//                )
+//            }
+        let message = "🤡 `look under` placeholder for \(targetItem)"
 
         return ActionResult(
             message,

@@ -44,6 +44,7 @@ public struct LookInsideActionHandler: ActionHandler {
 
         // Determine the message based on whether item is a container
         let message: String
+        /*
         if targetItem.hasFlag(.isContainer) {
             // For containers, provide container-specific messaging
             let isOpen = try await engine.hasFlag(.isOpen, on: targetItem.id)
@@ -97,6 +98,8 @@ public struct LookInsideActionHandler: ActionHandler {
                 )
             }
         }
+         */
+        message = "🤡 `look inside` placeholder for \(targetItem)"
 
         return ActionResult(
             message,

@@ -59,46 +59,46 @@ public struct TurnActionHandler: ActionHandler {
         }
 
         // Determine appropriate response based on object type
-        let message =
-            if targetItem.hasFlag(.isCharacter) {
-                // Can't turn characters
-                engine.messenger.turnCharacter(character: targetItem.withDefiniteArticle)
-            } else if targetItem.hasFlag(.isKey) {
-                // Keys need to be used with something
-                engine.messenger.turnKey(item: targetItem.withDefiniteArticle)
-            } else if targetItem.hasFlag(.isDial) {
-                // Dials click into position
-                if let setting = settingDescription {
-                    engine.messenger.turnDialTo(
-                        dial: targetItem.withDefiniteArticle,
-                        setting: setting
-                    )
-                } else {
-                    engine.messenger.turnDial(item: targetItem.withDefiniteArticle)
-                }
-            } else if targetItem.hasFlag(.isKnob) {
-                // Knobs click into position
-                if let setting = settingDescription {
-                    engine.messenger.turnKnobTo(
-                        knob: targetItem.withDefiniteArticle,
-                        setting: setting
-                    )
-                } else {
-                    engine.messenger.turnKnob(item: targetItem.withDefiniteArticle)
-                }
-            } else if targetItem.hasFlag(.isWheel) {
-                // Wheels rotate with effort
-                engine.messenger.turnWheel(item: targetItem.withDefiniteArticle)
-            } else if targetItem.hasFlag(.isHandle) {
-                // Handles move with grinding sound
-                engine.messenger.turnHandle(item: targetItem.withDefiniteArticle)
-            } else if targetItem.hasFlag(.isTakable) {
-                // Regular takable objects can be turned in hands
-                engine.messenger.turnRegularObject(item: targetItem.withDefiniteArticle)
-            } else {
-                // Fixed objects can't be turned
-                engine.messenger.turnFixedObject(item: targetItem.withDefiniteArticle)
-            }
+        let message = "🤡 `turn` placeholder for \(targetItemID)"
+//            if targetItem.hasFlag(.isCharacter) {
+//                // Can't turn characters
+//                engine.messenger.turnCharacter(character: targetItem.withDefiniteArticle)
+//            } else if targetItem.hasFlag(.isKey) {
+//                // Keys need to be used with something
+//                engine.messenger.turnKey(item: targetItem.withDefiniteArticle)
+//            } else if targetItem.hasFlag(.isDial) {
+//                // Dials click into position
+//                if let setting = settingDescription {
+//                    engine.messenger.turnDialTo(
+//                        dial: targetItem.withDefiniteArticle,
+//                        setting: setting
+//                    )
+//                } else {
+//                    engine.messenger.turnDial(item: targetItem.withDefiniteArticle)
+//                }
+//            } else if targetItem.hasFlag(.isKnob) {
+//                // Knobs click into position
+//                if let setting = settingDescription {
+//                    engine.messenger.turnKnobTo(
+//                        knob: targetItem.withDefiniteArticle,
+//                        setting: setting
+//                    )
+//                } else {
+//                    engine.messenger.turnKnob(item: targetItem.withDefiniteArticle)
+//                }
+//            } else if targetItem.hasFlag(.isWheel) {
+//                // Wheels rotate with effort
+//                engine.messenger.turnWheel(item: targetItem.withDefiniteArticle)
+//            } else if targetItem.hasFlag(.isHandle) {
+//                // Handles move with grinding sound
+//                engine.messenger.turnHandle(item: targetItem.withDefiniteArticle)
+//            } else if targetItem.hasFlag(.isTakable) {
+//                // Regular takable objects can be turned in hands
+//                engine.messenger.turnRegularObject(item: targetItem.withDefiniteArticle)
+//            } else {
+//                // Fixed objects can't be turned
+//                engine.messenger.turnFixedObject(item: targetItem.withDefiniteArticle)
+//            }
 
         return ActionResult(
             message,

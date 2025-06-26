@@ -39,7 +39,7 @@ public struct YellActionHandler: ActionHandler {
             }
 
             return ActionResult(
-                engine.messenger.yellAtSomething(target: targetItem.withDefiniteArticle),
+                "🤡 engine.messenger.yellAtSomething(target: targetItem.withDefiniteArticle)",
                 await engine.setFlag(.isTouched, on: targetItem),
                 await engine.updatePronouns(to: targetItem)
             )

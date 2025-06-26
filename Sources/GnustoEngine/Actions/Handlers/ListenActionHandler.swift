@@ -41,7 +41,7 @@ public struct ListenActionHandler: ActionHandler {
             }
 
             return ActionResult(
-                engine.messenger.listenToSomething(target: targetItem.withDefiniteArticle),
+                "🤡 engine.messenger.listenToSomething(target: targetItem.withDefiniteArticle)",
                 await engine.setFlag(.isTouched, on: targetItem),
                 await engine.updatePronouns(to: targetItem)
             )
