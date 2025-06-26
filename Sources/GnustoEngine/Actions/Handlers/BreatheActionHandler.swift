@@ -37,7 +37,9 @@ public struct BreatheActionHandler: ActionHandler {
             }
 
             return ActionResult(
-                engine.messenger.breatheOnSomething(target: targetItem.withDefiniteArticle),
+                engine.messenger.breatheOnResponse(
+                    item: targetItem.withDefiniteArticle
+                ),
                 await engine.setFlag(.isTouched, on: targetItem),
                 await engine.updatePronouns(to: targetItem)
             )

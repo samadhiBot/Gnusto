@@ -186,6 +186,27 @@ open class MessageProvider: @unchecked Sendable {
         )
     }
 
+    open func breatheOnResponse(item: String) -> String {
+        output(
+            "breatheOnResponse(item: '\(item)')",
+            oneOf(
+                "You breathe on \(item) with the focus of someone who understands the power of proximity.",
+                "You exhale toward \(item) with a commitment to sharing your personal atmosphere.",
+                "You breathe on \(item) in an intimate manner that really makes an impression.",
+                "You direct your breath at \(item) with full confidence in your respiratory technique.",
+                "You exhale on \(item) with the authenticity of someone unafraid to get close.",
+                "You breathe on \(item) with refreshing directness in your interpersonal methodology.",
+                "You exhale on \(item) with an unshakable faith in the communicative power of respiration.",
+                "You breathe on \(item) with the fearless intimacy of someone who shares everything.",
+                "You direct your breath at \(item) with true dedication to atmospheric connection.",
+                "You exhale toward \(item) with a closeness that transcends conventional boundaries.",
+                "You breathe on \(item) with refreshing honesty about your breathing priorities.",
+                "You direct your breath at \(item), demonstrating your belief in direct engagement.",
+                "You exhale on \(item), showing your commitment to full sensory interaction.",
+            )
+        )
+    }
+
     open func breatheResponse() -> String {
         output(
             "breatheResponse()",
@@ -1618,31 +1639,10 @@ open class MessageProvider: @unchecked Sendable {
         )
     }
 
-    open func rubCleanItem(item: String) -> String {
-        output(
-            "rubCleanItem(item: '\(item)')",
-            "You rub \(item). It feels smooth to the touch."
-        )
-    }
-
     open func rubGenericObject(item: String) -> String {
         output(
             "rubGenericObject(item: '\(item)')",
             "You rub \(item), but nothing interesting happens."
-        )
-    }
-
-    open func rubLamp(item: String) -> String {
-        output(
-            "rubLamp(item: '\(item)')",
-            "Rubbing \(item) doesn't seem to do anything. No djinn appears."
-        )
-    }
-
-    open func rubTakableObject(item: String) -> String {
-        output(
-            "rubTakableObject(item: '\(item)')",
-            "You rub \(item). It feels smooth to the touch."
         )
     }
 
@@ -1853,10 +1853,10 @@ open class MessageProvider: @unchecked Sendable {
         )
     }
 
-    open func tastesAverage() -> String {
+    open func tastesAverage(item: String) -> String {
         output(
-            "tastesAverage()",
-            "That tastes about average."
+            "tastesAverage(item: '\(item)')",
+            "\(item.capitalizedFirst) tastes about average."
         )
     }
 

@@ -19,23 +19,22 @@ public struct TieActionHandler: ActionHandler {
 
     public init() {}
 
-    /// Validates the "TIE" command.
+    /// Processes the "TIE" command.
     ///
-    /// This method ensures that:
-    /// 1. A direct object is specified (what to tie).
-    /// 2. If an indirect object is specified, it exists and is reachable.
-    /// 3. The target items exist and are reachable.
+    /// Handles tying attempts on different types of objects.
+    /// Can tie objects together or just tie objects in general.
     ///
-    /// - Parameter context: The `ActionContext` for the current action.
-    /// - Throws: Various `ActionResponse` errors if validation fails.
+    /// - Parameter command: The command being processed.
+    /// - Parameter engine: The game engine.
+    /// - Returns: An `ActionResult` with appropriate tying message and state changes.
     public func process(command: Command, engine: GameEngine) async throws -> ActionResult {
-
         // Tie requires a direct object (what to tie)
         guard let directObjectRef = command.directObject else {
             throw ActionResponse.prerequisiteNotMet(
                 engine.messenger.doWhat(verb: command.verb)
             )
         }
+
         guard case .item(let targetItemID) = directObjectRef else {
             throw ActionResponse.prerequisiteNotMet(
                 engine.messenger.tieCannotTieThat()
@@ -43,7 +42,8 @@ public struct TieActionHandler: ActionHandler {
         }
 
         // Check if target exists and is reachable
-        _ = try await engine.item(targetItemID)
+        let targetItem = try await engine.item(targetItemID)
+
         guard await engine.playerCanReach(targetItemID) else {
             throw ActionResponse.itemNotAccessible(targetItemID)
         }
@@ -56,59 +56,48 @@ public struct TieActionHandler: ActionHandler {
                 )
             }
 
-            _ = try await engine.item(indirectItemID)
+            let indirectItem = try await engine.item(indirectItemID)
+
             guard await engine.playerCanReach(indirectItemID) else {
                 throw ActionResponse.itemNotAccessible(indirectItemID)
             }
-        }
-    /// Processes the "TIE" command.
-    ///
-    /// Handles tying attempts on different types of objects.
-    /// Can tie objects together or just tie objects in general.
-    ///
-    /// - Parameter context: The `ActionContext` for the current action.
-    /// - Returns: An `ActionResult` with appropriate tying message and state changes.
-        guard let directObjectRef = command.directObject,
-            case .item(let targetItemID) = directObjectRef
-        else {
-            throw ActionResponse.internalEngineError(
-                "TieActionHandler: directObject was not an item in process.")
-        }
 
-        let targetItem = try await engine.item(targetItemID)
-
-        if let indirectObjectRef = command.indirectObject,
-            case .item(let indirectItemID) = indirectObjectRef
-        {
             // Tie X to Y
-            let indirectItem = try await engine.item(indirectItemID)
+            let message = await handleTyingTogether(
+                targetItem: targetItem,
+                indirectItem: indirectItem,
+                engine: engine
+            )
 
             return ActionResult(
-                try await handleTyingTogether(
-                    targetItem: targetItem,
-                    indirectItem: indirectItem,
-                    context: context
-                ),
+                message,
                 await engine.setFlag(.isTouched, on: targetItem),
                 await engine.updatePronouns(to: targetItem),
                 await engine.setFlag(.isTouched, on: indirectItem)
             )
         } else {
             // Just "TIE X" - tie the object by itself
+            let message = await handleTyingAlone(
+                targetItem: targetItem,
+                engine: engine
+            )
+
             return ActionResult(
-                handleTyingAlone(targetItem: targetItem, context: context),
+                message,
                 await engine.setFlag(.isTouched, on: targetItem),
                 await engine.updatePronouns(to: targetItem)
             )
         }
     }
 
+    // MARK: - Private Helper Methods
+
     /// Handles tying two objects together.
     private func handleTyingTogether(
         targetItem: Item,
         indirectItem: Item,
-        context: ActionContext
-    ) async throws -> String {
+        engine: GameEngine
+    ) async -> String {
         // Check if we're trying to tie something to itself
         if targetItem.id == indirectItem.id {
             return engine.messenger.tieCannotTieToSelf(item: targetItem.name)
@@ -125,8 +114,8 @@ public struct TieActionHandler: ActionHandler {
     /// Handles tying a single object.
     private func handleTyingAlone(
         targetItem: Item,
-        context: ActionContext
-    ) -> String {
+        engine: GameEngine
+    ) async -> String {
         if targetItem.hasFlag(.isCharacter) {
             return engine.messenger.tieNeedsSomethingToTieCharacterWith(
                 character: targetItem.name
@@ -139,14 +128,5 @@ public struct TieActionHandler: ActionHandler {
                 item: targetItem.name
             )
         }
-    }
-
-    /// Performs any post-processing after the tie action completes.
-    ///
-    /// Currently no post-processing is needed for basic tying.
-    ///
-    /// - Parameter context: The action context for the current action.
-    public func postProcess(context: ActionContext) async throws {
-        // No post-processing needed for tie
     }
 }

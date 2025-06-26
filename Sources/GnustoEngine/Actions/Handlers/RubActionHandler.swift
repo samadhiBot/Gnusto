@@ -67,16 +67,9 @@ public struct RubActionHandler: ActionHandler {
         let message =
             if targetItem.hasFlag(.isCharacter) {
                 // Rubbing characters might not be appropriate
-                engine.messenger.rubCharacter(character: targetItem.withDefiniteArticle)
-            } else if targetItem.hasFlag(.isLightSource) {
-                // Special message for light sources (lamps, lanterns) - might have magical effects
-                engine.messenger.rubLamp(item: targetItem.withDefiniteArticle)
-            } else if targetItem.hasFlag(.isPolishable) {
-                // Items that can be meaningfully polished
-                engine.messenger.rubPolishableItem(item: targetItem.withDefiniteArticle)
-            } else if targetItem.hasFlag(.isTakable) {
-                // Message for a generic takable object
-                engine.messenger.rubTakableObject(item: targetItem.withDefiniteArticle)
+                engine.messenger.rubCharacter(
+                    character: targetItem.withDefiniteArticle
+                )
             } else {
                 // Generic rubbing response for objects
                 engine.messenger.rubGenericObject(item: targetItem.withDefiniteArticle)
@@ -85,8 +78,7 @@ public struct RubActionHandler: ActionHandler {
         return ActionResult(
             message,
             await engine.setFlag(.isTouched, on: targetItem),
-            await engine.updatePronouns(to: targetItem),
-            additionalStateChanges
+            await engine.updatePronouns(to: targetItem)
         )
     }
 }

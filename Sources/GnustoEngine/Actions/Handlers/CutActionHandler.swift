@@ -21,23 +21,25 @@ public struct CutActionHandler: ActionHandler {
 
     public init() {}
 
-    /// Validates the "CUT" command.
+    /// Processes the "CUT" command.
     ///
-    /// This method ensures that:
-    /// 1. A direct object is specified (what to cut).
-    /// 2. The target item exists and is reachable.
-    /// 3. If a cutting tool is specified, it exists and is held.
+    /// Handles cutting attempts with different tools:
+    /// - Sharp weapons (knives, swords)
+    /// - Tools (axes, saws)
+    /// - Inappropriate implements
+    /// - Bare hands
     ///
-    /// - Parameter context: The `ActionContext` for the current action.
-    /// - Throws: Various `ActionResponse` errors if validation fails.
+    /// - Parameter command: The command being processed.
+    /// - Parameter engine: The game engine.
+    /// - Returns: An `ActionResult` with appropriate cutting message and state changes.
     public func process(command: Command, engine: GameEngine) async throws -> ActionResult {
-
         // Cut requires a direct object (what to cut)
         guard let directObjectRef = command.directObject else {
             throw ActionResponse.prerequisiteNotMet(
                 engine.messenger.doWhat(verb: command.verb)
             )
         }
+
         guard case .item(let targetItemID) = directObjectRef else {
             throw ActionResponse.prerequisiteNotMet(
                 engine.messenger.cannotDoThat(verb: "cut")
@@ -45,7 +47,8 @@ public struct CutActionHandler: ActionHandler {
         }
 
         // Check if target exists and is reachable
-        _ = try await engine.item(targetItemID)
+        let targetItem = try await engine.item(targetItemID)
+
         guard await engine.playerCanReach(targetItemID) else {
             throw ActionResponse.itemNotAccessible(targetItemID)
         }
@@ -63,35 +66,13 @@ public struct CutActionHandler: ActionHandler {
                 throw ActionResponse.itemNotHeld(toolItemID)
             }
         }
-    /// Processes the "CUT" command.
-    ///
-    /// Handles cutting attempts with different tools:
-    /// - Sharp weapons (knives, swords)
-    /// - Tools (axes, saws)
-    /// - Inappropriate implements
-    /// - Bare hands
-    ///
-    /// - Parameter context: The `ActionContext` for the current action.
-    /// - Returns: An `ActionResult` with appropriate cutting message and state changes.
-        guard let directObjectRef = command.directObject,
-            case .item(let targetItemID) = directObjectRef
-        else {
-            let message = engine.messenger.actionHandlerInternalError(
-                handler: "CutActionHandler",
-                details: "directObject was not an item in process"
-            )
-            throw ActionResponse.internalEngineError(message)
-        }
 
-        let targetItem = try await engine.item(targetItemID)
-
-        // Determine cutting implement
+        // Determine cutting implement and generate appropriate message
         let message: String
 
         if let indirectObjectRef = command.indirectObject,
             case .item(let toolItemID) = indirectObjectRef
         {
-
             let toolItem = try await engine.item(toolItemID)
 
             if toolItem.hasFlag(.isWeapon) || toolItem.hasFlag(.isTool) {
@@ -106,7 +87,6 @@ public struct CutActionHandler: ActionHandler {
                     tool: toolItem.withDefiniteArticle.capitalizedFirst
                 )
             }
-
         } else {
             // No tool specified - check if player has cutting implements
             let playerInventory = await engine.playerInventory
@@ -131,15 +111,5 @@ public struct CutActionHandler: ActionHandler {
             await engine.setFlag(.isTouched, on: targetItem),
             await engine.updatePronouns(to: targetItem)
         )
-    }
-
-    /// Performs any post-processing after the "CUT" command.
-    ///
-    /// Currently no post-processing is needed for basic cutting.
-    ///
-    /// - Parameter context: The processed `ActionContext`.
-    /// - Returns: The context unchanged.
-    public func postProcess(context: ActionContext) async -> ActionContext {
-        return context
     }
 }

@@ -700,19 +700,18 @@ extension GameEngine {
     /// - Parameter command: The command to find a handler for
     /// - Returns: The action handler that can process this command, or nil if none found
     private func findActionHandler(for command: Command) -> ActionHandler? {
-        for handler in actionHandlers {
-            // Check if this handler can handle this verb (if it specifies verbs)
-            if !handler.verbs.isEmpty && handler.verbs.contains(command.verb) {
-                return handler
-            }
+        var bestHandler: ActionHandler?
+        var bestScore = 0
 
-            // For handlers with empty verbs, check if any syntax rules could match this command
-            if handler.verbs.isEmpty && couldHandlerMatchCommand(handler, command) {
-                return handler
+        for handler in actionHandlers {
+            let score = scoreHandlerForCommand(handler: handler, command: command)
+            if score > bestScore {
+                bestScore = score
+                bestHandler = handler
             }
         }
 
-        return nil
+        return bestHandler
     }
 
     /// Finds action handlers that represent a specific conceptual action.
@@ -747,6 +746,61 @@ extension GameEngine {
         return handler.actions.contains(actionID)
     }
 
+    /// Scores how well an action handler matches a command.
+    ///
+    /// Returns a score where higher numbers indicate better matches:
+    /// - 0: No match (handler cannot process this command)
+    /// - 100-199: Basic verb match (handler.verbs contains command.verb)
+    /// - 200-299: Specific verb match (.specificVerb matches exactly)
+    /// - +10: Required direct object is present
+    /// - +10: Required indirect object is present
+    /// - +20: Required particle matches exactly
+    /// - +5: Handler has syntax rules (more structured than verb-only)
+    ///
+    /// - Parameters:
+    ///   - handler: The action handler to score
+    ///   - command: The command to match against
+    /// - Returns: Score (0 means no match, higher is better)
+    private func scoreHandlerForCommand(handler: ActionHandler, command: Command) -> Int {
+        var score = 0
+        var hasMatchingSyntaxRule = false
+
+        // Check verb-based matching first
+        if !handler.verbs.isEmpty {
+            if handler.verbs.contains(command.verb) {
+                score = 100  // Base score for verb match
+            } else {
+                return 0  // Handler specifies verbs but none match
+            }
+        }
+
+        // Check syntax rule matching
+        if !handler.syntax.isEmpty {
+            // Handler has syntax rules, check if any match
+            for syntaxRule in handler.syntax {
+                let ruleScore = scoreSyntaxRuleForCommand(syntaxRule: syntaxRule, command: command)
+                if ruleScore > 0 {
+                    hasMatchingSyntaxRule = true
+                    score = max(score, ruleScore)
+                    break  // Take the best matching rule
+                }
+            }
+
+            // If handler has syntax rules but none match, it can't handle this command
+            if !hasMatchingSyntaxRule {
+                return 0
+            }
+
+            // Bonus for having structured syntax rules vs just verb matching
+            score += 5
+        } else if handler.verbs.isEmpty {
+            // Handler has no verbs AND no syntax rules - can't match anything
+            return 0
+        }
+
+        return score
+    }
+
     /// Checks if a handler's syntax rules could potentially match a command.
     ///
     /// This performs a basic compatibility check focusing on verb-specific patterns.
@@ -758,12 +812,85 @@ extension GameEngine {
     ///   - command: The command to match against
     /// - Returns: True if the handler could potentially process this command
     private func couldHandlerMatchCommand(_ handler: ActionHandler, _ command: Command) -> Bool {
-        for syntaxRule in handler.syntax {
-            if couldSyntaxRuleMatchCommand(syntaxRule, command) {
-                return true
+        return scoreHandlerForCommand(handler: handler, command: command) > 0
+    }
+
+    /// Scores how well a syntax rule matches a command.
+    ///
+    /// Returns a score where higher numbers indicate better matches:
+    /// - 0: No match (rule cannot process this command)
+    /// - 200: Specific verb match (.specificVerb matches exactly)
+    /// - 100: Generic verb match (.verb token present)
+    /// - +10: Required direct object is present when needed
+    /// - +10: Required indirect object is present when needed
+    /// - +20: Required particle matches exactly
+    ///
+    /// - Parameters:
+    ///   - syntaxRule: The syntax rule to score
+    ///   - command: The command to match against
+    /// - Returns: Score (0 means no match, higher is better)
+    private func scoreSyntaxRuleForCommand(syntaxRule: SyntaxRule, command: Command) -> Int {
+        var score = 0
+        var hasVerbToken = false
+
+        for token in syntaxRule.pattern {
+            switch token {
+            case .specificVerb(let requiredVerbID):
+                // Specific verb requirement - must match exactly
+                if command.verb == requiredVerbID {
+                    score = 200  // High score for specific verb match
+                    hasVerbToken = true
+                } else {
+                    return 0  // Specific verb doesn't match - rule fails
+                }
+
+            case .verb:
+                // Generic verb token - any verb can match
+                score = max(score, 100)
+                hasVerbToken = true
+
+            case .directObject, .directObjects:
+                // Rule requires direct object(s)
+                if !command.directObjects.isEmpty {
+                    score += 10  // Bonus for having required direct object
+                } else {
+                    return 0  // Rule requires direct object but command has none
+                }
+
+            case .indirectObject, .indirectObjects:
+                // Rule requires indirect object(s)
+                if !command.indirectObjects.isEmpty {
+                    score += 10  // Bonus for having required indirect object
+                } else {
+                    return 0  // Rule requires indirect object but command has none
+                }
+
+            case .particle(let requiredParticle):
+                // Rule requires specific particle/preposition
+                if let commandPreposition = command.preposition,
+                    commandPreposition.lowercased() == requiredParticle.lowercased()
+                {
+                    score += 20  // High bonus for exact particle match
+                } else {
+                    return 0  // Required particle doesn't match - rule fails
+                }
+
+            case .direction:
+                // Rule expects direction
+                if command.direction != nil {
+                    score += 10  // Bonus for having direction when expected
+                } else {
+                    return 0  // Rule requires direction but command has none
+                }
             }
         }
-        return false
+
+        // Rule must have some verb token to be valid
+        if !hasVerbToken {
+            return 0
+        }
+
+        return score
     }
 
     /// Checks if a specific syntax rule could match a command.
@@ -777,29 +904,7 @@ extension GameEngine {
     ///   - command: The command to match against
     /// - Returns: True if the syntax rule could match this command
     private func couldSyntaxRuleMatchCommand(_ syntaxRule: SyntaxRule, _ command: Command) -> Bool {
-        // Look for specificVerb requirements in the pattern
-        for token in syntaxRule.pattern {
-            switch token {
-            case .specificVerb(let requiredVerbID):
-                // If this pattern requires a specific verb, check if command matches
-                if command.verb != requiredVerbID {
-                    return false  // Command verb doesn't match required verb
-                }
-            case .verb:
-                // Generic .verb token would be handled by verb-based handlers
-                // Syntax-only handlers shouldn't have generic .verb tokens
-                continue
-            default:
-                // Other tokens (directObject, particles, etc.) would need more sophisticated
-                // matching logic, but for now we'll assume they could match
-                continue
-            }
-        }
-
-        // If we get here, either:
-        // 1. All specificVerb requirements were satisfied, or
-        // 2. There were no specificVerb requirements
-        return true
+        return scoreSyntaxRuleForCommand(syntaxRule: syntaxRule, command: command) > 0
     }
     /// Executes a parsed game command, orchestrating calls to event handlers and action handlers.
     ///
@@ -843,8 +948,7 @@ extension GameEngine {
         let wasLitBeforeCommand = await playerLocationIsLit()
 
         // --- Room BeforeTurn Hook ---
-        let currentLocationID = playerLocationID
-        if let locationHandler = locationEventHandlers[currentLocationID] {
+        if let locationHandler = locationEventHandlers[locationBeforeCommand] {
             do {
                 // Call handler, pass command using correct enum case syntax
                 if let result = try await locationHandler.handle(self, .beforeTurn(command)) {
@@ -1018,11 +1122,11 @@ extension GameEngine {
 
         // 1. Check Direct Object AfterTurn Handler (singular)
         if case .item(let doItemID) = command.directObject,
-           let itemHandler = itemEventHandlers[doItemID]
+            let itemHandler = itemEventHandlers[doItemID]
         {
             do {
                 if let result = try await itemHandler.handle(self, .afterTurn(command)),
-                   let message = try await processActionResult(result)
+                    let message = try await processActionResult(result)
                 {
                     await ioHandler.print(message)
                     return
@@ -1045,7 +1149,7 @@ extension GameEngine {
 
                 do {
                     if let result = try await itemHandler.handle(self, .afterTurn(command)),
-                       let message = try await processActionResult(result)
+                        let message = try await processActionResult(result)
                     {
                         await ioHandler.print(message)
                         return
@@ -1060,11 +1164,11 @@ extension GameEngine {
 
         // 2. Check Indirect Object AfterTurn Handler
         if case .item(let ioItemID) = command.indirectObject,
-           let itemHandler = itemEventHandlers[ioItemID]
+            let itemHandler = itemEventHandlers[ioItemID]
         {
             do {
                 if let result = try await itemHandler.handle(self, .afterTurn(command)),
-                   let message = try await processActionResult(result)
+                    let message = try await processActionResult(result)
                 {
                     await ioHandler.print(message)
                     return
@@ -1076,11 +1180,11 @@ extension GameEngine {
         }
 
         // --- Room AfterTurn Hook ---
-        if let locationHandler = locationEventHandlers[currentLocationID] {
+        if let locationHandler = locationEventHandlers[locationBeforeCommand] {
             do {
                 // Call handler, ignore return value, use correct enum case syntax
                 if let result = try await locationHandler.handle(self, .afterTurn(command)),
-                   let message = try await processActionResult(result)
+                    let message = try await processActionResult(result)
                 {
                     await ioHandler.print(message)
                     return
@@ -1219,7 +1323,8 @@ extension GameEngine {
         switch change.attribute {
         case .itemAttribute(let key):
             guard
-                case .item(let itemID) = change.entityID else {
+                case .item(let itemID) = change.entityID
+            else {
                 throw ActionResponse.internalEngineError(
                     "Invalid entity ID for itemAttribute: expected .item"
                 )
@@ -1241,7 +1346,8 @@ extension GameEngine {
 
         case .locationAttribute(let key):
             guard
-                case .location(let locationID) = change.entityID else {
+                case .location(let locationID) = change.entityID
+            else {
                 throw ActionResponse.internalEngineError(
                     "Invalid entity ID for locationAttribute: expected .location"
                 )

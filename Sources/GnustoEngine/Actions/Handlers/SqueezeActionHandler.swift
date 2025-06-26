@@ -46,9 +46,6 @@ public struct SqueezeActionHandler: ActionHandler {
             if targetItem.hasFlag(.isCharacter) {
                 // Squeezing characters - not advisable
                 engine.messenger.squeezeCharacter(character: targetItem.withDefiniteArticle)
-            } else if targetItem.hasFlag(.isSoft) || targetItem.hasFlag(.isFlexible) {
-                // Items that can be meaningfully squeezed
-                engine.messenger.squeezeSuccess(item: targetItem.withDefiniteArticle)
             } else {
                 // Generic squeezing response for objects
                 engine.messenger.squeezeItem(item: targetItem.withDefiniteArticle)

@@ -21,21 +21,6 @@ public struct FindActionHandler: ActionHandler {
 
     public init() {}
 
-    /// Validates the find command.
-    ///
-    /// Unlike most commands, FIND is more permissive - it can reference objects
-    /// that aren't currently visible, as the purpose is to ask about their location.
-    /// We only require that a direct object was specified.
-    ///
-    /// - Parameter context: The action context containing the command and engine.
-    /// - Throws: `ActionError` if no direct object is specified.
-    public func process(command: Command, engine: GameEngine) async throws -> ActionResult {
-
-        guard command.directObject != nil else {
-            throw ActionResponse.prerequisiteNotMet(
-                engine.messenger.doWhat(verb: command.verb)
-            )
-        }
     /// Processes the "FIND" command.
     ///
     /// This action provides different responses based on the target object's state:
@@ -44,11 +29,17 @@ public struct FindActionHandler: ActionHandler {
     /// - If the object exists but isn't visible: "You can't see any such thing here."
     /// - If the object doesn't exist: "You can't see any such thing here."
     ///
-    /// - Parameter context: The action context for the current action.
+    /// - Parameter command: The command being processed.
+    /// - Parameter engine: The game engine.
     /// - Returns: An `ActionResult` containing the appropriate response message.
-        guard let targetObjectID = command.directObject,
-            case .item(let itemID) = targetObjectID
-        else {
+    public func process(command: Command, engine: GameEngine) async throws -> ActionResult {
+        guard let targetObjectID = command.directObject else {
+            throw ActionResponse.prerequisiteNotMet(
+                engine.messenger.doWhat(verb: command.verb)
+            )
+        }
+
+        guard case .item(let itemID) = targetObjectID else {
             return ActionResult(
                 engine.messenger.unknownEntity()
             )

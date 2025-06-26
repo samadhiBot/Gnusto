@@ -44,18 +44,8 @@ public struct TasteActionHandler: ActionHandler {
             throw ActionResponse.itemNotAccessible(itemID)
         }
 
-        // Determine appropriate taste response
-        let message =
-            if targetItem.hasFlag(.isEdible) {
-                engine.messenger.tasteFood(item: targetItem.withDefiniteArticle)
-            } else if targetItem.hasFlag(.isDrinkable) {
-                engine.messenger.tasteLiquid(item: targetItem.withDefiniteArticle)
-            } else {
-                engine.messenger.tastesAverage(item: targetItem.withDefiniteArticle)
-            }
-
         return ActionResult(
-            message,
+            engine.messenger.tastesAverage(item: targetItem.withDefiniteArticle),
             await engine.setFlag(.isTouched, on: targetItem),
             await engine.updatePronouns(to: targetItem)
         )

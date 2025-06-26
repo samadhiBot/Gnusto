@@ -18,12 +18,12 @@ public struct ClimbOnActionHandler: ActionHandler {
 
     // MARK: - Action Processing Methods
 
-    /// Validates that the action can be performed.
+    /// Processes the climb on action.
     ///
-    /// - Parameter context: The `ActionContext` containing the command and game state.
-    /// - Throws: An `ActionResponse` if validation fails.
+    /// - Parameter command: The command being processed.
+    /// - Parameter engine: The game engine.
+    /// - Returns: An `ActionResult` with the action outcome.
     public func process(command: Command, engine: GameEngine) async throws -> ActionResult {
-
         guard let directObjectRef = command.directObject else {
             throw ActionResponse.prerequisiteNotMet(
                 engine.messenger.doWhat(action: "climb on")
@@ -43,17 +43,6 @@ public struct ClimbOnActionHandler: ActionHandler {
 
         guard await engine.playerCanReach(targetItemID) else {
             throw ActionResponse.itemNotAccessible(targetItemID)
-        }
-    /// Processes the climb on action.
-    ///
-    /// - Parameter context: The `ActionContext` containing the command and game state.
-    /// - Returns: An `ActionResult` with the action outcome.
-        guard case .item(let targetItemID) = command.directObject else {
-            let message = engine.messenger.actionHandlerInternalError(
-                handler: "ClimbOnActionHandler",
-                details: "directObject was not an item in process"
-            )
-            throw ActionResponse.internalEngineError(message)
         }
 
         let targetItem = try await engine.item(targetItemID)

@@ -15,12 +15,13 @@ public struct AttackActionHandler: ActionHandler {
     public let requiresLight: Bool = true
 
     // MARK: - Action Processing Methods
+
     public init() {}
 
     /// Processes the "ATTACK" command.
     ///
     /// Handles different attack scenarios following ZIL V-ATTACK logic:
-    /// 1. Non-characters: "I’ve known strange people, but fighting a [object]?"
+    /// 1. Non-characters: "I've known strange people, but fighting a [object]?"
     /// 2. Bare-handed attacks on characters: "Trying to attack a [character] with your bare hands is suicidal."
     /// 3. Non-weapon attacks on characters: "Trying to attack the [character] with a [item] is suicidal."
     /// 4. Weapon attacks: "You can't." (placeholder for combat system)
@@ -37,37 +38,11 @@ public struct AttackActionHandler: ActionHandler {
             )
         }
 
-//        let targetItem = try await engine.item(targetItemID)
-//
-//        guard await engine.playerCanReach(targetItemID) else {
-//            throw ActionResponse.itemNotAccessible(targetItemID)
-//        }
-//
-//        if let indirectObjectRef = command.indirectObject {
-//            guard case .item(let weaponItemID) = indirectObjectRef else {
-//                throw ActionResponse.prerequisiteNotMet(
-//                    engine.messenger.cannotActWithThat(verb: "attack")
-//                )
-//            }
-//
-//            let weaponItem = try await engine.item(weaponItemID)
-//            guard weaponItem.parent == .player else {
-//                throw ActionResponse.itemNotHeld(weaponItemID)
-//            }
-//        }
-//    ///
-//    /// - Parameter context: The `ActionContext` for the current action.
-//    /// - Returns: An `ActionResult` with appropriate combat message and state changes.
-//        guard
-//            let directObjectRef = command.directObject,
-//            case .item(let targetItemID) = directObjectRef
-//        else {
-//            throw ActionResponse.internalEngineError(
-//                "AttackActionHandler: directObject was not an item in process."
-//            )
-//        }
-
         let targetItem = try await engine.item(targetItemID)
+
+        guard await engine.playerCanReach(targetItemID) else {
+            throw ActionResponse.itemNotAccessible(targetItemID)
+        }
 
         // Follow ZIL V-ATTACK logic exactly
         let message: String
@@ -78,45 +53,40 @@ public struct AttackActionHandler: ActionHandler {
                 item: targetItem.withIndefiniteArticle
             )
         }
-
-        // Second check: No weapon specified OR weapon is hands (bare-handed attack)
+        // Second check: No weapon specified (bare-handed attack)
         else if command.indirectObject == nil {
             message = engine.messenger.attackWithBareHands(
                 character: targetItem.withIndefiniteArticle
             )
         }
-
-        // We have a weapon - check if it's a real weapon
+        // We have a weapon - validate and check if it's a real weapon
         else if let indirectObjectRef = command.indirectObject,
-                case .item(let weaponID) = indirectObjectRef
+            case .item(let weaponID) = indirectObjectRef
         {
             let weapon = try await engine.item(weaponID)
 
-            if weapon.parent != .player {
-                message = engine.messenger.itemNotHeld(
-                    item: weapon.withDefiniteArticle
-                )
+            guard weapon.parent == .player else {
+                throw ActionResponse.itemNotHeld(weaponID)
             }
 
-            else if !weapon.hasFlag(.isWeapon) {
+            if !weapon.hasFlag(.isWeapon) {
                 message = engine.messenger.attackWithNonWeapon(
                     character: targetItem.withDefiniteArticle,
                     weapon: weapon.withIndefiniteArticle
                 )
-
             } else {
                 // Real weapon attack - placeholder for combat system
                 message = engine.messenger.attackWithWeapon()
             }
         } else {
-            // Fallback case
+            // Fallback case for non-item indirect objects
             message = engine.messenger.attackWithWeapon()
         }
 
         return ActionResult(
             message,
             await engine.setFlag(.isTouched, on: targetItem),
-            await engine.updatePronouns(to: targetItem),
+            await engine.updatePronouns(to: targetItem)
         )
     }
 }

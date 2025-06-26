@@ -17,12 +17,14 @@ public struct RaiseActionHandler: ActionHandler {
 
     // MARK: - Action Processing Methods
 
-    /// Validates that the action can be performed.
-    ///
-    /// - Parameter context: The `ActionContext` containing the command and game state.
-    /// - Returns: An `ActionResult` indicating validation success or failure.
-    public func process(command: Command, engine: GameEngine) async throws -> ActionResult {
+    public init() {}
 
+    /// Processes the raise action.
+    ///
+    /// - Parameter command: The command being processed.
+    /// - Parameter engine: The game engine.
+    /// - Returns: An `ActionResult` with the action outcome.
+    public func process(command: Command, engine: GameEngine) async throws -> ActionResult {
         guard let directObjectRef = command.directObject else {
             throw ActionResponse.prerequisiteNotMet(
                 engine.messenger.doWhat(verb: command.verb)
@@ -36,24 +38,11 @@ public struct RaiseActionHandler: ActionHandler {
         }
 
         // Check if item exists and is reachable
-        guard (try? await engine.item(targetItemID)) != nil else {
-            throw ActionResponse.itemNotAccessible(targetItemID)
-        }
+        let targetItem = try await engine.item(targetItemID)
 
         guard await engine.playerCanReach(targetItemID) else {
             throw ActionResponse.itemNotAccessible(targetItemID)
         }
-    /// Processes the raise action.
-    ///
-    /// - Parameter context: The `ActionContext` containing the command and game state.
-    /// - Returns: An `ActionResult` with the action outcome.
-        guard case .item(let targetItemID) = command.directObject else {
-            throw ActionResponse.internalEngineError(
-                "Raise: directObject was not an item in process."
-            )
-        }
-
-        let targetItem = try await engine.item(targetItemID)
 
         // Default behavior: You can't raise most things
         return ActionResult(
