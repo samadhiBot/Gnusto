@@ -55,7 +55,7 @@ public struct ReadActionHandler: ActionHandler {
         let readText =
             if let textToRead: String = try await engine.attribute(
                 .readText, of: targetItem.id
-            ), !textToRead.isEmpty {
+            ), textToRead.isNotEmpty {
                 textToRead
             } else {
                 engine.messenger.nothingWrittenOn(item: targetItem.withDefiniteArticle)

@@ -22,8 +22,8 @@ struct MarkdownParserTests {
         for (index, line) in lines.enumerated() {
             let words = line.trimmingCharacters(in: .whitespaces)
                 .components(separatedBy: .whitespaces)
-                .filter { !$0.isEmpty }
-            if !words.isEmpty {
+                .filter { $0.isNotEmpty }
+            if words.isNotEmpty {
                 print("Line \(index + 1): '\(line)' has \(words.count) words")
                 #expect(words.count >= 2, "Found orphaned word on line \(index + 1): '\(line)'")
             }
@@ -45,8 +45,8 @@ struct MarkdownParserTests {
         for line in lines {
             let words = line.trimmingCharacters(in: .whitespaces)
                 .components(separatedBy: .whitespaces)
-                .filter { !$0.isEmpty }
-            if !words.isEmpty {
+                .filter { $0.isNotEmpty }
+            if words.isNotEmpty {
                 #expect(words.count >= 2, "Found orphaned word: '\(line)'")
             }
         }
@@ -71,8 +71,8 @@ struct MarkdownParserTests {
             for line in lines {
                 let words = line.trimmingCharacters(in: .whitespaces)
                     .components(separatedBy: .whitespaces)
-                    .filter { !$0.isEmpty }
-                if !words.isEmpty {
+                    .filter { $0.isNotEmpty }
+                if words.isNotEmpty {
                     #expect(words.count >= 2, "Found orphaned word in paragraph: '\(line)'")
                 }
             }
@@ -109,8 +109,8 @@ struct MarkdownParserTests {
         for line in lines {
             let words = line.trimmingCharacters(in: .whitespaces)
                 .components(separatedBy: .whitespaces)
-                .filter { !$0.isEmpty }
-            if !words.isEmpty {
+                .filter { $0.isNotEmpty }
+            if words.isNotEmpty {
                 #expect(words.count >= 2, "Found orphaned word: '\(line)'")
             }
         }

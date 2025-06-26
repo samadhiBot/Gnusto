@@ -142,7 +142,7 @@ public struct LookActionHandler: ActionHandler {
                     guard
                         let firstDescription = item.attributes[.firstDescription],
                         case .string(let description) = firstDescription,
-                        !description.isEmpty
+                        description.isNotEmpty
                     else {
                         return false
                     }
@@ -154,7 +154,7 @@ public struct LookActionHandler: ActionHandler {
                     for contentItem in contents.sorted() {
                         if let firstDescription = contentItem.attributes[.firstDescription],
                             case .string(let fdesc) = firstDescription,
-                            !fdesc.isEmpty,
+                            fdesc.isNotEmpty,
                             !contentItem.hasFlag(.isTouched)
                         {
                             // Use first description for untouched items on surfaces
@@ -180,13 +180,13 @@ public struct LookActionHandler: ActionHandler {
 
         // First, handle items directly in the location
         let directItems = visibleItems.filter { !$0.hasFlag(.omitDescription) }
-        if !directItems.isEmpty {
+        if directItems.isNotEmpty {
             // Check if any direct items have firstDescription and haven't been touched
             let hasFirstDescriptions = directItems.contains { item in
                 guard
                     let firstDescription = item.attributes[.firstDescription],
                     case .string(let description) = firstDescription,
-                    !description.isEmpty
+                    description.isNotEmpty
                 else {
                     return false
                 }
@@ -198,7 +198,7 @@ public struct LookActionHandler: ActionHandler {
                 for item in directItems.sorted() {
                     if let firstDescription = item.attributes[.firstDescription],
                         case .string(let fdesc) = firstDescription,
-                        !fdesc.isEmpty,
+                        fdesc.isNotEmpty,
                         !item.hasFlag(.isTouched)
                     {
                         // Use first description for untouched items
@@ -220,7 +220,7 @@ public struct LookActionHandler: ActionHandler {
         // Add surface/container first descriptions
         descriptionLines.append(contentsOf: surfaceFirstDescriptions)
 
-        if !descriptionLines.isEmpty {
+        if descriptionLines.isNotEmpty {
             description.append(descriptionLines.joined(separator: "\n"))
         }
 

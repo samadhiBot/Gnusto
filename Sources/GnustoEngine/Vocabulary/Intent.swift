@@ -1,5 +1,10 @@
 import Foundation
 
+// MARK: - Backward Compatibility
+
+/// Backward compatibility typealias for ActionID -> Intent migration
+public typealias ActionID = Intent
+
 /// Represents conceptual actions that can be performed in the game, independent of the specific verbs used.
 ///
 /// While `Verb` represents the specific words players can type (like "turn", "light", "extinguish"),

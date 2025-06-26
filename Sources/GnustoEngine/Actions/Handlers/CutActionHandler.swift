@@ -94,7 +94,7 @@ public struct CutActionHandler: ActionHandler {
                 $0.hasFlag(.isWeapon) || $0.hasFlag(.isTool)
             }
 
-            if !cuttingTools.isEmpty {
+            if cuttingTools.isNotEmpty {
                 let firstTool = cuttingTools.first!
                 // Auto-cut with available tool
                 message = engine.messenger.cutWithAutoTool(

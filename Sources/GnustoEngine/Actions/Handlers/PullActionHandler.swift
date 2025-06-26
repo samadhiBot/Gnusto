@@ -24,7 +24,7 @@ public struct PullActionHandler: ActionHandler {
     public func process(command: Command, engine: GameEngine) async throws -> ActionResult {
         // For ALL commands, empty directObjects is valid (means nothing to pull)
         if !command.isAllCommand {
-            guard !command.directObjects.isEmpty else {
+            guard command.directObjects.isNotEmpty else {
                 throw ActionResponse.prerequisiteNotMet(
                     engine.messenger.doWhat(verb: command.verb)
                 )
@@ -97,25 +97,25 @@ public struct PullActionHandler: ActionHandler {
         }
 
         // Generate appropriate message based on whether items are pullable
-//        let message =
-//            if pulledItems.isEmpty {
-//                command.isAllCommand
-//                    ? engine.messenger.nothingHereToPull()
-//                    : engine.messenger.doWhat(verb: command.verb)
-//            } else if pulledItems.count == 1 {
-//                let item = pulledItems[0]
-//                if item.hasFlag(.isPullable) {
-//                    engine.messenger.pullSuccess(item: item.withDefiniteArticle)
-//                } else {
-//                    engine.messenger.cannotDoThat(
-//                        verb: .pull,
-//                        item: item.withDefiniteArticle
-//                    )
-//                }
-//            } else {
-//                // Multiple items - provide general response
-//                engine.messenger.pullMultipleItems(items: pulledItems.listWithDefiniteArticles)
-//            }
+        //        let message =
+        //            if pulledItems.isEmpty {
+        //                command.isAllCommand
+        //                    ? engine.messenger.nothingHereToPull()
+        //                    : engine.messenger.doWhat(verb: command.verb)
+        //            } else if pulledItems.count == 1 {
+        //                let item = pulledItems[0]
+        //                if item.hasFlag(.isPullable) {
+        //                    engine.messenger.pullSuccess(item: item.withDefiniteArticle)
+        //                } else {
+        //                    engine.messenger.cannotDoThat(
+        //                        verb: .pull,
+        //                        item: item.withDefiniteArticle
+        //                    )
+        //                }
+        //            } else {
+        //                // Multiple items - provide general response
+        //                engine.messenger.pullMultipleItems(items: pulledItems.listWithDefiniteArticles)
+        //            }
         let message = "🤡 `pull` placeholder for \(pulledItems.listWithDefiniteArticles)"
 
         return ActionResult(

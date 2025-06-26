@@ -66,7 +66,7 @@ public struct OpenActionHandler: ActionHandler {
         let message: String
         if targetItem.hasFlag(.isContainer) {
             let itemsInside = await engine.items(in: .item(targetItemID))
-            if !itemsInside.isEmpty {
+            if itemsInside.isNotEmpty {
                 // Announce what's revealed: "Opening the small mailbox reveals a leaflet."
                 let itemList = itemsInside.sorted().listWithIndefiniteArticles
                 message = engine.messenger.openingRevealsContents(

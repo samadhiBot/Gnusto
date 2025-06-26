@@ -12,7 +12,7 @@ struct ThiefTests {
         let game = Zork1()
         let (engine, mockIO) = await GameEngine.test(
             blueprint: game,
-            activeDaemons: [.thiefTheftDaemon], // Activate the daemon from start
+            activeDaemons: [.thiefTheftDaemon],  // Activate the daemon from start
             parser: StandardParser()
         )
 
@@ -95,22 +95,24 @@ struct ThiefTests {
 
         // When
         try await engine.execute("give lamp to thief")
-//            command: Command(
-//                verb: .give,
-//                directObject: .item(.lamp),
-//                indirectObject: .item(.thief),
-//                preposition: "to",
-//                rawInput: "give lamp to thief"
-//            )
-//        )
+        //            command: Command(
+        //                verb: .give,
+        //                directObject: .item(.lamp),
+        //                indirectObject: .item(.thief),
+        //                preposition: "to",
+        //                rawInput: "give lamp to thief"
+        //            )
+        //        )
 
         // Then
         let output = await mockIO.flush()
-        expectNoDifference(output, """
-            
+        expectNoDifference(
+            output,
+            """
+
             """)
-//        #expect(output.contains("examines the lamp with obvious delight"))
-//        #expect(output.contains("carefully places it in his bag"))
+        //        #expect(output.contains("examines the lamp with obvious delight"))
+        //        #expect(output.contains("carefully places it in his bag"))
 
         // Verify lamp is now in thief’s bag
         let lamp = try await engine.item(.lamp)
@@ -175,8 +177,10 @@ struct ThiefTests {
         // Then
         let output = await mockIO.flush()
         // Should get some combat response
-        #expect(!output.isEmpty)
-        #expect(output.contains("thief") || output.contains("attack") || output.contains("combat") || output.contains("fight"))
+        #expect(output.isNotEmpty)
+        #expect(
+            output.contains("thief") || output.contains("attack") || output.contains("combat")
+                || output.contains("fight"))
     }
 
     @Test("Thief handles tell command")
@@ -327,8 +331,8 @@ struct ThiefTests {
         try await engine.apply(
             await engine.movePlayer(to: .location(.roundRoom)),
             // Give player multiple items of different values
-            await engine.move(ItemID("leaflet"), to: .player), // Low value
-            await engine.move(.diamond, to: .player) // High value
+            await engine.move(ItemID("leaflet"), to: .player),  // Low value
+            await engine.move(.diamond, to: .player)  // High value
         )
 
         // When - attempt theft multiple times
@@ -393,7 +397,7 @@ struct ThiefTests {
         switch finalThiefLocation {
         case .location(let locationID):
             let location = try await engine.location(locationID)
-            #expect(!location.name.isEmpty) // Valid location
+            #expect(location.name.isNotEmpty)  // Valid location
         default:
             // Thief should always be in a location
             #expect(Bool(false), "Thief should be in a location")
@@ -416,7 +420,7 @@ struct ThiefTests {
         try await engine.apply(
             await engine.move(.thief, to: .location(.northSouthPassage))
         )
-        _ = await mockIO.flush() // Clear any move message
+        _ = await mockIO.flush()  // Clear any move message
 
         // When - move thief back to player’s location
         try await engine.apply(
@@ -455,7 +459,7 @@ struct ThiefTests {
 
         // Then - should get enhanced combat response
         let output = await mockIO.flush()
-        #expect(!output.isEmpty)
+        #expect(output.isNotEmpty)
         // Combat should consider weapon (even if outcome is random)
         #expect(output.contains("thief") || output.contains("sword") || output.contains("attack"))
     }
@@ -483,7 +487,7 @@ struct ThiefTests {
         // Then - bag should be accessible after thief is gone
         switch bagLocation {
         case .location(let locationID):
-            #expect(locationID == .roundRoom) // Should drop in current location
+            #expect(locationID == .roundRoom)  // Should drop in current location
         case .nowhere:
             // Bag might be removed with thief - that’s also valid
             break
@@ -516,7 +520,7 @@ struct ThiefTests {
         // Then - score should potentially increase when treasures are recovered
         // (This tests the infrastructure exists even if specific scoring varies)
         let finalScore = await engine.playerScore
-        #expect(finalScore >= initialScore) // Score shouldn’t decrease
+        #expect(finalScore >= initialScore)  // Score shouldn’t decrease
     }
 
     @Test("Thief refuses to accept bag or stiletto")
@@ -550,7 +554,7 @@ struct ThiefTests {
         // Then - thief should handle this appropriately
         let output = await mockIO.flush()
         // Either accepts it back or has some response
-        #expect(!output.isEmpty)
+        #expect(output.isNotEmpty)
     }
 
     @Test("Sophisticated theft considers player vulnerability")
@@ -581,7 +585,9 @@ struct ThiefTests {
             )
             let output = await mockIO.flush()
 
-            if output.contains("thief") && (output.contains("snatches") || output.contains("steals")) {
+            if output.contains("thief")
+                && (output.contains("snatches") || output.contains("steals"))
+            {
                 attemptedTheft = true
                 break
             }
@@ -592,7 +598,7 @@ struct ThiefTests {
         let playerItems = await engine.items(in: .player)
 
         // Items should be distributed between player and bag
-        #expect((bagContents.count + playerItems.count) >= 3) // Original items still exist somewhere
+        #expect((bagContents.count + playerItems.count) >= 3)  // Original items still exist somewhere
     }
 
     @Test("Thief AI responds to different combat outcomes")
@@ -621,7 +627,7 @@ struct ThiefTests {
             )
             let output = await mockIO.flush()
 
-            if !output.isEmpty {
+            if output.isNotEmpty {
                 combatResponses.insert(output)
             }
 
@@ -636,11 +642,11 @@ struct ThiefTests {
         }
 
         // Then - should have gotten at least one combat response
-        #expect(!combatResponses.isEmpty)
+        #expect(combatResponses.isNotEmpty)
 
         // Verify enhanced combat system provides varied responses
-        let hasVariedResponses = combatResponses.count > 1 ||
-                                combatResponses.first?.count ?? 0 > 50 // Rich, detailed response
+        let hasVariedResponses =
+            combatResponses.count > 1 || combatResponses.first?.count ?? 0 > 50  // Rich, detailed response
         #expect(hasVariedResponses)
     }
 }

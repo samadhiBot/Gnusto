@@ -718,7 +718,7 @@ struct GameEngineTests {
 
         // Check history recorded correctly
         let history = await engine.changeHistory()
-        #expect(!history.isEmpty, "Change history should not be empty")
+        #expect(history.isNotEmpty, "Change history should not be empty")
 
         // Check for Player moves increment change
         #expect(
@@ -1512,8 +1512,11 @@ struct GameEngineTests {
             let requiresLight: Bool = true
 
             let result: ActionResult
-            func process(command: Command, engine: GameEngine) async throws -> ActionResult { result }
-            func postProcess(command: Command, engine: GameEngine, result: ActionResult) async throws
+            func process(command: Command, engine: GameEngine) async throws -> ActionResult {
+                result
+            }
+            func postProcess(command: Command, engine: GameEngine, result: ActionResult)
+                async throws
             { /* No post-processing needed */  }
         }
 

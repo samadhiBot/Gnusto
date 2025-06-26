@@ -572,7 +572,7 @@ extension InsideHouse {
         let currentLocationItems = try await engine.allItemsInLocation(currentLocation.id)
         let monstersInCurrentLocation = currentLocationItems.filter { $0.isMonster }
 
-        if !monstersInCurrentLocation.isEmpty {
+        if monstersInCurrentLocation.isNotEmpty {
             newGlowLevel = 2  // Very bright glow
         } else {
             // Check adjacent locations for monsters
@@ -583,7 +583,7 @@ extension InsideHouse {
                 let adjacentLocationItems = try await engine.allItemsInLocation(destination)
                 let monstersInAdjacentLocation = adjacentLocationItems.filter { $0.isMonster }
 
-                if !monstersInAdjacentLocation.isEmpty {
+                if monstersInAdjacentLocation.isNotEmpty {
                     newGlowLevel = 1  // Faint blue glow
                     break
                 }
@@ -616,7 +616,7 @@ extension InsideHouse {
                     engine.setGlobal(.swordGlowLevel, to: newGlowLevel)
                 )
             }
-        } else if !message.isEmpty {
+        } else if message.isNotEmpty {
             // Level didn't change but sword is still glowing - show the message
             return ActionResult(message)
         }

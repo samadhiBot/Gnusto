@@ -5,6 +5,10 @@ public struct Vocabulary: Codable, Equatable, Sendable {
     /// Maps Verbs to their full definitions (including synonyms, syntax, requiresLight).
     public var verbs: [Verb]
 
+    /// Maps verbs to their syntax rules from ActionHandlers.
+    /// This is used by the parser to validate command structure.
+    public var verbToSyntax: [Verb: [SyntaxRule]]
+
     /// Maps known nouns (including synonyms) to the Set of ItemIDs they can refer to.
     /// Example: `["lantern": ["lantern", "lantern2"], "lamp": ["lantern", "lantern2"]]`
     public var items: [String: Set<ItemID>]
@@ -49,34 +53,35 @@ public struct Vocabulary: Codable, Equatable, Sendable {
     /// Maps a synonym string (lowercase) to the Set of Verbs it can represent.
     /// When multiple verbs match, all potential matches are included so the parser can
     /// use syntax rules to determine the best match.
-//    public var verbSynonyms: [String: Set<Verb>] {
-//        var mapping: [String: Set<Verb>] = [:]
-//
-//        // Build the mapping without prioritization - include all possible matches
-//        for verb in verbDefinitions.values {
-//            let verbID = verb.id
-//            let primaryKey = verbID.rawValue.lowercased()
-//
-//            // Map the primary ID
-//            mapping[primaryKey, default: Set()].insert(verbID)
-//
-//            // Map all synonyms - allow synonyms to coexist with exact ID matches
-//            for synonym in verb.synonyms {
-//                let synonymKey = synonym.lowercased()
-//                mapping[synonymKey, default: Set()].insert(verbID)
-//            }
-//        }
-//        return mapping
-//    }
+    public var verbSynonyms: [String: Set<Verb>] {
+        var mapping: [String: Set<Verb>] = [:]
+
+        // Build the mapping without prioritization - include all possible matches
+        for verb in verbs {
+            let primaryKey = verb.rawValue.lowercased()
+
+            // Map the primary ID
+            mapping[primaryKey, default: Set()].insert(verb)
+
+            // TODO: Add synonyms support when Verb has synonyms property
+            // Map all synonyms - allow synonyms to coexist with exact ID matches
+            // for synonym in verb.synonyms {
+            //     let synonymKey = synonym.lowercased()
+            //     mapping[synonymKey, default: Set()].insert(verb)
+            // }
+        }
+        return mapping
+    }
 
     // MARK: - Initialization
 
     /// Initializes an empty vocabulary, using default noise words, prepositions, and pronouns.
     public init() {
-        self.verbDefinitions = [:] // Initialize new dictionary
+        self.verbs = []  // Initialize new array
+        self.verbToSyntax = [:]  // Initialize new mapping
         self.items = [:]
         self.adjectives = [:]
-        self.locationNames = [:] // Initialize new property
+        self.locationNames = [:]  // Initialize new property
         self.noiseWords = Vocabulary.defaultNoiseWords
         self.prepositions = Vocabulary.defaultPrepositions
         self.pronouns = Vocabulary.defaultPronouns
@@ -88,10 +93,11 @@ public struct Vocabulary: Codable, Equatable, Sendable {
 
     /// Initializes a vocabulary with pre-populated dictionaries and sets.
     public init(
-        verbDefinitions: [Verb: Verb] = [:], // Use verbDefinitions
+        verbs: [Verb] = [],
+        verbToSyntax: [Verb: [SyntaxRule]] = [:],
         items: [String: Set<ItemID>] = [:],
         adjectives: [String: Set<ItemID>] = [:],
-        locationNames: [String: LocationID] = [:], // Added parameter
+        locationNames: [String: LocationID] = [:],
         directions: [String: Direction] = [:],
         noiseWords: Set<String> = Vocabulary.defaultNoiseWords,
         prepositions: Set<String> = Vocabulary.defaultPrepositions,
@@ -100,10 +106,11 @@ public struct Vocabulary: Codable, Equatable, Sendable {
         conjunctions: Set<String> = Vocabulary.defaultConjunctions,
         adverbs: Set<String> = Vocabulary.defaultAdverbs
     ) {
-        self.verbDefinitions = verbDefinitions // Assign new dictionary
+        self.verbs = verbs
+        self.verbToSyntax = verbToSyntax
         self.items = items
         self.adjectives = adjectives
-        self.locationNames = locationNames // Assign new property
+        self.locationNames = locationNames
         self.directions = directions
         self.noiseWords = noiseWords
         self.prepositions = prepositions
@@ -160,7 +167,7 @@ public struct Vocabulary: Codable, Equatable, Sendable {
     /// Default set of common English pronouns.
     public static let defaultPronouns: Set<String> = [
         "it",
-        "them"
+        "them",
     ]
 
     /// Default set of special keywords that receive special parser treatment.
@@ -168,14 +175,14 @@ public struct Vocabulary: Codable, Equatable, Sendable {
     public static let defaultSpecialKeywords: Set<String> = [
         "all",
         "everything",
-        "each"
+        "each",
     ]
 
     /// Default set of conjunctions used to connect multiple objects.
     /// These words are used to parse commands like "TAKE SWORD AND LANTERN".
     public static let defaultConjunctions: Set<String> = [
         "and",
-        ","
+        ",",
     ]
 
     /// Default adverbs that can be ignored by the parser.
@@ -199,8 +206,9 @@ public struct Vocabulary: Codable, Equatable, Sendable {
     /// Adds a verb definition to the vocabulary.
     /// - Parameter verb: The `Verb` object to add.
     public mutating func add(verb: Verb) {
-        // Store the full verb definition under its ID
-        self.verbDefinitions[verb.id] = verb
+        // Remove any existing verb with the same ID, then add the new one
+        self.verbs.removeAll { $0.rawValue == verb.rawValue }
+        self.verbs.append(verb)
     }
 
     /// Adds an item, its synonyms, and its adjectives to the vocabulary.
@@ -272,26 +280,25 @@ public struct Vocabulary: Codable, Equatable, Sendable {
     ///   - items: An array of `Item` objects specific to the game.
     ///   - locations: An array of `Location` objects specific to the game.
     ///   - verbs: An array of `Verb` objects specific to the game.
+    ///   - verbToSyntax: A mapping from verbs to their syntax rules from ActionHandlers.
     /// - Returns: A populated `Vocabulary` instance.
     public static func build(
         items: [Item] = [],
         locations: [Location] = [],
-        verbs: [Verb] = []
+        verbs: [Verb] = [],
+        verbToSyntax: [Verb: [SyntaxRule]] = [:]
     ) -> Vocabulary {
         var vocab = Vocabulary()
+        vocab.verbToSyntax = verbToSyntax
 
         #if DEBUG
 
-        vocab.add(
-            verb: Verb(
-                id: .debug,
-                synonyms: "db",
-                syntax: [
-                    .match(.verb, .directObject)
-                ],
-                requiresLight: false
+            vocab.add(
+                verb: Verb(
+                    id: "debug",
+                    intents: .debug
+                )
             )
-        )
 
         #endif
 
@@ -330,8 +337,8 @@ public struct Vocabulary: Codable, Equatable, Sendable {
             "up": .up, "u": .up,
             "down": .down, "d": .down,
             "in": .inside,
-            "out": .outside
-            // Add LAND? Might conflict with "land verb"
+            "out": .outside,
+                // Add LAND? Might conflict with "land verb"
         ]
     }
 
@@ -343,10 +350,11 @@ public struct Vocabulary: Codable, Equatable, Sendable {
     // MARK: - Codable Conformance
 
     enum CodingKeys: String, CodingKey {
-        case verbDefinitions // Updated key
+        case verbs  // Updated key
+        case verbToSyntax
         case items
         case adjectives
-        case locationNames // Added coding key
+        case locationNames  // Added coding key
         case noiseWords
         case adverbs
         case prepositions
@@ -354,31 +362,36 @@ public struct Vocabulary: Codable, Equatable, Sendable {
         case directions
         case specialKeywords
         case conjunctions
-        // Removed verbs, syntaxRules
     }
 
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        // Decode verbDefinitions or default to empty
-        verbDefinitions = try container.decodeIfPresent([Verb: Verb].self, forKey: .verbDefinitions) ?? [:]
+        // Decode verbs or default to empty
+        verbs = try container.decodeIfPresent([Verb].self, forKey: .verbs) ?? []
+        verbToSyntax =
+            try container.decodeIfPresent([Verb: [SyntaxRule]].self, forKey: .verbToSyntax) ?? [:]
         items = try container.decode([String: Set<ItemID>].self, forKey: .items)
         adjectives = try container.decode([String: Set<ItemID>].self, forKey: .adjectives)
-        locationNames = try container.decodeIfPresent([String: LocationID].self, forKey: .locationNames) ?? [:] // Decode new property
+        locationNames =
+            try container.decodeIfPresent([String: LocationID].self, forKey: .locationNames) ?? [:]  // Decode new property
         noiseWords = try container.decode(Set<String>.self, forKey: .noiseWords)
         adverbs = try container.decode(Set<String>.self, forKey: .adverbs)
         prepositions = try container.decode(Set<String>.self, forKey: .prepositions)
         pronouns = try container.decode(Set<String>.self, forKey: .pronouns)
         directions = try container.decode([String: Direction].self, forKey: .directions)
         specialKeywords = try container.decode(Set<String>.self, forKey: .specialKeywords)
-        conjunctions = try container.decodeIfPresent(Set<String>.self, forKey: .conjunctions) ?? Vocabulary.defaultConjunctions
+        conjunctions =
+            try container.decodeIfPresent(Set<String>.self, forKey: .conjunctions)
+            ?? Vocabulary.defaultConjunctions
     }
 
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(verbDefinitions, forKey: .verbDefinitions)
+        try container.encode(verbs, forKey: .verbs)
+        try container.encode(verbToSyntax, forKey: .verbToSyntax)
         try container.encode(items, forKey: .items)
         try container.encode(adjectives, forKey: .adjectives)
-        try container.encode(locationNames, forKey: .locationNames) // Encode new property
+        try container.encode(locationNames, forKey: .locationNames)  // Encode new property
         try container.encode(noiseWords, forKey: .noiseWords)
         try container.encode(adverbs, forKey: .adverbs)
         try container.encode(prepositions, forKey: .prepositions)

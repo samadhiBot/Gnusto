@@ -7,64 +7,64 @@ public struct LocationAttributeID: GnustoID {
     /// Initializes a `AttributeID` with a raw string value.
     /// - Parameter rawValue: The string value for the ID.
     public init(rawValue: String) {
-        assert(!rawValue.isEmpty, "Attribute ID cannot be empty")
+        assert(rawValue.isNotEmpty, "Attribute ID cannot be empty")
         self.rawValue = rawValue
     }
 }
 
 // MARK: - General Property IDs
 
-public extension LocationAttributeID {
+extension LocationAttributeID {
     /// The available exits from a location.
-    static let exits = LocationAttributeID("exits")
+    public static let exits = LocationAttributeID("exits")
 
     /// Items that are considered local to a location (e.g. fixed scenery) and always in scope.
-    static let localGlobals = LocationAttributeID("localGlobals")
+    public static let localGlobals = LocationAttributeID("localGlobals")
 
     /// The primary noun used to refer to the item (ZIL: `DESC`).
-    static let name = LocationAttributeID("name")
+    public static let name = LocationAttributeID("name")
 }
 
 // MARK: - Descriptions
 
-public extension LocationAttributeID {
+extension LocationAttributeID {
     /// The description shown the first time an item is seen (ZIL `FDESC`).
-    static let firstDescription = LocationAttributeID("firstDescription")
+    public static let firstDescription = LocationAttributeID("firstDescription")
 
     /// The primary, detailed description (ZIL `LDESC`).
-    static let description = LocationAttributeID("description")
+    public static let description = LocationAttributeID("description")
 
     /// The shorter description used in lists or brief mentions (ZIL `SDESC`).
-    static let shortDescription = LocationAttributeID("shortDescription")
+    public static let shortDescription = LocationAttributeID("shortDescription")
 }
 
 // MARK: - Location Flags
 
-public extension LocationAttributeID {
+extension LocationAttributeID {
     /// RLIGHTBIT: Location is inherently lit (e.g., outdoors).
-    static let inherentlyLit = LocationAttributeID("inherentlyLit")
+    public static let inherentlyLit = LocationAttributeID("inherentlyLit")
 
     /// Location is considered outdoors.
-    static let isOutside = LocationAttributeID("isOutside")
+    public static let isOutside = LocationAttributeID("isOutside")
 
     /// Location is sacred, thus profanity is discouraged or disallowed here.
-    static let isSacred = LocationAttributeID("isSacred")
+    public static let isSacred = LocationAttributeID("isSacred")
 
     /// RMUNGBIT: Location description has been changed.
-    static let isChanged = LocationAttributeID("isChanged")
+    public static let isChanged = LocationAttributeID("isChanged")
 
     /// RLANDBIT: Location is land, not water/air.
-    static let isLand = LocationAttributeID("isLand")
+    public static let isLand = LocationAttributeID("isLand")
 
     /// Indicates whether an entity is currently considered "lit".
-    static let isLit = LocationAttributeID("isLit")
+    public static let isLit = LocationAttributeID("isLit")
 
     /// The player has visited this location previously.
-    static let isVisited = LocationAttributeID("isVisited")
+    public static let isVisited = LocationAttributeID("isVisited")
 
     /// The location contains or is primarily composed of water.
-    static let isWater = LocationAttributeID("locationIsWater")
+    public static let isWater = LocationAttributeID("locationIsWater")
 
     /// Magic does not function here.
-    static let breaksMagic = LocationAttributeID("breaksMagic")
+    public static let breaksMagic = LocationAttributeID("breaksMagic")
 }

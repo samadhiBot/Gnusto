@@ -168,13 +168,14 @@ public actor GameEngine: Sendable {
 
             // Combine custom and default action handlers to extract all verb definitions
             let allHandlers = blueprint.customActionHandlers + Self.defaultActionHandlers
-            let allVerbs = Self.extractVerbDefinitions(from: allHandlers)
+            let (allVerbs, verbToSyntax) = Self.extractVerbDefinitions(from: allHandlers)
 
             allActionHandlers = customHandlers
             gameVocabulary = Vocabulary.build(
                 items: blueprint.items,
                 locations: blueprint.locations,
-                verbs: allVerbs
+                verbs: allVerbs,
+                verbToSyntax: verbToSyntax
             )
         }
 
@@ -209,22 +210,32 @@ public actor GameEngine: Sendable {
     // MARK: - Action Handler Processing
 
     /// Extracts verb definitions from action handlers to build vocabulary.
-    static func extractVerbDefinitions(from handlers: [ActionHandler]) -> [Verb] {
+    /// Returns both the verbs and a mapping from verbs to their syntax rules.
+    static func extractVerbDefinitions(from handlers: [ActionHandler]) -> (
+        [Verb], [Verb: [SyntaxRule]]
+    ) {
         var verbs: [Verb] = []
+        var verbToSyntax: [Verb: [SyntaxRule]] = [:]
 
         for handler in handlers {
-            // Each handler can contribute multiple verbs
-            for verbID in handler.verbs {
-                let verb = Verb(
-                    id: verbID,
-                    syntax: handler.syntax,
-                    requiresLight: handler.requiresLight
-                )
-                verbs.append(verb)
+            // Each handler can contribute multiple verbs with the same syntax rules
+            for verb in handler.verbs {
+                // Add the verb if not already present
+                if !verbs.contains(verb) {
+                    verbs.append(verb)
+                }
+
+                // Map this verb to the handler's syntax rules
+                // If multiple handlers handle the same verb, combine their syntax rules
+                if verbToSyntax[verb] == nil {
+                    verbToSyntax[verb] = handler.syntax
+                } else {
+                    verbToSyntax[verb]?.append(contentsOf: handler.syntax)
+                }
             }
         }
 
-        return verbs
+        return (verbs, verbToSyntax)
     }
 }
 
@@ -766,8 +777,8 @@ extension GameEngine {
         var hasMatchingSyntaxRule = false
 
         // Check verb-based matching first
-        if !handler.verbs.isEmpty {
-            if handler.verbs.contains(command.verb) {
+        if handler.verbs.isNotEmpty {
+            if handler.verbs.contains(where: { $0.rawValue == command.verb.rawValue }) {
                 score = 100  // Base score for verb match
             } else {
                 return 0  // Handler specifies verbs but none match
@@ -775,7 +786,7 @@ extension GameEngine {
         }
 
         // Check syntax rule matching
-        if !handler.syntax.isEmpty {
+        if handler.syntax.isNotEmpty {
             // Handler has syntax rules, check if any match
             for syntaxRule in handler.syntax {
                 let ruleScore = scoreSyntaxRuleForCommand(syntaxRule: syntaxRule, command: command)
@@ -851,7 +862,7 @@ extension GameEngine {
 
             case .directObject, .directObjects:
                 // Rule requires direct object(s)
-                if !command.directObjects.isEmpty {
+                if command.directObjects.isNotEmpty {
                     score += 10  // Bonus for having required direct object
                 } else {
                     return 0  // Rule requires direct object but command has none
@@ -859,7 +870,7 @@ extension GameEngine {
 
             case .indirectObject, .indirectObjects:
                 // Rule requires indirect object(s)
-                if !command.indirectObjects.isEmpty {
+                if command.indirectObjects.isNotEmpty {
                     score += 10  // Bonus for having required indirect object
                 } else {
                     return 0  // Rule requires indirect object but command has none
@@ -989,7 +1000,7 @@ extension GameEngine {
         }
 
         // 1b. Check Direct Objects Handlers (plural) for multi-item commands
-        if !actionHandled, actionResponse == nil, !command.directObjects.isEmpty {
+        if actionHandled, actionResponse == nil, !command.directObjects.isNotEmpty {
             for directObjectRef in command.directObjects {
                 guard
                     case .item(let doItemID) = directObjectRef,
@@ -1055,7 +1066,11 @@ extension GameEngine {
             // Retrieve verb definition to check requiresLight property
             // Note: Parser should ensure command.verbID exists in vocabulary
             // Correct: Look up the Verb definition directly
-            guard let verb = gameState.vocabulary.verbDefinitions[command.verb] else {
+            guard
+                gameState.vocabulary.verbs.first(where: {
+                    $0.rawValue == command.verb.rawValue
+                }) != nil
+            else {
                 // This case should ideally not be reached if parser validates verbs
                 logWarning(
                     """
@@ -1068,22 +1083,22 @@ extension GameEngine {
                 return
             }
 
-            // If the room is dark and the verb requires light (and isn't 'turn'), report error.
-            if !isLit && verb.requiresLight && command.verb != .turn {
+            // Room is lit OR verb doesn't require light, proceed with default handler execution.
+            guard let verbHandler = findActionHandler(for: command) else {
+                // No handler registered for this verb (should match vocabulary definition)
+                logWarning(
+                    """
+                    Internal Error: No ActionHandler registered for verb ID \
+                    '\(command.verb.rawValue)'.
+                    """)
+                await ioHandler.print("I don't know how to '\(command.verb.rawValue)'.")
+                return
+            }
+
+            // If the room is dark and the handler requires light (and isn't 'turn'), report error.
+            if !isLit && verbHandler.requiresLight && command.verb.rawValue != "turn" {
                 await report(.roomIsDark)
             } else {
-                // Room is lit OR verb doesn't require light, proceed with default handler execution.
-                guard let verbHandler = findActionHandler(for: command) else {
-                    // No handler registered for this verb (should match vocabulary definition)
-                    logWarning(
-                        """
-                        Internal Error: No ActionHandler registered for verb ID \
-                        '\(command.verb.rawValue)'.
-                        """)
-                    await ioHandler.print("I don't know how to '\(command.verb.rawValue)'.")
-                    return
-                }
-
                 // --- Execute Handler ---
                 do {
                     // Use the unified process method (handles both validation and execution)
@@ -1138,7 +1153,7 @@ extension GameEngine {
         }
 
         // 1b. Check Direct Objects AfterTurn Handlers (plural) for multi-item commands
-        if !command.directObjects.isEmpty {
+        if command.directObjects.isNotEmpty {
             for directObjectRef in command.directObjects {
                 guard
                     case .item(let doItemID) = directObjectRef,
@@ -1291,7 +1306,7 @@ extension GameEngine {
         }
 
         // 2. Process Side Effects
-        if !result.effects.isEmpty {
+        if result.effects.isNotEmpty {
             do {
                 try await processSideEffects(result.effects)
             } catch {
@@ -1531,7 +1546,7 @@ extension GameEngine {
     /// - Returns: A random element from the collection.
     /// - Throws: `ActionResponse.internalEngineError` if the collection is empty.
     public func randomElement<T>(in collection: some Collection<T>) throws -> T {
-        guard !collection.isEmpty else {
+        guard collection.isNotEmpty else {
             throw ActionResponse.internalEngineError(
                 "Attempted to select a random element from an empty collection"
             )

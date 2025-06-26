@@ -39,7 +39,7 @@ struct GameStateTests {
                 id: Self.itemSword,
                 .in(.player),
                 .isTakable
-            )
+            ),
         ]
     }
 
@@ -57,7 +57,7 @@ struct GameStateTests {
                 .name("North of House"),
                 .description("You are north of the house."),
                 .exits([.south: .to(Self.locWOH)])
-            )
+            ),
         ]
     }
 
@@ -105,7 +105,7 @@ struct GameStateTests {
             activeDaemons: ["testDaemon"],
             globalState: [
                 "counter": 0,
-                "gameStarted": true
+                "gameStarted": true,
             ]
         )
     }
@@ -129,14 +129,14 @@ struct GameStateTests {
         #expect(state.changeHistory.isEmpty)
         #expect(state.globalState["counter"] == .int(0))
 
-        #expect(!state.vocabulary.verbDefinitions.isEmpty || !state.vocabulary.items.isEmpty)
+        #expect(state.vocabulary.verbs.isEmpty || !state.vocabulary.items.isNotEmpty)
     }
 
     // MARK: - Codable Tests
 
     @Test("GameState Basic Codable Conformance")
     func testGameStateBasicCodable() throws {
-        var originalState = createInitialState() // Make mutable for change history
+        var originalState = createInitialState()  // Make mutable for change history
         // Add some history for encoding
         let change1 = StateChange(entityID: .player, attribute: .playerScore, newValue: .int(10))
         try originalState.apply(change1)
@@ -155,8 +155,8 @@ struct GameStateTests {
     @Test("GameState Equatable Conformance")
     func testGameStateEquatable() throws {
         let state1 = createInitialState()
-        let state2 = createInitialState() // Create identical state
-        var state3 = createInitialState() // Make mutable for modification
+        let state2 = createInitialState()  // Create identical state
+        var state3 = createInitialState()  // Make mutable for modification
 
         #expect(state1 == state2)
 
@@ -171,8 +171,8 @@ struct GameStateTests {
 
     @Test("GameState Copy-on-Write Behavior")
     func testCopyOnWrite() throws {
-        var state1 = createInitialState() // Must be var to allow mutation
-        let state2 = state1 // Create a copy (structs are value types)
+        var state1 = createInitialState()  // Must be var to allow mutation
+        let state2 = state1  // Create a copy (structs are value types)
 
         // Modify state1
         let change = StateChange(
@@ -184,7 +184,7 @@ struct GameStateTests {
 
         // Verify state2 remains unchanged
         #expect(state1.player.score == 10)
-        #expect(state2.player.score == 0) // Initial score
+        #expect(state2.player.score == 0)  // Initial score
 
         // Verify internal dictionaries were copied (check count or a specific item)
         #expect(state1.items.count == state2.items.count)
@@ -209,14 +209,14 @@ struct GameStateTests {
         // #expect(state.locations[locWOH]?.items == [itemMailbox]) // Removed: Location no longer stores items directly
 
         // Check items exist
-        #expect(state.items.count == 4) // Now 4 items
-        #expect(state.items[Self.itemLantern] != nil) // Exists but parent is .nowhere
+        #expect(state.items.count == 4)  // Now 4 items
+        #expect(state.items[Self.itemLantern] != nil)  // Exists but parent is .nowhere
         #expect(state.items[Self.itemMailbox] != nil)
         #expect(state.items[Self.itemLeaflet] != nil)
         #expect(state.items[Self.itemSword] != nil)
 
         // Check item parents were set correctly by GameState.initial
-        #expect(state.items[Self.itemLantern]?.parent == .nowhere) // Default
+        #expect(state.items[Self.itemLantern]?.parent == .nowhere)  // Default
         #expect(state.items[Self.itemMailbox]?.parent == .location(Self.locWOH))
         #expect(state.items[Self.itemLeaflet]?.parent == .item(Self.itemMailbox))
         #expect(state.items[Self.itemSword]?.parent == .player)
@@ -263,7 +263,7 @@ struct GameStateTests {
 
         // Check derived inventory reflects parent changes
         let inventoryIDs = state.items.values.filter { $0.parent == .player }.map(\.id)
-        #expect(Set(inventoryIDs).isEmpty) // Sword dropped
+        #expect(Set(inventoryIDs).isEmpty)  // Sword dropped
 
         // Check sword is now in the location
         #expect(state.items[Self.itemSword]?.parent == .location(Self.locWOH))
@@ -303,32 +303,45 @@ struct GameStateTests {
         #expect(decodedState.items.count == originalState.items.count)
 
         // Check content of locations (comparing key properties)
-        #expect(decodedState.locations[Self.locWOH]?.name == originalState.locations[Self.locWOH]?.name)
-        #expect(decodedState.locations[Self.locNorth]?.attributes[.description] == originalState.locations[Self.locNorth]?.attributes[.description])
+        #expect(
+            decodedState.locations[Self.locWOH]?.name == originalState.locations[Self.locWOH]?.name)
+        #expect(
+            decodedState.locations[Self.locNorth]?.attributes[.description]
+                == originalState.locations[Self.locNorth]?.attributes[.description])
 
         // Check content of items (comparing key properties, including parent)
-        #expect(decodedState.items[Self.itemLantern]?.name == originalState.items[Self.itemLantern]?.name)
-        #expect(decodedState.items[Self.itemLantern]?.attributes == originalState.items[Self.itemLantern]?.attributes)
-        #expect(decodedState.items[Self.itemLantern]?.parent == originalState.items[Self.itemLantern]?.parent)
-        #expect(decodedState.items[Self.itemMailbox]?.parent == originalState.items[Self.itemMailbox]?.parent)
-        #expect(decodedState.items[Self.itemLeaflet]?.parent == originalState.items[Self.itemLeaflet]?.parent)
+        #expect(
+            decodedState.items[Self.itemLantern]?.name
+                == originalState.items[Self.itemLantern]?.name)
+        #expect(
+            decodedState.items[Self.itemLantern]?.attributes
+                == originalState.items[Self.itemLantern]?.attributes)
+        #expect(
+            decodedState.items[Self.itemLantern]?.parent
+                == originalState.items[Self.itemLantern]?.parent)
+        #expect(
+            decodedState.items[Self.itemMailbox]?.parent
+                == originalState.items[Self.itemMailbox]?.parent)
+        #expect(
+            decodedState.items[Self.itemLeaflet]?.parent
+                == originalState.items[Self.itemLeaflet]?.parent)
 
         // IMPORTANT: Check that decoded objects are EQUAL, not identical instances (structs)
         #expect(decodedState.locations[Self.locWOH] == originalState.locations[Self.locWOH])
         #expect(decodedState.items[Self.itemLantern] == originalState.items[Self.itemLantern])
     }
 
-    @Test("GameState Value Semantics (Struct Behavior)") // Updated name
+    @Test("GameState Value Semantics (Struct Behavior)")  // Updated name
     func testGameSemantics() async throws {
         let state1 = await createSampleGameState()
-        var state2 = state1 // Creates a copy of the struct
+        var state2 = state1  // Creates a copy of the struct
 
         // Check initial equality of value types
         #expect(state1.player == state2.player)
         #expect(state1.globalState == state2.globalState)
         #expect(state1.pronouns == state2.pronouns)
-        #expect(state1.items == state2.items) // Items dict should be equal initially
-        #expect(state1.locations == state2.locations) // Locations dict should be equal
+        #expect(state1.items == state2.items)  // Items dict should be equal initially
+        #expect(state1.locations == state2.locations)  // Locations dict should be equal
 
         // Modify value type (Player) *in* state2
         try state2.apply(
@@ -340,13 +353,13 @@ struct GameStateTests {
         )
 
         // Create new lantern with updated properties
-//        let updatedLantern = Item(
-//            id: Self.itemLantern,
-//            .name("Shiny Lantern"),
-//            .in(.player),
-//            .isTakable,
-//            .isLightSource
-//        )
+        //        let updatedLantern = Item(
+        //            id: Self.itemLantern,
+        //            .name("Shiny Lantern"),
+        //            .in(.player),
+        //            .isTakable,
+        //            .isLightSource
+        //        )
         try state2.apply(
             StateChange(
                 entityID: .item(Self.itemLantern),
@@ -361,9 +374,9 @@ struct GameStateTests {
         )
 
         // Verify state1’s value types remain unchanged
-        let initialPlayer = state1.player // Capture initial player state from state1
-        #expect(state1.player == initialPlayer) // state1 player unchanged
-        #expect(state2.player != initialPlayer) // state2 player changed
+        let initialPlayer = state1.player  // Capture initial player state from state1
+        #expect(state1.player == initialPlayer)  // state1 player unchanged
+        #expect(state2.player != initialPlayer)  // state2 player changed
         let initialFlags = state1.globalState
         #expect(state1.globalState == initialFlags)
         #expect(state2.globalState == initialFlags)
@@ -372,8 +385,8 @@ struct GameStateTests {
         #expect(state2.pronouns == initialPronouns)
 
         // Verify state1’s Item struct is UNCHANGED (because Item is a struct)
-        #expect(state1.items[Self.itemLantern]?.name == "lantern") // Original name
-        #expect(state1.items[Self.itemLantern]?.parent == .nowhere) // Original parent
+        #expect(state1.items[Self.itemLantern]?.name == "lantern")  // Original name
+        #expect(state1.items[Self.itemLantern]?.parent == .nowhere)  // Original parent
 
         // Verify state2’s Item struct *is* changed
         #expect(state2.items[Self.itemLantern]?.name == "Shiny Lantern")
@@ -381,14 +394,14 @@ struct GameStateTests {
 
         // Check derived inventories reflect the *separate* changes
         let inventory1 = state1.items.values.filter { $0.parent == .player }.map(\.id)
-        #expect(Set(inventory1) == [Self.itemSword]) // Only sword originally
+        #expect(Set(inventory1) == [Self.itemSword])  // Only sword originally
         let inventory2 = state2.items.values.filter { $0.parent == .player }.map(\.id)
-        #expect(Set(inventory2) == [Self.itemSword, Self.itemLantern]) // Sword and moved lantern
+        #expect(Set(inventory2) == [Self.itemSword, Self.itemLantern])  // Sword and moved lantern
 
         // Check equality of the states and dictionaries
         #expect(state1 != state2)
         #expect(state1.items != state2.items)
-        #expect(state1.locations == state2.locations) // Locations were not modified
+        #expect(state1.locations == state2.locations)  // Locations were not modified
 
         // Check specific items are not equal after modification
         #expect(state1.items[Self.itemLantern] != state2.items[Self.itemLantern])
@@ -405,8 +418,8 @@ struct GameStateTests {
         let change = StateChange(
             entityID: .global,
             attribute: .removeActiveFuse(fuseID: fuseID),
-            oldValue: nil, // Explicitly stating we expect it to be nil (non-existent)
-            newValue: .int(0) // newValue is often ignored for removals
+            oldValue: nil,  // Explicitly stating we expect it to be nil (non-existent)
+            newValue: .int(0)  // newValue is often ignored for removals
         )
 
         // Then: Apply should succeed without throwing
@@ -429,8 +442,8 @@ struct GameStateTests {
         let change = StateChange(
             entityID: .global,
             attribute: .removeActiveFuse(fuseID: "existingFuse"),
-            oldValue: .int(1), // Providing the wrong oldValue
-            newValue: .int(0) // newValue is ignored for remove
+            oldValue: .int(1),  // Providing the wrong oldValue
+            newValue: .int(0)  // newValue is ignored for remove
         )
 
         // Expect an error because the oldValue is wrong
@@ -438,7 +451,9 @@ struct GameStateTests {
         // let expectedError = ActionResponse.internalEngineError("StateChange oldValue mismatch for removeActiveFuse(fuseID: \"existingFuse\") on global. Expected: int(1), Actual: int(5)")
         do {
             try gameState.apply(change)
-            Issue.record("Expected apply to throw ActionResponse.stateValidationFailed, but it did not throw.")
+            Issue.record(
+                "Expected apply to throw ActionResponse.stateValidationFailed, but it did not throw."
+            )
         } catch let error as ActionResponse {
             if case .stateValidationFailed = error {
                 // Correct error type thrown, continue verification
@@ -450,8 +465,8 @@ struct GameStateTests {
         }
 
         // Verify state hasn’t changed unexpectedly
-        #expect(gameState.activeFuses == ["existingFuse": 5]) // Fuse should still be present
-        #expect(gameState.changeHistory.isEmpty) // Apply should fail before adding to history
+        #expect(gameState.activeFuses == ["existingFuse": 5])  // Fuse should still be present
+        #expect(gameState.changeHistory.isEmpty)  // Apply should fail before adding to history
     }
 
     @Test("apply - Modify Location Properties - Set")
@@ -554,7 +569,7 @@ struct GameStateTests {
         let incorrectChange = StateChange(
             entityID: .location(.startRoom),
             attribute: .locationAttribute(.description),
-            oldValue: .string("Wrong Old Description"), // Incorrect old value
+            oldValue: .string("Wrong Old Description"),  // Incorrect old value
             newValue: .string("New Description")
         )
         let correctChange = StateChange(
@@ -566,7 +581,9 @@ struct GameStateTests {
 
         do {
             try state.apply(incorrectChange)
-            Issue.record("Expected apply to throw ActionResponse.stateValidationFailed, but it did not throw.")
+            Issue.record(
+                "Expected apply to throw ActionResponse.stateValidationFailed, but it did not throw."
+            )
         } catch let error as ActionResponse {
             if case .stateValidationFailed = error {
                 // Correct error type thrown, test passes this part
@@ -579,10 +596,10 @@ struct GameStateTests {
 
         // Verify the state hasn’t changed
         #expect(state.locations[.startRoom]?.attributes[.description] == correctChange.oldValue)
-        #expect(state.changeHistory.isEmpty) // No change should be recorded
+        #expect(state.changeHistory.isEmpty)  // No change should be recorded
 
         // Now apply the correct change
-        try? state.apply(correctChange) // Use try? as we don’t care about the error here
+        try? state.apply(correctChange)  // Use try? as we don’t care about the error here
         #expect(state.locations[.startRoom]?.attributes[.description] == correctChange.newValue)
         #expect(state.changeHistory.count == 1)
     }

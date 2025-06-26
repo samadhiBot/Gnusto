@@ -106,8 +106,8 @@ public struct StandardParser: Parser {
 
         // 4. Handle Single-Word Direction Command (e.g., "NORTH", "N")
         if filteredTokens.count == 1,
-           let directionWord = filteredTokens.first,
-           let direction = vocabulary.directions[directionWord]
+            let directionWord = filteredTokens.first,
+            let direction = vocabulary.directions[directionWord]
         {
             // Assume a default movement verb like 'go'
             let defaultGoVerb = Verb.go
@@ -120,37 +120,37 @@ public struct StandardParser: Parser {
         }
 
         // 5. Handle Empty Input (after noise removal and direction check)
-        guard !filteredTokens.isEmpty else {
+        guard filteredTokens.isNotEmpty else {
             return .failure(.emptyInput)
         }
 
         // 6. Identify Verb (handling multi-word synonyms)
-        var matchedVerbs: Set<Verb> = [] // Store all potential verb IDs
+        var matchedVerbs: Set<Verb> = []  // Store all potential verb IDs
         var verbTokenCount = 0
         var verbStartIndex = 0
 
         // Iterate through possible starting positions for the verb
         for i in 0..<filteredTokens.count {
             var longestMatchLength = 0
-            var potentialMatchIDs: Set<Verb> = [] // Track IDs for the current longest match length
+            var potentialMatchIDs: Set<Verb> = []  // Track IDs for the current longest match length
 
             // Check token sequences starting from index i
-            for length in (1...min(4, filteredTokens.count - i)).reversed() { // Check up to 4-word verbs, reversed for longest match first
+            for length in (1...min(4, filteredTokens.count - i)).reversed() {  // Check up to 4-word verbs, reversed for longest match first
                 let subSequence = filteredTokens[i..<(i + length)]
                 let verbPhrase = subSequence.joined(separator: " ")
 
                 // Look up the set of verbs associated with this phrase
-                if let foundVerbs = vocabulary.verbSynonyms[verbPhrase] { // Now returns Set<Verb>?
+                if let foundVerbs = vocabulary.verbSynonyms[verbPhrase] {  // Now returns Set<Verb>?
                     // Found potential matches
                     if length > longestMatchLength {
                         // New longest length found, clear previous shorter matches and start fresh
                         longestMatchLength = length
-                        potentialMatchIDs = foundVerbs // Assign the whole set
-                        verbTokenCount = length // Store the length of this match
-                        verbStartIndex = i // Store the start index
+                        potentialMatchIDs = foundVerbs  // Assign the whole set
+                        verbTokenCount = length  // Store the length of this match
+                        verbStartIndex = i  // Store the start index
                     } else if length == longestMatchLength {
                         // Same length as the current longest, add these IDs to the set
-                        potentialMatchIDs.formUnion(foundVerbs) // Use formUnion to add all IDs
+                        potentialMatchIDs.formUnion(foundVerbs)  // Use formUnion to add all IDs
                     }
                     // If length < longestMatchLength, ignore (we only want the longest matches)
                 }
@@ -158,30 +158,34 @@ public struct StandardParser: Parser {
 
             // If we found any matches of the longest possible length starting at index i, use them and stop searching
             if longestMatchLength > 0 {
-                matchedVerbs = potentialMatchIDs // Assign the set of IDs found at the longest length
+                matchedVerbs = potentialMatchIDs  // Assign the set of IDs found at the longest length
                 // verbTokenCount and verbStartIndex are already set when longestMatchLength was updated
-                break // Found the first (and longest) verb match group, stop outer loop
+                break  // Found the first (and longest) verb match group, stop outer loop
             }
         }
 
         // Ensure at least one verb was matched
-        guard !matchedVerbs.isEmpty else {
+        guard matchedVerbs.isNotEmpty else {
             // No known single or multi-word verb/synonym found
-            return .failure(.unknownVerb(filteredTokens.first ?? filteredTokens.joined(separator: " "))) // Use first word as guess
+            return .failure(
+                .unknownVerb(
+                    filteredTokens.first ?? filteredTokens.joined(separator: " ")
+                )
+            )  // Use first word as guess
         }
 
         // ***** REVISED: Fetch rules for ALL matched Verbs *****
         var allPotentialRules: [(verb: Verb, rule: SyntaxRule)] = []
-        var verbsWithRules: Set<Verb> = [] // Track which verbs actually have rules
+        var verbsWithRules: Set<Verb> = []  // Track which verbs actually have rules
 
         // Sort matched verbs for deterministic behavior when there are ties
         let sortedMatchedVerbs = matchedVerbs.sorted { $0.rawValue < $1.rawValue }
 
         for verb in sortedMatchedVerbs {
-            if let verbDef = vocabulary.verbDefinitions[verb] {
-                if !verbDef.syntax.isEmpty {
+            if let syntaxRules = vocabulary.verbToSyntax[verb] {
+                if syntaxRules.isNotEmpty {
                     verbsWithRules.insert(verb)
-                    for rule in verbDef.syntax {
+                    for rule in syntaxRules {
                         allPotentialRules.append((verb: verb, rule: rule))
                     }
                 }
@@ -210,48 +214,50 @@ public struct StandardParser: Parser {
             vocabulary: vocabulary
         )
 
-        for (verb, rule) in allPotentialRules { // Iterate through all potential rules
+        for (verb, rule) in allPotentialRules {  // Iterate through all potential rules
             let matchResult = matchRule(
                 rule: rule,
                 tokens: filteredTokens,
                 verbStartIndex: verbStartIndex,
                 verbTokenCount: verbTokenCount,
-                verb: verb, // <<< Pass the specific verb for this rule
+                verb: verb,  // <<< Pass the specific verb for this rule
                 vocabulary: vocabulary,
                 gameState: gameState,
                 originalInput: input
             )
 
             switch matchResult {
-            case .success(let command): // Command already contains the correct verb from matchRule
-                                        // Rule matched structurally. Now check prepositions.
+            case .success(let command):  // Command already contains the correct verb from matchRule
+                // Rule matched structurally. Now check prepositions.
                 if let requiredPrep = rule.expectedPreposition {
                     // Rule requires a specific preposition
                     if let inputPrep = inputPreposition {
                         // Input also has a preposition
                         if requiredPrep == inputPrep {
                             // PREPOSITIONS MATCH - DEFINITIVE SUCCESS
-                            successfulParse = command // Command has the correct verb
-                            bestError = nil // Clear any previous error
-                            break // Found the best possible match for this input
+                            successfulParse = command  // Command has the correct verb
+                            bestError = nil  // Clear any previous error
+                            break  // Found the best possible match for this input
                         } else {
                             // PREPOSITIONS MISMATCH - Record error, continue
                             // Use the specific verb associated with this rule
                             let mismatchError = ParseError.badGrammar(
                                 "Preposition mismatch for verb '\(verb)' (expected '\(requiredPrep)', found '\(inputPrep)')."
                             )
-                            if bestError == nil || shouldReplaceError(existing: bestError!, new: mismatchError) {
+                            if bestError == nil
+                                || shouldReplaceError(existing: bestError!, new: mismatchError)
+                            {
                                 bestError = mismatchError
                             }
-                            continue // Try next rule, this one is invalid for this input
+                            continue  // Try next rule, this one is invalid for this input
                         }
                     } else {
                         // RULE REQUIRES PREP, INPUT HAS NONE - Allow command to proceed
                         // The action handler will provide appropriate error messages for missing prepositions
                         if successfulParse == nil {
-                            successfulParse = command // Allow command with missing preposition
+                            successfulParse = command  // Allow command with missing preposition
                         }
-                        continue // Continue searching for potentially better matches
+                        continue  // Continue searching for potentially better matches
                     }
                 } else {
                     // RULE REQUIRES NO SPECIFIC PREPOSITION
@@ -261,8 +267,8 @@ public struct StandardParser: Parser {
                     // Let's treat this as a potential success but keep looking for a better (preposition-matching) rule.
                     // However, for simplicity now, let's consider it a success unless we find a better one later.
                     // TODO: Refine logic if ZIL treats extra prepositions differently (e.g., as errors).
-                    if successfulParse == nil { // Only take this if we don't have a preposition-matched success yet
-                        successfulParse = command // Command has the correct verb
+                    if successfulParse == nil {  // Only take this if we don't have a preposition-matched success yet
+                        successfulParse = command  // Command has the correct verb
                         // Don't clear bestError here, a later rule might still be better or produce a higher-priority error
                     }
                     // Continue searching for a potentially better match (e.g., one that uses the input preposition)
@@ -271,63 +277,65 @@ public struct StandardParser: Parser {
             case .failure(let currentError):
                 // Structural failure reported by matchRule
                 if bestError == nil || shouldReplaceError(existing: bestError!, new: currentError) {
-                     bestError = currentError
+                    bestError = currentError
                 }
-                // Continue to the next rule (implicit in loop structure)
+            // Continue to the next rule (implicit in loop structure)
             }
-        } // End rule loop
-        endRuleLoop: // Label for goto
+        }  // End rule loop
+        endRuleLoop:  // Label for goto
 
         // 8. Return Result
         if let command = successfulParse {
             return .success(command)
-        } else if let error = bestError { // Otherwise return best error found
-             return .failure(error)
+        } else if let error = bestError {  // Otherwise return best error found
+            return .failure(error)
         } else {
             // Handle simple verb-only commands or internal error
-             if allPotentialRules.isEmpty && filteredTokens.count == verbTokenCount {
-                 // Input was just a verb phrase matching one or more verbs, none of which had rules.
+            if allPotentialRules.isEmpty && filteredTokens.count == verbTokenCount {
+                // Input was just a verb phrase matching one or more verbs, none of which had rules.
 
-                 // Check for perfect tie: multiple verbs matched but none have syntax rules
-                 if sortedMatchedVerbs.count > 1 {
-                     let verbList = sortedMatchedVerbs.map { $0.rawValue }.joined(separator: ", ")
-                     return .failure(
+                // Check for perfect tie: multiple verbs matched but none have syntax rules
+                if sortedMatchedVerbs.count > 1 {
+                    let verbList = sortedMatchedVerbs.map { $0.rawValue }.joined(separator: ", ")
+                    return .failure(
                         .badGrammar(
                             "The word '\(filteredTokens.joined(separator: " "))' could refer to multiple commands (\(verbList)), but none can handle this syntax. Please be more specific."
                         )
-                     )
-                 }
+                    )
+                }
 
-                 // Single verb with no syntax rules - allow it
-                 let firstMatchedID = sortedMatchedVerbs.first!
-                 let command = Command(verb: firstMatchedID, rawInput: input)
-                 return .success(command)
-             } else {
-                 // Rules existed but all failed
+                // Single verb with no syntax rules - allow it
+                let firstMatchedID = sortedMatchedVerbs.first!
+                let command = Command(verb: firstMatchedID, rawInput: input)
+                return .success(command)
+            } else {
+                // Rules existed but all failed
 
-                 // Check for perfect tie: multiple verbs tried but all failed validation
-                 if sortedMatchedVerbs.count > 1 {
-                     let verbList = sortedMatchedVerbs.map { $0.rawValue }.joined(separator: ", ")
-                     return .failure(
+                // Check for perfect tie: multiple verbs tried but all failed validation
+                if sortedMatchedVerbs.count > 1 {
+                    let verbList = sortedMatchedVerbs.map { $0.rawValue }.joined(separator: ", ")
+                    return .failure(
                         .badGrammar(
                             "The word '\(filteredTokens.first ?? "")' could refer to multiple commands (\(verbList)), but none can handle this syntax. Please be more specific."
                         )
-                     )
-                 }
+                    )
+                }
 
-                 // Single verb failed - provide the standard error
-                 let firstMatchedID = sortedMatchedVerbs.first!
-                 return .failure(
+                // Single verb failed - provide the standard error
+                let firstMatchedID = sortedMatchedVerbs.first!
+                return .failure(
                     .badGrammar(
                         "I understood '\(firstMatchedID.rawValue)' but couldn't parse the rest of the sentence with its known grammar rules."
                     )
-                 )
-             }
+                )
+            }
         }
     }
 
     /// Helper to find the preposition in the input tokens *after* the verb phrase.
-    private func findInputPreposition(tokens: [String], startIndex: Int, vocabulary: Vocabulary) -> String? {
+    private func findInputPreposition(tokens: [String], startIndex: Int, vocabulary: Vocabulary)
+        -> String?
+    {
         for i in startIndex..<tokens.count {
             let currentToken = tokens[i]
             if vocabulary.prepositions.contains(currentToken) {
@@ -345,7 +353,8 @@ public struct StandardParser: Parser {
     /// Prioritizes resolution errors > ambiguity > grammar > other.
     private func isResolutionError(_ error: ParseError) -> Bool {
         switch error {
-        case .itemNotInScope, .modifierMismatch, .unknownNoun, .pronounNotSet, .pronounRefersToOutOfScopeItem:
+        case .itemNotInScope, .modifierMismatch, .unknownNoun, .pronounNotSet,
+            .pronounRefersToOutOfScopeItem:
             return true
         default:
             return false
@@ -353,20 +362,20 @@ public struct StandardParser: Parser {
     }
 
     private func isAmbiguityError(_ error: ParseError) -> Bool {
-         switch error {
-         case .ambiguity, .ambiguousPronounReference:
-             return true
-         default:
-             return false
-         }
+        switch error {
+        case .ambiguity, .ambiguousPronounReference:
+            return true
+        default:
+            return false
+        }
     }
 
-     private func isGrammarError(_ error: ParseError) -> Bool {
-         switch error {
-         case .badGrammar: true
-         default: false
-         }
-     }
+    private func isGrammarError(_ error: ParseError) -> Bool {
+        switch error {
+        case .badGrammar: true
+        default: false
+        }
+    }
 
     private func errorPriority(_ error: ParseError) -> Int {
         if isResolutionError(error) { return 4 }
@@ -374,7 +383,7 @@ public struct StandardParser: Parser {
         if isGrammarError(error) { return 2 }
         if case .unknownVerb = error { return 1 }
         if case .emptyInput = error { return 0 }
-        return 0 // Default lowest priority
+        return 0  // Default lowest priority
     }
 
     private func shouldReplaceError(existing: ParseError, new: ParseError) -> Bool {
@@ -387,21 +396,22 @@ public struct StandardParser: Parser {
         // ZIL tokenization was more complex (e.g., dictionary separators).
 
         // Allow alphanumeric characters, spaces, commas (for conjunctions), and hyphens (for compound adjectives)
-        let allowedChars = CharacterSet.alphanumerics.union(.whitespaces).union(CharacterSet(charactersIn: ",-"))
+        let allowedChars = CharacterSet.alphanumerics.union(.whitespaces).union(
+            CharacterSet(charactersIn: ",-"))
         let sanitizedInput = String(input.unicodeScalars.filter { allowedChars.contains($0) })
 
         // Split by whitespace and also treat commas as separate tokens
         var tokens: [String] = []
         let words = sanitizedInput.lowercased()
             .components(separatedBy: .whitespacesAndNewlines)
-            .filter { !$0.isEmpty }
+            .filter { $0.isNotEmpty }
 
         for word in words {
             if word.contains(",") {
                 // Split words containing commas
                 let parts = word.components(separatedBy: ",")
                 for (index, part) in parts.enumerated() {
-                    if !part.isEmpty {
+                    if part.isNotEmpty {
                         tokens.append(part)
                     }
                     // Add comma as separate token (except after the last part)
@@ -461,7 +471,8 @@ public struct StandardParser: Parser {
                 switch tokenType {
                 case .particle(let expectedParticle):
                     // Particles are structural and required - if missing, this rule fails
-                    return .failure(.badGrammar("Expected '\(expectedParticle)' but reached end of input."))
+                    return .failure(
+                        .badGrammar("Expected '\(expectedParticle)' but reached end of input."))
                 case .directObject, .directObjects, .indirectObject, .indirectObjects, .direction:
                     // Objects and directions can be missing - let action handlers provide better error messages
                     break
@@ -482,7 +493,9 @@ public struct StandardParser: Parser {
             case .specificVerb(let requiredVerb):
                 // Verify that the command uses the specific verb required by this rule
                 guard verb == requiredVerb else {
-                    return .failure(.badGrammar("This syntax requires the specific verb '\(requiredVerb.rawValue)'."))
+                    return .failure(
+                        .badGrammar(
+                            "This syntax requires the specific verb '\(requiredVerb.rawValue)'."))
                 }
                 continue
 
@@ -498,36 +511,36 @@ public struct StandardParser: Parser {
                     directObjectPhraseTokens = Array(tokens[tokenCursor..<phraseEndIndex])
                     tokenCursor = phraseEndIndex
                 }
-                // If no direct object found, leave directObjectPhraseTokens empty
-                // Action handlers will provide appropriate error messages
+            // If no direct object found, leave directObjectPhraseTokens empty
+            // Action handlers will provide appropriate error messages
 
             case .indirectObject, .indirectObjects:
-                 let phraseEndIndex = findEndOfNounPhrase(
+                let phraseEndIndex = findEndOfNounPhrase(
                     startIndex: tokenCursor,
                     tokens: tokens,
                     pattern: rule.pattern,
                     patternIndex: patternIndex,
                     vocabulary: vocabulary
-                 )
-                 if phraseEndIndex > tokenCursor {
+                )
+                if phraseEndIndex > tokenCursor {
                     indirectObjectPhraseTokens = Array(tokens[tokenCursor..<phraseEndIndex])
                     tokenCursor = phraseEndIndex
-                 }
-                 // If no indirect object found, leave indirectObjectPhraseTokens empty
-                 // Action handlers will provide appropriate error messages
+                }
+            // If no indirect object found, leave indirectObjectPhraseTokens empty
+            // Action handlers will provide appropriate error messages
 
             case .direction:
-                 let currentToken = tokens[tokenCursor]
-                 if let direction = vocabulary.directions[currentToken] {
-                     matchedDirection = direction
-                     tokenCursor += 1
-                 } else {
-                     return .failure(
+                let currentToken = tokens[tokenCursor]
+                if let direction = vocabulary.directions[currentToken] {
+                    matchedDirection = direction
+                    tokenCursor += 1
+                } else {
+                    return .failure(
                         .badGrammar(
                             "Expected a direction (like north, s, up) but found '\(currentToken)'."
                         )
-                     )
-                 }
+                    )
+                }
 
             case .particle(let expectedParticle):
                 let currentToken = tokens[tokenCursor]
@@ -544,7 +557,8 @@ public struct StandardParser: Parser {
 
         if tokenCursor < tokens.count {
             return .failure(
-                .badGrammar("""
+                .badGrammar(
+                    """
                     Unexpected words found after command:
                     '\(Array(tokens[tokenCursor...]).joined(separator: " "))'
                     """
@@ -641,66 +655,67 @@ public struct StandardParser: Parser {
                 // Continue with empty indirect objects - action handlers will handle this
             } else {
 
-            // Check if we have multiple phrases (conjunctions) and the rule allows multiple objects
-            if indirectObjectPhrases.count > 1 && allowsMultiple {
-                isMultipleObjectsIO = true
-            } else if indirectObjectPhrases.count > 1 {
-                return .failure(
-                    .badGrammar(
-                        "The verb '\(verb)' doesn't support multiple indirect objects."
+                // Check if we have multiple phrases (conjunctions) and the rule allows multiple objects
+                if indirectObjectPhrases.count > 1 && allowsMultiple {
+                    isMultipleObjectsIO = true
+                } else if indirectObjectPhrases.count > 1 {
+                    return .failure(
+                        .badGrammar(
+                            "The verb '\(verb)' doesn't support multiple indirect objects."
+                        )
                     )
-                )
-            }
+                }
 
-            // Process each noun phrase
-            for (noun, modifiers) in indirectObjectPhrases {
-                let lowercasedNoun = noun.lowercased()
+                // Process each noun phrase
+                for (noun, modifiers) in indirectObjectPhrases {
+                    let lowercasedNoun = noun.lowercased()
 
-                // Check if this is an ALL command and the rule allows multiple objects
-                if vocabulary.specialKeywords.contains(lowercasedNoun) && allowsMultiple {
-                    isAllCommandIO = true
-                    let allObjectsResult = resolveAllObjects(
-                        verb: verb,
-                        modifiers: modifiers,
-                        in: gameState,
-                        using: vocabulary
-                    )
-                    switch allObjectsResult {
-                    case .success(let objects):
-                        resolvedIndirectObjects.append(contentsOf: objects)
-                    case .failure(let error):
-                        return .failure(error)
-                    }
-                } else {
-                    // Regular single object resolution
-                    let singleObjectResult = resolveObject(
-                        noun: noun,
-                        verb: verb,
-                        modifiers: modifiers,
-                        in: gameState,
-                        using: vocabulary
-                    )
-                    switch singleObjectResult {
-                    case .success(let objectRef):
-                        if let ref = objectRef {
-                            resolvedIndirectObjects.append(ref)
+                    // Check if this is an ALL command and the rule allows multiple objects
+                    if vocabulary.specialKeywords.contains(lowercasedNoun) && allowsMultiple {
+                        isAllCommandIO = true
+                        let allObjectsResult = resolveAllObjects(
+                            verb: verb,
+                            modifiers: modifiers,
+                            in: gameState,
+                            using: vocabulary
+                        )
+                        switch allObjectsResult {
+                        case .success(let objects):
+                            resolvedIndirectObjects.append(contentsOf: objects)
+                        case .failure(let error):
+                            return .failure(error)
                         }
-                    case .failure(let error):
-                        return .failure(error)
+                    } else {
+                        // Regular single object resolution
+                        let singleObjectResult = resolveObject(
+                            noun: noun,
+                            verb: verb,
+                            modifiers: modifiers,
+                            in: gameState,
+                            using: vocabulary
+                        )
+                        switch singleObjectResult {
+                        case .success(let objectRef):
+                            if let ref = objectRef {
+                                resolvedIndirectObjects.append(ref)
+                            }
+                        case .failure(let error):
+                            return .failure(error)
+                        }
                     }
                 }
             }
-        }
-        } // Close the else block for indirect object processing
+        }  // Close the else block for indirect object processing
 
         // Create command with multiple object support
         let command = Command(
             verb: verb,
             directObjects: resolvedDirectObjects,
-            directObjectModifiers: directObjectPhrases.first?.1 ?? [], // Use modifiers from first phrase
+            directObjectModifiers: directObjectPhrases.first?.1 ?? [],  // Use modifiers from first phrase
             indirectObjects: resolvedIndirectObjects,
-            indirectObjectModifiers: indirectObjectPhrases.first?.1 ?? [], // Use modifiers from first phrase
-            isAllCommand: isAllCommandDO || isAllCommandIO || isMultipleObjectsDO || isMultipleObjectsIO,
+            indirectObjectModifiers: indirectObjectPhrases.first?.1 ?? [],  // Use modifiers from first phrase
+            isAllCommand: isAllCommandDO || isAllCommandIO || isMultipleObjectsDO
+                || isMultipleObjectsIO,
             preposition: matchedPreposition,
             direction: matchedDirection,
             rawInput: originalInput
@@ -716,7 +731,7 @@ public struct StandardParser: Parser {
         from tokens: [String],
         vocabulary: Vocabulary
     ) -> [(noun: String, modifiers: [String])] {
-        guard !tokens.isEmpty else { return [] }
+        guard tokens.isNotEmpty else { return [] }
 
         // Split the tokens by conjunctions
         var phrases: [[String]] = []
@@ -725,7 +740,7 @@ public struct StandardParser: Parser {
         for token in tokens {
             if vocabulary.conjunctions.contains(token) {
                 // Found a conjunction, save current phrase and start a new one
-                if !currentPhrase.isEmpty {
+                if currentPhrase.isNotEmpty {
                     phrases.append(currentPhrase)
                     currentPhrase = []
                 }
@@ -735,12 +750,12 @@ public struct StandardParser: Parser {
         }
 
         // Add the last phrase
-        if !currentPhrase.isEmpty {
+        if currentPhrase.isNotEmpty {
             phrases.append(currentPhrase)
         }
 
         // If no conjunctions were found, we have a single phrase
-        if phrases.isEmpty && !tokens.isEmpty {
+        if phrases.isEmpty && tokens.isNotEmpty {
             phrases = [tokens]
         }
 
@@ -761,7 +776,7 @@ public struct StandardParser: Parser {
         return result
     }
 
-        /// Extracts the likely noun and preceding modifiers from a phrase.
+    /// Extracts the likely noun and preceding modifiers from a phrase.
     /// Filters noise words, identifies known nouns, and assumes the last known noun is primary.
     private func extractNounAndMods(
         from phrase: [String],
@@ -769,7 +784,7 @@ public struct StandardParser: Parser {
     ) -> (noun: String?, mods: [String]) {
         // Note: Input phrase has already been processed by removeNoise, so no need to filter again
         let significantPhrase = phrase
-        guard !significantPhrase.isEmpty else { return (nil, []) }
+        guard significantPhrase.isNotEmpty else { return (nil, []) }
 
         // First, check if the entire phrase (joined) matches any known item or location
         // Only do this for multi-word phrases to avoid interfering with single-word cases
@@ -809,13 +824,12 @@ public struct StandardParser: Parser {
             }
 
             let potentialMods = significantPhrase.filter { word in
-                !vocabulary.items.keys.contains(word) &&
-                !vocabulary.locationNames.keys.contains(word) &&
-                !playerAliases.contains(word) &&
-                !vocabulary.verbSynonyms.keys.contains(word) &&
-                !vocabulary.prepositions.contains(word) &&
-                !vocabulary.directions.keys.contains(word) &&
-                !vocabulary.specialKeywords.contains(word)
+                !vocabulary.items.keys.contains(word)
+                    && !vocabulary.locationNames.keys.contains(word)
+                    && !playerAliases.contains(word) && !vocabulary.verbSynonyms.keys.contains(word)
+                    && !vocabulary.prepositions.contains(word)
+                    && !vocabulary.directions.keys.contains(word)
+                    && !vocabulary.specialKeywords.contains(word)
             }
             return (nil, potentialMods)
         }
@@ -834,9 +848,12 @@ public struct StandardParser: Parser {
             // 2. Not known nouns UNLESS we're dealing with a compound phrase that matches a specific item
 
             // First check if this might be part of a compound phrase
-            let potentialCompoundPhrase = significantPhrase[index...lastNounIndex].joined(separator: " ").lowercased()
-            let isPartOfCompoundPhrase = vocabulary.items.keys.contains(potentialCompoundPhrase) ||
-                                        vocabulary.locationNames.keys.contains(potentialCompoundPhrase)
+            let potentialCompoundPhrase = significantPhrase[index...lastNounIndex].joined(
+                separator: " "
+            ).lowercased()
+            let isPartOfCompoundPhrase =
+                vocabulary.items.keys.contains(potentialCompoundPhrase)
+                || vocabulary.locationNames.keys.contains(potentialCompoundPhrase)
 
             if !isKnownVerb && !isKnownPrep && !isKnownDirection {
                 // Include as modifier if it's not a known noun, OR if it's part of a compound phrase
@@ -889,7 +906,7 @@ public struct StandardParser: Parser {
             // gameState.pronouns now stores Set<EntityReference>?
             guard
                 let referredEntityRefs = gameState.pronouns[lowercasedNoun],
-                !referredEntityRefs.isEmpty
+                referredEntityRefs.isNotEmpty
             else {
                 return .failure(.pronounNotSet(pronoun: lowercasedNoun))
             }
@@ -901,7 +918,7 @@ public struct StandardParser: Parser {
                 case .item(let itemID):
                     // Check scope for this specific itemID
                     let itemCandidates = gatherCandidates(in: gameState)
-                    if itemCandidates.keys.contains(itemID) { // Check if item is in the general candidate pool
+                    if itemCandidates.keys.contains(itemID) {  // Check if item is in the general candidate pool
                         // Modifiers (adjectives) usually don't apply to pronouns directly,
                         // but if they did, this is where they'd be checked against the item's adjectives.
                         // For now, if the pronoun refers to an item and that item is in scope, consider it a match.
@@ -912,7 +929,7 @@ public struct StandardParser: Parser {
                     if gameState.locations[locID] != nil {
                         resolvedPronounCandidates.append(ref)
                     }
-                case .player: // Pronoun referring to player
+                case .player:  // Pronoun referring to player
                     resolvedPronounCandidates.append(ref)
                 }
             }
@@ -925,7 +942,8 @@ public struct StandardParser: Parser {
                     entityRefToString($0, gameState: gameState)
                 }
                 return .failure(
-                    .ambiguousPronounReference("""
+                    .ambiguousPronounReference(
+                        """
                         Which '\(lowercasedNoun)' do you mean: \
                         \(descriptions.commaListing("or"))?
                         """)
@@ -940,7 +958,7 @@ public struct StandardParser: Parser {
 
         // First, try alternative interpretations if modifiers are present
         // Check if any modifier could actually be the primary noun
-        if !modifiers.isEmpty {
+        if modifiers.isNotEmpty {
             for modifier in modifiers {
                 let lowercasedModifier = modifier.lowercased()
 
@@ -950,13 +968,16 @@ public struct StandardParser: Parser {
                         // Only consider this alternative if the item is specifically identified by this modifier
                         // and also has the current noun as part of its name/synonyms
                         if let item = gameState.items[itemID] {
-                            let itemNameWords = Set(item.name.lowercased().split(separator: " ").map(String.init))
+                            let itemNameWords = Set(
+                                item.name.lowercased().split(separator: " ").map(String.init))
                             let itemSynonyms = Set(item.synonyms.map { $0.lowercased() })
                             let allItemWords = itemNameWords.union(itemSynonyms)
 
                             // If this item contains both the modifier and the noun in its identity,
                             // consider it as an alternative interpretation
-                            if allItemWords.contains(lowercasedModifier) && allItemWords.contains(lowercasedNoun) {
+                            if allItemWords.contains(lowercasedModifier)
+                                && allItemWords.contains(lowercasedNoun)
+                            {
                                 potentialEntities.append(.item(itemID))
                             }
                         }
@@ -995,12 +1016,12 @@ public struct StandardParser: Parser {
 
                 // Use existing item-centric scoping and filtering
                 let itemCandidates = gatherCandidates(in: gameState)
-                if itemCandidates.keys.contains(itemID) { // Check if item is in the general candidate pool
+                if itemCandidates.keys.contains(itemID) {  // Check if item is in the general candidate pool
                     // Pass the specific item's snapshot for modifier checking
                     if let item = gameState.items[itemID] {
                         if filterCandidates(item: item, modifiers: modifiers) {
                             resolvedAndScopedEntities.append(.item(itemID))
-                        } else if !modifiers.isEmpty {
+                        } else if modifiers.isNotEmpty {
                             // Modifier mismatch, but item was in scope. Do not add, let error be handled later if no other match.
                         }
                     } else {
@@ -1019,15 +1040,15 @@ public struct StandardParser: Parser {
                     // Locations typically aren't modified by adjectives in the same way items are.
                     // Consider this a parse error for now or decide to ignore modifiers for locations.
                     // Returning nothing here, will lead to .modifierMismatch if no item matches.
-                    continue // Skip this candidate if modifiers are present
+                    continue  // Skip this candidate if modifiers are present
                 }
                 // TODO: Add check for location-specific requiredConditions if they become a concept.
                 // For now, if it's a location reference, it's valid if named.
-                if let _ = gameState.locations[locationID] { // Verify location actually exists in current game state
+                if gameState.locations[locationID] != nil {  // Verify location actually exists in current game state
                     resolvedAndScopedEntities.append(.location(locationID))
                 }
 
-            case .player: // Should have been handled by player alias check, but defensive
+            case .player:  // Should have been handled by player alias check, but defensive
                 if modifiers.isEmpty {
                     resolvedAndScopedEntities.append(.player)
                 }
@@ -1037,7 +1058,7 @@ public struct StandardParser: Parser {
         if resolvedAndScopedEntities.isEmpty {
             // Special case: If modifiers are provided, check if the full phrase (modifiers + noun)
             // matches a synonym for any item that exists but is not accessible
-            if !modifiers.isEmpty {
+            if modifiers.isNotEmpty {
                 let fullPhrase = (modifiers + [noun]).joined(separator: " ").lowercased()
 
                 // Look through all items to see if any have this full phrase as a synonym
@@ -1048,7 +1069,8 @@ public struct StandardParser: Parser {
                             let itemNameLowercase = item.name.lowercased()
                             let itemSynonyms = item.synonyms.map { $0.lowercased() }
 
-                            if itemNameLowercase == fullPhrase || itemSynonyms.contains(fullPhrase) {
+                            if itemNameLowercase == fullPhrase || itemSynonyms.contains(fullPhrase)
+                            {
                                 // This exact phrase refers to a specific item, but it's not accessible
                                 // Return an unresolved reference to trigger "You can't see any such thing."
                                 let unresolvedRef = EntityReference.item(ItemID(fullPhrase))
@@ -1062,13 +1084,14 @@ public struct StandardParser: Parser {
                 let itemCandidates = gatherCandidates(in: gameState)
                 let accessiblePotentialItems = potentialEntities.compactMap { entityRef -> Item? in
                     if case .item(let itemID) = entityRef,
-                       let item = itemCandidates[itemID] {
+                        let item = itemCandidates[itemID]
+                    {
                         return item
                     }
                     return nil
                 }
 
-                if !accessiblePotentialItems.isEmpty {
+                if accessiblePotentialItems.isNotEmpty {
                     // We have accessible items with this noun but none match the modifiers
                     return .failure(.modifierMismatch(noun: noun, modifiers: modifiers))
                 }
@@ -1077,7 +1100,7 @@ public struct StandardParser: Parser {
             // If we had potential entities but none survived scoping/modifiers,
             // still return the first potential entity to allow action handlers
             // to provide more specific error messages
-            if !potentialEntities.isEmpty {
+            if potentialEntities.isNotEmpty {
                 // Return the first potential entity even if out of scope
                 return .success(potentialEntities.first!)
             }
@@ -1095,16 +1118,19 @@ public struct StandardParser: Parser {
                     nil
                 }
             }
-            if !itemEntities.isEmpty && itemEntities.count == resolvedAndScopedEntities.count {
+            if itemEntities.isNotEmpty && itemEntities.count == resolvedAndScopedEntities.count {
                 // All ambiguous are items
                 let baseName = itemEntities.first?.name ?? "item"
                 let allSameName = itemEntities.allSatisfy { $0.name == baseName }
                 let adjectiveSets = itemEntities.map { Set($0.adjectives) }
-                let allSameAdjectives = adjectiveSets.dropFirst().allSatisfy { $0 == adjectiveSets.first }
+                let allSameAdjectives = adjectiveSets.dropFirst().allSatisfy {
+                    $0 == adjectiveSets.first
+                }
                 if allSameName {
                     if allSameAdjectives {
                         // All truly identical
-                        logger.error("""
+                        logger.error(
+                            """
                             StandardParser cannot distinguish between \
                             \(itemEntities.count) identical items
                             """)
@@ -1157,19 +1183,20 @@ public struct StandardParser: Parser {
             case .take:
                 // For TAKE ALL, only include takable items not already held
                 // AND only items that are directly accessible (not inside containers)
-                let isDirectlyAccessible = switch item.parent {
-                case .player, .nowhere:
-                    false  // Already held or not placed anywhere
-                case .location:
-                    true   // In the current location
-                case .item(let parentID):
-                    // Check if parent is a surface (accessible) or container (not accessible for take all)
-                    if let parentItem = gameState.items[parentID] {
-                        parentItem.hasFlag(.isSurface)  // Only surfaces are directly accessible
-                    } else {
-                        false
+                let isDirectlyAccessible =
+                    switch item.parent {
+                    case .player, .nowhere:
+                        false  // Already held or not placed anywhere
+                    case .location:
+                        true  // In the current location
+                    case .item(let parentID):
+                        // Check if parent is a surface (accessible) or container (not accessible for take all)
+                        if let parentItem = gameState.items[parentID] {
+                            parentItem.hasFlag(.isSurface)  // Only surfaces are directly accessible
+                        } else {
+                            false
+                        }
                     }
-                }
                 isValidForVerb = item.hasFlag(.isTakable) && isDirectlyAccessible
             case .drop:
                 // For DROP ALL, only include items currently held by player
@@ -1198,7 +1225,7 @@ public struct StandardParser: Parser {
             return lhs.id.rawValue < rhs.id.rawValue
         }
 
-        guard !validItems.isEmpty else {
+        guard validItems.isNotEmpty else {
             // Return appropriate error based on context
             if modifiers.isEmpty {
                 switch verb {
@@ -1256,8 +1283,8 @@ public struct StandardParser: Parser {
         item: Item,
         modifiers: [String]
     ) -> Bool {
-        guard !modifiers.isEmpty else {
-            return true // No modifiers, the item is a valid match by default
+        guard modifiers.isNotEmpty else {
+            return true  // No modifiers, the item is a valid match by default
         }
 
         let lowercasedModifiers = Set(modifiers.map { $0.lowercased() })
@@ -1324,7 +1351,8 @@ public struct StandardParser: Parser {
                 case .specificVerb(let requiredVerb):
                     // Check if current token matches the required verb
                     if let verbIDs = vocabulary.verbSynonyms[currentToken],
-                       verbIDs.contains(requiredVerb) {
+                        verbIDs.contains(requiredVerb)
+                    {
                         isBoundaryToken = true
                     }
                 case .particle(let expectedParticle):
@@ -1349,8 +1377,8 @@ public struct StandardParser: Parser {
 
 // Helper to access failure value easily (avoids force unwrap)
 // Moved to file scope
-private extension Result where Success == EntityReference?, Failure == ParseError {
-    var failureValue: Failure? {
+extension Result where Success == EntityReference?, Failure == ParseError {
+    fileprivate var failureValue: Failure? {
         guard case .failure(let error) = self else { return nil }
         return error
     }

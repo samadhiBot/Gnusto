@@ -28,10 +28,10 @@ enum MarkdownParser {
     }
 }
 
-private extension String {
+extension String {
     /// Prevents orphaned words (single words on the last line of paragraphs)
     /// by moving words from the previous line when possible.
-    func preventOrphans() -> String {
+    fileprivate func preventOrphans() -> String {
         // Split into paragraphs (separated by double newlines)
         let paragraphs = self.components(separatedBy: "\n\n")
 
@@ -41,13 +41,17 @@ private extension String {
 
             // Check if the last line has only one word
             let lastLine = lines.last!.trimmingCharacters(in: .whitespaces)
-            let lastLineWords = lastLine.components(separatedBy: .whitespaces).filter { !$0.isEmpty }
+            let lastLineWords = lastLine.components(separatedBy: .whitespaces).filter {
+                $0.isNotEmpty
+            }
 
             guard lastLineWords.count == 1 else { return paragraph }
 
             // Check if the previous line has multiple words
             let previousLine = lines[lines.count - 2].trimmingCharacters(in: .whitespaces)
-            let previousLineWords = previousLine.components(separatedBy: .whitespaces).filter { !$0.isEmpty }
+            let previousLineWords = previousLine.components(separatedBy: .whitespaces).filter {
+                $0.isNotEmpty
+            }
 
             guard previousLineWords.count >= 2 else { return paragraph }
 

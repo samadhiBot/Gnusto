@@ -390,7 +390,7 @@ private func handleThiefCombatResponse(engine: GameEngine, outcome: ThiefCombatO
 /// Sophisticated theft system with treasure evaluation and targeting
 private func attemptSophisticatedTheft(engine: GameEngine) async throws -> ActionResult? {
     let playerItems = await engine.items(in: .player)
-    guard !playerItems.isEmpty else { return nil }
+    guard playerItems.isNotEmpty else { return nil }
 
     // Enhanced theft targeting - prioritize most valuable items
     let targetableItems = playerItems.compactMap { item -> (ItemID, Int)? in
@@ -398,7 +398,7 @@ private func attemptSophisticatedTheft(engine: GameEngine) async throws -> Actio
         return value > 0 ? (item.id, value) : nil
     }.sorted { $0.1 > $1.1 }  // Sort by value, highest first
 
-    guard !targetableItems.isEmpty else { return nil }
+    guard targetableItems.isNotEmpty else { return nil }
 
     // 25% base chance, increased if player has very valuable items
     let hasHighValueItems = targetableItems.contains { $0.1 >= 5 }
@@ -425,7 +425,7 @@ private func attemptSophisticatedTheft(engine: GameEngine) async throws -> Actio
 /// Steals a random item when thief defeats player in combat
 private func thiefStealsRandomItem(engine: GameEngine) async throws -> StateChange? {
     let playerItems = await engine.items(in: .player)
-    guard !playerItems.isEmpty else { return nil }
+    guard playerItems.isNotEmpty else { return nil }
 
     // Prefer valuable items, but will take anything in combat
     let valuableItems = playerItems.filter { item in

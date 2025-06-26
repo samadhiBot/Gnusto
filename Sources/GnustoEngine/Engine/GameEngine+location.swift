@@ -32,7 +32,8 @@ extension GameEngine {
         case .string(let stringValue):
             return stringValue
         default:
-            throw ActionResponse.invalidValue("""
+            throw ActionResponse.invalidValue(
+                """
                 Cannot fetch string value for \(locationID.rawValue).\(attributeID.rawValue): \
                 expected string but got \(value)
                 """)
@@ -262,7 +263,8 @@ extension GameEngine {
         attributeID: LocationAttributeID
     ) async -> (value: StateValue?, wasComputed: Bool) {
         guard let location = gameState.locations[locationID] else {
-            logWarning("""
+            logWarning(
+                """
                 Attempted to get dynamic value '\(attributeID.rawValue)' \
                 for non-existent location: \(locationID.rawValue)
                 """)
@@ -277,7 +279,9 @@ extension GameEngine {
                 }
                 // Computer returned nil, fall through to stored value
             } catch {
-                logError("Error computing dynamic value '\(attributeID.rawValue)' for location \(locationID.rawValue): \(error)")
+                logError(
+                    "Error computing dynamic value '\(attributeID.rawValue)' for location \(locationID.rawValue): \(error)"
+                )
                 // Fall through to stored value on error
             }
         }
@@ -301,19 +305,21 @@ extension GameEngine {
         let visibleItems = try visibleItemIDs.compactMap(item(_:))
 
         // 3. Format and print the list if not empty
-        if !visibleItems.isEmpty {
+        if visibleItems.isNotEmpty {
             var descriptionLines: [String] = []
 
             // Handle items directly in the location (excluding those that omit description)
             let directItems = visibleItems.filter { !$0.hasFlag(.omitDescription) }
-            if !directItems.isEmpty {
+            if directItems.isNotEmpty {
                 // Check if any direct items have firstDescription and haven't been touched
                 var hasFirstDescriptions = false
                 for item in directItems {
-                    let firstDescription: String? = try await attribute(.firstDescription, of: item.id)
+                    let firstDescription: String? = try await attribute(
+                        .firstDescription, of: item.id)
                     if let description = firstDescription,
-                       !description.isEmpty,
-                       !item.hasFlag(.isTouched) {
+                        description.isNotEmpty,
+                        !item.hasFlag(.isTouched)
+                    {
                         hasFirstDescriptions = true
                         break
                     }
@@ -322,10 +328,12 @@ extension GameEngine {
                 if hasFirstDescriptions {
                     // Use individual first descriptions for untouched direct items
                     for item in directItems.sorted() {
-                        let firstDescription: String? = try await attribute(.firstDescription, of: item.id)
+                        let firstDescription: String? = try await attribute(
+                            .firstDescription, of: item.id)
                         if let description = firstDescription,
-                           !description.isEmpty,
-                           !item.hasFlag(.isTouched) {
+                            description.isNotEmpty,
+                            !item.hasFlag(.isTouched)
+                        {
                             // Use first description for untouched items
                             descriptionLines.append(description)
                         } else {
@@ -344,19 +352,25 @@ extension GameEngine {
 
             // Check for surfaces and open/transparent containers in the location
             // Include ALL items in location (even those with .omitDescription) to check for surfaces
-            let allItemsInLocation = gameState.items.values.filter { $0.parent == .location(locationID) }
+            let allItemsInLocation = gameState.items.values.filter {
+                $0.parent == .location(locationID)
+            }
             for item in allItemsInLocation {
-                if item.hasFlag(.isSurface) ||
-                   (item.hasFlag(.isContainer) && (item.hasFlag(.isOpen) || item.hasFlag(.isTransparent))) {
+                if item.hasFlag(.isSurface)
+                    || (item.hasFlag(.isContainer)
+                        && (item.hasFlag(.isOpen) || item.hasFlag(.isTransparent)))
+                {
                     let contents = gameState.items(in: .item(item.id))
 
                     // Check if any items on this surface have first descriptions
                     var hasFirstDescriptions = false
                     for contentItem in contents {
-                        let firstDescription: String? = try await attribute(.firstDescription, of: contentItem.id)
+                        let firstDescription: String? = try await attribute(
+                            .firstDescription, of: contentItem.id)
                         if let description = firstDescription,
-                           !description.isEmpty,
-                           !contentItem.hasFlag(.isTouched) {
+                            description.isNotEmpty,
+                            !contentItem.hasFlag(.isTouched)
+                        {
                             hasFirstDescriptions = true
                             break
                         }
@@ -365,18 +379,24 @@ extension GameEngine {
                     if hasFirstDescriptions {
                         // Use individual first descriptions for items on surfaces
                         for contentItem in contents.sorted() {
-                            let firstDescription: String? = try await attribute(.firstDescription, of: contentItem.id)
+                            let firstDescription: String? = try await attribute(
+                                .firstDescription, of: contentItem.id)
                             if let fdesc = firstDescription,
-                               !fdesc.isEmpty,
-                               !contentItem.hasFlag(.isTouched) {
+                                fdesc.isNotEmpty,
+                                !contentItem.hasFlag(.isTouched)
+                            {
                                 // Use first description for untouched items on surfaces
                                 descriptionLines.append(fdesc)
                             } else if !contentItem.hasFlag(.isTouched) {
                                 // Use generic surface description for touched items without first descriptions
                                 if item.hasFlag(.isSurface) {
-                                    descriptionLines.append("On the \(item.name) is \(contentItem.withIndefiniteArticle).")
+                                    descriptionLines.append(
+                                        "On the \(item.name) is \(contentItem.withIndefiniteArticle)."
+                                    )
                                 } else {
-                                    descriptionLines.append("The \(item.name) contains \(contentItem.withIndefiniteArticle).")
+                                    descriptionLines.append(
+                                        "The \(item.name) contains \(contentItem.withIndefiniteArticle)."
+                                    )
                                 }
                             }
                         }

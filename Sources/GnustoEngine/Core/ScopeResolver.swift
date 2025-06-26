@@ -109,7 +109,8 @@ public struct ScopeResolver: Sendable {
             for globalItemID in location.localGlobals {
                 // Only add if the item exists and is not invisible
                 if let globalItem = gameState.items[globalItemID],
-                   !globalItem.hasFlag(.isInvisible) {
+                    !globalItem.hasFlag(.isInvisible)
+                {
                     scopeItemIDs.append(globalItemID)
                 }
             }
@@ -142,14 +143,17 @@ public struct ScopeResolver: Sendable {
         // 2. Add items in current location only if lit
         if isLit {
             // Add items directly in the location
-            let locationItems = gameState.items.values.filter { $0.parent == .location(currentLocationID) }
+            let locationItems = gameState.items.values.filter {
+                $0.parent == .location(currentLocationID)
+            }
             reachableItems.formUnion(locationItems.map(\.id))
 
             // Add local globals for the current location
             if let location = gameState.locations[currentLocationID] {
                 for globalItemID in location.localGlobals {
                     if let globalItem = gameState.items[globalItemID],
-                       !globalItem.hasFlag(.isInvisible) {
+                        !globalItem.hasFlag(.isInvisible)
+                    {
                         reachableItems.insert(globalItemID)
                     }
                 }
@@ -159,7 +163,7 @@ public struct ScopeResolver: Sendable {
         // 3. Process containers and surfaces recursively
         var itemsToCheck = reachableItems
 
-        while !itemsToCheck.isEmpty {
+        while itemsToCheck.isNotEmpty {
             let currentItemID = itemsToCheck.removeFirst()
             guard let currentItem = gameState.items[currentItemID] else { continue }
 
@@ -169,13 +173,14 @@ public struct ScopeResolver: Sendable {
 
                 // Check both static and dynamic open state
                 let isOpenStatic = currentItem.attributes[.isOpen]?.toBool ?? false
-                let isOpenDynamic: Bool = (
-                    try? await engine.attribute(.isOpen, of: currentItem.id)
-                ) ?? false
+                let isOpenDynamic: Bool =
+                    (try? await engine.attribute(.isOpen, of: currentItem.id)) ?? false
                 let isTransparent = currentItem.hasFlag(.isTransparent)
 
                 if isOpenStatic || isOpenDynamic || isTransparent {
-                    let itemsInside = gameState.items.values.filter { $0.parent == .item(currentItem.id) }
+                    let itemsInside = gameState.items.values.filter {
+                        $0.parent == .item(currentItem.id)
+                    }
                     let insideIDs = itemsInside.map(\.id)
 
                     let newlyReachable = Set(insideIDs).subtracting(reachableItems)
@@ -186,7 +191,9 @@ public struct ScopeResolver: Sendable {
 
             // Check if it's a surface
             if currentItem.hasFlag(.isSurface) {
-                let itemsOnSurface = gameState.items.values.filter { $0.parent == .item(currentItem.id) }
+                let itemsOnSurface = gameState.items.values.filter {
+                    $0.parent == .item(currentItem.id)
+                }
                 let onSurfaceIDs = itemsOnSurface.map(\.id)
 
                 let newlyReachable = Set(onSurfaceIDs).subtracting(reachableItems)

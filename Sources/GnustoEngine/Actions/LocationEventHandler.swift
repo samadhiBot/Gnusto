@@ -57,4 +57,41 @@ public enum LocationEvent: Sendable {
     case onEnter
 
     // Future ZIL message types: M-LOOK, M-FLASH, etc.
+
+    /// Checks if this event is a beforeTurn event with a command that has the specified intent.
+    ///
+    /// - Parameters:
+    ///   - intent: The Intent to check for in the command's verb
+    ///   - result: The closure to execute if the intent matches
+    /// - Returns: The result of the closure if the intent matches, nil otherwise
+    public func whenBeforeTurn(
+        intent: Intent,
+        result: () -> ActionResult?
+    ) -> ActionResult? {
+        if case .beforeTurn(let command) = self, command.verb.intents.contains(intent) {
+            return result()
+        } else {
+            return nil
+        }
+    }
+
+    /// Checks if this event is a beforeTurn event with a command that has *any* of the
+    /// specified intents.
+    ///
+    /// - Parameters:
+    ///   - intents: The Intents to check for in the command's verb
+    ///   - result: The closure to execute if any intent matches
+    /// - Returns: The result of the closure if any intent matches, nil otherwise
+    public func whenBeforeTurn(
+        intents: Intent...,
+        result: () -> ActionResult?
+    ) -> ActionResult? {
+        if case .beforeTurn(let command) = self,
+            Set(command.verb.intents).intersection(Set(intents)).isNotEmpty
+        {
+            return result()
+        } else {
+            return nil
+        }
+    }
 }

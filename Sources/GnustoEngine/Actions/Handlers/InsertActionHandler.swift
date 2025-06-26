@@ -54,7 +54,7 @@ public struct InsertActionHandler: ActionHandler {
 
         // For ALL commands, empty directObjects is valid (means nothing to insert)
         if !command.isAllCommand {
-            guard !command.directObjects.isEmpty else {
+            guard command.directObjects.isNotEmpty else {
                 throw ActionResponse.prerequisiteNotMet(
                     engine.messenger.doWhat(verb: command.verb)
                 )
@@ -176,7 +176,7 @@ public struct InsertActionHandler: ActionHandler {
         }
 
         // Mark container touched if any items were inserted
-        if !insertedItems.isEmpty {
+        if insertedItems.isNotEmpty {
             if let containerTouchedChange = await engine.setFlag(.isTouched, on: container) {
                 allStateChanges.append(containerTouchedChange)
             }

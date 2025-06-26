@@ -14,7 +14,7 @@ public struct ContextID: GnustoID {
     /// Use this initializer to create a `ContextID` programmatically from a string variable.
     /// - Parameter rawValue: The string value that uniquely identifies this context key.
     public init(rawValue: String) {
-        assert(!rawValue.isEmpty, "Context ID cannot be empty")
+        assert(rawValue.isNotEmpty, "Context ID cannot be empty")
         self.rawValue = rawValue
     }
 }

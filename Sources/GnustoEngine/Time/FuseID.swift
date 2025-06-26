@@ -14,7 +14,7 @@ public struct FuseID: GnustoID {
     /// Initializes a `FuseID` with a raw string value.
     /// - Parameter rawValue: The string value for the ID.
     public init(rawValue: String) {
-        assert(!rawValue.isEmpty, "Fuse ID cannot be empty")
+        assert(rawValue.isNotEmpty, "Fuse ID cannot be empty")
         self.rawValue = rawValue
     }
 }

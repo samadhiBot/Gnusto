@@ -18,9 +18,9 @@ import Foundation
 /// ```swift
 /// public struct MyCustomID: GnustoID {
 ///     public let rawValue: String
-///     
+///
 ///     public init(rawValue: String) {
-///         assert(!rawValue.isEmpty, "MyCustom ID cannot be empty")
+///         assert(rawValue.isNotEmpty, "MyCustom ID cannot be empty")
 ///         self.rawValue = rawValue
 ///     }
 /// }
@@ -34,16 +34,17 @@ import Foundation
 /// - `Sendable` for concurrency safety
 /// - Convenience initializer `init(_:)`
 public protocol GnustoID: Codable,
-                          Comparable,
-                          CustomDumpStringConvertible,
-                          CustomStringConvertible,
-                          ExpressibleByStringLiteral,
-                          Hashable,
-                          RawRepresentable,
-                          Sendable where RawValue == String {
+    Comparable,
+    CustomDumpStringConvertible,
+    CustomStringConvertible,
+    ExpressibleByStringLiteral,
+    Hashable,
+    RawRepresentable,
+    Sendable
+where RawValue == String {
     /// The underlying string value of the identifier.
     var rawValue: String { get }
-    
+
     /// Initializes the ID with a raw string value.
     /// - Parameter rawValue: The string value for the ID.
     init(rawValue: String)
@@ -51,25 +52,25 @@ public protocol GnustoID: Codable,
 
 // MARK: - Default Implementations
 
-public extension GnustoID {
+extension GnustoID {
     /// Convenience initializer for backward compatibility.
     /// - Parameter rawValue: The string value for the ID.
-    init(_ rawValue: String) {
-        assert(!rawValue.isEmpty, "\(Self.self) cannot be empty")
+    public init(_ rawValue: String) {
+        assert(rawValue.isNotEmpty, "\(Self.self) cannot be empty")
         self.init(rawValue: rawValue)
     }
-    
+
     /// Initializes the ID using a string literal.
     /// - Parameter value: The string literal representing the ID.
-    init(stringLiteral value: String) {
-        assert(!value.isEmpty, "\(Self.self) cannot be empty")
+    public init(stringLiteral value: String) {
+        assert(value.isNotEmpty, "\(Self.self) cannot be empty")
         self.init(rawValue: value)
     }
-    
+
     /// Creates a new ID from a decoder.
     /// Encodes as a plain string rather than an object with rawValue property.
     /// - Parameter decoder: The decoder to read data from.
-    init(from decoder: Decoder) throws {
+    public init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
         let rawValue = try container.decode(String.self)
         self.init(rawValue: rawValue)
@@ -78,13 +79,13 @@ public extension GnustoID {
     /// Encodes this ID into the given encoder.
     /// Encodes as a plain string rather than an object with rawValue property.
     /// - Parameter encoder: The encoder to write data to.
-    func encode(to encoder: Encoder) throws {
+    public func encode(to encoder: Encoder) throws {
         var container = encoder.singleValueContainer()
         try container.encode(self.rawValue)
     }
 
     /// GnustoIDs are case-insensitive when comparing.
-    static func ==(lhs: Self, rhs: Self) -> Bool {
+    public static func == (lhs: Self, rhs: Self) -> Bool {
         lhs.rawValue.lowercased() == rhs.rawValue.lowercased()
     }
 
@@ -93,15 +94,15 @@ public extension GnustoID {
     ///   - lhs: An ID to compare.
     ///   - rhs: Another ID to compare.
     /// - Returns: `true` if the `rawValue` of `lhs` lexicographically precedes that of `rhs`.
-    static func < (lhs: Self, rhs: Self) -> Bool {
+    public static func < (lhs: Self, rhs: Self) -> Bool {
         lhs.rawValue.lowercased() < rhs.rawValue.lowercased()
     }
 
-    var customDumpDescription: String {
+    public var customDumpDescription: String {
         ".\(rawValue)"
     }
 
-    var description: String {
+    public var description: String {
         ".\(rawValue)"
     }
 }

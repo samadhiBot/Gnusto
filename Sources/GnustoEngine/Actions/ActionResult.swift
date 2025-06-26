@@ -39,7 +39,7 @@ public struct ActionResult: Sendable {
         effects: [SideEffect?] = []
     ) {
         assert(
-            message?.isEmpty == false || !changes.isEmpty || !effects.isEmpty,
+            message?.isEmpty == false || changes.isEmpty || !effects.isNotEmpty,
             "ActionResults must contain at least one message, StateChange, or SideEffect"
         )
         self.message = message

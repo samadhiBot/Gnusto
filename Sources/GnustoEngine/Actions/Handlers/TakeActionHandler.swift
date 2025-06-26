@@ -28,7 +28,7 @@ public struct TakeActionHandler: ActionHandler {
     public func process(command: Command, engine: GameEngine) async throws -> ActionResult {
         // For ALL commands, empty directObjects is valid (means nothing to take)
         if !command.isAllCommand {
-            guard !command.directObjects.isEmpty else {
+            guard command.directObjects.isNotEmpty else {
                 throw ActionResponse.prerequisiteNotMet(
                     engine.messenger.doWhat(verb: command.verb)
                 )

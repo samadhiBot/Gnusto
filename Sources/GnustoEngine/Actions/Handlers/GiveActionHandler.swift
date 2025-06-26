@@ -51,7 +51,7 @@ public struct GiveActionHandler: ActionHandler {
 
         // For ALL commands, empty directObjects is valid (means nothing to give)
         if !command.isAllCommand {
-            guard !command.directObjects.isEmpty else {
+            guard command.directObjects.isNotEmpty else {
                 throw ActionResponse.prerequisiteNotMet(
                     engine.messenger.doWhat(verb: command.verb)
                 )
@@ -113,7 +113,7 @@ public struct GiveActionHandler: ActionHandler {
         }
 
         // Mark recipient as touched if any items were given
-        if !givenItems.isEmpty {
+        if givenItems.isNotEmpty {
             if let recipientTouchedChange = await engine.setFlag(.isTouched, on: recipient) {
                 allStateChanges.append(recipientTouchedChange)
             }

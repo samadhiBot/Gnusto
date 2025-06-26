@@ -17,7 +17,7 @@ public struct GlobalID: GnustoID {
     /// Creates a new game state key with the specified string value.
     /// - Parameter rawValue: The string representation of the key.
     public init(rawValue: String) {
-        assert(!rawValue.isEmpty, "Global ID cannot be empty")
+        assert(rawValue.isNotEmpty, "Global ID cannot be empty")
         self.rawValue = rawValue
     }
 }

@@ -15,14 +15,14 @@ public struct ItemID: GnustoID {
     /// Initializes an `ItemID` with a raw string value.
     /// - Parameter rawValue: The string value for the ID.
     public init(rawValue: String) {
-        assert(!rawValue.isEmpty, "Item ID cannot be empty")
+        assert(rawValue.isNotEmpty, "Item ID cannot be empty")
         self.rawValue = rawValue
     }
 }
 
 // MARK: - Standard Item IDs
 
-public extension ItemID {
+extension ItemID {
     /// Represents the player character as an item.
-    static let player = ItemID("player")
+    public static let player = ItemID("player")
 }
