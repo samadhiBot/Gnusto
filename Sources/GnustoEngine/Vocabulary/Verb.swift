@@ -27,7 +27,7 @@ public struct Verb: GnustoID {
     /// - Parameter rawValue: The unique string identifier for the verb.
     @available(*, deprecated, renamed: "init(id:intents:)")
     public init(rawValue: String) {
-        assert(rawValue.isNotEmpty, "Verb ID cannot be empty")
+        assert(rawValue.isNotEmpty, "Verb rawValue cannot be empty")
         self.rawValue = rawValue
         self.intents = []
     }
@@ -42,7 +42,7 @@ public struct Verb: GnustoID {
         id rawValue: String,
         intents: Intent...
     ) {
-        assert(rawValue.isNotEmpty, "Verb ID cannot be empty")
+        assert(rawValue.isNotEmpty, "Verb rawValue cannot be empty")
         self.rawValue = rawValue
         self.intents = intents
     }

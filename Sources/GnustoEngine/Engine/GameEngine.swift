@@ -314,7 +314,7 @@ extension GameEngine {
 
         // 1. Get Player Input
         guard let input = await ioHandler.readLine(prompt: "> ") else {
-            await ioHandler.print("\nGoodbye!")
+            await ioHandler.print("\n\(messenger.goodbye())")
             shouldQuit = true
             return
         }
@@ -1079,7 +1079,9 @@ extension GameEngine {
                     If you encounter this error during testing, make sure to use \
                     `parse(input:vocabulary:gameState:)` to generate the command.
                     """)
-                await ioHandler.print("I don't know how to '\(command.verb.rawValue)'.")
+                await ioHandler.print(
+                    messenger.unknownVerb(verb: command.verb.rawValue)
+                )
                 return
             }
 
@@ -1091,7 +1093,9 @@ extension GameEngine {
                     Internal Error: No ActionHandler registered for verb ID \
                     '\(command.verb.rawValue)'.
                     """)
-                await ioHandler.print("I don't know how to '\(command.verb.rawValue)'.")
+                await ioHandler.print(
+                    messenger.unknownVerb(verb: command.verb.rawValue)
+                )
                 return
             }
 
