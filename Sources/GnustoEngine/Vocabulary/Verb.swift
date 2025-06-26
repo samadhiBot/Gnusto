@@ -34,7 +34,8 @@ public struct Verb: GnustoID {
 
 extension Verb {
     public static let `switch` = Verb(
-        id: "switch"
+        id: "switch",
+        intents: .turn, .push
     )
 
     public static let `throw` = Verb(
@@ -43,686 +44,857 @@ extension Verb {
     )
 
     public static let ascend = Verb(
-        id: "ascend"
+        id: "ascend",
+        intents: .climb
     )
 
     public static let ask = Verb(
-        id: "ask"
+        id: "ask",
+        intents: .ask
     )
 
     public static let attack = Verb(
-        id: "attack"
+        id: "attack",
+        intents: .attack
     )
 
     public static let balance = Verb(
-        id: "balance"
+        id: "balance",
+        intents: .push, .turn
     )
 
     public static let bind = Verb(
-        id: "bind"
+        id: "bind",
+        intents: .tie
     )
 
     public static let bite = Verb(
-        id: "bite"
+        id: "bite",
+        intents: .attack, .eat
     )
 
     public static let blow = Verb(
-        id: "blow"
+        id: "blow",
+        intents: .push, .extinguish
     )
 
     public static let brandish = Verb(
-        id: "brandish"
+        id: "brandish",
+        intents: .attack
     )
 
     public static let breathe = Verb(
-        id: "breathe"
+        id: "breathe",
+        intents: .touch
     )
 
     public static let brief = Verb(
-        id: "brief"
+        id: "brief",
+        intents: .help
     )
 
     public static let burn = Verb(
-        id: "burn"
+        id: "burn",
+        intents: .burn
     )
 
     public static let chew = Verb(
-        id: "chew"
+        id: "chew",
+        intents: .eat
     )
 
     public static let chomp = Verb(
-        id: "chomp"
+        id: "chomp",
+        intents: .eat
     )
 
     public static let chop = Verb(
-        id: "chop"
+        id: "chop",
+        intents: .cut, .attack
     )
 
     public static let chortle = Verb(
-        id: "chortle"
+        id: "chortle",
+        intents: .tell
     )
 
     public static let chuck = Verb(
-        id: "chuck"
+        id: "chuck",
+        intents: .throwObject
     )
 
     public static let chuckle = Verb(
-        id: "chuckle"
+        id: "chuckle",
+        intents: .tell
     )
 
     public static let clean = Verb(
-        id: "clean"
+        id: "clean",
+        intents: .touch
     )
 
     public static let climb = Verb(
-        id: "climb"
+        id: "climb",
+        intents: .climb
     )
 
     public static let close = Verb(
-        id: "close"
+        id: "close",
+        intents: .close
     )
 
     public static let compress = Verb(
-        id: "compress"
+        id: "compress",
+        intents: .push
     )
 
     public static let consider = Verb(
-        id: "consider"
+        id: "consider",
+        intents: .think
     )
 
     public static let consume = Verb(
-        id: "consume"
+        id: "consume",
+        intents: .eat
     )
 
     public static let cry = Verb(
-        id: "cry"
+        id: "cry",
+        intents: .tell
     )
 
     public static let curse = Verb(
-        id: "curse"
+        id: "curse",
+        intents: .tell
     )
 
     public static let cut = Verb(
-        id: "cut"
+        id: "cut",
+        intents: .cut
     )
 
     public static let damn = Verb(
-        id: "damn"
+        id: "damn",
+        intents: .tell
     )
 
     public static let dance = Verb(
-        id: "dance"
+        id: "dance",
+        intents: .tell
     )
 
     public static let debug = Verb(
-        id: "debug"
+        id: "debug",
+        intents: .debug
     )
 
     public static let deflate = Verb(
-        id: "deflate"
+        id: "deflate",
+        intents: .push
     )
 
     public static let depress = Verb(
-        id: "depress"
+        id: "depress",
+        intents: .push
     )
 
     public static let devour = Verb(
-        id: "devour"
+        id: "devour",
+        intents: .eat
     )
 
     public static let dig = Verb(
-        id: "dig"
+        id: "dig",
+        intents: .dig
     )
 
     public static let discard = Verb(
-        id: "discard"
+        id: "discard",
+        intents: .drop
     )
 
     public static let doff = Verb(
-        id: "doff"
+        id: "doff",
+        intents: .remove
     )
 
     public static let don = Verb(
-        id: "don"
+        id: "don",
+        intents: .wear
     )
 
     public static let donate = Verb(
-        id: "donate"
+        id: "donate",
+        intents: .give
     )
 
     public static let douse = Verb(
-        id: "douse"
+        id: "douse",
+        intents: .extinguish
     )
 
     public static let drink = Verb(
-        id: "drink"
+        id: "drink",
+        intents: .drink
     )
 
     public static let drop = Verb(
-        id: "drop"
+        id: "drop",
+        intents: .drop
     )
 
     public static let dump = Verb(
-        id: "dump"
+        id: "dump",
+        intents: .drop
     )
 
     public static let eat = Verb(
-        id: "eat"
+        id: "eat",
+        intents: .eat
     )
 
     public static let empty = Verb(
-        id: "empty"
+        id: "empty",
+        intents: .empty
     )
 
     public static let enter = Verb(
-        id: "enter"
+        id: "enter",
+        intents: .enter
     )
 
     public static let examine = Verb(
-        id: "examine"
+        id: "examine",
+        intents: .examine
     )
 
     public static let excavate = Verb(
-        id: "excavate"
+        id: "excavate",
+        intents: .dig
     )
 
     public static let extinguish = Verb(
-        id: "extinguish"
+        id: "extinguish",
+        intents: .extinguish
     )
 
     public static let fasten = Verb(
-        id: "fasten"
+        id: "fasten",
+        intents: .tie
     )
 
     public static let feel = Verb(
-        id: "feel"
+        id: "feel",
+        intents: .touch
     )
 
     public static let fight = Verb(
-        id: "fight"
+        id: "fight",
+        intents: .attack
     )
 
     public static let fill = Verb(
-        id: "fill"
+        id: "fill",
+        intents: .fill
     )
 
     public static let find = Verb(
-        id: "find"
+        id: "find",
+        intents: .search
     )
 
     public static let fuck = Verb(
-        id: "fuck"
+        id: "fuck",
+        intents: .tell
     )
 
     public static let get = Verb(
-        id: "get"
+        id: "get",
+        intents: .take
     )
 
     public static let giggle = Verb(
-        id: "giggle"
+        id: "giggle",
+        intents: .tell
     )
 
     public static let give = Verb(
-        id: "give"
+        id: "give",
+        intents: .give
     )
 
     public static let go = Verb(
-        id: "go"
+        id: "go",
+        intents: .move
     )
 
     public static let grab = Verb(
-        id: "grab"
+        id: "grab",
+        intents: .take
     )
 
     public static let hang = Verb(
-        id: "hang"
+        id: "hang",
+        intents: .insert, .attack
     )
 
     public static let head = Verb(
-        id: "head"
+        id: "head",
+        intents: .move
     )
 
     public static let help = Verb(
-        id: "help"
+        id: "help",
+        intents: .help
     )
 
     public static let hike = Verb(
-        id: "hike"
+        id: "hike",
+        intents: .move
     )
 
     public static let hit = Verb(
-        id: "hit"
+        id: "hit",
+        intents: .attack
     )
 
     public static let hoist = Verb(
-        id: "hoist"
+        id: "hoist",
+        intents: .pull
     )
 
     public static let holler = Verb(
-        id: "holler"
+        id: "holler",
+        intents: .tell
     )
 
     public static let hop = Verb(
-        id: "hop"
+        id: "hop",
+        intents: .jump
     )
 
     public static let hum = Verb(
-        id: "hum"
+        id: "hum",
+        intents: .tell
     )
 
     public static let hurl = Verb(
-        id: "hurl"
+        id: "hurl",
+        intents: .throwObject
     )
 
     public static let ignite = Verb(
-        id: "ignite"
+        id: "ignite",
+        intents: .lightSource
     )
 
     public static let imbibe = Verb(
-        id: "imbibe"
+        id: "imbibe",
+        intents: .drink
     )
 
     public static let inflate = Verb(
-        id: "inflate"
+        id: "inflate",
+        intents: .push
     )
 
     public static let inform = Verb(
-        id: "inform"
+        id: "inform",
+        intents: .tell
     )
 
     public static let insert = Verb(
-        id: "insert"
+        id: "insert",
+        intents: .insert
     )
 
     public static let inspect = Verb(
-        id: "inspect"
+        id: "inspect",
+        intents: .examine
     )
 
     public static let inventory = Verb(
-        id: "inventory"
+        id: "inventory",
+        intents: .inventory
     )
 
     public static let jump = Verb(
-        id: "jump"
+        id: "jump",
+        intents: .jump
     )
 
     public static let kick = Verb(
-        id: "kick"
+        id: "kick",
+        intents: .attack
     )
 
     public static let kill = Verb(
-        id: "kill"
+        id: "kill",
+        intents: .attack
     )
 
     public static let kiss = Verb(
-        id: "kiss"
+        id: "kiss",
+        intents: .touch
     )
 
     public static let knock = Verb(
-        id: "knock"
+        id: "knock",
+        intents: .push, .attack
     )
 
     public static let laugh = Verb(
-        id: "laugh"
+        id: "laugh",
+        intents: .tell
     )
 
     public static let leap = Verb(
-        id: "leap"
+        id: "leap",
+        intents: .jump
     )
 
     public static let lick = Verb(
-        id: "lick"
+        id: "lick",
+        intents: .taste, .touch
     )
 
     public static let lift = Verb(
-        id: "lift"
+        id: "lift",
+        intents: .take, .pull
     )
 
     public static let light = Verb(
-        id: "light"
+        id: "light",
+        intents: .lightSource
     )
 
     public static let listen = Verb(
-        id: "listen"
+        id: "listen",
+        intents: .listen
     )
 
     public static let load = Verb(
-        id: "load"
+        id: "load",
+        intents: .insert
     )
 
     public static let locate = Verb(
-        id: "locate"
+        id: "locate",
+        intents: .search
     )
 
     public static let lock = Verb(
-        id: "lock"
+        id: "lock",
+        intents: .lock
     )
 
     public static let look = Verb(
-        id: "look"
+        id: "look",
+        intents: .look, .examine
     )
 
     public static let mount = Verb(
-        id: "mount"
+        id: "mount",
+        intents: .climb
     )
 
     public static let move = Verb(
-        id: "move"
+        id: "move",
+        intents: .push, .take
     )
 
     public static let offer = Verb(
-        id: "offer"
+        id: "offer",
+        intents: .give
     )
 
     public static let open = Verb(
-        id: "open"
+        id: "open",
+        intents: .open
     )
 
     public static let peek = Verb(
-        id: "peek"
+        id: "peek",
+        intents: .examine
     )
 
     public static let pick = Verb(
-        id: "pick"
+        id: "pick",
+        intents: .take, .search
     )
 
     public static let place = Verb(
-        id: "place"
+        id: "place",
+        intents: .insert
     )
 
     public static let polish = Verb(
-        id: "polish"
+        id: "polish",
+        intents: .touch
     )
 
     public static let ponder = Verb(
-        id: "ponder"
+        id: "ponder",
+        intents: .think
     )
 
     public static let pour = Verb(
-        id: "pour"
+        id: "pour",
+        intents: .pour
     )
 
     public static let press = Verb(
-        id: "press"
+        id: "press",
+        intents: .push
     )
 
     public static let proceed = Verb(
-        id: "proceed"
+        id: "proceed",
+        intents: .move
     )
 
     public static let prune = Verb(
-        id: "prune"
+        id: "prune",
+        intents: .cut
     )
 
     public static let puff = Verb(
-        id: "puff"
+        id: "puff",
+        intents: .push, .extinguish
     )
 
     public static let pull = Verb(
-        id: "pull"
+        id: "pull",
+        intents: .pull
     )
 
     public static let push = Verb(
-        id: "push"
+        id: "push",
+        intents: .push
     )
 
     public static let put = Verb(
-        id: "put"
+        id: "put",
+        intents: .insert
     )
 
     public static let quaff = Verb(
-        id: "quaff"
+        id: "quaff",
+        intents: .drink
     )
 
     public static let question = Verb(
-        id: "question"
+        id: "question",
+        intents: .ask
     )
 
     public static let quit = Verb(
-        id: "quit"
+        id: "quit",
+        intents: .quit
     )
 
     public static let raise = Verb(
-        id: "raise"
+        id: "raise",
+        intents: .pull, .take
     )
 
     public static let rap = Verb(
-        id: "rap"
+        id: "rap",
+        intents: .push, .attack
     )
 
     public static let rattle = Verb(
-        id: "rattle"
+        id: "rattle",
+        intents: .push
     )
 
     public static let read = Verb(
-        id: "read"
+        id: "read",
+        intents: .read
     )
 
     public static let remove = Verb(
-        id: "remove"
+        id: "remove",
+        intents: .remove
     )
 
     public static let restart = Verb(
-        id: "restart"
+        id: "restart",
+        intents: .restart
     )
 
     public static let restore = Verb(
-        id: "restore"
+        id: "restore",
+        intents: .restore
     )
 
     public static let rotate = Verb(
-        id: "rotate"
+        id: "rotate",
+        intents: .turn
     )
 
     public static let rub = Verb(
-        id: "rub"
+        id: "rub",
+        intents: .touch
     )
 
     public static let run = Verb(
-        id: "run"
+        id: "run",
+        intents: .move
     )
 
     public static let save = Verb(
-        id: "save"
+        id: "save",
+        intents: .save
     )
 
     public static let scale = Verb(
-        id: "scale"
+        id: "scale",
+        intents: .climb
     )
 
     public static let score = Verb(
-        id: "score"
+        id: "score",
+        intents: .help
     )
 
     public static let scream = Verb(
-        id: "scream"
+        id: "scream",
+        intents: .tell
     )
 
     public static let script = Verb(
-        id: "script"
+        id: "script",
+        intents: .help
     )
 
     public static let search = Verb(
-        id: "search"
+        id: "search",
+        intents: .search
     )
 
     public static let set = Verb(
-        id: "set"
+        id: "set",
+        intents: .insert, .push
     )
 
     public static let shake = Verb(
-        id: "shake"
+        id: "shake",
+        intents: .push
     )
 
     public static let shift = Verb(
-        id: "shift"
+        id: "shift",
+        intents: .push, .turn
     )
 
     public static let shit = Verb(
-        id: "shit"
+        id: "shit",
+        intents: .tell
     )
 
     public static let shout = Verb(
-        id: "shout"
+        id: "shout",
+        intents: .tell
     )
 
     public static let shove = Verb(
-        id: "shove"
+        id: "shove",
+        intents: .push
     )
 
     public static let shriek = Verb(
-        id: "shriek"
+        id: "shriek",
+        intents: .tell
     )
 
     public static let shut = Verb(
-        id: "shut"
+        id: "shut",
+        intents: .close
     )
 
     public static let sing = Verb(
-        id: "sing"
+        id: "sing",
+        intents: .tell
     )
 
     public static let sip = Verb(
-        id: "sip"
+        id: "sip",
+        intents: .drink
     )
 
     public static let sit = Verb(
-        id: "sit"
+        id: "sit",
+        intents: .sit
     )
 
     public static let slay = Verb(
-        id: "slay"
+        id: "slay",
+        intents: .attack
     )
 
     public static let slice = Verb(
-        id: "slice"
+        id: "slice",
+        intents: .cut, .attack
     )
 
     public static let slide = Verb(
-        id: "slide"
+        id: "slide",
+        intents: .push
     )
 
     public static let smell = Verb(
-        id: "smell"
+        id: "smell",
+        intents: .smell
     )
 
     public static let snicker = Verb(
-        id: "snicker"
+        id: "snicker",
+        intents: .tell
     )
 
     public static let sniff = Verb(
-        id: "sniff"
+        id: "sniff",
+        intents: .smell
     )
 
     public static let sob = Verb(
-        id: "sob"
+        id: "sob",
+        intents: .tell
     )
 
     public static let spill = Verb(
-        id: "spill"
+        id: "spill",
+        intents: .empty, .drop
     )
 
     public static let squeeze = Verb(
-        id: "squeeze"
+        id: "squeeze",
+        intents: .push
     )
 
     public static let stab = Verb(
-        id: "stab"
+        id: "stab",
+        intents: .attack, .cut
     )
 
     public static let steal = Verb(
-        id: "steal"
+        id: "steal",
+        intents: .take
     )
 
     public static let stroll = Verb(
-        id: "stroll"
+        id: "stroll",
+        intents: .move
     )
 
     public static let swear = Verb(
-        id: "swear"
+        id: "swear",
+        intents: .tell
     )
 
     public static let take = Verb(
-        id: "take"
+        id: "take",
+        intents: .take
     )
 
     public static let tap = Verb(
-        id: "tap"
+        id: "tap",
+        intents: .push, .touch
     )
 
     public static let taste = Verb(
-        id: "taste"
+        id: "taste",
+        intents: .taste
     )
 
     public static let tell = Verb(
-        id: "tell"
+        id: "tell",
+        intents: .tell
     )
 
     public static let think = Verb(
-        id: "think"
+        id: "think",
+        intents: .think
     )
 
     public static let tie = Verb(
-        id: "tie"
+        id: "tie",
+        intents: .tie
     )
 
     public static let toss = Verb(
-        id: "toss"
+        id: "toss",
+        intents: .throwObject
     )
 
     public static let touch = Verb(
-        id: "touch"
+        id: "touch",
+        intents: .touch
     )
 
     public static let travel = Verb(
-        id: "travel"
+        id: "travel",
+        intents: .move
     )
 
     public static let turn = Verb(
-        id: "turn"
+        id: "turn",
+        intents: .turn, .lightSource
     )
 
     public static let twist = Verb(
-        id: "twist"
+        id: "twist",
+        intents: .turn
     )
 
     public static let unlock = Verb(
-        id: "unlock"
+        id: "unlock",
+        intents: .unlock
     )
 
     public static let unscript = Verb(
-        id: "unscript"
+        id: "unscript",
+        intents: .help
     )
 
     public static let verbose = Verb(
-        id: "verbose"
+        id: "verbose",
+        intents: .help
     )
 
     public static let wait = Verb(
-        id: "wait"
+        id: "wait",
+        intents: .wait
     )
 
     public static let walk = Verb(
-        id: "walk"
+        id: "walk",
+        intents: .move
     )
 
     public static let wave = Verb(
-        id: "wave"
+        id: "wave",
+        intents: .attack, .tell
     )
 
     public static let wear = Verb(
-        id: "wear"
+        id: "wear",
+        intents: .wear
     )
 
     public static let weep = Verb(
-        id: "weep"
+        id: "weep",
+        intents: .tell
     )
 
     public static let xyzzy = Verb(
-        id: "xyzzy"
+        id: "xyzzy",
+        intents: .tell
     )
 
     public static let yell = Verb(
-        id: "yell"
+        id: "yell",
+        intents: .tell
     )
 }

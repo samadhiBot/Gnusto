@@ -173,6 +173,9 @@ public enum Intent: String, CaseIterable, Sendable, Codable {
     /// Searching for something
     case search
 
+    /// Sitting down or positioning oneself
+    case sit
+
     /// Debug-related actions (development only)
     case debug
 }

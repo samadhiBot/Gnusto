@@ -49,25 +49,25 @@ public struct Vocabulary: Codable, Equatable, Sendable {
     /// Maps a synonym string (lowercase) to the Set of Verbs it can represent.
     /// When multiple verbs match, all potential matches are included so the parser can
     /// use syntax rules to determine the best match.
-    public var verbSynonyms: [String: Set<Verb>] {
-        var mapping: [String: Set<Verb>] = [:]
-
-        // Build the mapping without prioritization - include all possible matches
-        for verb in verbDefinitions.values {
-            let verbID = verb.id
-            let primaryKey = verbID.rawValue.lowercased()
-
-            // Map the primary ID
-            mapping[primaryKey, default: Set()].insert(verbID)
-
-            // Map all synonyms - allow synonyms to coexist with exact ID matches
-            for synonym in verb.synonyms {
-                let synonymKey = synonym.lowercased()
-                mapping[synonymKey, default: Set()].insert(verbID)
-            }
-        }
-        return mapping
-    }
+//    public var verbSynonyms: [String: Set<Verb>] {
+//        var mapping: [String: Set<Verb>] = [:]
+//
+//        // Build the mapping without prioritization - include all possible matches
+//        for verb in verbDefinitions.values {
+//            let verbID = verb.id
+//            let primaryKey = verbID.rawValue.lowercased()
+//
+//            // Map the primary ID
+//            mapping[primaryKey, default: Set()].insert(verbID)
+//
+//            // Map all synonyms - allow synonyms to coexist with exact ID matches
+//            for synonym in verb.synonyms {
+//                let synonymKey = synonym.lowercased()
+//                mapping[synonymKey, default: Set()].insert(verbID)
+//            }
+//        }
+//        return mapping
+//    }
 
     // MARK: - Initialization
 
