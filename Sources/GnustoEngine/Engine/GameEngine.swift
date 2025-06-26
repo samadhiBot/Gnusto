@@ -775,10 +775,12 @@ extension GameEngine {
     private func scoreHandlerForCommand(handler: ActionHandler, command: Command) -> Int {
         var score = 0
         var hasMatchingSyntaxRule = false
+        var hasMatchingVerb = false
 
         // Check verb-based matching first
         if handler.verbs.isNotEmpty {
             if handler.verbs.contains(where: { $0 == command.verb }) {
+                hasMatchingVerb = true
                 score = 100  // Base score for verb match
             } else {
                 return 0  // Handler specifies verbs but none match
@@ -797,9 +799,13 @@ extension GameEngine {
                 }
             }
 
-            // If handler has syntax rules but none match, it can't handle this command
+            // If handler has syntax rules but none match, award minimal score for verb match
             if !hasMatchingSyntaxRule {
-                return 0
+                if hasMatchingVerb {
+                    return 1  // Minimal score to allow handler to provide contextual error
+                } else {
+                    return 0  // No verb match and no syntax match
+                }
             }
 
             // Bonus for having structured syntax rules vs just verb matching
