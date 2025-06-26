@@ -57,10 +57,10 @@ public enum ItemEvent: Sendable {
         intent: Intent,
         result: () -> ActionResult?
     ) -> ActionResult? {
-        if case .beforeTurn(let command) = self, command.verb.intents.contains(intent) {
-            return result()
+        if case .beforeTurn(let command) = self, command.hasIntent(intent) {
+            result()
         } else {
-            return nil
+            nil
         }
     }
 
@@ -75,12 +75,10 @@ public enum ItemEvent: Sendable {
         intents: Intent...,
         result: () -> ActionResult?
     ) -> ActionResult? {
-        if case .beforeTurn(let command) = self,
-            Set(command.verb.intents).intersection(Set(intents)).isNotEmpty
-        {
-            return result()
+        if case .beforeTurn(let command) = self, command.verb.intents.intersects(intents) {
+            result()
         } else {
-            return nil
+            nil
         }
     }
 }

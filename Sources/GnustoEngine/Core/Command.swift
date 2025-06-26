@@ -15,7 +15,7 @@ public struct Command: Equatable, Sendable {
     /// The primary entity that is the direct target of the verb, if any.
     /// For example, in "take lantern", the lantern is the direct object.
     /// It is represented as an `EntityReference`, which can be an item, location, or the player.
-    /// 
+    ///
     /// For backward compatibility with single-object commands. When `directObjects` contains
     /// multiple items, this returns the first one, or nil if the array is empty.
     public var directObject: EntityReference? {
@@ -36,7 +36,7 @@ public struct Command: Equatable, Sendable {
     /// by a preposition, if any.
     /// For example, in "put lantern in case", the case is the indirect object.
     /// Represented as an `EntityReference`.
-    /// 
+    ///
     /// For backward compatibility with single-object commands. When `indirectObjects` contains
     /// multiple items, this returns the first one, or nil if the array is empty.
     public var indirectObject: EntityReference? {
@@ -74,7 +74,7 @@ public struct Command: Equatable, Sendable {
     public let verb: Verb
 
     // --- Initialization ---
-    
+
     /// Initializes a new `Command` structure with all its components.
     ///
     /// This initializer is primarily used by `Parser` implementations when they successfully
@@ -144,5 +144,17 @@ public struct Command: Equatable, Sendable {
         self.preposition = preposition
         self.direction = direction
         self.rawInput = rawInput
+    }
+
+    /// Returns `true` if the command's verb includes the specified intent.
+    ///
+    /// This method checks whether the command's verb supports a particular intent,
+    /// such as `.take`, `.examine`, or `.move`. This is useful for determining
+    /// what kind of action the player is trying to perform.
+    ///
+    /// - Parameter intent: The `Intent` to check for.
+    /// - Returns: `true` if the verb includes the intent, `false` otherwise.
+    public func hasIntent(_ intent: Intent) -> Bool {
+        verb.intents.contains(intent)
     }
 }

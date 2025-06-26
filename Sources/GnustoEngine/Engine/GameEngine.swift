@@ -778,7 +778,7 @@ extension GameEngine {
 
         // Check verb-based matching first
         if handler.verbs.isNotEmpty {
-            if handler.verbs.contains(where: { $0.rawValue == command.verb.rawValue }) {
+            if handler.verbs.contains(where: { $0 == command.verb }) {
                 score = 100  // Base score for verb match
             } else {
                 return 0  // Handler specifies verbs but none match
@@ -1066,19 +1066,11 @@ extension GameEngine {
             // Retrieve verb definition to check requiresLight property
             // Note: Parser should ensure command.verbID exists in vocabulary
             // Correct: Look up the Verb definition directly
-            guard
-                gameState.vocabulary.verbs.first(where: {
-                    $0.rawValue == command.verb.rawValue
-                }) != nil
-            else {
+            guard gameState.vocabulary.verbs.first(where: { $0 == command.verb }) != nil else {
                 // This case should ideally not be reached if parser validates verbs
                 logWarning(
-                    """
-                    Internal Error: Unknown verb ID \
-                    '\(command.verb.rawValue)' reached execution. \
-                    If you encounter this error during testing, make sure to use \
-                    `parse(input:vocabulary:gameState:)` to generate the command.
-                    """)
+                    "Internal Error: Unknown verb ID '\(command.verb)' reached execution."
+                )
                 await ioHandler.print(
                     messenger.unknownVerb(verb: command.verb.rawValue)
                 )
@@ -1089,10 +1081,8 @@ extension GameEngine {
             guard let verbHandler = findActionHandler(for: command) else {
                 // No handler registered for this verb (should match vocabulary definition)
                 logWarning(
-                    """
-                    Internal Error: No ActionHandler registered for verb ID \
-                    '\(command.verb.rawValue)'.
-                    """)
+                    "Internal Error: No ActionHandler registered for verb ID '\(command.verb)'."
+                )
                 await ioHandler.print(
                     messenger.unknownVerb(verb: command.verb.rawValue)
                 )
@@ -1100,7 +1090,7 @@ extension GameEngine {
             }
 
             // If the room is dark and the handler requires light (and isn't 'turn'), report error.
-            if !isLit && verbHandler.requiresLight && command.verb.rawValue != "turn" {
+            if !isLit && verbHandler.requiresLight && !command.hasIntent(.lightSource) {
                 await report(.roomIsDark)
             } else {
                 // --- Execute Handler ---
