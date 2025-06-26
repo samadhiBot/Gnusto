@@ -17,27 +17,15 @@ public struct TurnOnActionHandler: ActionHandler {
 
     // MARK: - Action Processing Methods
 
-    // MARK: - ActionHandler Methods
+    public init() {}
 
-    /// Validates the "TURN ON" command.
+    /// Processes the "TURN ON" command.
     ///
-    /// This method ensures that:
-    /// 1. A direct object is specified (the player must indicate *what* to turn on).
-    /// 2. The direct object refers to an existing item.
-    /// 3. The player can reach the specified item. A special case allows turning on a
-    ///    light source that is in the current dark room, even if otherwise unreachable.
-    /// 4. The item is either a device (can be turned on/off) or flammable (can be burned).
-    /// 5. If it's a device, it's not already on.
-    ///
-    /// - Parameter context: The `ActionContext` for the current action.
-    /// - Throws: Various `ActionResponse` errors if validation fails, such as:
-    ///           `custom` (for "Turn on what?" or "It's already on."),
-    ///           `prerequisiteNotMet` (if not an item, not a device, and not flammable),
-    ///           `itemNotAccessible`.
-    ///           Can also throw errors from `engine.item()`.
+    /// This action validates prerequisites and activates the specified item if possible.
+    /// Handles both devices (can be turned on/off) and flammable objects (can be burned).
+    /// Devices take precedence over flammable behavior.
     public func process(command: Command, engine: GameEngine) async throws -> ActionResult {
-
-        // 1. Get direct object and ensure it's an item
+        // Get direct object and ensure it's an item
         guard let directObjectRef = command.directObject else {
             throw ActionResponse.prerequisiteNotMet(
                 engine.messenger.doWhat(verb: command.verb)
@@ -49,10 +37,10 @@ public struct TurnOnActionHandler: ActionHandler {
             )
         }
 
-        // 2. Fetch the item snapshot.
+        // Fetch the item
         let targetItem = try await engine.item(targetItemID)
 
-        // 3. Verify the item is reachable (with light source exception in dark).
+        // Verify the item is reachable (with light source exception in dark)
         let currentLocationID = await engine.playerLocationID
         let isHeld = targetItem.parent == .player
         let isInLocation = targetItem.parent == .location(currentLocationID)
@@ -63,11 +51,11 @@ public struct TurnOnActionHandler: ActionHandler {
         if isHeld {
             isReachable = true
         } else if isInLocation {
-            // If it's a light source in a dark room, consider it reachable to turn on.
+            // If it's a light source in a dark room, consider it reachable to turn on
             if roomIsDark && isLightSource {
                 isReachable = true
             } else {
-                // Otherwise, standard reachability check.
+                // Otherwise, standard reachability check
                 isReachable = await engine.playerCanReach(targetItemID)
             }
         }
@@ -75,7 +63,7 @@ public struct TurnOnActionHandler: ActionHandler {
             throw ActionResponse.itemNotAccessible(targetItemID)
         }
 
-        // 4. Check if the item is either a device or flammable.
+        // Check if the item is either a device or flammable
         let isDevice = targetItem.hasFlag(.isDevice)
         let isFlammable = targetItem.hasFlag(.isFlammable)
 
@@ -85,54 +73,20 @@ public struct TurnOnActionHandler: ActionHandler {
             )
         }
 
-        // 5. If it's a device, check if it's already on.
+        // If it's flammable but not a device, delegate to burn logic
+        if isFlammable && !isDevice {
+            return try await processBurn(targetItem: targetItem, engine: engine)
+        }
+
+        // For devices, check if it's already on
         if isDevice && targetItem.hasFlag(.isOn) {
             throw ActionResponse.custom(
                 engine.messenger.alreadyOn()
             )
         }
-    /// Processes the "TURN ON" command.
-    ///
-    /// This method intelligently handles both devices and flammable objects:
-    /// - If the item is a device (has `.isDevice`), it turns the device on.
-    /// - If the item is flammable but not a device (has `.isFlammable` but not `.isDevice`),
-    ///   it delegates to burn logic.
-    /// - If both, devices take precedence (lamps can be turned on, not burned).
-    ///
-    /// For devices, this action performs:
-    /// 1. Retrieves the target item.
-    /// 2. Ensures the `.isTouched` flag is set on the item.
-    /// 3. Sets the `.isOn` flag on the item.
-    /// 4. Returns an `ActionResult` with a confirmation message.
-    ///
-    /// If turning on the item illuminates a dark room, the game engine will automatically handle
-    /// printing the room's description after this action completes.
-    ///
-    /// - Parameter context: The `ActionContext` for the current action.
-    /// - Returns: An `ActionResult` containing the message and relevant state changes.
-    /// - Throws: `ActionResponse.internalEngineError` if the direct object is not an item (this should
-    ///           be caught by `validate`), or errors from `engine.item()`.
-        guard let directObjectRef = command.directObject,
-            case .item(let targetItemID) = directObjectRef
-        else {
-            throw ActionResponse.internalEngineError(
-                "TurnOn: directObject was not an item in process.")
-        }
-        let targetItem = try await engine.item(targetItemID)
-
-        let isDevice = targetItem.hasFlag(.isDevice)
-        let isFlammable = targetItem.hasFlag(.isFlammable)
-
-        // If it's flammable but not a device, delegate to burn logic
-        if isFlammable && !isDevice {
-            return try await processBurn(targetItem: targetItem, context: context)
-        }
-
-        // Otherwise, proceed with normal turn-on logic for devices
 
         // Check if room was dark before turning on the light
         let wasRoomDark = await engine.playerLocationIsLit() == false
-        let isLightSource = targetItem.hasFlag(.isLightSource)
 
         var messageParts: [String] = []
         messageParts.append("The \(targetItem.name) is now on.")
@@ -151,7 +105,7 @@ public struct TurnOnActionHandler: ActionHandler {
         return ActionResult(
             messageParts.joined(separator: "\n"),
             await engine.setFlag(.isTouched, on: targetItem),
-            await engine.setFlag(.isOn, on: targetItem),
+            await engine.setFlag(.isOn, on: targetItem)
         )
     }
 
@@ -164,20 +118,19 @@ public struct TurnOnActionHandler: ActionHandler {
     ///
     /// - Parameters:
     ///   - targetItem: The flammable item to burn.
-    ///   - context: The action context.
+    ///   - engine: The game engine instance.
     /// - Returns: An `ActionResult` with burn-specific messaging and state changes.
     private func processBurn(
         targetItem: Item,
-        context: ActionContext
-    ) async throws -> ActionResult
-    {
+        engine: GameEngine
+    ) async throws -> ActionResult {
         // Check if the item is flammable (should always be true in this context)
         if targetItem.hasFlag(.isFlammable) {
             return ActionResult(
                 engine.messenger.itemBurnsToAshes(item: targetItem.withDefiniteArticle),
                 await engine.setFlag(.isTouched, on: targetItem),
                 await engine.updatePronouns(to: targetItem),
-                await engine.move(targetItem, to: .nowhere),
+                await engine.move(targetItem, to: .nowhere)
             )
         } else {
             // Fallback message for non-flammable items (shouldn't reach here due to validation)
@@ -187,7 +140,7 @@ public struct TurnOnActionHandler: ActionHandler {
                     item: targetItem.withDefiniteArticle
                 ),
                 await engine.setFlag(.isTouched, on: targetItem),
-                await engine.updatePronouns(to: targetItem),
+                await engine.updatePronouns(to: targetItem)
             )
         }
     }

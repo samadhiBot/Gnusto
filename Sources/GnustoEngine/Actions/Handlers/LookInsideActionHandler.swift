@@ -17,10 +17,13 @@ public struct LookInsideActionHandler: ActionHandler {
 
     // MARK: - Action Processing Methods
 
-    /// Validates the "LOOK INSIDE" command.
-    /// Requires a direct object that must be an item the player can reach.
-    public func process(command: Command, engine: GameEngine) async throws -> ActionResult {
+    public init() {}
 
+    /// Processes the "LOOK INSIDE" command.
+    ///
+    /// This action validates prerequisites and handles looking inside containers or examining
+    /// the internal contents of objects. Provides specialized messaging for containers.
+    public func process(command: Command, engine: GameEngine) async throws -> ActionResult {
         guard let directObjectRef = command.directObject else {
             throw ActionResponse.prerequisiteNotMet(
                 engine.messenger.doWhat(verb: command.verb)
@@ -33,23 +36,11 @@ public struct LookInsideActionHandler: ActionHandler {
             )
         }
 
-        // Ensure item exists and is reachable
-        guard (try? await engine.item(targetItemID)) != nil else {
-            throw ActionResponse.unknownEntity(directObjectRef)
-        }
-
+        // Check if item exists and is accessible
+        let targetItem = try await engine.item(targetItemID)
         guard await engine.playerCanReach(targetItemID) else {
             throw ActionResponse.itemNotAccessible(targetItemID)
         }
-    /// Processes the "LOOK INSIDE" command.
-    /// By default, delegates to examine behavior with special focus on container contents.
-        guard let directObjectRef = command.directObject,
-            case .item(let targetItemID) = directObjectRef
-        else {
-            throw ActionResponse.internalEngineError("Validation should have caught this")
-        }
-
-        let targetItem = try await engine.item(targetItemID)
 
         // Determine the message based on whether item is a container
         let message: String
@@ -58,28 +49,52 @@ public struct LookInsideActionHandler: ActionHandler {
             let isOpen = try await engine.hasFlag(.isOpen, on: targetItem.id)
 
             if !isOpen {
-                message = "The \(targetItem.name) is closed."
+                if targetItem.hasFlag(.isTransparent) {
+                    // Can see through transparent containers even when closed
+                    let items = await engine.items(in: .item(targetItem.id))
+                    if items.isEmpty {
+                        message = engine.messenger.containerIsEmpty(
+                            container: targetItem.withDefiniteArticle
+                        )
+                    } else {
+                        let itemListing = items.listWithIndefiniteArticles
+                        message = engine.messenger.containerContains(
+                            container: targetItem.withDefiniteArticle,
+                            contents: itemListing
+                        )
+                    }
+                } else {
+                    message = engine.messenger.containerIsClosed(
+                        container: targetItem.withDefiniteArticle
+                    )
+                }
             } else {
                 // Show container contents
                 let items = await engine.items(in: .item(targetItem.id))
                 if items.isEmpty {
-                    message = "The \(targetItem.name) is empty."
+                    message = engine.messenger.containerIsEmpty(
+                        container: targetItem.withDefiniteArticle
+                    )
                 } else {
                     let itemListing = items.listWithIndefiniteArticles
-                    message = "In the \(targetItem.name) you see \(itemListing)."
+                    message = engine.messenger.containerContains(
+                        container: targetItem.withDefiniteArticle,
+                        contents: itemListing
+                    )
                 }
             }
         } else {
-            // For non-containers, delegate to examine behavior
-            let description = try await engine.generateDescription(
-                for: targetItem.id,
-                attributeID: .description
-            )
-
-            if !description.isEmpty {
-                message = description
+            // For non-containers, provide specialized "look inside" messaging
+            if targetItem.hasFlag(.isSurface) {
+                // Surfaces can have items "on" them, not "in" them
+                message = engine.messenger.cannotLookInsideSurface(
+                    item: targetItem.withDefiniteArticle
+                )
             } else {
-                message = "You see nothing special inside the \(targetItem.name)."
+                // Generic non-container
+                message = engine.messenger.nothingSpecialInside(
+                    item: targetItem.withDefiniteArticle
+                )
             }
         }
 

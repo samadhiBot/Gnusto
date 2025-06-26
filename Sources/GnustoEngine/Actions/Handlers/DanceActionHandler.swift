@@ -21,12 +21,34 @@ public struct DanceActionHandler: ActionHandler {
 
     public init() {}
 
-    public func process(
-        context: ActionContext
-    ) async throws -> ActionResult {
-        // Get random response from message provider
-        ActionResult(
-            engine.messenger.danceResponse()
-        )
+    /// Processes the "DANCE" command.
+    ///
+    /// This action provides humorous responses to player attempts to dance.
+    /// Can be used with or without a dance partner.
+    public func process(command: Command, engine: GameEngine) async throws -> ActionResult {
+        if let directObjectRef = command.directObject {
+            // Dancing with something/someone
+            guard case .item(let targetItemID) = directObjectRef else {
+                throw ActionResponse.prerequisiteNotMet(
+                    engine.messenger.cannotDoThat(verb: "dance")
+                )
+            }
+
+            let targetItem = try await engine.item(targetItemID)
+            guard await engine.playerCanReach(targetItemID) else {
+                throw ActionResponse.itemNotAccessible(targetItemID)
+            }
+
+            return ActionResult(
+                engine.messenger.danceWithSomething(partner: targetItem.withDefiniteArticle),
+                await engine.setFlag(.isTouched, on: targetItem),
+                await engine.updatePronouns(to: targetItem)
+            )
+        } else {
+            // General dancing
+            return ActionResult(
+                engine.messenger.danceResponse()
+            )
+        }
     }
 }

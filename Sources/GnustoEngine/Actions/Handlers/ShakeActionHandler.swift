@@ -14,18 +14,14 @@ public struct ShakeActionHandler: ActionHandler {
     public let requiresLight: Bool = true
 
     // MARK: - Action Processing Methods
+
     public init() {}
 
-    /// Validates the "SHAKE" command.
+    /// Processes the "SHAKE" command.
     ///
-    /// This method ensures that:
-    /// 1. A direct object is specified (what to shake).
-    /// 2. The target item exists and is reachable.
-    ///
-    /// - Parameter context: The `ActionContext` for the current action.
-    /// - Throws: Various `ActionResponse` errors if validation fails.
+    /// This action validates prerequisites and handles shaking attempts on different types
+    /// of objects. Generally provides descriptive responses following ZIL traditions.
     public func process(command: Command, engine: GameEngine) async throws -> ActionResult {
-
         // Shake requires a direct object (what to shake)
         guard let directObjectRef = command.directObject else {
             throw ActionResponse.prerequisiteNotMet(
@@ -38,26 +34,11 @@ public struct ShakeActionHandler: ActionHandler {
             )
         }
 
-        // Check if target exists and is reachable
-        _ = try await engine.item(targetItemID)
+        // Check if target exists and is accessible
+        let targetItem = try await engine.item(targetItemID)
         guard await engine.playerCanReach(targetItemID) else {
             throw ActionResponse.itemNotAccessible(targetItemID)
         }
-    /// Processes the "SHAKE" command.
-    ///
-    /// Handles shaking attempts on different types of objects.
-    /// Generally provides descriptive responses following ZIL traditions.
-    ///
-    /// - Parameter context: The `ActionContext` for the current action.
-    /// - Returns: An `ActionResult` with appropriate shaking message and state changes.
-        guard let directObjectRef = command.directObject,
-            case .item(let targetItemID) = directObjectRef
-        else {
-            throw ActionResponse.internalEngineError(
-                "ShakeActionHandler: directObject was not an item in process.")
-        }
-
-        let targetItem = try await engine.item(targetItemID)
 
         // Determine appropriate response based on object type and properties
         let message =
@@ -91,14 +72,5 @@ public struct ShakeActionHandler: ActionHandler {
             await engine.setFlag(.isTouched, on: targetItem),
             await engine.updatePronouns(to: targetItem)
         )
-    }
-
-    /// Performs any post-processing after the shake action completes.
-    ///
-    /// Currently no post-processing is needed for basic shaking.
-    ///
-    /// - Parameter context: The action context for the current action.
-    public func postProcess(context: ActionContext) async throws {
-        // No post-processing needed for shake
     }
 }

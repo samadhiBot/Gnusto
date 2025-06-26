@@ -20,11 +20,34 @@ public struct LaughActionHandler: ActionHandler {
 
     public init() {}
 
-    public func process(
-        context: ActionContext
-    ) async throws -> ActionResult {
-        ActionResult(
-            engine.messenger.laughResponse()
-        )
+    /// Processes the "LAUGH" command.
+    ///
+    /// This action provides humorous responses to player attempts to laugh.
+    /// Can be used with or without a target object.
+    public func process(command: Command, engine: GameEngine) async throws -> ActionResult {
+        if let directObjectRef = command.directObject {
+            // Laughing at something/someone
+            guard case .item(let targetItemID) = directObjectRef else {
+                throw ActionResponse.prerequisiteNotMet(
+                    engine.messenger.cannotDoThat(verb: "laugh")
+                )
+            }
+
+            let targetItem = try await engine.item(targetItemID)
+            guard await engine.playerCanReach(targetItemID) else {
+                throw ActionResponse.itemNotAccessible(targetItemID)
+            }
+
+            return ActionResult(
+                engine.messenger.laughAtSomething(target: targetItem.withDefiniteArticle),
+                await engine.setFlag(.isTouched, on: targetItem),
+                await engine.updatePronouns(to: targetItem)
+            )
+        } else {
+            // General laughing
+            return ActionResult(
+                engine.messenger.laughResponse()
+            )
+        }
     }
 }

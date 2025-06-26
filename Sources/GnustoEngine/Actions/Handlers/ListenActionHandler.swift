@@ -22,20 +22,34 @@ public struct ListenActionHandler: ActionHandler {
 
     public init() {}
 
-    /// Validates the "LISTEN" command.
-    /// Currently, listen requires no specific validation.
-    public func process(command: Command, engine: GameEngine) async throws -> ActionResult {
-
-        // No validation needed for LISTEN.
     /// Processes the "LISTEN" command.
     ///
-    /// This action typically results in a message indicating that nothing unusual is heard.
-    /// Game-specific sounds can be implemented via more specific handlers.
-    ///
-    /// - Parameter context: The `ActionContext` for the current action.
-    /// - Returns: An `ActionResult` with a default message.
-        return ActionResult(
-            engine.messenger.youHearNothingUnusual()
-        )
+    /// This action provides atmospheric responses to listening. Can be used without objects
+    /// for general listening, or with objects for listening to specific items.
+    public func process(command: Command, engine: GameEngine) async throws -> ActionResult {
+        if let directObjectRef = command.directObject {
+            // Listening to something specific
+            guard case .item(let targetItemID) = directObjectRef else {
+                throw ActionResponse.prerequisiteNotMet(
+                    engine.messenger.cannotDoThat(verb: "listen")
+                )
+            }
+
+            let targetItem = try await engine.item(targetItemID)
+            guard await engine.playerCanReach(targetItemID) else {
+                throw ActionResponse.itemNotAccessible(targetItemID)
+            }
+
+            return ActionResult(
+                engine.messenger.listenToSomething(target: targetItem.withDefiniteArticle),
+                await engine.setFlag(.isTouched, on: targetItem),
+                await engine.updatePronouns(to: targetItem)
+            )
+        } else {
+            // General listening
+            return ActionResult(
+                engine.messenger.youHearNothingUnusual()
+            )
+        }
     }
 }

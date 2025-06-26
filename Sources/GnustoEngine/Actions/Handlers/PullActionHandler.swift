@@ -14,77 +14,112 @@ public struct PullActionHandler: ActionHandler {
     public let requiresLight: Bool = true
 
     // MARK: - Action Processing Methods
+
     public init() {}
 
-    /// Validates the "PULL" command.
-    ///
-    /// This method ensures that:
-    /// 1. A direct object is specified (what to pull).
-    /// 2. The target item exists and is reachable.
-    /// 3. The item can be pulled (has the `.isPullable` flag or similar logic).
-    ///
-    /// - Parameter context: The `ActionContext` for the current action.
-    /// - Throws: Various `ActionResponse` errors if validation fails.
-    public func process(command: Command, engine: GameEngine) async throws -> ActionResult {
-
-        // Pull requires a direct object (what to pull)
-        guard let directObjectRef = command.directObject else {
-            throw ActionResponse.prerequisiteNotMet(
-                engine.messenger.doWhat(verb: command.verb)
-            )
-        }
-        guard case .item(let targetItemID) = directObjectRef else {
-            throw ActionResponse.prerequisiteNotMet(
-                engine.messenger.thatsNotSomethingYouCan(.pull)
-            )
-        }
-
-        // Check if target exists and is reachable
-        _ = try await engine.item(targetItemID)
-        guard await engine.playerCanReach(targetItemID) else {
-            throw ActionResponse.itemNotAccessible(targetItemID)
-        }
     /// Processes the "PULL" command.
     ///
-    /// Handles pulling objects. Most objects cannot be pulled, but some specific
-    /// items (like ropes, levers, handles) may have special pull behavior that
-    /// can be customized via ItemEventHandlers.
-    ///
-    /// - Parameter context: The `ActionContext` for the current action.
-    /// - Returns: An `ActionResult` with appropriate pull message and state changes.
-        guard let directObjectRef = command.directObject,
-            case .item(let targetItemID) = directObjectRef
-        else {
-            throw ActionResponse.internalEngineError(
-                "PullActionHandler: directObject was not an item in process.")
+    /// This action validates prerequisites and handles pulling objects. Most objects cannot
+    /// be pulled effectively, but some specific items may have special pull behavior.
+    public func process(command: Command, engine: GameEngine) async throws -> ActionResult {
+        // For ALL commands, empty directObjects is valid (means nothing to pull)
+        if !command.isAllCommand {
+            guard !command.directObjects.isEmpty else {
+                throw ActionResponse.prerequisiteNotMet(
+                    engine.messenger.doWhat(verb: command.verb)
+                )
+            }
         }
 
-        let targetItem = try await engine.item(targetItemID)
+        var allStateChanges: [StateChange] = []
+        var pulledItems: [Item] = []
+        var lastPulledItem: Item?
 
-        // Check if item is specifically pullable
-        let message = if targetItem.hasFlag(.isPullable) {
-            engine.messenger.pullSuccess(item: targetItem.withDefiniteArticle)
-        } else {
-            // Default behavior: most things can't be pulled effectively
-            engine.messenger.cannotDoThat(
-                verb: .pull,
-                item: targetItem.withDefiniteArticle
-            )
+        // Process each object individually
+        for directObjectRef in command.directObjects {
+            guard case .item(let targetItemID) = directObjectRef else {
+                if command.isAllCommand {
+                    continue  // Skip non-items in ALL commands
+                } else {
+                    throw ActionResponse.prerequisiteNotMet(
+                        engine.messenger.thatsNotSomethingYouCan(.pull)
+                    )
+                }
+            }
+
+            do {
+                let targetItem = try await engine.item(targetItemID)
+
+                // Check if player can reach the item
+                guard await engine.playerCanReach(targetItemID) else {
+                    if command.isAllCommand {
+                        continue  // Skip unreachable items in ALL commands
+                    } else {
+                        throw ActionResponse.itemNotAccessible(targetItemID)
+                    }
+                }
+
+                // Create state changes for this item
+                var itemStateChanges: [StateChange] = []
+
+                // Set .isTouched flag if not already set
+                if let touchedChange = await engine.setFlag(.isTouched, on: targetItem) {
+                    itemStateChanges.append(touchedChange)
+                }
+
+                allStateChanges.append(contentsOf: itemStateChanges)
+                pulledItems.append(targetItem)
+                lastPulledItem = targetItem
+
+            } catch {
+                // For ALL commands, skip items that cause errors
+                if !command.isAllCommand {
+                    throw error
+                }
+            }
         }
+
+        // Update pronouns appropriately for multiple objects
+        if let lastItem = lastPulledItem {
+            if pulledItems.count > 1 {
+                // For multiple items, update both "it" and "them"
+                let pronounChanges = await engine.updatePronounsForMultipleObjects(
+                    lastItem: lastItem,
+                    allItems: pulledItems
+                )
+                allStateChanges.append(contentsOf: pronounChanges)
+            } else {
+                // For single item, use the original method
+                if let pronounChange = await engine.updatePronouns(to: lastItem) {
+                    allStateChanges.append(pronounChange)
+                }
+            }
+        }
+
+        // Generate appropriate message based on whether items are pullable
+        let message =
+            if pulledItems.isEmpty {
+                command.isAllCommand
+                    ? engine.messenger.nothingHereToPull()
+                    : engine.messenger.doWhat(verb: command.verb)
+            } else if pulledItems.count == 1 {
+                let item = pulledItems[0]
+                if item.hasFlag(.isPullable) {
+                    engine.messenger.pullSuccess(item: item.withDefiniteArticle)
+                } else {
+                    engine.messenger.cannotDoThat(
+                        verb: .pull,
+                        item: item.withDefiniteArticle
+                    )
+                }
+            } else {
+                // Multiple items - provide general response
+                engine.messenger.pullMultipleItems(items: pulledItems.listWithDefiniteArticles)
+            }
 
         return ActionResult(
-            message,
-            await engine.setFlag(.isTouched, on: targetItem),
-            await engine.updatePronouns(to: targetItem)
+            message: message,
+            changes: allStateChanges
         )
-    }
-
-    /// Performs any post-processing after the pull action completes.
-    ///
-    /// Currently no post-processing is needed for basic pulling.
-    ///
-    /// - Parameter context: The action context for the current action.
-    public func postProcess(context: ActionContext, result: ActionResult) async throws {
-        // No post-processing needed for pull
     }
 }

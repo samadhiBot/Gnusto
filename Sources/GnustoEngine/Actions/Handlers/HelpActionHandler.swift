@@ -14,20 +14,14 @@ public struct HelpActionHandler: ActionHandler {
     public let requiresLight: Bool = false
 
     // MARK: - Action Processing Methods
+
     public init() {}
 
-    /// Validates the "HELP" command.
-    /// Help requires no specific validation and always proceeds.
-    public func process(command: Command, engine: GameEngine) async throws -> ActionResult {
-
-        // No validation needed for HELP
     /// Processes the "HELP" command.
     ///
     /// Displays basic help information about common interactive fiction commands.
     /// Games can override this with custom help via ItemEventHandlers or custom handlers.
-    ///
-    /// - Parameter context: The `ActionContext` for the current action.
-    /// - Returns: An `ActionResult` containing help text.
+    public func process(command: Command, engine: GameEngine) async throws -> ActionResult {
         let helpText = """
             This is an interactive fiction game. You control the story by typing commands.
 
@@ -51,14 +45,5 @@ public struct HelpActionHandler: ActionHandler {
             """
 
         return ActionResult(helpText)
-    }
-
-    /// Performs any post-processing after the help action completes.
-    ///
-    /// Currently no post-processing is needed for help.
-    ///
-    /// - Parameter context: The action context for the current action.
-    public func postProcess(context: ActionContext) async throws {
-        // No post-processing needed for help
     }
 }

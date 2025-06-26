@@ -18,48 +18,45 @@ public struct TurnActionHandler: ActionHandler {
 
     public init() {}
 
-    /// Validates the "TURN" command.
+    /// Processes the "TURN" command.
     ///
-    /// This method ensures that:
-    /// 1. A direct object is specified (what to turn).
-    /// 2. The target item exists and is reachable.
-    ///
-    /// - Parameter context: The `ActionContext` for the current action.
-    /// - Throws: Various `ActionResponse` errors if validation fails.
+    /// This action validates prerequisites and handles turning attempts on different types
+    /// of objects. Provides appropriate responses following ZIL traditions.
+    /// Can optionally turn to a specific setting specified in the indirect object.
     public func process(command: Command, engine: GameEngine) async throws -> ActionResult {
-
         // Turn requires a direct object (what to turn)
         guard let directObjectRef = command.directObject else {
             throw ActionResponse.prerequisiteNotMet(
                 engine.messenger.doWhat(verb: command.verb)
             )
         }
+
         guard case .item(let targetItemID) = directObjectRef else {
             throw ActionResponse.prerequisiteNotMet(
                 engine.messenger.cannotDoThat(verb: "turn")
             )
         }
 
-        // Check if target exists and is reachable
-        _ = try await engine.item(targetItemID)
+        // Check if target exists and is accessible
+        let targetItem = try await engine.item(targetItemID)
         guard await engine.playerCanReach(targetItemID) else {
             throw ActionResponse.itemNotAccessible(targetItemID)
         }
-    /// Processes the "TURN" command.
-    ///
-    /// Handles turning attempts on different types of objects.
-    /// Provides appropriate responses following ZIL traditions.
-    ///
-    /// - Parameter context: The `ActionContext` for the current action.
-    /// - Returns: An `ActionResult` with appropriate turning message and state changes.
-        guard let directObjectRef = command.directObject,
-            case .item(let targetItemID) = directObjectRef
-        else {
-            throw ActionResponse.internalEngineError(
-                "TurnActionHandler: directObject was not an item in process.")
-        }
 
-        let targetItem = try await engine.item(targetItemID)
+        // Handle optional setting to turn to (indirect object)
+        var settingDescription: String?
+        if let indirectObjectRef = command.indirectObject {
+            switch indirectObjectRef {
+            case .item(let settingItemID):
+                let settingItem = try await engine.item(settingItemID)
+                settingDescription = settingItem.name
+            case .location(let locationID):
+                let location = try await engine.location(locationID)
+                settingDescription = location.name
+            case .player:
+                settingDescription = "yourself"
+            }
+        }
 
         // Determine appropriate response based on object type
         let message =
@@ -71,10 +68,24 @@ public struct TurnActionHandler: ActionHandler {
                 engine.messenger.turnKey(item: targetItem.withDefiniteArticle)
             } else if targetItem.hasFlag(.isDial) {
                 // Dials click into position
-                engine.messenger.turnDial(item: targetItem.withDefiniteArticle)
+                if let setting = settingDescription {
+                    engine.messenger.turnDialTo(
+                        dial: targetItem.withDefiniteArticle,
+                        setting: setting
+                    )
+                } else {
+                    engine.messenger.turnDial(item: targetItem.withDefiniteArticle)
+                }
             } else if targetItem.hasFlag(.isKnob) {
                 // Knobs click into position
-                engine.messenger.turnKnob(item: targetItem.withDefiniteArticle)
+                if let setting = settingDescription {
+                    engine.messenger.turnKnobTo(
+                        knob: targetItem.withDefiniteArticle,
+                        setting: setting
+                    )
+                } else {
+                    engine.messenger.turnKnob(item: targetItem.withDefiniteArticle)
+                }
             } else if targetItem.hasFlag(.isWheel) {
                 // Wheels rotate with effort
                 engine.messenger.turnWheel(item: targetItem.withDefiniteArticle)
@@ -94,14 +105,5 @@ public struct TurnActionHandler: ActionHandler {
             await engine.setFlag(.isTouched, on: targetItem),
             await engine.updatePronouns(to: targetItem)
         )
-    }
-
-    /// Performs any post-processing after the turn action completes.
-    ///
-    /// Currently no post-processing is needed for basic turning.
-    ///
-    /// - Parameter context: The action context for the current action.
-    public func postProcess(context: ActionContext) async throws {
-        // No post-processing needed for turn
     }
 }

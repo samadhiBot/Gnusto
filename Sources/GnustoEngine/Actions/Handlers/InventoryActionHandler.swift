@@ -14,37 +14,31 @@ public struct InventoryActionHandler: ActionHandler {
     public let requiresLight: Bool = false
 
     // MARK: - Action Processing Methods
-    /// Validates the "INVENTORY" command.
-    /// This action typically requires no specific validation.
-    public func process(command: Command, engine: GameEngine) async throws -> ActionResult {
 
-        // No specific validation needed for basic inventory command.
+    public init() {}
+
     /// Processes the "INVENTORY" command.
     ///
     /// This action retrieves all items currently parented to the player from the `GameState`.
     /// It then formats these items into a list for display. If the player is carrying nothing,
     /// a message indicating they are empty-handed is shown.
     /// This action does not typically consume game time or cause state changes.
-    ///
-    /// - Parameter context: The `ActionContext` for the current action.
-    /// - Returns: An `ActionResult` containing the list of carried items or a message
-    ///   indicating an empty inventory.
+    public func process(command: Command, engine: GameEngine) async throws -> ActionResult {
         // Get inventory item snapshots
         let inventoryItems = await engine.items(in: .player)
 
         // Construct the message
-        var message: String {
-            if inventoryItems.isEmpty {
-                return engine.messenger.youAreEmptyHanded()
-            } else {
-                let itemList = inventoryItems.sorted().map {
-                    "- \($0.withIndefiniteArticle.capitalizedFirst)"
-                }.joined(separator: "\n")
-                return """
-                    \(engine.messenger.youAreCarrying())
-                    \(itemList.indent())
-                    """
-            }
+        let message: String
+        if inventoryItems.isEmpty {
+            message = engine.messenger.youAreEmptyHanded()
+        } else {
+            let itemList = inventoryItems.sorted().map {
+                "- \($0.withIndefiniteArticle.capitalizedFirst)"
+            }.joined(separator: "\n")
+            message = """
+                \(engine.messenger.youAreCarrying())
+                \(itemList.indent())
+                """
         }
 
         return ActionResult(message)

@@ -24,19 +24,21 @@ public struct ClimbActionHandler: ActionHandler {
 
     // MARK: - Action Processing Methods
 
-    /// Validates the "CLIMB" command.
-    ///
-    /// This method ensures that:
-    /// 1. If a direct object is specified, it exists and is reachable.
-    /// 2. The object is present in the current location (for global objects like stairs)
-    ///
-    /// - Parameter context: The `ActionContext` for the current action.
-    /// - Throws: Various `ActionResponse` errors if validation fails.
-    public func process(command: Command, engine: GameEngine) async throws -> ActionResult {
+    public init() {}
 
-        // CLIMB with no object is always valid (will be handled in process)
+    /// Processes the "CLIMB" command.
+    ///
+    /// This action validates prerequisites and handles various climbing scenarios:
+    /// 1. "climb" with no object - asks what to climb
+    /// 2. "climb <object>" that enables an exit - traverses that exit
+    /// 3. "climb <climbable object>" - default climbing behavior
+    /// 4. "climb <non-climbable object>" - error message
+    public func process(command: Command, engine: GameEngine) async throws -> ActionResult {
+        // Handle CLIMB with no object
         guard let directObjectRef = command.directObject else {
-            return
+            return ActionResult(
+                engine.messenger.doWhat(verb: command.verb)
+            )
         }
 
         let targetItemID: ItemID
@@ -53,41 +55,12 @@ public struct ClimbActionHandler: ActionHandler {
             )
         }
 
-        // Check if the target exists
-        guard (try? await engine.item(targetItemID)) != nil else {
-            throw ActionResponse.itemNotAccessible(targetItemID)
-        }
-
-        // Check if the target is reachable
+        // Check if the target exists and is reachable
+        let targetItem = try await engine.item(targetItemID)
         guard await engine.playerCanReach(targetItemID) else {
             throw ActionResponse.itemNotAccessible(targetItemID)
         }
-    /// Processes the "CLIMB" command.
-    ///
-    /// This method handles various climbing scenarios:
-    /// 1. "climb" with no object - asks what to climb
-    /// 2. "climb <object>" that enables an exit - traverses that exit
-    /// 3. "climb <climbable object>" - default climbing behavior
-    /// 4. "climb <non-climbable object>" - error message
-    ///
-    /// - Parameter context: The `ActionContext` for the current action.
-    /// - Returns: An `ActionResult` containing the message and any relevant state changes.
-        // Handle CLIMB with no object
-        guard let directObjectRef = command.directObject else {
-            return ActionResult(
-                engine.messenger.doWhat(verb: command.verb)
-            )
-        }
 
-        guard case .item(let targetItemID) = directObjectRef else {
-            let message = engine.messenger.actionHandlerInternalError(
-                handler: "ClimbActionHandler",
-                details: "directObject was not an item in process"
-            )
-            throw ActionResponse.internalEngineError(message)
-        }
-
-        let targetItem = try await engine.item(targetItemID)
         let currentLocation = try await engine.playerLocation()
 
         // Check if this object enables traversal of any exit in the current location
@@ -118,13 +91,7 @@ public struct ClimbActionHandler: ActionHandler {
                 )
 
                 let goHandler = GoActionHandler()
-                let goContext = ActionContext(
-                    command: goCommand,
-                    engine: engine
-                )
-
-                try await goHandler.validate(context: goContext)
-                let goResult = try await goHandler.process(context: goContext)
+                let goResult = try await goHandler.process(command: goCommand, engine: engine)
 
                 // Combine state changes from climb (touch/pronouns) with go result
                 return ActionResult(

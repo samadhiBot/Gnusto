@@ -18,47 +18,34 @@ public struct BreatheActionHandler: ActionHandler {
 
     public init() {}
 
-    /// Validates the "BREATHE" command.
-    ///
-    /// This method ensures that no direct or indirect objects are specified,
-    /// as breathing is a standalone atmospheric action.
-    ///
-    /// - Parameter context: The `ActionContext` for the current action.
-    /// - Throws: `ActionResponse.prerequisiteNotMet` if objects are specified.
-    public func process(command: Command, engine: GameEngine) async throws -> ActionResult {
-
-        // Breathe should not take any objects
-        if command.directObject != nil {
-            throw ActionResponse.prerequisiteNotMet(
-                engine.messenger.cannotDoThat(verb: "breathe")
-            )
-        }
-
-        if command.indirectObject != nil {
-            throw ActionResponse.prerequisiteNotMet(
-                engine.messenger.cannotDoThat(verb: "breathe")
-            )
-        }
     /// Processes the "BREATHE" command.
     ///
-    /// Provides varied atmospheric responses based on the current game state.
-    /// No state changes are made - this is purely a flavor command.
-    ///
-    /// - Parameter context: The `ActionContext` for the current action.
-    /// - Returns: An `ActionResult` with an atmospheric message.
-        // Get random response from message provider
-        return ActionResult(
-            engine.messenger.breatheResponse()
-        )
-    }
+    /// This action provides atmospheric responses to breathing. Can be used without objects
+    /// for general breathing, or with objects for breathing on specific items.
+    public func process(command: Command, engine: GameEngine) async throws -> ActionResult {
+        if let directObjectRef = command.directObject {
+            // Breathing on something
+            guard case .item(let targetItemID) = directObjectRef else {
+                throw ActionResponse.prerequisiteNotMet(
+                    engine.messenger.cannotDoThat(verb: "breathe")
+                )
+            }
 
-    /// Performs any post-processing after the "BREATHE" command.
-    ///
-    /// Currently no post-processing is needed for breathing.
-    ///
-    /// - Parameter context: The processed `ActionContext`.
-    /// - Returns: The context unchanged.
-    public func postProcess(context: ActionContext) async -> ActionContext {
-        return context
+            let targetItem = try await engine.item(targetItemID)
+            guard await engine.playerCanReach(targetItemID) else {
+                throw ActionResponse.itemNotAccessible(targetItemID)
+            }
+
+            return ActionResult(
+                engine.messenger.breatheOnSomething(target: targetItem.withDefiniteArticle),
+                await engine.setFlag(.isTouched, on: targetItem),
+                await engine.updatePronouns(to: targetItem)
+            )
+        } else {
+            // General breathing
+            return ActionResult(
+                engine.messenger.breatheResponse()
+            )
+        }
     }
 }

@@ -17,78 +17,20 @@ public struct MoveActionHandler: ActionHandler {
 
     // MARK: - Action Processing Methods
 
-    /// Validates the "MOVE" command.
-    ///
-    /// This method ensures that:
-    /// 1. A direct object is specified (the player must indicate *what* to move).
-    /// 2. The direct object refers to an existing item.
-    /// 3. The player can reach the specified item.
-    /// 4. The item is not scenery that cannot be moved.
-    ///
-    /// Note: Unlike TAKE, this does not require the item to be takable, as MOVE
-    /// is often used for manipulating objects that are too large or fixed to pick up.
-    ///
-    /// - Parameter context: The `ActionContext` for the current action.
-    /// - Throws: Various `ActionResponse` errors if validation fails, such as:
-    ///           `prerequisiteNotMet` (for missing object or wrong item type),
-    ///           `itemNotAccessible` (if item cannot be reached),
-    ///           `itemNotMovable` (if item is fixed scenery).
-    ///           Can also throw errors from `engine.item()`.
-    public func process(command: Command, engine: GameEngine) async throws -> ActionResult {
+    public init() {}
 
-        // For ALL commands, allow empty directObjects (handled in process method)
-        if command.isAllCommand {
-            return
-        }
-
-        // 1. Ensure we have at least one direct object for non-ALL commands
-        guard !command.directObjects.isEmpty else {
-            throw ActionResponse.prerequisiteNotMet(
-                engine.messenger.doWhat(verb: command.verb)
-            )
-        }
-
-        // For single object commands, validate the single object
-        guard let directObjectRef = command.directObject else {
-            throw ActionResponse.prerequisiteNotMet(
-                engine.messenger.doWhat(verb: command.verb)
-            )
-        }
-        guard case .item(let targetItemID) = directObjectRef else {
-            throw ActionResponse.prerequisiteNotMet(
-                engine.messenger.thatsNotSomethingYouCan(.move)
-            )
-        }
-
-        // 2. Check if item exists
-        _ = try await engine.item(targetItemID)
-
-        // 3. Check reachability using ScopeResolver
-        guard await engine.playerCanReach(targetItemID) else {
-            throw ActionResponse.itemNotAccessible(targetItemID)
-        }
-
-        // 4. Check if the item can be moved (not immovable scenery)
-        // Some scenery items might be movable (like a pile of leaves), others are not
-        // We'll let the process method handle the specific logic for what happens when moved
     /// Processes the "MOVE" command.
     ///
-    /// For each item to be moved:
-    /// 1. Checks if there's a specific handler for this item (via item events)
-    /// 2. If no specific handler, provides default behavior
-    /// 3. Updates touched flags and pronouns appropriately
-    /// 4. Returns appropriate feedback based on the result
-    ///
-    /// This action handler is designed to be extensible - specific items can provide
-    /// custom move behavior through item event handlers, while this provides the default.
-    ///
-    /// - Parameter context: The `ActionContext` for the current action.
-    /// - Returns: An `ActionResult` containing a message and any relevant `StateChange`s.
-    /// - Throws: `ActionResponse.internalEngineError` if direct object is not an item.
+    /// This action validates prerequisites and handles moving or manipulating objects.
+    /// Unlike TAKE, this doesn't require items to be takable, as MOVE is often used
+    /// for manipulating objects that are too large or fixed to pick up.
+    public func process(command: Command, engine: GameEngine) async throws -> ActionResult {
         // For ALL commands, empty directObjects is valid (means nothing to move)
         if !command.isAllCommand {
             guard !command.directObjects.isEmpty else {
-                throw ActionResponse.internalEngineError("Move: no direct objects in process.")
+                throw ActionResponse.prerequisiteNotMet(
+                    engine.messenger.doWhat(verb: command.verb)
+                )
             }
         }
 
@@ -102,29 +44,28 @@ public struct MoveActionHandler: ActionHandler {
                 if command.isAllCommand {
                     continue  // Skip non-items in ALL commands
                 } else {
-                    throw ActionResponse.internalEngineError(
-                        "Move: directObject was not an item in process.")
+                    throw ActionResponse.prerequisiteNotMet(
+                        engine.messenger.thatsNotSomethingYouCan(.move)
+                    )
                 }
             }
 
             do {
                 let targetItem = try await engine.item(targetItemID)
 
-                // Validate this specific item for ALL commands
-                if command.isAllCommand {
-                    // Check if player can reach the item
-                    guard await engine.playerCanReach(targetItemID) else {
+                // Check if player can reach the item
+                guard await engine.playerCanReach(targetItemID) else {
+                    if command.isAllCommand {
                         continue  // Skip unreachable items in ALL commands
+                    } else {
+                        throw ActionResponse.itemNotAccessible(targetItemID)
                     }
                 }
 
-                // --- Check for item-specific move behavior ---
-                // TODO: When item event handlers are implemented, check for custom move behavior here
-
-                // --- Default move behavior ---
+                // Create state changes for this item
                 var itemStateChanges: [StateChange] = []
 
-                // Change 1: Set `.isTouched` flag if not already set
+                // Set .isTouched flag if not already set
                 if let touchedChange = await engine.setFlag(.isTouched, on: targetItem) {
                     itemStateChanges.append(touchedChange)
                 }
@@ -162,13 +103,20 @@ public struct MoveActionHandler: ActionHandler {
         let message =
             if command.isAllCommand {
                 if movedItems.isEmpty {
-                    "There is nothing here to move."
+                    engine.messenger.nothingHereToMove()
                 } else {
-                    "You move \(movedItems.listWithDefiniteArticles)."
+                    engine.messenger.moveMultipleItems(items: movedItems.listWithDefiniteArticles)
+                }
+            } else if let movedItem = movedItems.first {
+                // Check if item has special move behavior
+                if movedItem.hasFlag(.isMovable) {
+                    engine.messenger.moveSuccess(item: movedItem.withDefiniteArticle)
+                } else {
+                    // Default behavior: most things can't be meaningfully moved
+                    engine.messenger.moveNoEffect(item: movedItem.withDefiniteArticle)
                 }
             } else {
-                // Default behavior: most things can't be meaningfully moved
-                "Moving the \(movedItems.first?.name ?? "item") doesn't accomplish anything."
+                engine.messenger.doWhat(verb: command.verb)
             }
 
         return ActionResult(
@@ -176,6 +124,4 @@ public struct MoveActionHandler: ActionHandler {
             changes: allStateChanges
         )
     }
-
-    // Rely on default postProcess.
 }

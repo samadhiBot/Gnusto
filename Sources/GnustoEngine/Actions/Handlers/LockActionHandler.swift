@@ -16,29 +16,15 @@ public struct LockActionHandler: ActionHandler {
 
     // MARK: - Action Processing Methods
 
-    /// Validates the "LOCK" command.
-    ///
-    /// This method ensures that:
-    /// 1. Both a direct object (the item to lock) and an indirect object (the key)
-    ///    are specified and are valid items.
-    /// 2. The key item is currently held by the player.
-    /// 3. The player can reach the item to be locked.
-    /// 4. The target item has the `.isLockable` flag set.
-    /// 5. The target item does not already have the `.isLocked` flag set (it's not already locked).
-    ///    If it is already locked, validation passes, and `process` will handle the message.
-    /// 6. The key item matches the `.lockKey` attribute of the target item.
-    ///
-    /// - Parameter context: The `ActionContext` for the current action.
-    /// - Throws: Various `ActionResponse` errors if validation fails, such as:
-    ///           `prerequisiteNotMet` (for missing objects or wrong item types),
-    ///           `itemNotHeld` (if key is not held),
-    ///           `itemNotAccessible` (if target cannot be reached),
-    ///           `itemNotLockable` (if target is not lockable),
-    ///           `wrongKey` (if the key doesn't match).
-    ///           Can also throw errors from `engine.item()`.
-    public func process(command: Command, engine: GameEngine) async throws -> ActionResult {
+    public init() {}
 
-        // 1. Validate command structure: Need DO and IO, both must be items
+    /// Processes the "LOCK" command.
+    ///
+    /// This action validates prerequisites and handles locking items using keys.
+    /// Checks that both items exist, the key is held, the target is lockable,
+    /// not already locked, and the correct key is being used.
+    public func process(command: Command, engine: GameEngine) async throws -> ActionResult {
+        // Validate command structure: Need direct object
         guard let directObjectRef = command.directObject else {
             throw ActionResponse.prerequisiteNotMet(
                 engine.messenger.doWhat(verb: command.verb)
@@ -49,96 +35,70 @@ public struct LockActionHandler: ActionHandler {
                 engine.messenger.thatsNotSomethingYouCan(.lock)
             )
         }
+
+        // Get target item and validate it's lockable
         let targetItem = try await engine.item(targetItemID)
-
-        guard let indirectObjectRef = command.indirectObject else {
-            throw ActionResponse.prerequisiteNotMet(
-                engine.messenger.lockWithWhat(item: targetItem.withDefiniteArticle)
-            )
-        }
-        guard case .item(let keyItemID) = indirectObjectRef else {
-            throw ActionResponse.prerequisiteNotMet(
-                engine.messenger.canOnlyUseItemAsKey()
-            )
+        guard targetItem.hasFlag(.isLockable) else {
+            throw ActionResponse.itemNotLockable(targetItemID)
         }
 
-        // 2. Get item snapshots (existence should be implicitly validated by parser/scope resolver before this point)
-        // If items don't exist, engine.item() will throw, which is an acceptable failure.
-        // Alternatively, could add explicit unknownEntity checks here if desired.
-        let keyItem = try await engine.item(keyItemID)
-
-        // 3. Check reachability
-        guard keyItem.parent == .player else {
-            throw ActionResponse.itemNotHeld(keyItemID)
-        }
+        // Check if target is accessible
         guard await engine.playerCanReach(targetItemID) else {
             throw ActionResponse.itemNotAccessible(targetItemID)
         }
 
-        // 4. Check item properties
-        guard targetItem.hasFlag(.isLockable) else {
-            throw ActionResponse.itemNotLockable(targetItemID)
-        }
-        guard !targetItem.hasFlag(.isLocked) else {
-            // Don't throw, let process handle the message
-            return
-        }
-
-        // 5. Check if it's the correct key
-        guard targetItem.attributes[.lockKey] == .itemID(keyItemID) else {
-            throw ActionResponse.wrongKey(keyID: keyItemID, lockID: targetItemID)
-        }
-    /// Processes the "LOCK" command.
-    ///
-    /// This action performs the following:
-    /// 1. Retrieves the target item and the key item.
-    /// 2. If the target item is already locked (checked via its `.isLocked` flag), an
-    ///    `ActionResult` with the message "The [item name] is already locked." is returned,
-    ///    and no state changes occur.
-    /// 3. If the item is not already locked (validation ensures it's lockable and the correct
-    ///    key is being used):
-    ///    a. Sets the `.isLocked` flag on the target item.
-    ///    b. Ensures the `.isTouched` flag is set on both the target item and the key item.
-    ///    c. Updates pronouns to refer to the target item.
-    ///    d. Returns an `ActionResult` with a confirmation message (e.g., "The wooden door is now locked.")
-    ///       and the state changes.
-    ///
-    /// - Parameter context: The `ActionContext` for the current action.
-    /// - Returns: An `ActionResult` containing the message and relevant state changes.
-    /// - Throws: `ActionResponse.internalEngineError` if direct or indirect objects are not items
-    ///           (this should be caught by `validate`), or errors from `engine.item()`.
-        // Direct and Indirect objects are guaranteed to be items by validate.
-        guard let directObjectRef = command.directObject,
-            case .item(let targetItemID) = directObjectRef
-        else {
-            throw ActionResponse.internalEngineError("Lock: Direct object not an item in process.")
-        }
-        guard let indirectObjectRef = command.indirectObject,
-            case .item(let keyItemID) = indirectObjectRef
-        else {
-            throw ActionResponse.internalEngineError(
-                "Lock: Indirect object not an item in process.")
-        }
-
-        let targetItem = try await engine.item(targetItemID)
-        let keyItem = try await engine.item(keyItemID)
-
-        // Handle case: Already locked (validation allows this to pass through).
+        // Check if already locked
         if targetItem.hasFlag(.isLocked) {
-            let message = engine.messenger.alreadyLocked(
-                item: targetItem.withDefiniteArticle.capitalizedFirst
+            return ActionResult(
+                engine.messenger.alreadyLocked(
+                    item: targetItem.withDefiniteArticle.capitalizedFirst
+                )
             )
-            return ActionResult(message)
         }
 
-        return ActionResult(
-            engine.messenger.lockSuccess(item: targetItem.withDefiniteArticle),
-            await engine.setFlag(.isLocked, on: targetItem),
-            await engine.setFlag(.isTouched, on: targetItem),
-            await engine.setFlag(.isTouched, on: keyItem),
-            await engine.updatePronouns(to: targetItem)
-        )
-    }
+        // Handle key validation (if indirect object provided)
+        if let indirectObjectRef = command.indirectObject {
+            guard case .item(let keyItemID) = indirectObjectRef else {
+                throw ActionResponse.prerequisiteNotMet(
+                    engine.messenger.canOnlyUseItemAsKey()
+                )
+            }
 
-    // Default postProcess will print the message
+            let keyItem = try await engine.item(keyItemID)
+
+            // Check if player is holding the key
+            guard keyItem.parent == .player else {
+                throw ActionResponse.itemNotHeld(keyItemID)
+            }
+
+            // Check if it's the correct key
+            guard targetItem.attributes[.lockKey] == .itemID(keyItemID) else {
+                throw ActionResponse.wrongKey(keyID: keyItemID, lockID: targetItemID)
+            }
+
+            // Lock with key
+            return ActionResult(
+                engine.messenger.lockSuccess(item: targetItem.withDefiniteArticle),
+                await engine.setFlag(.isLocked, on: targetItem),
+                await engine.setFlag(.isTouched, on: targetItem),
+                await engine.setFlag(.isTouched, on: keyItem),
+                await engine.updatePronouns(to: targetItem)
+            )
+        } else {
+            // No key specified - check if item requires a key
+            if targetItem.attributes[.lockKey] != nil {
+                throw ActionResponse.prerequisiteNotMet(
+                    engine.messenger.lockWithWhat(item: targetItem.withDefiniteArticle)
+                )
+            } else {
+                // Item doesn't require a key (manual lock)
+                return ActionResult(
+                    engine.messenger.lockSuccess(item: targetItem.withDefiniteArticle),
+                    await engine.setFlag(.isLocked, on: targetItem),
+                    await engine.setFlag(.isTouched, on: targetItem),
+                    await engine.updatePronouns(to: targetItem)
+                )
+            }
+        }
+    }
 }

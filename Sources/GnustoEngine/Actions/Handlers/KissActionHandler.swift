@@ -17,16 +17,12 @@ public struct KissActionHandler: ActionHandler {
 
     public init() {}
 
-    /// Validates the "KISS" command.
+    /// Processes the "KISS" command.
     ///
-    /// This method ensures that:
-    /// 1. A direct object is specified (what to kiss).
-    /// 2. The target item exists and is reachable.
-    ///
-    /// - Parameter context: The `ActionContext` for the current action.
-    /// - Throws: Various `ActionResponse` errors if validation fails.
+    /// This action validates prerequisites and handles kissing attempts on different types
+    /// of objects and characters. Generally provides humorous or appropriate responses
+    /// following ZIL traditions.
     public func process(command: Command, engine: GameEngine) async throws -> ActionResult {
-
         // Kiss requires a direct object (what to kiss)
         guard let directObjectRef = command.directObject else {
             throw ActionResponse.prerequisiteNotMet(
@@ -34,7 +30,12 @@ public struct KissActionHandler: ActionHandler {
             )
         }
 
-        if case .player = directObjectRef { return }
+        // Handle kissing self
+        if case .player = directObjectRef {
+            return ActionResult(
+                engine.messenger.kissSelf()
+            )
+        }
 
         guard case .item(let targetItemID) = directObjectRef else {
             throw ActionResponse.prerequisiteNotMet(
@@ -43,36 +44,10 @@ public struct KissActionHandler: ActionHandler {
         }
 
         // Check if target exists and is reachable
-        _ = try await engine.item(targetItemID)
+        let targetItem = try await engine.item(targetItemID)
         guard await engine.playerCanReach(targetItemID) else {
             throw ActionResponse.itemNotAccessible(targetItemID)
         }
-    /// Processes the "KISS" command.
-    ///
-    /// Handles kissing attempts on different types of objects and characters.
-    /// Generally provides humorous or appropriate responses following ZIL traditions.
-    ///
-    /// - Parameter context: The `ActionContext` for the current action.
-    /// - Returns: An `ActionResult` with appropriate kissing message and state changes.
-        guard let directObjectRef = command.directObject else {
-            throw ActionResponse.internalEngineError(
-                "KissActionHandler: directObject was not an item in process."
-            )
-        }
-
-        if case .player = directObjectRef {
-            return ActionResult(
-                engine.messenger.kissSelf()
-            )
-        }
-
-        guard case .item(let targetItemID) = directObjectRef else {
-            return ActionResult(
-                engine.messenger.doWhat(verb: command.verb)
-            )
-        }
-
-        let targetItem = try await engine.item(targetItemID)
 
         // Determine appropriate response based on object type
         let message =

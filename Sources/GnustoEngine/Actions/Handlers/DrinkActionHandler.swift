@@ -18,17 +18,11 @@ public struct DrinkActionHandler: ActionHandler {
 
     public init() {}
 
-    /// Validates the "DRINK" command.
+    /// Processes the "DRINK" command.
     ///
-    /// This method ensures that:
-    /// 1. A direct object is specified (the player must indicate what to drink).
-    /// 2. The target item exists and is reachable.
-    /// 3. The item or its contents are drinkable.
-    ///
-    /// - Parameter context: The `ActionContext` for the current action.
-    /// - Throws: Various `ActionResponse` errors if validation fails.
+    /// This action validates prerequisites and handles consuming liquids either directly
+    /// or from containers. Drinkable items are typically removed after consumption.
     public func process(command: Command, engine: GameEngine) async throws -> ActionResult {
-
         // Ensure we have a direct object
         guard let directObjectRef = command.directObject else {
             throw ActionResponse.prerequisiteNotMet(
@@ -41,10 +35,36 @@ public struct DrinkActionHandler: ActionHandler {
             )
         }
 
-        // Check if item exists
+        // Check if item exists and is accessible
         let targetItem = try await engine.item(targetItemID)
+        guard await engine.playerCanReach(targetItemID) else {
+            throw ActionResponse.itemNotAccessible(targetItemID)
+        }
 
-        // Check if the item is directly drinkable (either isDrinkable or isEdible for ZIL compatibility)
+        // Handle "drink X from Y" syntax
+        if let indirectObjectRef = command.indirectObject {
+            guard case .item(let containerID) = indirectObjectRef else {
+                throw ActionResponse.prerequisiteNotMet(
+                    engine.messenger.cannotDoThat(verb: "drink")
+                )
+            }
+
+            let container = try await engine.item(containerID)
+
+            // Verify the liquid is actually in the specified container
+            guard case .item(let actualParentID) = targetItem.parent,
+                actualParentID == containerID
+            else {
+                throw ActionResponse.prerequisiteNotMet(
+                    engine.messenger.liquidNotInContainer(
+                        liquid: targetItem.withDefiniteArticle,
+                        container: container.withDefiniteArticle
+                    )
+                )
+            }
+        }
+
+        // Handle direct drinkable item
         if targetItem.hasFlag(.isDrinkable) || targetItem.hasFlag(.isEdible) {
             // Check if item is inside a closed container
             if case .item(let parentID) = targetItem.parent {
@@ -58,121 +78,60 @@ public struct DrinkActionHandler: ActionHandler {
                 }
             }
 
-            // Direct drinkable item - check reachability
-            guard await engine.playerCanReach(targetItemID) else {
-                throw ActionResponse.itemNotAccessible(targetItemID)
-            }
-            return
+            let drinkSuccess = engine.messenger.drinkSuccess(item: targetItem.withDefiniteArticle)
+
+            let message =
+                if targetItem.shouldTakeFirst {
+                    """
+                    \(engine.messenger.taken())
+                    \(drinkSuccess)
+                    """
+                } else {
+                    drinkSuccess
+                }
+
+            return ActionResult(
+                message,
+                await engine.setFlag(.isTouched, on: targetItem),
+                await engine.updatePronouns(to: targetItem),
+                await engine.move(targetItem, to: .nowhere)
+            )
         }
-
-        // If not directly drinkable, check if it's a container with drinkable contents
-        if targetItem.hasFlag(.isContainer) {
-            // Check if container is reachable
-            guard await engine.playerCanReach(targetItemID) else {
-                throw ActionResponse.itemNotAccessible(targetItemID)
-            }
-
-            // Check if container is open (closed containers can't be drunk from)
+        // Handle container with drinkable contents
+        else if targetItem.hasFlag(.isContainer) {
+            // Check if container is open
             guard targetItem.hasFlag(.isOpen) else {
                 throw ActionResponse.containerIsClosed(targetItemID)
             }
 
-            // Check if container has drinkable contents (either isDrinkable or isEdible for ZIL compatibility)
+            // Check if container has drinkable contents
             let containerContents = await engine.items(in: .item(targetItemID))
             let drinkableContents = containerContents.filter {
                 $0.hasFlag(.isDrinkable) || $0.hasFlag(.isEdible)
             }
 
-            guard !drinkableContents.isEmpty else {
-                let message = engine.messenger.nothingToDrinkIn(
-                    container: targetItem.withDefiniteArticle
-                )
-                throw ActionResponse.prerequisiteNotMet(message)
-            }
-            return
-        }
-
-        // Item is neither drinkable nor a container with drinkables
-        throw ActionResponse.prerequisiteNotMet(
-            engine.messenger.cannotDrink(item: targetItem.withDefiniteArticle)
-        )
-    /// Processes the "DRINK" command.
-    ///
-    /// Handles consuming liquids either directly or from containers.
-    /// Drinkable items are typically removed after consumption.
-    ///
-    /// - Parameter context: The `ActionContext` for the current action.
-    /// - Returns: An `ActionResult` with appropriate message and state changes.
-        guard let directObjectRef = command.directObject,
-            case .item(let targetItemID) = directObjectRef
-        else {
-            throw ActionResponse.internalEngineError(
-                "DrinkActionHandler: directObject was not an item in process.")
-        }
-
-        let targetItem = try await engine.item(targetItemID)
-
-        // Handle container first (prioritize over direct drinkable)
-        if targetItem.hasFlag(.isContainer) {
-            let containerContents = await engine.items(in: .item(targetItemID))
-            let drinkableContents = containerContents.filter {
-                $0.hasFlag(.isDrinkable) || $0.hasFlag(.isEdible)
-            }
-
-            if let firstDrinkable = drinkableContents.first {
-                // For closed containers, can't drink from them
-                if !targetItem.hasFlag(.isOpen) {
-                    return ActionResult(
-                        engine.messenger.cannotDrinkFromClosed(
-                            container: targetItem.withDefiniteArticle
-                        ),
-                        await engine.setFlag(.isTouched, on: targetItem)
-                    )
-                } else {
-                    return ActionResult(
-                        engine.messenger.drinkFromContainer(
-                            liquid: firstDrinkable.withDefiniteArticle,
-                            container: targetItem.withDefiniteArticle
-                        ),
-                        await engine.setFlag(.isTouched, on: targetItem),
-                        await engine.move(firstDrinkable, to: .nowhere),
-                        await engine.updatePronouns(to: firstDrinkable)
-                    )
-                }
-            } else {
-                return ActionResult(
+            guard let firstDrinkable = drinkableContents.first else {
+                throw ActionResponse.prerequisiteNotMet(
                     engine.messenger.nothingToDrinkIn(
                         container: targetItem.withDefiniteArticle
-                    ),
-                    await engine.setFlag(.isTouched, on: targetItem)
+                    )
                 )
             }
-        }
 
-        // This shouldn't happen after validation, but handle it
-        guard targetItem.hasFlag(.isDrinkable) || targetItem.hasFlag(.isEdible) else {
             return ActionResult(
-                engine.messenger.cannotDrink(item: targetItem.withDefiniteArticle),
-                await engine.setFlag(.isTouched, on: targetItem)
+                engine.messenger.drinkFromContainer(
+                    liquid: firstDrinkable.withDefiniteArticle,
+                    container: targetItem.withDefiniteArticle
+                ),
+                await engine.setFlag(.isTouched, on: targetItem),
+                await engine.updatePronouns(to: firstDrinkable),
+                await engine.move(firstDrinkable, to: .nowhere)
+            )
+        } else {
+            // Item is neither drinkable nor a container with drinkables
+            throw ActionResponse.prerequisiteNotMet(
+                engine.messenger.cannotDrink(item: targetItem.withDefiniteArticle)
             )
         }
-
-        let drinkSuccess = engine.messenger.drinkSuccess(item: targetItem.withDefiniteArticle)
-
-        let message = if targetItem.shouldTakeFirst {
-            """
-            \(engine.messenger.taken())
-            \(drinkSuccess)
-            """
-        } else {
-            drinkSuccess
-        }
-
-        // Handle direct drinkable item (either isDrinkable or isEdible for ZIL compatibility)
-        return ActionResult(
-            message,
-            await engine.setFlag(.isTouched, on: targetItem),
-            await engine.move(targetItem, to: .nowhere)
-        )
     }
 }

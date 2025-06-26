@@ -19,17 +19,11 @@ public struct EmptyActionHandler: ActionHandler {
 
     public init() {}
 
-    /// Validates the "EMPTY" command.
+    /// Processes the "EMPTY" command.
     ///
-    /// This method ensures that:
-    /// 1. A direct object is specified (what to empty).
-    /// 2. The target item exists and is reachable.
-    /// 3. The item is a container that can be emptied.
-    ///
-    /// - Parameter context: The `ActionContext` for the current action.
-    /// - Throws: Various `ActionResponse` errors if validation fails.
+    /// This action validates prerequisites and handles emptying containers of their contents.
+    /// Checks that the item exists, is reachable, is a container, and is currently open.
     public func process(command: Command, engine: GameEngine) async throws -> ActionResult {
-
         // Empty requires a direct object (what to empty)
         guard let directObjectRef = command.directObject else {
             throw ActionResponse.prerequisiteNotMet(
@@ -42,7 +36,7 @@ public struct EmptyActionHandler: ActionHandler {
             )
         }
 
-        // Check if target exists and is reachable
+        // Check if target exists and is accessible
         let targetItem = try await engine.item(targetItemID)
         guard await engine.playerCanReach(targetItemID) else {
             throw ActionResponse.itemNotAccessible(targetItemID)
@@ -57,41 +51,49 @@ public struct EmptyActionHandler: ActionHandler {
         guard try await engine.hasFlag(.isOpen, on: targetItemID) else {
             throw ActionResponse.containerIsClosed(targetItemID)
         }
-    /// Processes the "EMPTY" command.
-    ///
-    /// Empties the contents of a container by moving all contained items to the
-    /// current location. If the container is already empty, provides an appropriate message.
-    ///
-    /// - Parameter context: The `ActionContext` for the current action.
-    /// - Returns: An `ActionResult` with appropriate empty message and state changes.
-        guard let directObjectRef = command.directObject,
-            case .item(let targetItemID) = directObjectRef
-        else {
-            throw ActionResponse.internalEngineError(
-                "EmptyActionHandler: directObject was not an item in process.")
-        }
-
-        let targetItem = try await engine.item(targetItemID)
 
         // Get current contents of the container
         let contents = await engine.items(in: .item(targetItemID))
 
         let message: String
-        var contentMoveChanges: [StateChange?] = []
+        var allStateChanges: [StateChange] = []
 
         if contents.isEmpty {
             message = engine.messenger.containerAlreadyEmpty(
                 container: targetItem.withDefiniteArticle.capitalizedFirst
             )
         } else {
-            // Get current location to move items to
-            let currentLocationID = await engine.playerLocationID
+            // Determine destination for contents
+            let destinationParent: ParentEntity
 
-            // Collect move changes for all contents
+            if let indirectObjectRef = command.indirectObject {
+                // "EMPTY X INTO Y" syntax
+                guard case .item(let destinationItemID) = indirectObjectRef else {
+                    throw ActionResponse.prerequisiteNotMet(
+                        engine.messenger.cannotEmptyIntoThat()
+                    )
+                }
+
+                let destinationItem = try await engine.item(destinationItemID)
+                guard destinationItem.hasFlag(.isContainer) else {
+                    throw ActionResponse.targetIsNotAContainer(destinationItemID)
+                }
+
+                guard try await engine.hasFlag(.isOpen, on: destinationItemID) else {
+                    throw ActionResponse.containerIsClosed(destinationItemID)
+                }
+
+                destinationParent = .item(destinationItemID)
+            } else {
+                // Default: empty into current location
+                let currentLocationID = await engine.playerLocationID
+                destinationParent = .location(currentLocationID)
+            }
+
+            // Move all contents to destination
             for item in contents {
-                contentMoveChanges.append(
-                    await engine.move(item, to: .location(currentLocationID))
-                )
+                let moveChange = await engine.move(item, to: destinationParent)
+                allStateChanges.append(moveChange)
             }
 
             message = engine.messenger.emptySuccess(
@@ -101,12 +103,18 @@ public struct EmptyActionHandler: ActionHandler {
             )
         }
 
+        // Add standard state changes
+        if let touchedChange = await engine.setFlag(.isTouched, on: targetItem) {
+            allStateChanges.append(touchedChange)
+        }
+
+        if let pronounChange = await engine.updatePronouns(to: targetItem) {
+            allStateChanges.append(pronounChange)
+        }
+
         return ActionResult(
             message: message,
-            changes: [
-                await engine.setFlag(.isTouched, on: targetItem),
-                await engine.updatePronouns(to: targetItem),
-            ] + contentMoveChanges
+            changes: allStateChanges
         )
     }
 }

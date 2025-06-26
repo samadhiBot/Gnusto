@@ -9,7 +9,6 @@ public struct CurseActionHandler: ActionHandler {
 
     public let syntax: [SyntaxRule] = [
         .match(.verb),
-        .match(.verb),
         .match(.damn, .directObject),
     ]
 
@@ -21,42 +20,32 @@ public struct CurseActionHandler: ActionHandler {
 
     public init() {}
 
-    public func validate(
-        context: ActionContext
-    ) async throws {
-        // If there's a direct object, validate it exists and is reachable
-        guard let directObjectRef = command.directObject else {
-            return  // General cursing is always valid
-        }
+    /// Processes the "CURSE" command.
+    ///
+    /// This action provides humorous responses to player attempts to curse or swear.
+    /// Can be used with or without a target object.
+    public func process(command: Command, engine: GameEngine) async throws -> ActionResult {
+        if let directObjectRef = command.directObject {
+            // Cursing at something
+            guard case .item(let targetItemID) = directObjectRef else {
+                throw ActionResponse.prerequisiteNotMet(
+                    engine.messenger.thatsNotSomethingYouCan(.curse)
+                )
+            }
 
-        guard case .item(let targetItemID) = directObjectRef else {
-            throw ActionResponse.prerequisiteNotMet(
-                engine.messenger.thatsNotSomethingYouCan(.curse)
-            )
-        }
-
-        // Check if item exists
-        let _ = try await engine.item(targetItemID)
-
-        // Check reachability (you can curse at things you can see)
-        guard await engine.playerCanReach(targetItemID) else {
-            throw ActionResponse.itemNotAccessible(targetItemID)
-        }
-    }
-
-    public func process(
-        context: ActionContext
-    ) async throws -> ActionResult {
-        // Handle cursing at a specific object
-        if let directObjectRef = command.directObject,
-            case .item(let targetItemID) = directObjectRef
-        {
+            // Check if item exists and is accessible
             let targetItem = try await engine.item(targetItemID)
+            guard await engine.playerCanReach(targetItemID) else {
+                throw ActionResponse.itemNotAccessible(targetItemID)
+            }
 
-            let message = engine.messenger.curseTargetResponse(
-                item: targetItem.withDefiniteArticle
+            return ActionResult(
+                engine.messenger.curseTargetResponse(
+                    item: targetItem.withDefiniteArticle
+                ),
+                await engine.setFlag(.isTouched, on: targetItem),
+                await engine.updatePronouns(to: targetItem)
             )
-            return ActionResult(message)
         } else {
             // General cursing (no object)
             return ActionResult(

@@ -16,64 +16,18 @@ public struct GiveActionHandler: ActionHandler {
 
     // MARK: - Action Processing Methods
 
-    /// Validates the "GIVE" command.
+    public init() {}
+
+    /// Processes the "GIVE" command.
     ///
-    /// This method ensures that:
-    /// 1. A direct object is specified (the player must indicate *what* to give).
-    /// 2. An indirect object is specified (the player must indicate *to whom* to give).
-    /// 3. The direct object refers to an existing item that the player has.
-    /// 4. The indirect object refers to an existing actor.
-    ///
-    /// - Parameter context: The `ActionContext` for the current action.
-    /// - Throws: Various `ActionResponse` errors if validation fails.
+    /// This action validates prerequisites and handles giving items to characters.
+    /// Checks that items exist, are held by the player, and the recipient is a character.
+    /// Supports both single items and ALL commands.
     public func process(command: Command, engine: GameEngine) async throws -> ActionResult {
-
-        // For ALL commands, allow empty directObjects (handled in process method)
-        if command.isAllCommand {
-            // Still need an indirect object (recipient)
-            guard let indirectObjectRef = command.indirectObject else {
-                throw ActionResponse.prerequisiteNotMet(
-                    engine.messenger.giveToWhom()
-                )
-            }
-            guard case .item(let recipientID) = indirectObjectRef else {
-                throw ActionResponse.prerequisiteNotMet(
-                    engine.messenger.thatsNotSomethingYouCan(.give)
-                )
-            }
-            // Check if recipient exists and is an actor
-            let recipient = try await engine.item(recipientID)
-            guard recipient.hasFlag(.isCharacter) else {
-                throw ActionResponse.prerequisiteNotMet(
-                    engine.messenger.thatsNotSomethingYouCan(.give)
-                )
-            }
-            return
-        }
-
-        // 1. Ensure we have at least one direct object for non-ALL commands
-        guard !command.directObjects.isEmpty else {
-            throw ActionResponse.prerequisiteNotMet(
-                engine.messenger.doWhat(verb: command.verb)
-            )
-        }
-
-        // 2. Ensure we have an indirect object
+        // Get the recipient from indirect object
         guard let indirectObjectRef = command.indirectObject else {
             throw ActionResponse.prerequisiteNotMet(
                 engine.messenger.giveToWhom()
-            )
-        }
-
-        // For single object commands, validate the single object
-        guard let directObjectRef = command.directObject else {
-            throw ActionResponse.prerequisiteNotMet(
-                engine.messenger.doWhat(verb: command.verb)
-            )
-        }
-        guard case .item(let targetItemID) = directObjectRef else {
-            throw ActionResponse.prerequisiteNotMet(
-                engine.messenger.thatsNotSomethingYouCan(.give)
             )
         }
         guard case .item(let recipientID) = indirectObjectRef else {
@@ -82,15 +36,7 @@ public struct GiveActionHandler: ActionHandler {
             )
         }
 
-        // 3. Check if item exists and player has it
-        let targetItem = try await engine.item(targetItemID)
-        guard targetItem.parent == .player else {
-            throw ActionResponse.prerequisiteNotMet(
-                engine.messenger.youDontHaveThat()
-            )
-        }
-
-        // 4. Check if recipient exists and is an actor
+        // Validate recipient exists and is a character
         let recipient = try await engine.item(recipientID)
         guard recipient.hasFlag(.isCharacter) else {
             throw ActionResponse.prerequisiteNotMet(
@@ -98,35 +44,15 @@ public struct GiveActionHandler: ActionHandler {
             )
         }
 
-        // 5. Check if recipient is reachable
+        // Check if recipient is accessible
         guard await engine.playerCanReach(recipientID) else {
             throw ActionResponse.itemNotAccessible(recipientID)
         }
-    /// Processes the "GIVE" command.
-    ///
-    /// For each item to be given:
-    /// 1. Checks if the player has the item
-    /// 2. Moves the item to the recipient
-    /// 3. Updates pronouns and touched flags
-    /// 4. Provides appropriate feedback
-    ///
-    /// - Parameter context: The `ActionContext` for the current action.
-    /// - Returns: An `ActionResult` containing a message and any relevant `StateChange`s.
-        // Get the recipient
-        guard let indirectObjectRef = command.indirectObject,
-            case .item(let recipientID) = indirectObjectRef
-        else {
-            return ActionResult(
-                engine.messenger.giveToWhom()
-            )
-        }
-
-        let recipient = try await engine.item(recipientID)
 
         // For ALL commands, empty directObjects is valid (means nothing to give)
         if !command.isAllCommand {
             guard !command.directObjects.isEmpty else {
-                return ActionResult(
+                throw ActionResponse.prerequisiteNotMet(
                     engine.messenger.doWhat(verb: command.verb)
                 )
             }
@@ -142,7 +68,7 @@ public struct GiveActionHandler: ActionHandler {
                 if command.isAllCommand {
                     continue  // Skip non-items in ALL commands
                 } else {
-                    return ActionResult(
+                    throw ActionResponse.prerequisiteNotMet(
                         engine.messenger.thatsNotSomethingYouCan(.give)
                     )
                 }
@@ -156,20 +82,20 @@ public struct GiveActionHandler: ActionHandler {
                     if command.isAllCommand {
                         continue  // Skip items not held in ALL commands
                     } else {
-                        return ActionResult(
+                        throw ActionResponse.prerequisiteNotMet(
                             engine.messenger.youDontHaveThat()
                         )
                     }
                 }
 
-                // --- Calculate State Changes for this item ---
+                // Create state changes for this item
                 var itemStateChanges: [StateChange] = []
 
-                // Change 1: Move item to recipient
+                // Move item to recipient
                 let moveChange = await engine.move(targetItem, to: .item(recipientID))
                 itemStateChanges.append(moveChange)
 
-                // Change 2: Set `.isTouched` flag if not already set
+                // Set .isTouched flag if not already set
                 if let touchedChange = await engine.setFlag(.isTouched, on: targetItem) {
                     itemStateChanges.append(touchedChange)
                 }
@@ -183,6 +109,13 @@ public struct GiveActionHandler: ActionHandler {
                 if !command.isAllCommand {
                     throw error
                 }
+            }
+        }
+
+        // Mark recipient as touched if any items were given
+        if !givenItems.isEmpty {
+            if let recipientTouchedChange = await engine.setFlag(.isTouched, on: recipient) {
+                allStateChanges.append(recipientTouchedChange)
             }
         }
 
@@ -204,18 +137,19 @@ public struct GiveActionHandler: ActionHandler {
         }
 
         // Generate appropriate message
-        let message = if givenItems.isEmpty {
-            if command.isAllCommand {
-                engine.messenger.youHaveNothingToGive()
+        let message =
+            if givenItems.isEmpty {
+                if command.isAllCommand {
+                    engine.messenger.youHaveNothingToGive()
+                } else {
+                    engine.messenger.youDontHaveThat()
+                }
             } else {
-                engine.messenger.youDontHaveThat()
+                engine.messenger.itemGivenTo(
+                    item: givenItems.listWithDefiniteArticles,
+                    recipient: recipient.withDefiniteArticle
+                )
             }
-        } else {
-            engine.messenger.itemGivenTo(
-                item: givenItems.listWithDefiniteArticles,
-                recipient: recipient.withDefiniteArticle
-            )
-        }
 
         return ActionResult(
             message: message,

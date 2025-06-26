@@ -19,38 +19,11 @@ public struct JumpActionHandler: ActionHandler {
 
     public init() {}
 
-    /// Validates the "JUMP" command.
-    ///
-    /// This method ensures that if a direct object is specified,
-    /// it exists and is reachable.
-    ///
-    /// - Parameter context: The `ActionContext` for the current action.
-    /// - Throws: Various `ActionResponse` errors if validation fails.
-    public func process(command: Command, engine: GameEngine) async throws -> ActionResult {
-
-        // JUMP with no object is always valid (general jumping)
-        guard let directObjectRef = command.directObject else {
-            return
-        }
-
-        guard case .item(let targetItemID) = directObjectRef else {
-            throw ActionResponse.prerequisiteNotMet(
-                engine.messenger.cannotDoThat(verb: "jump")
-            )
-        }
-
-        // Check if target exists and is reachable
-        _ = try await engine.item(targetItemID)
-        guard await engine.playerCanReach(targetItemID) else {
-            throw ActionResponse.itemNotAccessible(targetItemID)
-        }
     /// Processes the "JUMP" command.
     ///
     /// Handles jumping in place or jumping over objects.
     /// Provides appropriate responses based on ZIL traditions.
-    ///
-    /// - Parameter context: The `ActionContext` for the current action.
-    /// - Returns: An `ActionResult` with appropriate jump message and state changes.
+    public func process(command: Command, engine: GameEngine) async throws -> ActionResult {
         // Handle JUMP with no object - general jumping
         guard let directObjectRef = command.directObject else {
             // General jumping - use random response from MessageProvider
@@ -60,11 +33,16 @@ public struct JumpActionHandler: ActionHandler {
         }
 
         guard case .item(let targetItemID) = directObjectRef else {
-            throw ActionResponse.internalEngineError(
-                "JumpActionHandler: directObject was not an item in process.")
+            throw ActionResponse.prerequisiteNotMet(
+                engine.messenger.cannotDoThat(verb: "jump")
+            )
         }
 
+        // Check if target exists and is reachable
         let targetItem = try await engine.item(targetItemID)
+        guard await engine.playerCanReach(targetItemID) else {
+            throw ActionResponse.itemNotAccessible(targetItemID)
+        }
 
         // Determine appropriate response based on object type
         let message =

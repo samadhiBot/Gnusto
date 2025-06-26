@@ -20,11 +20,34 @@ public struct YellActionHandler: ActionHandler {
 
     public init() {}
 
-    public func process(
-        context: ActionContext
-    ) async throws -> ActionResult {
-        ActionResult(
-            engine.messenger.yellResponse()
-        )
+    /// Processes the "YELL" command.
+    ///
+    /// This action provides humorous responses to player attempts to yell or shout.
+    /// Can be used with or without a target object.
+    public func process(command: Command, engine: GameEngine) async throws -> ActionResult {
+        if let directObjectRef = command.directObject {
+            // Yelling at something/someone
+            guard case .item(let targetItemID) = directObjectRef else {
+                throw ActionResponse.prerequisiteNotMet(
+                    engine.messenger.cannotDoThat(verb: "yell")
+                )
+            }
+
+            let targetItem = try await engine.item(targetItemID)
+            guard await engine.playerCanReach(targetItemID) else {
+                throw ActionResponse.itemNotAccessible(targetItemID)
+            }
+
+            return ActionResult(
+                engine.messenger.yellAtSomething(target: targetItem.withDefiniteArticle),
+                await engine.setFlag(.isTouched, on: targetItem),
+                await engine.updatePronouns(to: targetItem)
+            )
+        } else {
+            // General yelling
+            return ActionResult(
+                engine.messenger.yellResponse()
+            )
+        }
     }
 }

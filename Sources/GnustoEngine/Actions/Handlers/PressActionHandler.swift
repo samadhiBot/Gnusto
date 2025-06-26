@@ -17,17 +17,12 @@ public struct PressActionHandler: ActionHandler {
 
     public init() {}
 
-    /// Validates the "PRESS" command.
+    /// Processes the "PRESS" command.
     ///
-    /// This method ensures that:
-    /// 1. A direct object is specified (what to press).
-    /// 2. The target item exists and is reachable.
-    /// 3. The item can be pressed (has the `.isPressable` flag or similar logic).
-    ///
-    /// - Parameter context: The `ActionContext` for the current action.
-    /// - Throws: Various `ActionResponse` errors if validation fails.
+    /// This action validates prerequisites and handles pressing objects. Items with the
+    /// `.isPressable` flag can be pressed and may have special behavior defined via
+    /// ItemEventHandlers. Most objects cannot be pressed effectively.
     public func process(command: Command, engine: GameEngine) async throws -> ActionResult {
-
         // Press requires a direct object (what to press)
         guard let directObjectRef = command.directObject else {
             throw ActionResponse.prerequisiteNotMet(
@@ -41,26 +36,10 @@ public struct PressActionHandler: ActionHandler {
         }
 
         // Check if target exists and is reachable
-        _ = try await engine.item(targetItemID)
+        let targetItem = try await engine.item(targetItemID)
         guard await engine.playerCanReach(targetItemID) else {
             throw ActionResponse.itemNotAccessible(targetItemID)
         }
-    /// Processes the "PRESS" command.
-    ///
-    /// Handles pressing objects. Items with the `.isPressable` flag can be pressed
-    /// and may have special behavior defined via ItemEventHandlers. Most objects
-    /// cannot be pressed effectively.
-    ///
-    /// - Parameter context: The `ActionContext` for the current action.
-    /// - Returns: An `ActionResult` with appropriate press message and state changes.
-        guard let directObjectRef = command.directObject,
-            case .item(let targetItemID) = directObjectRef
-        else {
-            throw ActionResponse.internalEngineError(
-                "PressActionHandler: directObject was not an item in process.")
-        }
-
-        let targetItem = try await engine.item(targetItemID)
 
         // Check if item is pressable
         let message =
@@ -80,14 +59,5 @@ public struct PressActionHandler: ActionHandler {
             await engine.setFlag(.isTouched, on: targetItem),
             await engine.updatePronouns(to: targetItem)
         )
-    }
-
-    /// Performs any post-processing after the press action completes.
-    ///
-    /// Currently no post-processing is needed for basic pressing.
-    ///
-    /// - Parameter context: The action context for the current action.
-    public func postProcess(context: ActionContext, result: ActionResult) async throws {
-        // No post-processing needed for press
     }
 }

@@ -19,10 +19,12 @@ public struct SingActionHandler: ActionHandler {
 
     public init() {}
 
-    public func process(
-        context: ActionContext
-    ) async throws -> ActionResult {
-        ActionResult(
+    /// Processes the "SING" command.
+    ///
+    /// This action provides humorous responses to player attempts to sing or make music.
+    /// A classic atmospheric command from ZIL traditions.
+    public func process(command: Command, engine: GameEngine) async throws -> ActionResult {
+        return ActionResult(
             engine.messenger.singResponse()
         )
     }

@@ -17,24 +17,16 @@ public struct TurnOffActionHandler: ActionHandler {
     public let requiresLight: Bool = true
 
     // MARK: - Action Processing Methods
-    /// Validates the "TURN OFF" command.
-    ///
-    /// This method ensures that:
-    /// 1. A direct object is specified (the player must indicate *what* to turn off).
-    /// 2. The direct object refers to an existing item.
-    /// 3. The player can reach the specified item.
-    /// 4. The item has the `.isDevice` flag set (indicating it can be turned on/off).
-    /// 5. The item is not already off (i.e., it currently has the `.isOn` flag).
-    ///
-    /// - Parameter context: The `ActionContext` for the current action.
-    /// - Throws: Various `ActionResponse` errors if validation fails, such as:
-    ///           `custom` (for "Turn off what?" or "It's already off."),
-    ///           `prerequisiteNotMet` (if not an item or not a device),
-    ///           `itemNotAccessible`.
-    ///           Can also throw errors from `engine.item()`.
-    public func process(command: Command, engine: GameEngine) async throws -> ActionResult {
 
-        // 1. Get direct object and ensure it's an item
+    public init() {}
+
+    /// Processes the "TURN OFF" command.
+    ///
+    /// This action validates prerequisites and deactivates the specified device.
+    /// Checks that the item exists, is reachable, is a device, and is currently on.
+    /// Handles darkness messages when light sources are turned off.
+    public func process(command: Command, engine: GameEngine) async throws -> ActionResult {
+        // Get direct object and ensure it's an item
         guard let directObjectRef = command.directObject else {
             throw ActionResponse.prerequisiteNotMet(
                 engine.messenger.doWhat(verb: command.verb)
@@ -46,55 +38,27 @@ public struct TurnOffActionHandler: ActionHandler {
             )
         }
 
-        // 2. Fetch the item snapshot.
+        // Check if item exists and is accessible
         let targetItem = try await engine.item(targetItemID)
-
-        // 3. Verify the item is reachable.
         guard await engine.playerCanReach(targetItemID) else {
             throw ActionResponse.itemNotAccessible(targetItemID)
         }
 
-        // 4. Check if the item has the `.device` property.
+        // Check if the item is a device
         guard targetItem.hasFlag(.isDevice) else {
             throw ActionResponse.prerequisiteNotMet(
                 engine.messenger.cannotTurnOff()
             )
         }
 
-        // 5. Check if the item is already off (lacks `.on`).
+        // Check if the item is currently on
         guard targetItem.hasFlag(.isOn) else {
             throw ActionResponse.custom(
                 engine.messenger.alreadyOff()
             )
         }
-    /// Processes the "TURN OFF" command.
-    ///
-    /// Assuming basic validation has passed (the item is a reachable device and is currently on),
-    /// this action performs the following:
-    /// 1. Retrieves the target item.
-    /// 2. Ensures the `.isTouched` flag is set on the item.
-    /// 3. Clears the `.isOn` flag on the item.
-    /// 4. Constructs a message confirming the action (e.g., "The flashlight is now off.").
-    /// 5. If the turned-off item was a light source and the current location becomes dark as a result
-    ///    (i.e., the location is not inherently lit and no other active light sources are present),
-    ///    appends the classic "You are plunged into darkness." message.
-    /// 6. Returns an `ActionResult` with the constructed message and the state changes.
-    ///
-    /// - Parameter context: The `ActionContext` for the current action.
-    /// - Returns: An `ActionResult` containing the message and relevant state changes.
-    /// - Throws: `ActionResponse.internalEngineError` if the direct object is not an item (this should
-    ///           be caught by `validate`), or errors from `engine` calls (e.g., fetching items
-    ///           or player location).
-        guard let directObjectRef = command.directObject,
-            case .item(let targetItemID) = directObjectRef
-        else {
-            throw ActionResponse.internalEngineError(
-                "TurnOff: directObject was not an item in process."
-            )
-        }
-        let targetItem = try await engine.item(targetItemID)
 
-        // Check if location became dark
+        // Check if location will become dark when this light source is turned off
         let isLightSourceBeingTurnedOff = targetItem.hasFlag(.isLightSource)
         var messageParts = [
             engine.messenger.lightIsNowOff(item: targetItem.withDefiniteArticle)
@@ -127,7 +91,8 @@ public struct TurnOffActionHandler: ActionHandler {
         return ActionResult(
             messageParts.joined(separator: "\n"),
             await engine.setFlag(.isTouched, on: targetItem),
-            await engine.clearFlag(.isOn, on: targetItem)
+            await engine.clearFlag(.isOn, on: targetItem),
+            await engine.updatePronouns(to: targetItem)
         )
     }
 }

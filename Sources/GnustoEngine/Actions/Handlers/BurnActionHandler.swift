@@ -22,66 +22,49 @@ public struct BurnActionHandler: ActionHandler {
 
     public init() {}
 
-    /// Validates the burn command.
+    /// Processes the "BURN" command.
     ///
-    /// Ensures that:
-    /// - A direct object is specified
-    /// - The target object exists and is accessible
-    /// - There is sufficient light to see the object
-    ///
-    /// - Parameter context: The action context containing the command and engine.
-    /// - Throws: `ActionError` if validation fails.
+    /// This action validates prerequisites and attempts to burn the specified item.
+    /// Checks if the item is flammable and provides appropriate responses.
     public func process(command: Command, engine: GameEngine) async throws -> ActionResult {
-
-        guard let targetObjectID = command.directObject else {
+        guard let directObjectRef = command.directObject else {
             throw ActionResponse.prerequisiteNotMet(
                 engine.messenger.doWhat(verb: command.verb)
             )
         }
 
-        guard case .item(let itemID) = targetObjectID else {
+        guard case .item(let targetItemID) = directObjectRef else {
             throw ActionResponse.prerequisiteNotMet(
                 engine.messenger.thatsNotSomethingYouCan(.burn)
             )
         }
 
         // Check if the item exists and is accessible
-        guard (try? await engine.item(itemID)) != nil else {
-            throw ActionResponse.unknownEntity(targetObjectID)
+        let targetItem = try await engine.item(targetItemID)
+        guard await engine.playerCanReach(targetItemID) else {
+            throw ActionResponse.itemNotAccessible(targetItemID)
         }
 
-        guard await engine.playerCanReach(itemID) else {
-            throw ActionResponse.itemNotAccessible(itemID)
-        }
-    /// Processes the "BURN" command.
-    ///
-    /// This action performs the following:
-    /// 1. Retrieves the target item
-    /// 2. Checks if the item has the `.isFlammable` property
-    /// 3. If flammable, removes the item and provides a burn message
-    /// 4. If not flammable, provides an appropriate refusal message
-    /// 5. Sets the `.isTouched` flag on the item
-    /// 6. Updates pronouns to refer to the item
-    ///
-    /// - Parameter context: The action context for the current action.
-    /// - Returns: An `ActionResult` containing the burn result and any state changes.
-        guard let targetObjectID = command.directObject,
-            case .item(let itemID) = targetObjectID
-        else {
-            return ActionResult(
-                engine.messenger.cannotDoThat(verb: "burn")
-            )
-        }
+        // If an indirect object is specified, validate it as a tool for burning
+        if let indirectObjectRef = command.indirectObject {
+            guard case .item(let toolItemID) = indirectObjectRef else {
+                throw ActionResponse.prerequisiteNotMet(
+                    engine.messenger.cannotActWithThat(verb: "burn")
+                )
+            }
 
-        let targetItem = try await engine.item(itemID)
+            let toolItem = try await engine.item(toolItemID)
+            guard toolItem.parent == .player else {
+                throw ActionResponse.itemNotHeld(toolItemID)
+            }
+        }
 
         // Check if the item is flammable
         if targetItem.hasFlag(.isFlammable) {
-            let message = engine.messenger.itemBurnsToAshes(
-                item: targetItem.withDefiniteArticle.capitalizedFirst
-            )
             return ActionResult(
-                message,
+                engine.messenger.itemBurnsToAshes(
+                    item: targetItem.withDefiniteArticle
+                ),
                 await engine.setFlag(.isTouched, on: targetItem),
                 await engine.updatePronouns(to: targetItem),
                 await engine.move(targetItem, to: .nowhere)

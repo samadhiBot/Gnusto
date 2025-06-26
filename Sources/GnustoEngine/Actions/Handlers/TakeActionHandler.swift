@@ -18,159 +18,24 @@ public struct TakeActionHandler: ActionHandler {
     public let requiresLight: Bool = true
 
     // MARK: - Action Processing Methods
-    /// Validates the "TAKE" command.
-    ///
-    /// This method ensures that:
-    /// 1. A direct object is specified (the player must indicate *what* to take).
-    /// 2. The direct object refers to an existing item.
-    /// 3. If the item is inside another item, that parent item must be a container or surface.
-    ///    It prevents taking items from non-container/non-surface parents.
-    /// 4. If the item is inside a container, and that container is closed and not transparent,
-    ///    and the target item hasn't been touched (implying player knows it's there), an error
-    ///    for a closed container or general inaccessibility is thrown.
-    /// 5. The player can reach the item (general reachability check).
-    /// 6. The item has the `.isTakable` flag set.
-    /// 7. The player has enough carrying capacity for the item.
-    ///
-    /// Note: It explicitly *does not* throw an error if the player already has the item;
-    /// this case is handled gracefully in the `process` method with a specific message.
-    ///
-    /// - Parameter context: The `ActionContext` for the current action.
-    /// - Throws: Various `ActionResponse` errors if validation fails, such as:
-    ///           `prerequisiteNotMet`, `unknownEntity`, `itemNotAccessible`, `itemNotTakable`,
-    ///           `containerIsClosed`, or `playerCannotCarryMore`.
-    ///           Can also throw errors from `engine.item()`.
-    public func process(command: Command, engine: GameEngine) async throws -> ActionResult {
 
-        // For ALL commands, allow empty directObjects (handled in process method)
-        if command.isAllCommand {
-            return
-        }
+    public init() {}
 
-        // 1. Ensure we have at least one direct object for non-ALL commands
-        guard !command.directObjects.isEmpty else {
-            throw ActionResponse.prerequisiteNotMet(
-                engine.messenger.doWhat(verb: command.verb)
-            )
-        }
-
-        // For single object commands, validate the single object
-        guard let directObjectRef = command.directObject else {
-            throw ActionResponse.prerequisiteNotMet(
-                engine.messenger.doWhat(verb: command.verb)
-            )
-        }
-        guard case .item(let targetItemID) = directObjectRef else {
-            throw ActionResponse.prerequisiteNotMet(
-                engine.messenger.thatsNotSomethingYouCan(.take)
-            )
-        }
-
-        // 2. Check if item exists
-        let targetItem = try await engine.item(targetItemID)
-
-        // 3. If this is a "take X from Y" command, validate the indirect object
-        if let indirectObjectRef = command.indirectObject {
-            guard case .item(let containerID) = indirectObjectRef else {
-                throw ActionResponse.prerequisiteNotMet(
-                    engine.messenger.thatsNotSomethingYouCan(.take)
-                )
-            }
-
-            let container = try await engine.item(containerID)
-
-            // Check if the target item is actually in the specified container
-            guard case .item(let actualParentID) = targetItem.parent,
-                actualParentID == containerID
-            else {
-                throw ActionResponse.prerequisiteNotMet(
-                    engine.messenger.takeItemNotInContainer(
-                        item: targetItem.withDefiniteArticle,
-                        container: container.withDefiniteArticle
-                    )
-                )
-            }
-        }
-
-        // 4. Check if player already has the item
-        if targetItem.parent == .player {
-            // Can't throw error here, need to report specific message.
-            // Let process handle returning a specific ActionResult for this.
-            // This validation passes if already held, process generates the message.
-            return
-        }
-
-        // 5. Check if item is inside something invalid (non-container/non-surface)
-        if case .item(let parentID) = targetItem.parent {
-            let parentItem = try await engine.item(parentID)
-
-            // Fail only if the parent is NOT a container and NOT a surface.
-            // We allow taking from *closed* containers here; reachability handles closed state later.
-            guard parentItem.hasFlag(.isContainer) || parentItem.hasFlag(.isSurface) else {
-                // Custom message similar to Zork's, using the plain name.
-                throw ActionResponse.prerequisiteNotMet(
-                    engine.messenger.takeItemFromNonContainer(
-                        nonContainer: parentItem.withDefiniteArticle
-                    )
-                )
-            }
-        }
-
-        // 6. Handle specific container closed errors before general unreachability
-        if case .item(let parentID) = targetItem.parent {
-            let container = try await engine.item(parentID)
-            if container.hasFlag(.isContainer) && !container.hasFlag(.isOpen) {
-                if targetItem.hasFlag(.isTouched) || container.hasFlag(.isTransparent) {
-                    throw ActionResponse.containerIsClosed(parentID)
-                } else {
-                    throw ActionResponse.itemNotAccessible(targetItemID)
-                }
-            }
-        }
-
-        // 7. Check reachability using ScopeResolver (general check)
-        guard await engine.playerCanReach(targetItemID) else {
-            throw ActionResponse.itemNotAccessible(targetItemID)
-        }
-
-        // 8. Check if the item is takable
-        guard targetItem.hasFlag(.isTakable) else {
-            throw ActionResponse.itemNotTakable(targetItemID)
-        }
-
-        // 9. Check capacity
-        guard await engine.playerCanCarry(targetItem) else {
-            throw ActionResponse.playerCannotCarryMore
-        }
     /// Processes the "TAKE" command.
     ///
-    /// Assuming basic validation has passed, this action performs the following:
-    /// 1. Retrieves the target item(s).
-    /// 2. For each item, checks if the player already has it. If so, a message "You already have that."
-    ///    is returned.
-    /// 3. If the player does not have the item:
-    ///    a. Creates a `StateChange` to move the item to the player's inventory (`.player` parent).
-    ///    b. Ensures the `.isTouched` flag is set on the item.
-    ///    c. Updates pronouns to refer to the taken item.
-    ///    d. Returns a confirmation message, typically "Taken."
-    ///
-    /// For ALL commands, processes each object individually and provides consolidated feedback.
-    ///
-    /// - Parameter context: The `ActionContext` for the current action.
-    /// - Returns: An `ActionResult` containing a message and any relevant `StateChange`s.
-    /// - Throws: `ActionResponse.internalEngineError` if direct object is not an item (should be
-    ///           caught by validate), or errors from `engine.item()`.
+    /// This action validates prerequisites and moves the specified item(s) to the player's inventory.
+    /// Handles both single items and ALL commands with appropriate validation and messaging.
+    public func process(command: Command, engine: GameEngine) async throws -> ActionResult {
         // For ALL commands, empty directObjects is valid (means nothing to take)
         if !command.isAllCommand {
             guard !command.directObjects.isEmpty else {
-                throw ActionResponse.internalEngineError(
-                    engine.messenger.internalEngineError()
+                throw ActionResponse.prerequisiteNotMet(
+                    engine.messenger.doWhat(verb: command.verb)
                 )
             }
         }
 
         var allStateChanges: [StateChange] = []
-        var messages: [String] = []
         var takenItems: [Item] = []
         var lastTakenItem: Item?
 
@@ -180,14 +45,37 @@ public struct TakeActionHandler: ActionHandler {
                 if command.isAllCommand {
                     continue  // Skip non-items in ALL commands
                 } else {
-                    throw ActionResponse.internalEngineError(
-                        engine.messenger.internalEngineError()
+                    throw ActionResponse.prerequisiteNotMet(
+                        engine.messenger.thatsNotSomethingYouCan(.take)
                     )
                 }
             }
 
             do {
                 let targetItem = try await engine.item(targetItemID)
+
+                // If this is a "take X from Y" command, validate the indirect object
+                if let indirectObjectRef = command.indirectObject {
+                    guard case .item(let containerID) = indirectObjectRef else {
+                        throw ActionResponse.prerequisiteNotMet(
+                            engine.messenger.thatsNotSomethingYouCan(.take)
+                        )
+                    }
+
+                    let container = try await engine.item(containerID)
+
+                    // Check if the target item is actually in the specified container
+                    guard case .item(let actualParentID) = targetItem.parent,
+                        actualParentID == containerID
+                    else {
+                        throw ActionResponse.prerequisiteNotMet(
+                            engine.messenger.takeItemNotInContainer(
+                                item: targetItem.withDefiniteArticle,
+                                container: container.withDefiniteArticle
+                            )
+                        )
+                    }
+                }
 
                 // Check if player already has this item
                 if targetItem.parent == .player {
@@ -215,22 +103,66 @@ public struct TakeActionHandler: ActionHandler {
                     // Check capacity
                     guard await engine.playerCanCarry(targetItem) else {
                         if takenItems.isEmpty {
-                            messages.append(
+                            return ActionResult(
                                 engine.messenger.playerCannotCarryMore()
                             )
                         }
                         break  // Stop processing if capacity is exceeded
                     }
+                } else {
+                    // For single item commands, perform full validation
+
+                    // Check if item is inside something invalid (non-container/non-surface)
+                    if case .item(let parentID) = targetItem.parent {
+                        let parentItem = try await engine.item(parentID)
+
+                        // Fail only if the parent is NOT a container and NOT a surface
+                        guard parentItem.hasFlag(.isContainer) || parentItem.hasFlag(.isSurface)
+                        else {
+                            throw ActionResponse.prerequisiteNotMet(
+                                engine.messenger.takeItemFromNonContainer(
+                                    nonContainer: parentItem.withDefiniteArticle
+                                )
+                            )
+                        }
+                    }
+
+                    // Handle specific container closed errors before general unreachability
+                    if case .item(let parentID) = targetItem.parent {
+                        let container = try await engine.item(parentID)
+                        if container.hasFlag(.isContainer) && !container.hasFlag(.isOpen) {
+                            if targetItem.hasFlag(.isTouched) || container.hasFlag(.isTransparent) {
+                                throw ActionResponse.containerIsClosed(parentID)
+                            } else {
+                                throw ActionResponse.itemNotAccessible(targetItemID)
+                            }
+                        }
+                    }
+
+                    // Check reachability using ScopeResolver (general check)
+                    guard await engine.playerCanReach(targetItemID) else {
+                        throw ActionResponse.itemNotAccessible(targetItemID)
+                    }
+
+                    // Check if the item is takable
+                    guard targetItem.hasFlag(.isTakable) else {
+                        throw ActionResponse.itemNotTakable(targetItemID)
+                    }
+
+                    // Check capacity
+                    guard await engine.playerCanCarry(targetItem) else {
+                        throw ActionResponse.playerCannotCarryMore
+                    }
                 }
 
-                // --- Calculate State Changes for this item ---
+                // Create state changes for this item
                 var itemStateChanges: [StateChange] = []
 
-                // Change 1: Parent
+                // Move item to player
                 let moveChange = await engine.move(targetItem, to: .player)
                 itemStateChanges.append(moveChange)
 
-                // Change 2: Set `.isTouched` flag if not already set
+                // Set .isTouched flag if not already set
                 if let touchedChange = await engine.setFlag(.isTouched, on: targetItem) {
                     itemStateChanges.append(touchedChange)
                 }

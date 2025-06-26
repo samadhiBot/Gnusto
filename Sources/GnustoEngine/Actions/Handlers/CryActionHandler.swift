@@ -19,9 +19,11 @@ public struct CryActionHandler: ActionHandler {
 
     public init() {}
 
-    public func process(
-        context: ActionContext
-    ) async throws -> ActionResult {
+    /// Processes the "CRY" command.
+    ///
+    /// This action provides humorous responses to player attempts to cry or weep.
+    /// A classic atmospheric command from ZIL traditions.
+    public func process(command: Command, engine: GameEngine) async throws -> ActionResult {
         // Get random response from message provider
         return ActionResult(
             engine.messenger.cryResponse()

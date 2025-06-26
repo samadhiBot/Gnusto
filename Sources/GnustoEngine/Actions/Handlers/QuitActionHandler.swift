@@ -13,22 +13,15 @@ public struct QuitActionHandler: ActionHandler {
     public let requiresLight: Bool = false
 
     // MARK: - Action Processing Methods
+
     public init() {}
 
-    /// Validates the "QUIT" command.
-    /// Currently, quit requires no specific validation and always proceeds.
-    public func process(command: Command, engine: GameEngine) async throws -> ActionResult {
-
-        // No validation needed for QUIT.
     /// Processes the "QUIT" command.
     ///
     /// This action displays the player's current score and move count, then prompts
     /// for confirmation before quitting. If confirmed, it requests the GameEngine
     /// to terminate the game. If declined, the game continues.
-    ///
-    /// - Parameter context: The `ActionContext` for the current action.
-    /// - Returns: An `ActionResult` containing the appropriate message.
-        let engine = engine
+    public func process(command: Command, engine: GameEngine) async throws -> ActionResult {
         let currentScore = await engine.playerScore
         let currentMoves = await engine.playerMoves
         let maxScore = engine.maximumScore
