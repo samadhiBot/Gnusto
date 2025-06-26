@@ -49,26 +49,16 @@ public struct Vocabulary: Codable, Equatable, Sendable {
     /// Example: `["and", ","]`
     public var conjunctions: Set<String>
 
-    /// Computed property to get the verb synonym mapping needed by the parser.
-    /// Maps a synonym string (lowercase) to the Set of Verbs it can represent.
-    /// When multiple verbs match, all potential matches are included so the parser can
-    /// use syntax rules to determine the best match.
-    public var verbSynonyms: [String: Set<Verb>] {
-        var mapping: [String: Set<Verb>] = [:]
+    /// Computed property to get the verb lookup mapping needed by the parser.
+    /// Maps a verb string (lowercase) to the Verb it represents.
+    /// Each verb has a unique rawValue, so this is a simple one-to-one mapping.
+    public var verbLookup: [String: Verb] {
+        var mapping: [String: Verb] = [:]
 
-        // Build the mapping without prioritization - include all possible matches
+        // Build the mapping - each verb rawValue maps to exactly one verb
         for verb in verbs {
-            let primaryKey = verb.rawValue.lowercased()
-
-            // Map the primary ID
-            mapping[primaryKey, default: Set()].insert(verb)
-
-            // TODO: Add synonyms support when Verb has synonyms property
-            // Map all synonyms - allow synonyms to coexist with exact ID matches
-            // for synonym in verb.synonyms {
-            //     let synonymKey = synonym.lowercased()
-            //     mapping[synonymKey, default: Set()].insert(verb)
-            // }
+            let key = verb.rawValue.lowercased()
+            mapping[key] = verb
         }
         return mapping
     }

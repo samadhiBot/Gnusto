@@ -132,25 +132,25 @@ public struct StandardParser: Parser {
         // Iterate through possible starting positions for the verb
         for i in 0..<filteredTokens.count {
             var longestMatchLength = 0
-            var potentialMatchIDs: Set<Verb> = []  // Track IDs for the current longest match length
+            var potentialMatchVerbs: Set<Verb> = []  // Track verbs for the current longest match length
 
             // Check token sequences starting from index i
             for length in (1...min(4, filteredTokens.count - i)).reversed() {  // Check up to 4-word verbs, reversed for longest match first
                 let subSequence = filteredTokens[i..<(i + length)]
                 let verbPhrase = subSequence.joined(separator: " ")
 
-                // Look up the set of verbs associated with this phrase
-                if let foundVerbs = vocabulary.verbSynonyms[verbPhrase] {  // Now returns Set<Verb>?
-                    // Found potential matches
+                // Look up the verb associated with this phrase
+                if let foundVerb = vocabulary.verbLookup[verbPhrase] {
+                    // Found a match
                     if length > longestMatchLength {
                         // New longest length found, clear previous shorter matches and start fresh
                         longestMatchLength = length
-                        potentialMatchIDs = foundVerbs  // Assign the whole set
+                        potentialMatchVerbs = [foundVerb]  // Start with this verb
                         verbTokenCount = length  // Store the length of this match
                         verbStartIndex = i  // Store the start index
                     } else if length == longestMatchLength {
-                        // Same length as the current longest, add these IDs to the set
-                        potentialMatchIDs.formUnion(foundVerbs)  // Use formUnion to add all IDs
+                        // Same length as the current longest, add this verb to the set
+                        potentialMatchVerbs.insert(foundVerb)
                     }
                     // If length < longestMatchLength, ignore (we only want the longest matches)
                 }
@@ -158,7 +158,7 @@ public struct StandardParser: Parser {
 
             // If we found any matches of the longest possible length starting at index i, use them and stop searching
             if longestMatchLength > 0 {
-                matchedVerbs = potentialMatchIDs  // Assign the set of IDs found at the longest length
+                matchedVerbs = potentialMatchVerbs  // Assign the set of verbs found at the longest length
                 // verbTokenCount and verbStartIndex are already set when longestMatchLength was updated
                 break  // Found the first (and longest) verb match group, stop outer loop
             }
@@ -826,7 +826,7 @@ public struct StandardParser: Parser {
             let potentialMods = significantPhrase.filter { word in
                 !vocabulary.items.keys.contains(word)
                     && !vocabulary.locationNames.keys.contains(word)
-                    && !playerAliases.contains(word) && !vocabulary.verbSynonyms.keys.contains(word)
+                    && !playerAliases.contains(word) && !vocabulary.verbLookup.keys.contains(word)
                     && !vocabulary.prepositions.contains(word)
                     && !vocabulary.directions.keys.contains(word)
                     && !vocabulary.specialKeywords.contains(word)
@@ -839,7 +839,7 @@ public struct StandardParser: Parser {
         for index in 0..<lastNounIndex {
             let word = significantPhrase[index]
             let isKnownNoun = knownNounIndices.contains(index)
-            let isKnownVerb = vocabulary.verbSynonyms.keys.contains(word)
+            let isKnownVerb = vocabulary.verbLookup.keys.contains(word)
             let isKnownPrep = vocabulary.prepositions.contains(word)
             let isKnownDirection = vocabulary.directions.keys.contains(word)
 
@@ -1345,13 +1345,13 @@ public struct StandardParser: Parser {
                         isBoundaryToken = true
                     }
                 case .verb:
-                    if vocabulary.verbSynonyms.keys.contains(currentToken) {
+                    if vocabulary.verbLookup.keys.contains(currentToken) {
                         isBoundaryToken = true
                     }
                 case .specificVerb(let requiredVerb):
                     // Check if current token matches the required verb
-                    if let verbIDs = vocabulary.verbSynonyms[currentToken],
-                        verbIDs.contains(requiredVerb)
+                    if let verb = vocabulary.verbLookup[currentToken],
+                        verb == requiredVerb
                     {
                         isBoundaryToken = true
                     }
