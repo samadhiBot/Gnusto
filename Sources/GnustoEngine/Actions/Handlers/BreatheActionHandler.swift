@@ -42,32 +42,5 @@ public struct BreatheActionHandler: ActionHandler {
             await engine.setFlag(.isTouched, on: targetItem),
             await engine.updatePronouns(to: targetItem)
         )
-
-//        if let directObjectRef = command.directObject {
-//            // Breathing on something
-//            guard case .item(let targetItemID) = directObjectRef else {
-//                throw ActionResponse.prerequisiteNotMet(
-//                    engine.messenger.cannotDoThat(verb: "breathe")
-//                )
-//            }
-//
-//            let targetItem = try await engine.item(targetItemID)
-//            guard await engine.playerCanReach(targetItemID) else {
-//                throw ActionResponse.itemNotAccessible(targetItemID)
-//            }
-//
-//            return ActionResult(
-//                engine.messenger.breatheOnResponse(
-//                    item: targetItem.withDefiniteArticle
-//                ),
-//                await engine.setFlag(.isTouched, on: targetItem),
-//                await engine.updatePronouns(to: targetItem)
-//            )
-//        } else {
-//            // General breathing
-//            return ActionResult(
-//                engine.messenger.breatheResponse()
-//            )
-//        }
     }
 }

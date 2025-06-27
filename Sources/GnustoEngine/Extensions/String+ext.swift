@@ -9,16 +9,59 @@ extension String {
         return String(firstCharacter).uppercased() + dropFirst()
     }
 
+    /// Capitalizes the first letter of each sentence in the string.
+    var capitalizedSentences: String {
+        guard !isEmpty else { return self }
+
+        var result = ""
+        var index = startIndex
+        var isStartOfSentence = true
+
+        while index < endIndex {
+            let char = self[index]
+
+            if isStartOfSentence && char.isLetter && char.isLowercase {
+                result.append(char.uppercased())
+                isStartOfSentence = false
+            } else {
+                result.append(char)
+                if char == "." || char == "!" || char == "?" {
+                    isStartOfSentence = true
+                } else if !char.isWhitespace {
+                    isStartOfSentence = false
+                }
+            }
+
+            index = self.index(after: index)
+        }
+
+        return result
+    }
+
     /// The string prepended with the appropriate indefinite article ("a" or "an").
     ///
     /// Uses the simple rule: "an" if the string starts with a vowel (a, e, i, o, u), ignoring case,
     /// and "a" otherwise. Handles empty strings gracefully.
     var withIndefiniteArticle: String {
-        guard let firstChar = first?.lowercased() else {
+        guard let firstChar = first else {
             return self
         }
-        let vowels: Set<Character> = ["a", "e", "i", "o", "u"]
-        return vowels.contains(firstChar) ? "an \(self)" : "a \(self)"
+
+        // Handle numbers that start with vowel sounds
+        let vowelSoundPrefixes = ["8", "11", "18"]
+        for prefix in vowelSoundPrefixes {
+            if hasPrefix(prefix) {
+                return "an \(self)"
+            }
+        }
+
+        // Handle vowels (including accented vowels)
+        let lowerFirstChar = String(firstChar).lowercased().first!
+        let vowels: Set<Character> = [
+            "a", "e", "i", "o", "u", "à", "á", "â", "ã", "ä", "å", "è", "é", "ê", "ë", "ì", "í",
+            "î", "ï", "ò", "ó", "ô", "õ", "ö", "ù", "ú", "û", "ü",
+        ]
+        return vowels.contains(lowerFirstChar) ? "an \(self)" : "a \(self)"
     }
 
     /// Indents each line in the string by 4 spaces per tab level.
@@ -65,9 +108,8 @@ extension Array where Element == String {
         default:
             var items = sorted()
             let lastItem = items.removeLast()
-            return items.joined(separator: ", ") +
-                   (count == 2 ? "" : ",") +
-                   " \(conjunction) \(lastItem)"
+            return items.joined(separator: ", ") + (count == 2 ? "" : ",")
+                + " \(conjunction) \(lastItem)"
         }
     }
 

@@ -13,23 +13,37 @@ extension Item {
     /// Uses the simple rule: "an" if the string starts with a vowel (a, e, i, o, u), ignoring case,
     /// and "a" otherwise. Handles empty strings gracefully.
     var withIndefiniteArticle: String {
-        guard !hasFlag(.omitArticle), let firstChar = name.first?.lowercased() else {
+        guard !hasFlag(.omitArticle), let firstChar = name.first else {
             return name
         }
-        let vowels: Set<Character> = ["a", "e", "i", "o", "u"]
-        return vowels.contains(firstChar) ? "an \(name)" : "a \(name)"
+
+        // Handle numbers that start with vowel sounds
+        let vowelSoundPrefixes = ["8", "11", "18"]
+        for prefix in vowelSoundPrefixes {
+            if name.hasPrefix(prefix) {
+                return "an \(name)"
+            }
+        }
+
+        // Handle vowels (including accented vowels)
+        let lowerFirstChar = String(firstChar).lowercased().first!
+        let vowels: Set<Character> = [
+            "a", "e", "i", "o", "u", "à", "á", "â", "ã", "ä", "å", "è", "é", "ê", "ë", "ì", "í",
+            "î", "ï", "ò", "ó", "ô", "õ", "ö", "ù", "ú", "û", "ü",
+        ]
+        return vowels.contains(lowerFirstChar) ? "an \(name)" : "a \(name)"
     }
 }
 
 extension Array where Element == Item {
-    /// <#Description#>
-    /// - Parameter id: <#id description#>
-    /// - Returns: <#description#>
+    /// Returns the first item in the array with the specified ID.
+    /// - Parameter id: The ItemID to search for.
+    /// - Returns: The first item with the matching ID, or nil if not found.
     func find(_ id: ItemID) -> Item? {
         first { $0.id == id }
     }
 
-    /// Returns a grammatically correct string listing the elements, orted alphabetically,
+    /// Returns a grammatically correct string listing the elements, sorted alphabetically,
     /// with appropriate definite articles prepended.
     ///
     /// Example: `["pear", "apple", "banana"]` becomes `"the apple, the banana, and the pear"`.

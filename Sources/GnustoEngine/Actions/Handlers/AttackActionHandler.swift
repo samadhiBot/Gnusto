@@ -26,15 +26,9 @@ public struct AttackActionHandler: ActionHandler {
     /// 3. Non-weapon attacks on characters: "Trying to attack the [character] with a [item] is suicidal."
     /// 4. Weapon attacks: "You can't." (placeholder for combat system)
     public func process(command: Command, engine: GameEngine) async throws -> ActionResult {
-        guard let directObjectRef = command.directObject else {
+        guard let targetItemID = command.directObjectItemID else {
             throw ActionResponse.prerequisiteNotMet(
                 engine.messenger.doWhat(verb: command.verb)
-            )
-        }
-
-        guard case .item(let targetItemID) = directObjectRef else {
-            throw ActionResponse.prerequisiteNotMet(
-                engine.messenger.cannotDoThat(verb: "attack")
             )
         }
 
@@ -61,7 +55,7 @@ public struct AttackActionHandler: ActionHandler {
         }
         // We have a weapon - validate and check if it's a real weapon
         else if let indirectObjectRef = command.indirectObject,
-            case .item(let weaponID) = indirectObjectRef
+                case .item(let weaponID) = indirectObjectRef
         {
             let weapon = try await engine.item(weaponID)
 
@@ -72,15 +66,20 @@ public struct AttackActionHandler: ActionHandler {
             if !weapon.hasFlag(.isWeapon) {
                 message = engine.messenger.attackWithNonWeapon(
                     character: targetItem.withDefiniteArticle,
-                    weapon: weapon.withIndefiniteArticle
+                    item: weapon.withIndefiniteArticle
                 )
             } else {
                 // Real weapon attack - placeholder for combat system
-                message = engine.messenger.attackWithWeapon()
+                message = engine.messenger.attackWithWeapon(
+                    character: targetItem.withDefiniteArticle,
+                    weapon: weapon.withDefiniteArticle
+                )
             }
         } else {
             // Fallback case for non-item indirect objects
-            message = engine.messenger.attackWithWeapon()
+            message = engine.messenger.attackWithUnknown(
+                enemy: targetItem.withDefiniteArticle
+            )
         }
 
         return ActionResult(
