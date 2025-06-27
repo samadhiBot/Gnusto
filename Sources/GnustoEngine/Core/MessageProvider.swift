@@ -269,21 +269,72 @@ open class MessageProvider: @unchecked Sendable {
     open func badGrammar(text: String) -> String {
         output(
             "badGrammar(text: '\(text)')",
-            "I don't understand that sentence."
+            oneOf(
+                "Your eloquence has exceeded our modest computational abilities.", // DP
+                "How charmingly sophisticated. We're far too simple to comprehend such complexity.", // OW
+                "You've stumped the machinery with your fancy talk.", // MT
+                "Such linguistic artistry deserves a more cultured audience than this humble program.", // TC
+                "How terribly advanced of you. We're still working on basic vocabulary.", // NC
+                "Your discourse surpasses the boundaries of our mechanical understanding.", // SJ
+                "You've achieved communication beyond our programming pay grade.", // DA
+                "We're flattered you think we're smart enough to parse that.", // DP
+                "What delightfully incomprehensible prose. We applaud from our digital limitations.", // OW
+                "You've out-clevered our simple electronic brain.", // MT
+                "Such refined expression! Alas, we're programmed for more pedestrian conversation.", // TC
+                "How wonderfully cryptic. We lack the sophistication to decode such brilliance.", // NC
+                "The machinery confesses its inadequacy before your verbal prowess.", // SJ
+                "Your input has achieved a level of complexity we weren't built to appreciate.", // DA
+                "We're charmed by your faith in our intellectual capacity.", // DP
+                "How marvelously beyond us. Perhaps try speaking more slowly to the computer?", // OW
+            )
         )
     }
 
     open func blow() -> String {
         output(
             "blowGeneral()",
-            "You blow the air around, but nothing interesting happens."
+            oneOf(
+                "You blow with the determination of someone practicing for a hurricane.", // DP
+                "How delightfully windy of you. The atmosphere seems mildly rearranged.", // OW
+                "You puff like a locomotive with nowhere important to go.", // MT
+                "Such passionate exhalation! The air molecules seem almost flattered.", // TC
+                "How terribly theatrical. You've given the breeze some competition.", // NC
+                "The forceful expulsion of air proceeds with customary futility.", // SJ
+                "You blow. The universe remains magnificently unblow-able.", // DA
+                "You exhale with the fury of someone who's run out of birthday candles.", // DP
+                "What vigorous breathing! Surely something should have moved by now?", // OW
+                "You blow like a bellows with delusions of grandeur.", // MT
+                "Such dramatic huffing and puffing deserves a more cooperative target.", // TC
+                "How wonderfully pointless. The air seems unimpressed by your efforts.", // NC
+                "Your respiratory gymnastics achieve their intended lack of effect.", // SJ
+                "You blow forcefully at nothing and succeed beyond your wildest dreams.", // DA
+                "You puff with the confidence of someone who's mastered the art of moving air around.", // DP
+                "How charmingly futile. Perhaps the wind could use some pointers?", // OW
+            )
         )
     }
 
     open func blowOn(item: String) -> String {
         output(
             "blowOnGeneric(item: '\(item)')",
-            "You blow on \(item), but nothing interesting happens."
+            oneOf(
+                "You blow on \(item) with the enthusiasm of someone who's clearly run out of ideas.", // DP
+                "How delightfully primitive. \(item) seems unmoved by your respiratory efforts.", // OW
+                "You puff at \(item) like it's a birthday candle that's given up on life.", // MT
+                "Such passionate huffing! \(item) remains stubbornly unaffected by your breath.", // TC
+                "How wonderfully direct. \(item) appears immune to your windy charms.", // NC
+                "The application of breath to \(item) yields predictably modest results.", // SJ
+                "You blow on \(item). \(item) fails to be impressed by your lung capacity.", // DA
+                "You exhale forcefully at \(item) and achieve maximum atmospheric rearrangement.", // DP
+                "What vigorous breathing! \(item) seems almost embarrassed by the attention.", // OW
+                "You puff at \(item) with the determination of someone who's watched too many fairy tales.", // MT
+                "Your respiratory assault on \(item) demonstrates the limits of breath-based problem solving.", // TC
+                "How charmingly futile. \(item) maintains its dignity throughout your huffing.", // NC
+                "The engagement between your lungs and \(item) concludes without fanfare.", // SJ
+                "You blow on \(item). Physics remains disappointingly consistent.", // DA
+                "You treat \(item) to a personal windstorm of remarkable ineffectiveness.", // DP
+                "How marvelously pointless. \(item) seems grateful for the gentle breeze, if nothing else.", // OW
+            )
         )
     }
 
@@ -291,19 +342,22 @@ open class MessageProvider: @unchecked Sendable {
         output(
             "breatheOnResponse(item: '\(item)')",
             oneOf(
-                "You breathe on \(item) with the focus of someone who understands the power of proximity.",
-                "You exhale toward \(item) with a commitment to sharing your personal atmosphere.",
-                "You breathe on \(item) in an intimate manner that really makes an impression.",
-                "You direct your breath at \(item) with full confidence in your respiratory technique.",
-                "You exhale on \(item) with the authenticity of someone unafraid to get close.",
-                "You breathe on \(item) with refreshing directness in your interpersonal methodology.",
-                "You exhale on \(item) with an unshakable faith in the communicative power of respiration.",
-                "You breathe on \(item) with the fearless intimacy of someone who shares everything.",
-                "You direct your breath at \(item) with true dedication to atmospheric connection.",
-                "You exhale toward \(item) with a closeness that transcends conventional boundaries.",
-                "You breathe on \(item) with refreshing honesty about your breathing priorities.",
-                "You direct your breath at \(item), demonstrating your belief in direct engagement.",
-                "You exhale on \(item), showing your commitment to full sensory interaction.",
+                "You breathe on \(item) with the intimacy of someone who's clearly lost perspective.", // DP
+                "How delightfully personal. \(item) seems flattered by your warm exhalation.", // OW
+                "You huff on \(item) like it's a mirror that needs fogging.", // MT
+                "Such tender respiratory attention! \(item) basks in your carbon dioxide.", // TC
+                "How wonderfully direct. \(item) receives your breath with stoic grace.", // NC
+                "The application of respiration to \(item) proceeds without notable consequence.", // SJ
+                "You breathe on \(item). \(item) experiences a brief moment of humidity.", // DA
+                "You exhale intimately upon \(item) and achieve maximum awkwardness.", // DP
+                "What passionate breathing! \(item) seems unsure how to respond to such attention.", // OW
+                "You fog \(item) with your breath like someone testing for life signs.", // MT
+                "Your personal climate control system focuses exclusively on \(item).", // TC
+                "How charmingly pointless. \(item) now knows what you had for lunch.", // NC
+                "The engagement between your lungs and \(item) yields atmospheric intimacy.", // SJ
+                "You breathe on \(item). \(item) gets slightly warmer and more confused.", // DA
+                "You treat \(item) to a personal weather system of remarkable modesty.", // DP
+                "How marvelously inappropriate. \(item) maintains its composure despite your advances.", // OW
             )
         )
     }
@@ -312,19 +366,24 @@ open class MessageProvider: @unchecked Sendable {
         output(
             "breatheResponse()",
             oneOf(
-                "You breathe in life's very essence, which tastes faintly of confusion.",
-                "You breathe in whatever passes for air around here.",
-                "You breathe thoughtfully, pondering the miracle of atmospheric composition.",
-                "You breathe with great purpose, although breathing tends to happen anyway.",
-                "You inhale deeply, briefly grateful for the invention of oxygen.",
-                "You inhale slowly, appreciating the universe's decision to include breathable air.",
-                "You recall your mantra, 'Breathe in the love... and blow out the jive...'",
-                "You take a breath, marveling at your lungs' stubborn refusal to give up.",
-                "You take a breath, noting that it's roughly the same as the last one.",
-                "You take a breath, tasting hints of adventure and poor ventilation.",
-                "You take a tentative breath, unsure whether the atmosphere is still working.",
-                "You were already doing that, but you also continue to breathe.",
+                "You breathe with the determination of someone very much alive.", // DP
+                "How refreshingly automatic of you.", // OW
+                "You inhale and exhale like a champion of the obvious.", // MT
+                "Such dedication to this most basic of biological functions.", // TC
+                "Breathing? How terribly... functional.", // NC
+                "The lungs perform their office with customary efficiency.", // SJ
+                "You breathe. The atmosphere cooperates beautifully.", // DA
+                "Your respiratory system continues its thankless work.", // DP
+                "Oxygen in, carbon dioxide out. How delightfully predictable.", // OW
+                "You breathe like a person who's mastered the fundamentals.", // MT
+                "Such rhythmic chest movements. Almost hypnotic.", // TC
+                "How wonderfully automatic. Your medulla oblongata must be so proud.", // NC
+                "Air enters, air departs. The cycle continues unabated.", // SJ
+                "You breathe. Your lungs seem pleased with the arrangement.", // DA
+                "Inhaling with the confidence of someone who's done this before.", // DP
+                "You practice breathing with admirable consistency.", // OW
             )
+
         )
     }
 
@@ -367,20 +426,6 @@ open class MessageProvider: @unchecked Sendable {
         output(
             "cannotDrink(item: '\(item)')",
             "You can't drink \(item)."
-        )
-    }
-
-    open func cannotDrinkFromClosed(container: String) -> String {
-        output(
-            "cannotDrinkFromClosed(container: \(container))",
-            "You can't drink \(container)."
-        )
-    }
-
-    open func cannotEatFromClosed(container: String) -> String {
-        output(
-            "cannotEatFromClosed(container: \(container))",
-            "You can't eat from \(container)."
         )
     }
 
@@ -478,14 +523,48 @@ open class MessageProvider: @unchecked Sendable {
     open func characterDoesNotSeemToKnow(character: String, topic: String) -> String {
         output(
             "characterDoesNotSeemToKnow(character: '\(character)', topic: '\(topic)')",
-            "\(character) doesn't seem to know anything about \(topic)."
+            oneOf(
+                "\(character) responds to your inquiry about \(topic) with the eloquence of a goldfish.", // DP
+                "How disappointing. \(character) seems blissfully ignorant regarding \(topic).", // OW
+                "\(character) knows about as much concerning \(topic) as a mule knows about Sunday.", // MT
+                "Such hopeful questioning! \(character) offers only charming vacancy on the subject of \(topic).", // TC
+                "How terribly inconvenient. \(character) appears educationally deficient regarding \(topic).", // NC
+                "\(character) demonstrates a comprehensive ignorance of \(topic) with admirable consistency.", // SJ
+                "\(character) stares blankly. \(topic) might as well be advanced quantum mechanics.", // DA
+                "Your inquiry about \(topic) meets \(character)'s magnificent wall of unknowing.", // DP
+                "\(character) regards \(topic) as one might regard hieroglyphs - decoratively but incomprehensibly.", // OW
+                "\(character) draws a complete blank on \(topic), and not a particularly artistic one.", // MT
+                "Such optimism! \(character) treats \(topic) as a delightfully foreign concept.", // TC
+                "How wonderfully unhelpful. \(character) maintains perfect ignorance about \(topic).", // NC
+                "\(character)'s knowledge of \(topic) proves as substantial as morning mist.", // SJ
+                "\(character) knows nothing about \(topic). This seems to surprise no one.", // DA
+                "\(character) meets your question about \(topic) with the wisdom of an empty teacup.", // DP
+                "How charmingly useless. \(character) treats \(topic) as pure abstraction.", // OW
+            )
         )
     }
 
     open func characterListens(character: String, topic: String) -> String {
         output(
             "characterListens(character: '\(character)', topic: '\(topic)')",
-            "\(character) listens politely to what you say about \(topic)."
+            oneOf(
+                "\(character) listens to your discourse on \(topic) with the rapt attention of a well-mannered statue.", // DP
+                "How charming. \(character) receives your wisdom about \(topic) with decorative politeness.", // OW
+                "\(character) nods along to your talk on \(topic) like a bobblehead with good breeding.", // MT
+                "Such patient listening! \(character) absorbs your insights on \(topic) with the enthusiasm of drying paint.", // TC
+                "How wonderfully courteous. \(character) endures your monologue on \(topic) with admirable stoicism.", // NC
+                "\(character) attends to your exposition regarding \(topic) with ceremonial interest.", // SJ
+                "\(character) listens politely about \(topic). Information goes in, nothing comes out.", // DA
+                "Your soliloquy on \(topic) meets \(character)'s masterful performance of paying attention.", // DP
+                "\(character) receives your lecture on \(topic) with the grace of someone practiced in feigning interest.", // OW
+                "\(character) listens to your wisdom over \(topic) and files it under 'immediately forgettable.'", // MT
+                "Such diplomatic attention! \(character) treats your exposition on \(topic) like background music.", // TC
+                "How delightfully unresponsive. \(character) hears your discourse on \(topic) without troubling to react.", // NC
+                "\(character) demonstrates the fine art of listening without actually processing your thoughts on \(topic).", // SJ
+                "\(character) listens about \(topic). Your words achieve perfect conversational weightlessness.", // DA
+                "\(character) receives your insights on \(topic) with the enthusiasm of someone reading tax forms.", // DP
+                "How wonderfully one-sided. \(character) treats your commentary on \(topic) as ambient noise.", // OW
+            )
         )
     }
 
