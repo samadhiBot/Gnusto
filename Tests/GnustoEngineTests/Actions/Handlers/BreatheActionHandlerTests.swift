@@ -31,12 +31,11 @@ struct BreatheActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > breathe
-            You inhale slowly, appreciating the universe’s decision to
-            include breathable air.
+            Your respiratory system continues its thankless work.
             """)
     }
 
-    @Test("BREATHE ON DIRECTOBJECT syntax provides atmospheric response")
+    @Test("BREATHE ON DIRECTOBJECT syntax works")
     func testBreatheOnDirectObjectSyntax() async throws {
         // Given
         let testRoom = Location(
@@ -61,22 +60,14 @@ struct BreatheActionHandlerTests {
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // When
-        try await engine.execute("breathe on flower", times: 3)
+        try await engine.execute("breathe on flower")
 
         // Then
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > breathe on flower
-            You exhale on the red flower with an unshakable faith in the
-            communicative power of respiration.
-
-            > breathe on flower
-            You direct your breath at the red flower with full confidence
-            in your respiratory technique.
-
-            > breathe on flower
-            You breathe on the red flower with refreshing honesty about
-            your breathing priorities.
+            You exhale intimately upon the red flower and achieve
+            maximum awkwardness.
             """)
     }
 
@@ -113,7 +104,7 @@ struct BreatheActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > breathe air
-            I don’t understand that sentence.
+            We’re flattered you think we’re smart enough to parse that.
             """)
     }
 
@@ -148,7 +139,7 @@ struct BreatheActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > breathe with mask
-            I don’t understand that sentence.
+            We’re flattered you think we’re smart enough to parse that.
             """)
     }
 
@@ -175,8 +166,7 @@ struct BreatheActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > breathe
-            You inhale slowly, appreciating the universe’s decision to
-            include breathable air.
+            Your respiratory system continues its thankless work.
             """)
     }
 
@@ -205,18 +195,60 @@ struct BreatheActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > breathe
-            You inhale slowly, appreciating the universe’s decision to
-            include breathable air.
+            Your respiratory system continues its thankless work.
 
             > breathe
-            You breathe with great purpose, although breathing tends to
-            happen anyway.
+            Breathing? How terribly… Functional.
 
             > breathe
-            You take a breath, tasting hints of adventure and
-            poor ventilation.
+            Air enters, air departs. The cycle continues unabated.
             """)
     }
+
+    @Test("Breathe on Direct Object provides atmospheric response")
+    func testBreatheOnAtmosphericResponse() async throws {
+        // Given
+        let testRoom = Location(
+            id: "testRoom",
+            .name("Test Room"),
+            .inherentlyLit
+        )
+
+        let flower = Item(
+            id: "flower",
+            .name("red flower"),
+            .description("A beautiful red flower."),
+            .in(.location("testRoom"))
+        )
+
+        let game = MinimalGame(
+            player: Player(in: "testRoom"),
+            locations: testRoom,
+            items: flower
+        )
+
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // When
+        try await engine.execute("breathe on flower", times: 3)
+
+        // Then
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            > breathe on flower
+            You exhale intimately upon the red flower and achieve
+            maximum awkwardness.
+
+            > breathe on flower
+            How wonderfully direct. The red flower receives your breath
+            with stoic grace.
+
+            > breathe on flower
+            The engagement between your lungs and the red flower yields
+            atmospheric intimacy.
+            """)
+    }
+
 
     // MARK: - Intent Testing
 

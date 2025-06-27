@@ -33,14 +33,22 @@ struct BlowActionHandlerTests {
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // When
-        try await engine.execute("blow feather")
+        try await engine.execute("blow feather", times: 3)
 
         // Then
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > blow feather
-            You blow on the fluffy feather, but nothing
-            interesting happens.
+            You exhale forcefully at the fluffy feather and achieve maximum
+            atmospheric rearrangement.
+
+            > blow feather
+            How wonderfully direct. The fluffy feather appears immune to
+            your windy charms.
+
+            > blow feather
+            The engagement between your lungs and the fluffy feather
+            concludes without fanfare.
             """)
 
         let finalState = try await engine.item("feather")
@@ -78,7 +86,8 @@ struct BlowActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > blow on dust
-            You blow on the pile of dust, but nothing interesting happens.
+            You exhale forcefully at the pile of dust and achieve maximum
+            atmospheric rearrangement.
             """)
     }
 
@@ -113,7 +122,8 @@ struct BlowActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > puff card
-            You blow on the playing card, but nothing interesting happens.
+            You exhale forcefully at the playing card and achieve maximum
+            atmospheric rearrangement.
             """)
     }
 
@@ -220,7 +230,8 @@ struct BlowActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > blow
-            You blow the air around, but nothing interesting happens.
+            You exhale with the fury of someone who’s run out of
+            birthday candles.
             """)
     }
 
