@@ -36,7 +36,7 @@ struct BreatheActionHandlerTests {
             """)
     }
 
-    @Test("BREATHE ON DIRECTOBJECT syntax fails appropriately")
+    @Test("BREATHE ON DIRECTOBJECT syntax provides atmospheric response")
     func testBreatheOnDirectObjectSyntax() async throws {
         // Given
         let testRoom = Location(
@@ -61,13 +61,22 @@ struct BreatheActionHandlerTests {
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // When
-        try await engine.execute("breathe on flower")
+        try await engine.execute("breathe on flower", times: 3)
 
         // Then
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > breathe on flower
-            You can’t breathe on that.
+            You exhale on the red flower with an unshakable faith in the
+            communicative power of respiration.
+
+            > breathe on flower
+            You direct your breath at the red flower with full confidence
+            in your respiratory technique.
+
+            > breathe on flower
+            You breathe on the red flower with refreshing honesty about
+            your breathing priorities.
             """)
     }
 
@@ -104,7 +113,7 @@ struct BreatheActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > breathe air
-            You can’t breathe that.
+            I don’t understand that sentence.
             """)
     }
 
@@ -139,7 +148,7 @@ struct BreatheActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > breathe with mask
-            You can’t breathe that.
+            I don’t understand that sentence.
             """)
     }
 
@@ -190,7 +199,7 @@ struct BreatheActionHandlerTests {
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // When
-        try await engine.execute("breathe")
+        try await engine.execute("breathe", times: 3)
 
         // Then
         let output = await mockIO.flush()
@@ -198,6 +207,14 @@ struct BreatheActionHandlerTests {
             > breathe
             You inhale slowly, appreciating the universe’s decision to
             include breathable air.
+
+            > breathe
+            You breathe with great purpose, although breathing tends to
+            happen anyway.
+
+            > breathe
+            You take a breath, tasting hints of adventure and
+            poor ventilation.
             """)
     }
 

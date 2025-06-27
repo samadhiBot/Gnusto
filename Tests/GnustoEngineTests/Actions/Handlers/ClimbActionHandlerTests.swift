@@ -337,9 +337,9 @@ struct ClimbActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > climb stairs
-
             — Upper Room —
 
+            You are in a nondescript location.
             """)
 
         // Verify player moved
@@ -369,7 +369,7 @@ struct ClimbActionHandlerTests {
             items: wall
         )
 
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+        let (engine, _) = await GameEngine.test(blueprint: game)
 
         // When
         try await engine.execute("climb wall")

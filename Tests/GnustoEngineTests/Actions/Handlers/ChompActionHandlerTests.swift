@@ -270,7 +270,7 @@ struct ChompActionHandlerTests {
         )
 
         let castleGuard = Item(
-            id: "guard",
+            id: "castleGuard",
             .name("castle guard"),
             .description("A stern castle guard."),
             .isCharacter,
