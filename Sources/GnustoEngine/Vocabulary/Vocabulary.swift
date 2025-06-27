@@ -125,6 +125,7 @@ public struct Vocabulary: Codable, Equatable, Sendable {
         "\"",
         "a",
         "an",
+        "my",
         "some",
         "that",
         "the",

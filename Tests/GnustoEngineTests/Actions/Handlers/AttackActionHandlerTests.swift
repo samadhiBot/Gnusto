@@ -40,8 +40,8 @@ struct AttackActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > attack troll
-            Trying to attack a fierce troll with your bare hands
-            is suicidal.
+            You throw yourself at the fierce troll like a moth at a
+            particularly dangerous flame.
             """)
 
         let finalState = try await engine.item("troll")
@@ -89,7 +89,8 @@ struct AttackActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > attack dragon with sword
-            Let’s hope it doesn’t come to that.
+            You lunge at the red dragon and achieve spectacular contact
+            with nothing.
             """)
     }
 
@@ -125,7 +126,8 @@ struct AttackActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > fight orc
-            Trying to attack an angry orc with your bare hands is suicidal.
+            You throw yourself at the angry orc like a moth at a
+            particularly dangerous flame.
             """)
     }
 
@@ -161,8 +163,8 @@ struct AttackActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > hit goblin
-            Trying to attack a sneaky goblin with your bare hands
-            is suicidal.
+            You throw yourself at the sneaky goblin like a moth at a
+            particularly dangerous flame.
             """)
     }
 
@@ -198,8 +200,8 @@ struct AttackActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > kill spider
-            Trying to attack a giant spider with your bare hands
-            is suicidal.
+            You throw yourself at the giant spider like a moth at a
+            particularly dangerous flame.
             """)
     }
 
@@ -389,7 +391,7 @@ struct AttackActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > attack rock
-            I’ve known strange people, but fighting a large rock?
+            What did the large rock ever do to deserve such treatment?
             """)
 
         let finalState = try await engine.item("rock")
@@ -428,8 +430,8 @@ struct AttackActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > attack warrior
-            Trying to attack a skilled warrior with your bare hands
-            is suicidal.
+            You throw yourself at the skilled warrior like a moth at a
+            particularly dangerous flame.
             """)
 
         let finalState = try await engine.item("warrior")
@@ -470,14 +472,14 @@ struct AttackActionHandlerTests {
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // When
-        try await engine.execute("attack bandit with stick")
+        try await engine.execute("attack the bandit with a stick")
 
         // Then
         let output = await mockIO.flush()
         expectNoDifference(output, """
-            > attack bandit with stick
-            Trying to attack the dangerous bandit with a wooden stick
-            is suicidal.
+            > attack the bandit with a stick
+            You swing the wooden stick at the dangerous bandit with the
+            effectiveness of a stern rebuke.
             """)
     }
 
@@ -516,13 +518,14 @@ struct AttackActionHandlerTests {
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // When
-        try await engine.execute("attack monster with dagger")
+        try await engine.execute("attack the monster with my dagger")
 
         // Then
         let output = await mockIO.flush()
         expectNoDifference(output, """
-            > attack monster with dagger
-            Let’s hope it doesn’t come to that.
+            > attack the monster with my dagger
+            You lunge at the evil monster and achieve spectacular contact
+            with nothing.
             """)
 
         let finalState = try await engine.item("monster")

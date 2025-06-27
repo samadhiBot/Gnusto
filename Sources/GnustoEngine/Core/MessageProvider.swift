@@ -152,12 +152,12 @@ open class MessageProvider: @unchecked Sendable {
                 "You assault \(item) with the fury of someone who's clearly lost the plot.",  // DP
                 "How charmingly violent. \(item) remains serenely indifferent to your rage.",  // OW
                 "You attack \(item) like it owes you money and can't pay up.",  // MT
-                "Such passionate hostility toward innocent \(item). How deliciously unhinged.",  // TC
+                "Such passionate hostility toward \(item). How deliciously unhinged.",  // TC
                 "How terribly dramatic. \(item) fails to cower appropriately.",  // NC
                 "The assault upon \(item) proceeds with admirable futility.",  // SJ
                 "You attack \(item). \(item) wins by doing absolutely nothing.",  // DA
                 "You wage war against \(item) and lose spectacularly.",  // DP
-                "What did poor \(item) ever do to deserve such treatment?",  // OW
+                "What did \(item) ever do to deserve such treatment?",  // OW
                 "You pummel \(item) with the effectiveness of fighting fog.",  // MT
                 "Your vendetta against \(item) seems rather one-sided.",  // TC
                 "Such vigor! Such pointlessness! \(item) remains smugly inanimate.",  // NC
