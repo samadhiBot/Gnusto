@@ -53,7 +53,7 @@ struct ConversationManagerTests {
 
     // MARK: - Basic Question State Management
 
-    @Test("hasPendingQuestion returns false when no question is pending")
+    @Test("hasPendingQuestion is false when no question is pending")
     func testHasPendingQuestionFalse() async throws {
         let (engine, _) = await createTestEngine()
 
@@ -61,7 +61,7 @@ struct ConversationManagerTests {
         #expect(hasPending == false)
     }
 
-    @Test("hasPendingQuestion returns true when topic question is pending")
+    @Test("hasPendingQuestion is true when topic question is pending")
     func testHasPendingQuestionTrue() async throws {
         let (engine, _) = await createTestEngine()
 
@@ -83,7 +83,7 @@ struct ConversationManagerTests {
         #expect(hasPending == true)
     }
 
-    @Test("getCurrentQuestion returns nil when no question is pending")
+    @Test("getCurrentQuestion is nil when no question is pending")
     func testGetCurrentQuestionNil() async throws {
         let (engine, _) = await createTestEngine()
 
@@ -91,7 +91,7 @@ struct ConversationManagerTests {
         #expect(currentQuestion == nil)
     }
 
-    @Test("getCurrentQuestion returns correct context for topic question")
+    @Test("getCurrentQuestion is correct context for topic question")
     func testGetCurrentQuestionTopic() async throws {
         let (engine, _) = await createTestEngine()
 

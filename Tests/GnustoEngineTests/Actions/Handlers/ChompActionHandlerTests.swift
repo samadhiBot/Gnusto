@@ -1,5 +1,6 @@
-import Testing
 import CustomDump
+import Testing
+
 @testable import GnustoEngine
 
 @Suite("ChompActionHandler Tests")
@@ -7,7 +8,7 @@ struct ChompActionHandlerTests {
 
     // MARK: - Syntax Rule Testing
 
-    @Test("CHOMP DIRECTOBJECT syntax works")
+    @Test("CHOMP DIRECTOBJECT syntax works with disambiguation")
     func testChompDirectObjectSyntax() async throws {
         // Given
         let testRoom = Location(
@@ -33,21 +34,114 @@ struct ChompActionHandlerTests {
 
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        // When
+        // When: CHOMP on edible item should ask for disambiguation
         try await engine.execute("chomp apple")
 
-        // Then
+        // Then: Should ask whether to eat it
         let output = await mockIO.flush()
-        expectNoDifference(output, """
+        expectNoDifference(
+            output,
+            """
             > chomp apple
-            You take a bite. It tastes like a red apple.
+            Do you mean you want to eat the red apple?
             """)
 
-        let finalState = try await engine.item("apple")
-        #expect(finalState.hasFlag(.isTouched) == true)
+        // Verify question is pending
+        let hasPending = await ConversationManager.hasPendingQuestion(engine: engine)
+        #expect(hasPending == true)
     }
 
-    @Test("BITE syntax works")
+    @Test("CHOMP disambiguation - YES response eats the item")
+    func testChompDisambiguationYes() async throws {
+        // Given
+        let testRoom = Location(
+            id: "testRoom",
+            .name("Test Room"),
+            .inherentlyLit
+        )
+
+        let apple = Item(
+            id: "apple",
+            .name("red apple"),
+            .description("A juicy red apple."),
+            .isEdible,
+            .in(.location("testRoom"))
+        )
+
+        let game = MinimalGame(
+            player: Player(in: "testRoom"),
+            locations: testRoom,
+            items: apple
+        )
+
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // When: CHOMP then YES
+        try await engine.execute("chomp apple", "yes")
+
+        // Then: Should eat the apple (delegate to EatActionHandler)
+        let output = await mockIO.flush()
+        expectNoDifference(
+            output,
+            """
+            > chomp apple
+            Do you mean you want to eat the red apple?
+
+            > yes
+            You eat the red apple. It’s quite satisfying.
+            """)
+
+        // Apple should be gone (moved to .nowhere)
+        let finalState = try await engine.item("apple")
+        #expect(finalState.parent == .nowhere)
+    }
+
+    @Test("CHOMP disambiguation - NO response just takes a bite")
+    func testChompDisambiguationNo() async throws {
+        // Given
+        let testRoom = Location(
+            id: "testRoom",
+            .name("Test Room"),
+            .inherentlyLit
+        )
+
+        let apple = Item(
+            id: "apple",
+            .name("red apple"),
+            .description("A juicy red apple."),
+            .isEdible,
+            .in(.location("testRoom"))
+        )
+
+        let game = MinimalGame(
+            player: Player(in: "testRoom"),
+            locations: testRoom,
+            items: apple
+        )
+
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // When: CHOMP then NO
+        try await engine.execute("chomp apple", "no")
+
+        // Then: Should just decline
+        let output = await mockIO.flush()
+        expectNoDifference(
+            output,
+            """
+            > chomp apple
+            Do you mean you want to eat the red apple?
+
+            > no
+            Okay, never mind.
+            """)
+
+        // Apple should still be in the room
+        let finalState = try await engine.item("apple")
+        #expect(finalState.parent == .location("testRoom"))
+    }
+
+    @Test("BITE syntax works with disambiguation")
     func testBiteSyntax() async throws {
         // Given
         let testRoom = Location(
@@ -75,11 +169,13 @@ struct ChompActionHandlerTests {
         // When
         try await engine.execute("bite bread")
 
-        // Then
+        // Then: Should ask for disambiguation
         let output = await mockIO.flush()
-        expectNoDifference(output, """
+        expectNoDifference(
+            output,
+            """
             > bite bread
-            You take a bite. It tastes like a piece of bread.
+            Do you mean you want to eat the piece of bread?
             """)
     }
 
@@ -104,10 +200,11 @@ struct ChompActionHandlerTests {
 
         // Then
         let output = await mockIO.flush()
-        expectNoDifference(output, """
+        expectNoDifference(
+            output,
+            """
             > chew
-            You chomp with a conviction that makes reality itself
-            seem negotiable.
+            Your molars meet in a tragic tale of unrequited mastication.
             """)
     }
 
@@ -149,7 +246,9 @@ struct ChompActionHandlerTests {
 
         // Then
         let output = await mockIO.flush()
-        expectNoDifference(output, """
+        expectNoDifference(
+            output,
+            """
             > chomp apple
             You can’t see any such thing.
             """)
@@ -185,7 +284,9 @@ struct ChompActionHandlerTests {
 
         // Then
         let output = await mockIO.flush()
-        expectNoDifference(output, """
+        expectNoDifference(
+            output,
+            """
             > chomp apple
             It is pitch black. You can’t see a thing.
             """)
@@ -214,14 +315,15 @@ struct ChompActionHandlerTests {
 
         // Then
         let output = await mockIO.flush()
-        expectNoDifference(output, """
+        expectNoDifference(
+            output,
+            """
             > chomp
-            You chomp with a conviction that makes reality itself
-            seem negotiable.
+            Your molars meet in a tragic tale of unrequited mastication.
             """)
     }
 
-    @Test("Chomp on edible item")
+    @Test("Chomp on edible item asks for disambiguation")
     func testChompOnEdibleItem() async throws {
         // Given
         let testRoom = Location(
@@ -247,20 +349,23 @@ struct ChompActionHandlerTests {
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // When
-        try await engine.execute("chomp cookie")
+        try await engine.execute("chomp cookie", "no")
 
-        // Then
+        // Then: Should ask for disambiguation
         let output = await mockIO.flush()
-        expectNoDifference(output, """
+        expectNoDifference(
+            output,
+            """
             > chomp cookie
-            You take a bite. It tastes like a chocolate cookie.
+            Do you mean you want to eat the chocolate cookie?
             """)
 
-        let finalState = try await engine.item("cookie")
-        #expect(finalState.hasFlag(.isTouched) == true)
+        // Verify question is pending
+        let hasPending = await ConversationManager.hasPendingQuestion(engine: engine)
+        #expect(hasPending == true)
     }
 
-    @Test("Chomp on character")
+    @Test("Chomp on character gives humorous response")
     func testChompOnCharacter() async throws {
         // Given
         let testRoom = Location(
@@ -288,19 +393,21 @@ struct ChompActionHandlerTests {
         // When
         try await engine.execute("chomp guard")
 
-        // Then
+        // Then: Should give humorous response directly (no disambiguation)
         let output = await mockIO.flush()
-        expectNoDifference(output, """
+        expectNoDifference(
+            output,
+            """
             > chomp guard
-            You gnaw the castle guard in a thinking-outside-the-box kind of
-            a way.
+            You sink your teeth into the castle guard and immediately
+            regret skipping lunch.
             """)
 
         let finalState = try await engine.item("castleGuard")
         #expect(finalState.hasFlag(.isTouched) == true)
     }
 
-    @Test("Chomp on regular item")
+    @Test("Chomp on regular item gives humorous response")
     func testChompOnRegularItem() async throws {
         // Given
         let testRoom = Location(
@@ -327,16 +434,65 @@ struct ChompActionHandlerTests {
         // When
         try await engine.execute("chomp rock")
 
-        // Then
+        // Then: Should give humorous response directly (no disambiguation)
         let output = await mockIO.flush()
-        expectNoDifference(output, """
+        expectNoDifference(
+            output,
+            """
             > chomp rock
-            You chomp the smooth rock with the fearless innovation of
-            someone unbound by convention.
+            You gnaw the smooth rock with the enthusiasm of the
+            nutritionally confused.
             """)
 
         let finalState = try await engine.item("rock")
         #expect(finalState.hasFlag(.isTouched) == true)
+    }
+
+    @Test("Conversation recovery - non-response clears question")
+    func testConversationRecovery() async throws {
+        // Given
+        let testRoom = Location(
+            id: "testRoom",
+            .name("Test Room"),
+            .inherentlyLit
+        )
+
+        let apple = Item(
+            id: "apple",
+            .name("red apple"),
+            .description("A juicy red apple."),
+            .isEdible,
+            .in(.location("testRoom"))
+        )
+
+        let game = MinimalGame(
+            player: Player(in: "testRoom"),
+            locations: testRoom,
+            items: apple
+        )
+
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // When: CHOMP creates question, then do something else
+        try await engine.execute("chomp apple")
+        try await engine.execute("look")
+
+        // Then: Question should be automatically cleared
+        let output = await mockIO.flush()
+        expectNoDifference(
+            output,
+            """
+            > look
+            — Test Room —
+
+            A room for testing.
+
+            There is a red apple here.
+            """)
+
+        // Verify question is cleared
+        let hasPending = await ConversationManager.hasPendingQuestion(engine: engine)
+        #expect(hasPending == false)
     }
 
     // MARK: - Intent Testing
@@ -344,7 +500,7 @@ struct ChompActionHandlerTests {
     @Test("Handler exposes correct Intents")
     func testIntents() async throws {
         let handler = ChompActionHandler()
-        // ChompActionHandler doesn’t specify actions, so it should be empty
+        // ChompActionHandler doesn't specify actions, so it should be empty
         #expect(handler.actions.isEmpty)
     }
 

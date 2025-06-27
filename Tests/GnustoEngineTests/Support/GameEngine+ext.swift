@@ -51,6 +51,35 @@ extension GameEngine {
         }
     }
 
+    /// Executes multiple string commands in sequence.
+    ///
+    /// This is a convenience method for executing several commands one after another.
+    /// Each command is processed independently through the normal game engine pipeline.
+    ///
+    /// - Parameter input: A variadic list of command strings to execute in order.
+    /// - Throws: Re-throws any errors from individual command execution.
+    @_disfavoredOverload
+    func execute(_ input: String...) async throws {
+        for command in input {
+            try await execute(command)
+        }
+    }
+
+    /// Executes a string command through the game engine's parser and action handler system.
+    ///
+    /// This method processes user input by:
+    /// 1. Checking for pending conversation questions and handling responses
+    /// 2. Parsing the input string into a structured command
+    /// 3. Executing the parsed command through the action handler system
+    /// 4. Processing any resulting state changes and side effects
+    ///
+    /// The command execution includes full game engine processing with before/after
+    /// turn handlers, action validation, and side effect processing.
+    ///
+    /// - Parameters:
+    ///   - input: The command string to parse and execute (e.g., "go north", "take lamp").
+    ///   - times: Number of times to repeat the command execution (default: 1).
+    /// - Throws: Re-throws parsing errors, validation errors, or execution errors from the action handler system.
     func execute(_ input: String, times: Int = 1) async throws {
         for _ in 0..<times {
             // Record the command prompt for output transcript

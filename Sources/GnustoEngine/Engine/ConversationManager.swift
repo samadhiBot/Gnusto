@@ -152,14 +152,10 @@ public struct ConversationManager: Sendable {
     /// - Parameter engine: The game engine
     /// - Returns: True if a question is pending, false otherwise
     public static func hasPendingQuestion(engine: GameEngine) async -> Bool {
-        guard let questionTypeValue = await engine.global(.pendingQuestionType) as StateValue?,
-            let questionType = questionTypeValue.toString,
-            !questionType.isEmpty,
-            QuestionType(rawValue: questionType) != nil
-        else {
+        guard let questionTypeString = await engine.global(.pendingQuestionType)?.toString else {
             return false
         }
-        return true
+        return QuestionType(rawValue: questionTypeString) != nil
     }
 
     /// Gets the current question context if one exists.
@@ -181,7 +177,8 @@ public struct ConversationManager: Sendable {
 
         if let contextString = await engine.global(.pendingQuestionContext)?.toString,
             let contextData = try? JSONDecoder().decode(
-                [String: String].self, from: contextString.data(using: .utf8) ?? Data())
+                [String: String].self, from: contextString.data(using: .utf8) ?? Data()
+            )
         {
             data = contextData
         }
@@ -230,7 +227,6 @@ public struct ConversationManager: Sendable {
         _ context: QuestionContext,
         engine: GameEngine
     ) async -> [StateChange] {
-        // Encode additional context data as JSON
         let contextData = try? JSONEncoder().encode(context.data)
         let contextString = contextData.flatMap { String(data: $0, encoding: .utf8) } ?? "{}"
 
@@ -340,13 +336,15 @@ public struct ConversationManager: Sendable {
 
         // Check for yes responses
         if ["yes", "y", "sure", "ok", "okay", "yep", "yeah", "aye"].contains(input) {
-            // Execute the original action from the context data
-            if let originalVerb = context.data["verb"] {
+            // For disambiguation questions, use the clarified verb; otherwise use the original verb
+            let verbToUse = context.data["clarifiedVerb"] ?? context.data["verb"]
+
+            if let verbString = verbToUse {
                 // Find the verb by looking it up in the engine's vocabulary
                 let gameState = await engine.gameState
                 guard
                     let verb = gameState.vocabulary.verbs.first(where: {
-                        $0.rawValue == originalVerb
+                        $0.rawValue == verbString
                     })
                 else {
                     return ActionResult(
@@ -360,11 +358,16 @@ public struct ConversationManager: Sendable {
                 let directObject: EntityReference? = directObjectID.map { .item(ItemID($0)) }
                 let indirectObject: EntityReference? = indirectObjectID.map { .item(ItemID($0)) }
 
+                // Use the clarified command input if available, otherwise construct from verb
+                let commandInput =
+                    context.data["clarifiedCommand"] ?? context.originalCommandInput
+                    ?? "\(verb.rawValue)"
+
                 let confirmCommand = Command(
                     verb: verb,
                     directObject: directObject,
                     indirectObject: indirectObject,
-                    rawInput: context.originalCommandInput ?? "\(verb.rawValue)"
+                    rawInput: commandInput
                 )
 
                 // Find and execute the appropriate handler
