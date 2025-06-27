@@ -33,4 +33,18 @@ extension GlobalID {
 
     /// Flag indicating verbose mode is enabled (show full location descriptions every time)
     public static let isVerboseMode = GlobalID("isVerboseMode")
+
+    // MARK: - Conversation System
+
+    /// The type of question currently being asked (e.g., "topic", "yesno", "choice")
+    public static let pendingQuestionType = GlobalID("pendingQuestionType")
+
+    /// The prompt message for the current question
+    public static let pendingQuestionPrompt = GlobalID("pendingQuestionPrompt")
+
+    /// The character or item ID that initiated the question
+    public static let pendingQuestionSource = GlobalID("pendingQuestionSource")
+
+    /// Additional context data for the current question (e.g., verb, topic context)
+    public static let pendingQuestionContext = GlobalID("pendingQuestionContext")
 }

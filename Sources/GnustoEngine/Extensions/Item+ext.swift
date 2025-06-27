@@ -5,7 +5,7 @@ extension Item {
     ///
     /// This is only useful in optional item scenarios, e.g. `item?.withDefiniteArticle ?? "it"`.
     var withDefiniteArticle: String {
-        hasFlag(.omitArticle) ? name : "the \(name)"
+        hasFlag(.omitArticle) || name.isEmpty ? name : "the \(name)"
     }
 
     /// The item's name prepended with the appropriate indefinite article ("a" or "an").
@@ -13,25 +13,7 @@ extension Item {
     /// Uses the simple rule: "an" if the string starts with a vowel (a, e, i, o, u), ignoring case,
     /// and "a" otherwise. Handles empty strings gracefully.
     var withIndefiniteArticle: String {
-        guard !hasFlag(.omitArticle), let firstChar = name.first else {
-            return name
-        }
-
-        // Handle numbers that start with vowel sounds
-        let vowelSoundPrefixes = ["8", "11", "18"]
-        for prefix in vowelSoundPrefixes {
-            if name.hasPrefix(prefix) {
-                return "an \(name)"
-            }
-        }
-
-        // Handle vowels (including accented vowels)
-        let lowerFirstChar = String(firstChar).lowercased().first!
-        let vowels: Set<Character> = [
-            "a", "e", "i", "o", "u", "à", "á", "â", "ã", "ä", "å", "è", "é", "ê", "ë", "ì", "í",
-            "î", "ï", "ò", "ó", "ô", "õ", "ö", "ù", "ú", "û", "ü",
-        ]
-        return vowels.contains(lowerFirstChar) ? "an \(name)" : "a \(name)"
+        hasFlag(.omitArticle) || name.isEmpty ? name : name.withIndefiniteArticle
     }
 }
 

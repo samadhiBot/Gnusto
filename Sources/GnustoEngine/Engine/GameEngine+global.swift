@@ -43,6 +43,14 @@ extension GameEngine {
         gameState.globalState[int]?.toInt
     }
 
+    public func global(_ itemRef: GlobalID) -> ItemID? {
+        gameState.globalState[itemRef]?.toItemID
+    }
+
+    public func global(_ locationRef: GlobalID) -> LocationID? {
+        gameState.globalState[locationRef]?.toLocationID
+    }
+
     /// Checks if a boolean flag is set to true in global state.
     ///
     /// This is a convenience method that treats `nil` values as `false`, making it ideal
@@ -93,6 +101,42 @@ extension GameEngine {
     public func setGlobal(_ globalID: GlobalID, to value: Int) -> StateChange {
         let oldValue = gameState.globalState[globalID]
         let newValue = StateValue.int(value)
+
+        return StateChange(
+            entityID: .global,
+            attribute: .globalState(attributeID: globalID),
+            oldValue: oldValue,
+            newValue: newValue
+        )
+    }
+
+    /// Sets a global variable to an item identifier.
+    ///
+    /// - Parameters:
+    ///   - globalID: The `GlobalID` of the global variable to set.
+    ///   - itemID: The item identifier to set.
+    /// - Returns: A `StateChange` representing this modification.
+    public func setGlobal(_ globalID: GlobalID, to itemID: ItemID) -> StateChange {
+        let oldValue = gameState.globalState[globalID]
+        let newValue = StateValue.itemID(itemID)
+
+        return StateChange(
+            entityID: .global,
+            attribute: .globalState(attributeID: globalID),
+            oldValue: oldValue,
+            newValue: newValue
+        )
+    }
+
+    /// Sets a global variable to a location identifier.
+    ///
+    /// - Parameters:
+    ///   - globalID: The `GlobalID` of the global variable to set.
+    ///   - locationID: The location identifier to set.
+    /// - Returns: A `StateChange` representing this modification.
+    public func setGlobal(_ globalID: GlobalID, to locationID: LocationID) -> StateChange {
+        let oldValue = gameState.globalState[globalID]
+        let newValue = StateValue.locationID(locationID)
 
         return StateChange(
             entityID: .global,

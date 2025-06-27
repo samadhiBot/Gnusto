@@ -65,6 +65,6 @@ extension LocationAttributeID {
     /// The location contains or is primarily composed of water.
     public static let isWater = LocationAttributeID("locationIsWater")
 
-    /// Magic does not function here.
-    public static let breaksMagic = LocationAttributeID("breaksMagic")
+    /// NARTICLEBIT: Omit default article ("a", "the").
+    public static let omitArticle = LocationAttributeID("omitArticle")
 }

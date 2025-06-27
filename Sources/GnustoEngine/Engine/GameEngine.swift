@@ -325,14 +325,56 @@ extension GameEngine {
             return
         }
 
-        // 3. Parse Input
+        // 3. Check for pending questions first
+        if await ConversationManager.hasPendingQuestion(engine: self) {
+            if let questionResponse = await ConversationManager.processQuestionResponse(
+                input: input,
+                engine: self
+            ) {
+                // Question was handled, apply the result
+                if let message = questionResponse.message {
+                    await ioHandler.print(message)
+                }
+
+                // Apply state changes
+                for change in questionResponse.changes {
+                    do {
+                        try await applyWithDynamicValidation(change)
+                    } catch {
+                        logError("Error applying question response state change: \(error)")
+                    }
+                }
+
+                // Process side effects
+                for effect in questionResponse.effects {
+                    // Handle side effects (placeholder for now)
+                    logWarning("Side effect processing not yet implemented: \(effect)")
+                }
+
+                // Question was handled, skip normal command processing
+                return
+            } else {
+                // No question response generated - clear the question and continue with normal processing
+                let clearChanges = await ConversationManager.clearQuestion(engine: self)
+                for change in clearChanges {
+                    do {
+                        try await applyWithDynamicValidation(change)
+                    } catch {
+                        logError("Error clearing question state: \(error)")
+                    }
+                }
+                // Continue to normal command processing below
+            }
+        }
+
+        // 4. Parse Input
         let parseResult = parser.parse(
             input: input,
             vocabulary: gameState.vocabulary,
             gameState: gameState
         )
 
-        // 4. Execute Command or Handle Error
+        // 5. Execute Command or Handle Error
         switch parseResult {
         case .success(let command):
             // Allow quit command to be processed by QuitActionHandler
@@ -344,7 +386,7 @@ extension GameEngine {
             await report(parseError: error)
         }
 
-        // 5. Timed events happen AFTER the player's action is complete (or failed).
+        // 6. Timed events happen AFTER the player's action is complete (or failed).
         if !shouldQuit {
             do {
                 try await tickClock()
@@ -1441,6 +1483,7 @@ extension GameEngine {
             LookInsideActionHandler(),
             LookUnderActionHandler(),
             MoveActionHandler(),
+            NibbleActionHandler(),
             OpenActionHandler(),
             PourActionHandler(),
             PressActionHandler(),
@@ -1478,6 +1521,7 @@ extension GameEngine {
             WearActionHandler(),
             XyzzyActionHandler(),
             YellActionHandler(),
+            YesNoQuestionHandler(),
         ]
 
         #if DEBUG

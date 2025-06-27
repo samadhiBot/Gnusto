@@ -1,5 +1,6 @@
-import Testing
 import CustomDump
+import Testing
+
 @testable import GnustoEngine
 
 @Suite("AskActionHandler Tests")
@@ -45,10 +46,12 @@ struct AskActionHandlerTests {
 
         // Then
         let output = await mockIO.flush()
-        expectNoDifference(output, """
+        expectNoDifference(
+            output,
+            """
             > ask wizard about crystal
-            The old wizard doesn’t seem to know anything about a
-            magic crystal.
+            Your inquiry about a magic crystal meets the old wizard’s
+            magnificent wall of unknowing.
             """)
 
         let finalState = try await engine.item("wizard")
@@ -92,10 +95,12 @@ struct AskActionHandlerTests {
 
         // Then
         let output = await mockIO.flush()
-        expectNoDifference(output, """
+        expectNoDifference(
+            output,
+            """
             > question guard about sword
-            The castle guard doesn’t seem to know anything about a
-            silver sword.
+            Your inquiry about a silver sword meets the castle guard’s
+            magnificent wall of unknowing.
             """)
     }
 
@@ -122,14 +127,16 @@ struct AskActionHandlerTests {
 
         // Then
         let output = await mockIO.flush()
-        expectNoDifference(output, """
+        expectNoDifference(
+            output,
+            """
             > ask about treasure
             Ask whom?
             """)
     }
 
-    @Test("Cannot ask without specifying what about")
-    func testCannotAskWithoutWhatAbout() async throws {
+    @Test("Ask without topic prompts for topic (two-phase asking)")
+    func testAskWithoutTopicPromptsForTopic() async throws {
         // Given
         let testRoom = Location(
             id: "testRoom",
@@ -158,10 +165,20 @@ struct AskActionHandlerTests {
 
         // Then
         let output = await mockIO.flush()
-        expectNoDifference(output, """
+        expectNoDifference(
+            output,
+            """
             > ask merchant
-            Ask what?
+            What do you want to ask the traveling merchant about?
             """)
+
+        // Verify that a question is now pending
+        let hasPendingQuestion = await ConversationManager.hasPendingQuestion(engine: engine)
+        #expect(hasPendingQuestion == true)
+
+        let currentQuestion = await ConversationManager.getCurrentQuestion(engine: engine)
+        #expect(currentQuestion?.type == .topic)
+        #expect(currentQuestion?.sourceID == "merchant")
     }
 
     @Test("Cannot ask non-character")
@@ -200,9 +217,11 @@ struct AskActionHandlerTests {
 
         // Then
         let output = await mockIO.flush()
-        expectNoDifference(output, """
+        expectNoDifference(
+            output,
+            """
             > ask rock about crystal
-            You can’t ask the large rock about that.
+            You can’t ask the large rock about anything.
             """)
     }
 
@@ -249,7 +268,9 @@ struct AskActionHandlerTests {
 
         // Then
         let output = await mockIO.flush()
-        expectNoDifference(output, """
+        expectNoDifference(
+            output,
+            """
             > ask wizard about crystal
             You can’t see any such thing.
             """)
@@ -293,7 +314,9 @@ struct AskActionHandlerTests {
 
         // Then
         let output = await mockIO.flush()
-        expectNoDifference(output, """
+        expectNoDifference(
+            output,
+            """
             > ask wizard about crystal
             It is pitch black. You can’t see a thing.
             """)
@@ -342,10 +365,12 @@ struct AskActionHandlerTests {
 
         // Verify message
         let output = await mockIO.flush()
-        expectNoDifference(output, """
+        expectNoDifference(
+            output,
+            """
             > ask sage about scroll
-            The wise sage doesn’t seem to know anything about an
-            ancient scroll.
+            Your inquiry about an ancient scroll meets the wise sage’s
+            magnificent wall of unknowing.
             """)
     }
 
@@ -379,9 +404,12 @@ struct AskActionHandlerTests {
 
         // Then
         let output = await mockIO.flush()
-        expectNoDifference(output, """
+        expectNoDifference(
+            output,
+            """
             > ask oracle about me
-            The mystical oracle doesn’t seem to know anything about you.
+            Your inquiry about you meets the mystical oracle’s magnificent
+            wall of unknowing.
             """)
     }
 
@@ -421,11 +449,136 @@ struct AskActionHandlerTests {
 
         // Then
         let output = await mockIO.flush()
-        expectNoDifference(output, """
+        expectNoDifference(
+            output,
+            """
             > ask librarian about library
-            The old librarian doesn’t seem to know anything about any
-            Ancient Library.
+            Your inquiry about the Ancient Library meets the old
+            librarian’s magnificent wall of unknowing.
             """)
+    }
+
+    // MARK: - Two-Phase Integration Testing
+
+    @Test("Two-phase asking completes successfully")
+    func testTwoPhaseAskingCompleteFlow() async throws {
+        // Given
+        let testRoom = Location(
+            id: "testRoom",
+            .name("Test Room"),
+            .inherentlyLit
+        )
+
+        let wizard = Item(
+            id: "wizard",
+            .name("old wizard"),
+            .description("A wise old wizard."),
+            .isCharacter,
+            .in(.location("testRoom"))
+        )
+
+        let treasure = Item(
+            id: "treasure",
+            .name("golden treasure"),
+            .synonyms("treasure"),
+            .description("A chest of gold."),
+            .in(.location("testRoom"))
+        )
+
+        let game = MinimalGame(
+            player: Player(in: "testRoom"),
+            locations: testRoom,
+            items: wizard, treasure
+        )
+
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // Phase 1: Ask without topic
+        try await engine.execute("ask the wizard")
+        let phase1Output = await mockIO.flush()
+        expectNoDifference(
+            phase1Output,
+            """
+            > ask the wizard
+            What do you want to ask the old wizard about?
+            """)
+
+        // Verify question is pending
+        let hasPending = await ConversationManager.hasPendingQuestion(engine: engine)
+        #expect(hasPending == true)
+
+        // Phase 2: Provide topic
+        try await engine.execute("the treasure")
+        let phase2Output = await mockIO.flush()
+        expectNoDifference(
+            phase2Output,
+            """
+            > the treasure
+            Your inquiry about a golden treasure meets the old wizard’s
+            magnificent wall of unknowing.
+            """)
+
+        // Verify question is no longer pending
+        let stillPending = await ConversationManager.hasPendingQuestion(engine: engine)
+        #expect(stillPending == false)
+
+        // Verify wizard was touched and pronouns updated
+        let finalWizard = try await engine.item("wizard")
+        #expect(finalWizard.hasFlag(.isTouched) == true)
+    }
+
+    @Test("Direct ask still works with both character and topic")
+    func testDirectAskStillWorks() async throws {
+        // Given
+        let testRoom = Location(
+            id: "testRoom",
+            .name("Test Room"),
+            .inherentlyLit
+        )
+
+        let oracle = Item(
+            id: "oracle",
+            .name("mystical oracle"),
+            .description("A mystical oracle."),
+            .isCharacter,
+            .in(.location("testRoom"))
+        )
+
+        let crystal = Item(
+            id: "crystal",
+            .name("magic crystal"),
+            .description("A glowing crystal."),
+            .in(.location("testRoom"))
+        )
+
+        let game = MinimalGame(
+            player: Player(in: "testRoom"),
+            locations: testRoom,
+            items: oracle, crystal
+        )
+
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // When: Direct ask with both character and topic
+        try await engine.execute("ask oracle about crystal")
+
+        // Then: Should work immediately without prompting
+        let output = await mockIO.flush()
+        expectNoDifference(
+            output,
+            """
+            > ask oracle about crystal
+            Your inquiry about a magic crystal meets the mystical oracle’s
+            magnificent wall of unknowing.
+            """)
+
+        // Verify no question is pending (direct ask doesn't create questions)
+        let hasPending = await ConversationManager.hasPendingQuestion(engine: engine)
+        #expect(hasPending == false)
+
+        // Verify oracle was touched
+        let finalOracle = try await engine.item("oracle")
+        #expect(finalOracle.hasFlag(.isTouched) == true)
     }
 
     // MARK: - Intent Testing
@@ -433,7 +586,7 @@ struct AskActionHandlerTests {
     @Test("Handler exposes correct Intents")
     func testIntents() async throws {
         let handler = AskActionHandler()
-        // AskActionHandler doesn’t specify actions, so it should be empty
+        // AskActionHandler doesn't specify actions, so it should be empty
         #expect(handler.actions.isEmpty)
     }
 

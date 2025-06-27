@@ -100,8 +100,8 @@ extension LocationAttribute {
         LocationAttribute(id: .isWater, rawValue: true)
     }
 
-    /// Magic does not function here.
-    public static var breaksMagic: LocationAttribute {
-        LocationAttribute(id: .breaksMagic, rawValue: true)
+    /// NARTICLEBIT: Suppress default article ("a", "the").
+    public static var omitArticle: LocationAttribute {
+        LocationAttribute(id: .omitArticle, rawValue: true)
     }
 }

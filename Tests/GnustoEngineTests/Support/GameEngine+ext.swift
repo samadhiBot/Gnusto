@@ -52,15 +52,58 @@ extension GameEngine {
     }
 
     func execute(_ input: String, times: Int = 1) async throws {
-        let parseResult = parser.parse(
-            input: input,
-            vocabulary: gameState.vocabulary,
-            gameState: gameState
-        )
-
         for _ in 0..<times {
             // Record the command prompt for output transcript
             await ioHandler.print("> \(input)", style: .input, newline: true)
+
+            // Check for pending questions first
+            if await ConversationManager.hasPendingQuestion(engine: self) {
+                if let questionResponse = await ConversationManager.processQuestionResponse(
+                    input: input,
+                    engine: self
+                ) {
+                    // Question was handled, apply the result
+                    if let message = questionResponse.message {
+                        await ioHandler.print(message)
+                    }
+
+                    // Apply state changes
+                    for change in questionResponse.changes {
+                        do {
+                            try await applyWithDynamicValidation(change)
+                        } catch {
+                            logError("Error applying question response state change: \(error)")
+                        }
+                    }
+
+                    // Process side effects
+                    for effect in questionResponse.effects {
+                        // Handle side effects (placeholder for now)
+                        logWarning("Side effect processing not yet implemented: \(effect)")
+                    }
+
+                    // Question was handled, skip normal command processing
+                    continue
+                } else {
+                    // No question response generated - clear the question and continue with normal processing
+                    let clearChanges = await ConversationManager.clearQuestion(engine: self)
+                    for change in clearChanges {
+                        do {
+                            try await applyWithDynamicValidation(change)
+                        } catch {
+                            logError("Error clearing question state: \(error)")
+                        }
+                    }
+                    // Continue to normal command processing below
+                }
+            }
+
+            // Parse and execute normal commands
+            let parseResult = parser.parse(
+                input: input,
+                vocabulary: gameState.vocabulary,
+                gameState: gameState
+            )
 
             switch parseResult {
             case .success(let command):

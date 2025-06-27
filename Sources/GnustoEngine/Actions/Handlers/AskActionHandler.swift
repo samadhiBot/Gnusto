@@ -2,6 +2,8 @@ import Foundation
 
 /// Handles the "ASK" command for asking characters about topics.
 /// Implements communication mechanics following ZIL patterns for character interaction.
+/// Supports both direct asking ("ASK TROLL ABOUT TREASURE") and two-phase asking
+/// ("ASK TROLL" → "What do you want to ask the troll about?" → "TREASURE").
 public struct AskActionHandler: ActionHandler {
     // MARK: - Verb Definition Properties
 
@@ -20,19 +22,15 @@ public struct AskActionHandler: ActionHandler {
 
     /// Processes the "ASK" command.
     ///
-    /// Handles asking characters about topics. By default, most characters
-    /// don't have specific responses, but game-specific ItemEventHandlers
-    /// can provide custom dialogue.
+    /// Handles asking characters about topics in two modes:
+    /// 1. Direct asking: "ASK TROLL ABOUT TREASURE" - processes immediately
+    /// 2. Two-phase asking: "ASK TROLL" - prompts for topic, then processes response
+    ///
+    /// Game-specific ItemEventHandlers can provide custom dialogue responses.
     public func process(command: Command, engine: GameEngine) async throws -> ActionResult {
         guard let characterID = command.directObjectItemID else {
             throw ActionResponse.prerequisiteNotMet(
                 engine.messenger.askWhom()
-            )
-        }
-
-        guard let indirectObjectRef = command.indirectObject else {
-            throw ActionResponse.prerequisiteNotMet(
-                engine.messenger.doWhat(verb: command.verb)
             )
         }
 
@@ -48,8 +46,37 @@ public struct AskActionHandler: ActionHandler {
             throw ActionResponse.itemNotAccessible(characterID)
         }
 
+        // Check if we have an indirect object (topic) specified
+        if let indirectObjectRef = command.indirectObject {
+            // Direct asking - we have both character and topic
+            return try await processDirectAsk(
+                character: character,
+                characterID: characterID,
+                topic: indirectObjectRef,
+                engine: engine
+            )
+        } else {
+            // Two-phase asking - prompt for topic
+            return await promptForTopic(
+                character: character,
+                characterID: characterID,
+                command: command,
+                engine: engine
+            )
+        }
+    }
+
+    // MARK: - Private Helpers
+
+    /// Processes a direct ask command where both character and topic are specified.
+    private func processDirectAsk(
+        character: Item,
+        characterID: ItemID,
+        topic: EntityReference,
+        engine: GameEngine
+    ) async throws -> ActionResult {
         let topicDescription: String
-        switch indirectObjectRef {
+        switch topic {
         case .item(let topicItemID):
             let topicItem = try await engine.item(topicItemID)
             topicDescription = topicItem.withIndefiniteArticle
@@ -57,7 +84,7 @@ public struct AskActionHandler: ActionHandler {
             topicDescription = engine.messenger.you()
         case .location(let locationID):
             let location = try await engine.location(locationID)
-            topicDescription = engine.messenger.anySomething(location.name)
+            topicDescription = location.withDefiniteArticle
         }
 
         // Default response - games can override with ItemEventHandlers
@@ -68,6 +95,31 @@ public struct AskActionHandler: ActionHandler {
             ),
             await engine.setFlag(.isTouched, on: character),
             await engine.updatePronouns(to: character)
+        )
+    }
+
+    /// Prompts the player to specify what topic they want to ask about.
+    private func promptForTopic(
+        character: Item,
+        characterID: ItemID,
+        command: Command,
+        engine: GameEngine
+    ) async -> ActionResult {
+        let prompt = "What do you want to ask \(character.withDefiniteArticle) about?"
+
+        let questionChanges = await ConversationManager.askForTopic(
+            prompt: prompt,
+            characterID: characterID,
+            originalCommand: command,
+            engine: engine
+        )
+
+        return ActionResult(
+            message: prompt,
+            changes: questionChanges + [
+                await engine.setFlag(.isTouched, on: character),
+                await engine.updatePronouns(to: character),
+            ]
         )
     }
 }

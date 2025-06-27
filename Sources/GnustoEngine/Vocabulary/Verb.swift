@@ -1096,4 +1096,22 @@ extension Verb {
         id: "yell",
         intents: .tell
     )
+
+    /// Nibble or take small bites of something.
+    public static let nibble = Verb(
+        id: "nibble",
+        intents: .eat
+    )
+
+    /// Respond affirmatively to a question.
+    public static let yes = Verb(
+        id: "yes",
+        intents: .tell
+    )
+
+    /// Respond negatively to a question.
+    public static let no = Verb(
+        id: "no",
+        intents: .tell
+    )
 }
