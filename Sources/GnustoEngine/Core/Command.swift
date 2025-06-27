@@ -145,6 +145,42 @@ public struct Command: Equatable, Sendable {
         self.direction = direction
         self.rawInput = rawInput
     }
+}
+
+// MARK: - Command helpers
+
+extension Command {
+    /// The `ItemID` of the direct object if it is an item reference.
+    ///
+    /// This computed property provides a convenient way to extract the `ItemID` from
+    /// the command's direct object when it references an item. Returns `nil` if there
+    /// is no direct object or if the direct object is not an item (e.g., it's a location
+    /// or player reference).
+    ///
+    /// - Returns: The `ItemID` if the direct object is an item, otherwise `nil`.
+    var directObjectItemID: ItemID? {
+        if let directObject, case .item(let itemID) = directObject {
+            itemID
+        } else {
+            nil
+        }
+    }
+
+    /// The `ItemID` of the indirect object if it is an item reference.
+    ///
+    /// This computed property provides a convenient way to extract the `ItemID` from
+    /// the command's indirect object when it references an item. Returns `nil` if there
+    /// is no indirect object or if the indirect object is not an item (e.g., it's a location
+    /// or player reference).
+    ///
+    /// - Returns: The `ItemID` if the indirect object is an item, otherwise `nil`.
+    var indirectObjectItemID: ItemID? {
+        if let indirectObject, case .item(let itemID) = indirectObject {
+            itemID
+        } else {
+            nil
+        }
+    }
 
     /// Returns `true` if the command's verb includes the specified intent.
     ///

@@ -23,38 +23,18 @@ public struct BlowActionHandler: ActionHandler {
     /// Handles blowing on objects or general blowing. Special items like candles,
     /// fires, or wind instruments can have custom behavior via ItemEventHandlers.
     public func process(command: Command, engine: GameEngine) async throws -> ActionResult {
-        // Blow can be used without an object (general blowing) or with an object
-        guard
-            let directObjectRef = command.directObject,
-            case .item(let targetItemID) = directObjectRef
-        else {
+        guard let targetItemID = command.directObjectItemID else {
             return ActionResult(
-                engine.messenger.blowGeneral()
+                engine.messenger.blow()
             )
         }
 
         let targetItem = try await engine.item(targetItemID)
 
-        // Default behavior for blowing on objects
-        let message =
-            if targetItem.hasFlag(.isLightSource) && targetItem.hasFlag(.isLit) {
-                // Blowing on lit light sources might extinguish them
-                engine.messenger.blowOnLightSource(
-                    item: targetItem.withDefiniteArticle
-                )
-            } else if targetItem.hasFlag(.isFlammable) {
-                // Specific extinguishing behavior should use TurnOffActionHandler or custom logic
-                engine.messenger.blowOnFlammable(
-                    item: targetItem.withDefiniteArticle
-                )
-            } else {
-                engine.messenger.blowOnGeneric(
-                    item: targetItem.withDefiniteArticle
-                )
-            }
-
         return ActionResult(
-            message,
+            engine.messenger.blowOn(
+                item: targetItem.withDefiniteArticle
+            ),
             await engine.setFlag(.isTouched, on: targetItem),
             await engine.updatePronouns(to: targetItem),
         )

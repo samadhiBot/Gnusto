@@ -24,7 +24,7 @@ public struct AskActionHandler: ActionHandler {
     /// don't have specific responses, but game-specific ItemEventHandlers
     /// can provide custom dialogue.
     public func process(command: Command, engine: GameEngine) async throws -> ActionResult {
-        guard let directObjectRef = command.directObject else {
+        guard let characterID = command.directObjectItemID else {
             throw ActionResponse.prerequisiteNotMet(
                 engine.messenger.askWhom()
             )

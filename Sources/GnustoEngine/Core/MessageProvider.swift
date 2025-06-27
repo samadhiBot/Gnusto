@@ -158,31 +158,17 @@ open class MessageProvider: @unchecked Sendable {
         )
     }
 
-    open func blowGeneral() -> String {
+    open func blow() -> String {
         output(
             "blowGeneral()",
             "You blow the air around, but nothing interesting happens."
         )
     }
 
-    open func blowOnFlammable(item: String) -> String {
-        output(
-            "blowOnFlammable(item: '\(item)')",
-            "You blow on \(item), but it doesn't go out."
-        )
-    }
-
-    open func blowOnGeneric(item: String) -> String {
+    open func blowOn(item: String) -> String {
         output(
             "blowOnGeneric(item: '\(item)')",
             "You blow on \(item), but nothing interesting happens."
-        )
-    }
-
-    open func blowOnLightSource(item: String) -> String {
-        output(
-            "blowOnLightSource(item: '\(item)')",
-            "You blow on \(item), but it remains lit."
         )
     }
 
