@@ -36,12 +36,6 @@ public struct AskActionHandler: ActionHandler {
             )
         }
 
-        guard case .item(let characterID) = directObjectRef else {
-            throw ActionResponse.prerequisiteNotMet(
-                engine.messenger.canOnlyActOnCharacters(verb: "ask")
-            )
-        }
-
         let character = try await engine.item(characterID)
 
         guard character.hasFlag(.isCharacter) else {

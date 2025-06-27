@@ -29,6 +29,10 @@ public struct BlowActionHandler: ActionHandler {
             )
         }
 
+        guard await engine.playerCanReach(targetItemID) else {
+            throw ActionResponse.itemNotAccessible(characterID)
+        }
+
         let targetItem = try await engine.item(targetItemID)
 
         return ActionResult(
