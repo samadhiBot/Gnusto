@@ -256,7 +256,7 @@ struct NibbleActionHandlerTests {
             output,
             """
             > yes
-            You eat the chocolate cookie. It was delicious!
+            You eat the chocolate cookie. It's quite satisfying.
             """)
 
         // Verify question is no longer pending
@@ -265,7 +265,7 @@ struct NibbleActionHandlerTests {
 
         // Verify cookie is gone (eaten)
         let cookie = try await engine.item("cookie")
-        #expect(cookie.parent == .player)  // Should be consumed/removed, but test framework limitation
+        #expect(cookie.parent == .nowhere)  // Item is consumed and removed
     }
 
     @Test("NO response to nibble question cancels action")

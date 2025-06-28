@@ -349,7 +349,7 @@ struct ChompActionHandlerTests {
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // When
-        try await engine.execute("chomp cookie", "no")
+        try await engine.execute("chomp cookie")
 
         // Then: Should ask for disambiguation
         let output = await mockIO.flush()
@@ -454,6 +454,7 @@ struct ChompActionHandlerTests {
         let testRoom = Location(
             id: "testRoom",
             .name("Test Room"),
+            .description("A room for testing."),
             .inherentlyLit
         )
 
@@ -474,14 +475,16 @@ struct ChompActionHandlerTests {
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // When: CHOMP creates question, then do something else
-        try await engine.execute("chomp apple")
-        try await engine.execute("look")
+        try await engine.execute("chomp apple", "look")
 
         // Then: Question should be automatically cleared
         let output = await mockIO.flush()
         expectNoDifference(
             output,
             """
+            > chomp apple
+            Do you mean you want to eat the red apple?
+
             > look
             — Test Room —
 

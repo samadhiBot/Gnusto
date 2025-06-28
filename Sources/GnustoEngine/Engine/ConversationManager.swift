@@ -399,9 +399,9 @@ public struct ConversationManager: Sendable {
             return ActionResult(message: "Okay, never mind.", changes: clearChanges)
         }
 
-        // If it's not a clear yes/no, treat it as a regular command
-        // and clear the question state
-        return ActionResult(changes: clearChanges)
+        // If it's not a clear yes/no, return nil to let the engine
+        // clear the question and process the input as a normal command
+        return nil
     }
 
     /// Processes a choice response (for future use).
