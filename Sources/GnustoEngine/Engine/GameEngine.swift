@@ -1137,8 +1137,8 @@ extension GameEngine {
                 return
             }
 
-            // If the room is dark and the handler requires light (and isn't 'turn'), report error.
-            if !isLit && verbHandler.requiresLight && !command.hasIntent(.lightSource) {
+            // If the room is dark and the handler requires light, report error.
+            if !isLit && verbHandler.requiresLight {
                 await report(.roomIsDark)
             } else {
                 // --- Execute Handler ---

@@ -31,9 +31,17 @@ public struct TurnActionHandler: ActionHandler {
             )
         }
 
-        guard case .item(let targetItemID) = directObjectRef else {
+        let targetItemID: ItemID
+        switch directObjectRef {
+        case .item(let itemID):
+            targetItemID = itemID
+        case .location(let locationID):
             throw ActionResponse.prerequisiteNotMet(
                 engine.messenger.cannotDoThat(verb: "turn")
+            )
+        case .player:
+            throw ActionResponse.prerequisiteNotMet(
+                engine.messenger.turnSelf()
             )
         }
 
@@ -44,12 +52,13 @@ public struct TurnActionHandler: ActionHandler {
         }
 
         // Determine appropriate response based on object type
-        let message =
-            if targetItem.hasFlag(.isCharacter) {
-                engine.messenger.turnCharacter(character: targetItem.withDefiniteArticle)
-            } else {
-                engine.messenger.turnItem(item: targetItem.withDefiniteArticle)
-            }
+        let message = if targetItem.hasFlag(.isCharacter) {
+            engine.messenger.turnCharacter(character: targetItem.withDefiniteArticle)
+        } else if targetItem.hasFlag(.isTakable) {
+            engine.messenger.turnItem(item: targetItem.withDefiniteArticle)
+        } else {
+            engine.messenger.turnFixedObject(item: targetItem.withDefiniteArticle)
+        }
 
         return ActionResult(
             message,

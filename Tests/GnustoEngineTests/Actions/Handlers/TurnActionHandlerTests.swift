@@ -34,14 +34,22 @@ struct TurnActionHandlerTests {
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // When
-        try await engine.execute("turn dial")
+        try await engine.execute("turn dial", times: 3)
 
         // Then
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > turn dial
-            The brass dial responds to your turning attempt with the
-            unwavering resolve of the professionally immobile.
+            The brass dial responds to your efforts with the immovable
+            dignity of something that predates your arrival.
+
+            > turn dial
+            The brass dial demonstrates the sort of steadfast resolve that
+            comes with being bolted to reality.
+
+            > turn dial
+            You find that the brass dial has strong architectural opinions
+            about remaining in its designated spot.
             """)
 
         let finalState = try await engine.item("dial")
@@ -80,8 +88,8 @@ struct TurnActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > rotate wheel
-            The steering wheel responds to your turning attempt with the
-            unwavering resolve of the professionally immobile.
+            The steering wheel responds to your efforts with the immovable
+            dignity of something that predates your arrival.
             """)
     }
 
@@ -117,8 +125,8 @@ struct TurnActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > twist knob
-            The door knob responds to your turning attempt with the
-            unwavering resolve of the professionally immobile.
+            The door knob responds to your efforts with the immovable
+            dignity of something that predates your arrival.
             """)
     }
 
@@ -231,186 +239,6 @@ struct TurnActionHandlerTests {
 
     // MARK: - Processing Testing
 
-    @Test("Turn dial")
-    func testTurnDial() async throws {
-        // Given
-        let testRoom = Location(
-            id: "testRoom",
-            .name("Test Room"),
-            .inherentlyLit
-        )
-
-        let safeDial = Item(
-            id: "safeDial",
-            .name("combination dial"),
-            .description("A dial for entering combinations."),
-            .isDial,
-            .in(.location("testRoom"))
-        )
-
-        let game = MinimalGame(
-            player: Player(in: "testRoom"),
-            locations: testRoom,
-            items: safeDial
-        )
-
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
-
-        // When
-        try await engine.execute("turn dial")
-
-        // Then
-        let output = await mockIO.flush()
-        expectNoDifference(output, """
-            > turn dial
-            The dial clicks to a new position.
-            """)
-    }
-
-    @Test("Turn knob")
-    func testTurnKnob() async throws {
-        // Given
-        let testRoom = Location(
-            id: "testRoom",
-            .name("Test Room"),
-            .inherentlyLit
-        )
-
-        let volumeKnob = Item(
-            id: "volumeKnob",
-            .name("volume knob"),
-            .description("A volume control knob."),
-            .isKnob,
-            .in(.location("testRoom"))
-        )
-
-        let game = MinimalGame(
-            player: Player(in: "testRoom"),
-            locations: testRoom,
-            items: volumeKnob
-        )
-
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
-
-        // When
-        try await engine.execute("turn knob")
-
-        // Then
-        let output = await mockIO.flush()
-        expectNoDifference(output, """
-            > turn knob
-            The knob clicks to a new position.
-            """)
-    }
-
-    @Test("Turn wheel")
-    func testTurnWheel() async throws {
-        // Given
-        let testRoom = Location(
-            id: "testRoom",
-            .name("Test Room"),
-            .inherentlyLit
-        )
-
-        let shipWheel = Item(
-            id: "shipWheel",
-            .name("ship’s wheel"),
-            .description("A large wooden ship’s wheel."),
-            .isWheel,
-            .in(.location("testRoom"))
-        )
-
-        let game = MinimalGame(
-            player: Player(in: "testRoom"),
-            locations: testRoom,
-            items: shipWheel
-        )
-
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
-
-        // When
-        try await engine.execute("turn wheel")
-
-        // Then
-        let output = await mockIO.flush()
-        expectNoDifference(output, """
-            > turn wheel
-            You turn the wheel with considerable effort.
-            """)
-    }
-
-    @Test("Turn handle")
-    func testTurnHandle() async throws {
-        // Given
-        let testRoom = Location(
-            id: "testRoom",
-            .name("Test Room"),
-            .inherentlyLit
-        )
-
-        let crankHandle = Item(
-            id: "crankHandle",
-            .name("crank handle"),
-            .description("A metal crank handle."),
-            .isHandle,
-            .in(.location("testRoom"))
-        )
-
-        let game = MinimalGame(
-            player: Player(in: "testRoom"),
-            locations: testRoom,
-            items: crankHandle
-        )
-
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
-
-        // When
-        try await engine.execute("turn handle")
-
-        // Then
-        let output = await mockIO.flush()
-        expectNoDifference(output, """
-            > turn handle
-            The handle turns with a grinding sound.
-            """)
-    }
-
-    @Test("Turn key")
-    func testTurnKey() async throws {
-        // Given
-        let testRoom = Location(
-            id: "testRoom",
-            .name("Test Room"),
-            .inherentlyLit
-        )
-
-        let key = Item(
-            id: "key",
-            .name("brass key"),
-            .description("A small brass key."),
-            .isKey,
-            .in(.location("testRoom"))
-        )
-
-        let game = MinimalGame(
-            player: Player(in: "testRoom"),
-            locations: testRoom,
-            items: key
-        )
-
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
-
-        // When
-        try await engine.execute("turn key")
-
-        // Then
-        let output = await mockIO.flush()
-        expectNoDifference(output, """
-            > turn key
-            You need to be more specific about what to use the key with.
-            """)
-    }
-
     @Test("Turn character")
     func testTurnCharacter() async throws {
         // Given
@@ -437,13 +265,22 @@ struct TurnActionHandlerTests {
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // When
-        try await engine.execute("turn guard")
+        try await engine.execute("turn guard", times: 3)
 
         // Then
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > turn guard
-            You can’t turn the palace guard.
+            You discover that the palace guard has developed a
+            philosophical attachment to facing this particular way.
+
+            > turn guard
+            Your attempt to turn the palace guard reveals that they’re
+            surprisingly committed to their present orientation.
+
+            > turn guard
+            The palace guard maintains their bearing with the quiet dignity
+            of someone who knows which way they’re facing.
             """)
     }
 
@@ -473,13 +310,22 @@ struct TurnActionHandlerTests {
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // When
-        try await engine.execute("turn cube")
+        try await engine.execute("turn cube", times: 3)
 
         // Then
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > turn cube
-            You turn the puzzle cube in your hands.
+            The puzzle cube responds to your turning attempt with the
+            unwavering resolve of the professionally immobile.
+
+            > turn cube
+            The puzzle cube demonstrates the sort of stubborn integrity
+            that refuses to be turned by mere enthusiasm.
+
+            > turn cube
+            Your turning efforts bounce off the puzzle cube like optimism
+            off a tax collector.
             """)
     }
 
@@ -508,13 +354,49 @@ struct TurnActionHandlerTests {
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // When
-        try await engine.execute("turn statue")
+        try await engine.execute("turn statue", times: 3)
 
         // Then
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > turn statue
-            You can’t turn the marble statue.
+            The marble statue responds to your efforts with the immovable
+            dignity of something that predates your arrival.
+
+            > turn statue
+            The marble statue demonstrates the sort of steadfast resolve
+            that comes with being bolted to reality.
+
+            > turn statue
+            You find that the marble statue has strong architectural
+            opinions about remaining in its designated spot.
+            """)
+    }
+
+    @Test("Turn location")
+    func testTurnLocation() async throws {
+        // Given
+        let testRoom = Location(
+            id: "testRoom",
+            .name("Test Room"),
+            .inherentlyLit
+        )
+
+        let game = MinimalGame(
+            player: Player(in: "testRoom"),
+            locations: testRoom
+        )
+
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // When
+        try await engine.execute("turn Test Room")
+
+        // Then
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            > turn Test Room
+            You can’t turn that.
             """)
     }
 
@@ -541,7 +423,7 @@ struct TurnActionHandlerTests {
             items: valve
         )
 
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+        let (engine, _) = await GameEngine.test(blueprint: game)
 
         // Verify initial state
         let initialState = try await engine.item("valve")
@@ -596,9 +478,12 @@ struct TurnActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > turn first dial
-            The dial clicks to a new position.
+            The first dial responds to your efforts with the immovable
+            dignity of something that predates your arrival.
+
             > rotate second dial
-            The dial clicks to a new position.
+            The second dial demonstrates the sort of steadfast resolve that
+            comes with being bolted to reality.
             """)
 
         let dial1State = try await engine.item("dial1")

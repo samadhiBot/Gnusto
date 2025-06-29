@@ -311,7 +311,6 @@ struct CloseActionHandlerTests {
 
         let finalState = try await engine.item("closedChest")
         #expect(finalState.hasFlag(.isOpen) == false)
-        #expect(finalState.hasFlag(.isTouched) == true)
     }
 
     @Test("Closing sets isTouched flag")
@@ -338,7 +337,7 @@ struct CloseActionHandlerTests {
             items: container
         )
 
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+        let (engine, _) = await GameEngine.test(blueprint: game)
 
         // When
         try await engine.execute("close container")

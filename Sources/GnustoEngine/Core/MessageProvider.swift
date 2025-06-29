@@ -2287,9 +2287,31 @@ open class MessageProvider: @unchecked Sendable {
         )
     }
 
+    open func turnFixedObject(item: String) -> String {
+        output(
+            "turnFixedObject(item: '\(item)')",
+            oneOf(
+                "You attempt to turn \(item) with the optimistic determination of someone who hasn't grasped the concept of 'fixed in place.'", // DP
+                "\(item) regards your turning efforts with the serene confidence of the permanently installed.", // SJ
+                "Your hands discover that \(item) has achieved a state of architectural permanence.", // OW
+                "You try turning \(item), but it appears to have made lasting commitments to its current location.", // MT
+                "\(item) demonstrates the sort of steadfast resolve that comes with being bolted to reality.", // NC
+                "Your turning ambitions meet \(item)'s unwavering dedication to structural integrity.", // TC
+                "\(item) responds to your efforts with the immovable dignity of something that predates your arrival.", // DA
+                "You discover that \(item) has tenure in the 'staying exactly where it is' department.", // DP
+                "\(item) maintains its position with the quiet authority of the fundamentally unturnable.", // SJ
+                "Your attempt reveals that \(item) subscribes to a more stationary interpretation of existence.", // OW
+                "\(item) politely declines your rotational invitation with the confidence of the deeply rooted.", // MT
+                "You find that \(item) has strong architectural opinions about remaining in its designated spot.", // NC
+                "\(item) exhibits the sort of stubborn permanence that makes engineers proud.", // TC
+                "The universe appears to have filed \(item) under 'things that don't turn' and lost the paperwork.", // DA
+            )
+        )
+    }
+
     open func turnItem(item: String) -> String {
         output(
-            "turnRegularObject(item: '\(item)')",
+            "turnItem(item: '\(item)')",
             oneOf(
                 "\(item) regards your turning efforts with the immovable dignity of something that knows better.", // SJ
                 "You attempt to turn \(item), but it subscribes to a more stationary philosophy of existence.", // OW
@@ -2305,6 +2327,28 @@ open class MessageProvider: @unchecked Sendable {
                 "Your turning efforts bounce off \(item) like optimism off a tax collector.", // NC
                 "\(item) exhibits the sort of steadfast character that made the Empire what it was.", // TC
                 "The universe conspires with \(item) to remain disappointingly static.", // DA
+            )
+        )
+    }
+
+    open func turnSelf() -> String {
+        output(
+            "turnSelf()",
+            oneOf(
+                "You execute a turn with the graceful efficiency of someone who at least knows where their own joints are.", // NC
+                "A successful rotation accomplished with all the dignity one can muster while spinning in place.", // DP
+                "You turn yourself around with the philosophical satisfaction of controlling at least one thing in this world.", // SJ
+                "You perform a personal rotation that would make a music box dancer weep with professional envy.", // OW
+                "You turn yourself with the practiced ease of someone who's mastered the art of facing different directions.", // MT
+                "A pirouette executed with all the subtle drama of someone making a statement about personal autonomy.", // TC
+                "You accomplish a turn that demonstrates your complete mastery over your own spatial orientation.", // DA
+                "You rotate with the quiet confidence of someone who knows which way they're pointing.", // DP
+                "A turn performed with the sort of casual competence that comes from years of being yourself.", // NC
+                "You execute a personal rotation that achieves exactly what one might expect from turning oneself.", // SJ
+                "You turn around with the satisfied air of someone who's successfully changed their perspective by 180 degrees.", // MT
+                "A graceful pivot that proves you remain the undisputed authority on your own directional preferences.", // OW
+                "You turn yourself with the effortless skill of someone intimately familiar with their own mechanics.", // TC
+                "You accomplish a rotation that stands as a testament to humanity's mastery over basic spatial concepts.", // DA
             )
         )
     }
