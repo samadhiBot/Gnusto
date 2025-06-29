@@ -34,7 +34,7 @@ struct DigActionHandlerTests {
             output,
             """
             > dig
-            Digging with your bare hands is ineffective.
+            Dig what?
             """)
     }
 
@@ -63,7 +63,7 @@ struct DigActionHandlerTests {
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // When
-        try await engine.execute("dig dirt")
+        try await engine.execute("dig dirt", times: 3)
 
         // Then
         let output = await mockIO.flush()
@@ -71,15 +71,24 @@ struct DigActionHandlerTests {
             output,
             """
             > dig dirt
-            You can’t dig the pile of dirt.
+            You apply your hands to the pile of dirt with results that
+            suggest evolution skipped the ‘digging claws’ upgrade.
+
+            > dig dirt
+            You dig the pile of dirt with your hands, creating a depression
+            that’s more symbolic than functional.
+
+            > dig dirt
+            Your fingers explore the pile of dirt with the sort of
+            determination that makes proper tools weep.
             """)
 
         let finalState = try await engine.item("dirt")
-        #expect(finalState.hasFlag(.isTouched) == true)
+        #expect(finalState.hasFlag(.isTouched) == false)
     }
 
     @Test("DIG DIRECTOBJECT WITH INDIRECTOBJECT syntax works")
-    func testDigWithToolSyntax() async throws {
+    func testDigDirectObjectWithToolSyntax() async throws {
         // Given
         let testRoom = Location(
             id: "testRoom",
@@ -120,7 +129,57 @@ struct DigActionHandlerTests {
             output,
             """
             > dig ground with shovel
-            You can’t dig the hard ground.
+            You apply the rusty shovel to the ground with the confident
+            determination of someone who believes in the power of
+            persistence over physics.
+            """)
+    }
+
+    @Test("DIG WITH INDIRECTOBJECT syntax works")
+    func testDigWithToolSyntax() async throws {
+        // Given
+        let testRoom = Location(
+            id: "testRoom",
+            .name("Test Room"),
+            .inherentlyLit
+        )
+
+        let ground = Item(
+            id: "ground",
+            .name("hard ground"),
+            .description("Hard packed earth."),
+            .in(.location("testRoom"))
+        )
+
+        let shovel = Item(
+            id: "shovel",
+            .name("rusty shovel"),
+            .description("A rusty but functional shovel."),
+            .isTool,
+            .isTakable,
+            .in(.player)
+        )
+
+        let game = MinimalGame(
+            player: Player(in: "testRoom"),
+            locations: testRoom,
+            items: ground, shovel
+        )
+
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // When
+        try await engine.execute("dig with shovel")
+
+        // Then
+        let output = await mockIO.flush()
+        expectNoDifference(
+            output,
+            """
+            > dig with shovel
+            You apply the rusty shovel to the ground with the confident
+            determination of someone who believes in the power of
+            persistence over physics.
             """)
     }
 
@@ -157,7 +216,8 @@ struct DigActionHandlerTests {
             output,
             """
             > excavate mound
-            You can’t dig the small mound.
+            You apply your hands to the small mound with results that
+            suggest evolution skipped the ‘digging claws’ upgrade.
             """)
     }
 
@@ -292,6 +352,44 @@ struct DigActionHandlerTests {
 
     // MARK: - Processing Testing
 
+    @Test("Dig takable item gives ineffective message")
+    func testTakableItem() async throws {
+        // Given
+        let testRoom = Location(
+            id: "testRoom",
+            .name("Test Room"),
+            .inherentlyLit
+        )
+
+        let statue = Item(
+            id: "statue",
+            .name("ebony statue"),
+            .description("An elegant ebony statue."),
+            .in(.location("testRoom")),
+            .isTakable
+        )
+
+        let game = MinimalGame(
+            player: Player(in: "testRoom"),
+            locations: testRoom,
+            items: statue
+        )
+
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // When
+        try await engine.execute("dig ebony statue")
+
+        // Then
+        let output = await mockIO.flush()
+        expectNoDifference(
+            output,
+            """
+            > dig ebony statue
+            You can’t dig that.
+            """)
+    }
+
     @Test("Dig with bare hands gives ineffective message")
     func testDigWithBareHands() async throws {
         // Given
@@ -309,14 +407,14 @@ struct DigActionHandlerTests {
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // When
-        try await engine.execute("dig")
+        try await engine.execute("dig the ground")
 
         // Then
         let output = await mockIO.flush()
         expectNoDifference(
             output,
             """
-            > dig
+            > dig the ground
             Digging with your bare hands is ineffective.
             """)
     }
@@ -348,7 +446,7 @@ struct DigActionHandlerTests {
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // When
-        try await engine.execute("dig")
+        try await engine.execute("dig the ground")
 
         // Then
         let output = await mockIO.flush()

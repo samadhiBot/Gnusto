@@ -9,6 +9,7 @@ public struct DigActionHandler: ActionHandler {
         .match(.dig),
         .match(.verb, .directObject),
         .match(.verb, .directObject, .with, .indirectObject),
+        .match(.verb, .with, .indirectObject),
     ]
 
     public let verbs: [Verb] = [.dig, .excavate]
@@ -31,60 +32,71 @@ public struct DigActionHandler: ActionHandler {
     /// - Parameter engine: The game engine.
     /// - Returns: An `ActionResult` with appropriate digging message and state changes.
     public func process(command: Command, engine: GameEngine) async throws -> ActionResult {
-        // If a direct object is specified, validate it
-        if let directObjectRef = command.directObject {
-            guard case .item(let targetItemID) = directObjectRef else {
-                throw ActionResponse.prerequisiteNotMet(
-                    engine.messenger.cannotDoThat(verb: "dig")
-                )
+        guard let directObjectRef = command.directObject else {
+            // Ground implied .match(.verb, .with, .indirectObject)
+            if let indirectObjectItemID = command.indirectObjectItemID {
+                let indirectObjectItem = try await engine.item(indirectObjectItemID)
+                if indirectObjectItem.hasFlag(.isTool) {
+                    return ActionResult(
+                        engine.messenger.digWithToolNothing(
+                            tool: indirectObjectItem.withDefiniteArticle
+                        )
+                    )
+                }
             }
+            throw ActionResponse.prerequisiteNotMet(
+                engine.messenger.doWhat(verb: command.verb)
+            )
+        }
+        guard case .item(let targetItemID) = directObjectRef else {
+            throw ActionResponse.prerequisiteNotMet(
+                engine.messenger.cannotDoThat(verb: "dig")
+            )
+        }
 
-            let targetItem = try await engine.item(targetItemID)
+        guard await engine.playerCanReach(targetItemID) else {
+            throw ActionResponse.itemNotAccessible(targetItemID)
+        }
 
-            guard await engine.playerCanReach(targetItemID) else {
-                throw ActionResponse.itemNotAccessible(targetItemID)
-            }
+        let targetItem = try await engine.item(targetItemID)
 
-            return ActionResult(
-                engine.messenger.cannotDoThat(
-                    verb: .dig,
-                    item: targetItem.withDefiniteArticle
-                ),
-                await engine.setFlag(.isTouched, on: targetItem),
-                await engine.updatePronouns(to: targetItem)
+        if targetItem.hasFlag(.isTakable) {
+            // Generally cannot dig something that can be taken
+            throw ActionResponse.prerequisiteNotMet(
+                engine.messenger.cannotDoThat(verb: "dig")
             )
         }
 
         // If digging tool is specified, validate it
-        if let indirectObjectRef = command.indirectObject {
-            guard case .item(let toolItemID) = indirectObjectRef else {
-                throw ActionResponse.prerequisiteNotMet(
-                    engine.messenger.cannotActWithThat(verb: "dig")
-                )
-            }
+        guard let indirectObjectRef = command.indirectObject else {
+            // General digging (no specific target, no tool)
+            let playerInventory = await engine.playerInventory
+            let diggingTools = playerInventory.filter { $0.hasFlag(.isTool) }
 
-            let toolItem = try await engine.item(toolItemID)
-
-            guard toolItem.parent == .player else {
-                throw ActionResponse.itemNotHeld(toolItemID)
-            }
-
-            let message =
-                toolItem.hasFlag(.isTool)
-                ? engine.messenger.digWithToolNothing(tool: toolItem.withDefiniteArticle)
-                : engine.messenger.toolNotSuitableForDigging(tool: toolItem.withDefiniteArticle)
+            let message = diggingTools.isEmpty ?
+                engine.messenger.diggingBareHandsIneffective(
+                    ground: targetItem.withDefiniteArticle
+                ) :
+                engine.messenger.suggestUsingToolToDig()
 
             return ActionResult(message)
         }
 
-        // General digging (no specific target, no tool)
-        let playerInventory = await engine.playerInventory
-        let diggingTools = playerInventory.filter { $0.hasFlag(.isTool) }
+        guard case .item(let toolItemID) = indirectObjectRef else {
+            throw ActionResponse.prerequisiteNotMet(
+                engine.messenger.cannotActWithThat(verb: "dig")
+            )
+        }
 
-        let message =
-            diggingTools.isEmpty
-            ? engine.messenger.diggingBareHandsIneffective()
-            : engine.messenger.suggestUsingToolToDig()
+        let toolItem = try await engine.item(toolItemID)
+
+        guard toolItem.parent == .player else {
+            throw ActionResponse.itemNotHeld(toolItemID)
+        }
+
+        let message = toolItem.hasFlag(.isTool)
+            ? engine.messenger.digWithToolNothing(tool: toolItem.withDefiniteArticle)
+            : engine.messenger.toolNotSuitableForDigging(tool: toolItem.withDefiniteArticle)
 
         return ActionResult(message)
     }

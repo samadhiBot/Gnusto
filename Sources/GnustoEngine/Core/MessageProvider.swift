@@ -922,17 +922,47 @@ open class MessageProvider: @unchecked Sendable {
         )
     }
 
-    open func diggingBareHandsIneffective() -> String {
+    open func diggingBareHandsIneffective(ground: String) -> String {
         output(
-            "diggingBareHandsIneffective()",
-            "Digging with your bare hands is ineffective."
+            "diggingBareHandsIneffective(ground: '\(ground)')",
+            oneOf(
+                "You dig \(ground) with your hands, demonstrating humanity's eternal optimism in the face of basic geology.", // DP
+                "Your bare-handed excavation of \(ground) achieves results that would make moles reconsider their career choices.", // OW
+                "You attempt to dig \(ground) by hand, proving that determination can indeed meet its match in solid earth.", // SJ
+                "Your fingers encounter \(ground) with the sort of naive confidence that precedes immediate disappointment.", // NC
+                "You dig \(ground) with your hands, creating a depression that's more symbolic than functional.", // MT
+                "Your manual excavation of \(ground) demonstrates the touching faith humans place in their fingernails.", // TC
+                "You apply your hands to \(ground) with results that suggest evolution skipped the 'digging claws' upgrade.", // DA
+                "Your bare-handed assault on \(ground) produces the kind of progress that makes earthworms smug.", // DP
+                "You dig \(ground) with your fingers, achieving a hole that exists primarily in the realm of good intentions.", // SJ
+                "Your hands meet \(ground) in an encounter that redefines the concept of 'manual labor.'", // OW
+                "You attempt to excavate \(ground) with your bare hands, proving that optimism has its geological limits.", // NC
+                "Your fingers explore \(ground) with the sort of determination that makes proper tools weep.", // MT
+                "You dig \(ground) by hand, creating results that wouldn't impress a particularly ambitious hamster.", // TC
+                "Your manual excavation demonstrates that \(ground) has strong opinions about remaining undisturbed.", // DA
+            )
         )
     }
 
     open func digWithToolNothing(tool: String) -> String {
         output(
             "digWithToolNothing(tool: '\(tool)')",
-            "You dig with \(tool), but find nothing of interest."
+            oneOf(
+                "You dig with \(tool), achieving the sort of hole that would make earthworms question your technique.", // DP
+                "\(tool) meets the ground with all the effectiveness of optimism meeting reality.", // OW
+                "Your excavation with \(tool) demonstrates that enthusiasm can indeed triumph over geology, briefly.", // SJ
+                "You dig with \(tool), creating a modest depression that earth itself seems embarrassed by.", // NC
+                "\(tool) encounters the ground in a meeting that produces more noise than progress.", // MT
+                "Your digging with \(tool) achieves the kind of results that make archaeologists weep quietly.", // TC
+                "You apply \(tool) to the ground with the confident determination of someone who believes in the power of persistence over physics.", // DA
+                "\(tool) makes contact with earth in a display that redefines 'diminishing returns.'", // DP
+                "Your excavation efforts with \(tool) produce a hole that's more theoretical than actual.", // SJ
+                "You dig with \(tool), proving that good intentions and solid ground rarely reach satisfactory agreements.", // OW
+                "\(tool) demonstrates its commitment to the digging process while the ground remains diplomatically unimpressed.", // NC
+                "Your digging with \(tool) creates the sort of modest excavation that wouldn't trouble a determined ant.", // MT
+                "You apply \(tool) to the earth with results that suggest geology has a sense of humor.", // TC
+                "\(tool) meets the ground in an encounter that produces more ambition than actual depth.", // DA
+            )
         )
     }
 

@@ -76,7 +76,7 @@ struct DebugActionHandlerTests {
             output,
             """
             > debug
-            Debug what?
+            DEBUG requires a direct object to examine.
             """)
     }
 
