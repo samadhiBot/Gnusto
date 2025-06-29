@@ -192,7 +192,6 @@ public struct YesNoQuestionHandler: ActionHandler {
             engine: engine,
             additionalData: [
                 "clarifiedVerb": clarifiedCommand.verb.rawValue,
-                "clarifiedCommand": clarifiedCommand.rawInput,
             ]
         )
     }

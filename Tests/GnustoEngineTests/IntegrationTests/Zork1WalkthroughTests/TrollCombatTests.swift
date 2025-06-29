@@ -20,8 +20,7 @@ func testTrollBlocksMovement() async throws {
     await engine.execute(
         command: Command(
             verb: .go,
-            direction: .east,
-            rawInput: "go east"
+            direction: .east
         )
     )
 
@@ -42,7 +41,6 @@ func testTrollAllowsMovementWhenDead() async throws {
         await engine.movePlayer(to: .location(.trollRoom)),
         try await engine.remove(.troll)
     )
-
 
     // When - try to go east (should work now)
     try await engine.execute("go east")
@@ -169,7 +167,9 @@ func testTrollCombatResponses() async throws {
         engine: engine,
         outcome: .victory("Victory")
     )
-    expectNoDifference(victoryResult.message, """
+    expectNoDifference(
+        victoryResult.message,
+        """
         Victory
 
         Almost as soon as the troll breathes his last breath, a cloud
@@ -181,7 +181,9 @@ func testTrollCombatResponses() async throws {
         engine: engine,
         outcome: .draw("Draw")
     )
-    expectNoDifference(drawResult.message, """
+    expectNoDifference(
+        drawResult.message,
+        """
         Draw
 
         You both circle each other warily, weapons at the ready.
@@ -191,7 +193,9 @@ func testTrollCombatResponses() async throws {
         engine: engine,
         outcome: .defeat("Defeat")
     )
-    expectNoDifference(defeatResult.message, """
+    expectNoDifference(
+        defeatResult.message,
+        """
         Defeat
 
         The troll stands over your fallen form, grunting what might

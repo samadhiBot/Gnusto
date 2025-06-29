@@ -328,8 +328,7 @@ struct ScriptActionHandlerTests {
         let handler = ScriptActionHandler()
 
         let command = Command(
-            verb: .script,
-            rawInput: "script"
+            verb: .script
         )
 
         // When/Then: Should not throw
@@ -359,8 +358,7 @@ struct ScriptActionHandlerTests {
         )
 
         let command = Command(
-            verb: .script,
-            rawInput: "script"
+            verb: .script
         )
 
         // When/Then: Should throw
@@ -387,8 +385,7 @@ struct ScriptActionHandlerTests {
         let handler = ScriptActionHandler()
 
         let command = Command(
-            verb: .script,
-            rawInput: "script"
+            verb: .script
         )
 
         // When
@@ -396,8 +393,8 @@ struct ScriptActionHandlerTests {
 
         // Then
         expectNoDifference(result.message, "")
-//        #expect(result.message.contains("Enter a file name"))
-//        #expect(result.message.contains("[Transcript recording started]"))
+        //        #expect(result.message.contains("Enter a file name"))
+        //        #expect(result.message.contains("[Transcript recording started]"))
         #expect(result.changes.count == 1)
     }
 

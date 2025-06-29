@@ -292,8 +292,7 @@ public struct ConversationManager: Sendable {
             let askCommand = Command(
                 verb: .ask,
                 directObject: .item(context.sourceID),
-                indirectObject: topic,
-                rawInput: "ask \(context.sourceID) about \(trimmedInput)"
+                indirectObject: topic
             )
 
             // Find the ASK action handler and process the command
@@ -358,16 +357,10 @@ public struct ConversationManager: Sendable {
                 let directObject: EntityReference? = directObjectID.map { .item(ItemID($0)) }
                 let indirectObject: EntityReference? = indirectObjectID.map { .item(ItemID($0)) }
 
-                // Use the clarified command input if available, otherwise construct from verb
-                let commandInput =
-                    context.data["clarifiedCommand"] ?? context.originalCommandInput
-                    ?? "\(verb.rawValue)"
-
                 let confirmCommand = Command(
                     verb: verb,
                     directObject: directObject,
-                    indirectObject: indirectObject,
-                    rawInput: commandInput
+                    indirectObject: indirectObject
                 )
 
                 // Find and execute the appropriate handler

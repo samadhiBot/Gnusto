@@ -163,8 +163,7 @@ struct GameEngineTests {
         var mockParser = MockParser()
         let takeCommand = Command(
             verb: .take,
-            directObject: .item("startItem"),
-            rawInput: "take pebble"
+            directObject: .item("startItem")
         )
 
         // Configure parser to succeed
@@ -271,8 +270,7 @@ struct GameEngineTests {
         let lookCommand = Command(verb: .look, rawInput: "look")
         let takePebbleCommand = Command(
             verb: .take,
-            directObject: .item("startItem"),
-            rawInput: "take pebble"
+            directObject: .item("startItem")
         )
 
         // Configure parser
@@ -341,13 +339,11 @@ struct GameEngineTests {
         var mockParser = MockParser()
 
         let lookCommand = Command(
-            verb: .look,
-            rawInput: "look"
+            verb: .look
         )
         let takePebbleCommand = Command(
             verb: .take,
-            directObject: .item("startItem"),
-            rawInput: "take pebble"
+            directObject: .item("startItem")
         )
 
         // Configure parser for the sequence
@@ -517,12 +513,10 @@ struct GameEngineTests {
         // Configure the MockParser
         let takeCommand = Command(
             verb: .take,
-            directObject: .item("startItem"),
-            rawInput: "take pebble"
+            directObject: .item("startItem")
         )
         let inventoryCommand = Command(
-            verb: .inventory,
-            rawInput: "inventory"
+            verb: .inventory
         )
         mockParser.parseHandler = { input, _, _ in
             switch input {
@@ -682,8 +676,7 @@ struct GameEngineTests {
         var mockParser = MockParser()
         let activateCommand = Command(
             verb: "activate",
-            directObject: .item(testItemID),
-            rawInput: "activate lamp"
+            directObject: .item(testItemID)
         )
 
         mockParser.parseHandler = { input, _, _ in
@@ -898,8 +891,7 @@ struct GameEngineTests {
 
         let command = Command(
             verb: .go,
-            preposition: "xyzzy",
-            rawInput: "go xyzzy"
+            preposition: "xyzzy"
         )
         let output = try await runCommandAndCaptureOutput(
             blueprint: game,
@@ -928,8 +920,7 @@ struct GameEngineTests {
 
         let command = Command(
             verb: .take,
-            directObject: .item("startItem"),
-            rawInput: "take pebble"
+            directObject: .item("startItem")
         )
         let output = try await runCommandAndCaptureOutput(
             blueprint: game,
@@ -958,8 +949,7 @@ struct GameEngineTests {
 
         let command = Command(
             verb: .wear,
-            directObject: .item("startItem"),
-            rawInput: "wear pebble"
+            directObject: .item("startItem")
         )
         let output = try await runCommandAndCaptureOutput(
             blueprint: game,
@@ -995,8 +985,7 @@ struct GameEngineTests {
             verb: .insert,
             directObject: .item("key"),
             indirectObject: .item("box"),
-            preposition: "in",
-            rawInput: "put key in box"
+            preposition: "in"
         )
         let output = try await runCommandAndCaptureOutput(
             blueprint: game,
@@ -1023,8 +1012,7 @@ struct GameEngineTests {
 
         let command = Command(
             verb: .open,
-            directObject: .item("rock"),
-            rawInput: "open rock"
+            directObject: .item("rock")
         )
         let output = try await runCommandAndCaptureOutput(
             blueprint: game,
@@ -1052,8 +1040,7 @@ struct GameEngineTests {
 
         let command = Command(
             verb: .wear,
-            directObject: .item("rock"),
-            rawInput: "wear rock"
+            directObject: .item("rock")
         )
         let output = try await runCommandAndCaptureOutput(
             blueprint: game,
@@ -1094,8 +1081,7 @@ struct GameEngineTests {
 
         let command = Command(
             verb: .take,
-            directObject: .item("shield"),
-            rawInput: "take shield"
+            directObject: .item("shield")
         )
         let output = try await runCommandAndCaptureOutput(
             blueprint: game,
@@ -1129,8 +1115,7 @@ struct GameEngineTests {
             verb: .insert,
             directObject: .item("key"),
             indirectObject: .item("rock"),
-            preposition: "in",
-            rawInput: "put key in rock"
+            preposition: "in"
         )
         let output = try await runCommandAndCaptureOutput(
             blueprint: game,
@@ -1164,8 +1149,7 @@ struct GameEngineTests {
             verb: .put,
             directObject: .item("key"),
             indirectObject: .item("rock"),
-            preposition: "on",
-            rawInput: "put key on rock"
+            preposition: "on"
         )
         let output = try await runCommandAndCaptureOutput(
             blueprint: game,
@@ -1193,8 +1177,7 @@ struct GameEngineTests {
         let command = Command(
             verb: .go,
             directObject: .item("north"),
-            direction: .north,
-            rawInput: "go north"
+            direction: .north
         )
         let output = try await runCommandAndCaptureOutput(
             blueprint: game,
@@ -1223,8 +1206,7 @@ struct GameEngineTests {
 
         let command = Command(
             verb: .close,
-            directObject: .item(container.id),
-            rawInput: "close box"
+            directObject: .item(container.id)
         )
         let output = try await runCommandAndCaptureOutput(
             blueprint: game,
@@ -1264,8 +1246,7 @@ struct GameEngineTests {
             verb: .unlock,
             directObject: .item(container.id),
             indirectObject: .item(key.id),
-            preposition: "with",
-            rawInput: "unlock chest with key"
+            preposition: "with"
         )
         let output = try await runCommandAndCaptureOutput(
             blueprint: game,
@@ -1292,8 +1273,7 @@ struct GameEngineTests {
 
         let command = Command(
             verb: .close,
-            directObject: .item(item.id),
-            rawInput: "close book"
+            directObject: .item(item.id)
         )
         let output = try await runCommandAndCaptureOutput(
             blueprint: game,
@@ -1321,8 +1301,7 @@ struct GameEngineTests {
 
         let command = Command(
             verb: .drop,
-            directObject: .item(item.id),
-            rawInput: "drop statue"
+            directObject: .item(item.id)
         )
         let output = try await runCommandAndCaptureOutput(
             blueprint: game,
@@ -1352,8 +1331,7 @@ struct GameEngineTests {
 
         let command = Command(
             verb: .remove,
-            directObject: .item(item.id),
-            rawInput: "remove amulet"
+            directObject: .item(item.id)
         )
         let output = try await runCommandAndCaptureOutput(
             blueprint: game,
@@ -1381,8 +1359,7 @@ struct GameEngineTests {
         let command = Command(
             verb: .go,
             directObject: .item("up"),
-            direction: .up,
-            rawInput: "go up"
+            direction: .up
         )
         let output = try await runCommandAndCaptureOutput(
             blueprint: game,
@@ -1416,8 +1393,7 @@ struct GameEngineTests {
 
         let command = Command(
             verb: .examine,
-            directObject: .item(item.id),
-            rawInput: "examine shadow"
+            directObject: .item(item.id)
         )
         let output = try await runCommandAndCaptureOutput(
             blueprint: game,
@@ -1458,8 +1434,7 @@ struct GameEngineTests {
             verb: .unlock,
             directObject: .item(container.id),
             indirectObject: .item(wrongKey.id),
-            preposition: "with",
-            rawInput: "unlock chest with key2"
+            preposition: "with"
         )
         let output = try await runCommandAndCaptureOutput(
             blueprint: game,
@@ -1558,8 +1533,7 @@ struct GameEngineTests {
         // Create the command to trigger the mock handler
         let testCommand = Command(
             verb: .examine,
-            directObject: .item(.startItem),
-            rawInput: "examine the pebble"
+            directObject: .item(.startItem)
         )
 
         // Act: Execute the command

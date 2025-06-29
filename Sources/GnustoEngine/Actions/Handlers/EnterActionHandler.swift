@@ -101,8 +101,7 @@ public struct EnterActionHandler: ActionHandler {
                 // This object enables movement - delegate to GO command
                 let goCommand = Command(
                     verb: .go,
-                    direction: direction,
-                    rawInput: "go \(direction.rawValue)"
+                    direction: direction
                 )
 
                 let goHandler = GoActionHandler()

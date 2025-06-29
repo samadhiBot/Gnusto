@@ -305,8 +305,7 @@ struct XyzzyActionHandlerTests {
         let handler = XyzzyActionHandler()
 
         let command = Command(
-            verb: .xyzzy,
-            rawInput: "xyzzy"
+            verb: .xyzzy
         )
 
         // When/Then: Should not throw
@@ -331,8 +330,7 @@ struct XyzzyActionHandlerTests {
         let handler = XyzzyActionHandler()
 
         let command = Command(
-            verb: .xyzzy,
-            rawInput: "xyzzy"
+            verb: .xyzzy
         )
 
         // When

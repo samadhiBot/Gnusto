@@ -324,8 +324,7 @@ struct SaveActionHandlerTests {
         let handler = SaveActionHandler()
 
         let command = Command(
-            verb: .save,
-            rawInput: "save"
+            verb: .save
         )
 
         // When/Then: Should not throw
@@ -350,8 +349,7 @@ struct SaveActionHandlerTests {
         let handler = SaveActionHandler()
 
         let command = Command(
-            verb: .save,
-            rawInput: "save"
+            verb: .save
         )
 
         // When

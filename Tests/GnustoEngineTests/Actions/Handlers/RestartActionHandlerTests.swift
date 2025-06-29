@@ -231,8 +231,7 @@ struct RestartActionHandlerTests {
         let handler = RestartActionHandler()
 
         let command = Command(
-            verb: .restart,
-            rawInput: "restart"
+            verb: .restart
         )
 
         // When/Then: Should not throw
@@ -257,8 +256,7 @@ struct RestartActionHandlerTests {
         let handler = RestartActionHandler()
 
         let command = Command(
-            verb: .restart,
-            rawInput: "restart"
+            verb: .restart
         )
 
         // When

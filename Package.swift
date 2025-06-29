@@ -40,7 +40,7 @@ let package = Package(
         .package(url: "https://github.com/apple/swift-log.git", from: "1.5.0"),
         .package(url: "https://github.com/pointfreeco/swift-custom-dump", from: "1.0.0"),
         .package(url: "https://github.com/swiftlang/swift-markdown.git", branch: "main"),
-        .package(url: "https://github.com/swiftlang/swift-syntax", "600.0.0"..<"602.0.0"),
+        .package(url: "https://github.com/swiftlang/swift-syntax", "600.0.0"..."602.0.0"),
     ],
     targets: [
         .target(

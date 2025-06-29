@@ -67,7 +67,7 @@ public struct Command: Equatable, Sendable {
 
     /// The original, unmodified input string exactly as the player typed it.
     /// This is useful for debugging, logging, or displaying exact player input in messages.
-    public let rawInput: String
+    public let rawInput: String?
 
     /// The primary `Verb` identified by the parser as the core action the player
     /// intends to perform (e.g., `.take`, `.look`, `.go`).
@@ -97,7 +97,7 @@ public struct Command: Equatable, Sendable {
         indirectObjectModifiers: [String] = [],
         preposition: String? = nil,
         direction: Direction? = nil,
-        rawInput: String
+        rawInput: String? = nil
     ) {
         self.verb = verb
         self.directObjects = directObject.map { [$0] } ?? []
@@ -133,7 +133,7 @@ public struct Command: Equatable, Sendable {
         isAllCommand: Bool = false,
         preposition: String? = nil,
         direction: Direction? = nil,
-        rawInput: String
+        rawInput: String? = nil
     ) {
         self.verb = verb
         self.directObjects = directObjects

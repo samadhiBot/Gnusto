@@ -49,8 +49,7 @@ public struct NibbleActionHandler: ActionHandler {
         // Create the clarified EAT command
         let eatCommand = Command(
             verb: .eat,
-            directObject: command.directObject,
-            rawInput: "eat \(item.name)"
+            directObject: command.directObject
         )
 
         // Ask for confirmation using the disambiguation pattern

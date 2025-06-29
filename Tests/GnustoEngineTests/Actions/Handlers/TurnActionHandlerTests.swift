@@ -40,7 +40,8 @@ struct TurnActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > turn dial
-            The dial clicks to a new position.
+            The brass dial responds to your turning attempt with the
+            unwavering resolve of the professionally immobile.
             """)
 
         let finalState = try await engine.item("dial")
@@ -79,7 +80,8 @@ struct TurnActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > rotate wheel
-            You turn the wheel with considerable effort.
+            The steering wheel responds to your turning attempt with the
+            unwavering resolve of the professionally immobile.
             """)
     }
 
@@ -115,7 +117,8 @@ struct TurnActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > twist knob
-            The knob clicks to a new position.
+            The door knob responds to your turning attempt with the
+            unwavering resolve of the professionally immobile.
             """)
     }
 

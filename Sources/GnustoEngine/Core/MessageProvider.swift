@@ -2268,56 +2268,44 @@ open class MessageProvider: @unchecked Sendable {
     open func turnCharacter(character: String) -> String {
         output(
             "turnCharacter(character: '\(character)')",
-            "You can't turn \(character) around like an object."
+            oneOf(
+                "You attempt to turn \(character), who responds with the bewildered dignity of someone unaccustomed to being rotated.", // SJ
+                "\(character) experiences your turning efforts as an unexpected lesson in personal boundaries.", // DP
+                "You try to turn \(character), but they seem to have strong feelings about their current facing direction.", // MT
+                "\(character) politely resists your rotational enthusiasm with admirable composure.", // NC
+                "Your attempt to turn \(character) reveals that they're surprisingly committed to their present orientation.", // OW
+                "\(character) demonstrates that turning people is considerably more complex than turning objects.", // TC
+                "You discover that \(character) has developed a philosophical attachment to facing this particular way.", // DA
+                "\(character) regards your turning attempt as an interesting but ultimately unsuccessful social experiment.", // SJ
+                "Your hands find that \(character) subscribes to the radical notion of choosing their own direction.", // DP
+                "\(character) responds to your turning efforts with the patient forbearance of the frequently mishandled.", // MT
+                "You try turning \(character), but they appear to have strong opinions about rotational consent.", // OW
+                "\(character) maintains their bearing with the quiet dignity of someone who knows which way they're facing.", // NC
+                "Your turning ambitions meet \(character)'s steadfast commitment to personal autonomy.", // TC
+                "\(character) demonstrates that they're surprisingly well-anchored to their current position.", // DA
+            )
         )
     }
 
-    open func turnDial(item: String) -> String {
-        output(
-            "turnDial(item: '\(item)')",
-            "You turn \(item). It clicks into a new position."
-        )
-    }
-
-    open func turnFixedObject(item: String) -> String {
-        output(
-            "turnFixedObject(item: '\(item)')",
-            "\(item) doesn't seem to be designed to be turned."
-        )
-    }
-
-    open func turnHandle(item: String) -> String {
-        output(
-            "turnHandle(item: '\(item)')",
-            "You turn \(item). It moves with a grinding sound."
-        )
-    }
-
-    open func turnKey(item: String) -> String {
-        output(
-            "turnKey(item: '\(item)')",
-            "You can't just turn \(item) by itself. You need to use it with something."
-        )
-    }
-
-    open func turnKnob(item: String) -> String {
-        output(
-            "turnKnob(item: '\(item)')",
-            "You turn \(item). It clicks into a new position."
-        )
-    }
-
-    open func turnRegularObject(item: String) -> String {
+    open func turnItem(item: String) -> String {
         output(
             "turnRegularObject(item: '\(item)')",
-            "You turn \(item) around in your hands, but nothing happens."
-        )
-    }
-
-    open func turnWheel(item: String) -> String {
-        output(
-            "turnWheel(item: '\(item)')",
-            "You turn \(item). It rotates with some effort."
+            oneOf(
+                "\(item) regards your turning efforts with the immovable dignity of something that knows better.", // SJ
+                "You attempt to turn \(item), but it subscribes to a more stationary philosophy of existence.", // OW
+                "\(item) politely declines your invitation to rotate.", // NC
+                "Your turning ambitions meet \(item)'s steadfast commitment to remaining exactly where it is.", // DP
+                "\(item) demonstrates the sort of stubborn integrity that refuses to be turned by mere enthusiasm.", // MT
+                "You discover that \(item) has strong opinions about its current orientation.", // TC
+                "\(item) responds to your turning attempt with the unwavering resolve of the professionally immobile.", // DA
+                "Your hands find that \(item) has achieved a zen-like state of rotational resistance.", // SJ
+                "\(item) seems to have tenure in its current position.", // DP
+                "You try turning \(item), but it appears to have philosophical objections to change.", // OW
+                "\(item) maintains its bearing with the confidence of something that's found its true direction.", // MT
+                "Your turning efforts bounce off \(item) like optimism off a tax collector.", // NC
+                "\(item) exhibits the sort of steadfast character that made the Empire what it was.", // TC
+                "The universe conspires with \(item) to remain disappointingly static.", // DA
+            )
         )
     }
 

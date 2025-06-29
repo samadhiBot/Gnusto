@@ -74,7 +74,7 @@ struct ActionResultTests {
     @Test("ActionResult Initialization - Full")
     func testActionResultFullInitialization() {
         let result = ActionResult(
-            message: "🤡 The lamp is now on.",
+            message: "The lamp is now on.",
             changes: [simpleChange],
             effects: [simpleEffect]
         )

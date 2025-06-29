@@ -357,8 +357,7 @@ struct RestoreActionHandlerTests {
         let handler = RestoreActionHandler()
 
         let command = Command(
-            verb: .restore,
-            rawInput: "restore"
+            verb: .restore
         )
 
         // When/Then: Should not throw
@@ -383,8 +382,7 @@ struct RestoreActionHandlerTests {
         let handler = RestoreActionHandler()
 
         let command = Command(
-            verb: .restore,
-            rawInput: "restore"
+            verb: .restore
         )
 
         // When

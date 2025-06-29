@@ -49,8 +49,7 @@ public struct ChompActionHandler: ActionHandler {
                 // Create the EAT command to execute if they confirm
                 let eatCommand = Command(
                     verb: .eat,
-                    directObject: .item(targetItemID),
-                    rawInput: "eat \(targetItem.name)"
+                    directObject: .item(targetItemID)
                 )
 
                 return await YesNoQuestionHandler.askToDisambiguate(

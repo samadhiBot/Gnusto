@@ -86,8 +86,7 @@ public struct ClimbActionHandler: ActionHandler {
                 // Execute movement in the appropriate direction
                 let goCommand = Command(
                     verb: .go,
-                    direction: direction,
-                    rawInput: "go \(direction.rawValue)"
+                    direction: direction
                 )
 
                 let goHandler = GoActionHandler()
