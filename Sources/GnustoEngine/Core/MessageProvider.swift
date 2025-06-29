@@ -820,20 +820,90 @@ open class MessageProvider: @unchecked Sendable {
         output(
             "danceResponse()",
             oneOf(
-                "You boogie with admirable confidence in your choreographic vision.",
-                "You boogie with impressive commitment to your personal artistic expression.",
-                "You boogie with the bold conviction of one who's rewriting the rules.",
-                "You boogie with the fearless self-expression of a pioneering artist.",
-                "You dance with admirable commitment to the full spectrum of human motion.",
-                "You dance with an innovative spirit that pushes the boundaries of the form.",
-                "You dance with an interpretive boldness that transcends conventional movement.",
-                "You dance with impressive range, exploring movements that defy categorization.",
-                "You dance with refreshing originality, creating your own relationship with music.",
-                "You dance with the confident flair of one who has finally found their voice.",
-                "You dance with the fearless creativity of someone redefining rhythm itself.",
-                "You dance with the natural grace of one unencumbered by traditional technique.",
-                "You move rhythmically with profound dedication to your own internal beat.",
-                "You move with an authentic passion that cannot be choreographed.",
+                "You dance with the sort of confident abandon that suggests no one is watching. They are.", // DP
+                "A performance executed with all the grace of someone who believes rhythm is merely a suggestion.", // NC
+                "You dance as if the very concept of self-consciousness had never been invented.", // OW
+                "Your dancing demonstrates that enthusiasm can indeed triumph over technique, though not always gracefully.", // MT
+                "You execute movements that would be called dancing by someone with a very generous definition.", // TC
+                "A spirited display that proves the human capacity for expressing joy through interpretive flailing.", // SJ
+                "You dance with the carefree abandon of someone who's forgotten that gravity still applies.", // DA
+                "Your choreography suggests a deep personal relationship with music that may be entirely one-sided.", // DP
+                "You perform a dance that would make professional dancers everywhere reconsider their career choices.", // NC
+                "A bold interpretation of movement that challenges conventional notions of coordination.", // OW
+                "You dance as if the floor had personally wronged you and this is your revenge.", // MT
+                "Your performance demonstrates that passion can indeed compensate for what talent forgot to provide.", // TC
+                "You execute a dance that proves the triumph of spirit over the basic laws of physics.", // SJ
+                "A display of terpsichorean enthusiasm that redefines the very concept of rhythm.", // DA
+                "Your dancing is both triumphant and slightly catastrophic -- the perfect combination.", // TC
+                "There's something beautifully human about dancing badly with complete conviction.", // MT
+            )
+        )
+    }
+
+    open func danceWith(item: String) -> String {
+        output(
+            "danceWith(item: '\(item)')",
+            oneOf(
+                "You dance with \(item), who proves to be a surprisingly unresponsive partner.", // DP
+                "\(item) participates in your dance with all the enthusiasm of the fundamentally inanimate.", // SJ
+                "You and \(item) share a dance that redefines the concept of 'leading' in ballroom terms.", // OW
+                "Your dancing partnership with \(item) demonstrates the triumph of imagination over basic physics.", // NC
+                "\(item) follows your lead with the graceful compliance of something that has no choice in the matter.", // MT
+                "You dance with \(item) in a performance that challenges traditional notions of reciprocity.", // TC
+                "\(item) proves to be the sort of dance partner who never steps on your toes, mainly through complete inaction.", // DA
+                "Your waltz with \(item) achieves a level of one-sided romance that poets would envy.", // DP
+                "\(item) demonstrates the perfect dance partner qualities of reliability and complete lack of criticism.", // SJ
+                "You and \(item) execute a dance that would make Fred Astaire reconsider the importance of having a pulse.", // OW
+                "\(item) participates in your choreography with the stoic dignity of the professionally non-participatory.", // NC
+                "Your dance with \(item) proves that chemistry isn't always necessary for a memorable performance.", // MT
+                "\(item) follows your every move with the devoted attention of something that has no other options.", // TC
+                "You dance with \(item) in a display that redefines 'solo performance' as a team effort.", // DA
+                "The beauty is in the complete asymmetry - one partner desperately engaged, the other magnificently indifferent.", // OW
+            )
+        )
+    }
+
+    open func danceWith(partner: String) -> String {
+        output(
+            "danceWith(partner: '\(partner)')",
+            oneOf(
+                "You invite \(partner) to dance, who responds with the sort of polite bewilderment reserved for unexpected social propositions.", // SJ
+                "\(partner) considers your dancing invitation with the careful deliberation of someone weighing their options.", // DP
+                "You and \(partner) attempt a dance that redefines the concept of 'getting to know each other.'", // OW
+                "\(partner) participates in your dance with the gracious confusion of the socially ambushed.", // NC
+                "Your dancing partnership with \(partner) demonstrates that rhythm is indeed a highly personal interpretation.", // MT
+                "\(partner) follows your lead with the patient resignation of someone who's learned to expect the unexpected.", // TC
+                "You dance with \(partner) in a performance that challenges both your coordination and their composure.", // DA
+                "\(partner) proves to be a dance partner whose enthusiasm is inversely proportional to their preparation.", // DP
+                "Your waltz with \(partner) achieves the sort of awkward intimacy that makes everyone slightly uncomfortable.", // SJ
+                "\(partner) demonstrates that dancing skills are not universally distributed among the population.", // OW
+                "You and \(partner) execute a dance that would make etiquette instructors everywhere reach for their smelling salts.", // NC
+                "\(partner) participates in your choreography with the bewildered grace of the suddenly conscripted.", // MT
+                "Your dance with \(partner) proves that good intentions can indeed triumph over mutual inexperience.", // TC
+                "\(partner) follows your dancing lead with the sort of cautious optimism that suggests they're making it up as they go.", // DA
+                "The delicious social awkwardness of suddenly proposing a dance - it works whether the partner is a sophisticated duchess or a confused badger.", // NC
+            )
+        )
+    }
+
+    open func danceWith(enemy: String) -> String {
+        output(
+            "danceWith(enemy: '\(enemy)')",
+            oneOf(
+                "You invite \(enemy) to dance, transforming centuries of combat etiquette into an awkward social moment.", // SJ
+                "\(enemy) receives your dancing invitation with the sort of confusion typically reserved for peace treaties.", // DP
+                "You attempt to dance with \(enemy), who seems unprepared for this particular form of conflict resolution.", // OW
+                "\(enemy) considers your choreographic overture with the bewildered wariness of the professionally hostile.", // NC
+                "Your dancing invitation catches \(enemy) off guard, suggesting they skipped the 'social graces during warfare' seminars.", // MT
+                "\(enemy) responds to your dance proposal with the sort of diplomatic confusion that starts international incidents.", // TC
+                "You offer \(enemy) a dance, creating the kind of social paradox that philosophers write dissertations about.", // DA
+                "\(enemy) regards your dancing invitation as either a brilliant strategy or complete tactical madness.", // DP
+                "Your waltz proposal to \(enemy) demonstrates that optimism can indeed triumph over basic common sense.", // SJ
+                "\(enemy) receives your dance invitation with the careful consideration of someone reassessing their life choices.", // OW
+                "You invite \(enemy) to dance, proving that social awkwardness knows no boundaries of allegiance.", // NC
+                "\(enemy) contemplates your choreographic offer with the sort of suspicion usually reserved for obvious traps.", // MT
+                "Your dancing invitation transforms \(enemy) from adversary to bewildered recipient of unexpected social courtesy.", // TC
+                "\(enemy) faces your dance proposal with the sort of existential confusion that redefines the nature of conflict.", // DA
             )
         )
     }

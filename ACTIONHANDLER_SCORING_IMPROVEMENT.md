@@ -159,14 +159,47 @@ Existing handlers continue to work - the improvement is purely in selection logi
 ## Implementation Files
 
 ### Modified Files
-- `Gnusto/Sources/GnustoEngine/Engine/GameEngine.swift`: Core scoring implementation
+- `Gnusto/Sources/GnustoEngine/Engine/GameEngine.swift`: Core scoring implementation and enhanced `extractVerbDefinitions`
 - `Gnusto/Sources/GnustoEngine/Parsing/SyntaxRule.swift`: Enhanced with better documentation
 
 ### New Files
 - `Gnusto/Tests/GnustoEngineTests/Engine/ActionHandlerScoringTests.swift`: Comprehensive test suite
 - `Gnusto/Tests/GnustoEngineTests/Engine/ActionHandlerScoringMinimalTests.swift`: Focused test cases
 
+### Key Fixes
+- **Enhanced `extractVerbDefinitions`**: Now extracts verbs from both `handler.verbs` and specific verbs in syntax rules
+- **Proper Vocabulary Registration**: Handlers using only specific verbs in syntax rules are now correctly registered
+
 ## Technical Notes
+
+### Verbs Property vs Specific Verbs in Syntax Rules
+
+A critical insight for understanding action handler behavior:
+
+**The `verbs` property is only used for `.verb` tokens in syntax rules.** Specific verbs mentioned in syntax rules (like `.climb`, `.get`, `.sit`) do not need to appear in the `verbs` array.
+
+```swift
+// Example: ClimbOnActionHandler
+public let syntax: [SyntaxRule] = [
+    .match(.climb, .on, .directObject),    // Uses .climb specifically
+    .match(.get, .on, .directObject),      // Uses .get specifically  
+    .match(.sit, .on, .directObject),      // Uses .sit specifically
+    .match(.mount, .directObject),         // Uses .mount specifically
+]
+
+public let verbs: [Verb] = []  // Empty! No .verb tokens in syntax rules
+```
+
+This means:
+- **Handlers with only specific verbs** in syntax rules should have empty `verbs` arrays
+- **Handlers with `.verb` tokens** need those verbs listed in the `verbs` array
+- **Mixed handlers** can have both specific verbs in some rules and `.verb` tokens in others
+
+The `extractVerbDefinitions` method must handle both cases:
+1. Extract verbs from `handler.verbs` (for `.verb` syntax tokens)
+2. Extract specific verbs from syntax rule patterns (for `.climb`, `.get`, etc.)
+
+This ensures all verbs get properly registered in the vocabulary's `verbToSyntax` mapping.
 
 ### Case Insensitive Particle Matching
 Particle matching is case-insensitive to handle variations like "turn ON lamp" vs "turn on lamp".

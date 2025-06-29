@@ -218,7 +218,7 @@ public actor GameEngine: Sendable {
         var verbToSyntax: [Verb: [SyntaxRule]] = [:]
 
         for handler in handlers {
-            // Each handler can contribute multiple verbs with the same syntax rules
+            // Extract verbs from handler.verbs (for .verb tokens in syntax rules)
             for verb in handler.verbs {
                 // Add the verb if not already present
                 if !verbs.contains(verb) {
@@ -231,6 +231,25 @@ public actor GameEngine: Sendable {
                     verbToSyntax[verb] = handler.syntax
                 } else {
                     verbToSyntax[verb]?.append(contentsOf: handler.syntax)
+                }
+            }
+
+            // Extract specific verbs from syntax rules (for .climb, .get, etc.)
+            for syntaxRule in handler.syntax {
+                for token in syntaxRule.pattern {
+                    if case .specificVerb(let specificVerb) = token {
+                        // Add the specific verb if not already present
+                        if !verbs.contains(specificVerb) {
+                            verbs.append(specificVerb)
+                        }
+
+                        // Map this specific verb to this syntax rule
+                        if verbToSyntax[specificVerb] == nil {
+                            verbToSyntax[specificVerb] = [syntaxRule]
+                        } else {
+                            verbToSyntax[specificVerb]?.append(syntaxRule)
+                        }
+                    }
                 }
             }
         }
@@ -752,7 +771,7 @@ extension GameEngine {
     ///
     /// - Parameter command: The command to find a handler for
     /// - Returns: The action handler that can process this command, or nil if none found
-    private func findActionHandler(for command: Command) -> ActionHandler? {
+    func findActionHandler(for command: Command) -> ActionHandler? {
         var bestHandler: ActionHandler?
         var bestScore = 0
 
@@ -776,7 +795,7 @@ extension GameEngine {
     /// - Parameter actionID: The conceptual action to find handlers for
     /// - Returns: Array of action handlers that represent this conceptual action
     public func actionHandlers(for actionID: Intent) -> [ActionHandler] {
-        return actionHandlers.filter { handler in
+        actionHandlers.filter { handler in
             handler.actions.contains(actionID)
         }
     }
@@ -814,7 +833,7 @@ extension GameEngine {
     ///   - handler: The action handler to score
     ///   - command: The command to match against
     /// - Returns: Score (0 means no match, higher is better)
-    private func scoreHandlerForCommand(handler: ActionHandler, command: Command) -> Int {
+    func scoreHandlerForCommand(handler: ActionHandler, command: Command) -> Int {
         var score = 0
         var hasMatchingSyntaxRule = false
         var hasMatchingVerb = false
@@ -870,8 +889,8 @@ extension GameEngine {
     ///   - handler: The action handler to check
     ///   - command: The command to match against
     /// - Returns: True if the handler could potentially process this command
-    private func couldHandlerMatchCommand(_ handler: ActionHandler, _ command: Command) -> Bool {
-        return scoreHandlerForCommand(handler: handler, command: command) > 0
+    func couldHandlerMatchCommand(_ handler: ActionHandler, _ command: Command) -> Bool {
+        scoreHandlerForCommand(handler: handler, command: command) > 0
     }
 
     /// Scores how well a syntax rule matches a command.
@@ -888,7 +907,7 @@ extension GameEngine {
     ///   - syntaxRule: The syntax rule to score
     ///   - command: The command to match against
     /// - Returns: Score (0 means no match, higher is better)
-    private func scoreSyntaxRuleForCommand(syntaxRule: SyntaxRule, command: Command) -> Int {
+    func scoreSyntaxRuleForCommand(syntaxRule: SyntaxRule, command: Command) -> Int {
         var score = 0
         var hasVerbToken = false
 
@@ -962,8 +981,8 @@ extension GameEngine {
     ///   - syntaxRule: The syntax rule to check
     ///   - command: The command to match against
     /// - Returns: True if the syntax rule could match this command
-    private func couldSyntaxRuleMatchCommand(_ syntaxRule: SyntaxRule, _ command: Command) -> Bool {
-        return scoreSyntaxRuleForCommand(syntaxRule: syntaxRule, command: command) > 0
+    func couldSyntaxRuleMatchCommand(_ syntaxRule: SyntaxRule, _ command: Command) -> Bool {
+        scoreSyntaxRuleForCommand(syntaxRule: syntaxRule, command: command) > 0
     }
     /// Executes a parsed game command, orchestrating calls to event handlers and action handlers.
     ///

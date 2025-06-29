@@ -187,7 +187,7 @@ struct ClimbOnActionHandlerTests {
             output,
             """
             > climb on
-            Climb on what?
+            Climb what?
             """)
     }
 
@@ -424,11 +424,9 @@ struct ClimbOnActionHandlerTests {
     @Test("Handler exposes correct Verbs")
     func testVerbs() async throws {
         let handler = ClimbOnActionHandler()
-        #expect(handler.verbs.contains(.climb))
-        #expect(handler.verbs.contains(.get))
-        #expect(handler.verbs.contains(.sit))
-        #expect(handler.verbs.contains(.mount))
-        #expect(handler.verbs.count == 4)
+        // ClimbOnActionHandler uses specific verbs in syntax rules (.climb, .get, .sit, .mount)
+        // rather than generic .verb tokens, so verbs array should be empty
+        #expect(handler.verbs.isEmpty)
     }
 
     @Test("Handler requires light")

@@ -18,6 +18,8 @@ public struct ClimbOnActionHandler: ActionHandler {
 
     // MARK: - Action Processing Methods
 
+    public init() {}
+
     /// Processes the climb on action.
     ///
     /// - Parameter command: The command being processed.

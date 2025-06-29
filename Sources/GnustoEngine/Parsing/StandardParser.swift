@@ -551,6 +551,7 @@ public struct StandardParser: Parser {
                         )
                     )
                 }
+                matchedPreposition = currentToken
                 tokenCursor += 1
             }
         }

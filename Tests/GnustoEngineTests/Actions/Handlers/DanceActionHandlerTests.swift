@@ -32,13 +32,57 @@ struct DanceActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > dance
-            You dance with an interpretive boldness that transcends
-            conventional movement.
+            Your choreography suggests a deep personal relationship with
+            music that may be entirely one-sided.
             """)
     }
 
-    @Test("DANCE WITH DIRECTOBJECT syntax works")
-    func testDanceWithDirectObjectSyntax() async throws {
+    @Test("DANCE WITH (Item) DIRECTOBJECT syntax works")
+    func testDanceWithItemDirectObjectSyntax() async throws {
+        // Given
+        let testRoom = Location(
+            id: "testRoom",
+            .name("Test Room"),
+            .inherentlyLit
+        )
+
+        let statue = Item(
+            id: "statue",
+            .name("stone statue"),
+            .description("A graceful marble statue."),
+            .in(.location("testRoom"))
+        )
+
+        let game = MinimalGame(
+            player: Player(in: "testRoom"),
+            locations: testRoom,
+            items: statue
+        )
+
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // When
+        try await engine.execute("dance with statue", times: 3)
+
+        // Then
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            > dance with statue
+            Your waltz with the stone statue achieves a level of one-sided
+            romance that poets would envy.
+
+            > dance with statue
+            The stone statue follows your lead with the graceful compliance
+            of something that has no choice in the matter.
+
+            > dance with statue
+            The stone statue follows your every move with the devoted
+            attention of something that has no other options.
+            """)
+    }
+
+    @Test("DANCE WITH (Character) DIRECTOBJECT syntax works")
+    func testDanceWithCharacterDirectObjectSyntax() async throws {
         // Given
         let testRoom = Location(
             id: "testRoom",
@@ -63,14 +107,69 @@ struct DanceActionHandlerTests {
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // When
-        try await engine.execute("dance with partner")
+        try await engine.execute("dance with partner", times: 3)
 
         // Then
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > dance with partner
-            You dance with an interpretive boldness that transcends
-            conventional movement.
+            The dance partner proves to be a dance partner whose enthusiasm
+            is inversely proportional to their preparation.
+
+            > dance with partner
+            Your dancing partnership with the dance partner demonstrates
+            that rhythm is indeed a highly personal interpretation.
+
+            > dance with partner
+            Your dance with the dance partner proves that good intentions
+            can indeed triumph over mutual inexperience.
+            """)
+    }
+
+    @Test("DANCE WITH (Enemy) DIRECTOBJECT syntax works")
+    func testDanceWithEnemyDirectObjectSyntax() async throws {
+        // Given
+        let testRoom = Location(
+            id: "testRoom",
+            .name("Test Room"),
+            .inherentlyLit
+        )
+
+        let troll = Item(
+            id: "troll",
+            .name("menacing troll"),
+            .description("A menacing troll."),
+            .isCharacter,
+            .isFighting,
+            .in(.location("testRoom"))
+        )
+
+        let game = MinimalGame(
+            player: Player(in: "testRoom"),
+            locations: testRoom,
+            items: troll
+        )
+
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // When
+        try await engine.execute("dance with troll", times: 3)
+
+        // Then
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            > dance with troll
+            You offer the menacing troll a dance, creating the kind of
+            social paradox that philosophers write dissertations about.
+
+            > dance with troll
+            Your dancing invitation catches the menacing troll off guard,
+            suggesting they skipped the ‘social graces during
+            warfare’ seminars.
+
+            > dance with troll
+            The menacing troll contemplates your choreographic offer with
+            the sort of suspicion usually reserved for obvious traps.
             """)
     }
 
@@ -99,16 +198,16 @@ struct DanceActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > dance
-            You dance with an interpretive boldness that transcends
-            conventional movement.
+            Your choreography suggests a deep personal relationship with
+            music that may be entirely one-sided.
 
             > dance
-            You dance with admirable commitment to the full spectrum of
-            human motion.
-
+            You execute movements that would be called dancing by someone
+            with a very generous definition.
+            
             > dance
-            You dance with the natural grace of one unencumbered by
-            traditional technique.
+            You execute a dance that proves the triumph of spirit over the
+            basic laws of physics.
             """)
     }
 
@@ -135,8 +234,8 @@ struct DanceActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > dance
-            You dance with an interpretive boldness that transcends
-            conventional movement.
+            Your choreography suggests a deep personal relationship with
+            music that may be entirely one-sided.
             """)
     }
 
@@ -171,8 +270,8 @@ struct DanceActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > dance with chair
-            You dance with an interpretive boldness that transcends
-            conventional movement.
+            Your waltz with the wooden chair achieves a level of one-sided
+            romance that poets would envy.
             """)
     }
 
