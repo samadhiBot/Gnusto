@@ -932,6 +932,9 @@ public struct StandardParser: Parser {
                     }
                 case .player:  // Pronoun referring to player
                     resolvedPronounCandidates.append(ref)
+                case .universal:
+                    // Universal objects are always considered in scope
+                    resolvedPronounCandidates.append(ref)
                 }
             }
 
@@ -999,9 +1002,19 @@ public struct StandardParser: Parser {
             potentialEntities.append(.location(locationID))
         }
 
-        // If no entities found in vocabulary, create an unresolved item reference
-        // This allows action handlers to provide more specific error messages
+        // If no entities found in vocabulary, check for universal objects as fallback
         if potentialEntities.isEmpty {
+            // Check if the noun matches any universal objects
+            if let universalObjects = vocabulary.universals[lowercasedNoun] {
+                // For now, if multiple universals match, pick the first one
+                // TODO: Consider disambiguation for universals if needed
+                if let firstUniversal = universalObjects.first {
+                    return .success(.universal(firstUniversal))
+                }
+            }
+
+            // No universal objects found either, create an unresolved item reference
+            // This allows action handlers to provide more specific error messages
             let unresolvedRef = EntityReference.item(ItemID(noun))
             return .success(unresolvedRef)
         }
@@ -1052,6 +1065,12 @@ public struct StandardParser: Parser {
             case .player:  // Should have been handled by player alias check, but defensive
                 if modifiers.isEmpty {
                     resolvedAndScopedEntities.append(.player)
+                }
+            case .universal:
+                // Universal objects are always considered in scope if modifiers match
+                // For now, we don't apply modifier filtering to universals
+                if modifiers.isEmpty {
+                    resolvedAndScopedEntities.append(entityRef)
                 }
             }
         }
@@ -1262,7 +1281,7 @@ public struct StandardParser: Parser {
     /// Gathers all potential candidate ItemIDs currently in scope.
     /// NOTE: This function remains item-centric for now. It's used by `resolveObject` for item candidates.
     func gatherCandidates(in gameState: GameState) -> [ItemID: Item] {
-        let currentLocationID = gameState.player.currentLocationID
+        let _ = gameState.player.currentLocationID
 
         // Use ReachabilityUtils for consistent scope resolution, but don't filter by light
         // The parser historically doesn't enforce strict light conditions like ScopeResolver
@@ -1303,9 +1322,11 @@ public struct StandardParser: Parser {
         case .item(let id):
             "the \(gameState.items[id]?.name ?? id.rawValue)"
         case .location(let id):
-            "the \(gameState.locations[id]?.name ?? id.rawValue)"
+            gameState.locations[id]?.name ?? id.rawValue
         case .player:
             "yourself"
+        case .universal(let universal):
+            "the \(universal)"
         }
     }
 

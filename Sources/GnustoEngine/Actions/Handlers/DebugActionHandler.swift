@@ -56,6 +56,9 @@ public struct DebugActionHandler: ActionHandler {
                 throw ActionResponse.unknownEntity(directObjectRef)
             }
             customDump(location, to: &target)
+
+        case .universal(let universal):
+            customDump(universal, to: &target)
         }
 
         return ActionResult(

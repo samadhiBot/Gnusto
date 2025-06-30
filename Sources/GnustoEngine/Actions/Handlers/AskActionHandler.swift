@@ -85,6 +85,8 @@ public struct AskActionHandler: ActionHandler {
         case .location(let locationID):
             let location = try await engine.location(locationID)
             topicDescription = location.withDefiniteArticle
+        case .universal(let universal):
+            topicDescription = "the \(universal)"
         }
 
         // Default response - games can override with ItemEventHandlers

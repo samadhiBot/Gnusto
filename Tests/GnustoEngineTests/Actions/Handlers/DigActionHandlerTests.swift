@@ -453,7 +453,7 @@ struct DigActionHandlerTests {
         expectNoDifference(
             output,
             """
-            > dig
+            > dig the ground
             You could try using a tool for digging.
             """)
     }

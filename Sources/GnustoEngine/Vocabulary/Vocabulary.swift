@@ -20,6 +20,12 @@ public struct Vocabulary: Codable, Equatable, Sendable {
     /// Maps known location names to the LocationID they refer to.
     public var locationNames: [String: LocationID]
 
+    /// Maps known universal object names to the Set of UniversalObjects they can refer to.
+    /// Universal objects are implicit concepts like "ground", "sky", "walls" that don't
+    /// need explicit Item objects but can still be referenced by players.
+    /// Example: `["ground": [.ground, .earth], "sky": [.sky, .heavens]]`
+    public var universals: [String: Set<UniversalObject>]
+
     /// A set of "noise" words to be ignored by the parser (articles, punctuation, etc.).
     /// Example: `["a", "an", "the", ".", ","]`
     public var noiseWords: Set<String>
@@ -72,6 +78,7 @@ public struct Vocabulary: Codable, Equatable, Sendable {
         self.items = [:]
         self.adjectives = [:]
         self.locationNames = [:]  // Initialize new property
+        self.universals = Vocabulary.defaultUniversals
         self.noiseWords = Vocabulary.defaultNoiseWords
         self.prepositions = Vocabulary.defaultPrepositions
         self.pronouns = Vocabulary.defaultPronouns
@@ -88,6 +95,7 @@ public struct Vocabulary: Codable, Equatable, Sendable {
         items: [String: Set<ItemID>] = [:],
         adjectives: [String: Set<ItemID>] = [:],
         locationNames: [String: LocationID] = [:],
+        universals: [String: Set<UniversalObject>] = Vocabulary.defaultUniversals,
         directions: [String: Direction] = [:],
         noiseWords: Set<String> = Vocabulary.defaultNoiseWords,
         prepositions: Set<String> = Vocabulary.defaultPrepositions,
@@ -101,6 +109,7 @@ public struct Vocabulary: Codable, Equatable, Sendable {
         self.items = items
         self.adjectives = adjectives
         self.locationNames = locationNames
+        self.universals = universals
         self.directions = directions
         self.noiseWords = noiseWords
         self.prepositions = prepositions
@@ -346,6 +355,7 @@ public struct Vocabulary: Codable, Equatable, Sendable {
         case items
         case adjectives
         case locationNames  // Added coding key
+        case universals
         case noiseWords
         case adverbs
         case prepositions
@@ -365,6 +375,9 @@ public struct Vocabulary: Codable, Equatable, Sendable {
         adjectives = try container.decode([String: Set<ItemID>].self, forKey: .adjectives)
         locationNames =
             try container.decodeIfPresent([String: LocationID].self, forKey: .locationNames) ?? [:]  // Decode new property
+        universals =
+            try container.decodeIfPresent([String: Set<UniversalObject>].self, forKey: .universals)
+            ?? Vocabulary.defaultUniversals
         noiseWords = try container.decode(Set<String>.self, forKey: .noiseWords)
         adverbs = try container.decode(Set<String>.self, forKey: .adverbs)
         prepositions = try container.decode(Set<String>.self, forKey: .prepositions)
@@ -383,6 +396,7 @@ public struct Vocabulary: Codable, Equatable, Sendable {
         try container.encode(items, forKey: .items)
         try container.encode(adjectives, forKey: .adjectives)
         try container.encode(locationNames, forKey: .locationNames)  // Encode new property
+        try container.encode(universals, forKey: .universals)
         try container.encode(noiseWords, forKey: .noiseWords)
         try container.encode(adverbs, forKey: .adverbs)
         try container.encode(prepositions, forKey: .prepositions)
@@ -391,4 +405,61 @@ public struct Vocabulary: Codable, Equatable, Sendable {
         try container.encode(specialKeywords, forKey: .specialKeywords)
         try container.encode(conjunctions, forKey: .conjunctions)
     }
+
+    // MARK: - Default Universal Objects
+
+    /// Default mapping of common English words to universal objects.
+    /// This provides sensible defaults that work for most English IF games.
+    /// Games can override or extend this mapping for localization or customization.
+    public static let defaultUniversals: [String: Set<UniversalObject>] = [
+        // Ground and earth
+        "ground": [.ground],
+        "earth": [.earth, .ground],
+        "soil": [.soil, .earth, .ground],
+        "dirt": [.dirt, .earth, .ground],
+        "floor": [.floor, .ground],
+
+        // Sky and atmosphere
+        "sky": [.sky],
+        "heavens": [.heavens, .sky],
+        "air": [.air],
+        "clouds": [.clouds, .sky],
+        "sun": [.sun],
+        "moon": [.moon],
+        "stars": [.stars],
+
+        // Architectural elements
+        "ceiling": [.ceiling],
+        "walls": [.walls],
+        "wall": [.wall, .walls],
+        "roof": [.roof, .ceiling],
+
+        // Water features
+        "water": [.water],
+        "river": [.river, .water],
+        "stream": [.stream, .river, .water],
+        "lake": [.lake, .water],
+        "pond": [.pond, .lake, .water],
+        "ocean": [.ocean, .sea, .water],
+        "sea": [.sea, .ocean, .water],
+
+        // Natural elements
+        "wind": [.wind, .air],
+        "fire": [.fire],
+        "flames": [.flames, .fire],
+        "smoke": [.smoke],
+        "dust": [.dust],
+        "mud": [.mud, .dirt, .earth],
+        "sand": [.sand, .dirt],
+        "rock": [.rock, .stone],
+        "stone": [.stone, .rock],
+
+        // Abstract concepts
+        "darkness": [.darkness],
+        "shadows": [.shadows, .darkness],
+        "light": [.light],
+        "silence": [.silence],
+        "sound": [.sound, .noise],
+        "noise": [.noise, .sound],
+    ]
 }

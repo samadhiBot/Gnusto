@@ -52,6 +52,11 @@ public struct SmellActionHandler: ActionHandler {
                 return ActionResult(
                     engine.messenger.smellMyself()
                 )
+
+            case .universal:
+                return ActionResult(
+                    engine.messenger.smellNothingUnusual()
+                )
             }
         } else {
             // General environmental smelling

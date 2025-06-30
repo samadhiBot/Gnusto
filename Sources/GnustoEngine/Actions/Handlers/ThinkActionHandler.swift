@@ -54,6 +54,11 @@ public struct ThinkActionHandler: ActionHandler {
             throw ActionResponse.prerequisiteNotMet(
                 engine.messenger.thinkAboutLocation()
             )
+
+        case .universal:
+            throw ActionResponse.prerequisiteNotMet(
+                engine.messenger.cannotDoThat(verb: "think about")
+            )
         }
     }
 }

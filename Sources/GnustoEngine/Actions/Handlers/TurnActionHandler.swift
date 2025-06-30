@@ -41,7 +41,11 @@ public struct TurnActionHandler: ActionHandler {
             )
         case .player:
             throw ActionResponse.prerequisiteNotMet(
-                engine.messenger.turnSelf()
+                engine.messenger.cannotVerbYourself(verb: "turn")
+            )
+        case .universal:
+            throw ActionResponse.prerequisiteNotMet(
+                engine.messenger.cannotDoThat(verb: "turn")
             )
         }
 
@@ -52,13 +56,14 @@ public struct TurnActionHandler: ActionHandler {
         }
 
         // Determine appropriate response based on object type
-        let message = if targetItem.hasFlag(.isCharacter) {
-            engine.messenger.turnCharacter(character: targetItem.withDefiniteArticle)
-        } else if targetItem.hasFlag(.isTakable) {
-            engine.messenger.turnItem(item: targetItem.withDefiniteArticle)
-        } else {
-            engine.messenger.turnFixedObject(item: targetItem.withDefiniteArticle)
-        }
+        let message =
+            if targetItem.hasFlag(.isCharacter) {
+                engine.messenger.turnCharacter(character: targetItem.withDefiniteArticle)
+            } else if targetItem.hasFlag(.isTakable) {
+                engine.messenger.turnItem(item: targetItem.withDefiniteArticle)
+            } else {
+                engine.messenger.turnFixedObject(item: targetItem.withDefiniteArticle)
+            }
 
         return ActionResult(
             message,

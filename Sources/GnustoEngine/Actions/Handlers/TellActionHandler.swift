@@ -67,10 +67,12 @@ public struct TellActionHandler: ActionHandler {
             let topicItem = try await engine.item(topicItemID)
             topicDescription = topicItem.withDefiniteArticle
         case .player:
-            topicDescription = "yourself"
+            topicDescription = engine.messenger.you()
         case .location(let locationID):
             let location = try await engine.location(locationID)
-            topicDescription = location.name
+            topicDescription = location.withDefiniteArticle
+        case .universal(let universal):
+            topicDescription = "the \(universal)"
         }
 
         // Default response - games can override with ItemEventHandlers

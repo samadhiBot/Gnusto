@@ -61,6 +61,21 @@ public protocol ActionHandler: Sendable {
     /// regardless of lighting conditions.
     var requiresLight: Bool { get }
 
+    // MARK: - Universal Object Support
+
+    /// Determines whether this action handler can process the given universal object.
+    ///
+    /// Universal objects are implicit concepts like "ground", "sky", "walls" that don't
+    /// require explicit Item objects but can still be referenced by players. This method
+    /// allows action handlers to declare which universals they can meaningfully handle.
+    ///
+    /// For example, a DigActionHandler might return `true` for `.ground`, `.earth`, and
+    /// `.soil` universals, while a ClimbActionHandler might handle `.walls` and `.stairs`.
+    ///
+    /// - Parameter universal: The universal object being checked.
+    /// - Returns: `true` if this handler can process the universal, `false` otherwise.
+    func handlesUniversal(_ universal: UniversalObject) -> Bool
+
     // MARK: - Action Processing Methods
 
     /// Processes the action, performing validation and execution in a single unified step.
@@ -139,5 +154,12 @@ extension ActionHandler {
     /// Override this property to `false` for verbs that can be used in darkness.
     public var requiresLight: Bool {
         true
+    }
+
+    /// Default implementation for `handlesUniversal`. Returns `false`.
+    ///
+    /// Override this method to specify which universal objects this handler can process.
+    public func handlesUniversal(_ universal: UniversalObject) -> Bool {
+        false
     }
 }

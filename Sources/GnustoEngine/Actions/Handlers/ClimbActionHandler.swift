@@ -51,7 +51,11 @@ public struct ClimbActionHandler: ActionHandler {
             )
         case .player:
             throw ActionResponse.prerequisiteNotMet(
-                engine.messenger.cannotVerbYourself(verb: "climb")
+                engine.messenger.cannotDoThat(verb: "climb")
+            )
+        case .universal:
+            throw ActionResponse.prerequisiteNotMet(
+                engine.messenger.cannotDoThat(verb: "climb")
             )
         }
 

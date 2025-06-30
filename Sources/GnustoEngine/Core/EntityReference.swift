@@ -12,6 +12,9 @@ public enum EntityReference: Hashable, Sendable, Codable {
     /// A reference to the player character.
     case player
 
+    /// A reference to a universal object concept.
+    case universal(UniversalObject)
+
     // Consider adding later if useful:
     // /// A reference to the current location where the command is being issued.
     // case here
@@ -31,6 +34,8 @@ extension EntityReference: CustomStringConvertible {
             locationID.description
         case .player:
             ".player"
+        case .universal(let universalObject):
+            ".universal(.\(universalObject))"
         }
     }
 }

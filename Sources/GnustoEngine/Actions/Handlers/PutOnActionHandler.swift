@@ -44,11 +44,15 @@ public struct PutOnActionHandler: ActionHandler {
             itemToPutID = itemID
         case .location:
             throw ActionResponse.prerequisiteNotMet(
-                engine.messenger.thatsNotSomethingYouCanPutOnThings()
+                engine.messenger.cannotDoThat(verb: "put that on")
             )
         case .player:
             throw ActionResponse.prerequisiteNotMet(
-                "🤡 You can't put yourself on that."
+                engine.messenger.cannotDoThat(verb: "put yourself on")
+            )
+        case .universal:
+            throw ActionResponse.prerequisiteNotMet(
+                engine.messenger.cannotDoThat(verb: "put that on")
             )
         }
 

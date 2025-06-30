@@ -820,22 +820,22 @@ open class MessageProvider: @unchecked Sendable {
         output(
             "danceResponse()",
             oneOf(
-                "You dance with the sort of confident abandon that suggests no one is watching. They are.", // DP
-                "A performance executed with all the grace of someone who believes rhythm is merely a suggestion.", // NC
-                "You dance as if the very concept of self-consciousness had never been invented.", // OW
-                "Your dancing demonstrates that enthusiasm can indeed triumph over technique, though not always gracefully.", // MT
-                "You execute movements that would be called dancing by someone with a very generous definition.", // TC
-                "A spirited display that proves the human capacity for expressing joy through interpretive flailing.", // SJ
-                "You dance with the carefree abandon of someone who's forgotten that gravity still applies.", // DA
-                "Your choreography suggests a deep personal relationship with music that may be entirely one-sided.", // DP
-                "You perform a dance that would make professional dancers everywhere reconsider their career choices.", // NC
-                "A bold interpretation of movement that challenges conventional notions of coordination.", // OW
-                "You dance as if the floor had personally wronged you and this is your revenge.", // MT
-                "Your performance demonstrates that passion can indeed compensate for what talent forgot to provide.", // TC
-                "You execute a dance that proves the triumph of spirit over the basic laws of physics.", // SJ
-                "A display of terpsichorean enthusiasm that redefines the very concept of rhythm.", // DA
-                "Your dancing is both triumphant and slightly catastrophic -- the perfect combination.", // TC
-                "There's something beautifully human about dancing badly with complete conviction.", // MT
+                "You dance with the sort of confident abandon that suggests no one is watching. They are.",  // DP
+                "A performance executed with all the grace of someone who believes rhythm is merely a suggestion.",  // NC
+                "You dance as if the very concept of self-consciousness had never been invented.",  // OW
+                "Your dancing demonstrates that enthusiasm can indeed triumph over technique, though not always gracefully.",  // MT
+                "You execute movements that would be called dancing by someone with a very generous definition.",  // TC
+                "A spirited display that proves the human capacity for expressing joy through interpretive flailing.",  // SJ
+                "You dance with the carefree abandon of someone who's forgotten that gravity still applies.",  // DA
+                "Your choreography suggests a deep personal relationship with music that may be entirely one-sided.",  // DP
+                "You perform a dance that would make professional dancers everywhere reconsider their career choices.",  // NC
+                "A bold interpretation of movement that challenges conventional notions of coordination.",  // OW
+                "You dance as if the floor had personally wronged you and this is your revenge.",  // MT
+                "Your performance demonstrates that passion can indeed compensate for what talent forgot to provide.",  // TC
+                "You execute a dance that proves the triumph of spirit over the basic laws of physics.",  // SJ
+                "A display of terpsichorean enthusiasm that redefines the very concept of rhythm.",  // DA
+                "Your dancing is both triumphant and slightly catastrophic -- the perfect combination.",  // TC
+                "There's something beautifully human about dancing badly with complete conviction.",  // MT
             )
         )
     }
@@ -844,21 +844,21 @@ open class MessageProvider: @unchecked Sendable {
         output(
             "danceWith(item: '\(item)')",
             oneOf(
-                "You dance with \(item), who proves to be a surprisingly unresponsive partner.", // DP
-                "\(item) participates in your dance with all the enthusiasm of the fundamentally inanimate.", // SJ
-                "You and \(item) share a dance that redefines the concept of 'leading' in ballroom terms.", // OW
-                "Your dancing partnership with \(item) demonstrates the triumph of imagination over basic physics.", // NC
-                "\(item) follows your lead with the graceful compliance of something that has no choice in the matter.", // MT
-                "You dance with \(item) in a performance that challenges traditional notions of reciprocity.", // TC
-                "\(item) proves to be the sort of dance partner who never steps on your toes, mainly through complete inaction.", // DA
-                "Your waltz with \(item) achieves a level of one-sided romance that poets would envy.", // DP
-                "\(item) demonstrates the perfect dance partner qualities of reliability and complete lack of criticism.", // SJ
-                "You and \(item) execute a dance that would make Fred Astaire reconsider the importance of having a pulse.", // OW
-                "\(item) participates in your choreography with the stoic dignity of the professionally non-participatory.", // NC
-                "Your dance with \(item) proves that chemistry isn't always necessary for a memorable performance.", // MT
-                "\(item) follows your every move with the devoted attention of something that has no other options.", // TC
-                "You dance with \(item) in a display that redefines 'solo performance' as a team effort.", // DA
-                "The beauty is in the complete asymmetry - one partner desperately engaged, the other magnificently indifferent.", // OW
+                "You dance with \(item), who proves to be a surprisingly unresponsive partner.",  // DP
+                "\(item) participates in your dance with all the enthusiasm of the fundamentally inanimate.",  // SJ
+                "You and \(item) share a dance that redefines the concept of 'leading' in ballroom terms.",  // OW
+                "Your dancing partnership with \(item) demonstrates the triumph of imagination over basic physics.",  // NC
+                "\(item) follows your lead with the graceful compliance of something that has no choice in the matter.",  // MT
+                "You dance with \(item) in a performance that challenges traditional notions of reciprocity.",  // TC
+                "\(item) proves to be the sort of dance partner who never steps on your toes, mainly through complete inaction.",  // DA
+                "Your waltz with \(item) achieves a level of one-sided romance that poets would envy.",  // DP
+                "\(item) demonstrates the perfect dance partner qualities of reliability and complete lack of criticism.",  // SJ
+                "You and \(item) execute a dance that would make Fred Astaire reconsider the importance of having a pulse.",  // OW
+                "\(item) participates in your choreography with the stoic dignity of the professionally non-participatory.",  // NC
+                "Your dance with \(item) proves that chemistry isn't always necessary for a memorable performance.",  // MT
+                "\(item) follows your every move with the devoted attention of something that has no other options.",  // TC
+                "You dance with \(item) in a display that redefines 'solo performance' as a team effort.",  // DA
+                "The beauty is in the complete asymmetry - one partner desperately engaged, the other magnificently indifferent.",  // OW
             )
         )
     }
@@ -867,21 +867,21 @@ open class MessageProvider: @unchecked Sendable {
         output(
             "danceWith(partner: '\(partner)')",
             oneOf(
-                "You invite \(partner) to dance, who responds with the sort of polite bewilderment reserved for unexpected social propositions.", // SJ
-                "\(partner) considers your dancing invitation with the careful deliberation of someone weighing their options.", // DP
-                "You and \(partner) attempt a dance that redefines the concept of 'getting to know each other.'", // OW
-                "\(partner) participates in your dance with the gracious confusion of the socially ambushed.", // NC
-                "Your dancing partnership with \(partner) demonstrates that rhythm is indeed a highly personal interpretation.", // MT
-                "\(partner) follows your lead with the patient resignation of someone who's learned to expect the unexpected.", // TC
-                "You dance with \(partner) in a performance that challenges both your coordination and their composure.", // DA
-                "\(partner) proves to be a dance partner whose enthusiasm is inversely proportional to their preparation.", // DP
-                "Your waltz with \(partner) achieves the sort of awkward intimacy that makes everyone slightly uncomfortable.", // SJ
-                "\(partner) demonstrates that dancing skills are not universally distributed among the population.", // OW
-                "You and \(partner) execute a dance that would make etiquette instructors everywhere reach for their smelling salts.", // NC
-                "\(partner) participates in your choreography with the bewildered grace of the suddenly conscripted.", // MT
-                "Your dance with \(partner) proves that good intentions can indeed triumph over mutual inexperience.", // TC
-                "\(partner) follows your dancing lead with the sort of cautious optimism that suggests they're making it up as they go.", // DA
-                "The delicious social awkwardness of suddenly proposing a dance - it works whether the partner is a sophisticated duchess or a confused badger.", // NC
+                "You invite \(partner) to dance, who responds with the sort of polite bewilderment reserved for unexpected social propositions.",  // SJ
+                "\(partner) considers your dancing invitation with the careful deliberation of someone weighing their options.",  // DP
+                "You and \(partner) attempt a dance that redefines the concept of 'getting to know each other.'",  // OW
+                "\(partner) participates in your dance with the gracious confusion of the socially ambushed.",  // NC
+                "Your dancing partnership with \(partner) demonstrates that rhythm is indeed a highly personal interpretation.",  // MT
+                "\(partner) follows your lead with the patient resignation of someone who's learned to expect the unexpected.",  // TC
+                "You dance with \(partner) in a performance that challenges both your coordination and their composure.",  // DA
+                "\(partner) proves to be a dance partner whose enthusiasm is inversely proportional to their preparation.",  // DP
+                "Your waltz with \(partner) achieves the sort of awkward intimacy that makes everyone slightly uncomfortable.",  // SJ
+                "\(partner) demonstrates that dancing skills are not universally distributed among the population.",  // OW
+                "You and \(partner) execute a dance that would make etiquette instructors everywhere reach for their smelling salts.",  // NC
+                "\(partner) participates in your choreography with the bewildered grace of the suddenly conscripted.",  // MT
+                "Your dance with \(partner) proves that good intentions can indeed triumph over mutual inexperience.",  // TC
+                "\(partner) follows your dancing lead with the sort of cautious optimism that suggests they're making it up as they go.",  // DA
+                "The delicious social awkwardness of suddenly proposing a dance - it works whether the partner is a sophisticated duchess or a confused badger.",  // NC
             )
         )
     }
@@ -890,20 +890,20 @@ open class MessageProvider: @unchecked Sendable {
         output(
             "danceWith(enemy: '\(enemy)')",
             oneOf(
-                "You invite \(enemy) to dance, transforming centuries of combat etiquette into an awkward social moment.", // SJ
-                "\(enemy) receives your dancing invitation with the sort of confusion typically reserved for peace treaties.", // DP
-                "You attempt to dance with \(enemy), who seems unprepared for this particular form of conflict resolution.", // OW
-                "\(enemy) considers your choreographic overture with the bewildered wariness of the professionally hostile.", // NC
-                "Your dancing invitation catches \(enemy) off guard, suggesting they skipped the 'social graces during warfare' seminars.", // MT
-                "\(enemy) responds to your dance proposal with the sort of diplomatic confusion that starts international incidents.", // TC
-                "You offer \(enemy) a dance, creating the kind of social paradox that philosophers write dissertations about.", // DA
-                "\(enemy) regards your dancing invitation as either a brilliant strategy or complete tactical madness.", // DP
-                "Your waltz proposal to \(enemy) demonstrates that optimism can indeed triumph over basic common sense.", // SJ
-                "\(enemy) receives your dance invitation with the careful consideration of someone reassessing their life choices.", // OW
-                "You invite \(enemy) to dance, proving that social awkwardness knows no boundaries of allegiance.", // NC
-                "\(enemy) contemplates your choreographic offer with the sort of suspicion usually reserved for obvious traps.", // MT
-                "Your dancing invitation transforms \(enemy) from adversary to bewildered recipient of unexpected social courtesy.", // TC
-                "\(enemy) faces your dance proposal with the sort of existential confusion that redefines the nature of conflict.", // DA
+                "You invite \(enemy) to dance, transforming centuries of combat etiquette into an awkward social moment.",  // SJ
+                "\(enemy) receives your dancing invitation with the sort of confusion typically reserved for peace treaties.",  // DP
+                "You attempt to dance with \(enemy), who seems unprepared for this particular form of conflict resolution.",  // OW
+                "\(enemy) considers your choreographic overture with the bewildered wariness of the professionally hostile.",  // NC
+                "Your dancing invitation catches \(enemy) off guard, suggesting they skipped the 'social graces during warfare' seminars.",  // MT
+                "\(enemy) responds to your dance proposal with the sort of diplomatic confusion that starts international incidents.",  // TC
+                "You offer \(enemy) a dance, creating the kind of social paradox that philosophers write dissertations about.",  // DA
+                "\(enemy) regards your dancing invitation as either a brilliant strategy or complete tactical madness.",  // DP
+                "Your waltz proposal to \(enemy) demonstrates that optimism can indeed triumph over basic common sense.",  // SJ
+                "\(enemy) receives your dance invitation with the careful consideration of someone reassessing their life choices.",  // OW
+                "You invite \(enemy) to dance, proving that social awkwardness knows no boundaries of allegiance.",  // NC
+                "\(enemy) contemplates your choreographic offer with the sort of suspicion usually reserved for obvious traps.",  // MT
+                "Your dancing invitation transforms \(enemy) from adversary to bewildered recipient of unexpected social courtesy.",  // TC
+                "\(enemy) faces your dance proposal with the sort of existential confusion that redefines the nature of conflict.",  // DA
             )
         )
     }
@@ -926,21 +926,35 @@ open class MessageProvider: @unchecked Sendable {
         output(
             "diggingBareHandsIneffective(ground: '\(ground)')",
             oneOf(
-                "You dig \(ground) with your hands, demonstrating humanity's eternal optimism in the face of basic geology.", // DP
-                "Your bare-handed excavation of \(ground) achieves results that would make moles reconsider their career choices.", // OW
-                "You attempt to dig \(ground) by hand, proving that determination can indeed meet its match in solid earth.", // SJ
-                "Your fingers encounter \(ground) with the sort of naive confidence that precedes immediate disappointment.", // NC
-                "You dig \(ground) with your hands, creating a depression that's more symbolic than functional.", // MT
-                "Your manual excavation of \(ground) demonstrates the touching faith humans place in their fingernails.", // TC
-                "You apply your hands to \(ground) with results that suggest evolution skipped the 'digging claws' upgrade.", // DA
-                "Your bare-handed assault on \(ground) produces the kind of progress that makes earthworms smug.", // DP
-                "You dig \(ground) with your fingers, achieving a hole that exists primarily in the realm of good intentions.", // SJ
-                "Your hands meet \(ground) in an encounter that redefines the concept of 'manual labor.'", // OW
-                "You attempt to excavate \(ground) with your bare hands, proving that optimism has its geological limits.", // NC
-                "Your fingers explore \(ground) with the sort of determination that makes proper tools weep.", // MT
-                "You dig \(ground) by hand, creating results that wouldn't impress a particularly ambitious hamster.", // TC
-                "Your manual excavation demonstrates that \(ground) has strong opinions about remaining undisturbed.", // DA
+                "You dig \(ground) with your hands, demonstrating humanity's eternal optimism in the face of basic geology.",  // DP
+                "Your bare-handed excavation of \(ground) achieves results that would make moles reconsider their career choices.",  // OW
+                "You attempt to dig \(ground) by hand, proving that determination can indeed meet its match in solid earth.",  // SJ
+                "Your fingers encounter \(ground) with the sort of naive confidence that precedes immediate disappointment.",  // NC
+                "You dig \(ground) with your hands, creating a depression that's more symbolic than functional.",  // MT
+                "Your manual excavation of \(ground) demonstrates the touching faith humans place in their fingernails.",  // TC
+                "You apply your hands to \(ground) with results that suggest evolution skipped the 'digging claws' upgrade.",  // DA
+                "Your bare-handed assault on \(ground) produces the kind of progress that makes earthworms smug.",  // DP
+                "You dig \(ground) with your fingers, achieving a hole that exists primarily in the realm of good intentions.",  // SJ
+                "Your hands meet \(ground) in an encounter that redefines the concept of 'manual labor.'",  // OW
+                "You attempt to excavate \(ground) with your bare hands, proving that optimism has its geological limits.",  // NC
+                "Your fingers explore \(ground) with the sort of determination that makes proper tools weep.",  // MT
+                "You dig \(ground) by hand, creating results that wouldn't impress a particularly ambitious hamster.",  // TC
+                "Your manual excavation demonstrates that \(ground) has strong opinions about remaining undisturbed.",  // DA
             )
+        )
+    }
+
+    open func digUniversalIneffective() -> String {
+        output(
+            "digUniversalIneffective()",
+            "Digging with your bare hands is ineffective."
+        )
+    }
+
+    open func digWithToolGeneral(tool: String) -> String {
+        output(
+            "digWithToolGeneral(tool: '\(tool)')",
+            "You dig with \(tool), but find nothing of interest."
         )
     }
 
@@ -948,20 +962,20 @@ open class MessageProvider: @unchecked Sendable {
         output(
             "digWithToolNothing(tool: '\(tool)')",
             oneOf(
-                "You dig with \(tool), achieving the sort of hole that would make earthworms question your technique.", // DP
-                "\(tool) meets the ground with all the effectiveness of optimism meeting reality.", // OW
-                "Your excavation with \(tool) demonstrates that enthusiasm can indeed triumph over geology, briefly.", // SJ
-                "You dig with \(tool), creating a modest depression that earth itself seems embarrassed by.", // NC
-                "\(tool) encounters the ground in a meeting that produces more noise than progress.", // MT
-                "Your digging with \(tool) achieves the kind of results that make archaeologists weep quietly.", // TC
-                "You apply \(tool) to the ground with the confident determination of someone who believes in the power of persistence over physics.", // DA
-                "\(tool) makes contact with earth in a display that redefines 'diminishing returns.'", // DP
-                "Your excavation efforts with \(tool) produce a hole that's more theoretical than actual.", // SJ
-                "You dig with \(tool), proving that good intentions and solid ground rarely reach satisfactory agreements.", // OW
-                "\(tool) demonstrates its commitment to the digging process while the ground remains diplomatically unimpressed.", // NC
-                "Your digging with \(tool) creates the sort of modest excavation that wouldn't trouble a determined ant.", // MT
-                "You apply \(tool) to the earth with results that suggest geology has a sense of humor.", // TC
-                "\(tool) meets the ground in an encounter that produces more ambition than actual depth.", // DA
+                "You dig with \(tool), achieving the sort of hole that would make earthworms question your technique.",  // DP
+                "\(tool) meets the ground with all the effectiveness of optimism meeting reality.",  // OW
+                "Your excavation with \(tool) demonstrates that enthusiasm can indeed triumph over geology, briefly.",  // SJ
+                "You dig with \(tool), creating a modest depression that earth itself seems embarrassed by.",  // NC
+                "\(tool) encounters the ground in a meeting that produces more noise than progress.",  // MT
+                "Your digging with \(tool) achieves the kind of results that make archaeologists weep quietly.",  // TC
+                "You apply \(tool) to the ground with the confident determination of someone who believes in the power of persistence over physics.",  // DA
+                "\(tool) makes contact with earth in a display that redefines 'diminishing returns.'",  // DP
+                "Your excavation efforts with \(tool) produce a hole that's more theoretical than actual.",  // SJ
+                "You dig with \(tool), proving that good intentions and solid ground rarely reach satisfactory agreements.",  // OW
+                "\(tool) demonstrates its commitment to the digging process while the ground remains diplomatically unimpressed.",  // NC
+                "Your digging with \(tool) creates the sort of modest excavation that wouldn't trouble a determined ant.",  // MT
+                "You apply \(tool) to the earth with results that suggest geology has a sense of humor.",  // TC
+                "\(tool) meets the ground in an encounter that produces more ambition than actual depth.",  // DA
             )
         )
     }
@@ -2369,20 +2383,20 @@ open class MessageProvider: @unchecked Sendable {
         output(
             "turnCharacter(character: '\(character)')",
             oneOf(
-                "You attempt to turn \(character), who responds with the bewildered dignity of someone unaccustomed to being rotated.", // SJ
-                "\(character) experiences your turning efforts as an unexpected lesson in personal boundaries.", // DP
-                "You try to turn \(character), but they seem to have strong feelings about their current facing direction.", // MT
-                "\(character) politely resists your rotational enthusiasm with admirable composure.", // NC
-                "Your attempt to turn \(character) reveals that they're surprisingly committed to their present orientation.", // OW
-                "\(character) demonstrates that turning people is considerably more complex than turning objects.", // TC
-                "You discover that \(character) has developed a philosophical attachment to facing this particular way.", // DA
-                "\(character) regards your turning attempt as an interesting but ultimately unsuccessful social experiment.", // SJ
-                "Your hands find that \(character) subscribes to the radical notion of choosing their own direction.", // DP
-                "\(character) responds to your turning efforts with the patient forbearance of the frequently mishandled.", // MT
-                "You try turning \(character), but they appear to have strong opinions about rotational consent.", // OW
-                "\(character) maintains their bearing with the quiet dignity of someone who knows which way they're facing.", // NC
-                "Your turning ambitions meet \(character)'s steadfast commitment to personal autonomy.", // TC
-                "\(character) demonstrates that they're surprisingly well-anchored to their current position.", // DA
+                "You attempt to turn \(character), who responds with the bewildered dignity of someone unaccustomed to being rotated.",  // SJ
+                "\(character) experiences your turning efforts as an unexpected lesson in personal boundaries.",  // DP
+                "You try to turn \(character), but they seem to have strong feelings about their current facing direction.",  // MT
+                "\(character) politely resists your rotational enthusiasm with admirable composure.",  // NC
+                "Your attempt to turn \(character) reveals that they're surprisingly committed to their present orientation.",  // OW
+                "\(character) demonstrates that turning people is considerably more complex than turning objects.",  // TC
+                "You discover that \(character) has developed a philosophical attachment to facing this particular way.",  // DA
+                "\(character) regards your turning attempt as an interesting but ultimately unsuccessful social experiment.",  // SJ
+                "Your hands find that \(character) subscribes to the radical notion of choosing their own direction.",  // DP
+                "\(character) responds to your turning efforts with the patient forbearance of the frequently mishandled.",  // MT
+                "You try turning \(character), but they appear to have strong opinions about rotational consent.",  // OW
+                "\(character) maintains their bearing with the quiet dignity of someone who knows which way they're facing.",  // NC
+                "Your turning ambitions meet \(character)'s steadfast commitment to personal autonomy.",  // TC
+                "\(character) demonstrates that they're surprisingly well-anchored to their current position.",  // DA
             )
         )
     }
@@ -2391,20 +2405,20 @@ open class MessageProvider: @unchecked Sendable {
         output(
             "turnFixedObject(item: '\(item)')",
             oneOf(
-                "You attempt to turn \(item) with the optimistic determination of someone who hasn't grasped the concept of 'fixed in place.'", // DP
-                "\(item) regards your turning efforts with the serene confidence of the permanently installed.", // SJ
-                "Your hands discover that \(item) has achieved a state of architectural permanence.", // OW
-                "You try turning \(item), but it appears to have made lasting commitments to its current location.", // MT
-                "\(item) demonstrates the sort of steadfast resolve that comes with being bolted to reality.", // NC
-                "Your turning ambitions meet \(item)'s unwavering dedication to structural integrity.", // TC
-                "\(item) responds to your efforts with the immovable dignity of something that predates your arrival.", // DA
-                "You discover that \(item) has tenure in the 'staying exactly where it is' department.", // DP
-                "\(item) maintains its position with the quiet authority of the fundamentally unturnable.", // SJ
-                "Your attempt reveals that \(item) subscribes to a more stationary interpretation of existence.", // OW
-                "\(item) politely declines your rotational invitation with the confidence of the deeply rooted.", // MT
-                "You find that \(item) has strong architectural opinions about remaining in its designated spot.", // NC
-                "\(item) exhibits the sort of stubborn permanence that makes engineers proud.", // TC
-                "The universe appears to have filed \(item) under 'things that don't turn' and lost the paperwork.", // DA
+                "You attempt to turn \(item) with the optimistic determination of someone who hasn't grasped the concept of 'fixed in place.'",  // DP
+                "\(item) regards your turning efforts with the serene confidence of the permanently installed.",  // SJ
+                "Your hands discover that \(item) has achieved a state of architectural permanence.",  // OW
+                "You try turning \(item), but it appears to have made lasting commitments to its current location.",  // MT
+                "\(item) demonstrates the sort of steadfast resolve that comes with being bolted to reality.",  // NC
+                "Your turning ambitions meet \(item)'s unwavering dedication to structural integrity.",  // TC
+                "\(item) responds to your efforts with the immovable dignity of something that predates your arrival.",  // DA
+                "You discover that \(item) has tenure in the 'staying exactly where it is' department.",  // DP
+                "\(item) maintains its position with the quiet authority of the fundamentally unturnable.",  // SJ
+                "Your attempt reveals that \(item) subscribes to a more stationary interpretation of existence.",  // OW
+                "\(item) politely declines your rotational invitation with the confidence of the deeply rooted.",  // MT
+                "You find that \(item) has strong architectural opinions about remaining in its designated spot.",  // NC
+                "\(item) exhibits the sort of stubborn permanence that makes engineers proud.",  // TC
+                "The universe appears to have filed \(item) under 'things that don't turn' and lost the paperwork.",  // DA
             )
         )
     }
@@ -2413,20 +2427,20 @@ open class MessageProvider: @unchecked Sendable {
         output(
             "turnItem(item: '\(item)')",
             oneOf(
-                "\(item) regards your turning efforts with the immovable dignity of something that knows better.", // SJ
-                "You attempt to turn \(item), but it subscribes to a more stationary philosophy of existence.", // OW
-                "\(item) politely declines your invitation to rotate.", // NC
-                "Your turning ambitions meet \(item)'s steadfast commitment to remaining exactly where it is.", // DP
-                "\(item) demonstrates the sort of stubborn integrity that refuses to be turned by mere enthusiasm.", // MT
-                "You discover that \(item) has strong opinions about its current orientation.", // TC
-                "\(item) responds to your turning attempt with the unwavering resolve of the professionally immobile.", // DA
-                "Your hands find that \(item) has achieved a zen-like state of rotational resistance.", // SJ
-                "\(item) seems to have tenure in its current position.", // DP
-                "You try turning \(item), but it appears to have philosophical objections to change.", // OW
-                "\(item) maintains its bearing with the confidence of something that's found its true direction.", // MT
-                "Your turning efforts bounce off \(item) like optimism off a tax collector.", // NC
-                "\(item) exhibits the sort of steadfast character that made the Empire what it was.", // TC
-                "The universe conspires with \(item) to remain disappointingly static.", // DA
+                "\(item) regards your turning efforts with the immovable dignity of something that knows better.",  // SJ
+                "You attempt to turn \(item), but it subscribes to a more stationary philosophy of existence.",  // OW
+                "\(item) politely declines your invitation to rotate.",  // NC
+                "Your turning ambitions meet \(item)'s steadfast commitment to remaining exactly where it is.",  // DP
+                "\(item) demonstrates the sort of stubborn integrity that refuses to be turned by mere enthusiasm.",  // MT
+                "You discover that \(item) has strong opinions about its current orientation.",  // TC
+                "\(item) responds to your turning attempt with the unwavering resolve of the professionally immobile.",  // DA
+                "Your hands find that \(item) has achieved a zen-like state of rotational resistance.",  // SJ
+                "\(item) seems to have tenure in its current position.",  // DP
+                "You try turning \(item), but it appears to have philosophical objections to change.",  // OW
+                "\(item) maintains its bearing with the confidence of something that's found its true direction.",  // MT
+                "Your turning efforts bounce off \(item) like optimism off a tax collector.",  // NC
+                "\(item) exhibits the sort of steadfast character that made the Empire what it was.",  // TC
+                "The universe conspires with \(item) to remain disappointingly static.",  // DA
             )
         )
     }
@@ -2435,20 +2449,20 @@ open class MessageProvider: @unchecked Sendable {
         output(
             "turnSelf()",
             oneOf(
-                "You execute a turn with the graceful efficiency of someone who at least knows where their own joints are.", // NC
-                "A successful rotation accomplished with all the dignity one can muster while spinning in place.", // DP
-                "You turn yourself around with the philosophical satisfaction of controlling at least one thing in this world.", // SJ
-                "You perform a personal rotation that would make a music box dancer weep with professional envy.", // OW
-                "You turn yourself with the practiced ease of someone who's mastered the art of facing different directions.", // MT
-                "A pirouette executed with all the subtle drama of someone making a statement about personal autonomy.", // TC
-                "You accomplish a turn that demonstrates your complete mastery over your own spatial orientation.", // DA
-                "You rotate with the quiet confidence of someone who knows which way they're pointing.", // DP
-                "A turn performed with the sort of casual competence that comes from years of being yourself.", // NC
-                "You execute a personal rotation that achieves exactly what one might expect from turning oneself.", // SJ
-                "You turn around with the satisfied air of someone who's successfully changed their perspective by 180 degrees.", // MT
-                "A graceful pivot that proves you remain the undisputed authority on your own directional preferences.", // OW
-                "You turn yourself with the effortless skill of someone intimately familiar with their own mechanics.", // TC
-                "You accomplish a rotation that stands as a testament to humanity's mastery over basic spatial concepts.", // DA
+                "You execute a turn with the graceful efficiency of someone who at least knows where their own joints are.",  // NC
+                "A successful rotation accomplished with all the dignity one can muster while spinning in place.",  // DP
+                "You turn yourself around with the philosophical satisfaction of controlling at least one thing in this world.",  // SJ
+                "You perform a personal rotation that would make a music box dancer weep with professional envy.",  // OW
+                "You turn yourself with the practiced ease of someone who's mastered the art of facing different directions.",  // MT
+                "A pirouette executed with all the subtle drama of someone making a statement about personal autonomy.",  // TC
+                "You accomplish a turn that demonstrates your complete mastery over your own spatial orientation.",  // DA
+                "You rotate with the quiet confidence of someone who knows which way they're pointing.",  // DP
+                "A turn performed with the sort of casual competence that comes from years of being yourself.",  // NC
+                "You execute a personal rotation that achieves exactly what one might expect from turning oneself.",  // SJ
+                "You turn around with the satisfied air of someone who's successfully changed their perspective by 180 degrees.",  // MT
+                "A graceful pivot that proves you remain the undisputed authority on your own directional preferences.",  // OW
+                "You turn yourself with the effortless skill of someone intimately familiar with their own mechanics.",  // TC
+                "You accomplish a rotation that stands as a testament to humanity's mastery over basic spatial concepts.",  // DA
             )
         )
     }
