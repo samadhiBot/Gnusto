@@ -7,58 +7,60 @@ import Foundation
 /// instances (provided via `GameBlueprint.customActionHandlers` or the engine's default
 /// handlers) to execute parsed player `Command`s.
 ///
-/// The handling of an action is divided into three distinct, asynchronous phases:
-/// 1.  **`validate(context:)`**: Check if the action is currently possible (e.g., prerequisites met,
-///     target item is accessible). This phase should *not* modify game state.
-/// 2.  **`process(context:)`**: Execute the core logic of the action. This phase may involve
-///     calculating intended state changes and determining the outcome (e.g., success message,
-///     failure reason, side effects).
-/// 3.  **`postProcess(context:result:)`**: Perform any cleanup or follow-up tasks after `process`
-///     has completed. The engine typically applies state changes and prints messages *after*
-///     `process` returns and *before* `postProcess` is called, but `postProcess` offers a hook
-///     for additional logic if needed.
-///
-/// Handlers should be `Sendable` as they are used by the `GameEngine` actor.
+/// Each `ActionHandler` is completely self-contained, defining both the verb's parsing
+/// rules (via `synonyms`, `syntax`, etc.) and its execution logic. This eliminates
+/// the need to coordinate changes across multiple files when adding new verbs.
 public protocol ActionHandler: Sendable {
-    /// Validates if the action can be performed based on the current game state and command context.
-    ///
-    /// This method should check all prerequisites for the action (e.g., is the target item held?
-    /// Is the door unlocked? Does the player have the required tool?). It should *not* make
-    /// any changes to the game state (`context.stateSnapshot` provides an immutable view for checks).
-    ///
-    /// If validation fails, this method should throw an appropriate `ActionResponse` (e.g.,
-    /// `.itemNotHeld(itemID)`, `.itemIsLocked(itemID)`). If validation passes, it should return normally.
-    ///
-    /// - Parameters:
-    ///   - context: An `ActionContext` providing the current `Command`, a non-isolated reference
-    ///              to the `GameEngine`, an immutable `GameState` snapshot, and any additional
-    ///              contextual data.
-    /// - Throws: An `ActionResponse` if validation fails, preventing further processing.
-    func validate(
-        context: ActionContext
-    ) async throws
+    // MARK: - Verb Definition Properties
 
-    /// Processes the core logic of the action and determines its outcome.
+    /// Syntax patterns that this verb accepts.
     ///
-    /// This method is called only if `validate(context:)` completed successfully. Here, you
-    /// implement the primary effect of the action. This might involve:
-    ///   - Creating `StateChange` objects to represent modifications to the game world.
-    ///   - Defining `SideEffect`s (e.g., starting a timer, activating a daemon).
-    ///   - Crafting a message to be displayed to the player.
+    /// Each `SyntaxRule` defines a valid command structure for this verb, such as:
+    /// - `.match(.verb)` for verbs without objects (e.g., "inventory")
+    /// - `.match(.verb, .directObject)` for verbs with one object (e.g., "take sword")
+    /// - `.match(.verb, .directObject, .with, .indirectObject)` for complex patterns
+    /// - `.match(.lift, .up, .directObject)` for specific verb matches
     ///
-    /// All outcomes are packaged into an `ActionResult`.
+    /// The parser uses these rules to validate and structure player input.
+    var syntax: [SyntaxRule] { get }
+
+    /// All of the verb synonyms that can match `.verb` in the syntax rules to trigger this action handler.
+    ///
+    /// The parser treats all of the verb synonym as equivalent when matching player input.
+    var synonyms: [Verb] { get }
+
+    /// Whether this verb requires light to execute.
+    ///
+    /// If `true`, the verb will fail with a "room is dark" message when executed in darkness
+    /// (except for light-producing verbs like "turn on"). If `false`, the verb can be used
+    /// regardless of lighting conditions.
+    var requiresLight: Bool { get }
+
+    /// Whether this verb consumes a turn when executed.
+    ///
+    /// If `true`, executing this command will increment the player's move counter and trigger
+    /// timed events (fuses and daemons). If `false`, the command is considered a "meta-command"
+    /// that doesn't advance game time.
+    ///
+    /// Set this to `false` for commands like SAVE, SCORE, BRIEF, VERBOSE, HELP, QUIT, etc.
+    /// that provide information or change settings without affecting the game world.
+    var consumesTurn: Bool { get }
+
+    // MARK: - Action Processing Methods
+
+    /// Processes the action, performing validation and execution in a single unified step.
+    ///
+    /// This method should:
+    ///   1. Validate all prerequisites (item exists, is accessible, meets requirements)
+    ///   2. If validation fails, throw an appropriate `ActionResponse`
+    ///   3. If validation passes, execute the action and return an `ActionResult`
     ///
     /// - Parameters:
-    ///   - context: The `ActionContext` (same as in `validate`).
-    /// - Returns: An `ActionResult` detailing the outcome. This includes an optional message
-    ///            for the player, an array of `StateChange`s to be applied by the engine, and
-    ///            an array of `SideEffect`s to be triggered.
-    /// - Throws: An `ActionResponse` or other `Error` if processing fails unexpectedly.
-    ///           Throwing an `ActionResponse` here will typically result in its standard message
-    ///           being shown to the player.
-    func process(
-        context: ActionContext
-    ) async throws -> ActionResult
+    ///   - context: The context object containing the parsed command and game engine reference.
+    /// - Returns: An `ActionResult` containing the message, state changes, and side effects.
+    /// - Throws: `ActionResponse` for expected validation failures, and other errors for
+    ///           unexpected issues.
+    func process(context: ActionContext) async throws -> ActionResult
 
     /// Handles any follow-up effects or cleanup after the `process` step has completed
     /// and its `ActionResult` has been initially handled by the engine.
@@ -70,12 +72,14 @@ public protocol ActionHandler: Sendable {
     /// just-applied changes. The default implementation of this method does nothing.
     ///
     /// - Parameters:
-    ///   - context: The `ActionContext` (same as in `validate` and `process`).
+    ///   - command: The specific parsed `Command` that is currently being executed.
+    ///   - engine: A non-isolated reference to the `GameEngine` instance.
     ///   - result: The `ActionResult` that was returned by the `process` step.
     /// - Throws: An `Error` if post-processing encounters a problem. This is generally
     ///           less common than throwing from `validate` or `process`.
     func postProcess(
-        context: ActionContext,
+        command: Command,
+        engine: GameEngine,
         result: ActionResult
     ) async throws
 }
@@ -83,14 +87,6 @@ public protocol ActionHandler: Sendable {
 // MARK: - Default Implementation
 
 extension ActionHandler {
-    /// Default implementation for `validate`. Does nothing, assuming the action is always valid
-    /// unless overridden by a specific handler.
-    public func validate(
-        context: ActionContext
-    ) async throws {
-        // Default: No specific validation required.
-    }
-
     /// Default implementation for `postProcess`. Does nothing.
     ///
     /// This optional step allows handlers to implement custom logic that should execute
@@ -98,9 +94,31 @@ extension ActionHandler {
     /// has applied the primary state changes and printed the main message from that result.
     /// Most handlers may not need to override this.
     public func postProcess(
-        context: ActionContext,
+        command: Command,
+        engine: GameEngine,
         result: ActionResult
     ) async throws {
         // Default: Do nothing
+    }
+
+    /// Default implementation for `synonyms`. Returns an empty array.
+    ///
+    /// Override this property to provide the synonyms that can trigger this action handler.
+    public var synonyms: [Verb] {
+        []
+    }
+
+    /// Default implementation for `requiresLight`. Returns `true` for safety.
+    ///
+    /// Override this property to `false` for verbs that can be used in darkness.
+    public var requiresLight: Bool {
+        true
+    }
+
+    /// Default implementation for `consumesTurn`. Returns `true` by default.
+    ///
+    /// Override this property to `false` for meta-commands that shouldn't advance game time.
+    public var consumesTurn: Bool {
+        true
     }
 }

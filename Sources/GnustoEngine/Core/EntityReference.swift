@@ -3,34 +3,43 @@ import Foundation
 /// Represents a reference to a game entity, which can be an item, a location, or the player.
 /// This provides a type-safe way to specify the target of a command.
 public enum EntityReference: Hashable, Sendable, Codable {
-    /// A reference to an item, identified by its `ItemID`.
-    case item(ItemID)
+    /// A reference to an item, identified by its `Item`.
+    case item(Item)
 
-    /// A reference to a location, identified by its `LocationID`.
-    case location(LocationID)
+    /// A reference to a location, identified by its `Location`.
+    case location(Location)
 
     /// A reference to the player character.
     case player
 
-    // Consider adding later if useful:
-    // /// A reference to the current location where the command is being issued.
-    // case here
-    //
-    // /// A reference to the entity that was the primary result/target of the previous action.
-    // case previous
+    /// A reference to a universal object concept.
+    case universal(UniversalObject)
 }
-
-// MARK: - Conformances
 
 extension EntityReference: CustomStringConvertible {
     public var description: String {
         switch self {
-        case .item(let itemID):
-            itemID.description
-        case .location(let locationID):
-            locationID.description
-        case .player:
-            ".player"
+        case .item(let item): "\(item.id)"
+        case .location(let location): "\(location.id)"
+        case .player: "player"
+        case .universal(let universal): "\(universal)"
+        }
+    }
+}
+
+extension EntityReference: Equatable {
+    public static func == (lhs: EntityReference, rhs: EntityReference) -> Bool {
+        switch (lhs, rhs) {
+        case (.item(let lhsItem), .item(let rhsItem)):
+            lhsItem.id == rhsItem.id
+        case (.location(let lhsLocation), .location(let rhsLocation)):
+            lhsLocation.id == rhsLocation.id
+        case (.player, .player):
+            true
+        case (.universal(let lhsUniversal), .universal(let rhsUniversal)):
+            lhsUniversal.id == rhsUniversal.id
+        default:
+            false
         }
     }
 }

@@ -3,19 +3,28 @@ import Foundation
 
 /// Represents a one-way connection from one `Location` to another in a specific `Direction`.
 ///
-/// `Exit` objects are stored in a `Location`'s `exits` dictionary, mapping a `Direction`
-/// (e.g., `.north`, `.east`) to the `Exit` that defines the path in that direction.
-/// An exit can be a simple passage or can be associated with a door (`doorID`)
-/// that might be open, closed, or locked, affecting traversal.
+/// `Exit` objects are stored in a `Location`'s `exits` property, declaring a `Direction`
+/// (e.g., `.north`, `.east`) and the path in that direction. An exit can be a simple passage
+/// or can be associated with a door (`doorID`) that might be open, closed, or locked, all
+/// affecting traversal. If `destinationID` is `nil`, the exit is permanently blocked.
 public struct Exit: Codable, Hashable, Sendable {
-    /// The `LocationID` of the location this exit leads to.
-    public var destinationID: LocationID
+    /// The cardinal or other direction to move toward or through the exit.
+    let direction: Direction
+
+    /// The `LocationID` of the location this exit leads to, or `nil` if the exit is permanently
+    /// blocked.
+    ///
+    /// When `nil`, this represents an exit that doesn't actually lead anywhere (e.g., repeatedly
+    /// going north in Zork's forest). Such exits should typically display either the custom
+    /// `blockedMessage` or a default "You can't go that way" message.
+    public let destinationID: LocationID?
 
     /// An optional custom message to be displayed if the player attempts to use this exit
-    /// but is prevented from doing so (e.g., because an associated door is closed and locked,
-    /// or some other game condition blocks passage).
-    /// If `nil`, the `GameEngine` or `ActionHandler` might use a default message.
-    public var blockedMessage: String? = nil
+    /// but is prevented from doing so.
+    ///
+    /// Examples of blockages include when an associated door is closed and locked, or some
+    /// other game condition blocks passage. If `nil`, the engine displays a default message.
+    public let blockedMessage: String?
 
     /// An optional `ItemID` that identifies an `Item` acting as a door or barrier for this exit.
     ///
@@ -24,71 +33,388 @@ public struct Exit: Codable, Hashable, Sendable {
     /// The `GoActionHandler` often uses this to check door states.
     public let doorID: ItemID?
 
-    /// Creates a new exit to another location, optionally with a custom blocked message
-    /// and/or an associated door item.
-    ///
+    // MARK: - Cardinal Directions
+
+    /// Creates an exit leading north to the specified location.
     /// - Parameters:
-    ///   - destination: The `LocationID` this exit leads to.
-    ///   - blockedMessage: An optional custom message to display if the player cannot
-    ///     use this exit (e.g., due to a closed door or other obstruction). If `nil`,
-    ///     the engine will use a default message.
-    ///   - doorID: An optional `ItemID` for an item that acts as a door or barrier
-    ///     for this exit. If set, the state of this item (e.g., open/closed/locked)
-    ///     will typically determine if the player can pass through.
-    public init(
-        destination: LocationID,
-        blockedMessage: String? = nil,
-        doorID: ItemID? = nil
-    ) {
-        self.destinationID = destination
-        self.blockedMessage = blockedMessage
-        self.doorID = doorID
+    ///   - locationID: The destination location ID.
+    ///   - itemID: Optional door or barrier item ID that controls access.
+    ///   - blocked: Optional custom message shown when the exit is blocked.
+    /// - Returns: An `Exit` configured for northward movement.
+    public static func north(
+        _ locationID: LocationID,
+        via itemID: ItemID? = nil,
+        blocked: String? = nil
+    ) -> Exit {
+        Exit(
+            direction: .north,
+            destinationID: locationID,
+            blockedMessage: blocked,
+            doorID: itemID
+        )
     }
 
-    /// A convenience factory method for creating a simple exit to another location.
-    ///
-    /// This is a shorthand for `Exit(destination: destination)` when you don't need
-    /// a custom blocked message or door.
-    ///
-    /// Example:
-    /// ```swift
-    /// .exits([
-    ///     .north: .to("garden"),
-    ///     .east: .to("kitchen")
-    /// ])
-    /// ```
-    ///
-    /// - Parameter destination: The `LocationID` this exit leads to.
-    /// - Returns: A new `Exit` instance with the specified destination.
-    public static func to(_ destination: LocationID) -> Exit {
-        .init(destination: destination)
+    /// Creates an exit leading south to the specified location.
+    /// - Parameters:
+    ///   - locationID: The destination location ID.
+    ///   - itemID: Optional door or barrier item ID that controls access.
+    ///   - blocked: Optional custom message shown when the exit is blocked.
+    /// - Returns: An `Exit` configured for southward movement.
+    public static func south(
+        _ locationID: LocationID,
+        via itemID: ItemID? = nil,
+        blocked: String? = nil
+    ) -> Exit {
+        Exit(
+            direction: .south,
+            destinationID: locationID,
+            blockedMessage: blocked,
+            doorID: itemID
+        )
     }
 
-    // TODO: Consider adding properties for:
-    // - Visibility (e.g., hidden exit)
-    // - One-way exits
-    // - Action routines associated with traversing (e.g., FEXIT in ZIL)
+    /// Creates an exit leading east to the specified location.
+    /// - Parameters:
+    ///   - locationID: The destination location ID.
+    ///   - itemID: Optional door or barrier item ID that controls access.
+    ///   - blocked: Optional custom message shown when the exit is blocked.
+    /// - Returns: An `Exit` configured for eastward movement.
+    public static func east(
+        _ locationID: LocationID,
+        via itemID: ItemID? = nil,
+        blocked: String? = nil
+    ) -> Exit {
+        Exit(
+            direction: .east,
+            destinationID: locationID,
+            blockedMessage: blocked,
+            doorID: itemID
+        )
+    }
+
+    /// Creates an exit leading west to the specified location.
+    /// - Parameters:
+    ///   - locationID: The destination location ID.
+    ///   - itemID: Optional door or barrier item ID that controls access.
+    ///   - blocked: Optional custom message shown when the exit is blocked.
+    /// - Returns: An `Exit` configured for westward movement.
+    public static func west(
+        _ locationID: LocationID,
+        via itemID: ItemID? = nil,
+        blocked: String? = nil
+    ) -> Exit {
+        Exit(
+            direction: .west,
+            destinationID: locationID,
+            blockedMessage: blocked,
+            doorID: itemID
+        )
+    }
+
+    // MARK: - Intermediate Directions
+
+    /// Creates an exit leading northeast to the specified location.
+    /// - Parameters:
+    ///   - locationID: The destination location ID.
+    ///   - itemID: Optional door or barrier item ID that controls access.
+    ///   - blocked: Optional custom message shown when the exit is blocked.
+    /// - Returns: An `Exit` configured for northeastward movement.
+    public static func northeast(
+        _ locationID: LocationID,
+        via itemID: ItemID? = nil,
+        blocked: String? = nil
+    ) -> Exit {
+        Exit(
+            direction: .northeast,
+            destinationID: locationID,
+            blockedMessage: blocked,
+            doorID: itemID
+        )
+    }
+
+    /// Creates an exit leading northwest to the specified location.
+    /// - Parameters:
+    ///   - locationID: The destination location ID.
+    ///   - itemID: Optional door or barrier item ID that controls access.
+    ///   - blocked: Optional custom message shown when the exit is blocked.
+    /// - Returns: An `Exit` configured for northwestward movement.
+    public static func northwest(
+        _ locationID: LocationID,
+        via itemID: ItemID? = nil,
+        blocked: String? = nil
+    ) -> Exit {
+        Exit(
+            direction: .northwest,
+            destinationID: locationID,
+            blockedMessage: blocked,
+            doorID: itemID
+        )
+    }
+
+    /// Creates an exit leading southeast to the specified location.
+    /// - Parameters:
+    ///   - locationID: The destination location ID.
+    ///   - itemID: Optional door or barrier item ID that controls access.
+    ///   - blocked: Optional custom message shown when the exit is blocked.
+    /// - Returns: An `Exit` configured for southeastward movement.
+    public static func southeast(
+        _ locationID: LocationID,
+        via itemID: ItemID? = nil,
+        blocked: String? = nil
+    ) -> Exit {
+        Exit(
+            direction: .southeast,
+            destinationID: locationID,
+            blockedMessage: blocked,
+            doorID: itemID
+        )
+    }
+
+    /// Creates an exit leading southwest to the specified location.
+    /// - Parameters:
+    ///   - locationID: The destination location ID.
+    ///   - itemID: Optional door or barrier item ID that controls access.
+    ///   - blocked: Optional custom message shown when the exit is blocked.
+    /// - Returns: An `Exit` configured for southwestward movement.
+    public static func southwest(
+        _ locationID: LocationID,
+        via itemID: ItemID? = nil,
+        blocked: String? = nil
+    ) -> Exit {
+        Exit(
+            direction: .southwest,
+            destinationID: locationID,
+            blockedMessage: blocked,
+            doorID: itemID
+        )
+    }
+
+    // MARK: - Vertical Directions
+
+    /// Creates an exit leading up to the specified location.
+    /// - Parameters:
+    ///   - locationID: The destination location ID.
+    ///   - itemID: Optional door or barrier item ID that controls access.
+    ///   - blocked: Optional custom message shown when the exit is blocked.
+    /// - Returns: An `Exit` configured for upward movement.
+    public static func up(
+        _ locationID: LocationID,
+        via itemID: ItemID? = nil,
+        blocked: String? = nil
+    ) -> Exit {
+        Exit(
+            direction: .up,
+            destinationID: locationID,
+            blockedMessage: blocked,
+            doorID: itemID
+        )
+    }
+
+    /// Creates an exit leading down to the specified location.
+    /// - Parameters:
+    ///   - locationID: The destination location ID.
+    ///   - itemID: Optional door or barrier item ID that controls access.
+    ///   - blocked: Optional custom message shown when the exit is blocked.
+    /// - Returns: An `Exit` configured for downward movement.
+    public static func down(
+        _ locationID: LocationID,
+        via itemID: ItemID? = nil,
+        blocked: String? = nil
+    ) -> Exit {
+        Exit(
+            direction: .down,
+            destinationID: locationID,
+            blockedMessage: blocked,
+            doorID: itemID
+        )
+    }
+
+    // MARK: - Inside/Outside Directions
+
+    /// Creates an exit leading inside to the specified location.
+    /// - Parameters:
+    ///   - locationID: The destination location ID.
+    ///   - itemID: Optional door or barrier item ID that controls access.
+    ///   - blocked: Optional custom message shown when the exit is blocked.
+    /// - Returns: An `Exit` configured for movement inside.
+    public static func inside(
+        _ locationID: LocationID,
+        via itemID: ItemID? = nil,
+        blocked: String? = nil
+    ) -> Exit {
+        Exit(
+            direction: .inside,
+            destinationID: locationID,
+            blockedMessage: blocked,
+            doorID: itemID
+        )
+    }
+
+    /// Creates an exit leading outside to the specified location.
+    /// - Parameters:
+    ///   - locationID: The destination location ID.
+    ///   - itemID: Optional door or barrier item ID that controls access.
+    ///   - blocked: Optional custom message shown when the exit is blocked.
+    /// - Returns: An `Exit` configured for movement outside.
+    public static func outside(
+        _ locationID: LocationID,
+        via itemID: ItemID? = nil,
+        blocked: String? = nil
+    ) -> Exit {
+        Exit(
+            direction: .outside,
+            destinationID: locationID,
+            blockedMessage: blocked,
+            doorID: itemID
+        )
+    }
+
+    // MARK: - Blocked Exits
+
+    /// Creates a permanently blocked exit leading north.
+    /// - Parameter blocked: The custom message to display when the player attempts this exit.
+    /// - Returns: A blocked `Exit` configured for northward movement.
+    public static func north(blocked: String) -> Exit {
+        Exit(
+            direction: .north,
+            destinationID: nil,
+            blockedMessage: blocked,
+            doorID: nil
+        )
+    }
+
+    /// Creates a permanently blocked exit leading south.
+    /// - Parameter blocked: The custom message to display when the player attempts this exit.
+    /// - Returns: A blocked `Exit` configured for southward movement.
+    public static func south(blocked: String) -> Exit {
+        Exit(
+            direction: .south,
+            destinationID: nil,
+            blockedMessage: blocked,
+            doorID: nil
+        )
+    }
+
+    /// Creates a permanently blocked exit leading east.
+    /// - Parameter blocked: The custom message to display when the player attempts this exit.
+    /// - Returns: A blocked `Exit` configured for eastward movement.
+    public static func east(blocked: String) -> Exit {
+        Exit(
+            direction: .east,
+            destinationID: nil,
+            blockedMessage: blocked,
+            doorID: nil
+        )
+    }
+
+    /// Creates a permanently blocked exit leading west.
+    /// - Parameter blocked: The custom message to display when the player attempts this exit.
+    /// - Returns: A blocked `Exit` configured for westward movement.
+    public static func west(blocked: String) -> Exit {
+        Exit(
+            direction: .west,
+            destinationID: nil,
+            blockedMessage: blocked,
+            doorID: nil
+        )
+    }
+
+    /// Creates a permanently blocked exit leading up.
+    /// - Parameter blocked: The custom message to display when the player attempts this exit.
+    /// - Returns: A blocked `Exit` configured for upward movement.
+    public static func up(blocked: String) -> Exit {
+        Exit(
+            direction: .up,
+            destinationID: nil,
+            blockedMessage: blocked,
+            doorID: nil
+        )
+    }
+
+    /// Creates a permanently blocked exit leading down.
+    /// - Parameter blocked: The custom message to display when the player attempts this exit.
+    /// - Returns: A blocked `Exit` configured for downward movement.
+    public static func down(blocked: String) -> Exit {
+        Exit(
+            direction: .down,
+            destinationID: nil,
+            blockedMessage: blocked,
+            doorID: nil
+        )
+    }
+
+    /// Creates a permanently blocked exit leading inside.
+    /// - Parameter blocked: The custom message to display when the player attempts this exit.
+    /// - Returns: A blocked `Exit` configured for movement inside.
+    public static func inside(blocked: String) -> Exit {
+        Exit(
+            direction: .inside,
+            destinationID: nil,
+            blockedMessage: blocked,
+            doorID: nil
+        )
+    }
+
+    /// Creates a permanently blocked exit leading outside.
+    /// - Parameter blocked: The custom message to display when the player attempts this exit.
+    /// - Returns: A blocked `Exit` configured for movement outside.
+    public static func outside(blocked: String) -> Exit {
+        Exit(
+            direction: .outside,
+            destinationID: nil,
+            blockedMessage: blocked,
+            doorID: nil
+        )
+    }
 }
 
-// MARK: - CustomDumpStringConvertible conformance
+// MARK: - CustomDumpStringConvertible
+
+extension Exit: Comparable {
+    public static func < (lhs: Exit, rhs: Exit) -> Bool {
+        lhs.direction < rhs.direction
+    }
+}
 
 extension Exit: CustomDumpStringConvertible {
+    /// A custom string representation used by the CustomDump library for debugging output.
+    ///
+    /// Formats the exit as `direction(details...)` where details include the destination,
+    /// blocked message, and door ID if present.
+    ///
+    /// Example output: `north(destinationID: foyer, door: frontDoor)`
     public var customDumpDescription: String {
-        var details = ["to: \(destinationID)"]
+        var details = [String]()
+        if let destinationID {
+            details.append("to: \(destinationID)")
+        }
+        if let doorID {
+            details.append("via: \(doorID)")
+        }
         if let blockedMessage {
             details.append("blocked: \(blockedMessage.indent(omitFirst: true))")
         }
-        if let doorID { details.append("door: \(doorID)")}
-        return "\n\(details.joined(separator: "\n").indent())"
-
+        return "\(direction)(\(details.joined(separator: .linebreak)))"
     }
 }
 
-extension Dictionary: @retroactive CustomDumpStringConvertible where Key == Direction, Value == Exit {
-    public var customDumpDescription: String {
-        let elements = self.map { "\($0): \($1)" }
-        return """
-            \(elements.joined(separator: "\n").indent())
-            """
+// MARK: - MovementBehavior
+
+extension Exit {
+    public enum MovementBehavior: Equatable {
+        /// Can pass through any exit, even if blocked
+        case any
+
+        /// Can pass through closed door that are unlocked
+        case closedDoors
+
+        /// Can pass through locked doors
+        case lockedDoors
+
+        /// Can pass through locked doors that can be unlocked by one of the specified keys
+        case lockedDoorsUnlockedByKeys([ItemID])
+
+        /// Normal interaction with doors
+        case normal
     }
 }

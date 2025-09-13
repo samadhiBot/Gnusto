@@ -21,23 +21,177 @@ public struct SideEffect: Sendable, Equatable {
     /// For example, a `.startFuse` effect might include a parameter for the fuse's duration.
     public let parameters: [String: StateValue]
 
-    /// Creates a new `SideEffect` instance.
-    ///
-    /// - Parameters:
-    ///   - type: The `SideEffectType` categorizing this side effect.
-    ///   - targetID: The `EntityID` of the entity primarily affected or involved.
-    ///   - parameters: Optional. A dictionary of additional `String`-keyed `StateValue`
-    ///                 parameters needed for this specific side effect. Defaults to an empty dictionary.
-    public init(
-        type: SideEffectType,
-        targetID: EntityID,
-        parameters: [String: StateValue] = [:]
-    ) {
+    public init(type: SideEffectType, targetID: EntityID, parameters: [String: StateValue]) {
         self.type = type
         self.targetID = targetID
         self.parameters = parameters
     }
 }
+
+// MARK: - SideEffect Factories
+
+extension SideEffect {
+    /// Creates a new `SideEffect` instance with type `.startFuse`.
+    ///
+    /// This unified fuse system supports both simple timers and complex context-aware events.
+    /// The `turns` parameter controls timing, while `state` provides application-specific data.
+    ///
+    /// - Parameters:
+    ///   - fuseID: The `FuseID` of the fuse to start.
+    ///   - turns: Optional number of turns until the fuse triggers. If not provided,
+    ///            uses the default turns from the Fuse definition.
+    ///   - state: Optional custom state data to associate with this fuse instance.
+    ///            This data will be available to the fuse's action when it triggers.
+    public static func startFuse(
+        _ fuseID: FuseID,
+        turns: Int? = nil,
+        state: [String: StateValue] = [:]
+    ) -> SideEffect {
+        var parameters = state
+        if let turns = turns {
+            parameters["--turns"] = .int(turns)
+        }
+
+        return SideEffect(
+            type: .startFuse,
+            targetID: .fuse(fuseID),
+            parameters: parameters
+        )
+    }
+
+    /// Creates a new `SideEffect` instance with type `.stopFuse`.
+    ///
+    /// - Parameters:
+    ///   - fuseID: The `FuseID` of the entity primarily affected or involved.
+    ///   - parameters: An optional dictionary of additional parameters.
+    public static func stopFuse(
+        _ fuseID: FuseID,
+        parameters: [String: StateValue] = [:]
+    ) -> SideEffect {
+        SideEffect(
+            type: .stopFuse,
+            targetID: .fuse(fuseID),
+            parameters: parameters
+        )
+    }
+
+    /// Creates a new `SideEffect` instance with type `.runDaemon`.
+    ///
+    /// - Parameters:
+    ///   - daemonID: The `DaemonID` of the entity primarily affected or involved.
+    ///   - parameters: An optional dictionary of additional parameters.
+    public static func runDaemon(
+        _ daemonID: DaemonID,
+        parameters: [String: StateValue] = [:]
+    ) -> SideEffect {
+        SideEffect(
+            type: .runDaemon,
+            targetID: .daemon(daemonID),
+            parameters: parameters
+        )
+    }
+
+    /// Creates a new `SideEffect` instance with type `.stopDaemon`.
+    ///
+    /// - Parameters:
+    ///   - daemonID: The `DaemonID` of the entity primarily affected or involved.
+    ///   - parameters: An optional dictionary of additional parameters.
+    public static func stopDaemon(
+        _ daemonID: DaemonID,
+        parameters: [String: StateValue] = [:]
+    ) -> SideEffect {
+        SideEffect(
+            type: .stopDaemon,
+            targetID: .daemon(daemonID),
+            parameters: parameters
+        )
+    }
+}
+
+// MARK: - Convenience Methods for Common Fuse Patterns
+
+extension SideEffect {
+    /// Starts an enemy wake-up fuse with a specific enemy ID.
+    /// 
+    /// This convenience method creates a properly configured side effect for waking up
+    /// an unconscious enemy after a specified number of turns.
+    /// 
+    /// - Parameters:
+    ///   - enemyID: The ID of the enemy that should wake up.
+    ///   - message: The message to display if the player is present when the enemy wakes up.
+    ///   - turns: Number of turns until the enemy wakes up. Defaults to 3.
+    /// - Returns: A configured SideEffect for the enemy wake-up fuse.
+    public static func startEnemyWakeUpFuse(
+        enemyID: ItemID,
+        message: String,
+        turns: Int
+    ) -> SideEffect {
+        .startFuse(
+            .enemyWakeUp,
+            turns: turns,
+            state: [
+                "enemyID": .string(enemyID.rawValue),
+                "message": .string(message),
+            ]
+        )
+    }
+
+    /// Starts an enemy return fuse with specific enemy and location IDs.
+    /// 
+    /// This convenience method creates a properly configured side effect for returning
+    /// an enemy to a specific location after a specified number of turns. This prevents
+    /// the enemy from spawning in the player's current location.
+    /// 
+    /// - Parameters:
+    ///   - enemyID: The ID of the enemy that should return.
+    ///   - locationID: The ID of the location where the enemy should return.
+    ///   - message: The message to display if the player is present when the enemy returns.
+    ///   - turns: Number of turns until the enemy returns. Defaults to 3.
+    /// - Returns: A configured SideEffect for the enemy return fuse.
+    public static func startEnemyReturnFuse(
+        enemyID: ItemID,
+        to locationID: LocationID,
+        message: String,
+        turns: Int
+    ) -> SideEffect {
+        .startFuse(
+            .enemyReturn,
+            turns: turns,
+            state: [
+                "enemyID": .string(enemyID.rawValue),
+                "locationID": .string(locationID.rawValue),
+                "message": .string(message),
+            ]
+        )
+    }
+
+    /// Starts a status effect expiry fuse with item and effect details.
+    ///
+    /// This convenience method creates a side effect for removing temporary status
+    /// effects from items after a specified duration.
+    ///
+    /// - Parameters:
+    ///   - itemID: The ID of the item affected by the status effect.
+    ///   - effectName: A string identifier for the specific effect to remove.
+    ///   - turns: Number of turns until the effect expires. Defaults to 5.
+    /// - Returns: A configured SideEffect for the status effect expiry fuse.
+    public static func startStatusEffectExpiryFuse(
+        for itemID: ItemID,
+        effectName: String,
+        turns: Int = 5
+    ) -> SideEffect {
+        return .startFuse(
+            .statusEffectExpiry,
+            turns: turns,
+            state: [
+                "itemID": .string(itemID.rawValue),
+                "effectName": .string(effectName),
+            ]
+        )
+    }
+}
+
+// MARK: - SideEffectType
 
 /// Enumerates the distinct categories of side effects that can be triggered within the game.
 ///
@@ -57,10 +211,4 @@ public enum SideEffectType: String, Codable, Sendable, Equatable {
     /// Indicates that an active daemon should be deactivated.
     /// The `targetID` should be the `EntityID.daemon(daemonID)` of the daemon to stop.
     case stopDaemon
-    /// Indicates that a custom event should be scheduled to occur at a later time or under
-    /// certain conditions. This can be used for delayed messages, recurring events, or other
-    /// time-based game logic not fitting the fuse/daemon model.
-    /// `targetID` and `parameters` would be defined by the specific needs of the scheduled event.
-    case scheduleEvent // e.g., for delayed messages or actions
-    // Add more as needed
 }

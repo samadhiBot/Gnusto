@@ -1,205 +1,325 @@
 import CustomDump
+import GnustoEngine
+import GnustoTestSupport
 import Testing
-
-@testable import GnustoEngine
 
 @Suite("CloseActionHandler Tests")
 struct CloseActionHandlerTests {
-    let handler = CloseActionHandler()
 
-    @Test("Close open container successfully")
-    func testCloseOpenContainerSuccessfully() async throws {
-        let box = Item(
-            id: "box",
-            .name("wooden box"),
-            .in(.location(.startRoom)),
-            .isContainer,
+    // MARK: - Syntax Rule Testing
+
+    @Test("CLOSE DIRECTOBJECT syntax works")
+    func testCloseDirectObjectSyntax() async throws {
+        // Given
+        let chest = Item(
+            id: "chest",
+            .name("wooden chest"),
+            .description("A large wooden chest."),
             .isOpenable,
-            .isOpen // Start open
-        )
-        let game = MinimalGame(items: [box])
-        let mockIO = await MockIOHandler()
-        let mockParser = MockParser()
-        let engine = await GameEngine(
-            blueprint: game,
-            parser: mockParser,
-            ioHandler: mockIO
+            .isOpen,
+            .in(.startRoom)
         )
 
-        let command = Command(
-            verb: .close,
-            directObject: .item("box"),
-            rawInput: "close box"
+        let game = MinimalGame(
+            items: chest
         )
 
-        // Initial state check
-        let initialBox = try await engine.item("box")
-        #expect(initialBox.attributes[.isOpen] == true)
-        #expect(await engine.gameState.changeHistory.isEmpty)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        // Act
-        await engine.execute(command: command)
+        // When
+        try await engine.execute("close chest")
 
-        // Assert State Change
-        let finalBox = try await engine.item("box")
-        #expect(finalBox.attributes[.isOpen] == false)
-        #expect(finalBox.attributes[.isTouched] == true)
-
-        // Assert Output
+        // Then
         let output = await mockIO.flush()
-        expectNoDifference(output, "Closed.")
+        expectNoDifference(
+            output,
+            """
+            > close chest
+            Firmly closed.
+            """
+        )
 
-        // Assert Change History
-        let changeHistory = await engine.gameState.changeHistory
-        expectNoDifference(changeHistory, [
-            StateChange(
-                entityID: .item(box.id),
-                attribute: .itemAttribute(.isOpen),
-                oldValue: true, // Assume it was open before closing
-                newValue: false
-            ),
-            StateChange(
-                entityID: .item(box.id),
-                attribute: .itemAttribute(.isTouched),
-                newValue: true,
-            ),
-            StateChange(
-                entityID: .global,
-                attribute: .pronounReference(pronoun: "it"),
-                newValue: .entityReferenceSet([.item(box.id)])
-            ),
-        ])
+        let finalState = try await engine.item("chest")
+        #expect(await finalState.hasFlag(.isOpen) == false)
+        #expect(await finalState.hasFlag(.isTouched) == true)
     }
 
-    @Test("Close fails if already closed")
-    func testCloseFailsIfAlreadyClosed() async throws {
-        let box = Item(
-            id: "box",
-            .name("wooden box"),
-            .in(.location(.startRoom)),
-            .isContainer,
-            .isOpenable
-            // Starts closed by default (no .isOpen)
-        )
-        let game = MinimalGame(items: [box])
-        let mockIO = await MockIOHandler()
-        let mockParser = MockParser()
-        let engine = await GameEngine(
-            blueprint: game,
-            parser: mockParser,
-            ioHandler: mockIO
+    @Test("SHUT syntax works")
+    func testShutSyntax() async throws {
+        // Given
+        let door = Item(
+            id: "door",
+            .name("wooden door"),
+            .description("A heavy wooden door."),
+            .isOpenable,
+            .isOpen,
+            .in(.startRoom)
         )
 
-        let command = Command(
-            verb: .close,
-            directObject: .item("box"),
-            rawInput: "close box"
+        let game = MinimalGame(
+            items: door
         )
 
-        // Act: Use engine.execute for full pipeline
-        await engine.execute(command: command)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        // Assert Output
+        // When
+        try await engine.execute("shut door")
+
+        // Then
         let output = await mockIO.flush()
-        expectNoDifference(output, "The wooden box is already closed.")
-
-        // Assert Change History
-        #expect(await engine.gameState.changeHistory.isEmpty)
+        expectNoDifference(
+            output,
+            """
+            > shut door
+            Firmly closed.
+            """
+        )
     }
 
-    @Test("Close fails if not openable")
-    func testCloseFailsIfNotOpenable() async throws {
+    // MARK: - Validation Testing
+
+    @Test("Cannot close without specifying target")
+    func testCannotCloseWithoutTarget() async throws {
+        // Given
+        let game = MinimalGame()
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // When
+        try await engine.execute("close")
+
+        // Then
+        let output = await mockIO.flush()
+        expectNoDifference(
+            output,
+            """
+            > close
+            Close what?
+            """
+        )
+    }
+
+    @Test("Cannot close target not in scope")
+    func testCannotCloseTargetNotInScope() async throws {
+        // Given
+        let anotherRoom = Location(
+            id: "anotherRoom",
+            .name("Another Room"),
+            .inherentlyLit
+        )
+
+        let remoteDoor = Item(
+            id: "remoteDoor",
+            .name("remote door"),
+            .description("A door in another room."),
+            .isOpenable,
+            .isOpen,
+            .in("anotherRoom")
+        )
+
+        let game = MinimalGame(
+            locations: anotherRoom,
+            items: remoteDoor
+        )
+
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // When
+        try await engine.execute("close door")
+
+        // Then
+        let output = await mockIO.flush()
+        expectNoDifference(
+            output,
+            """
+            > close door
+            Any such thing lurks beyond your reach.
+            """
+        )
+    }
+
+    @Test("Cannot close non-openable item")
+    func testCannotCloseNonOpenableItem() async throws {
+        // Given
         let rock = Item(
             id: "rock",
-            .name("smooth rock"),
-            .in(.location(.startRoom))
-            // isContainer/isOpenable are false by default
-        )
-        let game = MinimalGame(items: [rock])
-        let engine = await GameEngine(
-            blueprint: game,
-            parser: MockParser(),
-            ioHandler: await MockIOHandler()
+            .name("large rock"),
+            .description("A large boulder."),
+            .in(.startRoom)
         )
 
-        let command = Command(
-            verb: .close,
-            directObject: .item("rock"),
-            rawInput: "close rock"
+        let game = MinimalGame(
+            items: rock
         )
 
-        // Act & Assert Error
-        await #expect(throws: ActionResponse.itemNotClosable("rock")) {
-            try await handler.validate(
-                context: ActionContext(
-                    command: command,
-                    engine: engine,
-                    stateSnapshot: engine.gameState
-                )
-            )
-        }
-        #expect(await engine.gameState.changeHistory.isEmpty)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // When
+        try await engine.execute("close rock")
+
+        // Then
+        let output = await mockIO.flush()
+        expectNoDifference(
+            output,
+            """
+            > close rock
+            The large rock stubbornly resists your attempts to close it.
+            """
+        )
     }
 
-    @Test("Close fails if item not accessible")
-    func testCloseFailsIfNotAccessible() async throws {
+    @Test("Requires light to close")
+    func testRequiresLight() async throws {
+        // Given: Dark room with openable item
+        let darkRoom = Location(
+            id: "darkRoom",
+            .name("Dark Room"),
+            .description("A pitch black room.")
+        )
+
+        let chest = Item(
+            id: "chest",
+            .name("wooden chest"),
+            .description("A large wooden chest."),
+            .isOpenable,
+            .isOpen,
+            .in("darkRoom")
+        )
+
+        let game = MinimalGame(
+            player: Player(in: "darkRoom"),
+            locations: darkRoom,
+            items: chest
+        )
+
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // When
+        try await engine.execute("close chest")
+
+        // Then
+        let output = await mockIO.flush()
+        expectNoDifference(
+            output,
+            """
+            > close chest
+            The darkness here is absolute, consuming all light and hope of
+            sight.
+            """
+        )
+    }
+
+    // MARK: - Processing Testing
+
+    @Test("Close open item succeeds")
+    func testCloseOpenItem() async throws {
+        // Given
         let box = Item(
             id: "box",
-            .name("wooden box"),
-            .in(.nowhere),
+            .name("cardboard box"),
+            .description("A simple cardboard box."),
             .isOpenable,
-            .isOpen // Start open
-        )
-        let game = MinimalGame(items: [box])
-        let engine = await GameEngine(
-            blueprint: game,
-            parser: MockParser(),
-            ioHandler: await MockIOHandler()
+            .isOpen,
+            .in(.startRoom)
         )
 
-        let command = Command(
-            verb: .close,
-            directObject: .item("box"),
-            rawInput: "close box"
+        let game = MinimalGame(
+            items: box
         )
 
-        // Act & Assert Error
-        await #expect(throws: ActionResponse.itemNotAccessible("box")) {
-            try await handler.validate(
-                context: ActionContext(
-                    command: command,
-                    engine: engine,
-                    stateSnapshot: engine.gameState
-                )
-            )
-        }
-        #expect(await engine.gameState.changeHistory.isEmpty)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // When
+        try await engine.execute("close box")
+
+        // Then
+        let output = await mockIO.flush()
+        expectNoDifference(
+            output,
+            """
+            > close box
+            Firmly closed.
+            """
+        )
+
+        let finalState = try await engine.item("box")
+        #expect(await finalState.hasFlag(.isOpen) == false)
+        #expect(await finalState.hasFlag(.isTouched) == true)
     }
 
-    @Test("Close fails with no direct object")
-    func testCloseFailsWithNoObject() async throws {
-        let game = MinimalGame()
-        let engine = await GameEngine(
-            blueprint: game,
-            parser: MockParser(),
-            ioHandler: await MockIOHandler()
+    @Test("Close already closed item gives appropriate message")
+    func testCloseAlreadyClosedItem() async throws {
+        // Given
+        let closedChest = Item(
+            id: "closedChest",
+            .name("closed chest"),
+            .description("A chest that is already closed."),
+            .isOpenable,
+            // Note: No .isOpen flag - defaults to closed
+            .in(.startRoom)
         )
 
-        let command = Command(
-            verb: .close,
-            rawInput: "close"
+        let game = MinimalGame(
+            items: closedChest
         )
 
-        // Act & Assert Error
-        await #expect(throws: ActionResponse.prerequisiteNotMet("Close what?")) {
-            try await handler.validate(
-                context: ActionContext(
-                    command: command,
-                    engine: engine,
-                    stateSnapshot: engine.gameState
-                )
-            )
-        }
-        #expect(await engine.gameState.changeHistory.isEmpty)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // When
+        try await engine.execute("close chest")
+
+        // Then
+        let output = await mockIO.flush()
+        expectNoDifference(
+            output,
+            """
+            > close chest
+            The closed chest is already closed.
+            """
+        )
+
+        let finalState = try await engine.item("closedChest")
+        #expect(await finalState.hasFlag(.isOpen) == false)
+    }
+
+    @Test("Closing sets isTouched flag")
+    func testClosingSetsTouchedFlag() async throws {
+        // Given
+        let container = Item(
+            id: "container",
+            .name("metal container"),
+            .description("A metal storage container."),
+            .isOpenable,
+            .isOpen,
+            .in(.startRoom)
+        )
+
+        let game = MinimalGame(
+            items: container
+        )
+
+        let (engine, _) = await GameEngine.test(blueprint: game)
+
+        // When
+        try await engine.execute("close container")
+
+        // Then
+        let finalState = try await engine.item("container")
+        #expect(await finalState.hasFlag(.isTouched) == true)
+    }
+
+    // MARK: - Intent Testing
+
+    @Test("Handler exposes correct Verbs")
+    func testVerbs() async throws {
+        let handler = CloseActionHandler()
+        #expect(handler.synonyms.contains(.close))
+        #expect(handler.synonyms.contains(.shut))
+        #expect(handler.synonyms.count == 2)
+    }
+
+    @Test("Handler requires light")
+    func testRequiresLightProperty() async throws {
+        let handler = CloseActionHandler()
+        #expect(handler.requiresLight == true)
     }
 }

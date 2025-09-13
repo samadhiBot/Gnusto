@@ -1,5 +1,7 @@
-import Testing
 import Foundation
+import GnustoTestSupport
+import Testing
+
 @testable import GnustoEngine
 
 @Suite("FuseID Tests")
@@ -50,15 +52,15 @@ struct FuseIDTests {
         #expect(id2 != id3)
     }
 
-    @Test("FuseID Case Sensitivity")
+    @Test("FuseIDs are case-insensitive")
     func testCaseSensitivity() throws {
         let id1: FuseID = "BombFuse"
         let id2: FuseID = "bombfuse"
         let id3: FuseID = "BOMBFUSE"
 
-        #expect(id1 != id2)
-        #expect(id1 != id3)
-        #expect(id2 != id3)
+        #expect(id1 == id2)
+        #expect(id1 == id3)
+        #expect(id2 == id3)
     }
 
     // MARK: - Hashability Tests
@@ -68,7 +70,7 @@ struct FuseIDTests {
         let fuseDict = [
             FuseID("bombFuse"): "Explosive timer",
             FuseID("candleTimer"): "Candle burndown",
-            FuseID("alarmClock"): "Scheduled alarm"
+            FuseID("alarmClock"): "Scheduled alarm",
         ]
 
         #expect(fuseDict[FuseID("bombFuse")] == "Explosive timer")
@@ -83,7 +85,7 @@ struct FuseIDTests {
             "bombFuse",
             "candleTimer",
             "alarmClock",
-            "bombFuse" // Duplicate should be ignored
+            "bombFuse",  // Duplicate should be ignored
         ]
 
         #expect(fuseSet.count == 3)
@@ -170,7 +172,7 @@ struct FuseIDTests {
         let fuses: [FuseID] = [
             "bombFuse",
             "candleTimer",
-            "alarmClock"
+            "alarmClock",
         ]
 
         #expect(fuses.count == 3)
@@ -186,7 +188,7 @@ struct FuseIDTests {
         let fuseIDs: [FuseID] = [
             "bombFuse",
             "candleTimer",
-            "alarmClock"
+            "alarmClock",
         ]
 
         // Test that FuseID can be safely passed across actor boundaries
@@ -298,7 +300,7 @@ struct FuseIDTests {
             "floodTimer",
             "poisonGasDelay",
             "earthquakeWarning",
-            "treasureVanish"
+            "treasureVanish",
         ]
 
         #expect(gameFuses.count == 7)
@@ -313,22 +315,22 @@ struct FuseIDTests {
     func testTimeBasedContext() throws {
         // Test fuse IDs in contexts that suggest turn-based timing
         let timeBasedFuses: [FuseID] = [
-            "shortTimer",       // 1-2 turns
-            "mediumTimer",      // 5-10 turns  
-            "longTimer",        // 20+ turns
+            "shortTimer",  // 1-2 turns
+            "mediumTimer",  // 5-10 turns
+            "longTimer",  // 20+ turns
             "urgentCountdown",  // immediate
-            "delayedReaction"   // varies
+            "delayedReaction",  // varies
         ]
 
         #expect(timeBasedFuses.count == 5)
-        
+
         // Test that they can be used in turn-based contexts
         let fuseTimings: [FuseID: Int] = [
             "shortTimer": 2,
             "mediumTimer": 8,
             "longTimer": 25,
             "urgentCountdown": 1,
-            "delayedReaction": 15
+            "delayedReaction": 15,
         ]
 
         #expect(fuseTimings["shortTimer"] == 2)
@@ -342,14 +344,14 @@ struct FuseIDTests {
     func testDocumentationCommentValidation() throws {
         // Test that the documented usage pattern works
         let id: FuseID = "bombFuse"
-        
+
         // Verify this can be used in contexts mentioned in the documentation
         let timeRegistry: [FuseID: String] = [
             id: "A timed explosive device"
         ]
-        
-        let gameState: [FuseID: Int] = [id: 10] // Remaining turns
-        
+
+        let gameState: [FuseID: Int] = [id: 10]  // Remaining turns
+
         #expect(timeRegistry[id] == "A timed explosive device")
         #expect(gameState[id] == 10)
     }
@@ -360,11 +362,11 @@ struct FuseIDTests {
     func testTypeSafety() throws {
         // Test that FuseID is properly type-safe
         let fuseID: FuseID = "bombFuse"
-        
+
         // This should work - same type
         let sameFuseID: FuseID = fuseID
         #expect(sameFuseID == fuseID)
-        
+
         // Test that we can't accidentally mix with other ID types
         // (This is enforced at compile time, but we can test runtime behavior)
         let fuseDict: [FuseID: String] = [fuseID: "test"]
@@ -381,26 +383,26 @@ struct FuseIDTests {
             var remainingTurns: Int
             let action: String
         }
-        
+
         var activeTimers = [
             FuseTimer(id: "bombFuse", remainingTurns: 5, action: "explode"),
             FuseTimer(id: "candleTimer", remainingTurns: 10, action: "burnOut"),
-            FuseTimer(id: "alarmClock", remainingTurns: 3, action: "ring")
+            FuseTimer(id: "alarmClock", remainingTurns: 3, action: "ring"),
         ]
-        
+
         // Simulate one turn passing
         for i in 0..<activeTimers.count {
             activeTimers[i].remainingTurns -= 1
         }
-        
+
         // Check for expired timers
         let expiredTimers = activeTimers.filter { $0.remainingTurns <= 0 }
         let remainingTimers = activeTimers.filter { $0.remainingTurns > 0 }
-        
-        #expect(expiredTimers.isEmpty) // No timers should expire yet
+
+        #expect(expiredTimers.isEmpty)  // No timers should expire yet
         #expect(remainingTimers.count == 3)
         #expect(remainingTimers.contains { $0.id == "bombFuse" && $0.remainingTurns == 4 })
         #expect(remainingTimers.contains { $0.id == "candleTimer" && $0.remainingTurns == 9 })
         #expect(remainingTimers.contains { $0.id == "alarmClock" && $0.remainingTurns == 2 })
     }
-} 
+}

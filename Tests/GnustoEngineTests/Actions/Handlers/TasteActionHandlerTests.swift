@@ -1,460 +1,547 @@
 import CustomDump
+import GnustoEngine
+import GnustoTestSupport
 import Testing
-
-@testable import GnustoEngine
 
 @Suite("TasteActionHandler Tests")
 struct TasteActionHandlerTests {
-    let handler = TasteActionHandler()
 
-    // MARK: - Setup Helper
-    
-    private func createTestEngine() async -> GameEngine {
-        let game = MinimalGame()
-        let mockIO = await MockIOHandler()
-        let mockParser = MockParser()
-        
-        return await GameEngine(
-            blueprint: game,
-            parser: mockParser,
-            ioHandler: mockIO
-        )
-    }
+    // MARK: - Syntax Rule Testing
 
-    // MARK: - Basic Functionality Tests
-
-    @Test("TASTE with item produces expected message")
-    func testTasteWithItem() async throws {
-        let testItem = Item(
+    @Test("TASTE DIRECTOBJECT syntax works")
+    func testTasteDirectObjectSyntax() async throws {
+        // Given
+        let apple = Item(
             id: "apple",
-            .name("red apple"),
-            .description("A juicy red apple."),
-            .isTakable,
-            .in(.player)
-        )
-        
-        let game = MinimalGame(items: [testItem])
-        let mockIO = await MockIOHandler()
-        let mockParser = MockParser()
-        let engine = await GameEngine(
-            blueprint: game,
-            parser: mockParser,
-            ioHandler: mockIO
+            .name("moldy apple"),
+            .description("A withered moldy apple."),
+            .in(.startRoom)
         )
 
-        let command = Command(
-            verb: .taste,
-            directObject: .item("apple"),
-            rawInput: "taste apple"
+        let game = MinimalGame(
+            items: apple
         )
 
-        // Act: Use engine.execute for full pipeline
-        await engine.execute(command: command)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        // Assert Output
+        // When
+        try await engine.execute("taste apple")
+
+        // Then
         let output = await mockIO.flush()
-        expectNoDifference(output, "That tastes about average.")
+        expectNoDifference(
+            output,
+            """
+            > taste apple
+            The moldy apple tastes remarkably like you'd expect the moldy
+            apple to taste.
+            """
+        )
     }
 
-    @Test("TASTE without object is rejected")
-    func testTasteWithoutObject() async throws {
-        let engine = await createTestEngine()
+    // MARK: - Validation Testing
 
-        let command = Command(
-            verb: .taste,
-            rawInput: "taste"
-        )
-        let context = ActionContext(
-            command: command,
-            engine: engine,
-            stateSnapshot: await engine.gameState
-        )
+    @Test("Cannot taste without specifying target")
+    func testCannotTasteWithoutTarget() async throws {
+        // Given
+        let game = MinimalGame()
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        // Should throw validation error for missing direct object
-        do {
-            try await handler.validate(context: context)
-            Issue.record("Expected validation to throw for missing direct object")
-        } catch {
-            // Expected - should require a direct object
-        }
+        // When
+        try await engine.execute("taste")
+
+        // Then
+        let output = await mockIO.flush()
+        expectNoDifference(
+            output,
+            """
+            > taste
+            The flavor profile proves disappointingly ordinary.
+            """
+        )
     }
 
-    @Test("TASTE validation rejects non-item objects")
-    func testTasteValidationRejectsNonItems() async throws {
-        let engine = await createTestEngine()
-
-        let command = Command(
-            verb: .taste,
-            directObject: .location(.startRoom),
-            rawInput: "taste room"
-        )
-        let context = ActionContext(
-            command: command,
-            engine: engine,
-            stateSnapshot: await engine.gameState
+    @Test("Cannot taste target not in scope")
+    func testCannotTasteTargetNotInScope() async throws {
+        // Given
+        let anotherRoom = Location(
+            id: "anotherRoom",
+            .name("Another Room"),
+            .inherentlyLit
         )
 
-        // Should throw validation error for non-item
-        do {
-            try await handler.validate(context: context)
-            Issue.record("Expected validation to throw for non-item direct object")
-        } catch {
-            // Expected - should reject non-item objects
-        }
+        let remoteCake = Item(
+            id: "remoteCake",
+            .name("remote cake"),
+            .description("A cake in another room."),
+            .in("anotherRoom")
+        )
+
+        let game = MinimalGame(
+            locations: anotherRoom,
+            items: remoteCake
+        )
+
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // When
+        try await engine.execute("taste cake")
+
+        // Then
+        let output = await mockIO.flush()
+        expectNoDifference(
+            output,
+            """
+            > taste cake
+            Any such thing remains frustratingly inaccessible.
+            """
+        )
     }
 
-    @Test("TASTE validation succeeds for items")
-    func testTasteValidationSucceedsForItems() async throws {
-        let testItem = Item(
+    @Test("Taste works in dark room")
+    func testTasteWorksInDarkRoom() async throws {
+        // Given: Dark room with an object to taste
+        let darkRoom = Location(
+            id: "darkRoom",
+            .name("Dark Room"),
+            .description("A pitch black room.")
+        )
+
+        let bread = Item(
+            id: "bread",
+            .name("stale bread"),
+            .description("A piece of stale bread."),
+            .in("darkRoom")
+        )
+
+        let game = MinimalGame(
+            player: Player(in: "darkRoom"),
+            locations: darkRoom,
+            items: bread
+        )
+
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // When
+        try await engine.execute("taste bread")
+
+        // Then
+        let output = await mockIO.flush()
+        expectNoDifference(
+            output,
+            """
+            > taste bread
+            Any such thing remains frustratingly inaccessible.
+            """
+        )
+    }
+
+    // MARK: - Processing Testing
+
+    @Test("Taste object in room")
+    func testTasteObjectInRoom() async throws {
+        // Given
+        let berry = Item(
             id: "berry",
             .name("wild berry"),
             .description("A small wild berry."),
-            .isTakable,
-            .in(.player)
-        )
-        
-        let game = MinimalGame(items: [testItem])
-        let mockIO = await MockIOHandler()
-        let mockParser = MockParser()
-        let engine = await GameEngine(
-            blueprint: game,
-            parser: mockParser,
-            ioHandler: mockIO
+            .in(.startRoom)
         )
 
-        let command = Command(
-            verb: .taste,
-            directObject: .item("berry"),
-            rawInput: "taste berry"
-        )
-        let context = ActionContext(
-            command: command,
-            engine: engine,
-            stateSnapshot: await engine.gameState
-        )
-
-        // Should not throw - items are valid for tasting
-        try await handler.validate(context: context)
-    }
-
-    @Test("TASTE produces correct ActionResult")
-    func testTasteActionResult() async throws {
-        let testItem = Item(
-            id: "bread",
-            .name("loaf of bread"),
-            .description("A fresh loaf of bread."),
-            .isTakable,
-            .in(.player)
-        )
-        
-        let game = MinimalGame(items: [testItem])
-        let mockIO = await MockIOHandler()
-        let mockParser = MockParser()
-        let engine = await GameEngine(
-            blueprint: game,
-            parser: mockParser,
-            ioHandler: mockIO
-        )
-
-        let command = Command(
-            verb: .taste,
-            directObject: .item("bread"),
-            rawInput: "taste bread"
-        )
-        let context = ActionContext(
-            command: command,
-            engine: engine,
-            stateSnapshot: await engine.gameState
-        )
-        
-        // Process the command directly
-        let result = try await handler.process(context: context)
-        
-        // Verify result
-        #expect(result.message == "That tastes about average.")
-        #expect(result.stateChanges.isEmpty) // TASTE should not modify state
-        #expect(result.sideEffects.isEmpty) // TASTE should not have side effects
-    }
-
-    @Test("TASTE does not affect game state")
-    func testTasteDoesNotAffectGameState() async throws {
-        let testItem = Item(
-            id: "cookie",
-            .name("chocolate cookie"),
-            .description("A delicious chocolate cookie."),
-            .isTakable,
-            .in(.player)
-        )
-        
-        let game = MinimalGame(items: [testItem])
-        let mockIO = await MockIOHandler()
-        let mockParser = MockParser()
-        let engine = await GameEngine(
-            blueprint: game,
-            parser: mockParser,
-            ioHandler: mockIO
-        )
-        
-        // Capture initial state
-        let initialState = await engine.gameState
-        let initialScore = initialState.player.score
-        let initialMoves = initialState.player.moves
-        let initialLocation = initialState.player.currentLocationID
-        
-        let command = Command(
-            verb: .taste,
-            directObject: .item("cookie"),
-            rawInput: "taste cookie"
-        )
-
-        // Execute TASTE
-        await engine.execute(command: command)
-
-        // Verify state hasn't changed
-        let finalState = await engine.gameState
-        #expect(finalState.player.score == initialScore)
-        #expect(finalState.player.moves == initialMoves)
-        #expect(finalState.player.currentLocationID == initialLocation)
-        #expect(await engine.gameState.changeHistory.isEmpty)
-    }
-
-    @Test("TASTE works with items in different locations")
-    func testTasteWorksWithItemsInDifferentLocations() async throws {
-        let testItem = Item(
-            id: "fruit",
-            .name("exotic fruit"),
-            .description("An unusual exotic fruit."),
-            .isTakable,
-            .in(.location(.startRoom))
-        )
-        
-        let game = MinimalGame(items: [testItem])
-        let mockIO = await MockIOHandler()
-        let mockParser = MockParser()
-        let engine = await GameEngine(
-            blueprint: game,
-            parser: mockParser,
-            ioHandler: mockIO
-        )
-
-        let command = Command(
-            verb: .taste,
-            directObject: .item("fruit"),
-            rawInput: "taste fruit"
-        )
-
-        // Test tasting item in room
-        await engine.execute(command: command)
-        let output = await mockIO.flush()
-        expectNoDifference(output, "That tastes about average.")
-    }
-
-    @Test("TASTE message is consistent across multiple calls")
-    func testTasteConsistency() async throws {
-        let testItem = Item(
-            id: "candy",
-            .name("piece of candy"),
-            .description("A sweet piece of candy."),
-            .isTakable,
-            .in(.player)
-        )
-        
-        let game = MinimalGame(items: [testItem])
-        let mockIO = await MockIOHandler()
-        let mockParser = MockParser()
-        let engine = await GameEngine(
-            blueprint: game,
-            parser: mockParser,
-            ioHandler: mockIO
-        )
-
-        let command = Command(
-            verb: .taste,
-            directObject: .item("candy"),
-            rawInput: "taste candy"
-        )
-
-        // Execute TASTE multiple times
-        await engine.execute(command: command)
-        let firstOutput = await mockIO.flush()
-        
-        await engine.execute(command: command)
-        let secondOutput = await mockIO.flush()
-        
-        await engine.execute(command: command)
-        let thirdOutput = await mockIO.flush()
-
-        // All outputs should be identical
-        expectNoDifference(firstOutput, "That tastes about average.")
-        expectNoDifference(secondOutput, "That tastes about average.")
-        expectNoDifference(thirdOutput, "That tastes about average.")
-    }
-
-    @Test("TASTE with carried item works")
-    func testTasteWithCarriedItem() async throws {
-        let testItem = Item(
-            id: "medicine",
-            .name("bottle of medicine"),
-            .description("A small bottle of bitter medicine."),
-            .isTakable,
-            .in(.player)
-        )
-        
-        let game = MinimalGame(items: [testItem])
-        let mockIO = await MockIOHandler()
-        let mockParser = MockParser()
-        let engine = await GameEngine(
-            blueprint: game,
-            parser: mockParser,
-            ioHandler: mockIO
-        )
-
-        let command = Command(
-            verb: .taste,
-            directObject: .item("medicine"),
-            rawInput: "taste medicine"
-        )
-
-        // Act: Use engine.execute for full pipeline
-        await engine.execute(command: command)
-
-        // Assert Output
-        let output = await mockIO.flush()
-        expectNoDifference(output, "That tastes about average.")
-    }
-
-    @Test("TASTE works in dark room")
-    func testTasteWorksInDarkRoom() async throws {
-        let darkLocation = Location(
-            id: "dark_pantry",
-            .name("Dark Pantry"),
-            .description("A completely dark pantry.")
-            // No .inherentlyLit, so it should be dark
-        )
-        
-        let testItem = Item(
-            id: "spice",
-            .name("mysterious spice"),
-            .description("A jar of mysterious spice."),
-            .isTakable,
-            .in(.player)
-        )
-        
-        let player = Player(in: "dark_pantry")
         let game = MinimalGame(
-            player: player,
-            locations: [darkLocation],
-            items: [testItem]
-        )
-        let mockIO = await MockIOHandler()
-        let mockParser = MockParser()
-        let engine = await GameEngine(
-            blueprint: game,
-            parser: mockParser,
-            ioHandler: mockIO
+            items: berry
         )
 
-        let command = Command(
-            verb: .taste,
-            directObject: .item("spice"),
-            rawInput: "taste spice"
-        )
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        // Act: TASTE should work even in dark rooms (taste doesn't require sight)
-        await engine.execute(command: command)
+        // When
+        try await engine.execute("taste berry")
 
-        // Assert Output - should still work
+        // Then
         let output = await mockIO.flush()
-        expectNoDifference(output, "That tastes about average.")
+        expectNoDifference(
+            output,
+            """
+            > taste berry
+            The wild berry tastes remarkably like you'd expect the wild
+            berry to taste.
+            """
+        )
     }
 
-    @Test("TASTE full workflow integration test")
-    func testTasteFullWorkflow() async throws {
-        let testItem = Item(
-            id: "honey",
-            .name("jar of honey"),
-            .description("A jar of golden honey."),
-            .isTakable,
-            .in(.player)
-        )
-        
-        let game = MinimalGame(items: [testItem])
-        let mockIO = await MockIOHandler()
-        let mockParser = MockParser()
-        let engine = await GameEngine(
-            blueprint: game,
-            parser: mockParser,
-            ioHandler: mockIO
+    @Test("Taste character gives appropriate message")
+    func testTasteCharacter() async throws {
+        // Given
+        let wizard = Item(
+            id: "wizard",
+            .name("old wizard"),
+            .description("A wise old wizard."),
+            .characterSheet(.wise),
+            .in(.startRoom)
         )
 
-        let command = Command(
-            verb: .taste,
-            directObject: .item("honey"),
-            rawInput: "taste honey"
+        let game = MinimalGame(
+            items: wizard
         )
-        let context = ActionContext(
-            command: command,
-            engine: engine,
-            stateSnapshot: await engine.gameState
+
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // When
+        try await engine.execute(
+            "taste the wizard",
+            "lick the wizard",
+            "taste the wizard",
         )
-        
-        // Validate
-        try await handler.validate(context: context)
-        
-        // Process
-        let result = try await handler.process(context: context)
-        
-        // Verify complete workflow
-        #expect(result.message == "That tastes about average.")
-        #expect(result.stateChanges.isEmpty)
-        #expect(result.sideEffects.isEmpty)
+
+        // Then
+        let output = await mockIO.flush()
+        expectNoDifference(
+            output,
+            """
+            > taste the wizard
+            Tasting the old wizard would end your relationship and possibly
+            your freedom.
+
+            > lick the wizard
+            The old wizard is a person, not a delicacy to be sampled.
+
+            > taste the wizard
+            The old wizard is a person, not a delicacy to be sampled.
+            """
+        )
+
+        let finalState = try await engine.item("wizard")
+        #expect(await finalState.hasFlag(.isTouched) == true)
     }
 
-    @Test("TASTE works with different item types")
-    func testTasteWorksWithDifferentItemTypes() async throws {
-        let liquidItem = Item(
-            id: "water",
-            .name("glass of water"),
-            .description("A clear glass of water."),
-            .isTakable,
-            .in(.player)
+    @Test("Taste enemy gives appropriate message")
+    func testTasteEnemy() async throws {
+        // Given
+        let necromancer = Item(
+            id: "necromancer",
+            .name("furious necromancer"),
+            .description("An angry old necromancer."),
+            .characterSheet(
+                CharacterSheet(isFighting: true)
+            ),
+            .in(.startRoom)
         )
-        
-        let solidItem = Item(
+
+        let game = MinimalGame(
+            items: necromancer
+        )
+
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // When
+        try await engine.execute(
+            "lick the necromancer",
+            "taste the necromancer",
+            "lick the necromancer",
+        )
+
+        // Then
+        let output = await mockIO.flush()
+        expectNoDifference(
+            output,
+            """
+            > lick the necromancer
+            Tasting the furious necromancer ranks among history's worst
+            battle strategies.
+
+            In a moment of raw violence, the furious necromancer comes at
+            you with nothing but fury! You raise your fists, knowing this
+            will hurt regardless of who wins.
+
+            > taste the necromancer
+            That's a level of intimacy the furious necromancer would answer
+            with sharp steel.
+
+            In the tangle, the furious necromancer drives an elbow
+            home--sudden pressure that blooms into dull pain. The wound is
+            trivial against your battle fury.
+
+            > lick the necromancer
+            That's a level of intimacy the furious necromancer would answer
+            with sharp steel.
+
+            In the tangle, the furious necromancer drives an elbow
+            home--sudden pressure that blooms into dull pain. The wound is
+            trivial against your battle fury.
+            """
+        )
+
+        let finalState = try await engine.item("necromancer")
+        #expect(await finalState.hasFlag(.isTouched) == true)
+    }
+
+    @Test("Taste self")
+    func testTasteSelf() async throws {
+        // Given
+        let game = MinimalGame()
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // When
+        try await engine.execute(
+            "taste myself",
+            "lick myself",
+            "lick myself",
+        )
+
+        // Then
+        let output = await mockIO.flush()
+        expectNoDifference(
+            output,
+            """
+            > taste myself
+            You sample your own flavor. The results are predictably salty.
+
+            > lick myself
+            Your auto-gustatory exploration yields no surprising flavors.
+
+            > lick myself
+            You taste vaguely of determination and poor life choices.
+            """
+        )
+    }
+
+    @Test("Taste object in open container")
+    func testTasteObjectInOpenContainer() async throws {
+        // Given
+        let bowl = Item(
+            id: "bowl",
+            .name("fruit bowl"),
+            .description("A bowl filled with fruit."),
+            .isContainer,
+            .isOpenable,
+            .isOpen,
+            .in(.startRoom)
+        )
+
+        let orange = Item(
+            id: "orange",
+            .name("moldy orange"),
+            .description("A moldy orange."),
+            .in(.item("bowl"))
+        )
+
+        let game = MinimalGame(
+            items: bowl, orange
+        )
+
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // When
+        try await engine.execute(
+            "taste the moldy orange",
+            "lick the orange",
+            "taste moldy orange",
+        )
+
+        // Then
+        let output = await mockIO.flush()
+        expectNoDifference(
+            output,
+            """
+            > taste the moldy orange
+            The moldy orange tastes remarkably like you'd expect the moldy
+            orange to taste.
+
+            > lick the orange
+            The flavor of the moldy orange will not be making any culinary
+            history.
+
+            > taste moldy orange
+            The flavor of the moldy orange will not be making any culinary
+            history.
+            """
+        )
+    }
+
+    @Test("Taste sequence of different foods")
+    func testTasteSequenceOfDifferentFoods() async throws {
+        // Given
+        let cookie = Item(
+            id: "cookie",
+            .name("ancient cookie"),
+            .description("An ancient cookie."),
+            .in(.startRoom)
+        )
+
+        let milk = Item(
+            id: "milk",
+            .name("glass of lumpy milk"),
+            .description("A warm glass of milk."),
+            .in(.startRoom)
+        )
+
+        let game = MinimalGame(
+            items: cookie, milk
+        )
+
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // When
+        try await engine.execute(
+            "lick the cookie",
+            "taste the milk"
+        )
+
+        // Then
+        let output = await mockIO.flush()
+        expectNoDifference(
+            output,
+            """
+            > lick the cookie
+            The ancient cookie tastes remarkably like you'd expect the
+            ancient cookie to taste.
+
+            > taste the milk
+            The flavor of the glass of lumpy milk will not be making any
+            culinary history.
+            """
+        )
+    }
+
+    @Test("Different taste syntax variations")
+    func testDifferentTasteSyntaxVariations() async throws {
+        // Given
+        let slime = Item(
+            id: "slime",
+            .name("bubbling slime"),
+            .description("A scoop of bubbling slime."),
+            .in(.startRoom)
+        )
+
+        let game = MinimalGame(
+            items: slime
+        )
+
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // When
+        try await engine.execute(
+            "taste the slime",
+            "lick the slime"
+        )
+
+        // Then
+        let output = await mockIO.flush()
+        expectNoDifference(
+            output,
+            """
+            > taste the slime
+            The bubbling slime tastes remarkably like you'd expect the
+            bubbling slime to taste.
+
+            > lick the slime
+            The flavor of the bubbling slime will not be making any
+            culinary history.
+            """
+        )
+    }
+
+    @Test("Taste unusual objects")
+    func testTasteUnusualObjects() async throws {
+        // Given
+        let rock = Item(
             id: "rock",
             .name("smooth rock"),
-            .description("A smooth stone rock."),
-            .isTakable,
-            .in(.player)
-        )
-        
-        let game = MinimalGame(items: [liquidItem, solidItem])
-        let mockIO = await MockIOHandler()
-        let mockParser = MockParser()
-        let engine = await GameEngine(
-            blueprint: game,
-            parser: mockParser,
-            ioHandler: mockIO
+            .description("A smooth stone."),
+            .in(.startRoom)
         )
 
-        // Test tasting liquid
-        let waterCommand = Command(
-            verb: .taste,
-            directObject: .item("water"),
-            rawInput: "taste water"
+        let metal = Item(
+            id: "metal",
+            .name("copper coin"),
+            .description("A tarnished copper coin."),
+            .in(.startRoom)
         )
-        await engine.execute(command: waterCommand)
-        let waterOutput = await mockIO.flush()
-        expectNoDifference(waterOutput, "That tastes about average.")
 
-        // Test tasting solid
-        let rockCommand = Command(
-            verb: .taste,
-            directObject: .item("rock"),
-            rawInput: "taste rock"
+        let game = MinimalGame(
+            items: rock, metal
         )
-        await engine.execute(command: rockCommand)
-        let rockOutput = await mockIO.flush()
-        expectNoDifference(rockOutput, "That tastes about average.")
+
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // When
+        try await engine.execute(
+            "taste rock",
+            "lick coin"
+        )
+
+        // Then
+        let output = await mockIO.flush()
+        expectNoDifference(
+            output,
+            """
+            > taste rock
+            The smooth rock tastes remarkably like you'd expect the smooth
+            rock to taste.
+
+            > lick coin
+            The flavor of the copper coin will not be making any culinary
+            history.
+            """
+        )
     }
-} 
+
+    @Test("Multiple taste attempts")
+    func testMultipleTasteAttempts() async throws {
+        // Given
+        let slop = Item(
+            id: "slop",
+            .name("bowl of slop"),
+            .description("A warm bowl of slop."),
+            .in(.startRoom)
+        )
+
+        let game = MinimalGame(
+            items: slop
+        )
+
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // When
+        try await engine.execute(
+            "taste the slop",
+            "taste the slop",
+            "lick the slop"
+        )
+
+        // Then
+        let output = await mockIO.flush()
+        expectNoDifference(
+            output,
+            """
+            > taste the slop
+            The bowl of slop tastes remarkably like you'd expect the bowl
+            of slop to taste.
+
+            > taste the slop
+            The flavor of the bowl of slop will not be making any culinary
+            history.
+
+            > lick the slop
+            The flavor of the bowl of slop will not be making any culinary
+            history.
+            """
+        )
+    }
+
+    // MARK: - Intent Testing
+
+    @Test("Handler exposes correct Verbs")
+    func testVerbs() async throws {
+        let handler = TasteActionHandler()
+        #expect(handler.synonyms.contains(.taste))
+        #expect(handler.synonyms.contains(.lick))
+        #expect(handler.synonyms.count == 2)
+    }
+
+    @Test("Handler does not require light")
+    func testDoesNotRequireLight() async throws {
+        let handler = TasteActionHandler()
+        #expect(handler.requiresLight == false)
+    }
+}

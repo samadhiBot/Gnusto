@@ -1,0 +1,24 @@
+{
+  "configurations" : [
+    {
+      "id" : "510473E5-CB13-45CD-BAFB-76523020F820",
+      "name" : "Test Scheme Action",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "codeCoverage" : false
+  },
+  "testTargets" : [
+    {
+      "target" : {
+        "containerPath" : "container:",
+        "identifier" : "GnustoEngineTests",
+        "name" : "GnustoEngineTests"
+      }
+    }
+  ],
+  "version" : 1
+}

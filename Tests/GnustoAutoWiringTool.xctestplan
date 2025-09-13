@@ -1,0 +1,29 @@
+{
+  "configurations" : [
+    {
+      "id" : "EDF1B88C-3DBB-488A-9814-6FE556B9DF1A",
+      "name" : "Test Scheme Action",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "codeCoverage" : false,
+    "targetForVariableExpansion" : {
+      "containerPath" : "container:",
+      "identifier" : "GnustoAutoWiringTool",
+      "name" : "GnustoAutoWiringTool"
+    }
+  },
+  "testTargets" : [
+    {
+      "target" : {
+        "containerPath" : "container:",
+        "identifier" : "GnustoAutoWiringToolTests",
+        "name" : "GnustoAutoWiringToolTests"
+      }
+    }
+  ],
+  "version" : 1
+}

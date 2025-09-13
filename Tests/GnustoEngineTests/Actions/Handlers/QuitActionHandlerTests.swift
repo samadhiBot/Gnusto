@@ -1,256 +1,470 @@
 import CustomDump
+import GnustoEngine
+import GnustoTestSupport
 import Testing
-
-@testable import GnustoEngine
 
 @Suite("QuitActionHandler Tests")
 struct QuitActionHandlerTests {
-    let handler = QuitActionHandler()
 
-    // MARK: - Setup Helper
-    
-    private func createTestEngine() async -> GameEngine {
+    // MARK: - Syntax Rule Testing
+
+    @Test("QUIT syntax works")
+    func testQuitSyntax() async throws {
+        // Given
         let game = MinimalGame()
-        let mockIO = await MockIOHandler()
-        let mockParser = MockParser()
-        
-        return await GameEngine(
-            blueprint: game,
-            parser: mockParser,
-            ioHandler: mockIO
-        )
-    }
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-    // MARK: - Basic Functionality Tests
+        // Set up mock to respond "yes" to quit confirmation
+        await mockIO.enqueueInput("yes")
 
-    @Test("QUIT command produces the expected message")
-    func testQuitBasicFunctionality() async throws {
-        let engine = await createTestEngine()
-        let mockIO = engine.ioHandler as! MockIOHandler
+        // When
+        try await engine.execute("quit")
 
-        let command = Command(
-            verb: .quit,
-            rawInput: "quit"
-        )
-
-        // Act: Use engine.execute for full pipeline
-        await engine.execute(command: command)
-
-        // Assert Output
+        // Then
         let output = await mockIO.flush()
-        expectNoDifference(output, "Goodbye!")
+        expectNoDifference(
+            output,
+            """
+            > quit
+            Your score is 0 (total of 10 points), in 0 moves. Do you wish
+            to leave the game? (Y is affirmative): yes
+            Farewell, brave soul!
+            """
+        )
     }
 
-    @Test("QUIT produces correct ActionResult")
-    func testQuitActionResult() async throws {
-        let engine = await createTestEngine()
+    @Test("Q shorthand syntax works")
+    func testQShorthandSyntax() async throws {
+        // Given
+        let game = MinimalGame()
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        let command = Command(
-            verb: .quit,
-            rawInput: "quit"
-        )
-        let context = ActionContext(
-            command: command,
-            engine: engine,
-            stateSnapshot: await engine.gameState
-        )
-        
-        // Process the command directly
-        let result = try await handler.process(context: context)
-        
-        // Verify result
-        #expect(result.message == "Goodbye!")
-        #expect(result.stateChanges.isEmpty) // QUIT should not modify state directly
-        #expect(result.sideEffects.isEmpty) // QUIT should not have side effects
-    }
+        // Set up mock to respond "y" to quit confirmation
+        await mockIO.enqueueInput("y")
 
-    @Test("QUIT validation always succeeds")
-    func testQuitValidationSucceeds() async throws {
-        let engine = await createTestEngine()
+        // When
+        try await engine.execute("q")
 
-        let command = Command(
-            verb: .quit,
-            rawInput: "quit"
-        )
-        let context = ActionContext(
-            command: command,
-            engine: engine,
-            stateSnapshot: await engine.gameState
-        )
-
-        // Should not throw - QUIT has no validation requirements
-        try await handler.validate(context: context)
-    }
-
-    @Test("QUIT requests engine to quit")
-    func testQuitRequestsEngineQuit() async throws {
-        let engine = await createTestEngine()
-
-        let command = Command(
-            verb: .quit,
-            rawInput: "quit"
-        )
-        let context = ActionContext(
-            command: command,
-            engine: engine,
-            stateSnapshot: await engine.gameState
-        )
-        
-        // Initially should not be quitting
-        #expect(await !engine.shouldQuit)
-        
-        // Process QUIT command
-        let _ = try await handler.process(context: context)
-        
-        // Engine should now be marked to quit
-        #expect(await engine.shouldQuit)
-    }
-
-    @Test("Q alias works the same as QUIT")
-    func testQAliasWorks() async throws {
-        let engine = await createTestEngine()
-        let mockIO = engine.ioHandler as! MockIOHandler
-
-        let command = Command(
-            verb: .quit, // Q is mapped to .quit verb
-            rawInput: "q"
-        )
-
-        // Act: Use engine.execute for full pipeline
-        await engine.execute(command: command)
-
-        // Assert Output - should be the same as QUIT
+        // Then
         let output = await mockIO.flush()
-        expectNoDifference(output, "Goodbye!")
-        
-        // Should also request quit
-        #expect(await engine.shouldQuit)
+        expectNoDifference(
+            output,
+            """
+            > q
+            Your score is 0 (total of 10 points), in 0 moves. Do you wish
+            to leave the game? (Y is affirmative): y
+            Farewell, brave soul!
+            """
+        )
     }
 
-    @Test("QUIT full workflow integration test")
-    func testQuitFullWorkflow() async throws {
-        let engine = await createTestEngine()
+    // MARK: - Validation Testing
 
-        let command = Command(
-            verb: .quit,
-            rawInput: "quit"
-        )
-        let context = ActionContext(
-            command: command,
-            engine: engine,
-            stateSnapshot: await engine.gameState
-        )
-        
-        // Validate
-        try await handler.validate(context: context)
-        
-        // Process
-        let result = try await handler.process(context: context)
-        
-        // Verify complete workflow
-        #expect(result.message == "Goodbye!")
-        #expect(result.stateChanges.isEmpty)
-        #expect(result.sideEffects.isEmpty)
-        #expect(await engine.shouldQuit)
-    }
-
-    @Test("QUIT works regardless of game state")
-    func testQuitWorksInDifferentStates() async throws {
-        let engine = await createTestEngine()
-        let mockIO = engine.ioHandler as! MockIOHandler
-
-        // Modify game state
-        let scoreChange = StateChange(
-            entityID: .player,
-            attribute: .playerScore,
-            newValue: 100
-        )
-        try await engine.apply(scoreChange)
-        
-        let command = Command(
-            verb: .quit,
-            rawInput: "quit"
+    @Test("Quit does not require light")
+    func testQuitDoesNotRequireLight() async throws {
+        // Given: Dark room
+        let darkRoom = Location(
+            id: "darkRoom",
+            .name("Dark Room"),
+            .description("A pitch black room.")
+            // Note: No .inherentlyLit property
         )
 
-        // Act: QUIT should work the same regardless of game state
-        await engine.execute(command: command)
+        let game = MinimalGame(
+            player: Player(in: "darkRoom"),
+            locations: darkRoom
+        )
 
-        // Assert Output is unchanged
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // Set up mock to respond "yes" to quit confirmation
+        await mockIO.enqueueInput("yes")
+
+        // When
+        try await engine.execute("quit")
+
+        // Then - Quit should work even in darkness
         let output = await mockIO.flush()
-        expectNoDifference(output, "Goodbye!")
-        
-        // Should still request quit
-        #expect(await engine.shouldQuit)
+        expectNoDifference(
+            output,
+            """
+            > quit
+            Your score is 0 (total of 10 points), in 0 moves. Do you wish
+            to leave the game? (Y is affirmative): yes
+            Farewell, brave soul!
+            """
+        )
     }
 
-    @Test("QUIT does not modify game state")
-    func testQuitDoesNotModifyGameState() async throws {
-        let engine = await createTestEngine()
-        
-        // Capture initial state
-        let initialState = await engine.gameState
-        let initialScore = initialState.player.score
-        let initialMoves = initialState.player.moves
-        let initialLocation = initialState.player.currentLocationID
-        
-        let command = Command(
-            verb: .quit,
-            rawInput: "quit"
-        )
+    @Test("Quit accepts no parameters")
+    func testQuitAcceptsNoParameters() async throws {
+        // Given
+        let game = MinimalGame()
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        // Execute QUIT
-        await engine.execute(command: command)
+        // Set up mock to respond "yes" to quit confirmation
+        await mockIO.enqueueInput("yes")
 
-        // Verify game state hasn't changed (except for quit flag)
-        let finalState = await engine.gameState
-        #expect(finalState.player.score == initialScore)
-        #expect(finalState.player.moves == initialMoves)
-        #expect(finalState.player.currentLocationID == initialLocation)
-        #expect(await engine.gameState.changeHistory.isEmpty)
-    }
+        // When
+        try await engine.execute("quit")
 
-    @Test("QUIT with extra parameters still works")
-    func testQuitWithExtraParameters() async throws {
-        let engine = await createTestEngine()
-        let mockIO = engine.ioHandler as! MockIOHandler
-
-        let command = Command(
-            verb: .quit,
-            rawInput: "quit game now"
-        )
-
-        // Act: Use engine.execute for full pipeline
-        await engine.execute(command: command)
-
-        // Assert Output - should work the same way
+        // Then
         let output = await mockIO.flush()
-        expectNoDifference(output, "Goodbye!")
-        
-        // Should request quit
-        #expect(await engine.shouldQuit)
+        expectNoDifference(
+            output,
+            """
+            > quit
+            Your score is 0 (total of 10 points), in 0 moves. Do you wish
+            to leave the game? (Y is affirmative): yes
+            Farewell, brave soul!
+            """
+        )
     }
 
-    @Test("Multiple QUIT commands maintain quit state")
-    func testMultipleQuitCommands() async throws {
-        let engine = await createTestEngine()
-        let mockIO = engine.ioHandler as! MockIOHandler
+    // MARK: - Processing Testing
 
-        let command = Command(
-            verb: .quit,
-            rawInput: "quit"
+    @Test("Quit confirmation with yes quits game")
+    func testQuitConfirmationWithYesQuitsGame() async throws {
+        // Given
+        let game = MinimalGame()
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // Set up mock to respond "yes" to quit confirmation
+        await mockIO.enqueueInput("yes")
+
+        // When
+        try await engine.execute("quit")
+
+        // Then
+        let output = await mockIO.flush()
+        expectNoDifference(
+            output,
+            """
+            > quit
+            Your score is 0 (total of 10 points), in 0 moves. Do you wish
+            to leave the game? (Y is affirmative): yes
+            Farewell, brave soul!
+            """
         )
 
-        // Execute QUIT multiple times
-        await engine.execute(command: command)
-        #expect(await engine.shouldQuit)
-        let firstOutput = await mockIO.flush()
-        
-        await engine.execute(command: command)
-        #expect(await engine.shouldQuit) // Should still be quitting
-        let secondOutput = await mockIO.flush()
-
-        // Both outputs should be identical
-        expectNoDifference(firstOutput, "Goodbye!")
-        expectNoDifference(secondOutput, "Goodbye!")
+        // Game should be marked for quit
+        let shouldQuit = await engine.shouldQuit
+        #expect(shouldQuit == true)
     }
-} 
+
+    @Test("Quit confirmation with y quits game")
+    func testQuitConfirmationWithYQuitsGame() async throws {
+        // Given
+        let game = MinimalGame()
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // Set up mock to respond "y" to quit confirmation
+        await mockIO.enqueueInput("y")
+
+        // When
+        try await engine.execute("quit")
+
+        // Then
+        let output = await mockIO.flush()
+        expectNoDifference(
+            output,
+            """
+            > quit
+            Your score is 0 (total of 10 points), in 0 moves. Do you wish
+            to leave the game? (Y is affirmative): y
+            Farewell, brave soul!
+            """
+        )
+
+        let shouldQuit = await engine.shouldQuit
+        #expect(shouldQuit == true)
+    }
+
+    @Test("Quit confirmation with no cancels quit")
+    func testQuitConfirmationWithNoCancelsQuit() async throws {
+        // Given
+        let game = MinimalGame()
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // Set up mock to respond "no" to quit confirmation
+        await mockIO.enqueueInput("no")
+
+        // When
+        try await engine.execute("quit")
+
+        // Then
+        let output = await mockIO.flush()
+        expectNoDifference(
+            output,
+            """
+            > quit
+            Your score is 0 (total of 10 points), in 0 moves. Do you wish
+            to leave the game? (Y is affirmative): no
+            The adventure continues!
+            """
+        )
+
+        // Game should NOT be marked for quit
+        let shouldQuit = await engine.shouldQuit
+        #expect(shouldQuit == false)
+    }
+
+    @Test("Quit confirmation with n cancels quit")
+    func testQuitConfirmationWithNCancelsQuit() async throws {
+        // Given
+        let game = MinimalGame()
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // Set up mock to respond "n" to quit confirmation
+        await mockIO.enqueueInput("n")
+
+        // When
+        try await engine.execute("quit")
+
+        // Then
+        let output = await mockIO.flush()
+        expectNoDifference(
+            output,
+            """
+            > quit
+            Your score is 0 (total of 10 points), in 0 moves. Do you wish
+            to leave the game? (Y is affirmative): n
+            The adventure continues!
+            """
+        )
+
+        let shouldQuit = await engine.shouldQuit
+        #expect(shouldQuit == false)
+    }
+
+    @Test("Quit handles invalid response then valid response")
+    func testQuitHandlesInvalidResponseThenValid() async throws {
+        // Given
+        let game = MinimalGame()
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // Set up mock to respond with invalid then valid response
+        await mockIO.enqueueInput("maybe", "y")
+
+        // When
+        try await engine.execute("quit")
+
+        // Then
+        let output = await mockIO.flush()
+        expectNoDifference(
+            output,
+            """
+            > quit
+            Your score is 0 (total of 10 points), in 0 moves. Do you wish
+            to leave the game? (Y is affirmative): maybe
+            Your response defies binary interpretation. I'll take that as a
+            'no'.
+            """
+        )
+
+        let shouldQuit = await engine.shouldQuit
+        #expect(shouldQuit == false)
+    }
+
+    @Test("Quit handles multiple invalid responses")
+    func testQuitHandlesMultipleInvalidResponses() async throws {
+        // Given
+        let game = MinimalGame()
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // Set up mock to respond with multiple invalid then valid response
+        await mockIO.enqueueInput("invalid", "wrong", "no")
+
+        // When
+        try await engine.execute("quit")
+
+        // Then
+        let output = await mockIO.flush()
+        expectNoDifference(
+            output,
+            """
+            > quit
+            Your score is 0 (total of 10 points), in 0 moves. Do you wish
+            to leave the game? (Y is affirmative): invalid
+            Your response defies binary interpretation. I'll take that as a
+            'no'.
+            """
+        )
+
+        let shouldQuit = await engine.shouldQuit
+        #expect(shouldQuit == false)
+    }
+
+    @Test("Quit displays current score and moves")
+    func testQuitDisplaysCurrentScoreAndMoves() async throws {
+        // Given
+        let game = MinimalGame()
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // Set some score and execute some moves
+        try await engine.apply(
+            await engine.player.updateScore(by: 25)
+        )
+
+        // Execute a few commands to increase move count
+        try await engine.execute(
+            "look",
+            "inventory"
+        )
+
+        // Set up mock to respond "yes" to quit confirmation
+        await mockIO.enqueueInput("yes")
+
+        // When
+        try await engine.execute("quit")
+
+        // Then
+        let output = await mockIO.flush()
+        expectNoDifference(
+            output,
+            """
+            > look
+            --- Laboratory ---
+
+            A laboratory in which strange experiments are being conducted.
+
+            > inventory
+            Your hands are as empty as your pockets.
+
+            > quit
+            Your score is 25 (total of 10 points), in 1 move. Do you wish
+            to leave the game? (Y is affirmative): yes
+            May your adventures elsewhere prove fruitful!
+            """
+        )
+    }
+
+    @Test("Quit with maximum score displays correctly")
+    func testQuitWithMaximumScoreDisplaysCorrectly() async throws {
+        // Given
+        // Create a game with maximum score
+        let game = MinimalGame()
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // Set up mock to respond "yes" to quit confirmation
+        await mockIO.enqueueInput("yes")
+
+        // When
+        try await engine.execute("quit")
+
+        // Then
+        let output = await mockIO.flush()
+        expectNoDifference(
+            output,
+            """
+            > quit
+            Your score is 0 (total of 10 points), in 0 moves. Do you wish
+            to leave the game? (Y is affirmative): yes
+            Farewell, brave soul!
+            """
+        )
+    }
+
+    @Test("Quit handles EOF as confirmation")
+    func testQuitHandlesEOFAsConfirmation() async throws {
+        // Given
+        let game = MinimalGame()
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // When
+        try await engine.execute("quit")
+
+        // Then
+        let output = await mockIO.flush()
+        expectNoDifference(
+            output,
+            """
+            > quit
+            Your score is 0 (total of 10 points), in 0 moves. Do you wish
+            to leave the game? (Y is affirmative):
+            Farewell, brave soul!
+            """
+        )
+    }
+
+    @Test("Quit response is case insensitive")
+    func testQuitResponseIsCaseInsensitive() async throws {
+        // Given
+        let game = MinimalGame()
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // Set up mock to respond with uppercase
+        await mockIO.enqueueInput("YES")
+
+        // When
+        try await engine.execute("quit")
+
+        // Then
+        let output = await mockIO.flush()
+        expectNoDifference(
+            output,
+            """
+            > quit
+            Your score is 0 (total of 10 points), in 0 moves. Do you wish
+            to leave the game? (Y is affirmative): YES
+            Farewell, brave soul!
+            """
+        )
+
+        let shouldQuit = await engine.shouldQuit
+        #expect(shouldQuit == true)
+    }
+
+    @Test("Quit handles whitespace in response")
+    func testQuitHandlesWhitespaceInResponse() async throws {
+        // Given
+        let game = MinimalGame()
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // Set up mock to respond with whitespace around answer
+        await mockIO.enqueueInput("  no  ")
+
+        // When
+        try await engine.execute("quit")
+
+        // Then
+        let output = await mockIO.flush()
+        expectNoDifference(
+            output,
+            """
+            > quit
+            Your score is 0 (total of 10 points), in 0 moves. Do you wish
+            to leave the game? (Y is affirmative):   no
+            The adventure continues!
+            """
+        )
+
+        let shouldQuit = await engine.shouldQuit
+        #expect(shouldQuit == false)
+    }
+
+    // MARK: - Intent Testing
+
+    @Test("Handler exposes correct Verbs")
+    func testVerbs() async throws {
+        let handler = QuitActionHandler()
+        #expect(handler.synonyms.contains(.quit))
+        #expect(handler.synonyms.contains("q"))
+        #expect(handler.synonyms.count == 2)
+    }
+
+    @Test("Handler does not require light")
+    func testRequiresLightProperty() async throws {
+        let handler = QuitActionHandler()
+        #expect(handler.requiresLight == false)
+    }
+
+    @Test("Handler uses correct syntax")
+    func testSyntaxRules() async throws {
+        let handler = QuitActionHandler()
+        #expect(handler.syntax.count == 1)
+
+        // Should have one syntax rule:
+        // .match(.verb)
+    }
+}

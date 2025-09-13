@@ -13,6 +13,14 @@ import Foundation
 /// All methods of an `IOHandler` are expected to be called on the main actor.
 @MainActor
 public protocol IOHandler: Sendable {
+    /// The current transcript recorder, if one is active.
+    var transcriptRecorder: TranscriptRecorder? { get set }
+
+    /// Sets the transcript recorder from a non-main actor context.
+    mutating func setTranscriptRecorder(_ recorder: TranscriptRecorder)
+
+    /// Clears the transcript recorder from a non-main actor context.
+    mutating func clearTranscriptRecorder()
 
     // --- Output Methods ---
 
@@ -60,11 +68,21 @@ public protocol IOHandler: Sendable {
 public extension IOHandler {
     /// Prints a Markdown string to the output using the `.normal` style and appends a newline.
     func print(_ markdown: String) {
-        self.print(markdown, style: .normal, newline: true)
+        print(markdown, style: .normal, newline: true)
     }
 
     /// Prints a Markdown string to the output using the specified `style` and appends a newline.
     func print(_ markdown: String, style: TextStyle) {
-        self.print(markdown, style: style, newline: true)
+        print(markdown, style: style, newline: true)
+    }
+
+    /// Default implementation of setTranscriptRecorder that simply clears the property.
+    mutating func clearTranscriptRecorder() {
+        transcriptRecorder = nil
+    }
+
+    /// Default implementation of setTranscriptRecorder that simply sets the property.
+    mutating func setTranscriptRecorder(_ recorder: TranscriptRecorder) {
+        transcriptRecorder = recorder
     }
 }

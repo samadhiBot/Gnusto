@@ -1,373 +1,960 @@
 import CustomDump
+import GnustoEngine
+import GnustoTestSupport
 import Testing
-
-@testable import GnustoEngine
 
 @Suite("GoActionHandler Tests")
 struct GoActionHandlerTests {
-    let handler = GoActionHandler()
 
-    @Test("GO NORTH moves player to connected room")
-    func testGoNorth() async throws {
-        let startRoom = Location(
-            id: .startRoom,
-            .description("You are here."),
-            .exits([.north: .to("end")]),
-            .inherentlyLit
+    // MARK: - Syntax Rule Testing
+
+    @Test("GO DIRECTION syntax works")
+    func testGoDirectionSyntax() async throws {
+        // Given
+        let roundRoom = Location(
+            id: "roundRoom",
+            .name("Round Room"),
+            .description("A room for testing."),
+            .inherentlyLit,
+            .exits(.north("northRoom"))
         )
-        let endRoom = Location(
-            id: "end",
-            .description("You went there."),
+
+        let northRoom = Location(
+            id: "northRoom",
+            .name("North Room"),
+            .description("A room to the north."),
             .inherentlyLit
         )
 
         let game = MinimalGame(
-            locations: [startRoom, endRoom]
-        )
-        let mockIO = await MockIOHandler()
-        let mockParser = MockParser()
-        let engine = await GameEngine(
-            blueprint: game,
-            parser: mockParser,
-            ioHandler: mockIO
+            player: Player(in: "roundRoom"),
+            locations: roundRoom, northRoom
         )
 
-        let command = Command(
-            verb: .go,
-            direction: .north,
-            rawInput: "north"
-        )
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        await engine.execute(command: command)
+        // When
+        try await engine.execute("go north")
 
+        // Then
         let output = await mockIO.flush()
-        expectNoDifference(output, "")
+        expectNoDifference(
+            output,
+            """
+            > go north
+            --- North Room ---
+
+            A room to the north.
+            """
+        )
+
+        let playerLocation = try await engine.player.location.id
+        #expect(playerLocation == "northRoom")
     }
 
-    @Test("GO NORTH prints blocked message when exit is blocked")
-    func testGoNorthBlocked() async throws {
-        let startRoom = Location(
-            id: .startRoom,
-            .description("You are here."),
-            .exits([
-                .north: Exit(
-                    destination: "end",
-                    blockedMessage: "A wall blocks your path."
-                )
-            ])
+    @Test("WALK DIRECTION syntax works")
+    func testWalkDirectionSyntax() async throws {
+        // Given
+        let roundRoom = Location(
+            id: "roundRoom",
+            .name("Round Room"),
+            .inherentlyLit,
+            .exits(.south("southRoom"))
         )
-        let endRoom = Location(
-            id: "end",
-            .description("You went there.")
+
+        let southRoom = Location(
+            id: "southRoom",
+            .name("South Room"),
+            .description("A room to the south."),
+            .inherentlyLit
         )
 
         let game = MinimalGame(
-            player: Player(in: .startRoom),
-            locations: [startRoom, endRoom]
-        )
-        let mockIO = await MockIOHandler()
-        let mockParser = MockParser()
-        let engine = await GameEngine(
-            blueprint: game,
-            parser: mockParser,
-            ioHandler: mockIO
+            player: Player(in: "roundRoom"),
+            locations: roundRoom, southRoom
         )
 
-        let command = Command(
-            verb: .go,
-            direction: .north,
-            rawInput: "north"
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // When
+        try await engine.execute("walk south")
+
+        // Then
+        let output = await mockIO.flush()
+        expectNoDifference(
+            output,
+            """
+            > walk south
+            --- South Room ---
+
+            A room to the south.
+            """
         )
 
-        await #expect(throws: ActionResponse.directionIsBlocked("A wall blocks your path.")) {
-            try await handler.validate(
-                context: ActionContext(
-                    command: command,
-                    engine: engine,
-                    stateSnapshot: engine.gameState
-                )
+        let playerLocation = try await engine.player.location.id
+        #expect(playerLocation == "southRoom")
+    }
+
+    @Test("RUN DIRECTION syntax works")
+    func testRunDirectionSyntax() async throws {
+        // Given
+        let roundRoom = Location(
+            id: "roundRoom",
+            .name("Round Room"),
+            .inherentlyLit,
+            .exits(.east("eastRoom"))
+        )
+
+        let eastRoom = Location(
+            id: "eastRoom",
+            .name("East Room"),
+            .description("A room to the east."),
+            .inherentlyLit
+        )
+
+        let game = MinimalGame(
+            player: Player(in: "roundRoom"),
+            locations: roundRoom, eastRoom
+        )
+
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // When
+        try await engine.execute("run east")
+
+        // Then
+        let output = await mockIO.flush()
+        expectNoDifference(
+            output,
+            """
+            > run east
+            --- East Room ---
+
+            A room to the east.
+            """
+        )
+
+        let playerLocation = try await engine.player.location.id
+        #expect(playerLocation == "eastRoom")
+    }
+
+    // MARK: - Directional Commands
+
+    @Test("NORTH directional command works")
+    func testNorthDirectionalCommand() async throws {
+        // Given
+        let roundRoom = Location(
+            id: "roundRoom",
+            .name("Round Room"),
+            .inherentlyLit,
+            .exits(.north("northRoom"))
+        )
+
+        let northRoom = Location(
+            id: "northRoom",
+            .name("North Room"),
+            .description("A room to the north."),
+            .inherentlyLit
+        )
+
+        let game = MinimalGame(
+            player: Player(in: "roundRoom"),
+            locations: roundRoom, northRoom
+        )
+
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // When
+        try await engine.execute("north")
+
+        // Then
+        let output = await mockIO.flush()
+        expectNoDifference(
+            output,
+            """
+            > north
+            --- North Room ---
+
+            A room to the north.
+            """
+        )
+
+        let playerLocation = try await engine.player.location.id
+        #expect(playerLocation == "northRoom")
+    }
+
+    @Test("N directional abbreviation works")
+    func testNDirectionalAbbreviation() async throws {
+        // Given
+        let roundRoom = Location(
+            id: "roundRoom",
+            .name("Round Room"),
+            .inherentlyLit,
+            .exits(.north("northRoom"))
+        )
+
+        let northRoom = Location(
+            id: "northRoom",
+            .name("North Room"),
+            .description("A room to the north."),
+            .inherentlyLit
+        )
+
+        let game = MinimalGame(
+            player: Player(in: "roundRoom"),
+            locations: roundRoom, northRoom
+        )
+
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // When
+        try await engine.execute("n")
+
+        // Then
+        let output = await mockIO.flush()
+        expectNoDifference(
+            output,
+            """
+            > n
+            --- North Room ---
+
+            A room to the north.
+            """
+        )
+
+        let playerLocation = try await engine.player.location.id
+        #expect(playerLocation == "northRoom")
+    }
+
+    @Test("All cardinal directions work")
+    func testAllCardinalDirections() async throws {
+        // Given
+        let centerRoom = Location(
+            id: "centerRoom",
+            .name("Center Room"),
+            .description("A room in the center."),
+            .inherentlyLit,
+            .exits(
+                .north("northRoom"),
+                .south("southRoom"),
+                .east("eastRoom"),
+                .west("westRoom")
             )
-        }
-
-        let output = await mockIO.flush()
-        #expect(output.isEmpty, "Expected no output when GO is blocked.")
-    }
-
-    @Test("GO NORTH fails when no exit exists")
-    func testGoNorthNoExit() async throws {
-        let startRoom = Location(
-            id: .startRoom,
-            .description("You are here.")
         )
-        let endRoom = Location(
-            id: "end",
-            .description("You went there.")
+
+        let northRoom = Location(
+            id: "northRoom",
+            .name("North Room"),
+            .description("A room to the north."),
+            .inherentlyLit,
+            .exits(.south("centerRoom"))
+        )
+
+        let southRoom = Location(
+            id: "southRoom",
+            .name("South Room"),
+            .description("A room to the south."),
+            .inherentlyLit,
+            .exits(.north("centerRoom"))
+        )
+
+        let eastRoom = Location(
+            id: "eastRoom",
+            .name("East Room"),
+            .description("A room to the east."),
+            .inherentlyLit,
+            .exits(.west("centerRoom"))
+        )
+
+        let westRoom = Location(
+            id: "westRoom",
+            .name("West Room"),
+            .description("A room to the west."),
+            .inherentlyLit,
+            .exits(.east("centerRoom"))
         )
 
         let game = MinimalGame(
-            player: Player(in: .startRoom),
-            locations: [startRoom, endRoom]
-        )
-        let mockIO = await MockIOHandler()
-        let mockParser = MockParser()
-        let engine = await GameEngine(
-            blueprint: game,
-            parser: mockParser,
-            ioHandler: mockIO
+            player: Player(in: "centerRoom"),
+            locations: centerRoom, northRoom, southRoom, eastRoom, westRoom
         )
 
-        let command = Command(
-            verb: .go,
-            direction: .north,
-            rawInput: "north"
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // Test each direction
+        try await engine.execute("north")
+        var playerLocation = try await engine.player.location.id
+        #expect(playerLocation == "northRoom")
+
+        try await engine.execute("south")
+        playerLocation = try await engine.player.location.id
+        #expect(playerLocation == "centerRoom")
+
+        try await engine.execute("south")
+        playerLocation = try await engine.player.location.id
+        #expect(playerLocation == "southRoom")
+
+        try await engine.execute("north")
+        try await engine.execute("east")
+        playerLocation = try await engine.player.location.id
+        #expect(playerLocation == "eastRoom")
+
+        try await engine.execute("west")
+        try await engine.execute("west")
+        playerLocation = try await engine.player.location.id
+        #expect(playerLocation == "westRoom")
+
+        // Clear output
+        let output = await mockIO.flush()
+        expectNoDifference(
+            output,
+            """
+            > north
+            --- North Room ---
+
+            A room to the north.
+
+            > south
+            --- Center Room ---
+
+            A room in the center.
+
+            > south
+            --- South Room ---
+
+            A room to the south.
+
+            > north
+            --- Center Room ---
+
+            > east
+            --- East Room ---
+
+            A room to the east.
+
+            > west
+            --- Center Room ---
+
+            > west
+            --- West Room ---
+
+            A room to the west.
+            """
+        )
+    }
+
+    // MARK: - Validation Testing
+
+    @Test("Cannot go without specifying direction")
+    func testCannotGoWithoutDirection() async throws {
+        // Given
+        let roundRoom = Location(
+            id: "roundRoom",
+            .name("Round Room"),
+            .inherentlyLit
         )
 
-        await #expect(throws: ActionResponse.invalidDirection) {
-            try await handler.validate(
-                context: ActionContext(
-                    command: command,
-                    engine: engine,
-                    stateSnapshot: engine.gameState
-                )
+        let game = MinimalGame(
+            player: Player(in: "roundRoom"),
+            locations: roundRoom
+        )
+
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // When
+        try await engine.execute("go")
+
+        // Then
+        let output = await mockIO.flush()
+        expectNoDifference(
+            output,
+            """
+            > go
+            The compass awaits your decision.
+            """
+        )
+    }
+
+    @Test("Cannot go in direction with no exit")
+    func testCannotGoInDirectionWithNoExit() async throws {
+        // Given
+        let roundRoom = Location(
+            id: "roundRoom",
+            .name("Round Room"),
+            .description("A room with no exits."),
+            .inherentlyLit
+        )
+
+        let game = MinimalGame(
+            player: Player(in: "roundRoom"),
+            locations: roundRoom
+        )
+
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // When
+        try await engine.execute("north")
+
+        // Then
+        let output = await mockIO.flush()
+        expectNoDifference(
+            output,
+            """
+            > north
+            That way lies only disappointment.
+            """
+        )
+    }
+
+    @Test("Cannot go through permanently blocked exit")
+    func testCannotGoThroughPermanentlyBlockedExit() async throws {
+        // Given
+        let roundRoom = Location(
+            id: "roundRoom",
+            .name("Round Room"),
+            .inherentlyLit,
+            .exits(
+                .north(blocked: "The way north is permanently blocked by rubble.")
             )
-        }
-
-        let output = await mockIO.flush()
-        #expect(output.isEmpty, "Expected no output when direction is invalid.")
-    }
-
-    @Test("Go to adjacent room successfully")
-    func testGoToAdjacentRoomSuccessfully() async throws {
-        // Arrange
-        let foyer = Location(
-            id: "foyer",
-            .description("A grand foyer."),
-            .exits([.north: .to("hall")]),
-            .inherentlyLit
-        )
-        let hall = Location(
-            id: "hall",
-            .description("A long hall."),
-            .inherentlyLit
-        )
-        let game = MinimalGame(player: Player(in: "foyer"), locations: [foyer, hall])
-        let engine = await GameEngine(blueprint: game, parser: MockParser(), ioHandler: await MockIOHandler())
-
-        let command = Command(
-            verb: .go,
-            direction: .north,
-            rawInput: "go north"
         )
 
-        // Act
-        await engine.execute(command: command)
-
-        // Assert
-        #expect(await engine.playerLocationID == "hall")
-        // Output handled by GameEngine's look after move, not tested here directly
-    }
-
-    @Test("Go fails with no exit in direction")
-    func testGoFailsWithNoExit() async throws {
-        // Arrange
-        let foyer = Location(
-            id: "foyer",
-            .description("A grand foyer."),
-            .inherentlyLit
-            // No exit north
-        )
-        let game = MinimalGame(player: Player(in: "foyer"), locations: [foyer])
-        let mockIO = await MockIOHandler()
-        let engine = await GameEngine(blueprint: game, parser: MockParser(), ioHandler: mockIO)
-
-        let command = Command(
-            verb: .go,
-            direction: .north,
-            rawInput: "go north"
-        )
-
-        // Act
-        await engine.execute(command: command)
-
-        // Assert
-        #expect(await engine.playerLocationID == "foyer") // Player hasn’t moved
-        let output = await mockIO.flush()
-        expectNoDifference(output, "You can’t go that way.")
-    }
-
-    @Test("Go fails with locked door")
-    func testGoFailsWithLockedDoor() async throws {
-        // Arrange
-        let foyer = Location(
-            id: "foyer",
-            .description("A grand foyer."),
-            .exits([
-                .north: Exit(
-                    destination: "vault",
-                    doorID: "vaultDoor"
-                )
-            ]),
-            .inherentlyLit
-        )
-        let vaultDoor = Item(
-            id: "vaultDoor",
-            .name("door to the vault"),
-            .description("""
-                A massive, reinforced steel door dominates one wall of the grand foyer.
-                """),
-            .in(.location(foyer.id)),
-            .isLocked
-        )
-        let vault = Location(
-            id: "vault",
-            .description("A secure vault."),
-            .inherentlyLit
-        )
         let game = MinimalGame(
-            player: Player(in: "foyer"),
-            locations: [foyer, vault],
-            items: [vaultDoor]
-        )
-        let mockIO = await MockIOHandler()
-        let engine = await GameEngine(blueprint: game, parser: MockParser(), ioHandler: mockIO)
-
-        let command = Command(
-            verb: .go,
-            direction: .north,
-            rawInput: "go north"
+            player: Player(in: "roundRoom"),
+            locations: roundRoom
         )
 
-        // Act
-        await engine.execute(command: command)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        // Assert
-        #expect(await engine.playerLocationID == "foyer") // Player hasn’t moved
+        // When
+        try await engine.execute("north")
+
+        // Then
         let output = await mockIO.flush()
-        expectNoDifference(output, "The door to the vault is locked.")
+        expectNoDifference(
+            output,
+            """
+            > north
+            The way north is permanently blocked by rubble.
+            """
+        )
     }
 
-    @Test("Go fails with conditional exit (condition not met)")
-    func testGoFailsWithConditionalExit() async throws {
-        // Arrange
-        let conditionFlagKey = "gateOpen"
-        // Flags use GlobalID, not AttributeID - requires explicit type annotation
-        let conditionGlobalID = GlobalID(rawValue: conditionFlagKey)
+    @Test("Cannot go through statically blocked exit")
+    func testCannotGoThroughStaticallyBlockedExit() async throws {
+        // Given
+        let roundRoom = Location(
+            id: "roundRoom",
+            .name("Round Room"),
+            .inherentlyLit,
+            .exits(
+                .south(blocked: "A magical barrier blocks your way south.")
+            )
+        )
 
-        let foyer = Location(
-            id: "foyer",
-            .description("A grand foyer."),
-            // Initially, the exit does not exist if the condition is not met
-            .exits([:]),
+        let southRoom = Location(
+            id: "southRoom",
+            .name("South Room"),
             .inherentlyLit
         )
-        let garden = Location(
-            id: "garden",
-            .description("A beautiful garden."),
-            .inherentlyLit
-        )
+
         let game = MinimalGame(
-            player: Player(in: "foyer"),
-            locations: [foyer, garden]
-        )
-        let engine = await GameEngine(
-            blueprint: game,
-            globalState: [conditionGlobalID: false],
-            parser: MockParser(),
-            ioHandler: await MockIOHandler()
+            player: Player(in: "roundRoom"),
+            locations: roundRoom, southRoom
         )
 
-        // Check flags set using contains
-        #expect(await engine.global(conditionGlobalID) == false)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        let command = Command(
-            verb: .go,
-            direction: .east,
-            rawInput: "go east"
+        // When
+        try await engine.execute("south")
+
+        // Then
+        let output = await mockIO.flush()
+        expectNoDifference(
+            output,
+            """
+            > south
+            A magical barrier blocks your way south.
+            """
         )
-
-        // Act
-        await engine.execute(command: command)
-
-        // Assert
-        #expect(await engine.playerLocationID == "foyer") // Player hasn’t moved
     }
 
-    /* TODO: implement conditional exits
-    @Test("Go succeeds with conditional exit (condition met)")
-    func testGoSucceedsWithConditionalExit() async throws {
-        // Arrange
-        let conditionFlagKey = "gateOpen"
-        // Flags use GlobalID, not AttributeID - requires explicit type annotation
-        let conditionGlobalID = GlobalID(conditionFlagKey)
-
-        var foyer = Location( // Make foyer mutable to add the exit later
-            id: "foyer",
-            name: "Foyer",
-            description: "A grand foyer.",
-            // Exit will be added when condition is met
-            exits: [:],
-            isLit: true
+    @Test("Cannot go through closed door")
+    func testCannotGoThroughClosedDoor() async throws {
+        // Given
+        let roundRoom = Location(
+            id: "roundRoom",
+            .name("Round Room"),
+            .inherentlyLit,
+            .exits(.east("eastRoom", via: "door"))
         )
-        let garden = Location(
-            id: "garden",
-            name: "Garden",
-            description: "A beautiful garden.",
-            isLit: true
-        )
-        let game = MinimalGame(player: Player(in: "foyer"), locations: [foyer, garden]) // Pass initial foyer
-        let engine = await GameEngine(blueprint: game, parser: MockParser(), ioHandler: await MockIOHandler())
 
-        // Set the condition flag to true by applying a state change
-        let change = StateChange(
-            entityID: .global, // Use .global for game-specific flags
-            // Use .setFlag property key
-            attribute: .setFlag(conditionGlobalID),
-            oldValue: false, // Expect flag was not set
-            newValue: true, // Set flag to true
-        )
-//        try await engine.TEST_ONLY_applyStateChange(change)
-
-        // Check flags set using contains
-        #expect(await engine.gameState.flags.contains(conditionGlobalID))
-
-        // Manually add the exit now that the condition is met
-        foyer.exits[.east] = .to("garden")
-        // Update the location in the game state directly for the test setup
-//        await engine.TEST_ONLY_updateLocation(foyer)
-
-        let command = Command(verb: .go, direction: .east, rawInput: "go east")
-
-        // Act
-        await engine.execute(command: command)
-
-        // Assert
-        #expect(await engine.playerLocationID == "garden") // Player moved
-    }
-     */
-
-    @Test("Go fails with no direction")
-    func testGoFailsWithNoDirection() async throws {
-        // Arrange
-        let foyer = Location(
-            id: "foyer",
-            .description("A grand foyer."),
+        let eastRoom = Location(
+            id: "eastRoom",
+            .name("East Room"),
             .inherentlyLit
         )
-        let game = MinimalGame(player: Player(in: "foyer"), locations: [foyer])
-        let mockIO = await MockIOHandler()
-        let engine = await GameEngine(blueprint: game, parser: MockParser(), ioHandler: mockIO)
 
-        let command = Command(
-            verb: .go,
-            rawInput: "go"
-        ) // No direction
+        let door = Item(
+            id: "door",
+            .name("wooden door"),
+            .description("A sturdy wooden door."),
+            .isOpenable,
+            // Note: Not open
+            .in("roundRoom")
+        )
 
-        // Act
-        await engine.execute(command: command)
+        let game = MinimalGame(
+            player: Player(in: "roundRoom"),
+            locations: roundRoom, eastRoom,
+            items: door
+        )
 
-        // Assert
-        #expect(await engine.playerLocationID == "foyer") // Player hasn’t moved
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // When
+        try await engine.execute("east")
+
+        // Then
         let output = await mockIO.flush()
-        expectNoDifference(output, "Go where?")
+        expectNoDifference(
+            output,
+            """
+            > east
+            The wooden door is closed.
+            """
+        )
+    }
+
+    @Test("Cannot go through locked door")
+    func testCannotGoThroughLockedDoor() async throws {
+        // Given
+        let roundRoom = Location(
+            id: "roundRoom",
+            .name("Round Room"),
+            .inherentlyLit,
+            .exits(.west("westRoom", via: "door"))
+        )
+
+        let westRoom = Location(
+            id: "westRoom",
+            .name("West Room"),
+            .inherentlyLit
+        )
+
+        let door = Item(
+            id: "door",
+            .name("iron door"),
+            .description("A heavy iron door."),
+            .isOpenable,
+            .isLockable,
+            .isOpen,
+            .isLocked,
+            .in("roundRoom")
+        )
+
+        let game = MinimalGame(
+            player: Player(in: "roundRoom"),
+            locations: roundRoom, westRoom,
+            items: door
+        )
+
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // When
+        try await engine.execute("west")
+
+        // Then
+        let output = await mockIO.flush()
+        expectNoDifference(
+            output,
+            """
+            > west
+            The iron door is locked.
+            """
+        )
+    }
+
+    @Test("Can go through open unlocked door")
+    func testCanGoThroughOpenUnlockedDoor() async throws {
+        // Given
+        let roundRoom = Location(
+            id: "roundRoom",
+            .name("Round Room"),
+            .inherentlyLit,
+            .exits(.north("northRoom", via: "door"))
+        )
+
+        let northRoom = Location(
+            id: "northRoom",
+            .name("North Room"),
+            .description("A room beyond the door."),
+            .inherentlyLit
+        )
+
+        let door = Item(
+            id: "door",
+            .name("oak door"),
+            .description("A polished oak door."),
+            .isOpenable,
+            .isOpen,
+            .in("roundRoom")
+        )
+
+        let game = MinimalGame(
+            player: Player(in: "roundRoom"),
+            locations: roundRoom, northRoom,
+            items: door
+        )
+
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // When
+        try await engine.execute("north")
+
+        // Then
+        let output = await mockIO.flush()
+        expectNoDifference(
+            output,
+            """
+            > north
+            --- North Room ---
+
+            A room beyond the door.
+            """
+        )
+
+        let playerLocation = try await engine.player.location.id
+        #expect(playerLocation == "northRoom")
+    }
+
+    @Test("Can go through non-door exit object")
+    func testCanGoThroughNonDoorExitObject() async throws {
+        // Given
+        let roundRoom = Location(
+            id: "roundRoom",
+            .name("Round Room"),
+            .inherentlyLit,
+            .exits(.up("upperRoom", via: "stairs"))
+        )
+
+        let upperRoom = Location(
+            id: "upperRoom",
+            .name("Upper Room"),
+            .description("A room upstairs."),
+            .inherentlyLit
+        )
+
+        let stairs = Item(
+            id: "stairs",
+            .name("wooden stairs"),
+            .description("A set of wooden stairs leading up."),
+            // Note: Not a door, so doesn't need to be open
+            .in("roundRoom")
+        )
+
+        let game = MinimalGame(
+            player: Player(in: "roundRoom"),
+            locations: roundRoom, upperRoom,
+            items: stairs
+        )
+
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // When
+        try await engine.execute("up")
+
+        // Then
+        let output = await mockIO.flush()
+        expectNoDifference(
+            output,
+            """
+            > up
+            --- Upper Room ---
+
+            A room upstairs.
+            """
+        )
+
+        let playerLocation = try await engine.player.location.id
+        #expect(playerLocation == "upperRoom")
+    }
+
+    // MARK: - Processing Testing
+
+    @Test("Movement updates player location")
+    func testMovementUpdatesPlayerLocation() async throws {
+        // Given
+        let startRoom = Location(
+            id: "startRoom",
+            .name("Start Room"),
+            .inherentlyLit,
+            .exits(.north("endRoom"))
+        )
+
+        let endRoom = Location(
+            id: "endRoom",
+            .name("End Room"),
+            .description("The destination room."),
+            .inherentlyLit
+        )
+
+        let game = MinimalGame(
+            player: Player(in: "startRoom"),
+            locations: startRoom, endRoom
+        )
+
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // Verify initial location
+        var playerLocation = try await engine.player.location.id
+        #expect(playerLocation == "startRoom")
+
+        // When
+        try await engine.execute("north")
+
+        // Then
+        playerLocation = try await engine.player.location.id
+        #expect(playerLocation == "endRoom")
+
+        let output = await mockIO.flush()
+        expectNoDifference(
+            output,
+            """
+            > north
+            --- End Room ---
+
+            The destination room.
+            """
+        )
+    }
+
+    @Test("Movement works in dark rooms")
+    func testMovementWorksInDarkRooms() async throws {
+        // Given: Dark starting room
+        let darkRoom = Location(
+            id: "darkRoom",
+            .name("Dark Room"),
+            .description("A pitch black room."),
+            .exits(.south("litRoom"))
+            // Note: No .inherentlyLit property
+        )
+
+        let litRoom = Location(
+            id: "litRoom",
+            .name("Lit Room"),
+            .description("A well-lit room."),
+            .inherentlyLit
+        )
+
+        let game = MinimalGame(
+            player: Player(in: "darkRoom"),
+            locations: darkRoom, litRoom
+        )
+
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // When
+        try await engine.execute("south")
+
+        // Then
+        let output = await mockIO.flush()
+        expectNoDifference(
+            output,
+            """
+            > south
+            --- Lit Room ---
+
+            A well-lit room.
+            """
+        )
+
+        let playerLocation = try await engine.player.location.id
+        #expect(playerLocation == "litRoom")
+    }
+
+    @Test("Movement from lit to dark room shows darkness")
+    func testMovementFromLitToDarkRoomShowsDarkness() async throws {
+        // Given
+        let litRoom = Location(
+            id: "litRoom",
+            .name("Lit Room"),
+            .description("A well-lit room."),
+            .inherentlyLit,
+            .exits(.north("darkRoom"))
+        )
+
+        let darkRoom = Location(
+            id: "darkRoom",
+            .name("Dark Room"),
+            .description("A pitch black room.")
+            // Note: No .inherentlyLit property
+        )
+
+        let game = MinimalGame(
+            player: Player(in: "litRoom"),
+            locations: litRoom, darkRoom
+        )
+
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // When
+        try await engine.execute("north")
+
+        // Then
+        let output = await mockIO.flush()
+        expectNoDifference(
+            output,
+            """
+            > north
+            Darkness rushes in like a living thing.
+
+            This is the kind of dark that swallows shapes and edges,
+            leaving only breath and heartbeat to prove you exist.
+            """
+        )
+
+        let playerLocation = try await engine.player.location.id
+        #expect(playerLocation == "darkRoom")
+    }
+
+    @Test("Movement with light source illuminates destination")
+    func testMovementWithLightSourceIlluminatesDestination() async throws {
+        // Given
+        let litRoom = Location(
+            id: "litRoom",
+            .name("Lit Room"),
+            .inherentlyLit,
+            .exits(.north("darkRoom"))
+        )
+
+        let darkRoom = Location(
+            id: "darkRoom",
+            .name("Dark Room"),
+            .description("A room that needs artificial light.")
+            // Note: No .inherentlyLit property
+        )
+
+        let torch = Item(
+            id: "torch",
+            .name("burning torch"),
+            .description("A torch with a bright flame."),
+            .isLightSource,
+            .isDevice,
+            .isTakable,
+            .in(.player)
+        )
+
+        let game = MinimalGame(
+            player: Player(in: "litRoom"),
+            locations: litRoom, darkRoom,
+            items: torch
+        )
+
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // Set torch to be on (providing light)
+        try await engine.apply(
+            await torch.proxy(engine).setFlag(.isOn)
+        )
+
+        // When
+        try await engine.execute("north")
+
+        // Then
+        let output = await mockIO.flush()
+        expectNoDifference(
+            output,
+            """
+            > north
+            --- Dark Room ---
+
+            A room that needs artificial light.
+            """
+        )
+
+        let playerLocation = try await engine.player.location.id
+        #expect(playerLocation == "darkRoom")
+    }
+
+    @Test("Roundtrip movement works")
+    func testRoundtripMovementWorks() async throws {
+        // Given
+        let roomA = Location(
+            id: "roomA",
+            .name("Room A"),
+            .description("The first room."),
+            .inherentlyLit,
+            .exits(.east("roomB"))
+        )
+
+        let roomB = Location(
+            id: "roomB",
+            .name("Room B"),
+            .description("The second room."),
+            .inherentlyLit,
+            .exits(.west("roomA"))
+        )
+
+        let game = MinimalGame(
+            player: Player(in: "roomA"),
+            locations: roomA, roomB
+        )
+
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // When - go east then west
+        try await engine.execute("east")
+        var playerLocation = try await engine.player.location.id
+        #expect(playerLocation == "roomB")
+
+        try await engine.execute("west")
+        playerLocation = try await engine.player.location.id
+        #expect(playerLocation == "roomA")
+
+        let output = await mockIO.flush()
+        expectNoDifference(
+            output,
+            """
+            > east
+            --- Room B ---
+
+            The second room.
+
+            > west
+            --- Room A ---
+
+            The first room.
+            """
+        )
+    }
+
+    // MARK: - Intent Testing
+
+    @Test("Handler exposes correct Verbs")
+    func testVerbs() async throws {
+        let handler = GoActionHandler()
+        #expect(handler.synonyms.contains(.go))
+        #expect(handler.synonyms.contains(.walk))
+        #expect(handler.synonyms.contains(.run))
+        #expect(handler.synonyms.contains(.proceed))
+        #expect(handler.synonyms.contains(.stroll))
+        #expect(handler.synonyms.contains(.hike))
+        #expect(handler.synonyms.contains(.head))
+        #expect(handler.synonyms.contains(.move))
+        #expect(handler.synonyms.contains(.travel))
+        #expect(handler.synonyms.count == 9)
+    }
+
+    @Test("Handler does not require light")
+    func testDoesNotRequireLight() async throws {
+        let handler = GoActionHandler()
+        #expect(handler.requiresLight == false)
+    }
+
+    @Test("Handler syntax rules are correct")
+    func testSyntaxRules() async throws {
+        let handler = GoActionHandler()
+        #expect(handler.syntax.count == 1)
+        // The specific syntax pattern requires verb + direction
     }
 }

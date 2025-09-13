@@ -16,7 +16,7 @@ public struct LocationID: GnustoID {
     /// Initializes a `LocationID` with a raw string value.
     /// - Parameter rawValue: The string value for the ID.
     public init(rawValue: String) {
-        assert(!rawValue.isEmpty, "Location ID cannot be empty")
+        assert(rawValue.isNotEmpty, "Location ID cannot be empty")
         self.rawValue = rawValue
     }
 }

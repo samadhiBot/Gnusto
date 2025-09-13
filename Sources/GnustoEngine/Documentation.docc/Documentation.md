@@ -32,10 +32,11 @@ enum OperaHouse {
         .description("""
             The walls of this small room were clearly once lined with hooks,
             though now only one remains. The exit is a door to the east.
-            """),
-        .exits([
-            .east: .to(.foyer),
-        ]),
+            """
+        ),
+        .exits(
+            .east(.foyer)
+        ),
         .inherentlyLit
     )
 }
@@ -44,14 +45,14 @@ enum OperaHouse {
 In this example:
 
 - ``Location/id``: Each location needs a unique ``LocationID`` (here, `"cloakroom"`).
-- ``LocationAttribute/name(_:)``: This is often used as the heading when describing the location.
-- ``LocationAttribute/description(_:)``: The text paints a picture of the location for the player.
-- ``LocationAttribute/exits(_:)``: A dictionary mapping a ``Direction`` to an ``Exit``, defining how the player can move between locations. The ``Exit`` specifies the ``Exit/destinationID`` ``LocationID``.
-- ``LocationAttribute/inherentlyLit``: This ``LocationAttribute`` indicates the room is lit by default, without needing a light source.
+- ``LocationProperty/name(_:)``: This is often used as the heading when describing the location.
+- ``LocationProperty/description(_:)``: The text paints a picture of the location for the player.
+- ``LocationProperty/exits(_:)``: A dictionary mapping a ``Direction`` to an ``Exit``, defining how the player can move between locations. The ``Exit`` specifies the ``Exit/destinationID`` ``LocationID``.
+- ``LocationProperty/inherentlyLit``: This ``LocationProperty`` indicates the room is lit by default, without needing a light source.
 
 #### Items: Populating Your World
 
-An ``Item`` is any object, character, or other entity that the player can interact with. Like locations, items have an ID, a name, a description, and various attributes that define their behavior and state.
+An ``Item`` is any object, character, or other entity that the player can interact with. Like locations, items have an ID, a name, a description, and various properties that define their behavior and state.
 
 Let's add a cloak that the player is wearing, and a brass hook in the cloakroom to hang it on:
 
@@ -62,8 +63,8 @@ extension OperaHouse {
     static let hook = Item(
         id: .hook,
         .adjectives("small", "brass"),
-        .in(.location(.cloakroom)),
-        .isScenery,
+        .in(.cloakroom),
+        .omitDescription,
         .isSurface,
         .name("small brass hook"),
         .synonyms("peg"),
@@ -76,7 +77,8 @@ extension OperaHouse {
             A handsome cloak, of velvet trimmed with satin, and slightly
             spattered with raindrops. Its blackness is so deep that it
             almost seems to suck light from the room.
-            """),
+            """
+        ),
         .adjectives("handsome", "dark", "black", "velvet", "satin"),
         .in(.player),
         .isTakable,
@@ -86,11 +88,11 @@ extension OperaHouse {
 }
 ```
 
-Key ``ItemAttribute``s here include:
+Key ``ItemProperty``s here include:
 
-- ``ItemAttribute/name(_:)``, ``ItemAttribute/description(_:)``, ``ItemAttribute/adjectives(_:)``, ``ItemAttribute/synonyms(_:)``: Help describe the item and how the player can refer to it.
-- ``ItemAttribute/in(_:)``: Specifies the item's initial ``ParentEntity``, which can be a location, a container item, or the player.
-- Flags are boolean properties like ``ItemAttribute/isTakable`` (can the player pick it up?), ``ItemAttribute/isWearable`` (can the player wear it?), or ``ItemAttribute/isScenery`` (is it just part of the background?).
+- ``ItemProperty/name(_:)``, ``ItemProperty/description(_:)``, ``ItemProperty/adjectives(_:)``, ``ItemProperty/synonyms(_:)``: Help describe the item and how the player can refer to it.
+- ``ItemProperty/in(_:)``: Specifies the item's initial ``ParentEntity``, which can be a location, a container item, or the player.
+- Flags are boolean properties like ``ItemProperty/isTakable`` (can the player pick it up?), ``ItemProperty/isWearable`` (can the player wear it?), or ``ItemProperty/omitDescription`` (is it just part of the background?).
 
 ### Making it Interactive: Actions and Responses
 
@@ -111,7 +113,7 @@ The ``GameState`` is the single source of truth for everything dynamic in your g
 Creating a game with Gnusto generally follows these steps:
 
 1.  **Design Your World:** Sketch out your map, puzzles, items, and story.
-2.  **Define Core Entities:** Create your ``Location``s and ``Item``s using their respective initializers and attributes, often organized into logical area groups (enums or structs).
+2.  **Define Core Entities:** Create your ``Location``s and ``Item``s using their respective initializers and properties, often organized into logical area groups (enums or structs).
 3.  **Implement Custom Logic:** Add ``ItemEventHandler``s, ``LocationEventHandler``s, or custom ``ActionHandler``s for unique interactions and puzzle mechanics.
 4.  **Set up a `GameBlueprint`:** This brings together your areas, vocabulary, and initial game settings.
 5.  **Initialize and Run:** Create a ``GameEngine`` instance with your ``GameBlueprint`` and an ``IOHandler`` (like ``ConsoleIOHandler``), then start the game loop.
@@ -124,7 +126,7 @@ Gnusto is built with game creators in mind, offering features that simplify deve
 - **Dynamic Content:** Create living worlds with state-driven descriptions and behaviors using ``ItemEventHandler``s and ``LocationEventHandler``s.
 - **Rich Action System:** A flexible pipeline processes player commands, allowing for complex interactions and easy customization of game verbs.
 - **Smart `Parser`:** Gnusto's parser understands natural language, supporting synonyms, adjectives, and complex sentence structures.
-- **Comprehensive `GameState` management:** Easily track and modify game progress, item states, player attributes, and timed events (``FuseDefinition``s and ``DaemonDefinition``s).
+- **Comprehensive `GameState` management:** Easily track and modify game progress, item states, player properties, and timed events (``Fuse``s and ``Daemon``s).
 - **Extensible Architecture:** The engine is designed for modularity. Add custom behaviors, new actions, or even entirely new systems without fighting the core framework.
 
 ## Automatic ID Generation and Game Setup
@@ -137,7 +139,7 @@ When you include the GnustoAutoWiringPlugin in your game project, it automatical
 
 - **Generates ID Extensions**: Scans patterns like `Location(id: .foyer, ...)` and creates `static let foyer = LocationID("foyer")`
 - **Discovers Event Handlers**: Finds your ``ItemEventHandler`` and ``LocationEventHandler`` definitions and wires them up automatically
-- **Sets Up Time Registry**: Discovers ``FuseDefinition`` and ``DaemonDefinition`` instances and registers them
+- **Sets Up Time Registry**: Discovers ``Fuse`` and ``Daemon`` instances and registers them
 - **Aggregates Game Content**: Collects all your items and locations from multiple area files and provides them to your `GameBlueprint`
 - **Handles Custom Actions**: Discovers custom ``ActionHandler`` implementations and integrates them
 
@@ -194,7 +196,7 @@ If you prefer complete control or want to understand what's happening under the 
    }
    ```
 
-The choice is yours—use the plugin for convenience, or go manual for complete control!
+The choice is yours--use the plugin for convenience, or go manual for complete control!
 
 ## Where to Go Next
 

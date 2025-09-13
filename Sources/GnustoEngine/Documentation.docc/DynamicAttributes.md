@@ -1,67 +1,162 @@
-# Dynamic Attributes
+# Dynamic Properties
 
-Learn how to use dynamic attributes and validation handlers to create sophisticated game mechanics while respecting the action pipeline.
+Learn how to use dynamic properties and validation handlers to create sophisticated game mechanics while respecting the action pipeline.
 
 ## Overview
 
-The Gnusto Engine's dynamic attribute system allows you to create attributes that are computed at runtime or validated when changed. This enables complex game mechanics similar to those found in classic ZIL-based interactive fiction games like Zork.
+The Gnusto Engine's dynamic property system allows you to create properties that are computed at runtime or validated when changed. This enables complex game mechanics similar to those found in classic ZIL-based interactive fiction games like Zork.
 
-> **Note**: If you're using the GnustoAutoWiringPlugin, dynamic attribute registrations in your code (like `registerItemCompute(itemID: .sword, attribute: .sharpness)`) are automatically discovered and set up for you. You can focus on writing the logic while the plugin handles the wiring.
+Compute handlers are defined in your `GameBlueprint` using the `itemComputeHandlers` and `locationComputeHandlers` properties. This compile-time approach ensures better performance and predictability.
 
-**Important**: All attribute changes must flow through the action pipeline using `StateChange` builders. This ensures proper validation, event handling, and consistency.
+> **Note**: If you're using the GnustoAutoWiringPlugin, it will generate helpful scaffolding for the GameBlueprint approach, including commented examples for your items and locations.
+
+**Important**: All property changes must flow through the action pipeline using `StateChange` builders. This ensures proper validation, event handling, and consistency.
+
+## GameBlueprint Approach (Recommended)
+
+### Defining Compute Handlers in GameBlueprint
+
+The preferred way to define compute handlers is directly in your `GameBlueprint`:
+
+```swift
+struct MyGameBlueprint: GameBlueprint {
+    // ... other blueprint properties
+
+    var itemComputeHandlers: [ItemID: [PropertyID: DynamicPropertyRegistry.ItemComputeHandler]] {
+        [
+            .magicSword: [
+                .description: { item, gameState in
+                    let enchantment = item.properties["enchantmentLevel"]?.toInt ?? 0
+                    let desc = enchantment > 5 ? "A brilliantly glowing sword" : "A faintly shimmering blade"
+                    return .string(desc)
+                }
+            ],
+            .weatherVane: [
+                .direction: { item, gameState in
+                    let windDirection = gameState.globalState["windDirection"]?.toString ?? "north"
+                    return .string(windDirection)
+                }
+            ]
+        ]
+    }
+
+    var locationComputeHandlers: [LocationID: [PropertyID: DynamicPropertyRegistry.LocationComputeHandler]] {
+        [
+            .magicRoom: [
+                .description: { location, gameState in
+                    let isEnchanted = gameState.globalState["roomEnchanted"] == true
+                    let desc = isEnchanted ? "The room sparkles with magical energy." : "The room appears ordinary."
+                    return .string(desc)
+                }
+            ]
+        ]
+    }
+}
+```
+
+### Auto-Generated Scaffolding
+
+When using the GnustoAutoWiringPlugin, it will generate helpful scaffolding in your GameBlueprint extension:
+
+```swift
+extension MyGameBlueprint {
+    // TODO: Add compute handlers for dynamic item properties
+    // Example:
+    // var itemComputeHandlers: [ItemID: [PropertyID: DynamicPropertyRegistry.ItemComputeHandler]] {
+    //     [
+    //         .sword: [
+    //             .description: { item, gameState in
+    //                 return .string("Dynamic description for \(item.name)")
+    //             }
+    //         ],
+    //     ]
+    // }
+
+    // TODO: Add compute handlers for dynamic location properties
+    // Example:
+    // var locationComputeHandlers: [LocationID: [PropertyID: DynamicPropertyRegistry.LocationComputeHandler]] {
+    //     [
+    //         .livingRoom: [
+    //             .description: { location, gameState in
+    //                 return .string("Dynamic description for \(location.name)")
+    //             }
+    //         ],
+    //     ]
+    // }
+}
+```
+
+## Runtime Registration Approach
+
+You can also register compute handlers at runtime, which is useful for conditional or complex setup scenarios:
+
+```swift
+// Register after creating the engine
+await engine.registerItemCompute(itemID: .magicSword, propertyID: .description) { item, gameState in
+    let enchantment = item.properties["enchantmentLevel"]?.toInt ?? 0
+    let desc = enchantment > 5 ? "A brilliantly glowing sword" : "A faintly shimmering blade"
+    return .string(desc)
+}
+
+await engine.registerLocationCompute(locationID: .magicRoom, propertyID: .description) { location, gameState in
+    let isEnchanted = gameState.globalState["roomEnchanted"] == true
+    let desc = isEnchanted ? "The room sparkles with magical energy." : "The room appears ordinary."
+    return .string(desc)
+}
+```
 
 ## Basic Usage
 
-### Reading Attributes
+### Reading Properties
 
-Use the fetch methods to read dynamic or static attributes:
+Use the fetch methods to read dynamic or static properties:
 
 ```swift
 // Fetch typed values
-let sharpness: Int = try await engine.attribute("sharpness", of .sword)
-let description: String = try await engine.attribute(.description, of .sword)
-let isOpen: Bool = try await engine.attribute(.isOpen, of .door)
+let sharpness: Int = try await engine.property("sharpness", of .sword)
+let description: String = try await engine.property(.description, of .sword)
+let isOpen: Bool = try await engine.property(.isOpen, of .door)
 
-// Fetch location attributes
-let temperature: String = try await engine.attribute("temperature", of .cave)
+// Fetch location properties
+let temperature: String = try await engine.property("temperature", of .cave)
 ```
 
-### Setting Attributes (Respecting the Pipeline)
+### Setting Properties (Respecting the Pipeline)
 
-**Always use `StateChange` builders** to modify attributes. Never bypass the action pipeline:
+**Always use `StateChange` builders** to modify properties. Never bypass the action pipeline:
 
 ```swift
 // Create StateChange using builders
 let item = try engine.item("sword")
-if let change = await engine.setAttribute("sharpness", on: item, to: .int(8)) {
+if let change = await engine.setProperty("sharpness", on: item, to: .int(8)) {
     // Apply through the pipeline (usually in an ActionHandler)
-    return ActionResult(stateChanges: [change], message: "The sword gleams with sharpness.")
+    return ActionResult(changes: [change], message: "🤡 The sword gleams with sharpness.")
 }
 
 // Use convenience builders for common patterns
 if let change = await engine.setDescription(on: item, to: "A gleaming blade") {
-    return ActionResult(stateChanges: [change])
+    return ActionResult(changes: [change])
 }
 
-if let change = await engine.setAttribute("isOpen", on: door, to: true) {
-    return ActionResult(stateChanges: [change], message: "The door swings open.")
+if let change = await engine.setProperty("isOpen", on: door, to: true) {
+    return ActionResult(changes: [change], message: "🤡 The door swings open.")
 }
 ```
 
 ## Validation Handlers
 
-Validation handlers allow you to enforce rules when attributes are changed, similar to ZIL's property validation. They are called automatically when `StateChange`s are applied.
+Validation handlers allow you to enforce rules when properties are changed, similar to ZIL's property validation. They are called automatically when `StateChange`s are applied.
 
 ### Basic Validation
 
 ```swift
-// Register a validation handler for a specific item and attribute
-engine.registerItemValidate(itemID: "door", attributeID: "isOpen") { item, newValue in
+// Register a validation handler for a specific item and property
+engine.registerItemValidate(itemID: "door", propertyID: "isOpen") { item, newValue in
     guard case .bool(let isOpening) = newValue else { return false }
 
     // Can only open if not locked
     if isOpening {
-        let isLocked = item.attributes["isLocked"]?.toBool ?? false
+        let isLocked = item.properties["isLocked"]?.toBool ?? false
         return !isLocked
     }
     return true
@@ -74,13 +169,13 @@ Inspired by Zork's troll combat system:
 
 ```swift
 // Ensure troll state consistency when fighting status changes
-engine.registerItemValidate(itemID: "troll", attributeID: "fighting") { item, newValue in
+engine.registerItemValidate(itemID: "troll", propertyID: "fighting") { item, newValue in
     guard case .bool(let isFighting) = newValue else { return false }
 
     // If troll stops fighting, it must be unconscious or disarmed
     if !isFighting {
-        let hasWeapon = item.attributes["hasWeapon"]?.toBool ?? false
-        let isUnconscious = item.attributes["unconscious"]?.toBool ?? false
+        let hasWeapon = item.properties["hasWeapon"]?.toBool ?? false
+        let isUnconscious = item.properties["unconscious"]?.toBool ?? false
         return !hasWeapon || isUnconscious
     }
     return true
@@ -92,13 +187,13 @@ engine.registerItemValidate(itemID: "troll", attributeID: "fighting") { item, ne
 Validation handlers can throw specific errors for better user feedback:
 
 ```swift
-engine.registerItemValidate(itemID: "magicSword", attributeID: "enchantmentLevel") { item, newValue in
+engine.registerItemValidate(itemID: "magicSword", propertyID: "enchantmentLevel") { item, newValue in
     guard case .int(let level) = newValue else {
-        throw ActionResponse.prerequisiteNotMet("Enchantment level must be a number")
+        throw await ActionResponse.feedback("Enchantment level must be a number")
     }
 
     if level < 0 || level > 10 {
-        throw ActionResponse.prerequisiteNotMet("Enchantment level must be between 0 and 10")
+        throw await ActionResponse.feedback("Enchantment level must be between 0 and 10")
     }
 
     return true
@@ -109,12 +204,12 @@ engine.registerItemValidate(itemID: "magicSword", attributeID: "enchantmentLevel
 
 The engine provides convenient builders for creating `StateChange` objects that respect the action pipeline:
 
-### Generic Attribute Builders
+### Generic Property Builders
 
 ```swift
 // Set any StateValue on items or locations
-let change = await engine.setAttribute("customProp", on: item, to: .string("value"))
-let change = await engine.setAttribute("temperature", on: location, to: .int(72))
+let change = await engine.setProperty("customProp", on: item, to: .string("value"))
+let change = await engine.setProperty("temperature", on: location, to: .int(72))
 ```
 
 ### Convenience Builders
@@ -122,10 +217,10 @@ let change = await engine.setAttribute("temperature", on: location, to: .int(72)
 ```swift
 // Common patterns have dedicated builders
 let change = await engine.setDescription(on: item, to: "A new description")
-let change = await engine.setAttribute("isOpen", on: door, to: true)
-let change = await engine.setAttribute("isLit", on: room, to: false)
-let change = await engine.setAttribute("damage", on: weapon, to: 15)
-let change = await engine.setAttribute("material", on: armor, to: "steel")
+let change = await engine.setProperty("isOpen", on: door, to: true)
+let change = await engine.setProperty("isLit", on: room, to: false)
+let change = await engine.setProperty("damage", on: weapon, to: 15)
+let change = await engine.setProperty("material", on: armor, to: "steel")
 ```
 
 ### Using StateChanges in Action Handlers
@@ -133,7 +228,7 @@ let change = await engine.setAttribute("material", on: armor, to: "steel")
 ```swift
 struct OpenActionHandler: ActionHandler {
     func process(context: ActionContext) async throws -> ActionResult {
-        let item = try context.engine.item(context.command.directObjectID)
+        let item = try engine.item(command.directObjectID)
 
         // Validate the item can be opened
         guard item.hasProperty(.isOpenable) else {
@@ -141,14 +236,14 @@ struct OpenActionHandler: ActionHandler {
         }
 
         // Create state change using builder
-        guard let change = await context.engine.setAttribute("isOpen", on: item, to: true) else {
+        guard let change = await engine.setProperty("isOpen", on: item, to: true) else {
             throw ActionResponse.itemAlreadyOpen(item)
         }
 
         // Return result with state change - the engine will apply it through the pipeline
         return ActionResult(
-            stateChanges: [change],
-            message: "You open \(context.engine.theThat(item))."
+            changes: [change],
+            message: "🤡 You open \(engine.theThat(item))."
         )
     }
 }
@@ -156,14 +251,14 @@ struct OpenActionHandler: ActionHandler {
 
 ## ZIL-Inspired Patterns
 
-The dynamic attribute system enables classic interactive fiction patterns:
+The dynamic property system enables classic interactive fiction patterns:
 
 ### Opening and Closing Objects
 
 ```swift
 // Similar to ZIL's FSET/FCLEAR for OPENBIT
-if let change = await engine.setAttribute("isOpen", on: chest, to: true) {
-    return ActionResult(stateChanges: [change], message: "The chest creaks open.")
+if let change = await engine.setProperty("isOpen", on: chest, to: true) {
+    return ActionResult(changes: [change], message: "🤡 The chest creaks open.")
 }
 ```
 
@@ -171,7 +266,7 @@ if let change = await engine.setAttribute("isOpen", on: chest, to: true) {
 
 ```swift
 // Similar to ZIL's PUTP for changing descriptions
-let trollState = await engine.gameState.items["troll"]?.attributes["fighting"]?.toBool ?? false
+let trollState = await engine.gameState.items["troll"]?.properties["fighting"]?.toBool ?? false
 let newDescription = if trollState {
     "A nasty-looking troll, brandishing a bloody axe, blocks all passages."
 } else {
@@ -179,7 +274,7 @@ let newDescription = if trollState {
 }
 
 if let change = await engine.setDescription(on: troll, to: newDescription) {
-    return ActionResult(stateChanges: [change])
+    return ActionResult(changes: [change])
 }
 ```
 
@@ -188,14 +283,14 @@ if let change = await engine.setDescription(on: troll, to: newDescription) {
 ```swift
 // Complex state changes with validation
 let changes = [
-    await engine.setAttribute("unconscious", on: troll, to: true),
-    await engine.setAttribute("fighting", on: troll, to: false),
-    await engine.setAttribute("isVisible", on: axe, to: true)
+    await engine.setProperty("unconscious", on: troll, to: true),
+    await engine.setProperty("fighting", on: troll, to: false),
+    await engine.setProperty("isVisible", on: axe, to: true)
 ].compactMap { $0 }
 
 return ActionResult(
-    stateChanges: changes,
-    message: "The troll collapses, dropping his axe!"
+    changes: changes,
+    message: "🤡 The troll collapses, dropping his axe!"
 )
 ```
 
@@ -232,7 +327,7 @@ do {
 
 ## Integration with Action Pipeline
 
-The dynamic attribute system is fully integrated with the action pipeline:
+The dynamic property system is fully integrated with the action pipeline:
 
 1. **Validation**: When `StateChange`s are applied, dynamic validation handlers are called automatically
 2. **Event Handlers**: Item and location event handlers can create `StateChange`s that trigger validation

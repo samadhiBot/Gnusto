@@ -1,0 +1,29 @@
+{
+  "configurations" : [
+    {
+      "id" : "52EDF2D0-5226-4906-82E8-F9A223EAF800",
+      "name" : "Test Scheme Action",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "codeCoverage" : false,
+    "targetForVariableExpansion" : {
+      "containerPath" : "container:",
+      "identifier" : "FrobozzMagicDemoKit",
+      "name" : "FrobozzMagicDemoKit"
+    }
+  },
+  "testTargets" : [
+    {
+      "target" : {
+        "containerPath" : "container:",
+        "identifier" : "FrobozzMagicDemoKitTests",
+        "name" : "FrobozzMagicDemoKitTests"
+      }
+    }
+  ],
+  "version" : 1
+}

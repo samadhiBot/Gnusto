@@ -1,5 +1,7 @@
-import Testing
 import Foundation
+import GnustoTestSupport
+import Testing
+
 @testable import GnustoEngine
 
 // MARK: - Test ID Type
@@ -7,7 +9,7 @@ import Foundation
 /// A test ID type that conforms to GnustoID for testing the protocol's default implementations.
 private struct TestID: GnustoID {
     let rawValue: String
-    
+
     init(rawValue: String) {
         self.rawValue = rawValue
     }
@@ -22,7 +24,7 @@ struct GnustoIDTests {
     func testRawRepresentableConformance() throws {
         let id = TestID(rawValue: "testValue")
         #expect(id.rawValue == "testValue")
-        
+
         // Test that it can be used as RawRepresentable
         let rawRepresentable: any RawRepresentable = id
         #expect((rawRepresentable.rawValue as? String) == "testValue")
@@ -51,10 +53,10 @@ struct GnustoIDTests {
         #expect(id1 == id2)
         #expect(id1 != id3)
         #expect(id1.hashValue == id2.hashValue)
-        
+
         // Test in collections
         let idSet: Set<TestID> = [id1, id2, id3]
-        #expect(idSet.count == 2) // id1 and id2 should be considered the same
+        #expect(idSet.count == 2)  // id1 and id2 should be considered the same
     }
 
     // MARK: - Comparable Tests
@@ -78,7 +80,7 @@ struct GnustoIDTests {
             TestID("zebra"),
             TestID("apple"),
             TestID("monkey"),
-            TestID("banana")
+            TestID("banana"),
         ]
         let sortedIDs = unsortedIDs.sorted()
 
@@ -86,9 +88,9 @@ struct GnustoIDTests {
             TestID("apple"),
             TestID("banana"),
             TestID("monkey"),
-            TestID("zebra")
+            TestID("zebra"),
         ]
-        
+
         #expect(sortedIDs == expectedOrder)
     }
 
@@ -133,7 +135,7 @@ struct GnustoIDTests {
         let originalIDs = [
             TestID("first"),
             TestID("second"),
-            TestID("third")
+            TestID("third"),
         ]
 
         let encoder = JSONEncoder()
@@ -150,7 +152,7 @@ struct GnustoIDTests {
     func testDictionaryCodable() throws {
         let originalDict: [String: TestID] = [
             "key1": "value1",
-            "key2": "value2"
+            "key2": "value2",
         ]
 
         let encoder = JSONEncoder()
@@ -171,7 +173,7 @@ struct GnustoIDTests {
         let testIDs = [
             TestID("first"),
             TestID("second"),
-            TestID("third")
+            TestID("third"),
         ]
 
         // Test that TestID can be safely passed across actor boundaries
@@ -204,7 +206,7 @@ struct GnustoIDTests {
         let specialChars = "!@#$%^&*()_+-=[]{}|;':\",./<>?"
         let id = TestID(specialChars)
         #expect(id.rawValue == specialChars)
-        
+
         // Test that special characters work with encoding/decoding
         let encoder = JSONEncoder()
         let decoder = JSONDecoder()
@@ -218,11 +220,11 @@ struct GnustoIDTests {
         let unicodeString = "🎮🗝️魔法钥匙测试"
         let id = TestID(unicodeString)
         #expect(id.rawValue == unicodeString)
-        
+
         // Test that Unicode works with all operations
         let id2: TestID = "🎮🗝️魔法钥匙测试"
         #expect(id == id2)
-        
+
         // Test encoding/decoding
         let encoder = JSONEncoder()
         let decoder = JSONDecoder()
@@ -279,15 +281,15 @@ struct GnustoIDTests {
         // Test that different ID types are properly type-safe
         let testID = TestID("value")
         let itemID: ItemID = "value"
-        
+
         // These should have the same raw value but be different types
         #expect(testID.rawValue == itemID.rawValue)
-        
+
         // Test that they can't be accidentally mixed in collections
         // (This is enforced at compile time, but we can test runtime behavior)
         let testDict: [TestID: String] = [testID: "test"]
         #expect(testDict[testID] == "test")
-        
+
         let itemDict: [ItemID: String] = [itemID: "item"]
         #expect(itemDict[itemID] == "item")
     }
@@ -298,23 +300,23 @@ struct GnustoIDTests {
     func testDefaultImplementationCoverage() throws {
         // Test that all required protocol methods have default implementations
         let id: TestID = "test"
-        
+
         // Test RawRepresentable
         #expect(id.rawValue == "test")
-        
+
         // Test ExpressibleByStringLiteral
         let literalID: TestID = "literal"
         #expect(literalID.rawValue == "literal")
-        
+
         // Test convenience initializer
         let convenienceID = TestID("convenience")
         #expect(convenienceID.rawValue == "convenience")
-        
+
         // Test Comparable
         let id1 = TestID("a")
         let id2 = TestID("b")
         #expect(id1 < id2)
-        
+
         // Test Codable
         let encoder = JSONEncoder()
         let decoder = JSONDecoder()
@@ -322,4 +324,4 @@ struct GnustoIDTests {
         let decodedID = try decoder.decode(TestID.self, from: jsonData)
         #expect(decodedID == id)
     }
-} 
+}

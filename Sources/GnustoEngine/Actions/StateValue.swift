@@ -1,3 +1,4 @@
+import CustomDump
 
 /// A type-safe enumeration that represents the various kinds of values that game state
 /// properties can hold.
@@ -5,7 +6,7 @@
 /// `StateValue` is used extensively throughout the Gnusto engine, particularly in:
 /// - `StateChange` objects, to define the old and new values of a modified property.
 /// - `GameState.globalState`, for storing arbitrary game-specific global data.
-/// - Custom attributes in `Item` and `Location` objects.
+/// - Custom properties in `Item` and `Location` objects.
 ///
 /// It ensures that different data types (like booleans, integers, strings, entity IDs, etc.)
 /// can be handled in a consistent and type-safe manner. You will often encounter `StateValue`
@@ -13,6 +14,21 @@
 public enum StateValue: Codable, Sendable, Hashable {
     /// Represents a boolean value (e.g., for a flag like `isOpen` or `isLit`).
     case bool(Bool)
+
+    /// Comprehensive character sheet containing all attributes, properties, and states.
+    case characterSheet(CharacterSheet)
+
+    /// Character consciousness level (awake, asleep, unconscious, etc.).
+    case consciousness(ConsciousnessLevel)
+
+    /// Character combat condition (normal, off-balance, vulnerable, etc.).
+    case combatCondition(CombatCondition)
+
+    /// Character general condition (normal, drunk, poisoned, etc.).
+    case generalCondition(GeneralCondition)
+
+    /// Character moral and ethical alignment.
+    case alignment(Alignment)
 
     /// Represents an integer value (e.g., for a score, count, or size).
     case int(Int)
@@ -28,10 +44,13 @@ public enum StateValue: Codable, Sendable, Hashable {
     case entityReferenceSet(Set<EntityReference>?)
 
     /// Represents the exits from a location, mapping a `Direction` to `Exit` details.
-    case exits([Direction: Exit])
+    case exits(Set<Exit>)
 
     /// Represents a unique identifier for a location (`LocationID`).
     case locationID(LocationID)
+
+    /// Represents a set of unique location identifiers (`Set<LocationID>`).
+    case locationIDSet(Set<LocationID>)
 
     /// Represents the parent entity of an item, indicating where it is located (e.g., in a
     /// location, held by the player, or inside another item).
@@ -47,6 +66,10 @@ public enum StateValue: Codable, Sendable, Hashable {
     /// This can be distinct from `nil` when a property might optionally hold a typed value
     /// or be truly undefined.
     case undefined
+
+    /// Represents the current combat state, containing information about an active
+    /// combat encounter including participants, turn order, and combat-specific state.
+    case combatState(CombatState?)
 }
 
 // MARK: - Public casting helpers
@@ -56,6 +79,36 @@ extension StateValue {
     /// - Returns: The `Bool` value if this `StateValue` is a `.bool` case; otherwise, `nil`.
     public var toBool: Bool? {
         underlyingValue as? Bool
+    }
+
+    /// Attempts to cast and return the underlying value as a `CharacterSheet`.
+    /// - Returns: The `CharacterSheet` value if this `StateValue` is a `.characterSheet` case; otherwise, `nil`.
+    public var toCharacterSheet: CharacterSheet? {
+        underlyingValue as? CharacterSheet
+    }
+
+    /// Attempts to cast and return the underlying value as a `ConsciousnessLevel`.
+    /// - Returns: The `ConsciousnessLevel` value if this `StateValue` is a `.consciousness` case; otherwise, `nil`.
+    public var toConsciousnessLevel: ConsciousnessLevel? {
+        underlyingValue as? ConsciousnessLevel
+    }
+
+    /// Attempts to cast and return the underlying value as a `CombatCondition`.
+    /// - Returns: The `CombatCondition` value if this `StateValue` is a `.combatCondition` case; otherwise, `nil`.
+    public var toCombatCondition: CombatCondition? {
+        underlyingValue as? CombatCondition
+    }
+
+    /// Attempts to cast and return the underlying value as a `GeneralCondition`.
+    /// - Returns: The `GeneralCondition` value if this `StateValue` is a `.generalCondition` case; otherwise, `nil`.
+    public var toGeneralCondition: GeneralCondition? {
+        underlyingValue as? GeneralCondition
+    }
+
+    /// Attempts to cast and return the underlying value as an `Alignment`.
+    /// - Returns: The `Alignment` value if this `StateValue` is a `.alignment` case; otherwise, `nil`.
+    public var toAlignment: Alignment? {
+        underlyingValue as? Alignment
     }
 
     /// Attempts to cast and return the underlying value as an `Int`.
@@ -77,11 +130,11 @@ extension StateValue {
     }
 
     /// Attempts to cast and return the underlying value as a dictionary of location exits
-    /// (`[Direction: Exit]`).
-    /// - Returns: The `[Direction: Exit]` value if this `StateValue` is an `.exits` case;
+    /// (`Set<DirectionalExit>`).
+    /// - Returns: The `Set<DirectionalExit>` value if this `StateValue` is an `.exits` case;
     ///   otherwise, `nil`.
-    public var toLocationExits: [Direction: Exit]? {
-        underlyingValue as? [Direction: Exit]
+    public var toExits: Set<Exit>? {
+        underlyingValue as? Set<Exit>
     }
 
     /// Attempts to cast and return the underlying value as a `LocationID`.
@@ -89,6 +142,12 @@ extension StateValue {
     /// not match.
     public var toLocationID: LocationID? {
         underlyingValue as? LocationID
+    }
+
+    /// Returns the `StateValue` underlying value as a `Set<LocationID>`, or `nil` if the type
+    /// does not match.
+    public var toLocationIDs: Set<LocationID>? {
+        underlyingValue as? Set<LocationID>
     }
 
     /// Returns the `StateValue` underlying value as a `ParentEntity`, or `nil` if the type
@@ -114,6 +173,12 @@ extension StateValue {
     public var toEntityReferenceSet: Set<EntityReference>? {
         underlyingValue as? Set<EntityReference>
     }
+
+    /// Returns the `StateValue` underlying value as a `CombatState`, or `nil` if the type
+    /// does not match.
+    public var toCombatState: CombatState? {
+        underlyingValue as? CombatState
+    }
 }
 
 // MARK: - Private helpers
@@ -123,12 +188,19 @@ extension StateValue {
     private var underlyingValue: Any {
         switch self {
         case .bool(let value): value
+        case .characterSheet(let value): value
+        case .consciousness(let value): value
+        case .combatCondition(let value): value
+        case .generalCondition(let value): value
+        case .alignment(let value): value
+        case .combatState(let value): value as Any
+        case .entityReferenceSet(let value): value as Any
+        case .exits(let value): value
         case .int(let value): value
         case .itemID(let value): value
         case .itemIDSet(let value): value
-        case .entityReferenceSet(let value): value as Any
-        case .exits(let value): value
         case .locationID(let value): value
+        case .locationIDSet(let value): value
         case .parentEntity(let value): value
         case .string(let value): value
         case .stringSet(let value): value
@@ -200,34 +272,56 @@ extension StateValue: ExpressibleByStringLiteral {
 
 // MARK: - Debugging Support
 
-extension StateValue: CustomStringConvertible {
-    /// Provides a custom string representation for `StateValue`.
-    public var description: String {
+extension StateValue: CustomDumpStringConvertible {
+    public var customDumpDescription: String {
         switch self {
         case .bool(let bool):
             "\(bool)"
+        case .characterSheet(let characterSheet):
+            "\(characterSheet)"
+        case .consciousness(let consciousness):
+            "\(consciousness)"
+        case .combatCondition(let combatCondition):
+            "\(combatCondition)"
+        case .generalCondition(let generalCondition):
+            "\(generalCondition)"
+        case .alignment(let alignment):
+            "\(alignment)"
         case .int(let int):
             "\(int)"
         case .itemID(let itemID):
             ".\(itemID)"
         case .itemIDSet(let itemIDSet):
-            itemIDSet.map(\.description).joined(separator: ", ")
+            "[\(itemIDSet.map(\.description).sorted().joined(separator: ", "))]"
         case .entityReferenceSet(let entityReferenceSet):
-            entityReferenceSet?.map(\.description).joined(separator: ", ") ?? "[]"
-        case .exits(let exits):
-            exits.map {
-                "\n\($0): \($1)"
-            }.joined().indent()
+            "[\(entityReferenceSet?.map(\.description).sorted().joined(separator: ", ") ?? "")]"
+        case .exits(let exit):
+            "[\(exit.map(\.customDumpDescription).sorted().joined(separator: ", "))]"
         case .locationID(let locationID):
             ".\(locationID)"
+        case .locationIDSet(let locationIDSet):
+            "[\(locationIDSet.map(\.description).sorted().joined(separator: ", "))]"
         case .parentEntity(let parentEntity):
             parentEntity.description
         case .string(let string):
             string.multiline()
         case .stringSet(let stringSet):
-            stringSet.map { "'\($0)'" }.joined(separator: ", ")
+            "[\(stringSet.map { "'\($0)'" }.sorted().joined(separator: ", "))]"
+        case .combatState(let state):
+            if let state {
+                "CombatState(enemy: \(state.enemyID), round: \(state.roundCount))"
+            } else {
+                "CombatState(nil)"
+            }
         case .undefined:
             ".undefined"
         }
+    }
+}
+
+extension StateValue: CustomStringConvertible {
+    /// Provides a custom string representation for `StateValue`.
+    public var description: String {
+        customDumpDescription
     }
 }

@@ -50,15 +50,15 @@ struct ItemIDTests {
         #expect(id2 != id3)
     }
 
-    @Test("ItemID Case Sensitivity")
+    @Test("ItemID is case-insensitive")
     func testCaseSensitivity() throws {
         let id1: ItemID = "BrassLantern"
         let id2: ItemID = "brasslantern"
         let id3: ItemID = "BRASSLANTERN"
 
-        #expect(id1 != id2)
-        #expect(id1 != id3)
-        #expect(id2 != id3)
+        #expect(id1 == id2)
+        #expect(id1 == id3)
+        #expect(id2 == id3)
     }
 
     // MARK: - Hashability Tests
@@ -184,14 +184,6 @@ struct ItemIDTests {
         let id: ItemID = "brassLantern"
         #expect(id.description == ".brassLantern")
         #expect("\(id)" == ".brassLantern")
-    }
-
-    // MARK: - Standard Item IDs Tests
-
-    @Test("ItemID Standard Player ID")
-    func testStandardPlayerID() throws {
-        #expect(ItemID.player.rawValue == "player")
-        #expect(ItemID.player == ItemID("player"))
     }
 
     // MARK: - Sendable Compliance Tests

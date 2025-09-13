@@ -6,22 +6,52 @@ import Foundation
 /// customize listening behavior by providing custom `ItemEventHandler` or
 /// `LocationEventHandler` implementations for specific items or locations if special
 /// sounds should be heard.
-struct ListenActionHandler: ActionHandler {
+public struct ListenActionHandler: ActionHandler {
+    // MARK: - Verb Definition Properties
 
-    /// Validates the "LISTEN" command.
-    /// Currently, listen requires no specific validation.
-    func validate(context: ActionContext) async throws {
-        // No validation needed for LISTEN.
-    }
+    public let syntax: [SyntaxRule] = [
+        .match(.verb),
+        .match(.verb, .for, .directObject),
+        .match(.verb, .to, .directObject),
+    ]
+
+    public let synonyms: [Verb] = [.listen]
+
+    public let requiresLight: Bool = false
+
+    // MARK: - Action Processing Methods
+
+    public init() {}
 
     /// Processes the "LISTEN" command.
     ///
-    /// This action typically results in a message indicating that nothing unusual is heard.
-    /// Game-specific sounds can be implemented via more specific handlers.
-    ///
-    /// - Parameter context: The `ActionContext` for the current action.
-    /// - Returns: An `ActionResult` with a default message.
-    func process(context: ActionContext) async throws -> ActionResult {
-        return ActionResult("You hear nothing unusual.")
+    /// This action provides atmospheric responses to listening. Can be used without objects
+    /// for general listening, or with objects for listening to specific items.
+    public func process(context: ActionContext) async throws -> ActionResult {
+        do {
+            guard let item = try await context.itemDirectObject() else {
+                return ActionResult(
+                    context.msg.listen()
+                )
+            }
+
+            let message = if context.hasPreposition(.to) {
+                await context.msg.listenTo(item.withDefiniteArticle)
+            } else {
+                await context.msg.listenFor(item.withDefiniteArticle)
+            }
+
+            return try await ActionResult(
+                message,
+                item.setFlag(.isTouched)
+            )
+        } catch {
+            guard try await context.player.location.isLit else {
+                throw ActionResponse.feedback(
+                    context.msg.listenInDarkness()
+                )
+            }
+            throw error
+        }
     }
 }

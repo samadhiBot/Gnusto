@@ -50,15 +50,15 @@ struct LocationIDTests {
         #expect(id2 != id3)
     }
 
-    @Test("LocationID Case Sensitivity")
+    @Test("LocationID is case-insensitive")
     func testCaseSensitivity() throws {
         let id1: LocationID = "WestOfHouse"
         let id2: LocationID = "westofhouse"
         let id3: LocationID = "WESTOFHOUSE"
 
-        #expect(id1 != id2)
-        #expect(id1 != id3)
-        #expect(id2 != id3)
+        #expect(id1 == id2)
+        #expect(id1 == id3)
+        #expect(id2 == id3)
     }
 
     // MARK: - Hashability Tests
@@ -287,7 +287,12 @@ struct LocationIDTests {
         locations.append("library")
         locations.insert("attic", at: 1)
 
-        let expectedLocations: [LocationID] = ["kitchen", "attic", "garden", "library"]
+        let expectedLocations: [LocationID] = [
+            "kitchen",
+            "attic",
+            "garden",
+            "library"
+        ]
         #expect(locations == expectedLocations)
     }
 

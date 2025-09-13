@@ -4,10 +4,12 @@
 /// When a game action results in a change, `EntityID` is used within a `StateChange`
 /// to specify exactly which entity is affected.
 public enum EntityID: Codable, Sendable, Hashable {
-    /// Refers to a daemon (a periodically executing game logic component) via its unique `DaemonID`.
+    /// Refers to a daemon (a periodically executing game logic component) via its
+    /// unique `DaemonID`.
     case daemon(DaemonID)
 
-    /// Refers to a fuse (a timed event that triggers after a set number of turns) via its unique `FuseID`.
+    /// Refers to a fuse (a timed event that triggers after a set number of turns) via its
+    /// unique `FuseID`.
     case fuse(FuseID)
 
     /// Refers to an item in the game world via its unique `ItemID`.
@@ -32,7 +34,9 @@ extension EntityID {
     ///   Handle this error appropriately if you are not certain of the `EntityID` type.
     func daemonID() throws -> DaemonID {
         guard case .daemon(let daemonID) = self else {
-            throw ActionResponse.internalEngineError("EntityID expected to be DaemonID, got: \(self)")
+            throw ActionResponse.internalEngineError(
+                "EntityID expected to be DaemonID, got: \(self)"
+            )
         }
         return daemonID
     }
@@ -44,7 +48,9 @@ extension EntityID {
     ///   Handle this error appropriately if you are not certain of the `EntityID` type.
     func fuseID() throws -> FuseID {
         guard case .fuse(let fuseID) = self else {
-            throw ActionResponse.internalEngineError("EntityID expected to be FuseID, got: \(self)")
+            throw ActionResponse.internalEngineError(
+                "EntityID expected to be FuseID, got: \(self)"
+            )
         }
         return fuseID
     }
@@ -56,7 +62,9 @@ extension EntityID {
     ///   Handle this error appropriately if you are not certain of the `EntityID` type.
     func itemID() throws -> ItemID {
         guard case .item(let itemID) = self else {
-            throw ActionResponse.internalEngineError("EntityID expected to be ItemID, got: \(self)")
+            throw ActionResponse.internalEngineError(
+                "EntityID expected to be ItemID, got: \(self)"
+            )
         }
         return itemID
     }
@@ -68,7 +76,9 @@ extension EntityID {
     ///   Handle this error appropriately if you are not certain of the `EntityID` type.
     func locationID() throws -> LocationID {
         guard case .location(let locationID) = self else {
-            throw ActionResponse.internalEngineError("EntityID expected to be LocationID, got: \(self)")
+            throw ActionResponse.internalEngineError(
+                "EntityID expected to be LocationID, got: \(self)"
+            )
         }
         return locationID
     }

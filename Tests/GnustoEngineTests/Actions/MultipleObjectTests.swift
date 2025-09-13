@@ -1,89 +1,81 @@
 import CustomDump
+import GnustoEngine
+import GnustoTestSupport
 import Testing
-
-@testable import GnustoEngine
 
 /// Tests for verbs that support multiple objects (ALL and AND keywords).
 struct MultipleObjectTests {
-    
+
     // MARK: - EXAMINE Multiple Objects Tests
-    
+
     @Test("EXAMINE ALL works correctly")
     func testExamineAll() async throws {
         let sword = Item(
             id: "sword",
             .name("sword"),
-            .in(.location(.startRoom)),
+            .in(.startRoom),
             .description("A sharp blade.")
         )
         let lantern = Item(
             id: "lantern",
             .name("lantern"),
-            .in(.location(.startRoom)),
+            .in(.startRoom),
             .description("A bright light.")
         )
-        
-        let game = MinimalGame(items: [sword, lantern])
-        let mockIO = await MockIOHandler()
-        let mockParser = MockParser()
-        let engine = await GameEngine(blueprint: game, parser: mockParser, ioHandler: mockIO)
-        
+
+        let game = MinimalGame(items: sword, lantern)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
         // Act: Execute "examine all"
-        let command = Command(
-            verb: .examine,
-            directObjects: [.item("sword"), .item("lantern")],
-            isAllCommand: true,
-            rawInput: "examine all"
-        )
-        await engine.execute(command: command)
-        
+        try await engine.execute("examine all")
+
         // Assert: Should examine both items
         let output = await mockIO.flush()
-        expectNoDifference(output, """
-            - Sword: A sharp blade.
+        expectNoDifference(
+            output,
+            """
+            > examine all
             - Lantern: A bright light.
-            """)
+            - Sword: A sharp blade.
+            """
+        )
     }
-    
+
     @Test("EXAMINE SWORD AND LANTERN works correctly")
     func testExamineSwordAndLantern() async throws {
         let sword = Item(
             id: "sword",
             .name("sword"),
-            .in(.location(.startRoom)),
+            .in(.startRoom),
             .description("A sharp blade.")
         )
         let lantern = Item(
             id: "lantern",
             .name("lantern"),
-            .in(.location(.startRoom)),
+            .in(.startRoom),
             .description("A bright light.")
         )
-        
-        let game = MinimalGame(items: [sword, lantern])
-        let mockIO = await MockIOHandler()
-        let mockParser = MockParser()
-        let engine = await GameEngine(blueprint: game, parser: mockParser, ioHandler: mockIO)
-        
+
+        let game = MinimalGame(items: sword, lantern)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
         // Act: Execute "examine sword and lantern"
-        let command = Command(
-            verb: .examine,
-            directObjects: [.item("sword"), .item("lantern")],
-            isAllCommand: false,
-            rawInput: "examine sword and lantern"
-        )
-        await engine.execute(command: command)
-        
+        try await engine.execute("examine sword and lantern")
+
         // Assert: Should examine both items
         let output = await mockIO.flush()
-        expectNoDifference(output, """
-            - Sword: A sharp blade.
+        expectNoDifference(
+            output,
+            """
+            > examine sword and lantern
             - Lantern: A bright light.
-            """)
+            - Sword: A sharp blade.
+            """
+        )
     }
-    
+
     // MARK: - GIVE Multiple Objects Tests
-    
+
     @Test("GIVE ALL TO MERCHANT works correctly")
     func testGiveAllToMerchant() async throws {
         let coin = Item(
@@ -99,36 +91,35 @@ struct MultipleObjectTests {
         let merchant = Item(
             id: "merchant",
             .name("merchant"),
-            .in(.location(.startRoom)),
-            .isCharacter
+            .in(.startRoom),
+            .characterSheet(.default)
         )
-        
-        let game = MinimalGame(items: [coin, gem, merchant])
-        let mockIO = await MockIOHandler()
-        let mockParser = MockParser()
-        let engine = await GameEngine(blueprint: game, parser: mockParser, ioHandler: mockIO)
-        
+
+        let game = MinimalGame(
+            items: coin, gem, merchant
+        )
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
         // Act: Execute "give all to merchant"
-        let command = Command(
-            verb: .give,
-            directObjects: [.item("coin"), .item("gem")],
-            indirectObjects: [.item("merchant")],
-            isAllCommand: true,
-            rawInput: "give all to merchant"
-        )
-        await engine.execute(command: command)
-        
+        try await engine.execute("give all to merchant")
+
         // Assert: Should give both items
         let output = await mockIO.flush()
-        expectNoDifference(output, "You give the coin and the gem to the merchant.")
+        expectNoDifference(
+            output,
+            """
+            > give all to merchant
+            You give the coin and the gem to the merchant.
+            """
+        )
 
         // Verify items moved to merchant
         let updatedCoin = try await engine.item("coin")
         let updatedGem = try await engine.item("gem")
-        #expect(updatedCoin.parent == ParentEntity.item("merchant"))
-        #expect(updatedGem.parent == ParentEntity.item("merchant"))
+        #expect(try await updatedCoin.parent == .item(merchant.proxy(engine)))
+        #expect(try await updatedGem.parent == .item(merchant.proxy(engine)))
     }
-    
+
     @Test("GIVE COIN AND GEM TO MERCHANT works correctly")
     func testGiveCoinAndGemToMerchant() async throws {
         let coin = Item(
@@ -144,38 +135,37 @@ struct MultipleObjectTests {
         let merchant = Item(
             id: "merchant",
             .name("merchant"),
-            .in(.location(.startRoom)),
-            .isCharacter
+            .in(.startRoom),
+            .characterSheet(.init())
         )
-        
-        let game = MinimalGame(items: [coin, gem, merchant])
-        let mockIO = await MockIOHandler()
-        let mockParser = MockParser()
-        let engine = await GameEngine(blueprint: game, parser: mockParser, ioHandler: mockIO)
-        
+
+        let game = MinimalGame(
+            items: coin, gem, merchant
+        )
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
         // Act: Execute "give coin and gem to merchant"
-        let command = Command(
-            verb: .give,
-            directObjects: [.item("coin"), .item("gem")],
-            indirectObjects: [.item("merchant")],
-            isAllCommand: false,
-            rawInput: "give coin and gem to merchant"
-        )
-        await engine.execute(command: command)
-        
+        try await engine.execute("give coin and gem to merchant")
+
         // Assert: Should give both items
         let output = await mockIO.flush()
-        expectNoDifference(output, "You give the coin and the gem to the merchant.")
+        expectNoDifference(
+            output,
+            """
+            > give coin and gem to merchant
+            You give the coin and the gem to the merchant.
+            """
+        )
 
         // Verify items moved to merchant
         let updatedCoin = try await engine.item("coin")
         let updatedGem = try await engine.item("gem")
-        #expect(updatedCoin.parent == ParentEntity.item("merchant"))
-        #expect(updatedGem.parent == ParentEntity.item("merchant"))
+        #expect(try await updatedCoin.parent == .item(merchant.proxy(engine)))
+        #expect(try await updatedGem.parent == .item(merchant.proxy(engine)))
     }
-    
+
     // MARK: - PUT Multiple Objects Tests
-    
+
     @Test("PUT ALL IN BOX works correctly")
     func testPutAllInBox() async throws {
         let coin = Item(
@@ -191,37 +181,34 @@ struct MultipleObjectTests {
         let box = Item(
             id: "box",
             .name("box"),
-            .in(.location(.startRoom)),
+            .in(.startRoom),
             .isContainer,
             .isOpen
         )
-        
-        let game = MinimalGame(items: [coin, gem, box])
-        let mockIO = await MockIOHandler()
-        let mockParser = MockParser()
-        let engine = await GameEngine(blueprint: game, parser: mockParser, ioHandler: mockIO)
-        
+
+        let game = MinimalGame(items: coin, gem, box)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
         // Act: Execute "put all in box"
-        let command = Command(
-            verb: .insert,
-            directObjects: [.item("coin"), .item("gem")],
-            indirectObjects: [.item("box")],
-            isAllCommand: true,
-            rawInput: "put all in box"
-        )
-        await engine.execute(command: command)
-        
+        try await engine.execute("put all in box")
+
         // Assert: Should put both items in box
         let output = await mockIO.flush()
-        expectNoDifference(output, "You put the coin and the gem in the box.")
-        
+        expectNoDifference(
+            output,
+            """
+            > put all in box
+            You carefully place the coin and the gem within the box.
+            """
+        )
+
         // Verify items moved to box
         let updatedCoin = try await engine.item("coin")
         let updatedGem = try await engine.item("gem")
-        #expect(updatedCoin.parent == ParentEntity.item("box"))
-        #expect(updatedGem.parent == ParentEntity.item("box"))
+        #expect(try await updatedCoin.parent == .item(box.proxy(engine)))
+        #expect(try await updatedGem.parent == .item(box.proxy(engine)))
     }
-    
+
     @Test("PUT COIN AND GEM IN BOX works correctly")
     func testPutCoinAndGemInBox() async throws {
         let coin = Item(
@@ -237,155 +224,159 @@ struct MultipleObjectTests {
         let box = Item(
             id: "box",
             .name("box"),
-            .in(.location(.startRoom)),
+            .in(.startRoom),
             .isContainer,
             .isOpen
         )
-        
-        let game = MinimalGame(items: [coin, gem, box])
-        let mockIO = await MockIOHandler()
-        let mockParser = MockParser()
-        let engine = await GameEngine(blueprint: game, parser: mockParser, ioHandler: mockIO)
-        
+
+        let game = MinimalGame(items: coin, gem, box)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
         // Act: Execute "put coin and gem in box"
-        let command = Command(
-            verb: .insert,
-            directObjects: [.item("coin"), .item("gem")],
-            indirectObjects: [.item("box")],
-            isAllCommand: false,
-            rawInput: "put coin and gem in box"
-        )
-        await engine.execute(command: command)
-        
+        try await engine.execute("put coin and gem in box")
+
         // Assert: Should put both items in box
         let output = await mockIO.flush()
-        expectNoDifference(output, "You put the coin and the gem in the box.")
+        expectNoDifference(
+            output,
+            """
+            > put coin and gem in box
+            You carefully place the coin and the gem within the box.
+            """
+        )
 
         // Verify items moved to box
         let updatedCoin = try await engine.item("coin")
         let updatedGem = try await engine.item("gem")
-        #expect(updatedCoin.parent == ParentEntity.item("box"))
-        #expect(updatedGem.parent == ParentEntity.item("box"))
+        #expect(try await updatedCoin.parent == .item(box.proxy(engine)))
+        #expect(try await updatedGem.parent == .item(box.proxy(engine)))
     }
-    
-    // MARK: - PUSH Multiple Objects Tests
-    
-    @Test("PUSH ALL works correctly")
-    func testPushAll() async throws {
-        let button = Item(
-            id: "button",
-            .name("button"),
-            .in(.location(.startRoom))
+
+    // MARK: - TAKE Multiple Objects Tests
+
+    @Test("TAKE ALL works correctly")
+    func testTakeAll() async throws {
+        let goblet = Item(
+            id: "goblet",
+            .name("goblet"),
+            .in(.startRoom),
+            .isTakable
         )
-        let lever = Item(
-            id: "lever",
-            .name("lever"),
-            .in(.location(.startRoom))
+        let scepter = Item(
+            id: "scepter",
+            .name("scepter"),
+            .in(.startRoom),
+            .isTakable
         )
-        
-        let game = MinimalGame(items: [button, lever])
-        let mockIO = await MockIOHandler()
-        let mockParser = MockParser()
-        let engine = await GameEngine(blueprint: game, parser: mockParser, ioHandler: mockIO)
-        
-        // Act: Execute "push all"
-        let command = Command(
-            verb: .push,
-            directObjects: [.item("button"), .item("lever")],
-            isAllCommand: true,
-            rawInput: "push all"
+
+        let game = MinimalGame(
+            items: goblet, scepter
         )
-        await engine.execute(command: command)
-        
-        // Assert: Should push both items
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // Act: Execute "take all"
+        try await engine.execute("take all")
+
+        // Assert: Should take both items
         let output = await mockIO.flush()
-        expectNoDifference(output, "You push the button and the lever. Nothing happens.")
+        expectNoDifference(
+            output,
+            """
+            > take all
+            You take the goblet and the scepter.
+            """
+        )
     }
-    
-    @Test("PUSH BUTTON AND LEVER works correctly")
-    func testPushButtonAndLever() async throws {
-        let button = Item(
-            id: "button",
-            .name("button"),
-            .in(.location(.startRoom))
+
+    @Test("TAKE BUTTON AND LEVER works correctly")
+    func testTakeButtonAndLever() async throws {
+        let goblet = Item(
+            id: "goblet",
+            .name("goblet"),
+            .in(.startRoom),
+            .isTakable
         )
-        let lever = Item(
-            id: "lever",
-            .name("lever"),
-            .in(.location(.startRoom))
+        let scepter = Item(
+            id: "scepter",
+            .name("scepter"),
+            .in(.startRoom),
+            .isTakable
         )
-        
-        let game = MinimalGame(items: [button, lever])
-        let mockIO = await MockIOHandler()
-        let mockParser = MockParser()
-        let engine = await GameEngine(blueprint: game, parser: mockParser, ioHandler: mockIO)
-        
-        // Act: Execute "push button and lever"
-        let command = Command(
-            verb: .push,
-            directObjects: [.item("button"), .item("lever")],
-            isAllCommand: false,
-            rawInput: "push button and lever"
+
+        let game = MinimalGame(
+            items: goblet, scepter
         )
-        await engine.execute(command: command)
-        
-        // Assert: Should push both items
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // Act: Execute "take goblet and scepter"
+        try await engine.execute("take goblet and scepter")
+
+        // Assert: Should take both items
         let output = await mockIO.flush()
-        expectNoDifference(output, "You push the button and the lever. Nothing happens.")
+        expectNoDifference(
+            output,
+            """
+            > take goblet and scepter
+            You take the goblet and the scepter.
+            """
+        )
     }
-    
+
     // MARK: - Error Handling Tests
-    
+
     @Test("Multiple objects with unsupported verb fails gracefully")
     func testMultipleObjectsWithUnsupportedVerb() async throws {
         let sword = Item(
             id: "sword",
             .name("sword"),
-            .in(.location(.startRoom))
+            .in(.startRoom)
         )
         let lantern = Item(
             id: "lantern",
             .name("lantern"),
-            .in(.location(.startRoom))
+            .in(.startRoom)
         )
-        
-        let game = MinimalGame(items: [sword, lantern])
-        let mockIO = await MockIOHandler()
-        let mockParser = MockParser()
-        let engine = await GameEngine(blueprint: game, parser: mockParser, ioHandler: mockIO)
-        
+
+        let game = MinimalGame(items: sword, lantern)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
         // Act: Try "open sword and lantern" (OPEN doesn't support multiple objects)
-        let command = Command(
-            verb: .open,
-            directObjects: [.item("sword"), .item("lantern")],
-            isAllCommand: false,
-            rawInput: "open sword and lantern"
-        )
-        await engine.execute(command: command)
-        
+        try await engine.execute("open sword and lantern")
+
         // Assert: Should get an error about multiple objects not being supported
         let output = await mockIO.flush()
-        expectNoDifference(output, "The OPEN command doesn’t support multiple objects.")
+        expectNoDifference(
+            output,
+            """
+            > open sword and lantern
+            The verb 'open' doesn't support multiple objects.
+            """
+        )
     }
-    
+
     @Test("ALL with no applicable items handles gracefully")
     func testAllWithNoApplicableItems() async throws {
-        let game = MinimalGame(items: [])
-        let mockIO = await MockIOHandler()
-        let mockParser = MockParser()
-        let engine = await GameEngine(blueprint: game, parser: mockParser, ioHandler: mockIO)
-        
-        // Act: Execute "take all" when there's nothing to take
-        let command = Command(
-            verb: .take,
-            directObjects: [],
-            isAllCommand: true,
-            rawInput: "take all"
+        let fountain = Item(
+            id: .startItem,
+            .name("fountain"),
+            .in(.startRoom)
         )
-        await engine.execute(command: command)
-        
+
+        let game = MinimalGame(items: fountain)
+
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // Act: Execute "take all" when there's nothing to take
+        try await engine.execute("take all")
+
         // Assert: Should get appropriate message
         let output = await mockIO.flush()
-        expectNoDifference(output, "There is nothing here to take.")
+        expectNoDifference(
+            output,
+            """
+            > take all
+            Take what?
+            """
+        )
     }
-} 
+}

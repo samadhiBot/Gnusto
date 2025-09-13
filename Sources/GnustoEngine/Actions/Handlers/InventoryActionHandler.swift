@@ -3,11 +3,21 @@ import Foundation
 /// Handles the "INVENTORY" command (and its common synonym "I"), displaying a list
 /// of items currently carried by the player.
 public struct InventoryActionHandler: ActionHandler {
-    /// Validates the "INVENTORY" command.
-    /// This action typically requires no specific validation.
-    public func validate(context: ActionContext) async throws {
-        // No specific validation needed for basic inventory command.
-    }
+    // MARK: - Verb Definition Properties
+
+    public let syntax: [SyntaxRule] = [
+        .match(.verb)
+    ]
+
+    public let synonyms: [Verb] = [.inventory, "i"]
+
+    public let requiresLight: Bool = false
+
+    public let consumesTurn: Bool = false
+
+    // MARK: - Action Processing Methods
+
+    public init() {}
 
     /// Processes the "INVENTORY" command.
     ///
@@ -15,31 +25,24 @@ public struct InventoryActionHandler: ActionHandler {
     /// It then formats these items into a list for display. If the player is carrying nothing,
     /// a message indicating they are empty-handed is shown.
     /// This action does not typically consume game time or cause state changes.
-    ///
-    /// - Parameter context: The `ActionContext` for the current action.
-    /// - Returns: An `ActionResult` containing the list of carried items or a message
-    ///   indicating an empty inventory.
     public func process(context: ActionContext) async throws -> ActionResult {
-        // 1. Get inventory item snapshots
-        let inventoryItems = await context.engine.items(in: .player)
+        // Get inventory item snapshots
+        let inventoryItems = try await context.player.inventory
 
-        // 2. Construct the message
+        // Construct the message
+        let message: String
         if inventoryItems.isEmpty {
-            return ActionResult("You are empty-handed.")
+            message = context.msg.youAreEmptyHanded()
         } else {
-            // 3. List Items
-            let itemList = inventoryItems.sorted().map {
-                "- \($0.withIndefiniteArticle.capitalizedFirst)"
-            }.joined(separator: "\n")
-            return ActionResult(
+            let itemList = await inventoryItems.sorted().asyncMap {
+                await "- \($0.withIndefiniteArticle.capitalizedFirst)"
+            }
+            message = """
+                \(context.msg.youAreCarrying())
+                \(itemList.joined(separator: .linebreak).indent())
                 """
-                You are carrying:
-                \(itemList.indent())
-                """
-            )
         }
 
-        // Inventory command typically takes no game time.
-        // No state changes occur.
+        return ActionResult(message)
     }
 }

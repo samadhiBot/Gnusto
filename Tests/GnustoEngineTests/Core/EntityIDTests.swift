@@ -1,6 +1,7 @@
 import CustomDump
-import Testing
 import Foundation
+import GnustoTestSupport
+import Testing
 
 @testable import GnustoEngine
 
@@ -19,9 +20,9 @@ struct EntityIDTests {
     @Test("EntityID Daemon Case")
     func testDaemonCase() throws {
         let entityID = EntityID.daemon(testDaemonID)
-        
+
         #expect(entityID == .daemon(testDaemonID))
-        
+
         // Test the convenience getter
         let extractedDaemonID = try entityID.daemonID()
         #expect(extractedDaemonID == testDaemonID)
@@ -30,9 +31,9 @@ struct EntityIDTests {
     @Test("EntityID Fuse Case")
     func testFuseCase() throws {
         let entityID = EntityID.fuse(testFuseID)
-        
+
         #expect(entityID == .fuse(testFuseID))
-        
+
         // Test the convenience getter
         let extractedFuseID = try entityID.fuseID()
         #expect(extractedFuseID == testFuseID)
@@ -41,9 +42,9 @@ struct EntityIDTests {
     @Test("EntityID Item Case")
     func testItemCase() throws {
         let entityID = EntityID.item(testItemID)
-        
+
         #expect(entityID == .item(testItemID))
-        
+
         // Test the convenience getter
         let extractedItemID = try entityID.itemID()
         #expect(extractedItemID == testItemID)
@@ -52,9 +53,9 @@ struct EntityIDTests {
     @Test("EntityID Location Case")
     func testLocationCase() throws {
         let entityID = EntityID.location(testLocationID)
-        
+
         #expect(entityID == .location(testLocationID))
-        
+
         // Test the convenience getter
         let extractedLocationID = try entityID.locationID()
         #expect(extractedLocationID == testLocationID)
@@ -63,14 +64,14 @@ struct EntityIDTests {
     @Test("EntityID Player Case")
     func testPlayerCase() throws {
         let entityID = EntityID.player
-        
+
         #expect(entityID == .player)
     }
 
     @Test("EntityID Global Case")
     func testGlobalCase() throws {
         let entityID = EntityID.global
-        
+
         #expect(entityID == .global)
     }
 
@@ -81,26 +82,26 @@ struct EntityIDTests {
         let daemon1 = EntityID.daemon(testDaemonID)
         let daemon2 = EntityID.daemon(testDaemonID)
         let daemon3 = EntityID.daemon("differentDaemon")
-        
+
         let fuse1 = EntityID.fuse(testFuseID)
         let fuse2 = EntityID.fuse(testFuseID)
-        
+
         let item1 = EntityID.item(testItemID)
         let location1 = EntityID.location(testLocationID)
         let player1 = EntityID.player
         let player2 = EntityID.player
         let global1 = EntityID.global
         let global2 = EntityID.global
-        
+
         // Same cases with same values should be equal
         #expect(daemon1 == daemon2)
         #expect(fuse1 == fuse2)
         #expect(player1 == player2)
         #expect(global1 == global2)
-        
+
         // Same cases with different values should not be equal
         #expect(daemon1 != daemon3)
-        
+
         // Different cases should not be equal
         #expect(daemon1 != fuse1)
         #expect(daemon1 != item1)
@@ -119,15 +120,15 @@ struct EntityIDTests {
     func testEntityIDHashability() throws {
         let entityIDs: Set<EntityID> = [
             .daemon(testDaemonID),
-            .daemon(testDaemonID), // Duplicate should be ignored
+            .daemon(testDaemonID),  // Duplicate should be ignored
             .fuse(testFuseID),
             .item(testItemID),
             .location(testLocationID),
             .player,
-            .player, // Duplicate should be ignored
+            .player,  // Duplicate should be ignored
             .global,
         ]
-        
+
         // Should have 6 unique values (duplicates removed)
         #expect(entityIDs.count == 6)
         #expect(entityIDs.contains(.daemon(testDaemonID)))
@@ -136,7 +137,7 @@ struct EntityIDTests {
         #expect(entityIDs.contains(.location(testLocationID)))
         #expect(entityIDs.contains(.player))
         #expect(entityIDs.contains(.global))
-        
+
         // Test use as dictionary keys
         let entityDict: [EntityID: String] = [
             .daemon(testDaemonID): "daemon",
@@ -146,7 +147,7 @@ struct EntityIDTests {
             .player: "player",
             .global: "global",
         ]
-        
+
         #expect(entityDict[.daemon(testDaemonID)] == "daemon")
         #expect(entityDict[.fuse(testFuseID)] == "fuse")
         #expect(entityDict[.item(testItemID)] == "item")
@@ -167,15 +168,15 @@ struct EntityIDTests {
             .player,
             .global,
         ]
-        
+
         let encoder = JSONEncoder()
         encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
         let decoder = JSONDecoder()
-        
+
         for originalEntityID in originalEntityIDs {
             let jsonData = try encoder.encode(originalEntityID)
             let decodedEntityID = try decoder.decode(EntityID.self, from: jsonData)
-            
+
             #expect(decodedEntityID == originalEntityID)
         }
     }
@@ -191,7 +192,7 @@ struct EntityIDTests {
             .player,
             .global,
         ]
-        
+
         for testCase in testCases {
             #expect {
                 try testCase.daemonID()
@@ -213,7 +214,7 @@ struct EntityIDTests {
             .player,
             .global,
         ]
-        
+
         for testCase in testCases {
             #expect {
                 try testCase.fuseID()
@@ -235,7 +236,7 @@ struct EntityIDTests {
             .player,
             .global,
         ]
-        
+
         for testCase in testCases {
             #expect {
                 try testCase.itemID()
@@ -257,7 +258,7 @@ struct EntityIDTests {
             .player,
             .global,
         ]
-        
+
         for testCase in testCases {
             #expect {
                 try testCase.locationID()
@@ -275,7 +276,7 @@ struct EntityIDTests {
     @Test("Error Messages Include Actual EntityID")
     func testErrorMessagesIncludeActualEntityID() throws {
         let playerEntityID = EntityID.player
-        
+
         #expect {
             try playerEntityID.daemonID()
         } throws: { error in
@@ -286,7 +287,7 @@ struct EntityIDTests {
             expectNoDifference(message, "EntityID expected to be DaemonID, got: .player")
             return true
         }
-        
+
         #expect {
             try playerEntityID.fuseID()
         } throws: { error in
@@ -297,7 +298,7 @@ struct EntityIDTests {
             expectNoDifference(message, "EntityID expected to be FuseID, got: .player")
             return true
         }
-        
+
         #expect {
             try playerEntityID.itemID()
         } throws: { error in
@@ -308,7 +309,7 @@ struct EntityIDTests {
             expectNoDifference(message, "EntityID expected to be ItemID, got: .player")
             return true
         }
-        
+
         #expect {
             try playerEntityID.locationID()
         } throws: { error in
@@ -334,7 +335,7 @@ struct EntityIDTests {
             .player,
             .global,
         ]
-        
+
         // This test ensures that EntityID conforms to Sendable by using it in an async context
         let results = await withTaskGroup(of: EntityID.self) { group in
             for entityID in entityIDs {
@@ -342,19 +343,19 @@ struct EntityIDTests {
                     return entityID
                 }
             }
-            
+
             var collectedResults: [EntityID] = []
             for await result in group {
                 collectedResults.append(result)
             }
             return collectedResults
         }
-        
+
         #expect(results.count == entityIDs.count)
-        
+
         // Verify all original entity IDs are present in results
         for originalEntityID in entityIDs {
             #expect(results.contains(originalEntityID))
         }
     }
-} 
+}

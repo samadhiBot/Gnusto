@@ -17,11 +17,11 @@ public protocol Parser: Sendable {
     /// - Parameters:
     ///   - input: The raw string entered by the player.
     ///   - vocabulary: The game's vocabulary.
-    ///   - gameState: The current state of the game for context (e.g., scope, pronoun resolution).
+    ///   - engine: The game engine for dynamic property access.
     /// - Returns: A `Result` containing either a `Command` or a `ParseError`.
     func parse(
         input: String,
         vocabulary: Vocabulary,
-        gameState: GameState
-    ) -> Result<Command, ParseError>
+        engine: GameEngine
+    ) async throws -> Result<Command, ParseError>
 }

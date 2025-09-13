@@ -1,4 +1,5 @@
 import Foundation
+import Logging
 
 /// A basic implementation of `IOHandler` that interacts with the standard console
 /// (standard input and standard output).
@@ -7,8 +8,21 @@ import Foundation
 /// game output directly to the console and reads player input from it.
 @MainActor
 public struct ConsoleIOHandler: IOHandler {
+    /// The current transcript recorder, if one is active.
+    public var transcriptRecorder: TranscriptRecorder?
+
+    /// <#Description#>
+    public var markdownParser: MarkdownParser
+
+    /// Internal logger for engine messages, warnings, and errors.
+    private let logger = Logger(label: "com.samadhibot.Gnusto.ConsoleIOHandler")
+
     /// Initializes a new `ConsoleIOHandler`.
-    public init() {}
+    public init(
+        markdownParser: MarkdownParser = MarkdownParser()
+    ) {
+        self.markdownParser = markdownParser
+    }
 
     // --- Output Methods ---
 
@@ -22,8 +36,17 @@ public struct ConsoleIOHandler: IOHandler {
     ///   - newline: If `true`, a double newline is appended to the output.
     ///              If `false`, no terminator is added.
     public func print(_ markdown: String, style: TextStyle, newline: Bool) {
-        Swift.print(MarkdownParser.parse(markdown), terminator: newline ? "\n\n" : "")
+        Swift.print(
+            markdownParser.parse(markdown),
+            terminator: newline ? .paragraph : ""
+        )
         fflush(stdout)
+
+        do {
+            try transcriptRecorder?.write(markdown)
+        } catch {
+            logger.error("ConsoleIOHandler error: \(error)")
+        }
     }
 
     /// Displays the game's status line (current location, score, and turn count)
@@ -38,8 +61,8 @@ public struct ConsoleIOHandler: IOHandler {
         let scoreCol = 42
 
         let maxRoomLen = scoreCol - 2
-        let displayRoom = roomName.count > maxRoomLen ?
-                          roomName.prefix(maxRoomLen - 1) + "…" : roomName
+        let displayRoom =
+            roomName.count > maxRoomLen ? roomName.prefix(maxRoomLen - 1) + "..." : roomName
         let scoreStr = "Score: \(score)"
         let turnsStr = "Turns: \(turns)"
         let leftGap = displayRoom.padding(toLength: scoreCol, withPad: " ", startingAt: 0)
@@ -60,6 +83,8 @@ public struct ConsoleIOHandler: IOHandler {
         // \u{001B}[H moves cursor to home position (top-left).
         Swift.print("\u{001B}[2J\u{001B}[H", terminator: "")
         fflush(stdout)
+
+        try? transcriptRecorder?.write("---")
     }
 
     // --- Input Methods ---
@@ -72,8 +97,17 @@ public struct ConsoleIOHandler: IOHandler {
         // Print the prompt without a newline.
         Swift.print(prompt, terminator: "")
         fflush(stdout)
+
         // Read input from the console.
-        return Swift.readLine()
+        let input = Swift.readLine()
+
+        do {
+            try transcriptRecorder?.write("\n\(prompt)\(input ?? "<EOF>")")
+        } catch {
+            logger.error("ConsoleIOHandler error: \(error)")
+        }
+
+        return input
     }
 
     // --- Lifecycle Methods ---
@@ -90,6 +124,6 @@ public struct ConsoleIOHandler: IOHandler {
     /// Prints a "Game ended." message to the console.
     public func teardown() {
         // No specific teardown needed.
-        Swift.print("\nGame ended.") // Add a final message
+        Swift.print("\nGame ended.")  // Add a final message
     }
 }

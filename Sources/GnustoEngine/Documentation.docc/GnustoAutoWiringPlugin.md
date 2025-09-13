@@ -31,22 +31,22 @@ extension GlobalID {
     static let score = GlobalID("score")
 }
 
-// From: FuseDefinition(id: .timer, ...)
+// From: Fuse(id: .timer, ...)
 // Generates:
 extension FuseID {
     static let timer = FuseID("timer")
 }
 
-// From: DaemonDefinition(id: .ambientSound, ...)
+// From: Daemon(id: .ambientSound, ...)
 // Generates:
 extension DaemonID {
     static let ambientSound = DaemonID("ambientSound")
 }
 
-// From: VerbID("custom") for game-specific verbs
+// From: Verb("custom") for game-specific verbs
 // Generates:
-extension VerbID {
-    static let custom = VerbID("custom")
+extension Verb {
+    static let custom = Verb("custom")
 }
 ```
 
@@ -142,11 +142,11 @@ enum TownSquare {
     static let fountain = Item(
         id: .fountain,    // Plugin generates ItemID.fountain
         .name("ornate fountain"),
-        .in(.location(.townSquare)),
-        .isScenery
+        .in(.townSquare),
+        .omitDescription
     )
 
-    static let fountainHandler = ItemEventHandler { engine, event in
+    static let fountainHandler = ItemEventHandler(for: .fountain) {
         // Custom fountain behavior
     }
 }
@@ -162,7 +162,7 @@ The plugin supports both architectural patterns:
 enum Castle {
     static let throneRoom = Location(id: .throneRoom, ...)
     static let crown = Item(id: .crown, ...)
-    static let crownHandler = ItemEventHandler { ... }
+    static let crownHandler = ItemEventHandler(for: .crown) { ... }
 }
 ```
 
@@ -172,7 +172,7 @@ enum Castle {
 struct Castle {
     let throneRoom = Location(id: .throneRoom, ...)
     let crown = Item(id: .crown, ...)
-    let crownHandler = ItemEventHandler { ... }
+    let crownHandler = ItemEventHandler(for: .crown) { ... }
 }
 ```
 
@@ -194,17 +194,17 @@ The plugin recognizes these patterns automatically:
 
 - `GlobalID("key")` and global state dictionary usage
 - `FuseID("timer")` and `DaemonID("background")`
-- `VerbID("custom")` for game-specific verbs
+- `Verb("custom")` for game-specific verbs
 
 ### Event Handler Patterns
 
-- `let nameHandler = ItemEventHandler { ... }`
+- `let nameHandler = ItemEventHandler(for: .itemName) { ... }`
 - `static let nameHandler = LocationEventHandler { ... }`
 
 ### Time-Based Event Patterns
 
-- `let timerFuse = FuseDefinition(id: .timer, ...)`
-- `let ambientDaemon = DaemonDefinition(id: .ambient, ...)`
+- `let timerFuse = Fuse(id: .timer, ...)`
+- `let ambientDaemon = Daemon(id: .ambient, ...)`
 
 ## Advanced Features
 
@@ -254,10 +254,10 @@ The plugin filters out standard engine verbs and only generates constants for yo
 
 ```swift
 // This won't generate an extension (standard verb):
-VerbID("take")
+Verb("take")
 
-// This will generate VerbID.cast:
-VerbID("cast")
+// This will generate Verb.cast:
+Verb("cast")
 ```
 
 ## Output Location
