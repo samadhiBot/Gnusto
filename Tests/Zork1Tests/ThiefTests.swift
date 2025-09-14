@@ -142,7 +142,12 @@ struct ThiefTests {
         )
 
         // When
-        try await engine.execute("give sceptre to thief")
+        try await engine.execute(
+            """
+            wait
+            give sceptre to thief
+            """
+        )
 
         // Then
         let output = await mockIO.flush()
@@ -155,12 +160,17 @@ struct ThiefTests {
             This is a circular stone room with passages in all directions.
             Several of them have unfortunate endings.
 
-            > give sceptre to thief
-            You cannot reach any such thing from here.
+            > wait
+            Time flows onward, indifferent to your concerns.
 
             Someone carrying a large bag is casually leaning against one of
             the walls here. He does not speak, but it is clear from his
             aspect that the bag will be taken only over his dead body.
+
+            > give sceptre to thief
+            The thief examines the sceptre with obvious delight and
+            carefully places it in his bag, giving you a grudging nod of
+            acknowledgment.
             """
         )
 
@@ -184,7 +194,10 @@ struct ThiefTests {
         )
 
         // When
-        try await engine.execute("give garlic to thief")
+        try await engine.execute(
+            "wait",
+            "give garlic to thief"
+        )
 
         // Then
         let output = await mockIO.flush()
@@ -197,12 +210,17 @@ struct ThiefTests {
             This is a circular stone room with passages in all directions.
             Several of them have unfortunate endings.
 
-            > give garlic to thief
-            You cannot reach any such thing from here.
+            > wait
+            Time flows onward, indifferent to your concerns.
 
             Someone carrying a large bag is casually leaning against one of
             the walls here. He does not speak, but it is clear from his
             aspect that the bag will be taken only over his dead body.
+
+            > give garlic to thief
+            The thief examines the clove of garlic briefly, then shakes his
+            head with obvious disdain. "I only deal in quality
+            merchandise," he mutters.
             """
         )
 
