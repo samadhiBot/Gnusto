@@ -399,7 +399,6 @@ extension River {
         .synonyms("pot", "gold", "treasure"),
         .adjectives("gold"),
         .isTakable,
-        .isInvisible,
         .firstDescription("At the end of the rainbow is a pot of gold."),
         .size(15),
         .in(.endOfRainbow),

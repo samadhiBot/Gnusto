@@ -167,7 +167,7 @@ struct ScriptActionHandlerTests {
 
         // Set up complex game state
         try await engine.apply(
-            await lamp.proxy(engine).setFlag(.isOn),
+            lamp.proxy(engine).setFlag(.isOn),
             engine.player.updateScore(by: 100)
         )
 

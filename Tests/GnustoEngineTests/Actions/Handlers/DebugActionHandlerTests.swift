@@ -390,7 +390,7 @@ struct DebugActionHandlerTests {
 
         // Set the lamp to be on for more detailed debug output
         try await engine.apply(
-            await lamp.proxy(engine).setFlag(.isOn)
+            lamp.proxy(engine).setFlag(.isOn)
         )
 
         // When

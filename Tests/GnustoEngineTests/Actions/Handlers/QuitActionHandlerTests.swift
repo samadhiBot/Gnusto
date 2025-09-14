@@ -303,7 +303,7 @@ struct QuitActionHandlerTests {
 
         // Set some score and execute some moves
         try await engine.apply(
-            await engine.player.updateScore(by: 25)
+            engine.player.updateScore(by: 25)
         )
 
         // Execute a few commands to increase move count

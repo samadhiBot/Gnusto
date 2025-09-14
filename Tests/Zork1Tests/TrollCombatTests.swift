@@ -13,7 +13,7 @@ struct Zork1TrollCombatTests {
 
         // Position player in troll room with live troll
         try await engine.apply(
-            await engine.player.move(to: .location(.trollRoom)),
+            engine.player.move(to: .location(.trollRoom)),
         )
 
         // When - try to go east (should be blocked)
@@ -37,7 +37,7 @@ struct Zork1TrollCombatTests {
 
         // Position player in troll room and kill troll
         try await engine.apply(
-            await engine.player.move(to: .location(.trollRoom)),
+            engine.player.move(to: .location(.trollRoom)),
             await engine.item(.troll).remove()
         )
 
@@ -55,7 +55,7 @@ struct Zork1TrollCombatTests {
 
         // Set up scenario: player has sword, is with troll
         try await engine.apply(
-            await engine.player.move(to: .location(.trollRoom)),
+            engine.player.move(to: .location(.trollRoom)),
             await engine.item(.sword).move(to: .player)
         )
 
@@ -64,8 +64,8 @@ struct Zork1TrollCombatTests {
         for _ in 0..<10 {
             // Reset state
             try await engine.apply(
-                await engine.item(.sword).move(to: .player),
-                try await engine.item(.troll).setCharacterAttributes(isFighting: false)
+                engine.item(.sword).move(to: .player),
+                engine.item(.troll).setCharacterAttributes(isFighting: false)
             )
 
             try await engine.execute("give sword to troll")
@@ -104,8 +104,8 @@ struct Zork1TrollCombatTests {
         let (engine, mockIO) = await GameEngine.zork1()
 
         try await engine.apply(
-            await engine.player.move(to: .location(.trollRoom)),
-            await engine.item(.sword).move(to: .player)
+            engine.player.move(to: .location(.trollRoom)),
+            engine.item(.sword).move(to: .player)
         )
 
         // When - give sword to troll

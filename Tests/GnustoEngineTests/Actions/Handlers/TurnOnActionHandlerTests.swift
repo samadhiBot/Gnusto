@@ -248,7 +248,7 @@ struct TurnOnActionHandlerTests {
 
         // Set the lamp to already be on
         try await engine.apply(
-            await lamp.proxy(engine).setFlag(.isOn)
+            lamp.proxy(engine).setFlag(.isOn)
         )
 
         // When

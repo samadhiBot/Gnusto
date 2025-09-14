@@ -177,6 +177,7 @@ extension ItemProxy {
                 guard try await proxy.parent.entity == .item(self.id) else { return nil }
                 return proxy
             }
+            .sorted()
         }
     }
 
@@ -1017,7 +1018,7 @@ extension Array where Element == ItemProxy {
                 allContents.append(contentsOf: nestedContents)
             }
 
-            return allContents
+            return allContents.sorted()
         }
     }
 

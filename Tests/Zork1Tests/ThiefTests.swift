@@ -22,8 +22,7 @@ struct ThiefTests {
             sceptre.move(to: .player)
         )
 
-        // Note: Normally the thief daemon is started by specific game events. For this test,
-        // it is manually activated to verify the theft mechanism works.
+        // Manually activate the thiefDaemon to verify the theft mechanism works
         try await engine.processSideEffects(
             .runDaemon(.thiefDaemon)
         )
@@ -91,7 +90,7 @@ struct ThiefTests {
         let (engine, mockIO) = await GameEngine.zork1()
 
         try await engine.apply(
-            await engine.player.move(to: .location(.roundRoom)),
+            engine.player.move(to: .location(.roundRoom)),
             await engine.item(.thief).move(to: .location(.roundRoom))
         )
 
@@ -119,7 +118,7 @@ struct ThiefTests {
         let (engine, mockIO) = await GameEngine.zork1()
 
         try await engine.apply(
-            await engine.player.move(to: .location(.roundRoom)),
+            engine.player.move(to: .location(.roundRoom)),
             try await engine.item(.sceptre).move(to: .player)
         )
 
@@ -154,7 +153,7 @@ struct ThiefTests {
         let (engine, mockIO) = await GameEngine.zork1()
 
         try await engine.apply(
-            await engine.player.move(to: .location(.roundRoom)),
+            engine.player.move(to: .location(.roundRoom)),
             await engine.item(.garlic).move(to: .player)
         )
 
@@ -294,7 +293,7 @@ struct ThiefTests {
         let (engine, mockIO) = await GameEngine.zork1()
 
         try await engine.apply(
-            await engine.player.move(to: .location(.roundRoom))
+            engine.player.move(to: .location(.roundRoom))
         )
 
         // When
@@ -317,7 +316,7 @@ struct ThiefTests {
         let (engine, mockIO) = await GameEngine.zork1()
 
         try await engine.apply(
-            await engine.player.move(to: .location(.roundRoom))
+            engine.player.move(to: .location(.roundRoom))
         )
 
         // When
@@ -340,7 +339,7 @@ struct ThiefTests {
         let (engine, mockIO) = await GameEngine.zork1()
 
         try await engine.apply(
-            await engine.player.move(to: .location(.roundRoom))
+            engine.player.move(to: .location(.roundRoom))
         )
 
         // When
@@ -364,12 +363,12 @@ struct ThiefTests {
         let (engine, mockIO) = await GameEngine.zork1()
 
         try await engine.apply(
-            await engine.player.move(to: .location(.roundRoom))
+            engine.player.move(to: .location(.roundRoom))
         )
 
         // Ensure thief is present in the round room
         try await engine.apply(
-            await engine.item(.thief).move(to: .location(.roundRoom))
+            engine.item(.thief).move(to: .location(.roundRoom))
         )
 
         // Debug: Check what's in scope
@@ -412,7 +411,7 @@ struct ThiefTests {
         let (engine, mockIO) = await GameEngine.zork1()
 
         try await engine.apply(
-            await engine.player.move(to: .location(.roundRoom))
+            engine.player.move(to: .location(.roundRoom))
         )
 
         // When
@@ -441,10 +440,11 @@ struct ThiefTests {
         let (engine, mockIO) = await GameEngine.zork1()
 
         try await engine.apply(
-            await engine.player.move(to: .location(.roundRoom)),
+            engine.player.move(to: .location(.roundRoom)),
+
             // Give player multiple items of different values
-            try await engine.item(.advertisement).move(to: .player),  // Low value
-            try await engine.item(.diamond).move(to: .player)  // High value
+            engine.item(.advertisement).move(to: .player),  // Low value
+            engine.item(.diamond).move(to: .player)  // High value
         )
 
         // When - attempt theft multiple times
@@ -546,7 +546,7 @@ struct ThiefTests {
         let (engine, mockIO) = await GameEngine.zork1()
 
         try await engine.apply(
-            await engine.player.move(to: .location(.roundRoom))
+            engine.player.move(to: .location(.roundRoom))
         )
 
         // When - wait several turns to trigger movement daemon
@@ -575,18 +575,18 @@ struct ThiefTests {
         let (engine, mockIO) = await GameEngine.zork1()
 
         try await engine.apply(
-            await engine.player.move(to: .location(.roundRoom))
+            engine.player.move(to: .location(.roundRoom))
         )
 
         // Force thief to move to another location
         try await engine.apply(
-            await engine.item(.thief).move(to: .location(.northSouthPassage))
+            engine.item(.thief).move(to: .location(.northSouthPassage))
         )
         _ = await mockIO.flush()  // Clear any move message
 
         // When - move thief back to player's location
         try await engine.apply(
-            await engine.item(.thief).move(to: .location(.roundRoom))
+            engine.item(.thief).move(to: .location(.roundRoom))
         )
 
         // Then - should potentially see atmospheric arrival message
@@ -606,7 +606,7 @@ struct ThiefTests {
         let (engine, mockIO) = await GameEngine.zork1()
 
         try await engine.apply(
-            await engine.player.move(to: .location(.roundRoom)),
+            engine.player.move(to: .location(.roundRoom)),
             await engine.item(.sword).move(to: .player)
         )
 
@@ -638,17 +638,17 @@ struct ThiefTests {
         )
 
         try await engine.apply(
-            await engine.player.move(to: .location(.roundRoom))
+            engine.player.move(to: .location(.roundRoom))
         )
 
         // Force a combat victory by removing thief directly (simulating death)
         try await engine.apply(
-            await engine.item(.thief).remove()
+            engine.item(.thief).remove()
         )
 
         // Simulate dropping thief's possessions (what dropThiefPossessions does)
         try await engine.apply(
-            await engine.item(.largeBag).move(to: .location(.roundRoom))
+            engine.item(.largeBag).move(to: .location(.roundRoom))
         )
 
         // When - check if possessions are handled
@@ -678,12 +678,12 @@ struct ThiefTests {
 
         // Put valuable item in thief's bag
         try await engine.apply(
-            await engine.item(.diamond).move(to: .item(.largeBag))
+            engine.item(.diamond).move(to: .item(.largeBag))
         )
 
         // When - defeat thief (simulate by removing)
         try await engine.apply(
-            await engine.item(.thief).remove()
+            engine.item(.thief).remove()
         )
 
         // Then - score should potentially increase when treasures are recovered
@@ -698,12 +698,12 @@ struct ThiefTests {
         let (engine, mockIO) = await GameEngine.zork1()
 
         try await engine.apply(
-            await engine.player.move(to: .location(.roundRoom))
+            engine.player.move(to: .location(.roundRoom))
         )
 
         // Simulate getting stiletto somehow
         try await engine.apply(
-            await engine.item(.stiletto).move(to: .player)
+            engine.item(.stiletto).move(to: .player)
         )
 
         // When
@@ -715,79 +715,64 @@ struct ThiefTests {
         #expect(output.isNotEmpty)
     }
 
-    @Test("Sophisticated theft considers player vulnerability")
-    func testSophisticatedTheftMechanics() async throws {
+    @Test("Theft considers player vulnerability")
+    func testTheftMechanics() async throws {
         // Given
         let (engine, mockIO) = await GameEngine.zork1()
 
+        let diamond = try await engine.item(.diamond)
+        let skull = try await engine.item(.skull)
+        let potOfGold = try await engine.item(.potOfGold)
+
+        // Move player loaded with treasure to the round room
         try await engine.apply(
-            await engine.player.move(to: .location(.roundRoom)),
-            await engine.item(.diamond).move(to: .player),
-            await engine.item(.skull).move(to: .player),
-            await engine.item(.potOfGold).move(to: .player)
+            engine.player.move(to: .location(.roundRoom)),
+
+            diamond.move(to: .player),
+            skull.move(to: .player),
+            potOfGold.move(to: .player)
         )
 
-        // Ensure thief is present in the round room
-        try await engine.apply(
-            await engine.item(.thief).move(to: .location(.roundRoom))
-        )
-
-        // Note: Normally the thief daemon would be started by specific game events
-        // For this test, we manually activate them to verify the theft mechanism works
+        // Manually activate the thiefDaemon to verify the theft mechanism works
         try await engine.processSideEffects(
             .runDaemon(.thiefDaemon)
         )
 
-        // When - thief attempts to steal (this may require multiple attempts due to randomness)
-        var stoleItem = false
-        for _ in 1...10 {  // Try multiple times since theft is probabilistic
+        // Execute a wait command and trigger daemon processing
+        try await engine.execute("wait", times: 4)
 
-            // Check if any item was stolen before processing next turn
-            let diamond = try await engine.item(.diamond)
-            let skull = try await engine.item(.skull)
-            let potOfGold = try await engine.item(.potOfGold)
+        let output = await mockIO.flush()
+        expectNoDifference(
+            output,
+            """
+            > wait
+            Time flows onward, indifferent to your concerns.
 
-            if case .item(let parentItem) = try await diamond.parent, parentItem.id == .largeBag {
-                stoleItem = true
-                break
-            }
-            if case .item(let parentItem) = try await skull.parent, parentItem.id == .largeBag {
-                stoleItem = true
-                break
-            }
-            if case .item(let parentItem) = try await potOfGold.parent, parentItem.id == .largeBag {
-                stoleItem = true
-                break
-            }
+            > wait
+            The universe's clock ticks inexorably forward.
 
-            // Execute a wait command and trigger daemon processing
-            try await engine.execute("wait")
+            Someone carrying a large bag is casually leaning against one of
+            the walls here. He does not speak, but it is clear from his
+            aspect that the bag will be taken only over his dead body.
 
-            let output = await mockIO.flush()
-            expectNoDifference(
-                output,
-                """
-                > wait
-                Moments slip away like sand through fingers.
+            > wait
+            Moments slip away like sand through fingers.
 
-                The thief just left, still carrying his large bag. You may not
-                have noticed that he robbed you blind first.
-                """
-            )
-            //            if output.contains("thief snatches") || output.contains("lightning-quick reflexes") {
-            //                stoleItem = true
-            //                break
-            //            }
-        }
+            > wait
+            The universe's clock ticks inexorably forward.
 
-        #expect(stoleItem == true)
+            The thief just left, still carrying his large bag. You may not
+            have noticed that he robbed you blind first.
+            """
+        )
 
         // Then - verify theft system is operational
-        let bagContents = try await engine.item(.largeBag).contents
-        let finalPlayerItems = try await engine.player.inventory
+        let thiefItems = try await engine.item(.largeBag).contents
+        expectNoDifference(thiefItems, [
+            diamond, potOfGold, skull
+        ])
 
-        // Items should be distributed between player and bag
-        #expect((bagContents.count + finalPlayerItems.count) >= 3)  // Original items still exist somewhere
+        #expect(try await engine.player.inventory.isEmpty)
     }
 
     @Test("Thief AI responds to different combat outcomes")
@@ -796,7 +781,7 @@ struct ThiefTests {
         let (engine, mockIO) = await GameEngine.zork1()
 
         try await engine.apply(
-            await engine.player.move(to: .location(.roundRoom))
+            engine.player.move(to: .location(.roundRoom))
         )
 
         // When - attack multiple times to potentially see different outcomes
@@ -816,7 +801,7 @@ struct ThiefTests {
             if !thiefExists {
                 // Respawn thief for next test
                 try await engine.apply(
-                    await engine.player.move(to: .location(.roundRoom))
+                    engine.player.move(to: .location(.roundRoom))
                 )
             }
         }

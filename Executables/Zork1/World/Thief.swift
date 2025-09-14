@@ -55,29 +55,10 @@ enum Thief {
         .in(.item(.thief))
     )
 
-    // MARK: - Computers
-
-    //    static let thiefComputer = ItemComputer(for: .thief) {
-    //        itemProperty(.description, .firstDescription) { context in
-    //            """
-    //            There is a suspicious-looking individual, holding a large bag,
-    //            leaning against one wall. He is armed with a deadly stiletto.
-    //            """
-    //        }
-    //    }
-
     // MARK: - Event Handlers
 
     /// Main thief character handler with sophisticated AI behavior
     static let thiefHandler = ItemEventHandler(for: .thief) {
-        before(.give) { context, command in
-            // Get the item being given from the direct object
-            guard case .item(let giftProxy) = command.directObject else {
-                return nil
-            }
-            return try await handleGiveToThief(item: giftProxy)
-        }
-
         before(.examine) { _, _ in
             ActionResult(
                 """
@@ -87,6 +68,14 @@ enum Thief {
                 menacingly in your direction. I'd watch out if I were you.
                 """
             )
+        }
+
+        before(.give) { context, command in
+            // Get the item being given from the direct object
+            guard case .item(let giftProxy) = command.directObject else {
+                return nil
+            }
+            return try await handleGiveToThief(item: giftProxy)
         }
 
         before(.listen) { _, _ in
@@ -108,10 +97,6 @@ enum Thief {
                 nil
             }
         }
-
-        //        after(.attack) { context, command in
-        //            ActionResult("THIS OCCURS AFTER THE ATTACK")
-        //        }
     }
 
     /// Stiletto weapon handler with thief protection
@@ -176,7 +161,9 @@ enum Thief {
 
     // MARK: - Thief Daemon
 
-    /// Thief daemon based on Zork's `THIEF-VS-ADVENTURER` routine.
+    /// The `thiefDaemon` controls the thief's movement and tendency to steal.
+    ///
+    /// Based on Zork's `THIEF-VS-ADVENTURER` routine.
     static let thiefDaemon = Daemon(frequency: 1) { engine in
         let playerLocation = try await engine.player.location
         let thief = try await engine.item(.thief)
@@ -188,7 +175,9 @@ enum Thief {
             try await thief.isAwake,
             try await !thief.isFighting,
             try await thief.isAllowed(in: playerLocation.id)
-        else { return .yield }
+        else {
+            return .yield
+        }
 
         if try await thief.parent == .nowhere {
             // Thief is not here, has 30% chance to spawn into the current location
@@ -222,14 +211,15 @@ enum Thief {
                 var changes = [StateChange?]()
                 let roomItems = try await playerLocation.items.eligibleForTheft
                 for item in roomItems {
-                    try await changes.append(contentsOf: [
-                        item.move(to: thiefLargeBag.id),
-                        item.setFlag(.isTouched),
-                    ])
+                    changes.append(
+                        item.move(to: thiefLargeBag.id)
+                    )
                 }
                 let playerItems = try await engine.player.inventory.eligibleForTheft
                 for item in playerItems {
-                    changes.append(item.move(to: thiefLargeBag.id))
+                    changes.append(
+                        item.move(to: thiefLargeBag.id)
+                    )
                 }
                 let message =
                     if playerItems.isNotEmpty {
@@ -261,7 +251,6 @@ enum Thief {
                     thief.remove()
                 )
             }
-
         }
 
         // Otherwise, thief is no longer in the same room as the player, therefore remove.

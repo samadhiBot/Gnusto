@@ -338,7 +338,7 @@ struct BurnActionHandlerTests {
 
         // Set torch to already be lit
         try await engine.apply(
-            await torch.proxy(engine).setFlag(.isBurning)
+            torch.proxy(engine).setFlag(.isBurning)
         )
 
         // When
@@ -456,7 +456,7 @@ struct BurnActionHandlerTests {
 
         // Set match to be burning
         try await engine.apply(
-            await match.proxy(engine).setFlag(.isBurning)
+            match.proxy(engine).setFlag(.isBurning)
         )
 
         // When

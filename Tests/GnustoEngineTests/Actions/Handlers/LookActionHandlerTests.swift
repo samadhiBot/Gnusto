@@ -704,7 +704,7 @@ struct LookActionHandlerTests {
 
         // Set the torch to be on (providing light)
         try await engine.apply(
-            await torch.proxy(engine).setFlag(.isOn)
+            torch.proxy(engine).setFlag(.isOn)
         )
 
         // When

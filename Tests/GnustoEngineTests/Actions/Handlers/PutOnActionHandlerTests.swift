@@ -1195,7 +1195,7 @@ struct PutOnActionHandlerTests {
 
         // Move coin back to player for next test
         try await engine.apply(
-            await coin.proxy(engine).move(to: .player)
+            coin.proxy(engine).move(to: .player)
         )
 
         // When - Put on pedestal
@@ -1212,7 +1212,7 @@ struct PutOnActionHandlerTests {
 
         // Move coin back to player for next test
         try await engine.apply(
-            await coin.proxy(engine).move(to: .player)
+            coin.proxy(engine).move(to: .player)
         )
 
         // When - Put on mantle

@@ -118,6 +118,6 @@ extension ItemProxy: Hashable {
     }
 
     public static func == (lhs: ItemProxy, rhs: ItemProxy) -> Bool {
-        lhs.item == rhs.item
+        lhs.id == rhs.id
     }
 }

@@ -262,7 +262,7 @@ struct WearActionHandlerTests {
 
         // Set up: boots are already worn
         try await engine.apply(
-            await boots.proxy(engine).setFlag(.isWorn)
+            boots.proxy(engine).setFlag(.isWorn)
         )
 
         // When
@@ -532,7 +532,7 @@ struct WearActionHandlerTests {
 
         // Set up: hat is already worn
         try await engine.apply(
-            await hat.proxy(engine).setFlag(.isWorn)
+            hat.proxy(engine).setFlag(.isWorn)
         )
 
         // When

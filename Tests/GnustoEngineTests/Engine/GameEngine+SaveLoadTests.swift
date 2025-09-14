@@ -17,7 +17,9 @@ struct GameEngineSaveLoadTests {
 
         // Make some changes to the game state
         try await engine.execute("score")
-        try await engine.apply(await engine.player.updateScore(by: 10))
+        try await engine.apply(
+            engine.player.updateScore(by: 10)
+        )
 
         // When: Saving the game
         let testsaveURL = try await engine.saveGame(saveName: "testsave")
@@ -97,12 +99,16 @@ struct GameEngineSaveLoadTests {
         )
 
         // Modify state and save
-        try await engine.apply(await engine.player.updateScore(by: 25))
+        try await engine.apply(
+            engine.player.updateScore(by: 25)
+        )
         try await engine.apply(engine.player.move(to: "foyer"))
         let _ = try await engine.saveGame(saveName: "testrestore")
 
         // Reset state to verify restoration
-        try await engine.apply(await engine.player.updateScore(by: -25))  // Reset to 0
+        try await engine.apply(
+            engine.player.updateScore(by: -25)
+        )  // Reset to 0
         try await engine.apply(engine.player.move(to: "westOfHouse"))
 
         // When: Restoring the game
@@ -124,13 +130,17 @@ struct GameEngineSaveLoadTests {
         let testHandler = TestFilesystemHandler()
         let (engine, _) = await GameEngine.test(filesystemHandler: testHandler)
 
-        try await engine.apply(await engine.player.updateScore(by: 15))
+        try await engine.apply(
+            engine.player.updateScore(by: 15)
+        )
         let quicksaveURL = try await engine.saveGame()  // Uses default "quicksave" name
 
         #expect(quicksaveURL.lastPathComponent == "quicksave.gnusto")
 
         // Reset state
-        try await engine.apply(await engine.player.updateScore(by: -15))  // Reset to 0
+        try await engine.apply(
+            engine.player.updateScore(by: -15)
+        )  // Reset to 0
 
         // When: Restoring without specifying name
         try await engine.restoreGame()
@@ -290,7 +300,9 @@ struct GameEngineSaveLoadTests {
 
         // Make complex state changes
         try await engine.execute("take test item")
-        try await engine.apply(await engine.player.updateScore(by: 50))
+        try await engine.apply(
+            engine.player.updateScore(by: 50)
+        )
 
         // When: Saving and then restoring
         let complexURL = try await engine.saveGame(saveName: "complex")
@@ -299,7 +311,9 @@ struct GameEngineSaveLoadTests {
 
         // Modify state after save
         try await engine.execute("drop test item")
-        try await engine.apply(await engine.player.updateScore(by: -50))  // Reset to 0
+        try await engine.apply(
+            engine.player.updateScore(by: -50)
+        )  // Reset to 0
 
         // Restore the save
         try await engine.restoreGame(saveName: "complex")
@@ -358,7 +372,9 @@ struct GameEngineSaveLoadTests {
         let (engine, _) = await GameEngine.test(filesystemHandler: testHandler)
 
         // Add some complex state that might have encoding issues
-        try await engine.apply(await engine.player.updateScore(by: 123))
+        try await engine.apply(
+            engine.player.updateScore(by: 123)
+        )
 
         // When: Saving and restoring
         let encodingTestURL = try await engine.saveGame(saveName: "encoding_test")
@@ -366,7 +382,9 @@ struct GameEngineSaveLoadTests {
         #expect(encodingTestURL.lastPathComponent == "encoding_test.gnusto")
 
         // Clear the score
-        try await engine.apply(await engine.player.updateScore(by: -123))
+        try await engine.apply(
+            engine.player.updateScore(by: -123)
+        )
 
         // Restore
         try await engine.restoreGame(saveName: "encoding_test")
