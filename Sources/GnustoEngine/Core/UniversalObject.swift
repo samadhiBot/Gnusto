@@ -248,10 +248,10 @@ extension UniversalObject {
     public var isPhysical: Bool {
         switch self {
         case .ceiling, .dirt, .earth, .floor, .ground, .lake, .mud, .ocean, .pond, .river,
-             .rock, .roof, .sand, .sea, .soil, .stone, .stream, .wall, .walls, .water:
+            .rock, .roof, .sand, .sea, .soil, .stone, .stream, .wall, .walls, .water:
             true
         case .air, .clouds, .darkness, .dust, .fire, .flames, .heavens, .light, .moon, .noise,
-             .shadows, .silence, .sky, .smoke, .sound, .stars, .sun, .wind:
+            .shadows, .silence, .sky, .smoke, .sound, .stars, .sun, .wind:
             false
         }
     }
@@ -300,8 +300,44 @@ extension UniversalObject {
     }
 }
 
+// MARK: - Conformances
+
+extension UniversalObject: Comparable {
+    public static func < (lhs: UniversalObject, rhs: UniversalObject) -> Bool {
+        lhs.rawValue < rhs.rawValue
+    }
+}
+
 extension UniversalObject: CustomStringConvertible {
     public var description: String {
         rawValue
+    }
+}
+
+// MARK: - Set helpers
+
+extension Set where Element == UniversalObject {
+    /// Finds the closest matching UniversalObject to the given raw input string.
+    ///
+    /// This method first attempts to find an exact match by comparing the raw input
+    /// to the raw values of UniversalObjects in the set. If no exact match is found,
+    /// it returns the first element when the set is sorted alphabetically.
+    ///
+    /// - Parameter rawInput: The raw string input to match against UniversalObject raw values
+    /// - Returns: The matching UniversalObject if found, or the first sorted element as a fallback,
+    ///           or nil if the set is empty
+    ///
+    /// ## Example Usage
+    ///
+    /// ```swift
+    /// let universals: Set<UniversalObject> = [.ground, .sky, .water]
+    /// let match = universals.closestMatch(to: "ground") // Returns .ground
+    /// let fallback = universals.closestMatch(to: "invalid") // Returns .ground (first sorted)
+    /// ```
+    public func closestMatch(to rawInput: String) -> UniversalObject? {
+        if let exactMatch = first(where: { $0 == UniversalObject(rawValue: rawInput) }) {
+            return exactMatch
+        }
+        return sorted().first
     }
 }

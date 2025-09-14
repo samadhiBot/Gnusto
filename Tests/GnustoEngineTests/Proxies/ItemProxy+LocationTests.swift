@@ -1,10 +1,3 @@
-//
-//  ItemProxy+LocationTests.swift
-//  GnustoEngineTests
-//
-//  Tests for recursive location computation in ItemProxy.location
-//
-
 import Testing
 
 @testable import GnustoEngine

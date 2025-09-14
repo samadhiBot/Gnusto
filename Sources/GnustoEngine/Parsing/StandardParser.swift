@@ -1070,7 +1070,8 @@ public struct StandardParser: Parser {
             let potentialMods = significantPhrase.filter { word in
                 !vocabulary.items.keys.contains(word)
                     && !vocabulary.locationNames.keys.contains(word)
-                    && !vocabulary.playerAliases.contains(word) && !vocabulary.verbLookup.keys.contains(word)
+                    && !vocabulary.playerAliases.contains(word)
+                    && !vocabulary.verbLookup.keys.contains(word)
                     && !vocabulary.prepositions.contains(word)
                     && !vocabulary.directions.keys.contains(word)
                     && !vocabulary.specialKeywords.contains(word)
@@ -1257,12 +1258,10 @@ public struct StandardParser: Parser {
         // If no entities found in vocabulary, check for universal objects as fallback
         if potentialEntities.isEmpty {
             // Check if the noun matches any universal objects
-            if let universalObjects = vocabulary.universals[lowercasedNoun] {
-                // For now, if multiple universals match, pick the first one
-                // TODO: Consider disambiguation for universals if needed
-                if let firstUniversal = universalObjects.first {
-                    return .success(.universal(firstUniversal))
-                }
+            if let universalObjects = vocabulary.universals[lowercasedNoun],
+               let closestMatch = universalObjects.closestMatch(to: lowercasedNoun)
+            {
+                return .success(.universal(closestMatch))
             }
 
             // No universal objects found either, create an unresolved item reference
@@ -1389,7 +1388,7 @@ public struct StandardParser: Parser {
         if resolvedAndScopedProxies.count > 1 {
             // Enhanced ambiguity message logic
             let itemEntities = resolvedAndScopedProxies.compactMap { ref -> ItemProxy? in
-                if case let .item(itemProxy) = ref {
+                if case .item(let itemProxy) = ref {
                     itemProxy
                 } else {
                     nil

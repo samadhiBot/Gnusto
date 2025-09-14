@@ -599,4 +599,150 @@ struct UniversalObjectTests {
             UniversalObject.allCases.count >= expectedMinimumCount,
             "Should have at least \(expectedMinimumCount) cases")
     }
+
+    // MARK: - Set<UniversalObject>.closestMatch Tests
+
+    @Test("Set closestMatch returns exact match when found")
+    func testClosestMatchExactMatch() {
+        let universals: Set<UniversalObject> = [.ground, .sky, .water, .fire]
+
+        #expect(universals.closestMatch(to: "ground") == .ground)
+        #expect(universals.closestMatch(to: "sky") == .sky)
+        #expect(universals.closestMatch(to: "water") == .water)
+        #expect(universals.closestMatch(to: "fire") == .fire)
+    }
+
+    @Test("Set closestMatch returns first sorted element when no exact match")
+    func testClosestMatchFallback() {
+        // When sorted: [.fire, .ground, .sky, .water]
+        let universals: Set<UniversalObject> = [.water, .ground, .sky, .fire]
+
+        #expect(universals.closestMatch(to: "invalid") == .fire)
+        #expect(universals.closestMatch(to: "nonexistent") == .fire)
+        #expect(universals.closestMatch(to: "xyz") == .fire)
+    }
+
+    @Test("Set closestMatch deterministic fallback ordering")
+    func testClosestMatchDeterministicFallback() {
+        // Test that the fallback is deterministic by using same set multiple times
+        let universals: Set<UniversalObject> = [.walls, .air, .moon, .dust]
+
+        let results = (1...10).map { _ in
+            universals.closestMatch(to: "invalid")
+        }
+
+        // All results should be the same (deterministic)
+        let firstResult = results[0]
+        for result in results {
+            #expect(result == firstResult)
+        }
+
+        // Should be the first alphabetically: [.air, .dust, .moon, .walls]
+        #expect(firstResult == .air)
+    }
+
+    @Test("Set closestMatch with single element")
+    func testClosestMatchSingleElement() {
+        let universals: Set<UniversalObject> = [.ground]
+
+        // Exact match
+        #expect(universals.closestMatch(to: "ground") == .ground)
+
+        // No match - should return the single element
+        #expect(universals.closestMatch(to: "invalid") == .ground)
+    }
+
+    @Test("Set closestMatch with empty set")
+    func testClosestMatchEmptySet() {
+        let universals: Set<UniversalObject> = []
+
+        #expect(universals.closestMatch(to: "ground") == nil)
+        #expect(universals.closestMatch(to: "invalid") == nil)
+        #expect(universals.closestMatch(to: "") == nil)
+    }
+
+    @Test("Set closestMatch is case sensitive")
+    func testClosestMatchCaseSensitive() {
+        let universals: Set<UniversalObject> = [.ground, .sky, .water]
+
+        // Exact case matches
+        #expect(universals.closestMatch(to: "ground") == .ground)
+        #expect(universals.closestMatch(to: "sky") == .sky)
+
+        // Different case should not match - should fall back to first sorted
+        #expect(universals.closestMatch(to: "Ground") == .ground)  // fallback: sorted = [.ground, .sky, .water]
+        #expect(universals.closestMatch(to: "SKY") == .ground)  // fallback: sorted = [.ground, .sky, .water]
+        #expect(universals.closestMatch(to: "WATER") == .ground)  // fallback: sorted = [.ground, .sky, .water]
+    }
+
+    @Test("Set closestMatch with edge case inputs")
+    func testClosestMatchEdgeCases() {
+        let universals: Set<UniversalObject> = [.ground, .sky]
+
+        // Empty string should not match - falls back to first sorted
+        #expect(universals.closestMatch(to: "") == .ground)  // sorted = [.ground, .sky]
+
+        // Whitespace should not match - falls back to first sorted
+        #expect(universals.closestMatch(to: " ") == .ground)
+        #expect(universals.closestMatch(to: "  ground  ") == .ground)  // not exact match due to whitespace
+
+        // Special characters should not match - falls back to first sorted
+        #expect(universals.closestMatch(to: "ground!") == .ground)
+        #expect(universals.closestMatch(to: "sky?") == .ground)
+    }
+
+    @Test("Set closestMatch with all universal objects")
+    func testClosestMatchWithAllObjects() {
+        let universals = Set(UniversalObject.allCases)
+
+        // Test a few exact matches
+        #expect(universals.closestMatch(to: "ground") == .ground)
+        #expect(universals.closestMatch(to: "water") == .water)
+        #expect(universals.closestMatch(to: "fire") == .fire)
+
+        // Test fallback with invalid input - should return first alphabetically
+        let sortedAll = UniversalObject.allCases.sorted { $0.rawValue < $1.rawValue }
+        let expectedFirst = sortedAll.first!
+        #expect(universals.closestMatch(to: "invalid") == expectedFirst)
+    }
+
+    @Test("Set closestMatch preserves order independence")
+    func testClosestMatchOrderIndependence() {
+        // Same elements in different orders should produce same results
+        let set1: Set<UniversalObject> = [.water, .fire, .air, .earth]
+        let set2: Set<UniversalObject> = [.earth, .air, .fire, .water]
+        let set3: Set<UniversalObject> = [.fire, .earth, .water, .air]
+
+        // Exact matches should be same regardless of set creation order
+        #expect(set1.closestMatch(to: "water") == set2.closestMatch(to: "water"))
+        #expect(set2.closestMatch(to: "fire") == set3.closestMatch(to: "fire"))
+
+        // Fallbacks should be same regardless of set creation order
+        #expect(set1.closestMatch(to: "invalid") == set2.closestMatch(to: "invalid"))
+        #expect(set2.closestMatch(to: "invalid") == set3.closestMatch(to: "invalid"))
+    }
+
+    @Test("Set closestMatch with related universals")
+    func testClosestMatchWithRelatedUniversals() {
+        // Test with ground-related universals
+        let groundRelated: Set<UniversalObject> = [.ground, .floor, .earth, .soil, .dirt]
+
+        // Exact matches work
+        #expect(groundRelated.closestMatch(to: "ground") == .ground)
+        #expect(groundRelated.closestMatch(to: "floor") == .floor)
+        #expect(groundRelated.closestMatch(to: "earth") == .earth)
+
+        // Fallback should be first sorted: [.dirt, .earth, .floor, .ground, .soil]
+        #expect(groundRelated.closestMatch(to: "invalid") == .dirt)
+
+        // Test with water-related universals
+        let waterRelated: Set<UniversalObject> = [.water, .river, .lake, .ocean, .sea]
+
+        // Exact matches work
+        #expect(waterRelated.closestMatch(to: "ocean") == .ocean)
+        #expect(waterRelated.closestMatch(to: "river") == .river)
+
+        // Fallback should be first sorted: [.lake, .ocean, .river, .sea, .water]
+        #expect(waterRelated.closestMatch(to: "invalid") == .lake)
+    }
 }
