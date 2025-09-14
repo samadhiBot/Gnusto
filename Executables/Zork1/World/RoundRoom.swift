@@ -174,5 +174,19 @@ extension RoundRoom {
         .in(.item(.thief))
         // Note: Has action handler STILETTO-FUNCTION
     )
+}
 
+extension RoundRoom {
+    /// Entering the round room starts the thief daemon.
+    static let roundRoomHandler = LocationEventHandler(for: .roundRoom) {
+        onEnter { context in
+            if await !context.location.hasFlag(.isVisited) {
+                return ActionResult(
+                    .runDaemon(.thiefDaemon)
+                )
+            }
+            return nil
+        }
+
+    }
 }

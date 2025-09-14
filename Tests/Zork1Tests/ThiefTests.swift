@@ -7,33 +7,37 @@ import Testing
 
 /// Tests for the sophisticated Zork 1 thief implementation
 struct ThiefTests {
+    func setup() async throws -> (GameEngine, MockIOHandler) {
+        let (engine, mockIO) = await GameEngine.zork1()
+        try await engine.apply(
+            engine.item(.sword).move(to: .player),
+            engine.player.move(to: .location(.ewPassage)),
+        )
+        // Go east to the Round Room. Entering the Round Room starts the thief daemon.
+        try await engine.execute("go east")
+        return (engine, mockIO)
+    }
+
     @Test("Thief can steal valuable items from player")
     func testThiefStealsValuableItems() async throws {
         // Given
-        let (engine, mockIO) = await GameEngine.zork1()
+        let (engine, mockIO) = try await setup()
 
         let sceptre = try await engine.item(.sceptre)
         let thief = try await engine.item(.thief)
         let thiefBag = try await engine.item(.largeBag)
 
-        // Position player in round room with thief and give player a valuable item
+        // Position player in round room and give player a valuable item
         try await engine.apply(
-            engine.player.move(to: .location(.roundRoom)),
             sceptre.move(to: .player)
-        )
-
-        // Manually activate the thiefDaemon to verify the theft mechanism works
-        try await engine.processSideEffects(
-            .runDaemon(.thiefDaemon)
         )
 
         #expect(try await engine.player.isHolding(sceptre.id))
 
         try await engine.execute(
-            "look",
             "inventory",
             "examine the sceptre",
-            "look at the person",
+            "look at the man",
             "look at me",
             "inventory"
         )
@@ -42,7 +46,7 @@ struct ThiefTests {
         expectNoDifference(
             output,
             """
-            > look
+            > go east
             --- Round Room ---
 
             This is a circular stone room with passages in all directions.
@@ -51,6 +55,7 @@ struct ThiefTests {
             > inventory
             You are carrying:
             - A sceptre
+            - A sword
 
             > examine the sceptre
             An ornamented sceptre, tapering to a sharp point, is here.
@@ -59,7 +64,7 @@ struct ThiefTests {
             the walls here. He does not speak, but it is clear from his
             aspect that the bag will be taken only over his dead body.
 
-            > look at the person
+            > look at the man
             The thief is a slippery character with beady eyes that flit
             back and forth. He carries, along with an unmistakable
             arrogance, a large bag over his shoulder and a vicious
@@ -74,25 +79,23 @@ struct ThiefTests {
             have noticed that he robbed you blind first.
 
             > inventory
-            You are unburdened by material possessions.
+            You are carrying:
+            - A sword
             """
         )
 
         // The sceptre is in the large bag, which the thief is holding
         #expect(try await thiefBag.isHolding(sceptre.id))
         #expect(try await thief.isHolding(thiefBag.id))
+
+        // Therefore the thief is holding the sceptre
         #expect(try await thief.isHolding(sceptre.id))
     }
 
     @Test("Player can examine thief")
     func testExamineThief() async throws {
         // Given
-        let (engine, mockIO) = await GameEngine.zork1()
-
-        try await engine.apply(
-            engine.player.move(to: .location(.roundRoom)),
-            await engine.item(.thief).move(to: .location(.roundRoom))
-        )
+        let (engine, mockIO) = try await setup()
 
         // When
         try await engine.execute("examine thief")
@@ -115,11 +118,10 @@ struct ThiefTests {
     @Test("Player can give valuable items to thief")
     func testGiveValuableItemToThief() async throws {
         // Given
-        let (engine, mockIO) = await GameEngine.zork1()
+        let (engine, mockIO) = try await setup()
 
         try await engine.apply(
-            engine.player.move(to: .location(.roundRoom)),
-            try await engine.item(.sceptre).move(to: .player)
+            engine.item(.sceptre).move(to: .player)
         )
 
         // When
@@ -150,11 +152,10 @@ struct ThiefTests {
     @Test("Thief refuses non-valuable items")
     func testThiefRefusesNonValuableItems() async throws {
         // Given
-        let (engine, mockIO) = await GameEngine.zork1()
+        let (engine, mockIO) = try await setup()
 
         try await engine.apply(
-            engine.player.move(to: .location(.roundRoom)),
-            await engine.item(.garlic).move(to: .player)
+            engine.item(.garlic).move(to: .player)
         )
 
         // When
@@ -182,13 +183,7 @@ struct ThiefTests {
     @Test("Player can attack thief")
     func testAttackThief() async throws {
         // Given
-        let (engine, mockIO) = await GameEngine.zork1()
-
-        try await engine.apply(
-            engine.player.move(to: .location(.roundRoom)),
-            engine.item(.sword).move(to: .player),
-            engine.item(.thief).move(to: .location(.roundRoom))
-        )
+        let (engine, mockIO) = try await setup()
 
         // When
         try await engine.execute(
@@ -196,7 +191,8 @@ struct ThiefTests {
             "stab the thief with my sword",
             "slay the thief",
             "stab the thief",
-            "kill the thief"
+            "kill the thief",
+            "stab the thief",
         )
 
         // Then
@@ -206,13 +202,13 @@ struct ThiefTests {
             """
             > attack the thief
             No more waiting as you attack with your sword raised and the
-            shady man responds with its stiletto, two weapons now committed
+            shady man responds with his stiletto, two weapons now committed
             to drawing blood.
 
             The sneaky person evades your ancient blade with a fluid
             sidestep, managing to stay just out of reach.
 
-            Suddenly the thief slips past your guard. Its stiletto opens a
+            Suddenly the thief slips past your guard. His stiletto opens a
             wound that will mark you, and your blood flows out steady and
             sure. The blow lands solidly, drawing blood. You feel the sting
             but remain strong.
@@ -221,68 +217,42 @@ struct ThiefTests {
             The sneaky man evades your sword with a fluid sidestep,
             managing to stay just out of reach.
 
-            The robber's retaliation with its stiletto tears through your
+            The robber's retaliation with his stiletto tears through your
             guard, and in an instant you're completely exposed.
 
             > slay the thief
             The thief evades your orcrist with a fluid sidestep, managing
             to stay just out of reach.
 
-            The person strikes back with its stiletto so savagely that you
+            The person strikes back with his stiletto so savagely that you
             falter, uncertainty freezing your muscles for one crucial
             heartbeat.
 
             > stab the thief
             The blow lands hard! The thief stumbles sideways, defenseless
-            and struggling to stay on its feet.
+            and struggling to stay on his feet.
 
-            The person's retaliation with its vicious stiletto sends you
+            The person's retaliation with his vicious stiletto sends you
             stumbling like a drunk, with the world tilting at impossible
             angles.
 
             > kill the thief
-            Your strike with your ancient blade glances off its vicious
-            stiletto, still managing to catch the person lightly. The light
-            wound barely seems to register.
+            The blow lands hard! The man stumbles sideways, defenseless and
+            struggling to stay on his feet.
 
-            The thief strikes back with its stiletto so savagely that you
-            falter, uncertainty freezing your muscles for one crucial
-            heartbeat.
-            """
-        )
-    }
+            A long, theatrical slash. You catch it on your orcrist, but the
+            thief twists his knife, and your elvish glamdring goes flying.
 
-    @Test("Enhanced combat system provides engaging messages")
-    func testEnhancedCombatMessages() async throws {
-        // Given
-        let (engine, mockIO) = await GameEngine.zork1()
+            > stab the thief
+            You aren't holding the sword.
 
-        try await engine.apply(
-            engine.player.move(to: .location(.roundRoom)),
-            engine.item(.sword).move(to: .player),
-            engine.item(.thief).move(to: .location(.roundRoom))
-        )
+            Attacking the man bare-handed while he hold his vicious
+            stiletto? That would be suicidal.
 
-        // When - execute single combat round
-        try await engine.execute("attack the thief")
-
-        // Then - verify engaging combat messages
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
-            """
-            > attack the thief
-            No more waiting as you attack with your sword raised and the
-            shady man responds with its stiletto, two weapons now committed
-            to drawing blood.
-
-            The sneaky person evades your ancient blade with a fluid
-            sidestep, managing to stay just out of reach.
-
-            Suddenly the thief slips past your guard. Its stiletto opens a
-            wound that will mark you, and your blood flows out steady and
-            sure. The blow lands solidly, drawing blood. You feel the sting
-            but remain strong.
+            Your opponent, determining discretion to be the better part of
+            valor, decides to terminate this little contretemps. With a
+            rueful nod of his head, he steps backward into the gloom and
+            disappears.
             """
         )
     }
@@ -290,11 +260,7 @@ struct ThiefTests {
     @Test("Thief handles tell command")
     func testTellThief() async throws {
         // Given
-        let (engine, mockIO) = await GameEngine.zork1()
-
-        try await engine.apply(
-            engine.player.move(to: .location(.roundRoom))
-        )
+        let (engine, mockIO) = try await setup()
 
         // When
         try await engine.execute("tell thief about treasure")
@@ -313,11 +279,7 @@ struct ThiefTests {
     @Test("Cannot take thief directly")
     func testCannotTakeThief() async throws {
         // Given
-        let (engine, mockIO) = await GameEngine.zork1()
-
-        try await engine.apply(
-            engine.player.move(to: .location(.roundRoom))
-        )
+        let (engine, mockIO) = try await setup()
 
         // When
         try await engine.execute("take thief")
@@ -336,11 +298,7 @@ struct ThiefTests {
     @Test("Stiletto examination works")
     func testExamineStilettoInThiefsPossession() async throws {
         // Given
-        let (engine, mockIO) = await GameEngine.zork1()
-
-        try await engine.apply(
-            engine.player.move(to: .location(.roundRoom))
-        )
+        let (engine, mockIO) = try await setup()
 
         // When
         try await engine.execute("examine stiletto")
@@ -360,44 +318,17 @@ struct ThiefTests {
     @Test("Large bag examination works")
     func testExamineLargeBag() async throws {
         // Given
-        let (engine, mockIO) = await GameEngine.zork1()
-
-        try await engine.apply(
-            engine.player.move(to: .location(.roundRoom))
-        )
-
-        // Ensure thief is present in the round room
-        try await engine.apply(
-            engine.item(.thief).move(to: .location(.roundRoom))
-        )
-
-        // Debug: Check what's in scope
-        let playerLocation = try await engine.player.location
-        let roomItems = try await playerLocation.items
-        print("🎯 Room items:", roomItems.map(\.id))
-
-        let thief = try await engine.item(.thief)
-        let thiefLocation = try await thief.parent
-        print("🎯 Thief location:", thiefLocation)
-
-        let largeBag = try await engine.item(.largeBag)
-        let bagLocation = try await largeBag.parent
-        print("🎯 Large bag location:", bagLocation)
-        print("🎯 Large bag shouldDescribe:", await largeBag.shouldDescribe)
-        print("🎯 Large bag isVisible:", await largeBag.isVisible)
-
-        let thiefContents = try await thief.contents
-        print("🎯 Thief contents:", thiefContents.map(\.id))
+        let (engine, mockIO) = try await setup()
 
         // When
-        try await engine.execute("examine bag")
+        try await engine.execute("look inside the bag")
 
         // Then
         let output = await mockIO.flush()
         expectNoDifference(
             output,
             """
-            > examine bag
+            > look inside the bag
             The thief's large bag bulges with what are obviously stolen
             goods. He watches you carefully, ready to defend his ill-gotten
             gains.
@@ -408,11 +339,7 @@ struct ThiefTests {
     @Test("Cannot take stiletto while thief is present")
     func testCannotTakeStilettoWhileThiefPresent() async throws {
         // Given
-        let (engine, mockIO) = await GameEngine.zork1()
-
-        try await engine.apply(
-            engine.player.move(to: .location(.roundRoom))
-        )
+        let (engine, mockIO) = try await setup()
 
         // When
         try await engine.execute("take stiletto")
@@ -437,117 +364,39 @@ struct ThiefTests {
     @Test("Thief prioritizes high-value items for theft")
     func testThiefPrioritizesHighValueItems() async throws {
         // Given
-        let (engine, mockIO) = await GameEngine.zork1()
+        let (engine, mockIO) = try await setup()
 
+        // Give player multiple items of different values
         try await engine.apply(
-            engine.player.move(to: .location(.roundRoom)),
-
-            // Give player multiple items of different values
             engine.item(.advertisement).move(to: .player),  // Low value
             engine.item(.diamond).move(to: .player)  // High value
         )
 
-        // When - attempt theft multiple times
-        var theftOccurred = false
-        var stolenItem: String = ""
+        // When
+        try await engine.execute(
+            """
+            look
+            talk to the thief
+            take the stiletto
+            dance with the thief
+            kiss the thief
+            wait
+            """
+        )
 
-        for _ in 1...30 {
-            _ = await mockIO.flush()
-            _ = try await engine.execute("wait")
-            let output = await mockIO.flush()
-            if output.contains("thief snatches") {
-                theftOccurred = true
-                stolenItem = output
-                break
-            }
-        }
-
-        // Then - if theft occurred, it should prefer the diamond
-        if theftOccurred {
-            expectNoDifference(
-                stolenItem,
-                """
-                > north
-                --- Troll Room ---
-
-                This is a small room with passages to the east and south and a
-                forbidding hole leading west. Bloodstains and deep scratches
-                (perhaps made by an axe) mar the walls.
-
-                A nasty-looking troll, brandishing a bloody axe, blocks all
-                passages out of the room.
-
-                Your sword is glowing very brightly.
-
-                > walk east
-                The troll fends you off with a menacing gesture.
-
-                Your sword is glowing very brightly.
-
-                > go north
-                You can't go that way.
-
-                Your sword is glowing very brightly.
-
-                > head west
-                The troll fends you off with a menacing gesture.
-
-                Your sword is glowing very brightly.
-
-                > talk to the troll
-                The troll isn't much of a conversationalist.
-
-                Your sword is glowing very brightly.
-
-                > push the troll
-                The troll laughs at your puny gesture.
-
-                Your sword is glowing very brightly.
-
-                > hit the troll with the lantern
-                No more waiting as you attack with your light raised and the
-                pathetic troll responds with his axe, two weapons now committed
-                to drawing blood.
-
-                The brass lantern makes a poor weapon against the pathetic
-                troll's his axe! This might not end well. The troll's
-                retaliatory strike with his ax cuts toward you but your body
-                knows how to flow around death.
-
-                Your sword is glowing very brightly.
-
-                > head west
-                The troll fends you off with a menacing gesture.
-
-                In the exchange, his ax slips through to mark you--a stinging
-                reminder that the troll still has teeth. The wound is trivial
-                against your battle fury.
-
-                Your sword is glowing very brightly.
-
-                >
-                May your adventures elsewhere prove fruitful!
-                """
-            )
-
-            #expect(stolenItem.contains("diamond"))
-        } else {
-            Issue.record("Thief did not steal anything")
-        }
-
-        // Verify treasure evaluation system exists
-        let largeBag = try await engine.item(.largeBag)
-        #expect(await largeBag.isContainer)
+        // Then
+        let output = await mockIO.flush()
+        expectNoDifference(
+            output,
+            """
+            """
+        )
     }
 
     @Test("Thief movement daemon can move thief around dungeon")
     func testThiefMovementDaemon() async throws {
         // Given
-        let (engine, mockIO) = await GameEngine.zork1()
-
-        try await engine.apply(
-            engine.player.move(to: .location(.roundRoom))
-        )
+        let (engine, mockIO) = try await setup()
 
         // When - wait several turns to trigger movement daemon
         for _ in 1...10 {
@@ -572,11 +421,7 @@ struct ThiefTests {
     @Test("Thief movement shows atmospheric messages")
     func testThiefMovementMessages() async throws {
         // Given
-        let (engine, mockIO) = await GameEngine.zork1()
-
-        try await engine.apply(
-            engine.player.move(to: .location(.roundRoom))
-        )
+        let (engine, mockIO) = try await setup()
 
         // Force thief to move to another location
         try await engine.apply(
@@ -603,12 +448,7 @@ struct ThiefTests {
     @Test("Enhanced combat considers weapon effectiveness")
     func testEnhancedCombatWithWeapons() async throws {
         // Given
-        let (engine, mockIO) = await GameEngine.zork1()
-
-        try await engine.apply(
-            engine.player.move(to: .location(.roundRoom)),
-            await engine.item(.sword).move(to: .player)
-        )
+        let (engine, mockIO) = try await setup()
 
         // When
         try await engine.execute("attack the thief with my sword", times: 3)
@@ -638,7 +478,8 @@ struct ThiefTests {
         )
 
         try await engine.apply(
-            engine.player.move(to: .location(.roundRoom))
+            engine.player.move(to: .location(.roundRoom)),
+            engine.item(.thief).move(to: .location(.roundRoom))
         )
 
         // Force a combat victory by removing thief directly (simulating death)
@@ -695,11 +536,7 @@ struct ThiefTests {
     @Test("Thief refuses to accept bag or stiletto")
     func testThiefRefusesOwnPossessions() async throws {
         // Given
-        let (engine, mockIO) = await GameEngine.zork1()
-
-        try await engine.apply(
-            engine.player.move(to: .location(.roundRoom))
-        )
+        let (engine, mockIO) = try await setup()
 
         // Simulate getting stiletto somehow
         try await engine.apply(
@@ -718,7 +555,7 @@ struct ThiefTests {
     @Test("Theft considers player vulnerability")
     func testTheftMechanics() async throws {
         // Given
-        let (engine, mockIO) = await GameEngine.zork1()
+        let (engine, mockIO) = try await setup()
 
         let diamond = try await engine.item(.diamond)
         let skull = try await engine.item(.skull)
@@ -726,16 +563,9 @@ struct ThiefTests {
 
         // Move player loaded with treasure to the round room
         try await engine.apply(
-            engine.player.move(to: .location(.roundRoom)),
-
             diamond.move(to: .player),
             skull.move(to: .player),
             potOfGold.move(to: .player)
-        )
-
-        // Manually activate the thiefDaemon to verify the theft mechanism works
-        try await engine.processSideEffects(
-            .runDaemon(.thiefDaemon)
         )
 
         // Execute a wait command and trigger daemon processing
@@ -778,11 +608,7 @@ struct ThiefTests {
     @Test("Thief AI responds to different combat outcomes")
     func testThiefCombatOutcomeVariations() async throws {
         // Given
-        let (engine, mockIO) = await GameEngine.zork1()
-
-        try await engine.apply(
-            engine.player.move(to: .location(.roundRoom))
-        )
+        let (engine, mockIO) = try await setup()
 
         // When - attack multiple times to potentially see different outcomes
         var combatResponses: Set<String> = []
@@ -801,7 +627,8 @@ struct ThiefTests {
             if !thiefExists {
                 // Respawn thief for next test
                 try await engine.apply(
-                    engine.player.move(to: .location(.roundRoom))
+                    engine.player.move(to: .location(.roundRoom)),
+                    engine.item(.thief).move(to: .location(.roundRoom))
                 )
             }
         }

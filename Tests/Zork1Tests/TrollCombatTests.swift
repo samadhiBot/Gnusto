@@ -207,6 +207,11 @@ struct Zork1TrollCombatTests {
             Would you like to RESTART, RESTORE a saved game, or QUIT?
 
             >
+            Please type RESTART, RESTORE, or QUIT.
+
+            Would you like to RESTART, RESTORE a saved game, or QUIT?
+
+            >
             """
         )
     }

@@ -22,6 +22,12 @@ struct Thief {
         .name("thief"),
         .synonyms("thief", "robber", "man", "person"),
         .adjectives("shady", "suspicious", "seedy", "suspicious-looking", "sneaky"),
+        .firstDescription(
+            """
+            There is a suspicious-looking individual, holding a large bag,
+            leaning against one wall. He is armed with a deadly stiletto.
+            """
+        ),
         .characterSheet(  // Stronger than the troll
             CharacterSheet(
                 strength: 14,
@@ -37,7 +43,7 @@ struct Thief {
                 classification: .masculine,
                 alignment: .neutralEvil
             )
-                       ),
+        ),
         .validLocations(
             .cellar, .damRoom, .deepCanyon, .egyptRoom, .gallery, .maze1, .maze2, .maze3, .maze4,
             .maze5, .mirrorRoomSouth, .northSouthPassage, .reservoir, .reservoirSouth, .roundRoom,
@@ -280,10 +286,12 @@ extension Thief {
 extension Thief {
     static let thiefCombatSystem = StandardCombatSystem(
         versus: .thief
-    ) { event, msg async throws -> String? in
+    ) {
+        event,
+        msg async throws -> String? in
         switch event {
-        case .playerSlain(let enemy, _, let damage):
-            msg.oneOf(
+        case .playerSlain:
+            return msg.oneOf(
                 "The thief, forgetting his essentially genteel upbringing, cuts your throat.",
                 "The thief, a pragmatist, dispatches you as a threat to his livelihood.",
                 "Finishing you off, the thief inserts his blade into your heart.",
@@ -293,25 +301,27 @@ extension Thief {
                 and with a wry grin, ends the battle and your life.
                 """,
             )
-        case .playerUnconscious(let enemy, _, let damage):
-            msg.oneOf(
+        case .playerUnconscious:
+            return msg.oneOf(
                 """
                 Shifting in the midst of a thrust, the thief knocks you unconscious
                 with the haft of his stiletto.
                 """,
                 "The thief knocks you out."
             )
-        case .playerDisarmed(let enemy, let weapon, _, _):
-            msg.oneOf(
+        case let .playerDisarmed(enemy, playerWeapon, enemyWeapon, wasFumble):
+            let weapon = try await playerWeapon.alias(.withPossessiveAdjective)
+            let weaponAlt = try await playerWeapon.alias(.withPossessiveAdjective)
+            return msg.oneOf(
                 """
                 A long, theatrical slash. You catch it on \(weapon),
-                but the thief twists his knife, and \(weapon) goes flying.
+                but the thief twists his knife, and \(weaponAlt) goes flying.
                 """,
                 "The thief neatly flips \(weapon) out of your hands, and it drops to the floor.",
                 "You parry a low thrust, and \(weapon) slips out of your hand.",
             )
-        case .playerCriticallyWounded(let enemy, _, let damage):
-            msg.oneOf(
+        case .playerCriticallyWounded:
+            return msg.oneOf(
                 "The butt of his stiletto cracks you on the skull, and you stagger back.",
                 """
                 The thief rams the haft of his blade into your stomach,
@@ -319,40 +329,40 @@ extension Thief {
                 """,
                 "The thief attacks, and you fall back desperately.",
             )
-        case .playerGravelyInjured(let enemy, _, let damage):
-            msg.oneOf(
+        case .playerGravelyInjured:
+            return msg.oneOf(
                 "The thief strikes like a snake! The resulting wound is serious.",
                 "The thief stabs a deep cut in your upper arm.",
                 "The stiletto touches your forehead, and the blood obscures your vision.",
                 "The thief strikes at your wrist, and suddenly your grip is slippery with blood.",
             )
-        case .playerLightlyInjured(let enemy, _, let damage):
-            msg.oneOf(
+        case .playerLightlyInjured:
+            return msg.oneOf(
                 "A quick thrust pinks your left arm, and blood starts to trickle down.",
                 "The thief draws blood, raking his stiletto across your arm.",
                 "The stiletto flashes faster than you can follow, and blood wells from your leg.",
                 "The thief slowly approaches, strikes like a snake, and leaves you wounded.",
             )
-        case .playerMissed(let enemy, _):
-            msg.oneOf(
+        case .playerMissed:
+            return msg.oneOf(
                 "The thief stabs nonchalantly with his stiletto and misses.",
                 "You dodge as the thief comes in low.",
             )
-        case .playerDodged(let enemy, _):
-            msg.oneOf(
+        case .playerDodged:
+            return msg.oneOf(
                 "You parry a lightning thrust, and the thief salutes you with a grim nod.",
                 "The thief tries to sneak past your guard, but you twist away.",
             )
-        case .enemyFlees(let enemy, _, let direction, let destination):
-            msg.output(
+        case .enemyFlees:
+            return msg.output(
                 """
                 Your opponent, determining discretion to be the better part of
                 valor, decides to terminate this little contretemps. With a rueful
                 nod of his head, he steps backward into the gloom and disappears.
                 """
             )
-        case .enemySpecialAction(let enemy, _, let message):
-            msg.oneOf(
+        case .enemySpecialAction:
+            return msg.oneOf(
                 """
                 The thief, a man of superior breeding, pauses for a moment
                 to consider the propriety of finishing you off.
@@ -361,7 +371,7 @@ extension Thief {
                 "The thief entertains himself by rifling your pack."
             )
         default:
-            nil
+            return nil
         }
     }
 }

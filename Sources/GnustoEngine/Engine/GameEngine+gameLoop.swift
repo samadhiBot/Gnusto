@@ -69,7 +69,10 @@ extension GameEngine {
 
         // 3. Check for disambiguation responses when no pending question but recent disambiguation
         if let disambiguationContext = lastDisambiguationContext,
-            await tryHandleDisambiguationResponse(input: input, context: disambiguationContext)
+           await tryHandleDisambiguationResponse(
+            input: input,
+            context: disambiguationContext
+           )
         {
             // Disambiguation response was handled, skip normal command processing
             return
