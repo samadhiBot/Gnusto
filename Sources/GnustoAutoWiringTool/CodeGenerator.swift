@@ -92,48 +92,6 @@ struct CodeGenerator {
         for gameBlueprintType in gameData.gameBlueprintTypes.sorted() {
             var extensionLines = [String]()
 
-            // Collect all area types that need to be instantiated (for non-static properties)
-            var areaInstances: Set<String> = []
-
-            for itemProperty in gameData.items.sorted() {
-                if let areaType = gameData.itemToAreaMap[itemProperty] {
-                    let isStatic = gameData.propertyIsStatic[itemProperty] ?? true
-                    if !isStatic {
-                        areaInstances.insert(areaType)
-                    }
-                }
-            }
-
-            for locationProperty in gameData.locations.sorted() {
-                if let areaType = gameData.locationToAreaMap[locationProperty] {
-                    let isStatic = gameData.propertyIsStatic[locationProperty] ?? true
-                    if !isStatic {
-                        areaInstances.insert(areaType)
-                    }
-                }
-            }
-
-            // Check for non-static event handlers that need area instances
-            for itemHandler in gameData.itemEventHandlers {
-                if let areaType = gameData.handlerToAreaMap[itemHandler] {
-                    let handlerPropertyName = "\(itemHandler)Handler"
-                    let isStatic = gameData.propertyIsStatic[handlerPropertyName] ?? true
-                    if !isStatic {
-                        areaInstances.insert(areaType)
-                    }
-                }
-            }
-
-            for locationHandler in gameData.locationEventHandlers {
-                if let areaType = gameData.handlerToAreaMap[locationHandler] {
-                    let handlerPropertyName = "\(locationHandler)Handler"
-                    let isStatic = gameData.propertyIsStatic[handlerPropertyName] ?? true
-                    if !isStatic {
-                        areaInstances.insert(areaType)
-                    }
-                }
-            }
-
             // Only generate extension if there's content
             if !gameData.items.isEmpty || !gameData.locations.isEmpty
                 || !gameData.itemEventHandlers.isEmpty || !gameData.locationEventHandlers.isEmpty
@@ -148,17 +106,29 @@ struct CodeGenerator {
                 if !gameData.items.isEmpty {
                     extensionLines.append("    public var items: [Item] {")
 
-                    // Create area instances within this property if needed
-                    for areaType in areaInstances.sorted() {
-                        extensionLines.append(
-                            "        let \(areaType.prefix(1).lowercased() + areaType.dropFirst()) = \(areaType)()")
+                    // Collect area instances needed for items
+                    var itemAreaInstances: Set<String> = []
+                    for itemProperty in gameData.items.sorted() {
+                        if let areaType = gameData.itemToAreaMap[itemProperty] {
+                            let isStatic = gameData.propertyIsStatic[itemProperty] ?? true
+                            if !isStatic {
+                                itemAreaInstances.insert(areaType)
+                            }
+                        }
                     }
 
-                    if !areaInstances.isEmpty {
+                    // Create area instances within this property if needed
+                    for areaType in itemAreaInstances.sorted() {
+                        extensionLines.append(
+                            "        let \(areaType.prefix(1).lowercased() + areaType.dropFirst()) = \(areaType)()"
+                        )
+                    }
+
+                    if !itemAreaInstances.isEmpty {
                         extensionLines.append("")
                     }
 
-                    let returnStatement = areaInstances.isEmpty ? "" : "return "
+                    let returnStatement = itemAreaInstances.isEmpty ? "" : "return "
 
                     extensionLines.append("        \(returnStatement)[")
 
@@ -169,7 +139,8 @@ struct CodeGenerator {
                                 extensionLines.append("            \(areaType).\(itemProperty),")
                             } else {
                                 extensionLines.append(
-                                    "            \(areaType.prefix(1).lowercased() + areaType.dropFirst()).\(itemProperty),")
+                                    "            \(areaType.prefix(1).lowercased() + areaType.dropFirst()).\(itemProperty),"
+                                )
                             }
                         } else {
                             // When area mapping is unknown, skip rather than guessing wrong
@@ -188,17 +159,29 @@ struct CodeGenerator {
                 if !gameData.locations.isEmpty {
                     extensionLines.append("    public var locations: [Location] {")
 
-                    // Create area instances within this property if needed
-                    for areaType in areaInstances.sorted() {
-                        extensionLines.append(
-                            "        let \(areaType.prefix(1).lowercased() + areaType.dropFirst()) = \(areaType)()")
+                    // Collect area instances needed for locations
+                    var locationAreaInstances: Set<String> = []
+                    for locationProperty in gameData.locations.sorted() {
+                        if let areaType = gameData.locationToAreaMap[locationProperty] {
+                            let isStatic = gameData.propertyIsStatic[locationProperty] ?? true
+                            if !isStatic {
+                                locationAreaInstances.insert(areaType)
+                            }
+                        }
                     }
 
-                    if !areaInstances.isEmpty {
+                    // Create area instances within this property if needed
+                    for areaType in locationAreaInstances.sorted() {
+                        extensionLines.append(
+                            "        let \(areaType.prefix(1).lowercased() + areaType.dropFirst()) = \(areaType)()"
+                        )
+                    }
+
+                    if !locationAreaInstances.isEmpty {
                         extensionLines.append("")
                     }
 
-                    let returnStatement = areaInstances.isEmpty ? "" : "return "
+                    let returnStatement = locationAreaInstances.isEmpty ? "" : "return "
 
                     extensionLines.append("        \(returnStatement)[")
 
@@ -210,7 +193,8 @@ struct CodeGenerator {
                                     "            \(areaType).\(locationProperty),")
                             } else {
                                 extensionLines.append(
-                                    "            \(areaType.prefix(1).lowercased() + areaType.dropFirst()).\(locationProperty),")
+                                    "            \(areaType.prefix(1).lowercased() + areaType.dropFirst()).\(locationProperty),"
+                                )
                             }
                         } else {
                             // When area mapping is unknown, skip rather than guessing wrong
@@ -230,13 +214,26 @@ struct CodeGenerator {
                     extensionLines.append(
                         "    public var itemEventHandlers: [ItemID: ItemEventHandler] {")
 
-                    // Create area instances within this property if needed
-                    for areaType in areaInstances.sorted() {
-                        extensionLines.append(
-                            "        let \(areaType.prefix(1).lowercased() + areaType.dropFirst()) = \(areaType)()")
+                    // Collect area instances needed for item event handlers
+                    var itemHandlerAreaInstances: Set<String> = []
+                    for itemHandler in gameData.itemEventHandlers {
+                        if let areaType = gameData.handlerToAreaMap[itemHandler] {
+                            let handlerPropertyName = "\(itemHandler)Handler"
+                            let isStatic = gameData.propertyIsStatic[handlerPropertyName] ?? true
+                            if !isStatic {
+                                itemHandlerAreaInstances.insert(areaType)
+                            }
+                        }
                     }
 
-                    if !areaInstances.isEmpty {
+                    // Create area instances within this property if needed
+                    for areaType in itemHandlerAreaInstances.sorted() {
+                        extensionLines.append(
+                            "        let \(areaType.prefix(1).lowercased() + areaType.dropFirst()) = \(areaType)()"
+                        )
+                    }
+
+                    if !itemHandlerAreaInstances.isEmpty {
                         extensionLines.append("")
                     }
 
@@ -245,7 +242,7 @@ struct CodeGenerator {
                         gameData.handlerToAreaMap[handler] != nil
                     }
 
-                    let returnStatement = areaInstances.isEmpty ? "" : "return "
+                    let returnStatement = itemHandlerAreaInstances.isEmpty ? "" : "return "
 
                     if mappedHandlers.isEmpty {
                         extensionLines.append("        \(returnStatement)[:]")
@@ -285,22 +282,35 @@ struct CodeGenerator {
                     extensionLines.append(
                         "    public var combatMessengers: [ItemID: CombatMessenger] {")
 
-                    // Create area instances within this property if needed
-                    for areaType in areaInstances.sorted() {
-                        extensionLines.append(
-                            "        let \(areaType.prefix(1).lowercased() + areaType.dropFirst()) = \(areaType)()")
+                    // Collect area instances needed for combat messengers
+                    var combatMessengerAreaInstances: Set<String> = []
+                    for combatMessenger in gameData.combatMessengers {
+                        if let areaType = gameData.handlerToAreaMap[combatMessenger] {
+                            let isStatic = gameData.propertyIsStatic[combatMessenger] ?? true
+                            if !isStatic {
+                                combatMessengerAreaInstances.insert(areaType)
+                            }
+                        }
                     }
 
-                    if !areaInstances.isEmpty {
+                    // Create area instances within this property if needed
+                    for areaType in combatMessengerAreaInstances.sorted() {
+                        extensionLines.append(
+                            "        let \(areaType.prefix(1).lowercased() + areaType.dropFirst()) = \(areaType)()"
+                        )
+                    }
+
+                    if !combatMessengerAreaInstances.isEmpty {
                         extensionLines.append("")
                     }
 
                     // Check if we have any mapped combat messengers before generating the return statement
-                    let mappedCombatMessengers = gameData.combatMessengers.filter { combatMessenger in
+                    let mappedCombatMessengers = gameData.combatMessengers.filter {
+                        combatMessenger in
                         gameData.handlerToAreaMap[combatMessenger] != nil
                     }
 
-                    let returnStatement = areaInstances.isEmpty ? "" : "return "
+                    let returnStatement = combatMessengerAreaInstances.isEmpty ? "" : "return "
 
                     if mappedCombatMessengers.isEmpty {
                         extensionLines.append("        \(returnStatement)[:]")
@@ -352,13 +362,25 @@ struct CodeGenerator {
                     extensionLines.append(
                         "    public var combatSystems: [ItemID: any CombatSystem] {")
 
-                    // Create area instances within this property if needed
-                    for areaType in areaInstances.sorted() {
-                        extensionLines.append(
-                            "        let \(areaType.prefix(1).lowercased() + areaType.dropFirst()) = \(areaType)()")
+                    // Collect area instances needed for combat systems
+                    var combatSystemAreaInstances: Set<String> = []
+                    for combatSystem in gameData.combatSystems {
+                        if let areaType = gameData.handlerToAreaMap[combatSystem] {
+                            let isStatic = gameData.propertyIsStatic[combatSystem] ?? true
+                            if !isStatic {
+                                combatSystemAreaInstances.insert(areaType)
+                            }
+                        }
                     }
 
-                    if !areaInstances.isEmpty {
+                    // Create area instances within this property if needed
+                    for areaType in combatSystemAreaInstances.sorted() {
+                        extensionLines.append(
+                            "        let \(areaType.prefix(1).lowercased() + areaType.dropFirst()) = \(areaType)()"
+                        )
+                    }
+
+                    if !combatSystemAreaInstances.isEmpty {
                         extensionLines.append("")
                     }
 
@@ -367,7 +389,7 @@ struct CodeGenerator {
                         gameData.handlerToAreaMap[combatSystem] != nil
                     }
 
-                    let returnStatement = areaInstances.isEmpty ? "" : "return "
+                    let returnStatement = combatSystemAreaInstances.isEmpty ? "" : "return "
 
                     if mappedCombatSystems.isEmpty {
                         extensionLines.append("        \(returnStatement)[:]")
@@ -420,13 +442,26 @@ struct CodeGenerator {
                         "    public var locationEventHandlers: [LocationID: LocationEventHandler] {"
                     )
 
-                    // Create area instances within this property if needed
-                    for areaType in areaInstances.sorted() {
-                        extensionLines.append(
-                            "        let \(areaType.prefix(1).lowercased() + areaType.dropFirst()) = \(areaType)()")
+                    // Collect area instances needed for location event handlers
+                    var locationHandlerAreaInstances: Set<String> = []
+                    for locationHandler in gameData.locationEventHandlers {
+                        if let areaType = gameData.handlerToAreaMap[locationHandler] {
+                            let handlerPropertyName = "\(locationHandler)Handler"
+                            let isStatic = gameData.propertyIsStatic[handlerPropertyName] ?? true
+                            if !isStatic {
+                                locationHandlerAreaInstances.insert(areaType)
+                            }
+                        }
                     }
 
-                    if !areaInstances.isEmpty {
+                    // Create area instances within this property if needed
+                    for areaType in locationHandlerAreaInstances.sorted() {
+                        extensionLines.append(
+                            "        let \(areaType.prefix(1).lowercased() + areaType.dropFirst()) = \(areaType)()"
+                        )
+                    }
+
+                    if !locationHandlerAreaInstances.isEmpty {
                         extensionLines.append("")
                     }
 
@@ -435,7 +470,7 @@ struct CodeGenerator {
                         gameData.handlerToAreaMap[handler] != nil
                     }
 
-                    let returnStatement = areaInstances.isEmpty ? "" : "return "
+                    let returnStatement = locationHandlerAreaInstances.isEmpty ? "" : "return "
 
                     if mappedHandlers.isEmpty {
                         extensionLines.append("        \(returnStatement)[:]")
@@ -474,13 +509,25 @@ struct CodeGenerator {
                 if !gameData.daemons.isEmpty {
                     extensionLines.append("    public var daemons: [DaemonID: Daemon] {")
 
-                    // Create area instances within this property if needed
-                    for areaType in areaInstances.sorted() {
-                        extensionLines.append(
-                            "        let \(areaType.prefix(1).lowercased() + areaType.dropFirst()) = \(areaType)()")
+                    // Collect area instances needed for daemons
+                    var daemonAreaInstances: Set<String> = []
+                    for daemon in gameData.daemons {
+                        if let areaType = gameData.handlerToAreaMap[daemon] {
+                            let isStatic = gameData.propertyIsStatic[daemon] ?? true
+                            if !isStatic {
+                                daemonAreaInstances.insert(areaType)
+                            }
+                        }
                     }
 
-                    if !areaInstances.isEmpty {
+                    // Create area instances within this property if needed
+                    for areaType in daemonAreaInstances.sorted() {
+                        extensionLines.append(
+                            "        let \(areaType.prefix(1).lowercased() + areaType.dropFirst()) = \(areaType)()"
+                        )
+                    }
+
+                    if !daemonAreaInstances.isEmpty {
                         extensionLines.append("")
                     }
 
@@ -489,7 +536,7 @@ struct CodeGenerator {
                         gameData.handlerToAreaMap[daemon] != nil
                     }
 
-                    let returnStatement = areaInstances.isEmpty ? "" : "return "
+                    let returnStatement = daemonAreaInstances.isEmpty ? "" : "return "
 
                     if mappedDaemons.isEmpty {
                         extensionLines.append("        \(returnStatement)[:]")
@@ -528,13 +575,25 @@ struct CodeGenerator {
                 if !gameData.fuses.isEmpty {
                     extensionLines.append("    public var fuses: [FuseID: Fuse] {")
 
-                    // Create area instances within this property if needed
-                    for areaType in areaInstances.sorted() {
-                        extensionLines.append(
-                            "        let \(areaType.prefix(1).lowercased() + areaType.dropFirst()) = \(areaType)()")
+                    // Collect area instances needed for fuses
+                    var fuseAreaInstances: Set<String> = []
+                    for fuse in gameData.fuses {
+                        if let areaType = gameData.handlerToAreaMap[fuse] {
+                            let isStatic = gameData.propertyIsStatic[fuse] ?? true
+                            if !isStatic {
+                                fuseAreaInstances.insert(areaType)
+                            }
+                        }
                     }
 
-                    if !areaInstances.isEmpty {
+                    // Create area instances within this property if needed
+                    for areaType in fuseAreaInstances.sorted() {
+                        extensionLines.append(
+                            "        let \(areaType.prefix(1).lowercased() + areaType.dropFirst()) = \(areaType)()"
+                        )
+                    }
+
+                    if !fuseAreaInstances.isEmpty {
                         extensionLines.append("")
                     }
 
@@ -543,7 +602,7 @@ struct CodeGenerator {
                         gameData.handlerToAreaMap[fuse] != nil
                     }
 
-                    let returnStatement = areaInstances.isEmpty ? "" : "return "
+                    let returnStatement = fuseAreaInstances.isEmpty ? "" : "return "
 
                     if mappedFuses.isEmpty {
                         extensionLines.append("        \(returnStatement)[:]")
@@ -582,13 +641,26 @@ struct CodeGenerator {
                 if !gameData.itemComputeHandlers.isEmpty {
                     extensionLines.append("    public var itemComputers: [ItemID: ItemComputer] {")
 
-                    // Create area instances within this property if needed
-                    for areaType in areaInstances.sorted() {
-                        extensionLines.append(
-                            "        let \(areaType.prefix(1).lowercased() + areaType.dropFirst()) = \(areaType)()")
+                    // Collect area instances needed for item compute handlers
+                    var itemComputeAreaInstances: Set<String> = []
+                    for itemHandler in gameData.itemComputeHandlers {
+                        if let areaType = gameData.handlerToAreaMap[itemHandler] {
+                            let handlerPropertyName = "\(itemHandler)Computer"
+                            let isStatic = gameData.propertyIsStatic[handlerPropertyName] ?? true
+                            if !isStatic {
+                                itemComputeAreaInstances.insert(areaType)
+                            }
+                        }
                     }
 
-                    if !areaInstances.isEmpty {
+                    // Create area instances within this property if needed
+                    for areaType in itemComputeAreaInstances.sorted() {
+                        extensionLines.append(
+                            "        let \(areaType.prefix(1).lowercased() + areaType.dropFirst()) = \(areaType)()"
+                        )
+                    }
+
+                    if !itemComputeAreaInstances.isEmpty {
                         extensionLines.append("")
                     }
 
@@ -597,7 +669,7 @@ struct CodeGenerator {
                         gameData.handlerToAreaMap[handler] != nil
                     }
 
-                    let returnStatement = areaInstances.isEmpty ? "" : "return "
+                    let returnStatement = itemComputeAreaInstances.isEmpty ? "" : "return "
 
                     if mappedHandlers.isEmpty {
                         extensionLines.append("        \(returnStatement)[:]")
@@ -665,13 +737,26 @@ struct CodeGenerator {
                     extensionLines.append(
                         "    public var locationComputers: [LocationID: LocationComputer] {")
 
-                    // Create area instances within this property if needed
-                    for areaType in areaInstances.sorted() {
-                        extensionLines.append(
-                            "        let \(areaType.prefix(1).lowercased() + areaType.dropFirst()) = \(areaType)()")
+                    // Collect area instances needed for location compute handlers
+                    var locationComputeAreaInstances: Set<String> = []
+                    for locationHandler in gameData.locationComputeHandlers {
+                        if let areaType = gameData.handlerToAreaMap[locationHandler] {
+                            let handlerPropertyName = "\(locationHandler)Computer"
+                            let isStatic = gameData.propertyIsStatic[handlerPropertyName] ?? true
+                            if !isStatic {
+                                locationComputeAreaInstances.insert(areaType)
+                            }
+                        }
                     }
 
-                    if !areaInstances.isEmpty {
+                    // Create area instances within this property if needed
+                    for areaType in locationComputeAreaInstances.sorted() {
+                        extensionLines.append(
+                            "        let \(areaType.prefix(1).lowercased() + areaType.dropFirst()) = \(areaType)()"
+                        )
+                    }
+
+                    if !locationComputeAreaInstances.isEmpty {
                         extensionLines.append("")
                     }
 
@@ -680,7 +765,7 @@ struct CodeGenerator {
                         gameData.handlerToAreaMap[handler] != nil
                     }
 
-                    let returnStatement = areaInstances.isEmpty ? "" : "return "
+                    let returnStatement = locationComputeAreaInstances.isEmpty ? "" : "return "
 
                     if mappedHandlers.isEmpty {
                         extensionLines.append("        \(returnStatement)[:]")

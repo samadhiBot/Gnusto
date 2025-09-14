@@ -14,15 +14,30 @@ import GnustoEngine
 /// - Sophisticated theft mechanics for valuable items
 /// - Combat abilities with his deadly stiletto
 /// - Treasure interactions and enhanced AI
-enum Thief {
+struct Thief {
     // MARK: - Core Items
 
-    static let thief = Item(
+    let thief = Item(
         id: .thief,
         .name("thief"),
         .synonyms("thief", "robber", "man", "person"),
         .adjectives("shady", "suspicious", "seedy", "suspicious-looking", "sneaky"),
-        .characterSheet(.agile),  // Stronger than the troll
+        .characterSheet(  // Stronger than the troll
+            CharacterSheet(
+                strength: 14,
+                dexterity: 18,
+                intelligence: 13,
+                charisma: 7,
+                bravery: 9,
+                perception: 16,
+                accuracy: 15,
+                intimidation: 15,
+                stealth: 17,
+                level: 2,
+                classification: .masculine,
+                alignment: .neutralEvil
+            )
+                       ),
         .validLocations(
             .cellar, .damRoom, .deepCanyon, .egyptRoom, .gallery, .maze1, .maze2, .maze3, .maze4,
             .maze5, .mirrorRoomSouth, .northSouthPassage, .reservoir, .reservoirSouth, .roundRoom,
@@ -30,7 +45,7 @@ enum Thief {
         )
     )
 
-    static let stiletto = Item(
+    let stiletto = Item(
         id: .stiletto,
         .name("stiletto"),
         .synonyms("stiletto", "knife", "blade"),
@@ -43,7 +58,7 @@ enum Thief {
         .in(.item(.thief))
     )
 
-    static let largeBag = Item(
+    let largeBag = Item(
         id: .largeBag,
         .name("large bag"),
         .synonyms("bag", "sack"),
@@ -54,9 +69,11 @@ enum Thief {
         .capacity(1000),  // Large capacity for stolen treasures
         .in(.item(.thief))
     )
+}
 
-    // MARK: - Event Handlers
+// MARK: - Event Handlers
 
+extension Thief {
     /// Main thief character handler with sophisticated AI behavior
     static let thiefHandler = ItemEventHandler(for: .thief) {
         before(.examine) { _, _ in
