@@ -80,7 +80,7 @@ public struct ExamineActionHandler: ActionHandler {
             case .universal(let universal):
                 addMessage(
                     universal.withDefiniteArticle,
-                    context.msg.nothingSpecialAbout(universal.description)
+                    context.msg.nothingSpecialAbout(universal.withDefiniteArticle)
                 )
             }
         }

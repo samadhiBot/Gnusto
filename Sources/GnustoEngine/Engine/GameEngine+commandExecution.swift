@@ -83,6 +83,11 @@ extension GameEngine {
                     continue
                 }
 
+                // Ensure item is present before calling handler
+                guard try await itemProxy.hasSameLocationAsPlayer else {
+                    continue
+                }
+
                 do {
                     if let result = try await itemHandler.handle(self, .beforeTurn(command)) {
                         // Object handler returned a result, process it
@@ -110,7 +115,8 @@ extension GameEngine {
             actionResponse == nil,
             !command.isAllCommand,
             case .item(let itemProxy) = command.indirectObject,
-            let itemHandler = itemEventHandlers[itemProxy.id]
+            let itemHandler = itemEventHandlers[itemProxy.id],
+            try await itemProxy.hasSameLocationAsPlayer
         {
             do {
                 if let result = try await itemHandler.handle(self, .beforeTurn(command)) {
@@ -243,6 +249,11 @@ extension GameEngine {
                     continue
                 }
 
+                // Ensure item is present before calling handler
+                guard try await itemProxy.hasSameLocationAsPlayer else {
+                    continue
+                }
+
                 do {
                     if let result = try await itemHandler.handle(self, .afterTurn(command)) {
                         let shouldYield = try await processEventResult(result)
@@ -261,7 +272,8 @@ extension GameEngine {
 
         // 2. Check Indirect Object AfterTurn Handler
         if case .item(let itemProxy) = command.indirectObject,
-            let itemHandler = itemEventHandlers[itemProxy.id]
+            let itemHandler = itemEventHandlers[itemProxy.id],
+            try await itemProxy.hasSameLocationAsPlayer
         {
             do {
                 if let result = try await itemHandler.handle(self, .afterTurn(command)) {

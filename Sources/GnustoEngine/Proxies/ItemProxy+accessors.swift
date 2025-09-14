@@ -292,6 +292,27 @@ extension ItemProxy {
         return anyPropertyIDs.isEmpty
     }
 
+    /// Whether this item is in the same location as the player.
+    ///
+    /// Returns `true` if both the item and the player are currently in the same location.
+    /// This is useful for determining if items are accessible to the player or for
+    /// location-based game logic. Returns `false` if either the item or player has
+    /// no location, or if they're in different locations.
+    ///
+    /// This check only considers direct location placement - items inside containers
+    /// that are in the player's location will return `false` unless the container
+    /// itself is being checked.
+    public var hasSameLocationAsPlayer: Bool {
+        get async throws {
+            if try await playerIsHolding {
+                return true
+            }
+            let playerLocation = try await engine.player.location
+            let itemLocation = try await location
+            return itemLocation == playerLocation
+        }
+    }
+
     /// Checks if this item is allowed to be in the specified location.
     ///
     /// This method determines whether the item can be placed in or moved to a given location
@@ -468,12 +489,37 @@ extension ItemProxy {
         }
     }
 
+    /// The ultimate location where this item resides, computed recursively.
+    ///
+    /// This property traverses the containment hierarchy to find the final location
+    /// where this item exists. For example:
+    /// - If a sandwich is directly in a kitchen, returns the kitchen location
+    /// - If a sandwich is in a bag in a kitchen, still returns the kitchen location
+    /// - If a sandwich is in a bag held by the player in a kitchen, returns the kitchen location
+    /// - Returns `nil` if the item is nowhere or in an unresolvable containment chain
+    ///
+    /// This is useful for determining lighting, accessibility, and spatial relationships
+    /// regardless of how deeply nested an item is within containers.
+    ///
+    /// Corresponds to the ZIL `LOC` function which recursively finds an object's location.
     public var location: LocationProxy? {
         get async throws {
-            if case .location(let location) = try await parent {
-                location
-            } else {
-                nil
+            var currentParent = try await parent
+
+            // Traverse up the containment chain until we find a location or reach the end
+            while true {
+                switch currentParent {
+                case .location(let locationProxy):
+                    return locationProxy
+                case .item(let itemProxy):
+                    // Continue searching up the chain through this item's parent
+                    currentParent = try await itemProxy.parent
+                case .player:
+                    // Player is in a location, so get the player's location
+                    return try await engine.player.location
+                case .nowhere:
+                    return nil
+                }
             }
         }
     }

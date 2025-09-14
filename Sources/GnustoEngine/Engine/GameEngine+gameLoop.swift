@@ -132,12 +132,7 @@ extension GameEngine {
 
         // 8. Timed events happen AFTER the player's action is complete (or failed).
         if !shouldQuit && !shouldRestart && shouldConsumeTurn {
-            do {
-                // Only process timed events if the command consumed a turn.
-                try await tickClock()
-            } catch {
-                logError("Error processing timed events: \(error)")
-            }
+            try await tickClock()
         }
     }
 

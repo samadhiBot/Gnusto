@@ -98,13 +98,30 @@ struct ThiefTests {
         let (engine, mockIO) = try await setup()
 
         // When
-        try await engine.execute("examine thief")
+        try await engine.execute(
+            "look at the floor",
+            "examine thief"
+        )
 
         // Then
         let output = await mockIO.flush()
         expectNoDifference(
             output,
             """
+            > go east
+            --- Round Room ---
+
+            This is a circular stone room with passages in all directions.
+            Several of them have unfortunate endings.
+
+            > look at the floor
+            The ground reveals itself to be exactly what it
+            appears--nothing more, nothing less.
+
+            Someone carrying a large bag is casually leaning against one of
+            the walls here. He does not speak, but it is clear from his
+            aspect that the bag will be taken only over his dead body.
+
             > examine thief
             The thief is a slippery character with beady eyes that flit
             back and forth. He carries, along with an unmistakable
@@ -598,9 +615,11 @@ struct ThiefTests {
 
         // Then - verify theft system is operational
         let thiefItems = try await engine.item(.largeBag).contents
-        expectNoDifference(thiefItems, [
-            diamond, potOfGold, skull
-        ])
+        expectNoDifference(
+            thiefItems,
+            [
+                diamond, potOfGold, skull,
+            ])
 
         #expect(try await engine.player.inventory.isEmpty)
     }
