@@ -86,10 +86,11 @@ struct ForestTests {
             On the ground is a pile of leaves.
 
             > examine grating
-            The grating is closed.
+            Your scrutiny of the grating yields no hidden depths or secret
+            purposes.
 
             >
-            Until we meet again in another tale...
+            May your adventures elsewhere prove fruitful!
             """
         )
     }

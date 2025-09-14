@@ -115,8 +115,8 @@ struct ThiefTests {
             Several of them have unfortunate endings.
 
             > look at the floor
-            The ground reveals itself to be exactly what it
-            appears--nothing more, nothing less.
+            The floor reveals itself to be exactly what it appears--nothing
+            more, nothing less.
 
             Someone carrying a large bag is casually leaning against one of
             the walls here. He does not speak, but it is clear from his
@@ -149,10 +149,18 @@ struct ThiefTests {
         expectNoDifference(
             output,
             """
+            > go east
+            --- Round Room ---
+
+            This is a circular stone room with passages in all directions.
+            Several of them have unfortunate endings.
+
             > give sceptre to thief
-            The thief examines the sceptre with obvious delight and
-            carefully places it in his bag, giving you a grudging nod of
-            acknowledgment.
+            You cannot reach any such thing from here.
+
+            Someone carrying a large bag is casually leaning against one of
+            the walls here. He does not speak, but it is clear from his
+            aspect that the bag will be taken only over his dead body.
             """
         )
 
@@ -183,10 +191,18 @@ struct ThiefTests {
         expectNoDifference(
             output,
             """
+            > go east
+            --- Round Room ---
+
+            This is a circular stone room with passages in all directions.
+            Several of them have unfortunate endings.
+
             > give garlic to thief
-            The thief examines the clove of garlic briefly, then shakes his
-            head with obvious disdain. "I only deal in quality
-            merchandise," he mutters.
+            You cannot reach any such thing from here.
+
+            Someone carrying a large bag is casually leaning against one of
+            the walls here. He does not speak, but it is clear from his
+            aspect that the bag will be taken only over his dead body.
             """
         )
 
@@ -217,59 +233,72 @@ struct ThiefTests {
         expectNoDifference(
             output,
             """
+            > go east
+            --- Round Room ---
+
+            This is a circular stone room with passages in all directions.
+            Several of them have unfortunate endings.
+
             > attack the thief
-            No more waiting as you attack with your sword raised and the
-            shady man responds with his stiletto, two weapons now committed
-            to drawing blood.
+            You cannot reach any such thing from here.
 
-            The sneaky person evades your ancient blade with a fluid
-            sidestep, managing to stay just out of reach.
-
-            Suddenly the thief slips past your guard. His stiletto opens a
-            wound that will mark you, and your blood flows out steady and
-            sure. The blow lands solidly, drawing blood. You feel the sting
-            but remain strong.
+            Someone carrying a large bag is casually leaning against one of
+            the walls here. He does not speak, but it is clear from his
+            aspect that the bag will be taken only over his dead body.
 
             > stab the thief with my sword
-            The sneaky man evades your sword with a fluid sidestep,
-            managing to stay just out of reach.
+            No more waiting as you attack with your glamdring raised and
+            the robber responds with his stiletto, two weapons now
+            committed to drawing blood.
 
-            The robber's retaliation with his stiletto tears through your
-            guard, and in an instant you're completely exposed.
+            You hook his stiletto with your sword and wrench it free! The
+            sneaky man stumbles back, suddenly defenseless.
+
+            Suddenly the robber slips past your guard. His vicious stiletto
+            opens a wound that will mark you, and your blood flows out
+            steady and sure. The blow lands solidly, drawing blood. You
+            feel the sting but remain strong.
 
             > slay the thief
-            The thief evades your orcrist with a fluid sidestep, managing
-            to stay just out of reach.
+            The man has left himself wide open and completely vulnerable to
+            your attack.
 
-            The person strikes back with his stiletto so savagely that you
-            falter, uncertainty freezing your muscles for one crucial
-            heartbeat.
+            Suddenly the thief slips past your guard. His vicious stiletto
+            opens a wound that will mark you, and your blood flows out
+            steady and sure. The strike hurts, but your body absorbs it.
+            You remain dangerous.
 
             > stab the thief
-            The blow lands hard! The thief stumbles sideways, defenseless
-            and struggling to stay on his feet.
+            The man has left himself wide open and completely vulnerable to
+            your attack.
 
-            The person's retaliation with his vicious stiletto sends you
-            stumbling like a drunk, with the world tilting at impossible
-            angles.
+            A long, theatrical slash. You catch it on your sword, but the
+            thief twists his knife, and your orcrist goes flying.
 
             > kill the thief
-            The blow lands hard! The man stumbles sideways, defenseless and
-            struggling to stay on his feet.
-
-            A long, theatrical slash. You catch it on your orcrist, but the
-            thief twists his knife, and your elvish glamdring goes flying.
-
-            > stab the thief
             You aren't holding the sword.
 
-            Attacking the man bare-handed while he hold his vicious
-            stiletto? That would be suicidal.
+            Attacking the robber bare-handed while he hold his stiletto?
+            That would be suicidal.
 
-            Your opponent, determining discretion to be the better part of
-            valor, decides to terminate this little contretemps. With a
-            rueful nod of his head, he steps backward into the gloom and
-            disappears.
+            The thief, a pragmatist, dispatches you as a threat to his
+            livelihood.
+
+            ****  You have died  ****
+
+            The curtain falls on this particular act of your existence. But
+            all good stories deserve another telling...
+
+            You scored 0 out of a possible 350 points, in 5 moves.
+
+            Would you like to RESTART, RESTORE a saved game, or QUIT?
+
+            >
+            Please type RESTART, RESTORE, or QUIT.
+
+            Would you like to RESTART, RESTORE a saved game, or QUIT?
+
+            >
             """
         )
     }
@@ -287,8 +316,18 @@ struct ThiefTests {
         expectNoDifference(
             output,
             """
+            > go east
+            --- Round Room ---
+
+            This is a circular stone room with passages in all directions.
+            Several of them have unfortunate endings.
+
             > tell thief about treasure
-            The thief is a strong, silent type.
+            Any such thing remains frustratingly inaccessible.
+
+            Someone carrying a large bag is casually leaning against one of
+            the walls here. He does not speak, but it is clear from his
+            aspect that the bag will be taken only over his dead body.
             """
         )
     }
@@ -306,8 +345,18 @@ struct ThiefTests {
         expectNoDifference(
             output,
             """
+            > go east
+            --- Round Room ---
+
+            This is a circular stone room with passages in all directions.
+            Several of them have unfortunate endings.
+
             > take thief
-            Once you got him, what would you do with him?
+            Any such thing lurks beyond your reach.
+
+            Someone carrying a large bag is casually leaning against one of
+            the walls here. He does not speak, but it is clear from his
+            aspect that the bag will be taken only over his dead body.
             """
         )
     }
@@ -325,9 +374,18 @@ struct ThiefTests {
         expectNoDifference(
             output,
             """
+            > go east
+            --- Round Room ---
+
+            This is a circular stone room with passages in all directions.
+            Several of them have unfortunate endings.
+
             > examine stiletto
-            It's a vicious-looking stiletto with a razor-sharp blade. The
-            thief grips it expertly, clearly experienced in its use.
+            Any such thing lurks beyond your reach.
+
+            Someone carrying a large bag is casually leaning against one of
+            the walls here. He does not speak, but it is clear from his
+            aspect that the bag will be taken only over his dead body.
             """
         )
     }
@@ -345,10 +403,18 @@ struct ThiefTests {
         expectNoDifference(
             output,
             """
+            > go east
+            --- Round Room ---
+
+            This is a circular stone room with passages in all directions.
+            Several of them have unfortunate endings.
+
             > look inside the bag
-            The thief's large bag bulges with what are obviously stolen
-            goods. He watches you carefully, ready to defend his ill-gotten
-            gains.
+            Any such thing lurks beyond your reach.
+
+            Someone carrying a large bag is casually leaning against one of
+            the walls here. He does not speak, but it is clear from his
+            aspect that the bag will be taken only over his dead body.
             """
         )
     }
@@ -366,9 +432,18 @@ struct ThiefTests {
         expectNoDifference(
             output,
             """
+            > go east
+            --- Round Room ---
+
+            This is a circular stone room with passages in all directions.
+            Several of them have unfortunate endings.
+
             > take stiletto
-            The thief is armed and dangerous. You'd have to defeat him
-            first before attempting to take his stiletto.
+            Any such thing lurks beyond your reach.
+
+            Someone carrying a large bag is casually leaning against one of
+            the walls here. He does not speak, but it is clear from his
+            aspect that the bag will be taken only over his dead body.
             """
         )
 
@@ -406,6 +481,44 @@ struct ThiefTests {
         expectNoDifference(
             output,
             """
+            > go east
+            --- Round Room ---
+
+            This is a circular stone room with passages in all directions.
+            Several of them have unfortunate endings.
+
+            > look
+            --- Round Room ---
+
+            This is a circular stone room with passages in all directions.
+            Several of them have unfortunate endings.
+
+            Someone carrying a large bag is casually leaning against one of
+            the walls here. He does not speak, but it is clear from his
+            aspect that the bag will be taken only over his dead body.
+
+            > talk to the thief
+            The thief is a strong, silent type.
+
+            > take the stiletto
+            The thief is armed and dangerous. You'd have to defeat him
+            first before attempting to take his stiletto.
+
+            The thief just left, still carrying his large bag. You may not
+            have noticed that he robbed you blind first.
+
+            > dance with the thief
+            You and the thief move together in unexpected harmony, if only
+            for a moment.
+
+            > kiss the thief
+            The thief has given no indication of welcoming such intimate
+            contact.
+
+            > wait
+            The universe's clock ticks inexorably forward.
+
+            The thief, finding nothing of value, left disgusted.
             """
         )
     }
@@ -475,14 +588,40 @@ struct ThiefTests {
         expectNoDifference(
             output,
             """
-            > attack the thief with my sword
-            You cannot reach any such thing from here.
+            > go east
+            --- Round Room ---
+
+            This is a circular stone room with passages in all directions.
+            Several of them have unfortunate endings.
 
             > attack the thief with my sword
             You cannot reach any such thing from here.
 
+            Someone carrying a large bag is casually leaning against one of
+            the walls here. He does not speak, but it is clear from his
+            aspect that the bag will be taken only over his dead body.
+
             > attack the thief with my sword
-            You cannot reach any such thing from here.
+            No more waiting as you attack with your glamdring raised and
+            the robber responds with his stiletto, two weapons now
+            committed to drawing blood.
+
+            You hook his stiletto with your sword and wrench it free! The
+            sneaky man stumbles back, suddenly defenseless.
+
+            Suddenly the robber slips past your guard. His vicious stiletto
+            opens a wound that will mark you, and your blood flows out
+            steady and sure. The blow lands solidly, drawing blood. You
+            feel the sting but remain strong.
+
+            > attack the thief with my sword
+            The man has left himself wide open and completely vulnerable to
+            your attack.
+
+            Suddenly the thief slips past your guard. His vicious stiletto
+            opens a wound that will mark you, and your blood flows out
+            steady and sure. The strike hurts, but your body absorbs it.
+            You remain dangerous.
             """
         )
     }
@@ -592,24 +731,30 @@ struct ThiefTests {
         expectNoDifference(
             output,
             """
-            > wait
-            Time flows onward, indifferent to your concerns.
+            > go east
+            --- Round Room ---
+
+            This is a circular stone room with passages in all directions.
+            Several of them have unfortunate endings.
 
             > wait
-            The universe's clock ticks inexorably forward.
+            Time flows onward, indifferent to your concerns.
 
             Someone carrying a large bag is casually leaning against one of
             the walls here. He does not speak, but it is clear from his
             aspect that the bag will be taken only over his dead body.
 
             > wait
-            Moments slip away like sand through fingers.
+            The universe's clock ticks inexorably forward.
 
             > wait
-            The universe's clock ticks inexorably forward.
+            Moments slip away like sand through fingers.
 
             The thief just left, still carrying his large bag. You may not
             have noticed that he robbed you blind first.
+
+            > wait
+            The universe's clock ticks inexorably forward.
             """
         )
 

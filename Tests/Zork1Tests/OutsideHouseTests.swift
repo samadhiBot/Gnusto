@@ -60,11 +60,11 @@ struct OutsideHouseTests {
             The universe denies your request to open the door.
 
             > take boards
-            The boards are securely fastened.
+            You cannot take the board, much as you might wish otherwise.
 
             > look at the house
-            The house is a beautiful colonial house which is painted white.
-            It is clear that the owners must have been extremely wealthy.
+            The white house stubbornly remains ordinary despite your
+            thorough examination.
 
             >
             May your adventures elsewhere prove fruitful!
@@ -96,11 +96,11 @@ struct OutsideHouseTests {
             smelling of hot peppers.
 
             > open sack
-            Opening the brown sack brings a clove of garlic and a lunch
-            into the light.
+            The brown sack parts to disclose a clove of garlic and a lunch,
+            previously hidden from view.
 
             > inventory
-            You carry nothing but your own thoughts.
+            You are unburdened by material possessions.
 
             > take all
             You take the glass bottle and the brown sack.
@@ -151,7 +151,7 @@ struct OutsideHouseTests {
             There is a small mailbox here.
 
             > take the boards
-            The boards are securely fastened.
+            You cannot take the board, much as you might wish otherwise.
 
             > north
             --- North of House ---
@@ -161,7 +161,7 @@ struct OutsideHouseTests {
             narrow path winds through the trees.
 
             > take the boards
-            The boards are securely fastened.
+            The universe denies your request to take the board.
 
             > east
             --- Behind House ---
@@ -174,7 +174,7 @@ struct OutsideHouseTests {
             The window is slightly ajar, but not enough to allow entry.
 
             > look through the window
-            You can see what appears to be a kitchen.
+            The window is slightly ajar, but not enough to allow entry.
 
             > take the window
             You cannot take the kitchen window, much as you might wish
@@ -187,10 +187,10 @@ struct OutsideHouseTests {
             door here, and all the windows are boarded.
 
             > take the boards
-            The boards are securely fastened.
+            You cannot take the board, much as you might wish otherwise.
 
             >
-            Until we meet again in another tale...
+            May your adventures elsewhere prove fruitful!
             """
         )
     }
@@ -231,10 +231,10 @@ struct OutsideHouseTests {
             the trophy case hangs an elvish sword of great antiquity.
 
             > take lamp
-            Got it.
+            Acquired.
 
             > take sword
-            Acquired.
+            Got it.
 
             > examine lamp
             The lamp is turned off.
@@ -262,7 +262,7 @@ struct OutsideHouseTests {
             Got it.
 
             > take knife
-            Got it.
+            Acquired.
 
             > inventory
             You are carrying:
@@ -311,14 +311,14 @@ struct OutsideHouseTests {
             smelling of hot peppers.
 
             > take sack
-            Got it.
+            Acquired.
 
             > examine sack
             The brown sack is closed.
 
             > open sack
-            The brown sack parts to disclose a clove of garlic and a lunch,
-            previously hidden from view.
+            Opening the brown sack brings a clove of garlic and a lunch
+            into the light.
 
             > examine sack
             The brown sack contains a clove of garlic and a lunch.
@@ -330,7 +330,7 @@ struct OutsideHouseTests {
             Got it.
 
             > take bottle
-            Got it.
+            Acquired.
 
             > examine bottle
             The glass bottle contains a quantity of water.
@@ -360,7 +360,7 @@ struct OutsideHouseTests {
             - A brown sack
 
             >
-            Until we meet again in another tale...
+            May your adventures elsewhere prove fruitful!
             """
         )
     }

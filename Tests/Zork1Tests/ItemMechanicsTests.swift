@@ -47,7 +47,7 @@ struct ItemMechanicsTests {
             The lamp is turned off.
 
             > turn on the lamp
-            You successfully turn on the brass lantern.
+            With practiced efficiency, you turn on the brass lantern.
 
             > inventory
             You are carrying:
@@ -66,7 +66,7 @@ struct ItemMechanicsTests {
             nasty-looking knife.
 
             > take rope
-            Acquired.
+            Got it.
 
             > take knife
             Got it.
@@ -117,14 +117,14 @@ struct ItemMechanicsTests {
             smelling of hot peppers.
 
             > take sack
-            Got it.
+            Acquired.
 
             > examine sack
             The brown sack is closed.
 
             > open sack
-            The brown sack parts to disclose a clove of garlic and a lunch,
-            previously hidden from view.
+            Opening the brown sack brings a clove of garlic and a lunch
+            into the light.
 
             > examine sack
             The brown sack contains a clove of garlic and a lunch.
@@ -136,7 +136,7 @@ struct ItemMechanicsTests {
             Got it.
 
             > take bottle
-            Got it.
+            Acquired.
 
             > examine it
             The glass bottle contains a quantity of water.
@@ -163,7 +163,7 @@ struct ItemMechanicsTests {
             - A brown sack
 
             >
-            Until we meet again in another tale...
+            May your adventures elsewhere prove fruitful!
             """
         )
     }
@@ -200,7 +200,7 @@ struct ItemMechanicsTests {
             the trophy case hangs an elvish sword of great antiquity.
 
             > take the lamp
-            Got it.
+            Acquired.
 
             > examine it
             The lamp is turned off.
@@ -214,7 +214,7 @@ struct ItemMechanicsTests {
             It is pitch black. You are likely to be eaten by a grue.
 
             > light the lamp
-            With practiced efficiency, you light the brass lantern.
+            You successfully light the brass lantern.
 
             --- Attic ---
 
