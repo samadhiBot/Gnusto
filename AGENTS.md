@@ -145,14 +145,14 @@ func testSomething() async throws {
 ### Critical Testing Rules
 - **ALWAYS test through the full engine pipeline** using `engine.execute("command")`
 - **NEVER test action handlers in isolation** - this bypasses the parser and misses integration bugs
-- **ALWAYS include command echo** in test expectations (the `> command` line)
-- ALWAYS test exact mockIO output with `expectNoDifference(expected, actual)`, NEVER rely on `output.contains("expected")`
+- ALWAYS test exact mockIO output with `expectNoDifference(expected, actual)`
+- NEVER rely on `output.contains("expected")`
 
-### Diffs
+### Game Output Diffs
 
 Diff legend:
-  - lines are actual output
-  + lines are expected output
+  - lines are actual output from the game engine
+  + lines are the output expected by the test 
 
 You are blind to the difference between the following two lines. The first uses a curly apostrophe, and the second uses a straight apostrophe. If there is a failing test with an apostrophe or quote, and you cannot see the difference, leave the test for me and I will fix it.
 

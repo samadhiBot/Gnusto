@@ -17,8 +17,7 @@ struct OperaHouse {
             .south(.bar),
             .west(.cloakroom),
             .north(
-                blocked:
-                    """
+                blocked: """
                     You've only just arrived, and besides, the weather outside
                     seems to be getting worse.
                     """
@@ -171,9 +170,8 @@ struct OperaHouse {
 
     let hookHandler = ItemEventHandler(for: .hook) {
         before(.examine) { context, command in
-            let cloak = try await context.engine.item(.cloak)
             let hookDetail =
-                if try await cloak.parent == .item(context.item) {
+                if try await context.item.isHolding(.cloak) {
                     "with a cloak hanging on it"
                 } else {
                     "screwed to the wall"
