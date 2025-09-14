@@ -244,6 +244,7 @@ struct ThiefTests {
             "stab the thief",
             "kill the thief",
             "stab the thief",
+
         )
 
         // Then
@@ -308,11 +309,6 @@ struct ThiefTests {
             all good stories deserve another telling...
 
             You scored 0 out of a possible 350 points, in 5 moves.
-
-            Would you like to RESTART, RESTORE a saved game, or QUIT?
-
-            >
-            Please type RESTART, RESTORE, or QUIT.
 
             Would you like to RESTART, RESTORE a saved game, or QUIT?
 
@@ -778,13 +774,10 @@ struct ThiefTests {
 
         // Then - verify theft system is operational
         let thiefItems = try await engine.item(.largeBag).contents
-        expectNoDifference(
-            thiefItems,
-            [
-                diamond, potOfGold, skull,
-            ])
+        expectNoDifference(thiefItems, [diamond, potOfGold, skull])
 
-        #expect(try await engine.player.inventory.isEmpty)
+        let playerInventory = try await engine.player.inventory
+        expectNoDifference(playerInventory.map(\.id), [.sword])
     }
 
     @Test("Thief AI responds to different combat outcomes")

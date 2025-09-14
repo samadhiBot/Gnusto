@@ -33,10 +33,7 @@ struct FormattingTests {
             There is a small mailbox here.
 
             >
-            The universe awaits your command.
-
-            >
-            Until we meet again in another tale...
+            May your adventures elsewhere prove fruitful!
             """
         )
     }

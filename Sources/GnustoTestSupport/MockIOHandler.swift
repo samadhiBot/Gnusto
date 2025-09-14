@@ -103,9 +103,10 @@ public final class MockIOHandler: IOHandler {
         markdownParser = MarkdownParser.testParser()
         let setupCommands = setup.components(separatedBy: .newlines).filter(\.isNotEmpty)
         if commands.count == 1, let multi = commands.first??.components(separatedBy: .newlines) {
-            inputQueue = setupCommands + multi
+            inputQueue = setupCommands + multi.filter(\.isNotEmpty)
         } else {
-            inputQueue = setupCommands + commands
+            // Preserve nil values (EOF simulation) but convert empty strings to nil
+            inputQueue = setupCommands + commands.map { $0?.isEmpty == true ? nil : $0 }
         }
         setupCommandCount = setupCommands.count
     }
@@ -226,9 +227,10 @@ public final class MockIOHandler: IOHandler {
                 // Main command (like "> quit")
                 actualTranscript += call.text
                 if call.newline {
-                    actualTranscript = actualTranscript.trimmingCharacters(
-                        in: .whitespacesAndNewlines
-                    ) + .linebreak
+                    actualTranscript =
+                        actualTranscript.trimmingCharacters(
+                            in: .whitespacesAndNewlines
+                        ) + .linebreak
                 }
             } else if call.style == .input && !call.newline {
                 // Check if the next call is a user response to this prompt
@@ -244,17 +246,19 @@ public final class MockIOHandler: IOHandler {
                     if call.text == "> " {
                         // For main prompt, combine prompt and response on same line
                         actualTranscript += response.text
-                        actualTranscript = actualTranscript.trimmingCharacters(
-                            in: .whitespacesAndNewlines
-                        ) + .linebreak
+                        actualTranscript =
+                            actualTranscript.trimmingCharacters(
+                                in: .whitespacesAndNewlines
+                            ) + .linebreak
                         index += 1  // Skip the response since we handled it
                     } else {
                         // For custom prompts, keep response separate but don't add extra newline
                         actualTranscript += response.text
                         if response.newline {
-                            actualTranscript = actualTranscript.trimmingCharacters(
-                                in: .whitespacesAndNewlines
-                            ) + .linebreak
+                            actualTranscript =
+                                actualTranscript.trimmingCharacters(
+                                    in: .whitespacesAndNewlines
+                                ) + .linebreak
                         }
                         index += 1  // Skip the response since we handled it
                     }
@@ -263,17 +267,19 @@ public final class MockIOHandler: IOHandler {
                     actualTranscript += call.text
 
                     // No user response (EOF case), add newline after prompt
-                    actualTranscript = actualTranscript.trimmingCharacters(
-                        in: .whitespacesAndNewlines
-                    ) + .linebreak
+                    actualTranscript =
+                        actualTranscript.trimmingCharacters(
+                            in: .whitespacesAndNewlines
+                        ) + .linebreak
                 }
             } else if call.style == .input && call.newline {
                 // User response to a prompt (if not already handled above)
                 actualTranscript += call.text
                 if call.newline {
-                    actualTranscript = actualTranscript.trimmingCharacters(
-                        in: .whitespacesAndNewlines
-                    ) + .linebreak
+                    actualTranscript =
+                        actualTranscript.trimmingCharacters(
+                            in: .whitespacesAndNewlines
+                        ) + .linebreak
                 }
             } else if call.style != .input {
                 actualTranscript += call.text
