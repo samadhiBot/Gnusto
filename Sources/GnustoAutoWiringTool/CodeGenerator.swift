@@ -98,7 +98,7 @@ struct CodeGenerator {
                 || !gameData.combatSystems.isEmpty || !gameData.combatMessengers.isEmpty
                 || !gameData.itemComputeHandlers.isEmpty
                 || !gameData.locationComputeHandlers.isEmpty || !gameData.daemons.isEmpty
-                || !gameData.fuses.isEmpty || hasComputeHandlersToGenerate(gameData)
+                || !gameData.fuses.isEmpty
             {
                 output.append("extension \(gameBlueprintType) {")
 
@@ -703,33 +703,6 @@ struct CodeGenerator {
 
                     extensionLines.append("    }")
                     extensionLines.append("")
-                } else if hasItemsToGenerate(gameData) {
-                    // Generate scaffolding if no compute handlers found but items exist
-                    extensionLines.append(
-                        "    // TODO: Add compute handlers for dynamic item properties")
-                    extensionLines.append("    // Example:")
-                    extensionLines.append("    // var itemComputers: [ItemID: ItemComputer] {")
-                    extensionLines.append("    //     [")
-                    for itemProperty in gameData.items.sorted().prefix(3) {
-                        extensionLines.append(
-                            "    //         .\(extractItemID(from: itemProperty)): ItemComputer { propertyID, gameState in"
-                        )
-                        extensionLines.append("    //             switch propertyID {")
-                        extensionLines.append("    //             case .description:")
-                        extensionLines.append(
-                            "    //                 let item = gameState.items[.\(extractItemID(from: itemProperty))]!"
-                        )
-                        extensionLines.append(
-                            "    //                 return .string(\"Dynamic description for \\(item.name)\")"
-                        )
-                        extensionLines.append("    //             default:")
-                        extensionLines.append("    //                 return nil")
-                        extensionLines.append("    //             }")
-                        extensionLines.append("    //         },")
-                    }
-                    extensionLines.append("    //     ]")
-                    extensionLines.append("    // }")
-                    extensionLines.append("")
                 }
 
                 // Generate locationComputers property
@@ -799,34 +772,6 @@ struct CodeGenerator {
 
                     extensionLines.append("    }")
                     extensionLines.append("")
-                } else if hasLocationsToGenerate(gameData) {
-                    // Generate scaffolding if no compute handlers found but locations exist
-                    extensionLines.append(
-                        "    // TODO: Add compute handlers for dynamic location properties")
-                    extensionLines.append("    // Example:")
-                    extensionLines.append(
-                        "    // var locationComputers: [LocationID: LocationComputer] {")
-                    extensionLines.append("    //     [")
-                    for locationProperty in gameData.locations.sorted().prefix(3) {
-                        extensionLines.append(
-                            "    //         .\(extractLocationID(from: locationProperty)): LocationComputer { propertyID, gameState in"
-                        )
-                        extensionLines.append("    //             switch propertyID {")
-                        extensionLines.append("    //             case .description:")
-                        extensionLines.append(
-                            "    //                 let location = gameState.locations[.\(extractLocationID(from: locationProperty))]!"
-                        )
-                        extensionLines.append(
-                            "    //                 return .string(\"Dynamic description for \\(location.name)\")"
-                        )
-                        extensionLines.append("    //             default:")
-                        extensionLines.append("    //                 return nil")
-                        extensionLines.append("    //             }")
-                        extensionLines.append("    //         },")
-                    }
-                    extensionLines.append("    //     ]")
-                    extensionLines.append("    // }")
-                    extensionLines.append("")
                 }
 
                 output.append(contentsOf: extensionLines)
@@ -836,29 +781,4 @@ struct CodeGenerator {
         }
     }
 
-    // MARK: - Helper methods
-
-    private func hasComputeHandlersToGenerate(_ gameData: GameData) -> Bool {
-        return hasItemsToGenerate(gameData) || hasLocationsToGenerate(gameData)
-    }
-
-    private func hasItemsToGenerate(_ gameData: GameData) -> Bool {
-        return !gameData.items.isEmpty
-    }
-
-    private func hasLocationsToGenerate(_ gameData: GameData) -> Bool {
-        return !gameData.locations.isEmpty
-    }
-
-    private func extractItemID(from propertyName: String) -> String {
-        // Try to extract the likely ItemID from the property name
-        // e.g., "magicSword" -> "magicSword", "sword" -> "sword"
-        return propertyName
-    }
-
-    private func extractLocationID(from propertyName: String) -> String {
-        // Try to extract the likely LocationID from the property name
-        // e.g., "livingRoom" -> "livingRoom", "room" -> "room"
-        return propertyName
-    }
 }
