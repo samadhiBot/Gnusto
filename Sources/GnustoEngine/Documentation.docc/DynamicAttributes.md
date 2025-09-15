@@ -22,105 +22,14 @@ Instead of working with `Item`, `Location`, or `Player` objects directly, you ac
 
 ```swift
 // Access through the engine returns proxy objects
-let swordProxy = try await engine.item(.magicSword)
-let roomProxy = try await engine.location(.magicRoom)
+let sword = try await engine.item(.magicSword)
+let room = try await engine.location(.magicRoom)
 let playerProxy = try await engine.player
 
 // Proxies provide access to both static and computed properties
-let damage = await swordProxy.damage  // Could be static or computed
-let description = await swordProxy.description  // Dynamic based on current state
-let isLit = await roomProxy.isLit     // Automatically computed
-```
-
-### GameBlueprint Approach (Recommended)
-
-The preferred way to define compute handlers is directly in your `GameBlueprint`:
-
-```swift
-struct MyGameBlueprint: GameBlueprint {
-    // ... other blueprint properties
-
-    var itemComputeHandlers: [ItemID: [PropertyID: ItemComputer.Handler]] {
-        [
-            .magicSword: [
-                .description: { staticItem, gameState in
-                    let enchantment = staticItem.properties["enchantmentLevel"]?.toInt ?? 0
-                    let desc = enchantment > 5 ? "A brilliantly glowing sword" : "A faintly shimmering blade"
-                    return .string(desc)
-                }
-            ],
-            .weatherVane: [
-                .direction: { staticItem, gameState in
-                    let windDirection = gameState.globalState["windDirection"]?.toString ?? "north"
-                    return .string(windDirection)
-                }
-            ]
-        ]
-    }
-
-    var locationComputeHandlers: [LocationID: [PropertyID: LocationComputer.Handler]] {
-        [
-            .magicRoom: [
-                .description: { staticLocation, gameState in
-                    let isEnchanted = gameState.globalState["roomEnchanted"] == true
-                    let desc = isEnchanted ? "The room sparkles with magical energy." : "The room appears ordinary."
-                    return .string(desc)
-                }
-            ]
-        ]
-    }
-}
-```
-
-### Auto-Generated Scaffolding
-
-When using the GnustoAutoWiringPlugin, it will generate helpful scaffolding in your GameBlueprint extension:
-
-```swift
-extension MyGameBlueprint {
-    // TODO: Add compute handlers for dynamic item properties
-    // Example:
-    // var itemComputeHandlers: [ItemID: [PropertyID: ItemComputer.Handler]] {
-    //     [
-    //         .sword: [
-    //             .description: { staticItem, gameState in
-    //                 return .string("Dynamic description for \(staticItem.name)")
-    //             }
-    //         ],
-    //     ]
-    // }
-
-    // TODO: Add compute handlers for dynamic location properties
-    // Example:
-    // var locationComputeHandlers: [LocationID: [PropertyID: LocationComputer.Handler]] {
-    //     [
-    //         .livingRoom: [
-    //             .description: { staticLocation, gameState in
-    //                 return .string("Dynamic description for \(staticLocation.name)")
-    //             }
-    //         ],
-    //     ]
-    // }
-}
-```
-
-## Runtime Registration Approach
-
-You can also register compute handlers at runtime through the engine's computer systems:
-
-```swift
-// Register after creating the engine
-await engine.itemComputer.register(itemID: .magicSword, propertyID: .description) { staticItem, gameState in
-    let enchantment = staticItem.properties["enchantmentLevel"]?.toInt ?? 0
-    let desc = enchantment > 5 ? "A brilliantly glowing sword" : "A faintly shimmering blade"
-    return .string(desc)
-}
-
-await engine.locationComputer.register(locationID: .magicRoom, propertyID: .description) { staticLocation, gameState in
-    let isEnchanted = gameState.globalState["roomEnchanted"] == true
-    let desc = isEnchanted ? "The room sparkles with magical energy." : "The room appears ordinary."
-    return .string(desc)
-}
+let damage = await sword.damage  // Could be static or computed
+let description = await sword.description  // Dynamic based on current state
+let isLit = await room.isLit     // Automatically computed
 ```
 
 ## Basic Usage with Proxies
@@ -131,15 +40,13 @@ Access properties through proxy objects, which automatically handle both static 
 
 ```swift
 // Get proxy objects from the engine
-let swordProxy = try await engine.item(.sword)
-let doorProxy = try await engine.item(.door)
-let caveProxy = try await engine.location(.cave)
+let sword = try await engine.item(.sword)
+let door = try await engine.item(.door)
+let cave = try await engine.location(.cave)
 
 // Access properties through proxies
-let sharpness = await swordProxy.property("sharpness", type: Int.self) ?? 0
-let description = await swordProxy.description
-let isOpen = await doorProxy.hasFlag(.isOpen)
-let temperature = await caveProxy.property("temperature", type: String.self) ?? "moderate"
+let description = await sword.description
+let isOpen = await door.hasFlag(.isOpen)
 ```
 
 ### Setting Properties (Respecting the Pipeline)
@@ -148,20 +55,20 @@ let temperature = await caveProxy.property("temperature", type: String.self) ?? 
 
 ```swift
 // Create StateChange using proxy builders
-let swordProxy = try await engine.item(.sword)
+let sword = try await engine.item(.sword)
 
 // Use proxy methods to create state changes
 return ActionResult(
     context.msg.swordSharpened(),
-    swordProxy.setProperty("sharpness", to: .int(8)),
-    swordProxy.setDescription("A gleaming blade")
+    sword.setProperty("sharpness", to: 8),
+    sword.setDescription("A gleaming blade")
 )
 
 // Flag operations through proxies
-let doorProxy = try await engine.item(.door)
+let door = try await engine.item(.door)
 return ActionResult(
     context.msg.doorOpens(),
-    doorProxy.setFlag(.isOpen)
+    door.setFlag(.isOpen)
 )
 ```
 
@@ -175,12 +82,12 @@ Validation works seamlessly with the proxy system:
 
 ```swift
 // Validation happens automatically when state changes are applied
-let doorProxy = try await engine.item(.door)
+let door = try await engine.item(.door)
 
 // This will automatically validate through registered handlers
 return ActionResult(
     context.msg.doorOpens(),
-    doorProxy.setFlag(.isOpen)  // Validation applied here
+    door.setFlag(.isOpen)  // Validation applied here
 )
 ```
 
@@ -247,28 +154,28 @@ The proxy system provides convenient builders for creating `StateChange` objects
 
 ```swift
 // Set properties through proxy objects
-let swordProxy = try await engine.item(.sword)
-let caveProxy = try await engine.location(.cave)
+let sword = try await engine.item(.sword)
+let cave = try await engine.location(.cave)
 
 // Proxy methods return StateChange objects
-let propertyChange = swordProxy.setProperty("customProp", to: .string("value"))
-let temperatureChange = caveProxy.setProperty("temperature", to: .int(72))
+let propertyChange = sword.setProperty("customProp", to: .string("value"))
+let temperatureChange = cave.setProperty("temperature", to: .int(72))
 ```
 
 ### Convenience Builders Through Proxies
 
 ```swift
 // Common patterns have dedicated builders on proxies
-let swordProxy = try await engine.item(.sword)
-let doorProxy = try await engine.item(.door)
-let roomProxy = try await engine.location(.room)
+let sword = try await engine.item(.sword)
+let door = try await engine.item(.door)
+let room = try await engine.location(.room)
 
 let changes = [
-    swordProxy.setDescription("A new description"),
-    doorProxy.setFlag(.isOpen),
-    roomProxy.clearFlag(.isLit),
-    swordProxy.setProperty("damage", to: .int(15)),
-    swordProxy.setProperty("material", to: .string("steel"))
+    sword.setDescription("A new description"),
+    door.setFlag(.isOpen),
+    room.clearFlag(.isLit),
+    sword.setProperty("damage", to: .int(15)),
+    sword.setProperty("material", to: .string("steel"))
 ]
 ```
 
@@ -310,10 +217,10 @@ The proxy system enables classic interactive fiction patterns while maintaining 
 
 ```swift
 // Similar to ZIL's FSET/FCLEAR for OPENBIT, but through proxies
-let chestProxy = try await engine.item(.chest)
+let chest = try await engine.item(.chest)
 return ActionResult(
     context.msg.chestOpens(),
-    chestProxy.setFlag(.isOpen)
+    chest.setFlag(.isOpen)
 )
 ```
 
@@ -321,10 +228,9 @@ return ActionResult(
 
 ```swift
 // Similar to ZIL's PUTP for changing descriptions, with safe proxy access
-let trollProxy = try await engine.item(.troll)
-let isActive = await trollProxy.hasFlag(.fighting)
+let troll = try await engine.item(.troll)
 
-let newDescription = if isActive {
+let newDescription = if await troll.isFighting {
     "A nasty-looking troll, brandishing a bloody axe, blocks all passages."
 } else {
     "An unconscious troll is sprawled on the floor."
@@ -332,7 +238,7 @@ let newDescription = if isActive {
 
 return ActionResult(
     context.msg.trollChangesState(),
-    trollProxy.setDescription(newDescription)
+    troll.setDescription(newDescription)
 )
 ```
 
@@ -340,15 +246,15 @@ return ActionResult(
 
 ```swift
 // Complex state changes with validation through the proxy system
-let trollProxy = try await engine.item(.troll)
-let axeProxy = try await engine.item(.axe)
+let troll = try await engine.item(.troll)
+let axe = try await engine.item(.axe)
 
 return ActionResult(
     context.msg.trollCollapses(),
-    trollProxy.setFlag(.unconscious),
-    trollProxy.clearFlag(.fighting),
-    axeProxy.setFlag(.isVisible),
-    axeProxy.setParent(.location(trollProxy.parent))
+    troll.setFlag(.unconscious),
+    troll.clearFlag(.fighting),
+    axe.setFlag(.isVisible),
+    axe.setParent(.location(troll.parent))
 )
 ```
 

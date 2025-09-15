@@ -48,10 +48,10 @@ All game state modifications must use the `StateChange` system. Action handlers 
 public func process(context: ActionContext) async throws -> ActionResult {
     // Process inbound command, validate correctness...
 
-    return ActionResult(
-        engine.messenger.taken(),
-        await engine.setFlag(.isTouched, on: targetItem),
-        await engine.updatePronouns(to: targetItem)
+    return try await ActionResult(
+        message,
+        item.setFlag(.isTouched),
+        item.clearFlag(.isInflated)
     )
 }
 ```
@@ -132,10 +132,9 @@ public func process(context: ActionContext) async throws -> ActionResult {
 
     let targetItem = try await context.engine.item(targetItemID)
 
-    return ActionResult(
+    return await ActionResult(
         context.msg.blowOn(item: targetItem.withDefiniteArticle),
-        targetItem.setFlag(.isTouched),
-        await context.engine.updatePronouns(to: targetItem)
+        targetItem.setFlag(.isTouched)
     )
 }
 ```
@@ -490,10 +489,6 @@ for directObjectRef in context.command.directObjects {
     // Process each object through proxy system...
     processedItems.append(item)
 }
-
-// Update pronouns appropriately
-let pronounChanges = await context.engine.updatePronouns(to: processedItems)
-allStateChanges.append(contentsOf: pronounChanges)
 ```
 
 ## Best Practices
@@ -584,11 +579,11 @@ let lampHandler = ItemEventHandler(for: .magicLamp) {
         // Custom examine behavior for magic lamp with proxy access
         let lamp = try await context.engine.item(.magicLamp)
         let glowLevel = await lamp.property("glowLevel", type: Int.self) ?? 0
-        
-        let message = glowLevel > 0 ? 
-            "The lamp glows with inner light..." : 
+
+        let message = glowLevel > 0 ?
+            "The lamp glows with inner light..." :
             "The lamp appears ordinary."
-            
+
         return ActionResult(message)
     }
 }

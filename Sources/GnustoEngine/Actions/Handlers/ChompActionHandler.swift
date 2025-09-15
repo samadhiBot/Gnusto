@@ -46,14 +46,6 @@ public struct ChompActionHandler: ActionHandler {
                     noMessage: context.msg.chompAbort(),
                     context: context
                 )
-//            return await YesNoQuestionHandler.askToDisambiguate(
-//                question: context.msg.doYouWantToEat(item.withDefiniteArticle),
-//                clarifiedCommand: Command(
-//                    verb: .eat,
-//                    directObject: context.command.directObject
-//                ),
-//                context: context
-//            )
         }
 
         return try await ActionResult(

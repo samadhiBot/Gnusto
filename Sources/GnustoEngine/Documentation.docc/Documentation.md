@@ -249,7 +249,7 @@ return ActionResult(
 // Custom games can override messages for their specific tone
 class MyGameMessenger: MessageProvider {
     override func taken() -> String {
-        return "You've successfully acquired the item!"
+        output("You've successfully acquired the item!")
     }
 }
 ```
@@ -328,7 +328,7 @@ If you prefer complete control or want to understand what's happening under the 
    }
    ```
 
-The choice is yours--use the plugin for convenience, or go manual for complete control!
+The choice is yours--use the plugin for convenience, or go manual for complete control.
 
 ## Where to Go Next
 
