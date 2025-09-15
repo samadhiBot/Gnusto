@@ -29,7 +29,7 @@ def parse_new_heredoc_content(diff)
         s = l.lstrip
         if s.start_with?('+ ')
             nil
-        elsif s.start_with?('- ') || s.start_with?('− ')
+        elsif s.start_with?('− ')
             s[2..-1].to_s.chomp
         else
             s.chomp

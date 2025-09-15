@@ -158,7 +158,6 @@ extension OutsideHouse {
         .adjectives("kitchen", "small"),
         .synonyms("window"),
         .in(.eastOfHouse),
-
         .isOpenable,
         .omitDescription
     )
