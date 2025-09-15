@@ -6,51 +6,46 @@ import Foundation
 /// By default, smelling the environment or a generic item doesn't reveal anything specific.
 /// Game developers can provide more detailed smell descriptions for particular items or
 /// locations by implementing custom `ItemEventHandler` or `LocationEventHandler` logic.
-struct SmellActionHandler: ActionHandler {
-    /// Validates the "SMELL" command.
-    ///
-    /// If a direct object is specified (e.g., "SMELL SWORD"), this method ensures that
-    /// the direct object refers to an item. Smelling non-item entities is not permitted
-    /// by this default handler.
-    ///
-    /// - Parameter context: The `ActionContext` for the current action.
-    /// - Throws: `ActionResponse.prerequisiteNotMet` if the direct object is not an item.
-    func validate(context: ActionContext) async throws {
-        // If a direct object is provided, it should be an item.
-        if let directObjectRef = context.command.directObject {
-            guard case .item(_) = directObjectRef else {
-                throw ActionResponse.prerequisiteNotMet("You can only smell items directly.")
-            }
-            // Further validation (existence, reachability) could be added if desired,
-            // but default SMELL is often lenient.
-        }
-    }
+public struct SmellActionHandler: ActionHandler {
+    // MARK: - Verb Definition Properties
+
+    public let syntax: [SyntaxRule] = [
+        .match(.verb),
+        .match(.verb, .directObject),
+    ]
+
+    public let synonyms: [Verb] = [.smell, .sniff]
+
+    public let requiresLight: Bool = false
+
+    // MARK: - Action Processing Methods
+
+    public init() {}
 
     /// Processes the "SMELL" command.
     ///
-    /// - If a direct object (which must be an item, due to `validate`) is specified,
-    ///   a generic response like "That smells about average." is returned.
-    /// - If no direct object is specified (i.e., smelling the ambient environment),
-    ///   a message like "You smell nothing unusual." is returned.
-    ///
-    /// Specific olfactory details for items or locations should be implemented via
-    /// more targeted handlers.
-    ///
-    /// - Parameter context: The `ActionContext` for the current action.
-    /// - Returns: An `ActionResult` with a default smell-related message.
-    func process(context: ActionContext) async throws -> ActionResult {
-        if let directObjectRef = context.command.directObject {
-            // Validate should have ensured this is an .item if directObjectRef is not nil.
-            // We don't need the itemID itself for the generic response.
-            guard case .item(_) = directObjectRef else {
-                // This case should ideally be caught by validate.
-                return ActionResult("You can't smell that.")
-            }
-            // If smelling a specific item, give a generic response.
-            // Specific items could be handled by ItemEventHandler or custom handlers.
-            return ActionResult("That smells about average.")
-        } else {
-            return ActionResult("You smell nothing unusual.")
+    /// This action provides olfactory responses to smelling. Can be used without objects
+    /// for general environmental smelling, or with objects for smelling specific items.
+    public func process(context: ActionContext) async throws -> ActionResult {
+        // Smell requires a direct object (what to smell)
+        guard
+            let item = try await context.itemDirectObject(
+                playerMessage: context.msg.smellSelf(context.verb),
+                failureMessage: context.msg.smellNothingUnusual(context.verb)
+            )
+        else {
+            throw ActionResponse.feedback(
+                context.msg.smellNothingUnusual(context.verb)
+            )
         }
+
+        return try await ActionResult(
+            item.response(
+                object: { context.msg.smellObject(context.verb, item: $0) },
+                character: { context.msg.smellCharacter(context.verb, character: $0) },
+                enemy: { context.msg.smellEnemy(context.verb, enemy: $0) },
+            ),
+            item.setFlag(.isTouched)
+        )
     }
 }

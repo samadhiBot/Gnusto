@@ -1,26 +1,71 @@
 import Foundation
 
 /// Handles the "QUIT" (or "Q") command, allowing the player to end the game session.
-struct QuitActionHandler: ActionHandler {
+public struct QuitActionHandler: ActionHandler {
+    // MARK: - Verb Definition Properties
 
-    // MARK: - ActionHandler Methods
+    public let syntax: [SyntaxRule] = [
+        .match(.verb)
+    ]
 
-    /// Validates the "QUIT" command.
-    /// Currently, quit requires no specific validation and always proceeds.
-    func validate(context: ActionContext) async throws {
-        // No validation needed for QUIT.
-    }
+    public let synonyms: [Verb] = [.quit, "q"]
+
+    public let requiresLight: Bool = false
+
+    public let consumesTurn: Bool = false
+
+    // MARK: - Action Processing Methods
+
+    public init() {}
 
     /// Processes the "QUIT" command.
     ///
-    /// This action requests the `GameEngine` to terminate the game and produces a
-    /// "Goodbye!" message. Future enhancements might include a confirmation step.
-    ///
-    /// - Parameter context: The `ActionContext` for the current action.
-    /// - Returns: An `ActionResult` containing the farewell message.
-    func process(context: ActionContext) async throws -> ActionResult {
-        await context.engine.requestQuit()
+    /// This action displays the player's current score and move count, then prompts
+    /// for confirmation before quitting. If confirmed, it requests the GameEngine
+    /// to terminate the game. If declined, the game continues.
+    public func process(context: ActionContext) async throws -> ActionResult {
+        let currentScore = await context.player.score
+        let currentMoves = await context.player.moves
+        let maxScore = context.engine.maximumScore
 
-        return ActionResult("Goodbye!")
+        // Print the prompt without a newline and get user input
+        await context.engine.ioHandler.print(
+            context.msg.quitScoreAndPrompt(
+                currentScore,
+                maxScore: maxScore,
+                moves: currentMoves
+            ),
+            style: .normal,
+            newline: false
+        )
+
+        guard let response = await context.engine.ioHandler.readLine(prompt: "") else {
+            // Handle EOF/nil input as quit confirmation
+            await context.engine.requestQuit()
+            return ActionResult(
+                context.msg.goodbye()
+            )
+        }
+
+        let trimmedResponse = response.trimmingCharacters(
+            in: .whitespacesAndNewlines
+        ).lowercased()
+
+        if ["yes", "y"].contains(trimmedResponse) {
+            // User confirmed quit
+            await context.engine.requestQuit()
+            return ActionResult(
+                context.msg.goodbye()
+            )
+        } else if ["no", "n"].contains(trimmedResponse) {
+            // User cancelled quit
+            return ActionResult(
+                context.msg.quitCancelled()
+            )
+        } else {
+            return ActionResult(
+                context.msg.yesNoFumble()
+            )
+        }
     }
 }

@@ -14,7 +14,23 @@ public struct FuseID: GnustoID {
     /// Initializes a `FuseID` with a raw string value.
     /// - Parameter rawValue: The string value for the ID.
     public init(rawValue: String) {
-        assert(!rawValue.isEmpty, "Fuse ID cannot be empty")
+        assert(rawValue.isNotEmpty, "Fuse ID cannot be empty")
         self.rawValue = rawValue
     }
+}
+
+// MARK: - Standard Engine Fuses
+
+extension FuseID {
+    /// Fuse for enemy recovery after being knocked unconscious.
+    public static let enemyWakeUp: FuseID = "enemyWakeUp"
+
+    /// Fuse for enemy returning after player was knocked unconscious.
+    public static let enemyReturn: FuseID = "enemyReturn"
+
+    /// Fuse for temporary status effects wearing off.
+    public static let statusEffectExpiry: FuseID = "statusEffectExpiry"
+
+    /// Fuse for delayed environmental changes.
+    public static let environmentalChange: FuseID = "environmentalChange"
 }

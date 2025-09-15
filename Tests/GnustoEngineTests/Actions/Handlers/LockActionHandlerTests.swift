@@ -1,441 +1,687 @@
 import CustomDump
+import GnustoEngine
+import GnustoTestSupport
 import Testing
-
-@testable import GnustoEngine
 
 @Suite("LockActionHandler Tests")
 struct LockActionHandlerTests {
+
+    // MARK: - Syntax Rule Testing
+
+    @Test("LOCK DIRECTOBJECT syntax works")
+    func testLockDirectObjectSyntax() async throws {
+        // Given
+        let door = Item(
+            id: "door",
+            .name("wooden door"),
+            .description("A wooden door."),
+            .isLockable,
+            .lockKey("key"),
+            .in(.startRoom)
+        )
+
+        let key = Item(
+            id: "key",
+            .name("brass key"),
+            .description("A brass key."),
+            .isTakable,
+            .in(.player)
+        )
+
+        let game = MinimalGame(
+            items: door, key
+        )
+
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // When
+        try await engine.execute("lock door")
+
+        // Then
+        let output = await mockIO.flush()
+        expectNoDifference(
+            output,
+            """
+            > lock door
+            Lock the wooden door with what?
+            """
+        )
+    }
+
+    @Test("LOCK DIRECTOBJECT WITH INDIRECTOBJECT syntax works")
+    func testLockDirectObjectWithIndirectObjectSyntax() async throws {
+        // Given
+        let chest = Item(
+            id: "chest",
+            .name("treasure chest"),
+            .description("A treasure chest."),
+            .isContainer,
+            .isLockable,
+            .lockKey("key"),
+            .in(.startRoom)
+        )
+
+        let key = Item(
+            id: "key",
+            .name("golden key"),
+            .description("A golden key."),
+            .isTakable,
+            .in(.player)
+        )
+
+        let game = MinimalGame(
+            items: chest, key
+        )
+
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // When
+        try await engine.execute("lock chest with key")
+
+        // Then
+        let output = await mockIO.flush()
+        expectNoDifference(
+            output,
+            """
+            > lock chest with key
+            The treasure chest is now locked.
+            """
+        )
+
+        let finalChestState = try await engine.item("chest")
+        let finalKeyState = try await engine.item("key")
+        #expect(await finalChestState.hasFlag(.isLocked))
+        #expect(await finalChestState.hasFlag(.isTouched))
+        #expect(await finalKeyState.hasFlag(.isTouched))
+    }
+
+    // MARK: - Validation Testing
+
+    @Test("Cannot lock without specifying what")
+    func testCannotLockWithoutSpecifyingWhat() async throws {
+        // Given
+        let game = MinimalGame()
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // When
+        try await engine.execute("lock")
+
+        // Then
+        let output = await mockIO.flush()
+        expectNoDifference(
+            output,
+            """
+            > lock
+            Lock what?
+            """
+        )
+    }
+
+    @Test("Cannot lock without specifying key")
+    func testCannotLockWithoutSpecifyingKey() async throws {
+        // Given
+        let door = Item(
+            id: "door",
+            .name("iron door"),
+            .description("An iron door."),
+            .isLockable,
+            .lockKey("key"),
+            .in(.startRoom)
+        )
+
+        let game = MinimalGame(
+            items: door
+        )
+
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // When
+        try await engine.execute("lock door")
+
+        // Then
+        let output = await mockIO.flush()
+        expectNoDifference(
+            output,
+            """
+            > lock door
+            Lock the iron door with what?
+            """
+        )
+    }
+
+    @Test("Cannot lock with key not held")
+    func testCannotLockWithKeyNotHeld() async throws {
+        // Given
+        let door = Item(
+            id: "door",
+            .name("oak door"),
+            .description("An oak door."),
+            .isLockable,
+            .lockKey("key"),
+            .in(.startRoom)
+        )
+
+        let key = Item(
+            id: "key",
+            .name("silver key"),
+            .description("A silver key."),
+            .isTakable,
+            .in(.startRoom)
+        )
+
+        let game = MinimalGame(
+            items: door, key
+        )
+
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // When
+        try await engine.execute("lock door with key")
+
+        // Then
+        let output = await mockIO.flush()
+        expectNoDifference(
+            output,
+            """
+            > lock door with key
+            You aren't holding the silver key.
+            """
+        )
+    }
+
+    @Test("Cannot lock target not in scope")
+    func testCannotLockTargetNotInScope() async throws {
+        // Given
+        let anotherRoom = Location(
+            id: "anotherRoom",
+            .name("Another Room"),
+            .inherentlyLit
+        )
+
+        let remoteDoor = Item(
+            id: "remoteDoor",
+            .name("distant door"),
+            .description("A door in another room."),
+            .isLockable,
+            .lockKey("key"),
+            .in("anotherRoom")
+        )
+
+        let key = Item(
+            id: "key",
+            .name("brass key"),
+            .description("A brass key."),
+            .isTakable,
+            .in(.player)
+        )
+
+        let game = MinimalGame(
+            locations: anotherRoom,
+            items: remoteDoor, key
+        )
+
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // When
+        try await engine.execute("lock door with key")
+
+        // Then
+        let output = await mockIO.flush()
+        expectNoDifference(
+            output,
+            """
+            > lock door with key
+            Any such thing lurks beyond your reach.
+            """
+        )
+    }
+
+    @Test("Cannot lock non-lockable item")
+    func testCannotLockNonLockableItem() async throws {
+        // Given
+        let rock = Item(
+            id: "rock",
+            .name("large rock"),
+            .description("A large boulder."),
+            .in(.startRoom)
+        )
+
+        let key = Item(
+            id: "key",
+            .name("brass key"),
+            .description("A brass key."),
+            .isTakable,
+            .in(.player)
+        )
+
+        let game = MinimalGame(
+            items: rock, key
+        )
+
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // When
+        try await engine.execute("lock rock with key")
+
+        // Then
+        let output = await mockIO.flush()
+        expectNoDifference(
+            output,
+            """
+            > lock rock with key
+            The large rock stubbornly resists your attempts to lock it.
+            """
+        )
+    }
+
+    @Test("Cannot lock with wrong key")
+    func testCannotLockWithWrongKey() async throws {
+        // Given
+        let door = Item(
+            id: "door",
+            .name("secure door"),
+            .description("A secure door."),
+            .isLockable,
+            .lockKey("correctKey"),
+            .in(.startRoom)
+        )
+
+        let wrongKey = Item(
+            id: "wrongKey",
+            .name("wrong key"),
+            .description("A key that doesn't fit."),
+            .isTakable,
+            .in(.player)
+        )
+
+        let game = MinimalGame(
+            items: door, wrongKey
+        )
+
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // When
+        try await engine.execute("lock door with key")
+
+        // Then
+        let output = await mockIO.flush()
+        expectNoDifference(
+            output,
+            """
+            > lock door with key
+            The wrong key and the secure door were never meant to be
+            together.
+            """
+        )
+    }
+
+    @Test("Requires light to lock")
+    func testRequiresLight() async throws {
+        // Given: Dark room with lockable item
+        let darkRoom = Location(
+            id: "darkRoom",
+            .name("Dark Room"),
+            .description("A pitch black room.")
+            // Note: No .inherentlyLit property
+        )
+
+        let door = Item(
+            id: "door",
+            .name("mysterious door"),
+            .description("A mysterious door."),
+            .isLockable,
+            .lockKey("key"),
+            .in("darkRoom")
+        )
+
+        let key = Item(
+            id: "key",
+            .name("glowing key"),
+            .description("A glowing key."),
+            .isTakable,
+            .in(.player)
+        )
+
+        let game = MinimalGame(
+            player: Player(in: "darkRoom"),
+            locations: darkRoom,
+            items: door, key
+        )
+
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // When
+        try await engine.execute("lock door with key")
+
+        // Then
+        let output = await mockIO.flush()
+        expectNoDifference(
+            output,
+            """
+            > lock door with key
+            The darkness here is absolute, consuming all light and hope of
+            sight.
+            """
+        )
+    }
+
+    // MARK: - Processing Testing
+
     @Test("Lock item successfully")
     func testLockItemSuccessfully() async throws {
-        // Arrange: Key held, box reachable and unlocked
-        let initialBox = Item(
-            id: "box",
-            .name("wooden box"),
-            .in(.location(.startRoom)),
-            .lockKey("key"),
+        // Given
+        let safe = Item(
+            id: "safe",
+            .name("metal safe"),
+            .description("A metal safe."),
             .isContainer,
             .isLockable,
-            .isOpenable
-        )
-        let initialKey = Item(
-            id: "key",
-            .name("small key"),
-            .in(.player), // Key is held
-            .isTakable
+            .lockKey("combination"),
+            .in(.startRoom)
         )
 
-        let game = MinimalGame(items: [initialBox, initialKey])
-        let mockIO = await MockIOHandler()
-        let mockParser = MockParser()
-        let engine = await GameEngine(
-            blueprint: game,
-            parser: mockParser,
-            ioHandler: mockIO
+        let combination = Item(
+            id: "combination",
+            .name("combination code"),
+            .description("A piece of paper with the combination."),
+            .isTakable,
+            .in(.player)
         )
 
-        // Check initial state
-        let initialBoxSnapshot = try await engine.item("box")
-        #expect(initialBoxSnapshot.hasFlag(.isLocked) == false) // Qualified
-        let initialKeySnapshot = try await engine.item("key")
-
-        #expect(await engine.gameState.changeHistory.isEmpty)
-
-        let command = Command(
-            verb: .lock,
-            directObject: .item("box"),
-            indirectObject: .item("key"),
-            rawInput: "lock box with key"
+        let game = MinimalGame(
+            items: safe, combination
         )
 
-        // Act: Use engine.execute
-        await engine.execute(command: command)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        // Assert Output
+        // When
+        try await engine.execute("lock safe with combination")
+
+        // Then: Verify state changes
+        let finalSafeState = try await engine.item("safe")
+        let finalCombinationState = try await engine.item("combination")
+        #expect(await finalSafeState.hasFlag(.isLocked))
+        #expect(await finalSafeState.hasFlag(.isTouched))
+        #expect(await finalCombinationState.hasFlag(.isTouched))
+
+        // Verify message
         let output = await mockIO.flush()
-        expectNoDifference(output, "The wooden box is now locked.")
+        expectNoDifference(
+            output,
+            """
+            > lock safe with combination
+            The metal safe is now locked.
+            """
+        )
+    }
 
-        // Assert Final State
+    @Test("Lock already locked item gives appropriate message")
+    func testLockAlreadyLockedItem() async throws {
+        // Given
+        let door = Item(
+            id: "door",
+            .name("locked door"),
+            .description("A locked door."),
+            .isLockable,
+            .isLocked,
+            .lockKey("key"),
+            .in(.startRoom)
+        )
+
+        let key = Item(
+            id: "key",
+            .name("brass key"),
+            .description("A brass key."),
+            .isTakable,
+            .in(.player)
+        )
+
+        let game = MinimalGame(
+            items: door, key
+        )
+
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // When
+        try await engine.execute("lock door with key")
+
+        // Then
+        let output = await mockIO.flush()
+        expectNoDifference(
+            output,
+            """
+            > lock door with key
+            The locked door is already locked.
+            """
+        )
+
+        // Item should remain locked but not touched again
+        let finalDoorState = try await engine.item("door")
+        #expect(await finalDoorState.hasFlag(.isLocked))
+    }
+
+    @Test("Lock sets touched flag on both items")
+    func testLockSetsTouchedFlagOnBothItems() async throws {
+        // Given
+        let box = Item(
+            id: "box",
+            .name("jewelry box"),
+            .description("A jewelry box."),
+            .isContainer,
+            .isLockable,
+            .lockKey("tinyKey"),
+            .in(.startRoom)
+        )
+
+        let tinyKey = Item(
+            id: "tinyKey",
+            .name("tiny key"),
+            .description("A tiny key."),
+            .isTakable,
+            .in(.player)
+        )
+
+        let game = MinimalGame(
+            items: box, tinyKey
+        )
+
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // When
+        try await engine.execute("lock box with key")
+
+        // Then: Verify state changes
         let finalBoxState = try await engine.item("box")
-        #expect(finalBoxState.hasFlag(.isLocked), "Box should be locked")
-        #expect(finalBoxState.hasFlag(.isTouched), "Box should be touched")
+        let finalKeyState = try await engine.item("tinyKey")
+        #expect(await finalBoxState.hasFlag(.isLocked))
+        #expect(await finalBoxState.hasFlag(.isTouched))
+        #expect(await finalKeyState.hasFlag(.isTouched))
 
-        let finalKeyState = try await engine.item("key")
-        #expect(finalKeyState.hasFlag(.isTouched), "Key should be touched")
-
-        // Assert Change History
-        let expectedChanges = expectedLockChanges(
-            targetItemID: "box",
-            keyItemID: "key",
-            initialTargetLocked: initialBoxSnapshot.hasFlag(.isLocked),
-            initialTargetTouched: initialBoxSnapshot.hasFlag(.isTouched),
-            initialKeyTouched: initialKeySnapshot.hasFlag(.isTouched)
-        )
-        let changeHistory = await engine.gameState.changeHistory
-        expectNoDifference(changeHistory, expectedChanges)
-    }
-
-    @Test("Lock fails with no direct object")
-    func testLockFailsNoDirectObject() async throws {
-        // Arrange: Player holds key
-        let key = Item(
-            id: "key",
-            .name("key"),
-            .in(.player),
-            .isTakable
-        )
-        let game = MinimalGame(items: [key])
-        let mockIO = await MockIOHandler()
-        let mockParser = MockParser()
-        let engine = await GameEngine(
-            blueprint: game,
-            parser: mockParser,
-            ioHandler: mockIO
-        )
-        #expect(await engine.gameState.changeHistory.isEmpty)
-
-        let command = Command(
-            verb: .lock,
-            indirectObject: .item("key"),
-            rawInput: "lock with key"
-        ) // No direct object
-
-        // Act
-        await engine.execute(command: command)
-
-        // Assert Output
+        // Verify message
         let output = await mockIO.flush()
-        expectNoDifference(output, "Lock what?")
-
-        // Assert No State Change
-        #expect(await engine.gameState.changeHistory.isEmpty)
+        expectNoDifference(
+            output,
+            """
+            > lock box with key
+            The jewelry box is now locked.
+            """
+        )
     }
 
-    @Test("Lock fails with no indirect object")
-    func testLockFailsNoIndirectObject() async throws {
-        // Arrange: Box is reachable and unlocked
-        let box = Item(
-            id: "box",
-            .name("box"),
-            .in(.location(.startRoom)),
-            .lockKey("key"),
-            .isContainer,
-            .isLockable
-        )
-        let game = MinimalGame(items: [box])
-        let mockIO = await MockIOHandler()
-        let mockParser = MockParser()
-        let engine = await GameEngine(
-            blueprint: game,
-            parser: mockParser,
-            ioHandler: mockIO
-        )
-        #expect(await engine.gameState.changeHistory.isEmpty)
-
-        let command = Command(
-            verb: .lock,
-            directObject: .item("box"),
-            rawInput: "lock box"
-        ) // No indirect object
-
-        // Act
-        await engine.execute(command: command)
-
-        // Assert Output
-        let output = await mockIO.flush()
-        expectNoDifference(output, "Lock it with what?")
-
-        // Assert No State Change
-        #expect(await engine.gameState.changeHistory.isEmpty)
-    }
-
-    @Test("Lock fails when key not held")
-    func testLockFailsKeyNotHeld() async throws {
-        // Arrange: Key is in the room, not held; box is unlocked
-        let box = Item(
-            id: "box",
-            .name("box"),
-            .in(.location(.startRoom)),
-            .lockKey("key"),
-            .isContainer,
-            .isLockable
-        )
-        let key = Item(
-            id: "key",
-            .name("key"),
-            .in(.location(.startRoom)), // Key also in room
-            .isTakable
-        )
-        let game = MinimalGame(items: [box, key])
-        let mockIO = await MockIOHandler()
-        let mockParser = MockParser()
-        let engine = await GameEngine(
-            blueprint: game,
-            parser: mockParser,
-            ioHandler: mockIO
-        )
-        #expect(await engine.gameState.changeHistory.isEmpty)
-
-        let command = Command(
-            verb: .lock,
-            directObject: .item("box"),
-            indirectObject: .item("key"),
-            rawInput: "lock box with key"
+    @Test("Lock multiple different items")
+    func testLockMultipleDifferentItems() async throws {
+        // Given
+        let door = Item(
+            id: "door",
+            .name("front door"),
+            .description("The front door."),
+            .isLockable,
+            .lockKey("doorKey"),
+            .in(.startRoom)
         )
 
-        // Act
-        await engine.execute(command: command)
-
-        // Assert Output
-        let output = await mockIO.flush()
-        expectNoDifference(output, "You aren’t holding the key.")
-
-        // Assert No State Change
-        #expect(await engine.gameState.changeHistory.isEmpty)
-    }
-
-    @Test("Lock fails when target not reachable")
-    func testLockFailsTargetNotReachable() async throws {
-        // Arrange: Box is unlocked in another room, player holds key
-        let box = Item(
-            id: "box",
-            .name("box"),
-            .in(.location("otherRoom")),
-            .lockKey("key"),
-            .isContainer,
-            .isLockable
-        )
-        let key = Item(
-            id: "key",
-            .name("key"),
-            .in(.player),
-            .isTakable
-        )
-        let room1 = Location(
-            id: .startRoom,
-            .name("Start"),
-            .inherentlyLit
-        )
-        let room2 = Location(
-            id: "otherRoom",
-            .name("Other"),
-            .inherentlyLit
-        )
-        let game = MinimalGame(locations: [room1, room2], items: [box, key])
-        let mockIO = await MockIOHandler()
-        let mockParser = MockParser()
-        let engine = await GameEngine(
-            blueprint: game,
-            parser: mockParser,
-            ioHandler: mockIO
-        )
-        #expect(await engine.gameState.changeHistory.isEmpty)
-
-        let command = Command(
-            verb: .lock,
-            directObject: .item("box"),
-            indirectObject: .item("key"),
-            rawInput: "lock box with key"
-        )
-
-        // Act
-        await engine.execute(command: command)
-
-        // Assert Output
-        let output = await mockIO.flush()
-        expectNoDifference(output, "You can’t see any such thing.")
-
-        // Assert No State Change
-        #expect(await engine.gameState.changeHistory.isEmpty)
-    }
-
-    @Test("Lock fails when target not lockable")
-    func testLockFailsTargetNotLockable() async throws {
-        // Arrange: Target lacks .lockable, player holds key
-        let pebble = Item(
-            id: "pebble",
-            .in(.location(.startRoom))
-        ) // Not lockable
-        let key = Item(
-            id: "key",
-            .in(.player),
-            .isTakable
-        )
-        let game = MinimalGame(items: [pebble, key])
-        let mockIO = await MockIOHandler()
-        let mockParser = MockParser()
-        let engine = await GameEngine(
-            blueprint: game,
-            parser: mockParser,
-            ioHandler: mockIO
-        )
-        #expect(await engine.gameState.changeHistory.isEmpty)
-
-        let command = Command(
-            verb: .lock,
-            directObject: .item("pebble"),
-            indirectObject: .item("key"),
-            rawInput: "lock pebble with key"
-        )
-
-        // Act
-        await engine.execute(command: command)
-
-        // Assert Output
-        let output = await mockIO.flush()
-        expectNoDifference(output, "You can’t lock the pebble.") // Uses ActionResponse.itemNotLockable message
-
-        // Assert No State Change
-        #expect(await engine.gameState.changeHistory.isEmpty)
-    }
-
-    @Test("Lock fails with wrong key")
-    func testLockFailsWrongKey() async throws {
-        // Arrange: Box unlocked, requires 'key', player holds 'wrongkey'
-        let box = Item(
-            id: "box",
-            .name("box"),
-            .in(.location(.startRoom)),
-            .lockKey("key"),
-            .isContainer,
-            .isLockable
-        )
-        let wrongKey = Item(
-            id: "wrongkey",
-            .name("bent key"),
-            .in(.player), // Player holds this
-            .isTakable
-        )
-        let game = MinimalGame(items: [box, wrongKey])
-        let mockIO = await MockIOHandler()
-        let mockParser = MockParser()
-        let engine = await GameEngine(
-            blueprint: game,
-            parser: mockParser,
-            ioHandler: mockIO
-        )
-        #expect(await engine.gameState.changeHistory.isEmpty)
-
-        let command = Command(
-            verb: .lock,
-            directObject: .item("box"),
-            indirectObject: .item("wrongkey"),
-            rawInput: "lock box with bent key"
-        )
-
-        // Act
-        await engine.execute(command: command)
-
-        // Assert Output
-        let output = await mockIO.flush()
-        expectNoDifference(output, "The bent key doesn’t fit the box.")
-
-        // Assert No State Change
-        #expect(await engine.gameState.changeHistory.isEmpty)
-    }
-
-    @Test("Lock fails when already locked")
-    func testLockFailsAlreadyLocked() async throws {
-        // Arrange: Box is already locked, player holds key
-        let box = Item(
-            id: "box",
-            .name("box"),
-            .in(.location(.startRoom)),
-            .lockKey("key"),
+        let chest = Item(
+            id: "chest",
+            .name("storage chest"),
+            .description("A storage chest."),
             .isContainer,
             .isLockable,
-            .isLocked // Start locked
-        )
-        let key = Item(
-            id: "key",
-            .name("key"),
-            .in(.player),
-            .isTakable
-        )
-        let game = MinimalGame(items: [box, key])
-        let mockIO = await MockIOHandler()
-        let mockParser = MockParser()
-        let engine = await GameEngine(
-            blueprint: game,
-            parser: mockParser,
-            ioHandler: mockIO
-        )
-        let initialBoxSnapshot = try await engine.item("box")
-        #expect(initialBoxSnapshot.hasFlag(.isLocked) == true) // Qualified
-        #expect(await engine.gameState.changeHistory.isEmpty)
-
-        let command = Command(
-            verb: .lock,
-            directObject: .item("box"),
-            indirectObject: .item("key"),
-            rawInput: "lock box with key"
+            .lockKey("chestKey"),
+            .in(.startRoom)
         )
 
-        // Act
-        await engine.execute(command: command)
+        let doorKey = Item(
+            id: "doorKey",
+            .name("door key"),
+            .description("A key for the door."),
+            .isTakable,
+            .in(.player)
+        )
 
-        // Assert Output
-        let output = await mockIO.flush()
-        expectNoDifference(output, "The box is already locked.")
+        let chestKey = Item(
+            id: "chestKey",
+            .name("chest key"),
+            .description("A key for the chest."),
+            .isTakable,
+            .in(.player)
+        )
 
-        // Assert No State Change
-        #expect(await engine.gameState.changeHistory.isEmpty)
+        let game = MinimalGame(
+            items: door, chest, doorKey, chestKey
+        )
+
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // When: Lock door
+        try await engine.execute("lock door with door key")
+
+        // Then
+        let output1 = await mockIO.flush()
+        expectNoDifference(
+            output1,
+            """
+            > lock door with door key
+            The front door is now locked.
+            """
+        )
+
+        // When: Lock chest
+        try await engine.execute("lock chest with chest key")
+
+        // Then
+        let output2 = await mockIO.flush()
+        expectNoDifference(
+            output2,
+            """
+            > lock chest with chest key
+            The storage chest is now locked.
+            """
+        )
+
+        // Verify both items are locked
+        let doorState = try await engine.item("door")
+        let chestState = try await engine.item("chest")
+        #expect(await doorState.hasFlag(.isLocked))
+        #expect(await chestState.hasFlag(.isLocked))
     }
-}
 
-extension LockActionHandlerTests {
-    private func expectedLockChanges(
-        targetItemID: ItemID,
-        keyItemID: ItemID,
-        initialTargetLocked: Bool,
-        initialTargetTouched: Bool,
-        initialKeyTouched: Bool
-    ) -> [StateChange] {
-        var changes: [StateChange] = []
-
-        // Target item is locked (if not already)
-        if !initialTargetLocked {
-            changes.append(
-                StateChange(
-                    entityID: .item(targetItemID),
-                    attribute: .itemAttribute(.isLocked),
-                    newValue: true
-                )
-            )
-        }
-
-        // Target item is touched (if not already)
-        if !initialTargetTouched {
-            changes.append(
-                StateChange(
-                    entityID: .item(targetItemID),
-                    attribute: .itemAttribute(.isTouched),
-                    newValue: true
-                )
-            )
-        }
-
-        // Key is touched (if not already)
-        if !initialKeyTouched {
-            changes.append(
-                StateChange(
-                    entityID: .item(keyItemID),
-                    attribute: .itemAttribute(.isTouched),
-                    newValue: true
-                )
-            )
-        }
-
-        // Pronoun "it" is set to the target item
-        // Assuming "it" wasn’t already referring to targetItemID or was nil.
-        changes.append(
-            StateChange(
-                entityID: .global,
-                attribute: .pronounReference(pronoun: "it"),
-                oldValue: nil, // Simplified for test
-                newValue: .entityReferenceSet([.item(targetItemID)])
-            )
+    @Test("Lock item with special key types")
+    func testLockItemWithSpecialKeyTypes() async throws {
+        // Given
+        let magicBox = Item(
+            id: "magicBox",
+            .name("magic box"),
+            .description("A magic box."),
+            .isContainer,
+            .isLockable,
+            .lockKey("crystal"),
+            .in(.startRoom)
         )
 
-        return changes
+        let crystal = Item(
+            id: "crystal",
+            .name("magic crystal"),
+            .description("A magic crystal that serves as a key."),
+            .isTakable,
+            .in(.player)
+        )
+
+        let game = MinimalGame(
+            items: magicBox, crystal
+        )
+
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // When
+        try await engine.execute("lock box with crystal")
+
+        // Then
+        let output = await mockIO.flush()
+        expectNoDifference(
+            output,
+            """
+            > lock box with crystal
+            The magic box is now locked.
+            """
+        )
+
+        let finalBoxState = try await engine.item("magicBox")
+        #expect(await finalBoxState.hasFlag(.isLocked))
+    }
+
+    @Test("Lock attempts with non-key items fail")
+    func testLockAttemptsWithNonKeyItemsFail() async throws {
+        // Given
+        let door = Item(
+            id: "door",
+            .name("heavy door"),
+            .description("A heavy door."),
+            .isLockable,
+            .lockKey("properKey"),
+            .in(.startRoom)
+        )
+
+        let stick = Item(
+            id: "stick",
+            .name("wooden stick"),
+            .description("A wooden stick."),
+            .isTakable,
+            .in(.player)
+        )
+
+        let game = MinimalGame(
+            items: door, stick
+        )
+
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // When
+        try await engine.execute("lock door with stick")
+
+        // Then
+        let output = await mockIO.flush()
+        expectNoDifference(
+            output,
+            """
+            > lock door with stick
+            The wooden stick and the heavy door were never meant to be
+            together.
+            """
+        )
+    }
+
+    // MARK: - Intent Testing
+
+    @Test("Handler exposes correct Verbs")
+    func testVerbs() async throws {
+        let handler = LockActionHandler()
+        #expect(handler.synonyms.contains(.lock))
+        #expect(handler.synonyms.count == 1)
+    }
+
+    @Test("Handler requires light")
+    func testRequiresLightProperty() async throws {
+        let handler = LockActionHandler()
+        #expect(handler.requiresLight == true)
     }
 }

@@ -1,4 +1,7 @@
+import CustomDump
+import GnustoTestSupport
 import Testing
+
 @testable import GnustoEngine
 
 @Suite("Exit Struct Tests")
@@ -7,7 +10,7 @@ struct ExitTests {
     @Test("Exit Initialization - Destination Only")
     func testExitInitializationDestination() throws {
         let destination: LocationID = "clearing"
-        let exit = Exit.to(destination)
+        let exit: Exit = .north(destination)
 
         #expect(exit.destinationID == destination)
         #expect(exit.blockedMessage == nil)
@@ -19,7 +22,7 @@ struct ExitTests {
         let message = "The way is blocked by a fallen tree."
         // Exit must have a destination, use a placeholder
         let destination: LocationID = "nowhere"
-        let exit = Exit(destination: destination, blockedMessage: message)
+        let exit: Exit = .north(destination, blocked: message)
 
         #expect(exit.destinationID == destination)
         #expect(exit.blockedMessage == message)
@@ -29,7 +32,7 @@ struct ExitTests {
     func testExitInitializationBoth() throws {
         let destination: LocationID = "path"
         let message = "You push through the bushes."
-        let exit = Exit(destination: destination, blockedMessage: message)
+        let exit: Exit = .north(destination, blocked: message)
 
         #expect(exit.destinationID == destination)
         #expect(exit.blockedMessage == message)
@@ -39,7 +42,7 @@ struct ExitTests {
     func testExitInitializationDoor() throws {
         let destination: LocationID = "inside"
         let keyID: ItemID = "ironKey"
-        let exit = Exit(destination: destination, doorID: "jailCellDoor")
+        let exit: Exit = .north(destination, via: "jailCellDoor")
         let door = Item(
             id: "jailCellDoor",
             .name("Jail cell door"),
@@ -49,5 +52,15 @@ struct ExitTests {
         #expect(exit.doorID == "jailCellDoor")
         #expect(exit.blockedMessage == nil)
         #expect(exit.doorID == door.id)
+    }
+
+    @Test("Exit Initialization - Blocked Exit with Message")
+    func testExitInitializationBlockedWithMessage() {
+        let message = "The path is overgrown with thorns."
+        let exit: Exit = .north(blocked: message)
+
+        #expect(exit.destinationID == nil)
+        #expect(exit.blockedMessage == message)
+        #expect(exit.doorID == nil)
     }
 }

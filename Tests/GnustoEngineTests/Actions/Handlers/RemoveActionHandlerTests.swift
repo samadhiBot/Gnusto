@@ -1,348 +1,601 @@
-import Testing
 import CustomDump
-
-@testable import GnustoEngine
+import GnustoEngine
+import GnustoTestSupport
+import Testing
 
 @Suite("RemoveActionHandler Tests")
 struct RemoveActionHandlerTests {
-    let handler = RemoveActionHandler()
 
-    @Test("Remove worn item successfully")
-    func testRemoveItemSuccess() async throws {
-        let cloak = Item(
-            id: "cloak",
-            .in(.player),
+    // MARK: - Syntax Rule Testing
+
+    @Test("REMOVE DIRECTOBJECT syntax works")
+    func testRemoveDirectObjectSyntax() async throws {
+        // Given
+        let hat = Item(
+            id: "hat",
+            .name("blue hat"),
+            .description("A stylish blue hat."),
             .isTakable,
             .isWearable,
-            .isWorn
-        )
-        let game = MinimalGame(items: [cloak])
-        let mockIO = await MockIOHandler()
-        let engine = await GameEngine(
-            blueprint: game,
-            parser: StandardParser(),
-            ioHandler: mockIO
+            .in(.player)
         )
 
-        let command = Command(
-            verb: .remove,
-            directObject: .item("cloak"),
-            rawInput: "remove cloak"
+        let game = MinimalGame(
+            items: hat
         )
 
-        // Initial state check
-        #expect(try await engine.item("cloak").hasFlag(.isWorn) == true)
-        let initialHistory = await engine.gameState.changeHistory
-        #expect(initialHistory.isEmpty)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        // Act
-        await engine.execute(command: command)
+        // Set up: Hat must be worn first
+        try await engine.apply(
+            hat.proxy(engine).setFlag(.isWorn)
+        )
 
-        // Assert State Change
-        let finalCloakState = try await engine.item("cloak")
-        #expect(finalCloakState.parent == .player)
-        #expect(finalCloakState.hasFlag(.isWorn) == false, "Cloak should NOT have .isWorn flag")
-        #expect(finalCloakState.hasFlag(.isTouched) == true, "Cloak should have .isTouched flag") // Ensure touched is added
+        // When
+        try await engine.execute("remove hat")
 
-        // Assert Output
+        // Then
         let output = await mockIO.flush()
-        expectNoDifference(output, "You take off the cloak.")
+        expectNoDifference(
+            output,
+            """
+            > remove hat
+            You remove the blue hat.
+            """
+        )
 
-        // Assert Change History
-        let expectedChanges = [
-            StateChange(
-                entityID: .item("cloak"),
-                attribute: .itemAttribute(.isWorn),
-                oldValue: true,
-                newValue: false
-            ),
-            StateChange(
-                entityID: .item("cloak"),
-                attribute: .itemAttribute(.isTouched),
-                newValue: true
-            ),
-            StateChange(
-                entityID: .global,
-                attribute: .pronounReference(pronoun: "it"),
-                newValue: .entityReferenceSet([.item("cloak")])
-            )
-        ]
-        let finalHistory = await engine.gameState.changeHistory
-        expectNoDifference(finalHistory, expectedChanges)
+        let finalState = try await engine.item("hat")
+        #expect(await finalState.hasFlag(.isWorn) == false)
+        #expect(await finalState.hasFlag(.isTouched) == true)
+        #expect(try await finalState.playerIsHolding)
     }
 
-    @Test("Remove fails if item not worn (but held)")
-    func testRemoveItemNotWorn() async throws {
+    @Test("DOFF syntax works")
+    func testDoffSyntax() async throws {
+        // Given
         let cloak = Item(
             id: "cloak",
-            .in(.player),
+            .name("woolen cloak"),
+            .description("A warm woolen cloak."),
             .isTakable,
-            .isWearable
-        )
-        let game = MinimalGame(items: [cloak])
-        let engine = await GameEngine(
-            blueprint: game,
-            parser: MockParser(),
-            ioHandler: await MockIOHandler()
+            .isWearable,
+            .in(.player)
         )
 
-        let command = Command(
-            verb: .remove,
-            directObject: .item("cloak"),
-            rawInput: "take off cloak"
+        let game = MinimalGame(
+            items: cloak
         )
 
-        // Act & Assert Error (on validate)
-        await #expect(throws: ActionResponse.itemIsNotWorn("cloak")) {
-            try await handler.validate(
-                context: ActionContext(
-                    command: command,
-                    engine: engine,
-                    stateSnapshot: engine.gameState
-                )
-            )
-        }
-        #expect(await engine.gameState.changeHistory.isEmpty)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // Set up: Cloak must be worn first
+        try await engine.apply(
+            cloak.proxy(engine).setFlag(.isWorn)
+        )
+
+        // When
+        try await engine.execute("doff cloak")
+
+        // Then
+        let output = await mockIO.flush()
+        expectNoDifference(
+            output,
+            """
+            > doff cloak
+            You doff the woolen cloak.
+            """
+        )
+
+        let finalState = try await engine.item("cloak")
+        #expect(await finalState.hasFlag(.isWorn) == false)
     }
 
-    @Test("Remove fails if item not held")
-    func testRemoveItemNotHeld() async throws {
-        let game = MinimalGame() // Cloak doesn’t exist here
-        let engine = await GameEngine(
-            blueprint: game,
-            parser: MockParser(),
-            ioHandler: await MockIOHandler()
+    @Test("TAKE OFF syntax works")
+    func testTakeOffSyntax() async throws {
+        // Given
+        let shoes = Item(
+            id: "shoes",
+            .name("leather shoes"),
+            .description("Comfortable leather shoes."),
+            .isTakable,
+            .isWearable,
+            .in(.player)
         )
 
-        let command = Command(
-            verb: .remove,
-            directObject: .item("cloak"),
-            rawInput: "remove cloak"
+        let game = MinimalGame(
+            items: shoes
         )
 
-        // Act & Assert Error (on validate)
-        await #expect(throws: ActionResponse.itemNotAccessible("cloak")) {
-            try await handler.validate(
-                context: ActionContext(
-                    command: command,
-                    engine: engine,
-                    stateSnapshot: engine.gameState
-                )
-            )
-        }
-        #expect(await engine.gameState.changeHistory.isEmpty)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // Set up: Shoes must be worn first
+        try await engine.apply(
+            shoes.proxy(engine).setFlag(.isWorn)
+        )
+
+        // When
+        try await engine.execute("take off shoes")
+
+        // Then
+        let output = await mockIO.flush()
+        expectNoDifference(
+            output,
+            """
+            > take off shoes
+            You take off the leather shoes.
+            """
+        )
+
+        let finalState = try await engine.item("shoes")
+        #expect(await finalState.hasFlag(.isWorn) == false)
     }
 
-    @Test("Remove fails with no direct object")
-    func testRemoveNoObject() async throws {
+    @Test("REMOVE ALL syntax works")
+    func testRemoveAllSyntax() async throws {
+        // Given
+        let hat = Item(
+            id: "hat",
+            .name("red hat"),
+            .description("A bright red hat."),
+            .isTakable,
+            .isWearable,
+            .in(.player)
+        )
+
+        let gloves = Item(
+            id: "gloves",
+            .name("silk gloves"),
+            .description("Elegant silk gloves."),
+            .isTakable,
+            .isWearable,
+            .in(.player)
+        )
+
+        let game = MinimalGame(
+            items: hat, gloves
+        )
+
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // Set up: Both items must be worn first
+        try await engine.apply(
+            hat.proxy(engine).setFlag(.isWorn),
+            gloves.proxy(engine).setFlag(.isWorn)
+        )
+
+        // When
+        try await engine.execute("remove all")
+
+        // Then
+        let output = await mockIO.flush()
+        expectNoDifference(
+            output,
+            """
+            > remove all
+            You remove the silk gloves and the red hat.
+            """
+        )
+
+        let finalHat = try await engine.item("hat")
+        let finalGloves = try await engine.item("gloves")
+        #expect(await finalHat.hasFlag(.isWorn) == false)
+        #expect(await finalGloves.hasFlag(.isWorn) == false)
+    }
+
+    // MARK: - Validation Testing
+
+    @Test("Cannot remove without specifying what")
+    func testCannotRemoveWithoutTarget() async throws {
+        // Given
         let game = MinimalGame()
-        let engine = await GameEngine(
-            blueprint: game,
-            parser: MockParser(),
-            ioHandler: await MockIOHandler()
-        )
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        // Command with nil directObject
-        let command = Command(
-            verb: .remove,
-            rawInput: "remove"
-        )
+        // When
+        try await engine.execute("remove")
 
-        // Act & Assert Error (on validate)
-        await #expect(throws: ActionResponse.prerequisiteNotMet("Remove what?")) {
-            try await handler.validate(
-                context: ActionContext(
-                    command: command,
-                    engine: engine,
-                    stateSnapshot: engine.gameState
-                )
-            )
-        }
-        #expect(await engine.gameState.changeHistory.isEmpty)
+        // Then
+        let output = await mockIO.flush()
+        expectNoDifference(
+            output,
+            """
+            > remove
+            Remove what?
+            """
+        )
     }
 
-    @Test("Remove fails if item is fixed scenery (which can be worn)")
-    func testRemoveFailsIfFixed() async throws {
-        let amulet = Item(
-            id: "amulet",
-            .name("cursed amulet"),
-            .in(.player),
-            .isScenery,
+    @Test("Cannot remove item not worn")
+    func testCannotRemoveItemNotWorn() async throws {
+        // Given
+        let hat = Item(
+            id: "hat",
+            .name("blue hat"),
+            .description("A stylish blue hat."),
+            .isTakable,
             .isWearable,
-            .isWorn
-        )
-        let game = MinimalGame(items: [amulet])
-        let engine = await GameEngine(
-            blueprint: game,
-            parser: MockParser(),
-            ioHandler: await MockIOHandler()
+            .in(.player)
         )
 
-        let command = Command(
-            verb: .remove,
-            directObject: .item("amulet"),
-            rawInput: "remove amulet"
+        let game = MinimalGame(
+            items: hat
         )
 
-        // Act & Assert Error (on validate)
-        await #expect(throws: ActionResponse.itemNotRemovable("amulet")) {
-            try await handler.validate(
-                context: ActionContext(
-                    command: command,
-                    engine: engine,
-                    stateSnapshot: engine.gameState
-                )
-            )
-        }
-        #expect(await engine.gameState.changeHistory.isEmpty)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // When (hat is not worn)
+        try await engine.execute("remove hat")
+
+        // Then
+        let output = await mockIO.flush()
+        expectNoDifference(
+            output,
+            """
+            > remove hat
+            You aren't wearing the blue hat.
+            """
+        )
     }
 
-    // MARK: - Multiple Object Tests
+    @Test("Cannot remove non-existent item")
+    func testCannotRemoveNonExistentItem() async throws {
+        // Given
+        let game = MinimalGame()
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-    @Test("REMOVE ALL works correctly")
-    func testRemoveAll() async throws {
-        let cloak = Item(id: "cloak", .name("cloak"), .in(.player), .isWearable, .isWorn)
-        let boots = Item(id: "boots", .name("boots"), .in(.player), .isWearable, .isWorn)
-        
-        let game = MinimalGame(items: [cloak, boots])
-        let mockIO = await MockIOHandler()
-        let mockParser = MockParser()
-        let engine = await GameEngine(blueprint: game, parser: mockParser, ioHandler: mockIO)
-        
-        // Act: Execute "remove all"
-        let command = Command(
-            verb: .remove,
-            directObjects: [.item("cloak"), .item("boots")],
-            isAllCommand: true,
-            rawInput: "remove all"
-        )
-        await engine.execute(command: command)
-        
-        // Assert: Should remove both items
+        // When
+        try await engine.execute("remove nonexistent")
+
+        // Then
         let output = await mockIO.flush()
-        expectNoDifference(output, "You take off the boots and the cloak.")
-
-        // Verify items are no longer worn
-        let updatedCloak = try await engine.item("cloak")
-        let updatedBoots = try await engine.item("boots")
-        #expect(updatedCloak.hasFlag(.isWorn) == false)
-        #expect(updatedBoots.hasFlag(.isWorn) == false)
-        
-        // Verify items are still held
-        #expect(updatedCloak.parent == .player)
-        #expect(updatedBoots.parent == .player)
+        expectNoDifference(
+            output,
+            """
+            > remove nonexistent
+            Any such thing lurks beyond your reach.
+            """
+        )
     }
-    
-    @Test("REMOVE CLOAK AND BOOTS works correctly")
-    func testRemoveCloakAndBoots() async throws {
-        let cloak = Item(id: "cloak", .name("cloak"), .in(.player), .isWearable, .isWorn)
-        let boots = Item(id: "boots", .name("boots"), .in(.player), .isWearable, .isWorn)
-        
-        let game = MinimalGame(items: [cloak, boots])
-        let mockIO = await MockIOHandler()
-        let mockParser = MockParser()
-        let engine = await GameEngine(blueprint: game, parser: mockParser, ioHandler: mockIO)
-        
-        // Act: Execute "remove cloak and boots"
-        let command = Command(
-            verb: .remove,
-            directObjects: [.item("cloak"), .item("boots")],
-            isAllCommand: false,
-            rawInput: "remove cloak and boots"
-        )
-        await engine.execute(command: command)
-        
-        // Assert: Should remove both items
-        let output = await mockIO.flush()
-        expectNoDifference(output, "You take off the boots and the cloak.")
 
-        // Verify items are no longer worn
-        let updatedCloak = try await engine.item("cloak")
-        let updatedBoots = try await engine.item("boots")
-        #expect(updatedCloak.hasFlag(.isWorn) == false)
-        #expect(updatedBoots.hasFlag(.isWorn) == false)
-    }
-    
-    @Test("REMOVE ALL skips non-worn items")
-    func testRemoveAllSkipsNonWorn() async throws {
-        let cloak = Item(id: "cloak", .name("cloak"), .in(.player), .isWearable, .isWorn)
-        let boots = Item(id: "boots", .name("boots"), .in(.player), .isWearable) // Not worn
-        
-        let game = MinimalGame(items: [cloak, boots])
-        let mockIO = await MockIOHandler()
-        let mockParser = MockParser()
-        let engine = await GameEngine(blueprint: game, parser: mockParser, ioHandler: mockIO)
-        
-        // Act: Execute "remove all"
-        let command = Command(
-            verb: .remove,
-            directObjects: [.item("cloak"), .item("boots")],
-            isAllCommand: true,
-            rawInput: "remove all"
+    @Test("Cannot remove fixed scenery")
+    func testCannotRemoveFixedScenery() async throws {
+        // Given
+        let fixedItem = Item(
+            id: "fixedItem",
+            .name("ceremonial robe"),
+            .description("A ceremonial robe that cannot be removed."),
+            .isWearable,
+            .omitDescription,
+            .in(.player)
         )
-        await engine.execute(command: command)
-        
-        // Assert: Should remove only the cloak
-        let output = await mockIO.flush()
-        expectNoDifference(output, "You take off the cloak.")
 
-        // Verify only cloak is affected
-        let updatedCloak = try await engine.item("cloak")
-        let updatedBoots = try await engine.item("boots")
-        #expect(updatedCloak.hasFlag(.isWorn) == false)
-        #expect(updatedBoots.hasFlag(.isWorn) == false) // Was already false
-    }
-    
-    @Test("REMOVE ALL with no worn items")
-    func testRemoveAllWithNoWornItems() async throws {
-        let boots = Item(id: "boots", .name("boots"), .in(.player), .isWearable) // Not worn
-        
-        let game = MinimalGame(items: [boots])
-        let mockIO = await MockIOHandler()
-        let mockParser = MockParser()
-        let engine = await GameEngine(blueprint: game, parser: mockParser, ioHandler: mockIO)
-        
-        // Act: Execute "remove all"
-        let command = Command(
-            verb: .remove,
-            directObjects: [.item("boots")],
-            isAllCommand: true,
-            rawInput: "remove all"
+        let game = MinimalGame(
+            items: fixedItem
         )
-        await engine.execute(command: command)
-        
-        // Assert: Should get appropriate message
-        let output = await mockIO.flush()
-        expectNoDifference(output, "You aren’t wearing anything.")
-    }
-    
-    @Test("REMOVE ALL skips scenery items")
-    func testRemoveAllSkipsScenery() async throws {
-        let cloak = Item(id: "cloak", .name("cloak"), .in(.player), .isWearable, .isWorn)
-        let amulet = Item(id: "amulet", .name("cursed amulet"), .in(.player), .isWearable, .isWorn, .isScenery)
-        
-        let game = MinimalGame(items: [cloak, amulet])
-        let mockIO = await MockIOHandler()
-        let mockParser = MockParser()
-        let engine = await GameEngine(blueprint: game, parser: mockParser, ioHandler: mockIO)
-        
-        // Act: Execute "remove all"
-        let command = Command(
-            verb: .remove,
-            directObjects: [.item("cloak"), .item("amulet")],
-            isAllCommand: true,
-            rawInput: "remove all"
-        )
-        await engine.execute(command: command)
-        
-        // Assert: Should remove only the cloak (skip cursed amulet)
-        let output = await mockIO.flush()
-        expectNoDifference(output, "You take off the cloak.")
 
-        // Verify only cloak is affected
-        let updatedCloak = try await engine.item("cloak")
-        let updatedAmulet = try await engine.item("amulet")
-        #expect(updatedCloak.hasFlag(.isWorn) == false)
-        #expect(updatedAmulet.hasFlag(.isWorn) == true) // Still worn (cursed)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // Set up: Item must be worn first
+        try await engine.apply(
+            fixedItem.proxy(engine).setFlag(.isWorn)
+        )
+
+        // When
+        try await engine.execute("remove robe")
+
+        // Then
+        let output = await mockIO.flush()
+        expectNoDifference(
+            output,
+            """
+            > remove robe
+            The ceremonial robe stubbornly resists your attempts to remove
+            it.
+            """
+        )
+    }
+
+    @Test("Cannot remove non-item")
+    func testCannotRemoveNonItem() async throws {
+        // Given
+        let game = MinimalGame()
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // When
+        try await engine.execute("remove me")
+
+        // Then
+        let output = await mockIO.flush()
+        expectNoDifference(
+            output,
+            """
+            > remove me
+            That's not something you can remove.
+            """
+        )
+    }
+
+    // MARK: - Processing Testing
+
+    @Test("Remove single worn item")
+    func testRemoveSingleWornItem() async throws {
+        // Given
+        let jacket = Item(
+            id: "jacket",
+            .name("leather jacket"),
+            .description("A tough leather jacket."),
+            .isTakable,
+            .isWearable,
+            .in(.player)
+        )
+
+        let game = MinimalGame(
+            items: jacket
+        )
+
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // Set up: Jacket must be worn first
+        try await engine.apply(
+            jacket.proxy(engine).setFlag(.isWorn)
+        )
+
+        // When
+        try await engine.execute("remove jacket")
+
+        // Then
+        let output = await mockIO.flush()
+        expectNoDifference(
+            output,
+            """
+            > remove jacket
+            You remove the leather jacket.
+            """
+        )
+
+        // Verify state changes
+        let finalState = try await engine.item("jacket")
+        #expect(await finalState.hasFlag(.isWorn) == false)
+        #expect(await finalState.hasFlag(.isTouched) == true)
+        #expect(try await finalState.playerIsHolding)
+    }
+
+    @Test("Remove multiple worn items")
+    func testRemoveMultipleWornItems() async throws {
+        // Given
+        let coat = Item(
+            id: "coat",
+            .name("winter coat"),
+            .description("A warm winter coat."),
+            .isTakable,
+            .isWearable,
+            .in(.player)
+        )
+
+        let scarf = Item(
+            id: "scarf",
+            .name("woolen scarf"),
+            .description("A cozy woolen scarf."),
+            .isTakable,
+            .isWearable,
+            .in(.player)
+        )
+
+        let mittens = Item(
+            id: "mittens",
+            .name("thick mittens"),
+            .description("Thick winter mittens."),
+            .isTakable,
+            .isWearable,
+            .in(.player)
+        )
+
+        let game = MinimalGame(
+            items: coat, scarf, mittens
+        )
+
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // Set up: All items must be worn first
+        try await engine.apply(
+            coat.proxy(engine).setFlag(.isWorn),
+            scarf.proxy(engine).setFlag(.isWorn),
+            mittens.proxy(engine).setFlag(.isWorn)
+        )
+
+        // When
+        try await engine.execute("remove coat and scarf and mittens")
+
+        // Then
+        let output = await mockIO.flush()
+        expectNoDifference(
+            output,
+            """
+            > remove coat and scarf and mittens
+            You remove the winter coat, the thick mittens, and the woolen
+            scarf.
+            """
+        )
+
+        // Verify all items are no longer worn
+        let finalCoat = try await engine.item("coat")
+        let finalScarf = try await engine.item("scarf")
+        let finalMittens = try await engine.item("mittens")
+
+        #expect(await finalCoat.hasFlag(.isWorn) == false)
+        #expect(await finalScarf.hasFlag(.isWorn) == false)
+        #expect(await finalMittens.hasFlag(.isWorn) == false)
+
+        #expect(await finalCoat.hasFlag(.isTouched) == true)
+        #expect(await finalScarf.hasFlag(.isTouched) == true)
+        #expect(await finalMittens.hasFlag(.isTouched) == true)
+    }
+
+    @Test("Remove all when wearing multiple items")
+    func testRemoveAllWithMultipleWornItems() async throws {
+        // Given
+        let shirt = Item(
+            id: "shirt",
+            .name("cotton shirt"),
+            .description("A comfortable cotton shirt."),
+            .isTakable,
+            .isWearable,
+            .in(.player)
+        )
+
+        let pants = Item(
+            id: "pants",
+            .name("blue pants"),
+            .description("Comfortable blue pants."),
+            .isTakable,
+            .isWearable,
+            .in(.player)
+        )
+
+        let watch = Item(
+            id: "watch",
+            .name("gold watch"),
+            .description("An expensive gold watch."),
+            .isTakable,
+            .isWearable,
+            .in(.player)
+        )
+
+        let game = MinimalGame(
+            items: shirt, pants, watch
+        )
+
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // Set up: All items must be worn first
+        try await engine.apply(
+            shirt.proxy(engine).setFlag(.isWorn),
+            pants.proxy(engine).setFlag(.isWorn),
+            watch.proxy(engine).setFlag(.isWorn)
+        )
+
+        // When
+        try await engine.execute("remove all")
+
+        // Then
+        let output = await mockIO.flush()
+        expectNoDifference(
+            output,
+            """
+            > remove all
+            You remove the blue pants, the cotton shirt, and the gold
+            watch.
+            """
+        )
+
+        // Verify all items are no longer worn
+        let finalShirt = try await engine.item("shirt")
+        let finalPants = try await engine.item("pants")
+        let finalWatch = try await engine.item("watch")
+
+        #expect(await finalShirt.hasFlag(.isWorn) == false)
+        #expect(await finalPants.hasFlag(.isWorn) == false)
+        #expect(await finalWatch.hasFlag(.isWorn) == false)
+    }
+
+    @Test("Remove all when not wearing anything")
+    func testRemoveAllWhenNotWearingAnything() async throws {
+        // Given
+        let hat = Item(
+            id: "hat",
+            .name("straw hat"),
+            .description("A light straw hat."),
+            .isTakable,
+            .isWearable,
+            .in(.player)
+        )
+
+        let game = MinimalGame(
+            items: hat
+        )
+
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // When (hat is not worn)
+        try await engine.execute("remove all")
+
+        // Then
+        let output = await mockIO.flush()
+        expectNoDifference(
+            output,
+            """
+            > remove all
+            You remove everything you're wearing.
+            """
+        )
+    }
+
+    @Test("Remove all skips non-removable items")
+    func testRemoveAllSkipsNonRemovableItems() async throws {
+        // Given
+        let removableHat = Item(
+            id: "removableHat",
+            .name("baseball cap"),
+            .description("A casual baseball cap."),
+            .isTakable,
+            .isWearable,
+            .in(.player)
+        )
+
+        let fixedRing = Item(
+            id: "fixedRing",
+            .name("cursed ring"),
+            .description("A ring that cannot be removed."),
+            .isWearable,
+            .omitDescription,
+            .in(.player)
+        )
+
+        let game = MinimalGame(
+            items: removableHat, fixedRing
+        )
+
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // Set up: Both items must be worn first
+        try await engine.apply(
+            removableHat.proxy(engine).setFlag(.isWorn),
+            fixedRing.proxy(engine).setFlag(.isWorn)
+        )
+
+        // When
+        try await engine.execute("remove all")
+
+        // Then
+        let output = await mockIO.flush()
+        expectNoDifference(
+            output,
+            """
+            > remove all
+            You remove the baseball cap.
+            """
+        )
+
+        // Verify only removable item was removed
+        let finalHat = try await engine.item("removableHat")
+        let finalRing = try await engine.item("fixedRing")
+
+        #expect(await finalHat.hasFlag(.isWorn) == false)
+        #expect(await finalRing.hasFlag(.isWorn) == true)  // Still worn
+    }
+
+    // MARK: - Intent Testing
+
+    @Test("Handler exposes correct Verbs")
+    func testVerbs() async throws {
+        let handler = RemoveActionHandler()
+        #expect(handler.synonyms.contains(.remove))
+        #expect(handler.synonyms.contains(.doff))
+        #expect(handler.synonyms.count == 2)
+    }
+
+    @Test("Handler does not require light")
+    func testRequiresLightProperty() async throws {
+        let handler = RemoveActionHandler()
+        #expect(handler.requiresLight == false)
     }
 }

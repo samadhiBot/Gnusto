@@ -1,5 +1,7 @@
-import Testing
 import Foundation
+import GnustoTestSupport
+import Testing
+
 @testable import GnustoEngine
 
 @Suite("DaemonID Tests")
@@ -50,15 +52,15 @@ struct DaemonIDTests {
         #expect(id2 != id3)
     }
 
-    @Test("DaemonID Case Sensitivity")
+    @Test("DaemonIDs are case-insensitive")
     func testCaseSensitivity() throws {
         let id1: DaemonID = "HeartBeat"
         let id2: DaemonID = "heartbeat"
         let id3: DaemonID = "HEARTBEAT"
 
-        #expect(id1 != id2)
-        #expect(id1 != id3)
-        #expect(id2 != id3)
+        #expect(id1 == id2)
+        #expect(id1 == id3)
+        #expect(id2 == id3)
     }
 
     // MARK: - Hashability Tests
@@ -68,7 +70,7 @@ struct DaemonIDTests {
         let daemonDict = [
             DaemonID("heartbeat"): "Periodic pulse",
             DaemonID("clockTower"): "Hourly chimes",
-            DaemonID("weatherSystem"): "Weather changes"
+            DaemonID("weatherSystem"): "Weather changes",
         ]
 
         #expect(daemonDict[DaemonID("heartbeat")] == "Periodic pulse")
@@ -83,7 +85,7 @@ struct DaemonIDTests {
             "heartbeat",
             "clockTower",
             "weatherSystem",
-            "heartbeat" // Duplicate should be ignored
+            "heartbeat",  // Duplicate should be ignored
         ]
 
         #expect(daemonSet.count == 3)
@@ -170,7 +172,7 @@ struct DaemonIDTests {
         let daemons: [DaemonID] = [
             "heartbeat",
             "clockTower",
-            "weatherSystem"
+            "weatherSystem",
         ]
 
         #expect(daemons.count == 3)
@@ -186,7 +188,7 @@ struct DaemonIDTests {
         let daemonIDs: [DaemonID] = [
             "heartbeat",
             "clockTower",
-            "weatherSystem"
+            "weatherSystem",
         ]
 
         // Test that DaemonID can be safely passed across actor boundaries
@@ -272,7 +274,9 @@ struct DaemonIDTests {
         daemons.append("weatherSystem")
         daemons.insert("backgroundMusic", at: 1)
 
-        let expectedDaemons: [DaemonID] = ["heartbeat", "backgroundMusic", "clockTower", "weatherSystem"]
+        let expectedDaemons: [DaemonID] = [
+            "heartbeat", "backgroundMusic", "clockTower", "weatherSystem",
+        ]
         #expect(daemons == expectedDaemons)
     }
 
@@ -299,7 +303,7 @@ struct DaemonIDTests {
             "tideChanges",
             "randomEvents",
             "npcBehavior",
-            "weatherUpdates"
+            "weatherUpdates",
         ]
 
         #expect(gameDaemons.count == 7)
@@ -314,14 +318,14 @@ struct DaemonIDTests {
     func testDocumentationCommentValidation() throws {
         // Test that the documented usage pattern works
         let id: DaemonID = "heartbeat"
-        
+
         // Verify this can be used in contexts mentioned in the documentation
         let timeRegistry: [DaemonID: String] = [
             id: "A periodic heartbeat daemon"
         ]
-        
+
         let gameState: Set<DaemonID> = [id]
-        
+
         #expect(timeRegistry[id] == "A periodic heartbeat daemon")
         #expect(gameState.contains(id))
     }
@@ -332,14 +336,14 @@ struct DaemonIDTests {
     func testTypeSafety() throws {
         // Test that DaemonID is properly type-safe
         let daemonID: DaemonID = "heartbeat"
-        
+
         // This should work - same type
         let sameDaemonID: DaemonID = daemonID
         #expect(sameDaemonID == daemonID)
-        
+
         // Test that we can't accidentally mix with other ID types
         // (This is enforced at compile time, but we can test runtime behavior)
         let daemonDict: [DaemonID: String] = [daemonID: "test"]
         #expect(daemonDict[daemonID] == "test")
     }
-} 
+}

@@ -1,10 +1,11 @@
+import Foundation
 
 /// Represents the possible parents of an Item in the game hierarchy, determining its location
 /// or containment state.
-public enum ParentEntity: Hashable, Codable, Equatable, Sendable {
+public enum ParentEntity: Hashable, Codable, Sendable {
     /// The item is contained within or supported by another item.
     case item(ItemID)
-    
+
     /// The item is directly within a location.
     case location(LocationID)
 

@@ -10,12 +10,12 @@ import PackagePlugin
 /// - `Location(id: .someID, ...)` → `LocationID.someID`
 /// - `Item(id: .someID, ...)` → `ItemID.someID`
 /// - `GlobalID("key")` or global state patterns → `GlobalID.key`
-/// - `FuseDefinition(id: .someID, ...)` → `FuseID.someID`
-/// - `DaemonDefinition(id: .someID, ...)` → `DaemonID.someID`
-/// - Custom `VerbID("verb")` patterns → `VerbID.verb`
+/// - `Fuse(id: .someID, ...)` → `FuseID.someID`
+/// - `Daemon(id: .someID, ...)` → `DaemonID.someID`
+/// - Custom `Verb("verb")` patterns → `Verb.verb`
 ///
 /// **Event Handler Discovery:**
-/// - `let itemNameHandler = ItemEventHandler { ... }`
+/// - `let itemNameHandler = ItemEventHandler(for: .itemName) { ... }`
 /// - `let locationNameHandler = LocationEventHandler { ... }`
 ///
 /// **Game Setup Templates:**
@@ -54,15 +54,19 @@ struct GnustoAutoWiringPlugin: BuildToolPlugin {
         // Get the ID generator tool
         let tool = try context.tool(named: "GnustoAutoWiringTool")
 
-        // Build arguments for the tool
-        var arguments = [
-            "--output", outputURL.absoluteString,
-            "--source-files"
-        ]
-        arguments += swiftFiles.map { $0.url.absoluteString }
+        // Use the target directory as the source directory
+        let sourceDirectory = target.directoryURL
 
-        print("🔧 GnustoAutoWiringPlugin (SPM): Configuring comprehensive game setup generation for target '\(target.name)'")
-        print("📁 Will scan \(swiftFiles.count) Swift files")
+        // Build arguments for the tool
+        let arguments = [
+            "--output", outputURL.path(),
+            "--source", sourceDirectory.path(),
+        ]
+
+        print(
+            "🔧 GnustoAutoWiringPlugin (SPM): Configuring comprehensive game setup generation for target '\(target.name)'"
+        )
+        print("📁 Will scan \(swiftFiles.count) Swift files in \(sourceDirectory.path())")
         print("📝 Output: \(outputURL.path())")
         print("🛠️ Tool: \(tool.name)")
 
@@ -80,64 +84,79 @@ struct GnustoAutoWiringPlugin: BuildToolPlugin {
 
 #if canImport(XcodeProjectPlugin)
 
-import XcodeProjectPlugin
+    import XcodeProjectPlugin
 
-extension GnustoAutoWiringPlugin: XcodeBuildToolPlugin {
+    extension GnustoAutoWiringPlugin: XcodeBuildToolPlugin {
 
-    func createBuildCommands(
-        context: XcodePluginContext,
-        target: XcodeTarget
-    ) throws -> [Command] {
+        func createBuildCommands(
+            context: XcodePluginContext,
+            target: XcodeTarget
+        ) throws -> [Command] {
 
-        print("🔧 GnustoAutoWiringPlugin (Xcode): Starting comprehensive game setup analysis for target '\(target.displayName)'")
-
-        // Get all Swift source files in the target
-        let swiftFiles = target.inputFiles.filter {
-            $0.type == .source && $0.url.pathExtension == "swift"
-        }
-
-        // Skip if no Swift files to process
-        guard !swiftFiles.isEmpty else {
-            print("🚫 GnustoAutoWiringPlugin (Xcode): No Swift files found in target '\(target.displayName)'")
-            return []
-        }
-
-        // Define output file path in plugin work directory
-        let outputURL = context.pluginWorkDirectoryURL.appending(path: "GeneratedIDs.swift")
-
-        // Get the ID generator tool
-        let tool: PluginContext.Tool
-        do {
-            tool = try context.tool(named: "GnustoAutoWiringTool")
-            print("✅ GnustoAutoWiringPlugin (Xcode): Found tool at \(tool.url.path())")
-        } catch {
-            print("❌ GnustoAutoWiringPlugin (Xcode): Failed to find tool: \(error)")
-            throw error
-        }
-
-        // Build arguments for the tool
-        var arguments = [
-            "--output", outputURL.absoluteString,
-            "--source-files"
-        ]
-        arguments += swiftFiles.map { $0.url.absoluteString }
-
-        print("🔧 GnustoAutoWiringPlugin (Xcode): Configuring comprehensive game setup generation for target '\(target.displayName)'")
-        print("📁 Will scan \(swiftFiles.count) Swift files")
-        print("📝 Output: \(outputURL.path())")
-        print("🛠️ Tool: \(tool.name)")
-        print("📋 Arguments: \(arguments.joined(separator: " "))")
-
-        return [
-            .buildCommand(
-                displayName: "Generate Game Setup Code for \(target.displayName)",
-                executable: tool.url,
-                arguments: arguments,
-                inputFiles: swiftFiles.map(\.url),
-                outputFiles: [outputURL]
+            print(
+                "🔧 GnustoAutoWiringPlugin (Xcode): Starting comprehensive game setup analysis for target '\(target.displayName)'"
             )
-        ]
+
+            // Get all Swift source files in the target
+            let swiftFiles = target.inputFiles.filter {
+                $0.type == .source && $0.url.pathExtension == "swift"
+            }
+
+            // Skip if no Swift files to process
+            guard !swiftFiles.isEmpty else {
+                print(
+                    "🚫 GnustoAutoWiringPlugin (Xcode): No Swift files found in target '\(target.displayName)'"
+                )
+                return []
+            }
+
+            // Define output file path in plugin work directory
+            let outputURL = context.pluginWorkDirectoryURL.appending(path: "GeneratedIDs.swift")
+
+            // Get the ID generator tool
+            let tool: PluginContext.Tool
+            do {
+                tool = try context.tool(named: "GnustoAutoWiringTool")
+                print("✅ GnustoAutoWiringPlugin (Xcode): Found tool at \(tool.url.path())")
+            } catch {
+                print("❌ GnustoAutoWiringPlugin (Xcode): Failed to find tool: \(error)")
+                throw error
+            }
+
+            // For Xcode, we need to determine the source directory from the input files
+            // Find the common source directory by getting the directory of the first Swift file
+            let sourceDirectory: URL
+            if let firstFile = swiftFiles.first {
+                sourceDirectory = firstFile.url.deletingLastPathComponent()
+            } else {
+                // Fallback to plugin work directory if no files found
+                sourceDirectory = context.pluginWorkDirectoryURL
+            }
+
+            // Build arguments for the tool
+            let arguments = [
+                "--output", outputURL.path(),
+                "--source", sourceDirectory.path(),
+            ]
+
+            print(
+                "🔧 GnustoAutoWiringPlugin (Xcode): Configuring comprehensive game setup generation for target '\(target.displayName)'"
+            )
+            print("📁 Will scan \(swiftFiles.count) Swift files in \(sourceDirectory.path())")
+            print("📝 Output: \(outputURL.path())")
+            print("🛠️ Tool: \(tool.name)")
+            print("📋 Arguments: \(arguments.joined(separator: " "))")
+
+            return [
+                .buildCommand(
+                    displayName: "Generate Game Setup Code for \(target.displayName)",
+                    executable: tool.url,
+                    arguments: arguments,
+                    inputFiles: swiftFiles.map(\.url),
+                    outputFiles: [outputURL]
+                )
+            ]
+        }
     }
-}
 
 #endif

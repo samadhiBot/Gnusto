@@ -1,72 +1,45 @@
 import CustomDump
 import Foundation
+import GnustoEngine
+import GnustoTestSupport
 import Testing
-
-@testable import GnustoEngine
 
 @Suite("ActionResult Tests")
 struct ActionResultTests {
 
     // MARK: - Initial Setup and Examples
 
-    // — Simple Examples for Initialization Tests —
-    let simpleChange = StateChange(
-        entityID: .item("lamp"),
-        attribute: .itemAttribute(.isOn),
-        oldValue: false,
-        newValue: true
-    )
+    // - Simple Examples for Initialization Tests -
+    let simpleChange = StateChange.setItemProperty(id: "lamp", property: .isOn, value: .bool(true))
     let simpleEffect = SideEffect(
         type: .startFuse,
         targetID: .fuse("bomb"),
         parameters: ["duration": .int(10)]
     )
 
-    // — Examples for Merging/Applying Tests —
+    // - Examples for Merging/Applying Tests -
     // Note: These are now instance properties. `testResult` uses them,
     // so it needs to be accessed within a test method or be computed.
-    private let change1 = StateChange(
-        entityID: .item("lamp"),
-        attribute: .itemAttribute(.isOn),
-        oldValue: false,
-        newValue: true
-    )
-    private let change2 = StateChange(
-        entityID: .item("lamp"),
-        attribute: .itemAttribute(.isTouched),
-        oldValue: false,
-        newValue: true
-    )
-    private let change3 = StateChange(
-        entityID: .location("cave"),
-        attribute: .locationAttribute(.isVisited), // Corrected: .isVisited
-        oldValue: false,
-        newValue: true
-    )
+    private let change1 = StateChange.setItemProperty(
+        id: "lamp", property: .isOn, value: .bool(true))
+    private let change2 = StateChange.setItemProperty(
+        id: "lamp", property: .isTouched, value: .bool(true))
+    private let change3 = StateChange.setLocationProperty(
+        id: "cave", property: .isVisited, value: .bool(true))
 
     // Computed property to create the ActionResult using other instance properties
     private var testResult: ActionResult {
         ActionResult(
-            message: "Test message", // Message as String
-            stateChanges: [change1, change2, change3] // Use instance properties
-            // sideEffects: [] // Add if needed
+            message: "🤡 Test message",  // Message as String
+            changes: [change1, change2, change3]  // Use instance properties
+            // effects: [] // Add if needed
         )
     }
 
-    // — More Complex Examples for Apply/Validation —
+    // - More Complex Examples for Apply/Validation -
     let turnOnLampChanges = [
-        StateChange(
-            entityID: .item("lamp"),
-            attribute: .itemAttribute(.isOn),
-            oldValue: false,
-            newValue: true
-        ),
-        StateChange( // Mark cave visited when lamp is turned on (example)
-            entityID: .location("cave"),
-            attribute: .locationAttribute(.isVisited),
-            oldValue: false,
-            newValue: true
-        )
+        StateChange.setItemProperty(id: "lamp", property: .isOn, value: .bool(true)),
+        StateChange.setLocationProperty(id: "cave", property: .isVisited, value: .bool(true)),  // Mark cave visited when lamp is turned on (example)
     ]
 
     // MARK: - Basic Initialization Tests
@@ -75,80 +48,72 @@ struct ActionResultTests {
     func testActionResultFullInitialization() {
         let result = ActionResult(
             message: "The lamp is now on.",
-            stateChanges: [simpleChange],
-            sideEffects: [simpleEffect]
+            changes: [simpleChange],
+            effects: [simpleEffect]
         )
 
         #expect(result.message == "The lamp is now on.")
-        #expect(result.stateChanges.count == 1)
-        #expect(result.sideEffects.count == 1)
-        #expect(result.stateChanges.first == simpleChange)
-        #expect(result.sideEffects.first == simpleEffect)
+        #expect(result.changes.count == 1)
+        #expect(result.effects.count == 1)
+        #expect(result.changes.first == simpleChange)
+        #expect(result.effects.first == simpleEffect)
     }
 
     @Test("ActionResult Initialization - Defaults")
     func testActionResultDefaultInitialization() {
-        let result = ActionResult("You can’t do that.")
+        let result = ActionResult("You can't do that.")
 
-        #expect(result.message == "You can’t do that.")
-        #expect(result.stateChanges.isEmpty)
-        #expect(result.sideEffects.isEmpty)
+        #expect(result.message == "You can't do that.")
+        #expect(result.changes.isEmpty)
+        #expect(result.effects.isEmpty)
     }
 
     @Test("StateChange Initialization - Full")
     func testStateChangeInitializationFull() {
-        let change = StateChange(
-            entityID: .item("door"),
-            attribute: .itemAttribute(.isOpen),
-            oldValue: false,
-            newValue: true
-        )
+        let change = StateChange.setItemProperty(id: "door", property: .isOpen, value: .bool(true))
 
-        #expect(change.entityID == .item("door"))
-        #expect(change.attribute == .itemAttribute(.isOpen))
-        #expect(change.oldValue == false)
-        #expect(change.newValue == true)
+        // Test the enum case directly
+        if case .setItemProperty(let id, let property, let value) = change {
+            #expect(id == "door")
+            #expect(property == .isOpen)
+            #expect(value == .bool(true))
+        } else {
+            Issue.record("Expected setItemProperty case")
+        }
     }
 
-    @Test("StateChange Initialization - No Old Value")
-    func testStateChangeInitializationWithoutOldValue() {
-        let change = StateChange(
-            entityID: .player,
-            attribute: .playerScore,
-            newValue: .int(10)
-        )
+    @Test("StateChange Initialization - Player Score")
+    func testStateChangeInitializationPlayerScore() {
+        let change = StateChange.setPlayerScore(to: 10)
 
-        #expect(change.entityID == .player)
-        #expect(change.attribute == .playerScore)
-        #expect(change.oldValue == nil)
-        #expect(change.newValue == .int(10))
+        if case .setPlayerScore(let score) = change {
+            #expect(score == 10)
+        } else {
+            Issue.record("Expected setPlayerScore case")
+        }
     }
 
     @Test("StateChange Initialization - Set Flag")
     func testStateChangeInitializationSetFlag() {
-        let change = StateChange(
-            entityID: .global,
-            attribute: .setFlag("lightsOut"),
-            oldValue: false,
-            newValue: true
-        )
+        let change = StateChange.setFlag("lightsOut")
 
-        #expect(change.attribute == .setFlag("lightsOut"))
-        #expect(change.newValue == true)
-        #expect(change.oldValue == false)
+        if case .setFlag(let globalID) = change {
+            #expect(globalID == "lightsOut")
+        } else {
+            Issue.record("Expected setFlag case")
+        }
     }
 
-    @Test("StateChange Initialization - Game Specific")
+    @Test("StateChange Initialization - Game Specific Global State")
     func testStateChangeInitializationGameSpecific() {
-        let change = StateChange(
-            entityID: .global,
-            attribute: .globalState(attributeID: "puzzleCounter"),
-            oldValue: .int(5),
-            newValue: .int(6)
-        )
+        let change = StateChange.setGlobalState(id: "puzzleCounter", value: 6)
 
-        #expect(change.attribute == .globalState(attributeID: "puzzleCounter"))
-        #expect(change.newValue == .int(6))
+        if case .setGlobalState(let globalID, let value) = change {
+            #expect(globalID == "puzzleCounter")
+            #expect(value == .int(6))
+        } else {
+            Issue.record("Expected setGlobalState case")
+        }
     }
 
     @Test("SideEffect Initialization - Full")
@@ -158,7 +123,7 @@ struct ActionResultTests {
             targetID: .daemon("clock"),
             parameters: [
                 "interval": .int(60),
-                "message": .string("Tick tock")
+                "message": .string("Tick tock"),
             ]
         )
 
@@ -171,10 +136,7 @@ struct ActionResultTests {
 
     @Test("SideEffect Initialization - Defaults")
     func testSideEffectInitializationWithDefaultParameters() {
-        let effect = SideEffect(
-            type: .stopDaemon,
-            targetID: .daemon("clock")
-        )
+        let effect = SideEffect.stopDaemon("clock")
 
         #expect(effect.type == .stopDaemon)
         #expect(effect.targetID == .daemon("clock"))
@@ -206,84 +168,68 @@ struct ActionResultTests {
         }
     }
 
-    @Test("StateattributeID Codable Conformance")
-    func testStateattributeIDCodable() throws {
+    @Test("StateChange Codable Conformance")
+    func testStateChangeCodable() throws {
         let encoder = JSONEncoder()
         let decoder = JSONDecoder()
 
-        let keys: [AttributeKey] = [
-            .itemAttribute(.adjectives),
-            .itemAttribute(.capacity),
-            .itemAttribute(.isContainer),
-            .itemParent,
-            .locationAttribute(.inherentlyLit),
-            .locationAttribute(.isSacred),
-            .playerScore,
-            .playerLocation,
-            .setFlag("testFlag"),
-            .globalState(attributeID: "testCounter")
+        let changes: [StateChange] = [
+            .setItemProperty(id: "lamp", property: .isOn, value: .bool(true)),
+            .moveItem(id: "key", to: .player),
+            .setPlayerScore(to: 100),
+            .setFlag("lightsOut"),
+            .setGlobalInt(id: "score", value: 42),
+            .movePlayer(to: .startRoom),
+            .addActiveFuse(fuseID: "bomb", state: FuseState(turns: 5)),
         ]
 
-        for key in keys {
-            let encodedData = try encoder.encode(key)
-            let decodedKey = try decoder.decode(AttributeKey.self, from: encodedData)
-            #expect(decodedKey == key, "Failed for \(key)")
+        for change in changes {
+            let encodedData = try encoder.encode(change)
+            let decodedChange = try decoder.decode(StateChange.self, from: encodedData)
+            #expect(decodedChange == change, "Failed for \(change)")
         }
     }
 
-    // MARK: - Merging Tests (Assuming merge logic exists on ActionResult)
+    // MARK: - Helper Methods for Testing
 
     // Helper to create a simple item change for testing ActionResult merging
     private func createTestItemChange(
         id: ItemID,
-        attributeID: AttributeID,
-        oldValue: StateValue? = nil,
+        propertyID: ItemPropertyID,
         newValue: StateValue
     ) -> StateChange {
-        StateChange(
-            entityID: .item(id),
-            attribute: .itemAttribute(attributeID),
-            oldValue: oldValue,
-            newValue: newValue
-        )
+        StateChange.setItemProperty(id: id, property: propertyID, value: newValue)
     }
 
     // Helper to create a simple location change for testing ActionResult merging
     private func createTestLocationChange(
         id: LocationID,
-        attributeID: AttributeID,
-        oldValue: StateValue? = nil,
+        propertyID: LocationPropertyID,
         newValue: StateValue
     ) -> StateChange {
-        StateChange(
-            entityID: .location(id),
-            attribute: .locationAttribute(attributeID),
-            oldValue: oldValue,
-            newValue: newValue
-        )
+        StateChange.setLocationProperty(id: id, property: propertyID, value: newValue)
     }
 
     // Helper to create a simple global change
-    private func createGlobalChange(
-        attributeID: AttributeKey,
-        oldValue: StateValue? = nil,
-        newValue: StateValue
+    private func createGlobalIntChange(
+        globalID: GlobalID,
+        value: Int
     ) -> StateChange {
-        StateChange(
-            entityID: .global,
-            attribute: attributeID,
-            oldValue: oldValue,
-            newValue: newValue
-        )
+        StateChange.setGlobalInt(id: globalID, value: value)
+    }
+
+    // Helper to create a flag change
+    private func createFlagChange(globalID: GlobalID) -> StateChange {
+        StateChange.setFlag(globalID)
     }
 
     // Corrected SideEffect initialization:
     let sideEffect1 = SideEffect(
-        type: .scheduleEvent,
+        type: .startFuse,
         targetID: .fuse("fuse"),
         parameters: [
-            "turns": .int(5),
-            "eventName": .string("FuseBurnDown")
+            "--turns": .int(5),
+            "eventName": .string("FuseBurnDown"),
         ]
     )
 
@@ -292,21 +238,122 @@ struct ActionResultTests {
         // Initialize here where self.change1, self.change2 etc. are accessible
         let resultWithChangesAndEffects = ActionResult(
             message: "Action succeeded.",
-            stateChanges: [change1, change2], // Using the corrected change1/change2
-            sideEffects: [sideEffect1]      // Using the corrected sideEffect1
+            changes: [change1, change2],  // Using the corrected change1/change2
+            effects: [sideEffect1]  // Using the corrected sideEffect1
         )
 
         #expect(resultWithChangesAndEffects.message == "Action succeeded.")
-        #expect(resultWithChangesAndEffects.stateChanges.count == 2)
-        #expect(resultWithChangesAndEffects.stateChanges.contains(change1))
-        #expect(resultWithChangesAndEffects.stateChanges.contains(change2))
-        #expect(resultWithChangesAndEffects.sideEffects.count == 1)
+        #expect(resultWithChangesAndEffects.changes.count == 2)
+        #expect(resultWithChangesAndEffects.changes.contains(change1))
+        #expect(resultWithChangesAndEffects.changes.contains(change2))
+        #expect(resultWithChangesAndEffects.effects.count == 1)
 
         // Check if the side effect is the correct type and has params
-        let effect = resultWithChangesAndEffects.sideEffects.first
-        #expect(effect?.type == .scheduleEvent)
+        let effect = resultWithChangesAndEffects.effects.first
+        #expect(effect?.type == .startFuse)
         #expect(effect?.targetID == .fuse("fuse"))
-        #expect(effect?.parameters["turns"] == .int(5))
+        #expect(effect?.parameters["--turns"] == .int(5))
         #expect(effect?.parameters["eventName"] == .string("FuseBurnDown"))
     }
+
+    // MARK: - StateChange Pattern Matching Tests
+
+    @Test("StateChange pattern matching - moveItem")
+    func testStateChangePatternMatchingMoveItem() {
+        let change = StateChange.moveItem(id: "sword", to: .location("treasury"))
+
+        if case .moveItem(let itemID, let parent) = change {
+            #expect(itemID == "sword")
+            #expect(parent == .location("treasury"))
+        } else {
+            Issue.record("Expected moveItem case")
+        }
+    }
+
+    @Test("StateChange pattern matching - addActiveFuse")
+    func testStateChangePatternMatchingAddActiveFuse() {
+        let change = StateChange.addActiveFuse(
+            fuseID: "timeBomb",
+            state: FuseState(turns: 10)
+        )
+
+        if case .addActiveFuse(let fuseID, let fuseState) = change {
+            #expect(fuseID == "timeBomb")
+            #expect(fuseState.turns == 10)
+        } else {
+            Issue.record("Expected addActiveFuse case")
+        }
+    }
+
+    @Test("StateChange pattern matching - clearFlag")
+    func testStateChangePatternMatchingClearFlag() {
+        let change = StateChange.clearFlag("lightsOut")
+
+        if case .clearFlag(let globalID) = change {
+            #expect(globalID == "lightsOut")
+        } else {
+            Issue.record("Expected clearFlag case")
+        }
+    }
+
+    // MARK: - Yield Functionality Tests
+
+    @Test("ActionResult.yield has correct properties")
+    func testYield() {
+        let result = ActionResult.yield
+
+        #expect(result.shouldYieldToEngine == true)
+        #expect(result.message == nil)
+        #expect(result.changes.isEmpty)
+        #expect(result.effects.isEmpty)
+    }
+
+    @Test("ActionResult with shouldYieldToEngine set manually")
+    func testYieldToEngineProperty() {
+        let result = ActionResult(
+            message: "Test message",
+            changes: [simpleChange],
+            shouldYieldToEngine: true
+        )
+
+        #expect(result.shouldYieldToEngine == true)
+        #expect(result.message == "Test message")
+        #expect(result.changes.count == 1)
+        #expect(result.effects.isEmpty)
+    }
+
+    @Test("ActionResult with shouldYieldToEngine false by default")
+    func testDefaultYieldToEngine() {
+        let result = ActionResult("Regular message")
+
+        #expect(result.shouldYieldToEngine == false)
+        #expect(result.message == "Regular message")
+    }
+
+    // MARK: - StateChange Equality Tests
+
+    @Test("StateChange equality - same content")
+    func testStateChangeEquality() {
+        let change1 = StateChange.setItemProperty(id: "lamp", property: .isOn, value: .bool(true))
+        let change2 = StateChange.setItemProperty(id: "lamp", property: .isOn, value: .bool(true))
+
+        #expect(change1 == change2)
+    }
+
+    @Test("StateChange inequality - different values")
+    func testStateChangeInequality() {
+        let change1 = StateChange.setItemProperty(id: "lamp", property: .isOn, value: .bool(true))
+        let change2 = StateChange.setItemProperty(id: "lamp", property: .isOn, value: .bool(false))
+
+        #expect(change1 != change2)
+    }
+
+    @Test("StateChange inequality - different items")
+    func testStateChangeInequalityDifferentItems() {
+        let change1 = StateChange.moveItem(id: "sword", to: .player)
+        let change2 = StateChange.moveItem(id: "shield", to: .player)
+
+        #expect(change1 != change2)
+    }
+
 }

@@ -1,210 +1,125 @@
 import CustomDump
+import GnustoEngine
+import GnustoTestSupport
 import Testing
-
-@testable import GnustoEngine
 
 @Suite("XyzzyActionHandler Tests")
 struct XyzzyActionHandlerTests {
-    let handler = XyzzyActionHandler()
 
-    // Expected message constants to avoid repetition and ensure consistency
-    private let expectedMarkdown = "A hollow voice says \"Fool.\""
-    private let expectedMessage = "A hollow voice says “Fool.”"
+    // MARK: - Syntax Rule Testing
 
-    // MARK: - Setup Helper
-    
-    private func createTestEngine() async -> GameEngine {
+    @Test("XYZZY syntax works")
+    func testXyzzySyntax() async throws {
+        // Given
         let game = MinimalGame()
-        let mockIO = await MockIOHandler()
-        let mockParser = MockParser()
-        
-        return await GameEngine(
-            blueprint: game,
-            parser: mockParser,
-            ioHandler: mockIO
-        )
-    }
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-    // MARK: - Basic Functionality Tests
+        // When
+        try await engine.execute("xyzzy")
 
-    @Test("XYZZY command produces the expected message")
-    func testXyzzyBasicFunctionality() async throws {
-        let engine = await createTestEngine()
-        let mockIO = engine.ioHandler as! MockIOHandler
-
-        let command = Command(
-            verb: .xyzzy,
-            rawInput: "xyzzy"
-        )
-
-        // Act: Use engine.execute for full pipeline
-        await engine.execute(command: command)
-
-        // Assert Output
+        // Then
         let output = await mockIO.flush()
-        expectNoDifference(output, expectedMessage)
+        expectNoDifference(
+            output,
+            """
+            > xyzzy
+            A hollow voice says 'Fool.'
+            """
+        )
     }
 
-    @Test("XYZZY produces correct ActionResult")
-    func testXyzzyActionResult() async throws {
-        let engine = await createTestEngine()
+    // MARK: - Processing Testing
 
-        let command = Command(
-            verb: .xyzzy,
-            rawInput: "xyzzy"
-        )
-        let context = ActionContext(
-            command: command,
-            engine: engine,
-            stateSnapshot: await engine.gameState
-        )
-        
-        // Process the command directly
-        let result = try await handler.process(context: context)
-        
-        // Verify result
-        #expect(result.message == expectedMarkdown)
-        #expect(result.stateChanges.isEmpty) // XYZZY should not modify state
-        #expect(result.sideEffects.isEmpty) // XYZZY should not have side effects
-    }
-
-    @Test("XYZZY validation always succeeds")
-    func testXyzzyValidationSucceeds() async throws {
-        let engine = await createTestEngine()
-
-        let command = Command(
-            verb: .xyzzy,
-            rawInput: "xyzzy"
-        )
-        let context = ActionContext(
-            command: command,
-            engine: engine,
-            stateSnapshot: await engine.gameState
+    @Test("XYZZY works in dark rooms")
+    func testXyzzyWorksInDarkRooms() async throws {
+        // Given: Dark room (to verify light is not required)
+        let darkRoom = Location(
+            id: "darkRoom",
+            .name("Dark Room"),
+            .description("A pitch black room.")
+            // Note: No .inherentlyLit property
         )
 
-        // Should not throw - XYZZY has no validation requirements
-        try await handler.validate(context: context)
-    }
-
-    @Test("XYZZY with extra text still works")
-    func testXyzzyWithExtraText() async throws {
-        let engine = await createTestEngine()
-        let mockIO = engine.ioHandler as! MockIOHandler
-
-        let command = Command(
-            verb: .xyzzy,
-            rawInput: "xyzzy please work"
+        let game = MinimalGame(
+            player: Player(in: "darkRoom"),
+            locations: darkRoom
         )
 
-        // Act: Use engine.execute for full pipeline
-        await engine.execute(command: command)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        // Assert Output - should still work the same way
+        // When
+        try await engine.execute("xyzzy")
+
+        // Then
         let output = await mockIO.flush()
-        expectNoDifference(output, expectedMessage)
+        expectNoDifference(
+            output,
+            """
+            > xyzzy
+            A hollow voice says 'Fool.'
+            """
+        )
     }
 
-    @Test("XYZZY full workflow integration test")
-    func testXyzzyFullWorkflow() async throws {
-        let engine = await createTestEngine()
-
-        let command = Command(
-            verb: .xyzzy,
-            rawInput: "xyzzy"
-        )
-        let context = ActionContext(
-            command: command,
-            engine: engine,
-            stateSnapshot: await engine.gameState
-        )
-        
-        // Validate
-        try await handler.validate(context: context)
-        
-        // Process
-        let result = try await handler.process(context: context)
-        
-        // Verify complete workflow
-        #expect(result.message == expectedMarkdown)
-        #expect(result.stateChanges.isEmpty)
-        #expect(result.sideEffects.isEmpty)
-    }
-
-    @Test("XYZZY does not affect game state")
-    func testXyzzyDoesNotAffectGameState() async throws {
-        let engine = await createTestEngine()
-        
-        // Capture initial state
-        let initialState = await engine.gameState
-        let initialScore = initialState.player.score
-        let initialMoves = initialState.player.moves
-        let initialLocation = initialState.player.currentLocationID
-        
-        let command = Command(
-            verb: .xyzzy,
-            rawInput: "xyzzy"
+    @Test("XYZZY doesn't modify game state")
+    func testXyzzyNoStateChanges() async throws {
+        // Given
+        let lamp = Item(
+            id: "lamp",
+            .name("brass lamp"),
+            .description("A shiny brass lamp."),
+            .isLightSource,
+            .isDevice,
+            .isTakable,
+            .in(.player)
         )
 
-        // Execute XYZZY
-        await engine.execute(command: command)
-
-        // Verify state hasn't changed
-        let finalState = await engine.gameState
-        #expect(finalState.player.score == initialScore)
-        #expect(finalState.player.moves == initialMoves)
-        #expect(finalState.player.currentLocationID == initialLocation)
-        #expect(await engine.gameState.changeHistory.isEmpty)
-    }
-
-    @Test("XYZZY works regardless of game state")
-    func testXyzzyWorksInDifferentStates() async throws {
-        let engine = await createTestEngine()
-        let mockIO = engine.ioHandler as! MockIOHandler
-
-        // Modify game state
-        let scoreChange = StateChange(
-            entityID: .player,
-            attribute: .playerScore,
-            newValue: 100
-        )
-        try await engine.apply(scoreChange)
-        
-        let command = Command(
-            verb: .xyzzy,
-            rawInput: "xyzzy"
+        let game = MinimalGame(
+            items: lamp
         )
 
-        // Act: XYZZY should work the same regardless of game state
-        await engine.execute(command: command)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        // Assert Output is unchanged
+        // Record initial state
+        let initialLamp = try await engine.item("lamp")
+        let initialScore = await engine.player.score
+        let initialTurnCount = await engine.player.moves
+
+        // When
+        try await engine.execute("xyzzy")
+
+        // Then: State should be unchanged
+        let finalLamp = try await engine.item("lamp")
+        let finalScore = await engine.player.score
+        let finalTurnCount = await engine.player.moves
+
+        #expect(try await finalLamp.parent == initialLamp.parent)
+        #expect(await finalLamp.hasFlag(.isTouched) == initialLamp.hasFlag(.isTouched))
+        #expect(finalScore == initialScore)
+        #expect(finalTurnCount == initialTurnCount + 1)
+
         let output = await mockIO.flush()
-        expectNoDifference(output, expectedMessage)
-    }
-
-    @Test("XYZZY message is consistent across multiple calls")
-    func testXyzzyConsistency() async throws {
-        let engine = await createTestEngine()
-        let mockIO = engine.ioHandler as! MockIOHandler
-
-        let command = Command(
-            verb: .xyzzy,
-            rawInput: "xyzzy"
+        expectNoDifference(
+            output,
+            """
+            > xyzzy
+            A hollow voice says 'Fool.'
+            """
         )
-
-        // Execute XYZZY multiple times
-        await engine.execute(command: command)
-        let firstOutput = await mockIO.flush()
-        
-        await engine.execute(command: command)
-        let secondOutput = await mockIO.flush()
-        
-        await engine.execute(command: command)
-        let thirdOutput = await mockIO.flush()
-
-        // All outputs should be identical
-        expectNoDifference(firstOutput, expectedMessage)
-        expectNoDifference(secondOutput, expectedMessage)
-        expectNoDifference(thirdOutput, expectedMessage)
     }
-} 
+
+    // MARK: - Intent Testing
+
+    @Test("Handler exposes correct Verbs")
+    func testVerbs() async throws {
+        let handler = XyzzyActionHandler()
+        #expect(handler.synonyms.contains(.xyzzy))
+        #expect(handler.synonyms.count == 1)
+    }
+
+    @Test("Handler does not require light")
+    func testRequiresLightProperty() async throws {
+        let handler = XyzzyActionHandler()
+        #expect(handler.requiresLight == false)
+    }
+}

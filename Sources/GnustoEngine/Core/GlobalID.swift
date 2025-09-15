@@ -17,7 +17,23 @@ public struct GlobalID: GnustoID {
     /// Creates a new game state key with the specified string value.
     /// - Parameter rawValue: The string representation of the key.
     public init(rawValue: String) {
-        assert(!rawValue.isEmpty, "Global ID cannot be empty")
+        assert(rawValue.isNotEmpty, "Global ID cannot be empty")
         self.rawValue = rawValue
     }
+}
+
+// MARK: - Standard Global IDs
+
+extension GlobalID {
+    /// Global state containing the combat state during active combat.
+    public static let combatState = GlobalID("combatState")
+
+    /// Flag indicating transcript recording is currently active.
+    public static let isScripting = GlobalID("isScripting")
+
+    /// Flag indicating verbose mode is enabled (show full location descriptions every time).
+    public static let isVerboseMode = GlobalID("isVerboseMode")
+
+    /// Flag used for no-operation state changes that have no effect on game state.
+    public static let isNoOp = GlobalID("isNoOp")
 }

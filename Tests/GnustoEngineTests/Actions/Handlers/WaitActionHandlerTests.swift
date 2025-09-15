@@ -1,46 +1,86 @@
 import CustomDump
+import GnustoEngine
+import GnustoTestSupport
 import Testing
-
-@testable import GnustoEngine
 
 @Suite("WaitActionHandler Tests")
 struct WaitActionHandlerTests {
-    let handler = WaitActionHandler()
 
-    @Test("Wait performs successfully")
-    func testWaitPerformsSuccessfully() async throws {
-        // Arrange
+    // MARK: - Syntax Rule Testing
+
+    @Test("WAIT syntax works")
+    func testWaitSyntax() async throws {
+        // Given
         let game = MinimalGame()
-        let mockIO = await MockIOHandler()
-        let mockParser = MockParser()
-        let engine = await GameEngine(
-            blueprint: game,
-            parser: mockParser,
-            ioHandler: mockIO
-        )
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        let command = Command(
-            verb: .wait,
-            rawInput: "wait"
-        )
+        // When
+        try await engine.execute("wait")
 
-        // Act
-        // We call perform(), which uses the default implementation
-        // calling validate(), process(), and postProcess().
-        await engine.execute(command: command)
-
-        // Assert
-        // The default postProcess should print the message from the ActionResult.
+        // Then
         let output = await mockIO.flush()
-        expectNoDifference(output, "Time passes.")
+        expectNoDifference(
+            output,
+            """
+            > wait
+            Time flows onward, indifferent to your concerns.
+            """
+        )
     }
 
-    // Removed testWaitProcessReturnsCorrectResult due to Sendable complexities
-    // with returning ActionResult from the non-Sendable ActionHandler protocol.
-    // The perform test adequately covers the behavior for this simple handler.
+    // MARK: - Processing Testing
 
-    // @Test("Wait process returns correct ActionResult")
-    // func testWaitProcessReturnsCorrectResult() async throws {
-    //     // ... removed implementation ...
-    // }
+    @Test("Wait works in dark rooms")
+    func testWaitWorksInDarkRooms() async throws {
+        // Given: Dark room
+        let darkRoom = Location(
+            id: "darkRoom",
+            .name("Dark Room"),
+            .description("A pitch black room.")
+        )
+
+        let game = MinimalGame(
+            player: Player(in: "darkRoom"),
+            locations: darkRoom
+        )
+
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // When
+        try await engine.execute("wait")
+
+        // Then
+        let output = await mockIO.flush()
+        expectNoDifference(
+            output,
+            """
+            > wait
+            Time flows onward, indifferent to your concerns.
+            """
+        )
+    }
+
+    // MARK: - Intent Testing
+
+    @Test("Handler exposes correct Verbs")
+    func testCorrectVerbs() async throws {
+        // Given
+        let handler = WaitActionHandler()
+
+        // When
+        let verbIDs = handler.synonyms
+
+        // Then
+        #expect(verbIDs.contains(.wait))
+        #expect(verbIDs.contains("z"))
+    }
+
+    @Test("Handler does not require light")
+    func testHandlerDoesNotRequireLight() async throws {
+        // Given
+        let handler = WaitActionHandler()
+
+        // When & Then
+        #expect(handler.requiresLight == false)
+    }
 }

@@ -1,0 +1,24 @@
+{
+  "configurations" : [
+    {
+      "id" : "C6231819-4A5B-4C7D-9000-FFA88FBAEF20",
+      "name" : "Configuration 1",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+
+  },
+  "testTargets" : [
+    {
+      "target" : {
+        "containerPath" : "container:",
+        "identifier" : "CloakOfDarknessTests",
+        "name" : "CloakOfDarknessTests"
+      }
+    }
+  ],
+  "version" : 1
+}

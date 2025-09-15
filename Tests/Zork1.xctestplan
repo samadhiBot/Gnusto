@@ -1,0 +1,29 @@
+{
+  "configurations" : [
+    {
+      "id" : "924B00C1-AEFF-4906-BA9B-EA729E4CE985",
+      "name" : "Test Scheme Action",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "codeCoverage" : false,
+    "targetForVariableExpansion" : {
+      "containerPath" : "container:",
+      "identifier" : "Zork1",
+      "name" : "Zork1"
+    }
+  },
+  "testTargets" : [
+    {
+      "target" : {
+        "containerPath" : "container:",
+        "identifier" : "Zork1Tests",
+        "name" : "Zork1Tests"
+      }
+    }
+  ],
+  "version" : 1
+}

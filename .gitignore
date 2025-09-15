@@ -39,5 +39,7 @@ playground.xcworkspace
 # Documentation
 References/*
 !References/Cloak of Darkness/
+!References/Zork 1/
 
 .vscode
+Scripts/__pycache__

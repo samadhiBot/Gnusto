@@ -2,107 +2,357 @@ import Foundation
 
 /// Represents a single, atomic proposed or applied modification to the game state.
 ///
-/// `StateChange` objects are the fundamental mechanism by which the game world evolves.
-/// Typically, an `ActionHandler` or other game logic will create one or more `StateChange`
-/// instances to describe how an action should affect the game (e.g., moving an item,
-/// changing a player's score, setting a flag).
+/// `StateChange` is now an enum that precisely captures each type of state modification
+/// with type-safe associated values. This eliminates the need for `PropertyKey` and
+/// `StateValue` wrappers while providing a cleaner, more maintainable API.
 ///
-/// These `StateChange` objects are then processed by the `GameEngine`, which validates them
-/// (often using the `oldValue`) and applies them to the `GameState`. Each successful change
-/// is also recorded in the `GameState.changeHistory`.
-public struct StateChange: Codable, Sendable {
-    /// The unique identifier of the game entity (e.g., an item, location, the player, or a global
-    /// context) that this state change targets.
-    public let entityID: EntityID
+/// Each change type embeds its creation timestamp for chronological ordering in the
+/// game state history.
+public enum StateChange: Codable, Sendable {
 
-    /// The specific characteristic or property of the `entityID` that is being modified
-    /// (e.g., `.itemParent`, `.playerScore`, `.setFlag`).
-    public let attribute: AttributeKey
+    // MARK: - Item State Changes
 
-    /// The expected value of the `attribute` for the `entityID` *before* this change is applied.
-    /// This property is optional. If provided, the `GameEngine` uses it to ensure that the game
-    /// state hasn't been unexpectedly altered by another process between the time this change
-    /// was created and when it's applied. This helps prevent race conditions or unintended
-    /// consequences.
-    public let oldValue: StateValue?
+    /// Moves an item to a new parent entity (location, player, or container).
+    case moveItem(
+        id: ItemID,
+        to: ParentEntity
+    )
 
-    /// The new, intended value for the `attribute` of the `entityID` *after* this change
-    /// is applied.
-    public let newValue: StateValue
+    /// Sets a dynamic property on an item.
+    case setItemProperty(
+        id: ItemID,
+        property: ItemPropertyID,
+        value: StateValue
+    )
 
-    /// The date and time when this `StateChange` instance was created.
-    /// This is used for ordering changes chronologically, particularly in the `changeHistory`.
-    public let created: Date
+    /// Updates an item's primary name.
+    case setItemName(
+        id: ItemID,
+        name: String
+    )
 
-    /// Creates a new `StateChange` record, describing a proposed modification to the game state.
-    ///
-    /// When you create a `StateChange`, you specify which entity is affected, which of its
-    /// attributes should change, and what the new value should be. Optionally, you can provide
-    /// the `oldValue` for validation purposes.
-    ///
-    /// - Parameters:
-    ///   - entityID: The `EntityID` of the game entity to be modified.
-    ///   - attribute: The `AttributeKey` identifying the specific property to change.
-    ///   - oldValue: Optional. The expected current value of the attribute before the change.
-    ///               If provided, the `GameEngine` will validate this against the actual current
-    ///               state before applying the change.
-    ///   - newValue: The `StateValue` that the attribute should be set to.
-    public init(
-        entityID: EntityID,
-        attribute: AttributeKey,
-        oldValue: StateValue? = nil,
-        newValue: StateValue
-    ) {
-        self.entityID = entityID
-        self.attribute = attribute
-        self.oldValue = oldValue
-        self.newValue = newValue
-        self.created = .now
-    }
-}
+    /// Updates the descriptive adjectives associated with an item.
+    case setItemAdjectives(
+        id: ItemID,
+        adjectives: [String]
+    )
 
-// MARK: - Conformances
+    /// Sets the carrying capacity of a container item.
+    case setItemCapacity(
+        id: ItemID,
+        capacity: Int
+    )
 
-extension StateChange: Comparable {
-    /// Compares two `StateChange` objects based on their `created` timestamps.
-    ///
-    /// This allows `StateChange` instances to be sorted chronologically, which is primarily
-    /// used for ordering the `GameState.changeHistory`.
-    /// - Returns: `true` if `lhs` was created before `rhs`; otherwise, `false`.
-    public static func < (lhs: StateChange, rhs: StateChange) -> Bool {
-        lhs.created < rhs.created
-    }
+    /// Updates an item's size or weight value.
+    case setItemSize(
+        id: ItemID,
+        size: Int
+    )
+
+    /// Updates alternative nouns by which an item can be referenced.
+    case setItemSynonyms(
+        id: ItemID,
+        synonyms: [String]
+    )
+
+    /// Sets the numerical value of an item (for scoring or economy).
+    case setItemValue(
+        id: ItemID,
+        value: Int
+    )
+
+    // MARK: - Location State Changes
+
+    /// Sets a dynamic property on a location.
+    case setLocationProperty(
+        id: LocationID,
+        property: LocationPropertyID,
+        value: StateValue
+    )
+
+    /// Updates a location's description text.
+    case setLocationDescription(
+        id: LocationID,
+        description: String
+    )
+
+    /// Updates a location's primary name.
+    case setLocationName(
+        id: LocationID,
+        name: String
+    )
+
+    /// Updates the available exits from a location.
+    case setLocationExits(
+        id: LocationID,
+        exits: Set<Exit>
+    )
+
+    // MARK: - Player State Changes
+
+    /// Moves the player to a specific location.
+    case movePlayer(to: LocationID)
+
+    /// Moves the player to a parent entity (typically a location, but supports containers).
+    case movePlayerTo(parent: ParentEntity)
+
+    /// Sets the player's score to a specific value.
+    case setPlayerScore(to: Int)
+
+    /// Updates the player's character attributes (health, stats, etc.).
+    case setPlayerAttributes(attributes: CharacterSheet)
+
+    /// Increments the player's move counter by one.
+    case incrementPlayerMoves
+
+    // MARK: - Global State Changes
+
+    /// Sets a global boolean flag to `true`.
+    case setFlag(GlobalID)
+
+    /// Sets a global boolean flag to `false`.
+    case clearFlag(GlobalID)
+
+    /// Sets a global boolean value.
+    case setGlobalBool(
+        id: GlobalID,
+        value: Bool
+    )
+
+    /// Sets a global integer value.
+    case setGlobalInt(
+        id: GlobalID,
+        value: Int
+    )
+
+    /// Sets a global string value.
+    case setGlobalString(
+        id: GlobalID,
+        value: String
+    )
+
+    /// Sets a global ItemID reference.
+    case setGlobalItemID(
+        id: GlobalID,
+        value: ItemID
+    )
+
+    /// Sets a global LocationID reference.
+    case setGlobalLocationID(
+        id: GlobalID,
+        value: LocationID
+    )
+
+    /// Sets a global state value of any supported type.
+    case setGlobalState(
+        id: GlobalID,
+        value: StateValue
+    )
+
+    /// Removes a global state value entirely.
+    case clearGlobalState(id: GlobalID)
+
+    /// Updates the current combat state.
+    case setCombatState(CombatState?)
+
+    // MARK: - Timed Events (Fuses & Daemons)
+
+    /// Activates a daemon for periodic background processing.
+    case addActiveDaemon(daemonID: DaemonID)
+
+    /// Deactivates a currently running daemon.
+    case removeActiveDaemon(daemonID: DaemonID)
+
+    /// Starts a fuse with the specified initial state.
+    case addActiveFuse(fuseID: FuseID, state: FuseState)
+
+    /// Stops and removes an active fuse.
+    case removeActiveFuse(fuseID: FuseID)
+
+    /// Updates the remaining turns for an active fuse.
+    case updateFuseTurns(fuseID: FuseID, turns: Int)
 }
 
 extension StateChange: CustomStringConvertible {
     public var description: String {
-        var rows = [
-            "entityID: \(entityID)",
-            "attribute: \(attribute)",
-            "newValue: \(newValue)",
-        ]
-        if let oldValue {
-            rows.insert("oldValue: \(oldValue)", at: 2)
+        switch self {
+        case .moveItem(let id, let parent):
+            ".moveItem(id: \(id), to: \(parent))"
+        case .setItemProperty(let id, let property, let value):
+            ".setItemProperty(id: \(id), property: \(property), value: \(value))"
+        case .setItemName(let id, let name):
+            ".setItemName(id: \(id), name: \"\(name)\")"
+        case .setItemAdjectives(let id, let adjectives):
+            ".setItemAdjectives(id: \(id), adjectives: \(adjectives))"
+        case .setItemCapacity(let id, let capacity):
+            ".setItemCapacity(id: \(id), capacity: \(capacity))"
+        case .setItemSize(let id, let size):
+            ".setItemSize(id: \(id), size: \(size))"
+        case .setItemSynonyms(let id, let synonyms):
+            ".setItemSynonyms(id: \(id), synonyms: \(synonyms))"
+        case .setItemValue(let id, let value):
+            ".setItemValue(id: \(id), value: \(value))"
+        case .setLocationProperty(let id, let property, let value):
+            ".setLocationProperty(id: \(id), property: \(property), value: \(value))"
+        case .setLocationDescription(let id, let description):
+            ".setLocationDescription(id: \(id), description: \"\(description)\")"
+        case .setLocationName(let id, let name):
+            ".setLocationName(id: \(id), name: \"\(name)\")"
+        case .setLocationExits(let id, let exits):
+            ".setLocationExits(id: \(id), exits: \(exits))"
+        case .movePlayer(let locationID):
+            ".movePlayer(to: \(locationID))"
+        case .movePlayerTo(let parent):
+            ".movePlayerTo(parent: \(parent))"
+        case .setPlayerScore(let score):
+            ".setPlayerScore(to: \(score))"
+        case .setPlayerAttributes(let attributes):
+            ".setPlayerAttributes(\(attributes))"
+        case .incrementPlayerMoves:
+            ".incrementPlayerMoves()"
+        case .setFlag(let id):
+            ".setFlag(\(id))"
+        case .clearFlag(let id):
+            ".clearFlag(\(id))"
+        case .setGlobalBool(let id, let value):
+            ".setGlobalBool(id: \(id), value: \(value))"
+        case .setGlobalInt(let id, let value):
+            ".setGlobalInt(id: \(id), value: \(value))"
+        case .setGlobalString(let id, let value):
+            ".setGlobalString(id: \(id), value: \"\(value)\")"
+        case .setGlobalItemID(let id, let value):
+            ".setGlobalItemID(id: \(id), value: \(value))"
+        case .setGlobalLocationID(let id, let value):
+            ".setGlobalLocationID(id: \(id), value: \(value))"
+        case .setGlobalState(let id, let value):
+            ".setGlobalState(id: \(id), value: \(value))"
+        case .clearGlobalState(let id):
+            ".clearGlobalState(id: \(id))"
+        case .setCombatState(let state):
+            ".setCombatState(\(String(describing: state)))"
+        case .addActiveDaemon(let daemonID):
+            ".addActiveDaemon(daemonID: \(daemonID))"
+        case .removeActiveDaemon(let daemonID):
+            ".removeActiveDaemon(daemonID: \(daemonID))"
+        case .addActiveFuse(let fuseID, let fuseState):
+            ".addActiveFuse(fuseID: \(fuseID), state: \(fuseState))"
+        case .removeActiveFuse(let fuseID):
+            ".removeActiveFuse(fuseID: \(fuseID))"
+        case .updateFuseTurns(let fuseID, let turns):
+            ".updateFuseTurns(fuseID: \(fuseID), turns: \(turns))"
         }
-        return """
-            StateChange(
-            \(rows.joined(separator: "\n").indent())
-            )
-            """
     }
 }
 
 extension StateChange: Equatable {
-    /// Determines if two `StateChange` objects are equal based on their core properties.
-    ///
-    /// Two `StateChange` instances are considered equal if they target the same `entityID`
-    /// and `attribute`, and have the same `oldValue` and `newValue`.
-    /// The `created` timestamp is not considered in this comparison.
-    /// - Returns: `true` if the core properties of `lhs` and `rhs` are identical; otherwise, `false`.
     public static func == (lhs: StateChange, rhs: StateChange) -> Bool {
-        lhs.entityID == rhs.entityID
-        && lhs.attribute == rhs.attribute
-        && lhs.oldValue == rhs.oldValue
-        && lhs.newValue == rhs.newValue
+        switch (lhs, rhs) {
+        case (.moveItem(let lhsId, let lhsParent), .moveItem(let rhsId, let rhsParent)):
+            return lhsId == rhsId && lhsParent == rhsParent
+        case (
+            .setItemProperty(let lhsId, let lhsProp, let lhsValue),
+            .setItemProperty(let rhsId, let rhsProp, let rhsValue)
+        ):
+            return lhsId == rhsId && lhsProp == rhsProp && lhsValue == rhsValue
+        case (.setItemName(let lhsId, let lhsName), .setItemName(let rhsId, let rhsName)):
+            return lhsId == rhsId && lhsName == rhsName
+        case (
+            .setItemAdjectives(let lhsId, let lhsAdj),
+            .setItemAdjectives(let rhsId, let rhsAdj)
+        ):
+            return lhsId == rhsId && lhsAdj == rhsAdj
+        case (
+            .setItemCapacity(let lhsId, let lhsCap), .setItemCapacity(let rhsId, let rhsCap)
+        ):
+            return lhsId == rhsId && lhsCap == rhsCap
+        case (.setItemSize(let lhsId, let lhsSize), .setItemSize(let rhsId, let rhsSize)):
+            return lhsId == rhsId && lhsSize == rhsSize
+        case (
+            .setItemSynonyms(let lhsId, let lhsSyn), .setItemSynonyms(let rhsId, let rhsSyn)
+        ):
+            return lhsId == rhsId && lhsSyn == rhsSyn
+        case (.setItemValue(let lhsId, let lhsValue), .setItemValue(let rhsId, let rhsValue)):
+            return lhsId == rhsId && lhsValue == rhsValue
+        case (
+            .setLocationProperty(let lhsId, let lhsProp, let lhsValue),
+            .setLocationProperty(let rhsId, let rhsProp, let rhsValue)
+        ):
+            return lhsId == rhsId && lhsProp == rhsProp && lhsValue == rhsValue
+        case (
+            .setLocationDescription(let lhsId, let lhsDesc),
+            .setLocationDescription(let rhsId, let rhsDesc)
+        ):
+            return lhsId == rhsId && lhsDesc == rhsDesc
+        case (
+            .setLocationName(let lhsId, let lhsName), .setLocationName(let rhsId, let rhsName)
+        ):
+            return lhsId == rhsId && lhsName == rhsName
+        case (
+            .setLocationExits(let lhsId, let lhsExits),
+            .setLocationExits(let rhsId, let rhsExits)
+        ):
+            return lhsId == rhsId && lhsExits == rhsExits
+        case (.movePlayer(let lhsLoc), .movePlayer(let rhsLoc)):
+            return lhsLoc == rhsLoc
+        case (.movePlayerTo(let lhsParent), .movePlayerTo(let rhsParent)):
+            return lhsParent == rhsParent
+        case (.setPlayerScore(let lhsScore), .setPlayerScore(let rhsScore)):
+            return lhsScore == rhsScore
+        case (.setPlayerAttributes(let lhsAttrs), .setPlayerAttributes(let rhsAttrs)):
+            return lhsAttrs == rhsAttrs
+        case (.incrementPlayerMoves, .incrementPlayerMoves):
+            return true
+        case (.setFlag(let lhsId), .setFlag(let rhsId)):
+            return lhsId == rhsId
+        case (.clearFlag(let lhsId), .clearFlag(let rhsId)):
+            return lhsId == rhsId
+        case (
+            .setGlobalBool(let lhsId, let lhsValue), .setGlobalBool(let rhsId, let rhsValue)
+        ):
+            return lhsId == rhsId && lhsValue == rhsValue
+        case (.setGlobalInt(let lhsId, let lhsValue), .setGlobalInt(let rhsId, let rhsValue)):
+            return lhsId == rhsId && lhsValue == rhsValue
+        case (
+            .setGlobalString(let lhsId, let lhsValue),
+            .setGlobalString(let rhsId, let rhsValue)
+        ):
+            return lhsId == rhsId && lhsValue == rhsValue
+        case (
+            .setGlobalItemID(let lhsId, let lhsValue),
+            .setGlobalItemID(let rhsId, let rhsValue)
+        ):
+            return lhsId == rhsId && lhsValue == rhsValue
+        case (
+            .setGlobalLocationID(let lhsId, let lhsValue),
+            .setGlobalLocationID(let rhsId, let rhsValue)
+        ):
+            return lhsId == rhsId && lhsValue == rhsValue
+        case (
+            .setGlobalState(let lhsId, let lhsValue), .setGlobalState(let rhsId, let rhsValue)
+        ):
+            return lhsId == rhsId && lhsValue == rhsValue
+        case (.clearGlobalState(let lhsId), .clearGlobalState(let rhsId)):
+            return lhsId == rhsId
+        case (.setCombatState(let lhsState), .setCombatState(let rhsState)):
+            return lhsState == rhsState
+        case (.addActiveDaemon(let lhsId), .addActiveDaemon(let rhsId)):
+            return lhsId == rhsId
+        case (.removeActiveDaemon(let lhsId), .removeActiveDaemon(let rhsId)):
+            return lhsId == rhsId
+        case (
+            .addActiveFuse(let lhsId, let lhsState), .addActiveFuse(let rhsId, let rhsState)
+        ):
+            return lhsId == rhsId && lhsState == rhsState
+        case (.removeActiveFuse(let lhsId), .removeActiveFuse(let rhsId)):
+            return lhsId == rhsId
+        case (
+            .updateFuseTurns(let lhsId, let lhsTurns),
+            .updateFuseTurns(let rhsId, let rhsTurns)
+        ):
+            return lhsId == rhsId && lhsTurns == rhsTurns
+
+        default:
+            return false
+        }
     }
 }

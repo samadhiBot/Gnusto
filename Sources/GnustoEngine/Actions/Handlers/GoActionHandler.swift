@@ -3,107 +3,88 @@ import Foundation
 /// Handles movement commands (e.g., "GO NORTH", "NORTH", "N"), allowing the player to navigate
 /// between locations in the game world.
 public struct GoActionHandler: ActionHandler {
-    /// Validates the "GO" command (or its directional shorthand).
+    // MARK: - Verb Definition Properties
+
+    public let syntax: [SyntaxRule] = [
+        .match(.verb, .direction)
+    ]
+
+    public let synonyms: [Verb] = [
+        .go, .walk, .run, .proceed, .stroll, .hike, .head, .move, .travel,
+    ]
+
+    public let requiresLight: Bool = false
+
+    // MARK: - Action Processing Methods
+
+    public init() {}
+
+    /// Processes the "GO" command.
     ///
-    /// This method ensures that:
-    /// 1. A direction is specified in the command.
-    /// 2. The player's current location has an exit in the specified direction.
-    /// 3. If the exit has a static `blockedMessage`, that message is thrown as an error.
-    /// 4. If the exit is guarded by a door (`doorID` is present):
-    ///    a. The door item exists.
-    ///    b. The door is not flagged as `.isLocked`.
-    ///    c. The door is flagged as `.isOpen`.
-    ///
-    /// - Parameter context: The `ActionContext` for the current action.
-    /// - Throws: Various `ActionResponse` errors if validation fails, such as:
-    ///           `prerequisiteNotMet` (if no direction), `invalidDirection` (if no such exit),
-    ///           `directionIsBlocked` (if statically blocked or door is locked/closed).
-    ///           Can also throw errors from `context.engine.item()` or `context.engine.location()`.
-    public func validate(context: ActionContext) async throws {
-        // 1. Identify Direction
+    /// This action validates prerequisites and handles moving the player between locations.
+    /// Checks for valid direction, exit availability, and door conditions.
+    public func process(context: ActionContext) async throws -> ActionResult {
+        // Identify Direction
         guard let direction = context.command.direction else {
-            throw ActionResponse.prerequisiteNotMet("Go where?")
+            throw ActionResponse.feedback(
+                context.msg.goWhere()
+            )
         }
 
-        // 2. Get Current Location data
-        let currentLocationID = await context.engine.playerLocationID
-        let currentLocation = try await context.engine.location(currentLocationID)
+        // Get Current Location data
+        let currentLocation = try await context.player.location
 
-        // 3. Find Exit
-        guard let exit = currentLocation.exits[direction] else {
-            throw ActionResponse.invalidDirection // Standard message: "You can't go that way."
+        // Find Exit
+        guard
+            let exit = try await currentLocation.exits
+                .first(where: { $0.direction == direction })
+        else {
+            throw ActionResponse.invalidDirection
         }
 
-        // 4. Check Exit Conditions
+        // Check Exit Conditions
 
-        // Check for static blocked message first
+        // Check if exit is permanently blocked (no destination)
+        guard let destinationID = exit.destinationID else {
+            let message = exit.blockedMessage ?? "You can't go that way."
+            throw ActionResponse.directionIsBlocked(message)
+        }
+
+        // Check for static blocked message
         if let staticBlockedMessage = exit.blockedMessage {
             throw ActionResponse.directionIsBlocked(staticBlockedMessage)
         }
 
-        // Continue if exit is a door, otherwise validation is done
-        guard let doorID = exit.doorID else { return }
-        let door = try await context.engine.item(doorID)
+        // Check door conditions if exit has a doorID
+        if let doorID = exit.doorID {
+            let door = try await context.engine.item(doorID)
 
-        // Check if the door is locked
-        if door.hasFlag(.isLocked) {
-            throw ActionResponse.directionIsBlocked("The \(door.name) is locked.")
+            // Apply door validation based on the item's specific capabilities
+            // Check if the door is locked (only applies to lockable items)
+            let isLockable = await door.hasFlag(.isLockable)
+            let isLocked = await door.hasFlag(.isLocked)
+
+            if isLockable && isLocked {
+                throw await ActionResponse.directionIsBlocked(
+                    context.msg.doorIsLocked(door.withDefiniteArticle)
+                )
+            }
+
+            // Check if the door is closed (only applies to openable doors)
+            let isOpenable = await door.isOpenable
+            let isOpen = await door.isOpen
+
+            if isOpenable && !isOpen {
+                throw await ActionResponse.directionIsBlocked(
+                    context.msg.doorIsClosed(door.withDefiniteArticle)
+                )
+            }
         }
 
-        // Check if the door is open
-        if !door.hasFlag(.isOpen) {
-            throw ActionResponse.directionIsBlocked("The \(direction.rawValue) door is closed.")
-        }
-    }
-
-    /// Processes the "GO" command.
-    ///
-    /// Assuming validation has passed, this action:
-    /// 1. Retrieves the current location and the exit details for the specified direction.
-    /// 2. Creates a `StateChange` to update the player's `currentLocationID` to the
-    ///    destination of the exit.
-    /// 3. If the destination location has not yet been visited, creates a `StateChange` to set
-    ///    its `.isVisited` flag.
-    /// 4. Returns an `ActionResult` containing these state changes. Typically, no direct message
-    ///    is returned by this action, as the game engine will subsequently describe the new location.
-    ///
-    /// - Parameter context: The `ActionContext` for the current action.
-    /// - Returns: An `ActionResult` with `StateChange`s to move the player and mark the new
-    ///            location as visited.
-    /// - Throws: `ActionResponse.internalEngineError` if the exit disappears between validation and
-    ///           process, or errors from `context.engine.location()` / `context.engine.item()`.
-    public func process(context: ActionContext) async throws -> ActionResult {
-        // Validation passed, find exit again (state might have changed, though unlikely for exits)
-        let currentLocation = try await context.engine.playerLocation()
-        guard
-            let direction = context.command.direction,
-            let exit = currentLocation.exits[direction]
-        else {
-            // Should not happen if validate passed, but defensive check
-            throw ActionResponse.internalEngineError(
-                "Exit disappeared between validate and process for GO context.command."
-            )
-        }
-        let destination = try await context.engine.location(exit.destinationID)
-
-        // Create state changes
-        var stateChanges: [StateChange] = [
-            StateChange(
-                entityID: .player,
-                attribute: .playerLocation,
-                oldValue: .locationID(currentLocation.id),
-                newValue: .locationID(exit.destinationID)
-            )
-        ]
-
-        // Set isVisited flag for the new location if it hasn't been visited yet
-        if let update = await context.engine.setFlag(.isVisited, on: destination) {
-            stateChanges.append(update)
-        }
-
-        // --- Create Result ---
         // Movement itself doesn't usually print a message; the new location description suffices.
-        // The context.engine's run loop will trigger describeCurrentLocation after state changes.
-        return ActionResult(stateChanges: stateChanges)
+        // The engine's run loop will trigger describeCurrentLocation after state changes.
+        return ActionResult(
+            await context.player.move(to: destinationID)
+        )
     }
 }

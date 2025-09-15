@@ -1,12 +1,14 @@
-import Testing
+import CustomDump
 import Foundation
-
-@testable import GnustoEngine
+import GnustoEngine
+import GnustoTestSupport
+import Testing
 
 @Suite("Location Tests")
 struct LocationTests {
 
-    // — Test Setup —
+    // MARK: - Test Setup
+
     let defaultLocationID: LocationID = "defaultLoc"
     let defaultLocationName = "Room"
 
@@ -19,40 +21,37 @@ struct LocationTests {
     }
 
     func createCustomLocation() -> Location {
-        let westExit = Exit(destination: "westOfHouse", blockedMessage: "You head west.")
-        let eastExit = Exit(destination: "nowhere", blockedMessage: "A solid wall blocks your path.")
         return Location(
             id: "livingRoom",
             .name("Living Room"),
             .description("A comfortably furnished living room. There are exits west and east."),
-            .exits([.west: westExit, .east: eastExit]),
+            .exits(
+                .west(blocked: "You head west."),
+                .east(blocked: "A solid wall blocks your path.")
+            ),
             .inherentlyLit,
-            .isSacred,
-            .localGlobals("rug", "fireplace"),
+            .localGlobals("rug", "fireplace")
         )
     }
 
-    // — Tests —
+    // MARK: - Core Struct Tests
 
     @Test("Location Default Initialization")
     func testLocationDefaultInitialization() throws {
         let location = createDefaultLocation()
 
         #expect(location.id == defaultLocationID)
-        #expect(location.name == defaultLocationName)
-        // Check attributes for descriptions
-        #expect(location.attributes[.description] == .string("A nondescript room."))
-        #expect(location.attributes[.shortDescription] == nil)
-        #expect(location.exits.isEmpty)
-        #expect(location.attributes == [
+        #expect(location.properties[.name]?.toString == defaultLocationName)
+        // Check properties for descriptions
+        #expect(location.properties[.description] == .string("A nondescript room."))
+        #expect(location.properties[.shortDescription] == nil)
+        #expect(location.properties[.exits] == nil)  // Not set, so nil
+        #expect(location.properties == [
             .name: "Room",
             .description: "A nondescript room.",
         ])
-
-        #expect(location.attributes[.inherentlyLit] == nil)
-        #expect(location.hasFlag(.inherentlyLit) == false)
-
-        #expect(location.localGlobals.isEmpty)
+        #expect(location.properties[.inherentlyLit] == nil)
+        #expect(location.properties[.localGlobals] == nil)  // Not set, so nil
     }
 
     @Test("Location Custom Initialization")
@@ -61,104 +60,107 @@ struct LocationTests {
         let rugID: ItemID = "rug"
 
         #expect(location.id == "livingRoom")
-        #expect(location.name == "Living Room")
-        // Check attributes for descriptions
-        #expect(location.attributes[.description] == .string("A comfortably furnished living room. There are exits west and east."))
-        #expect(location.attributes[.shortDescription] == nil)
-        #expect(location.exits.count == 2)
-        #expect(location.exits[.west]?.destinationID == "westOfHouse")
-        #expect(location.exits[.east]?.blockedMessage == "A solid wall blocks your path.")
-        #expect(location.hasFlag(.inherentlyLit))
-        #expect(location.hasFlag(.isSacred))
-        #expect(location.localGlobals.count == 2)
-        #expect(location.localGlobals.contains(rugID))
-        // Check the full attributes dictionary for completeness
+        #expect(location.properties[.name]?.toString == "Living Room")
+        // Check properties for descriptions
+        expectNoDifference(
+            location.properties[.description],
+            .string("A comfortably furnished living room. There are exits west and east.")
+        )
+        #expect(location.properties[.shortDescription] == nil)
+        expectNoDifference(location.properties[.exits]?.toExits, [
+            .east(blocked: "A solid wall blocks your path."),
+            .west(blocked: "You head west."),
+        ])
+        #expect(location.properties[.inherentlyLit]?.toBool == true)
+        #expect(location.properties[.localGlobals]?.toItemIDs?.count == 2)
+        #expect(location.properties[.localGlobals]?.toItemIDs?.contains(rugID) == true)
+        // Check the full properties dictionary for completeness
         #expect(
-            location.attributes == [
+            location.properties == [
                 .name: "Living Room",
                 .description: "A comfortably furnished living room. There are exits west and east.",
                 .exits: .exits([
-                    .west: Exit(
-                        destination: "westOfHouse",
-                        blockedMessage: "You head west."
-                    ),
-                    .east: Exit(
-                        destination: "nowhere",
-                        blockedMessage: "A solid wall blocks your path."
-                    )
+                    .west(blocked: "You head west."),
+                    .east(blocked: "A solid wall blocks your path."),
                 ]),
                 .inherentlyLit: true,
-                .isSacred: true,
-                .localGlobals: .itemIDSet(["rug", "fireplace"])
+                .localGlobals: .itemIDSet(["rug", "fireplace"]),
             ]
         )
     }
 
-    @Test("Location Attribute Management")
-    func testLocationAttributeManagement() throws {
+    @Test("Location Property Management")
+    func testLocationPropertyManagement() throws {
         var location = createDefaultLocation()
 
-        #expect(!location.hasFlag(.inherentlyLit)) // isInherentlyLit is false by default
-        #expect(location.attributes == [
-            .name: "Room",
-            .description: "A nondescript room."
-        ])
+        #expect(location.properties[.inherentlyLit] == nil)  // Not set, so nil
+        #expect(
+            location.properties == [
+                .name: "Room",
+                .description: "A nondescript room.",
+            ])
 
-        location.attributes[.inherentlyLit] = true
-        #expect(location.hasFlag(.inherentlyLit))
-        #expect(location.attributes == [
-            .name: "Room",
-            .description: "A nondescript room.",
-            .inherentlyLit: true,
-        ])
+        location.properties[.inherentlyLit] = true
+        #expect(location.properties[.inherentlyLit]?.toBool == true)
+        #expect(
+            location.properties == [
+                .name: "Room",
+                .description: "A nondescript room.",
+                .inherentlyLit: true,
+            ])
 
-        location.attributes[.inherentlyLit] = true // Setting again should have no effect on count
-        #expect(location.attributes == [
-            .name: "Room",
-            .description: "A nondescript room.",
-            .inherentlyLit: true,
-        ])
+        location.properties[.inherentlyLit] = true  // Setting again should have no effect on count
+        #expect(
+            location.properties == [
+                .name: "Room",
+                .description: "A nondescript room.",
+                .inherentlyLit: true,
+            ])
 
-        location.attributes[.isOutside] = true
-        #expect(location.hasFlag(.isOutside))
-        #expect(location.attributes == [
-            .name: "Room",
-            .description: "A nondescript room.",
-            .inherentlyLit: true,
-            .isOutside: true,
-        ])
+        location.properties[.isOutside] = true
+        #expect(location.properties[.isOutside]?.toBool == true)
+        #expect(
+            location.properties == [
+                .name: "Room",
+                .description: "A nondescript room.",
+                .inherentlyLit: true,
+                .isOutside: true,
+            ])
 
-        location.attributes[.inherentlyLit] = false // Set back to false, don’t remove the key
-        #expect(!location.hasFlag(.inherentlyLit))
-        #expect(location.hasFlag(.isOutside))
-        #expect(location.attributes == [
-            .name: "Room",
-            .description: "A nondescript room.",
-            .inherentlyLit: false,
-            .isOutside: true,
-        ])
+        location.properties[.inherentlyLit] = false  // Set back to false, don't remove the key
+        #expect(location.properties[.inherentlyLit]?.toBool == false)
+        #expect(location.properties[.isOutside]?.toBool == true)
+        #expect(
+            location.properties == [
+                .name: "Room",
+                .description: "A nondescript room.",
+                .inherentlyLit: false,
+                .isOutside: true,
+            ])
 
-        location.attributes[.inherentlyLit] = nil // Remove the key entirely
-        #expect(!location.hasFlag(.inherentlyLit)) // Still false
-        #expect(location.attributes == [
-            .name: "Room",
-            .description: "A nondescript room.",
-            .isOutside: true,
-        ])
+        location.properties[.inherentlyLit] = nil  // Remove the key entirely
+        #expect(location.properties[.inherentlyLit] == nil)  // Now nil
+        #expect(
+            location.properties == [
+                .name: "Room",
+                .description: "A nondescript room.",
+                .isOutside: true,
+            ])
 
-        location.attributes[.isOutside] = nil // Remove the other key
-        #expect(!location.hasFlag(.isOutside))
-        #expect(location.attributes == [
-            .name: "Room",
-            .description: "A nondescript room.",
-        ])
+        location.properties[.isOutside] = nil  // Remove the other key
+        #expect(location.properties[.isOutside] == nil)  // Now nil
+        #expect(
+            location.properties == [
+                .name: "Room",
+                .description: "A nondescript room.",
+            ])
     }
 
     @Test("Location Codable Conformance")
     func testLocationCodable() throws {
         var originalLocation = createCustomLocation()
         // Add a short description for thorough testing by setting dynamic value
-        originalLocation.attributes[.shortDescription] = .string("A comfy room.")
+        originalLocation.properties[.shortDescription] = .string("A comfy room.")
 
         let encoder = JSONEncoder()
         encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
@@ -169,47 +171,182 @@ struct LocationTests {
 
         // Verify key properties after decoding
         #expect(decodedLocation.id == originalLocation.id)
-        #expect(decodedLocation.name == originalLocation.name)
-        // Compare attributes for descriptions
-        #expect(decodedLocation.attributes[.description] == originalLocation.attributes[.description])
-        #expect(decodedLocation.attributes[.shortDescription] == originalLocation.attributes[.shortDescription])
-        #expect(decodedLocation.exits.count == originalLocation.exits.count)
-        #expect(decodedLocation.exits[.west]?.destinationID == originalLocation.exits[.west]?.destinationID)
-        #expect(decodedLocation.exits[.east]?.blockedMessage == originalLocation.exits[.east]?.blockedMessage)
-        #expect(decodedLocation.attributes == originalLocation.attributes)
-        #expect(decodedLocation.localGlobals == originalLocation.localGlobals)
+        #expect(decodedLocation.properties[.name] == originalLocation.properties[.name])
+        // Compare properties for descriptions
+        #expect(
+            decodedLocation.properties[.description] == originalLocation.properties[.description])
+        #expect(
+            decodedLocation.properties[.shortDescription]
+            == originalLocation.properties[.shortDescription]
+        )
+        expectNoDifference(decodedLocation.properties[.exits]?.toExits, [
+            .east(blocked: "A solid wall blocks your path."),
+            .west(blocked: "You head west."),
+        ])
+        #expect(decodedLocation.properties == originalLocation.properties)
+        #expect(
+            decodedLocation.properties[.localGlobals] == originalLocation.properties[.localGlobals])
     }
 
     @Test("Location Value Semantics")
     func testLocationValueSemantics() throws {
         let location1 = createDefaultLocation()
-        var location2 = location1 // Assign creates a copy for structs
+        var location2 = location1  // Assign creates a copy for structs
 
-        let originalName = location1.name // Capture original values
-        let originalDescValue = location1.attributes[.description] // Capture original dynamic value
+        let originalName = location1.properties[.name]?.toString  // Capture original values
+        let originalDescValue = location1.properties[.description]  // Capture original dynamic value
 
         // Modify the copy (location2)
-        location2.attributes[.name] = "Renamed Room"
-        location2.attributes[.isVisited] = true
+        location2.properties[.name] = "Renamed Room"
+        location2.properties[.isVisited] = true
         // Set dynamic value for description
-        location2.attributes[.description] = .string("An updated room.")
+        location2.properties[.description] = .string("An updated room.")
 
         // Assert that the original (location1) is unchanged
-        #expect(location1.name == originalName) // Check against captured default
-        #expect(!location1.hasFlag(.isVisited))
-        // Check original dynamic value
-        #expect(location1.attributes[.description] == originalDescValue)
+        #expect(location1.properties[.name]?.toString == originalName)  // Check against captured default
+        #expect(location1.properties[.isVisited] == nil)  // Not set, so nil
+                                                          // Check original dynamic value
+        #expect(location1.properties[.description] == originalDescValue)
 
         // Assert that location2 has the changes
-        #expect(location2.name == "Renamed Room")
-        #expect(location2.hasFlag(.isVisited))
+        #expect(location2.properties[.name]?.toString == "Renamed Room")
+        #expect(location2.properties[.isVisited]?.toBool == true)
         // Check new dynamic value
-        #expect(location2.attributes[.description] == .string("An updated room."))
+        #expect(location2.properties[.description] == .string("An updated room."))
 
         // Assert that location1 and location2 are now different
         #expect(location1 != location2)
     }
 
-    // TODO: Add tests for dynamic description handler registration and generation
-    // using DescriptionHandlerRegistry and Location.
+    // MARK: - Proxy Integration Tests
+
+    @Test("LocationProxy provides access to static properties")
+    func testLocationProxyStaticProperties() async throws {
+        let location = createCustomLocation()
+        let game = MinimalGame(
+            player: Player(in: "livingRoom"),
+            locations: location
+        )
+        let (engine, _) = await GameEngine.test(blueprint: game)
+
+        let proxy = try await engine.location("livingRoom")
+
+        // Test that proxy correctly accesses static properties
+        #expect(proxy.id == "livingRoom")
+
+        let nameValue = try await proxy.property(.name)
+        #expect(nameValue?.toString == "Living Room")
+
+        let descriptionValue = try await proxy.property(.description)
+        #expect(
+            descriptionValue?.toString
+            == "A comfortably furnished living room. There are exits west and east.")
+
+        let inherentlyLitValue = try await proxy.property(.inherentlyLit)
+        #expect(inherentlyLitValue?.toBool == true)
+    }
+
+    @Test("LocationProxy equality and hashing")
+    func testLocationProxyEqualityAndHashing() async throws {
+        let location1 = Location(id: "room1", .name("First Room"), .description("First room."))
+        let location2 = Location(id: "room2", .name("Second Room"), .description("Second room."))
+        let location1Copy = Location(id: "room1", .name("First Room"), .description("First room."))
+
+        let game = MinimalGame(
+            player: Player(in: "room1"),
+            locations: location1, location2
+        )
+        let (engine, _) = await GameEngine.test(blueprint: game)
+
+        let proxy1 = try await engine.location("room1")
+        let proxy2 = try await engine.location("room2")
+        let proxy1Copy = try await location1Copy.proxy(engine)
+
+        // Test equality
+        #expect(proxy1 == proxy1Copy)  // Same location content
+        #expect(proxy1 != proxy2)  // Different locations
+
+        // Test hashing
+        var hasher1 = Hasher()
+        proxy1.hash(into: &hasher1)
+
+        var hasher1Copy = Hasher()
+        proxy1Copy.hash(into: &hasher1Copy)
+
+        var hasher2 = Hasher()
+        proxy2.hash(into: &hasher2)
+
+        #expect(hasher1.finalize() == hasher1Copy.finalize())
+        #expect(hasher1.finalize() != hasher2.finalize())
+    }
+
+    @Test("LocationProxy handles missing properties gracefully")
+    func testLocationProxyMissingProperties() async throws {
+        let location = Location(id: "minimal", .name("Minimal Room"))
+        let game = MinimalGame(
+            player: Player(in: "minimal"),
+            locations: location
+        )
+        let (engine, _) = await GameEngine.test(blueprint: game)
+
+        let proxy = try await engine.location("minimal")
+
+        // Test that proxy returns nil for unset properties
+        let shortDescValue = try await proxy.property(.shortDescription)
+        #expect(shortDescValue == nil)
+
+        let exitsValue = try await proxy.property(.exits)
+        #expect(exitsValue == nil)  // Not set, so nil
+
+        let inherentlyLitValue = try await proxy.property(.inherentlyLit)
+        #expect(inherentlyLitValue == nil)  // Not set, so nil
+    }
+
+    @Test("Engine location lookup throws for unknown locations")
+    func testEngineLocationLookupFailure() async throws {
+        let (engine, _) = await GameEngine.test()
+
+        await #expect(throws: ActionResponse.self) {
+            _ = try await engine.location("nonexistent")
+        }
+    }
+
+    @Test("LocationProxy handles exits correctly")
+    func testLocationProxyExits() async throws {
+        let location = createCustomLocation()
+        let game = MinimalGame(
+            player: Player(in: "livingRoom"),
+            locations: location
+        )
+        let (engine, _) = await GameEngine.test(blueprint: game)
+
+        let proxy = try await engine.location("livingRoom")
+
+        let exitsValue = try await proxy.property(.exits)
+        let exits = exitsValue?.toExits
+
+        expectNoDifference(exits, [
+            .east(blocked: "A solid wall blocks your path."),
+            .west(blocked: "You head west."),
+        ])
+    }
+
+    @Test("LocationProxy handles localGlobals correctly")
+    func testLocationProxyLocalGlobals() async throws {
+        let location = createCustomLocation()
+        let game = MinimalGame(
+            player: Player(in: "livingRoom"),
+            locations: location
+        )
+        let (engine, _) = await GameEngine.test(blueprint: game)
+
+        let proxy = try await engine.location("livingRoom")
+
+        let localGlobalsValue = try await proxy.property(.localGlobals)
+        let localGlobals = localGlobalsValue?.toItemIDs
+
+        #expect(localGlobals?.count == 2)
+        #expect(localGlobals?.contains("rug") == true)
+        #expect(localGlobals?.contains("fireplace") == true)
+    }
 }

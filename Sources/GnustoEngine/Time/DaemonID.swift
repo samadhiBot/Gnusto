@@ -15,7 +15,7 @@ public struct DaemonID: GnustoID {
     /// Initializes a `DaemonID` with a raw string value.
     /// - Parameter rawValue: The string value for the ID.
     public init(rawValue: String) {
-        assert(!rawValue.isEmpty, "Daemon ID cannot be empty")
+        assert(rawValue.isNotEmpty, "Daemon ID cannot be empty")
         self.rawValue = rawValue
     }
 }

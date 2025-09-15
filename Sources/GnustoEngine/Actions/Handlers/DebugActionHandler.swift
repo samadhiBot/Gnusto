@@ -10,74 +10,59 @@ import Foundation
 ///
 /// > Note: This handler is a development tool, and is only available in DEBUG game builds.
 public struct DebugActionHandler: ActionHandler {
+    // MARK: - Verb Definition Properties
+
+    public let syntax: [SyntaxRule] = [
+        .match(.verb, .directObject)
+    ]
+
+    public let synonyms: [Verb] = [.debug]
+
+    public let requiresLight: Bool = false
+
+    public let consumesTurn: Bool = false
+
+    // MARK: - Action Processing Methods
+
     public init() {}
-
-    /// Validates the "DEBUG" command.
-    ///
-    /// This method ensures that:
-    /// 1. A direct object is specified.
-    /// 2. The direct object refers to an existing entity (item, location, or player).
-    ///
-    /// - Parameter context: The `ActionContext` for the current action.
-    /// - Throws: `ActionResponse.prerequisiteNotMet` if no direct object is provided,
-    ///           or `ActionResponse.unknownEntity` if the direct object does not exist.
-    public func validate(context: ActionContext) async throws {
-        guard let directObjectRef = context.command.directObject else {
-            throw ActionResponse.prerequisiteNotMet("DEBUG requires a direct object to examine.")
-        }
-
-        switch directObjectRef {
-        case .player:
-            return // Player is always a valid entity for DEBUG.
-        case .item(let itemID):
-            guard (try? await context.engine.item(itemID)) != nil else {
-                throw ActionResponse.unknownEntity(directObjectRef)
-            }
-        case .location(let locationID):
-            guard (try? await context.engine.location(locationID)) != nil else {
-                throw ActionResponse.unknownEntity(directObjectRef)
-            }
-        }
-    }
 
     /// Processes the "DEBUG" command.
     ///
-    /// Assuming validation has passed, this action retrieves the specified entity
-    /// (item, location, or player) from the `GameState` snapshot and uses `customDump`
-    /// to generate a string representation of its properties and values.
+    /// Retrieves the specified entity (item, location, or player) from the `GameState`
+    /// and uses `customDump` to generate a string representation of its properties and values.
     ///
-    /// - Parameter context: The `ActionContext` for the current action.
+    /// - Parameter command: The command being processed.
+    /// - Parameter engine: The game context.engine.
     /// - Returns: An `ActionResult` containing the detailed dump of the target entity.
-    /// - Throws: `ActionResponse.prerequisiteNotMet` if no direct object is provided (though
-    ///           this should ideally be caught by `validate`), or `ActionResponse.unknownEntity`
-    ///           if the entity does not exist in the snapshot.
     public func process(context: ActionContext) async throws -> ActionResult {
         guard let directObjectRef = context.command.directObject else {
-            throw ActionResponse.prerequisiteNotMet("DEBUG requires a direct object.")
+            throw ActionResponse.feedback(
+                context.msg.debugRequiresObject()
+            )
         }
 
         var target = ""
 
         switch directObjectRef {
         case .player:
-            customDump(context.stateSnapshot.player, to: &target)
+            await customDump(context.engine.gameState.player, to: &target)
 
-        case .item(let itemID):
-            guard let item = context.stateSnapshot.items[itemID] else {
-                throw ActionResponse.unknownEntity(directObjectRef)
-            }
-            customDump(item, to: &target)
+        case .item(let proxy):
+            customDump(proxy.item, to: &target)
 
-        case .location(let locationID):
-            guard let location = context.stateSnapshot.locations[locationID] else {
-                throw ActionResponse.unknownEntity(directObjectRef)
-            }
-            customDump(location, to: &target)
+        case .location(let proxy):
+            customDump(proxy.location, to: &target)
+
+        case .universal(let universal):
+            customDump(universal, to: &target)
         }
-        return ActionResult("""
+
+        return ActionResult(
+            """
             ```
             \(target)
             ```
-            """)
+            """
+        )
     }
 }

@@ -1,336 +1,573 @@
-import Testing
 import CustomDump
-
-@testable import GnustoEngine
+import GnustoEngine
+import GnustoTestSupport
+import Testing
 
 @Suite("WearActionHandler Tests")
 struct WearActionHandlerTests {
-    // Keep handler instance for direct validation testing
-    let handler = WearActionHandler()
 
-    @Test("Wear held, wearable item successfully")
-    func testWearItemSuccess() async throws {
+    // MARK: - Syntax Rule Testing
+
+    @Test("WEAR DIRECTOBJECT syntax works")
+    func testWearDirectObjectSyntax() async throws {
+        // Given
+        let hat = Item(
+            id: "hat",
+            .name("red hat"),
+            .description("A stylish red hat."),
+            .isWearable,
+            .isTakable,
+            .in(.player)
+        )
+
+        let game = MinimalGame(
+            items: hat
+        )
+
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // When
+        try await engine.execute("wear hat")
+
+        // Then
+        let output = await mockIO.flush()
+        expectNoDifference(
+            output,
+            """
+            > wear hat
+            You don the red hat with practiced ease.
+            """
+        )
+
+        let finalState = try await engine.item("hat")
+        #expect(await finalState.hasFlag(.isWorn) == true)
+        #expect(await finalState.hasFlag(.isTouched) == true)
+    }
+
+    @Test("PUT ON DIRECTOBJECT syntax works")
+    func testPutOnSyntax() async throws {
+        // Given
+        let jacket = Item(
+            id: "jacket",
+            .name("leather jacket"),
+            .description("A worn leather jacket."),
+            .isWearable,
+            .isTakable,
+            .in(.player)
+        )
+
+        let game = MinimalGame(
+            items: jacket
+        )
+
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // When
+        try await engine.execute("put on jacket")
+
+        // Then
+        let output = await mockIO.flush()
+        expectNoDifference(
+            output,
+            """
+            > put on jacket
+            You don the leather jacket with practiced ease.
+            """
+        )
+
+        let finalState = try await engine.item("jacket")
+        #expect(await finalState.hasFlag(.isWorn) == true)
+    }
+
+    @Test("DON syntax works")
+    func testDonSyntax() async throws {
+        // Given
         let cloak = Item(
             id: "cloak",
-            .name("velvet cloak"),
-            .in(.player),
+            .name("dark cloak"),
+            .description("A mysterious dark cloak."),
             .isWearable,
-            .isTakable
-        )
-        let game = MinimalGame(items: [cloak])
-        let mockIO = await MockIOHandler()
-        var mockParser = MockParser()
-        let engine = await GameEngine(
-            blueprint: game,
-            parser: mockParser,
-            ioHandler: mockIO
+            .isTakable,
+            .in(.player)
         )
 
-        let command = Command(
-            verb: .wear,
-            directObject: .item("cloak"),
-            rawInput: "wear cloak"
+        let game = MinimalGame(
+            items: cloak
         )
-        mockParser.parseHandler = { _, _, _ in .success(command) }
 
-        let initialItem = try await engine.item("cloak")
-        #expect(initialItem.hasFlag(.isWorn) == false)
-        #expect(await engine.gameState.changeHistory.isEmpty)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        await engine.execute(command: command)
+        // When
+        try await engine.execute("don cloak")
 
-        let finalCloakState = try await engine.item("cloak")
-        #expect(finalCloakState.parent == .player)
-        #expect(finalCloakState.hasFlag(.isWorn) == true, "Cloak should have .worn property")
-        #expect(finalCloakState.hasFlag(.isTouched) == true, "Cloak should have .touched property")
-
+        // Then
         let output = await mockIO.flush()
-        expectNoDifference(output, "You put on the velvet cloak.")
-
-        let expectedChanges = [
-            StateChange(
-                entityID: .item("cloak"),
-                attribute: .itemAttribute(.isWorn),
-                newValue: true,
-            ),
-            StateChange(
-                entityID: .item("cloak"),
-                attribute: .itemAttribute(.isTouched),
-                newValue: true,
-            ),
-            StateChange(
-                entityID: .global,
-                attribute: .pronounReference(pronoun: "it"),
-                newValue: .entityReferenceSet([.item("cloak")])
-            )
-        ]
-        let finalHistory = await engine.gameState.changeHistory
-        expectNoDifference(finalHistory, expectedChanges)
+        expectNoDifference(
+            output,
+            """
+            > don cloak
+            You don the dark cloak with practiced ease.
+            """
+        )
     }
 
-    @Test("Wear fails if item not held")
-    func testWearItemNotHeld() async throws {
+    @Test("WEAR ALL syntax works")
+    func testWearAllSyntax() async throws {
+        // Given
+        let hat = Item(
+            id: "hat",
+            .name("blue hat"),
+            .description("A blue hat."),
+            .isWearable,
+            .isTakable,
+            .in(.player)
+        )
+
+        let gloves = Item(
+            id: "gloves",
+            .name("wool gloves"),
+            .description("Warm wool gloves."),
+            .isWearable,
+            .isTakable,
+            .in(.player)
+        )
+
+        let game = MinimalGame(
+            items: hat, gloves
+        )
+
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // When
+        try await engine.execute("wear all")
+
+        // Then
+        let output = await mockIO.flush()
+        expectNoDifference(
+            output,
+            """
+            > wear all
+            You don the wool gloves and the blue hat with practiced ease.
+            """
+        )
+
+        let finalHat = try await engine.item("hat")
+        let finalGloves = try await engine.item("gloves")
+        #expect(await finalHat.hasFlag(.isWorn) == true)
+        #expect(await finalGloves.hasFlag(.isWorn) == true)
+    }
+
+    // MARK: - Validation Testing
+
+    @Test("Cannot wear without specifying what")
+    func testCannotWearWithoutWhat() async throws {
+        // Given
         let game = MinimalGame()
-        let engine = await GameEngine(
-            blueprint: game,
-            parser: MockParser(),
-            ioHandler: await MockIOHandler()
-        )
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        let command = Command(
-            verb: .wear,
-            directObject: .item("cloak"),
-            rawInput: "wear cloak"
-        )
+        // When
+        try await engine.execute("wear")
 
-        await #expect(throws: ActionResponse.itemNotAccessible("cloak")) {
-            try await handler.validate(
-                context: ActionContext(
-                    command: command,
-                    engine: engine,
-                    stateSnapshot: engine.gameState
-                )
-            )
-        }
-        #expect(await engine.gameState.changeHistory.isEmpty)
+        // Then
+        let output = await mockIO.flush()
+        expectNoDifference(
+            output,
+            """
+            > wear
+            Wear what?
+            """
+        )
     }
 
-    @Test("Wear fails if item not wearable")
-    func testWearItemNotWearable() async throws {
+    @Test("Cannot wear item not held")
+    func testCannotWearItemNotHeld() async throws {
+        // Given
+        let hat = Item(
+            id: "hat",
+            .name("fancy hat"),
+            .description("A fancy hat."),
+            .isWearable,
+            .isTakable,
+            .in(.startRoom)
+        )
+
+        let game = MinimalGame(
+            items: hat
+        )
+
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // When
+        try await engine.execute("wear hat")
+
+        // Then
+        let output = await mockIO.flush()
+        expectNoDifference(
+            output,
+            """
+            > wear hat
+            You aren't holding the fancy hat.
+            """
+        )
+    }
+
+    @Test("Cannot wear non-wearable item")
+    func testCannotWearNonWearableItem() async throws {
+        // Given
         let rock = Item(
             id: "rock",
             .name("heavy rock"),
-            .in(.player),
-            .isTakable
-        )
-        let game = MinimalGame(items: [rock])
-        let engine = await GameEngine(
-            blueprint: game,
-            parser: MockParser(),
-            ioHandler: await MockIOHandler()
+            .description("A heavy rock."),
+            .isTakable,
+            .in(.player)
         )
 
-        let command = Command(
-            verb: .wear,
-            directObject: .item("rock"),
-            rawInput: "wear rock"
+        let game = MinimalGame(
+            items: rock
         )
 
-        await #expect(throws: ActionResponse.itemNotWearable("rock")) {
-            try await handler.validate(
-                context: ActionContext(
-                    command: command,
-                    engine: engine,
-                    stateSnapshot: engine.gameState
-                )
-            )
-        }
-        #expect(await engine.gameState.changeHistory.isEmpty)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // When
+        try await engine.execute("wear rock")
+
+        // Then
+        let output = await mockIO.flush()
+        expectNoDifference(
+            output,
+            """
+            > wear rock
+            The heavy rock stubbornly resists your attempts to wear it.
+            """
+        )
     }
 
-    @Test("Wear fails if item already worn")
-    func testWearItemAlreadyWorn() async throws {
-        let cloak = Item(
-            id: "cloak",
-            .name("velvet cloak"),
-            .in(.player),
+    @Test("Cannot wear already worn item")
+    func testCannotWearAlreadyWornItem() async throws {
+        // Given
+        let boots = Item(
+            id: "boots",
+            .name("hiking boots"),
+            .description("Sturdy hiking boots."),
             .isWearable,
             .isTakable,
-            .isWorn
-        )
-        let game = MinimalGame(items: [cloak])
-        let engine = await GameEngine(
-            blueprint: game,
-            parser: MockParser(),
-            ioHandler: await MockIOHandler()
+            .in(.player)
         )
 
-        let command = Command(
-            verb: .wear,
-            directObject: .item("cloak"),
-            rawInput: "wear cloak"
+        let game = MinimalGame(
+            items: boots
         )
 
-        await #expect(throws: ActionResponse.itemIsAlreadyWorn("cloak")) {
-            try await handler.validate(
-                context: ActionContext(
-                    command: command,
-                    engine: engine,
-                    stateSnapshot: engine.gameState
-                )
-            )
-        }
-        #expect(await engine.gameState.changeHistory.isEmpty)
-    }
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-    @Test("Wear fails with no direct object")
-    func testWearNoObject() async throws {
-        let game = MinimalGame()
-        let engine = await GameEngine(
-            blueprint: game,
-            parser: MockParser(),
-            ioHandler: await MockIOHandler()
+        // Set up: boots are already worn
+        try await engine.apply(
+            boots.proxy(engine).setFlag(.isWorn)
         )
 
-        let command = Command(
-            verb: .wear,
-            rawInput: "wear"
-        )
+        // When
+        try await engine.execute("wear boots")
 
-        await #expect(throws: ActionResponse.prerequisiteNotMet("Wear what?")) {
-            try await handler.validate(
-                context: ActionContext(
-                    command: command,
-                    engine: engine,
-                    stateSnapshot: engine.gameState
-                )
-            )
-        }
-        #expect(await engine.gameState.changeHistory.isEmpty)
-    }
-
-    // MARK: - Multiple Object Tests
-
-    @Test("WEAR ALL works correctly")
-    func testWearAll() async throws {
-        let cloak = Item(id: "cloak", .name("cloak"), .in(.player), .isWearable)
-        let boots = Item(id: "boots", .name("boots"), .in(.player), .isWearable)
-        
-        let game = MinimalGame(items: [cloak, boots])
-        let mockIO = await MockIOHandler()
-        let mockParser = MockParser()
-        let engine = await GameEngine(blueprint: game, parser: mockParser, ioHandler: mockIO)
-        
-        // Act: Execute "wear all"
-        let command = Command(
-            verb: .wear,
-            directObjects: [.item("cloak"), .item("boots")],
-            isAllCommand: true,
-            rawInput: "wear all"
-        )
-        await engine.execute(command: command)
-        
-        // Assert: Should wear both items
+        // Then
         let output = await mockIO.flush()
-        expectNoDifference(output, "You put on the boots and the cloak.")
+        expectNoDifference(
+            output,
+            """
+            > wear boots
+            You are already wearing the hiking boots.
+            """
+        )
+    }
 
-        // Verify items are worn
-        let updatedCloak = try await engine.item("cloak")
-        let updatedBoots = try await engine.item("boots")
-        #expect(updatedCloak.hasFlag(.isWorn) == true)
-        #expect(updatedBoots.hasFlag(.isWorn) == true)
-    }
-    
-    @Test("WEAR CLOAK AND BOOTS works correctly")
-    func testWearCloakAndBoots() async throws {
-        let cloak = Item(id: "cloak", .name("cloak"), .in(.player), .isWearable)
-        let boots = Item(id: "boots", .name("boots"), .in(.player), .isWearable)
-        
-        let game = MinimalGame(items: [cloak, boots])
-        let mockIO = await MockIOHandler()
-        let mockParser = MockParser()
-        let engine = await GameEngine(blueprint: game, parser: mockParser, ioHandler: mockIO)
-        
-        // Act: Execute "wear cloak and boots"
-        let command = Command(
-            verb: .wear,
-            directObjects: [.item("cloak"), .item("boots")],
-            isAllCommand: false,
-            rawInput: "wear cloak and boots"
+    @Test("Requires light to wear")
+    func testRequiresLight() async throws {
+        // Given: Dark room with wearable item
+        let darkRoom = Location(
+            id: "darkRoom",
+            .name("Dark Room"),
+            .description("A pitch black room.")
+            // Note: No .inherentlyLit property
         )
-        await engine.execute(command: command)
-        
-        // Assert: Should wear both items
-        let output = await mockIO.flush()
-        expectNoDifference(output, "You put on the boots and the cloak.")
-        
-        // Verify items are worn
-        let updatedCloak = try await engine.item("cloak")
-        let updatedBoots = try await engine.item("boots")
-        #expect(updatedCloak.hasFlag(.isWorn) == true)
-        #expect(updatedBoots.hasFlag(.isWorn) == true)
-    }
-    
-    @Test("WEAR ALL skips non-wearable items")
-    func testWearAllSkipsNonWearable() async throws {
-        let cloak = Item(id: "cloak", .name("cloak"), .in(.player), .isWearable)
-        let rock = Item(id: "rock", .name("rock"), .in(.player)) // Not wearable
-        
-        let game = MinimalGame(items: [cloak, rock])
-        let mockIO = await MockIOHandler()
-        let mockParser = MockParser()
-        let engine = await GameEngine(blueprint: game, parser: mockParser, ioHandler: mockIO)
-        
-        // Act: Execute "wear all"
-        let command = Command(
-            verb: .wear,
-            directObjects: [.item("cloak"), .item("rock")],
-            isAllCommand: true,
-            rawInput: "wear all"
+
+        let scarf = Item(
+            id: "scarf",
+            .name("warm scarf"),
+            .description("A warm scarf."),
+            .isWearable,
+            .isTakable,
+            .in(.player)
         )
-        await engine.execute(command: command)
-        
-        // Assert: Should wear only the cloak
-        let output = await mockIO.flush()
-        expectNoDifference(output, "You put on the cloak.")
-        
-        // Verify only cloak is worn
-        let updatedCloak = try await engine.item("cloak")
-        let updatedRock = try await engine.item("rock")
-        #expect(updatedCloak.hasFlag(.isWorn) == true)
-        #expect(updatedRock.hasFlag(.isWorn) == false)
-    }
-    
-    @Test("WEAR ALL with no wearable items")
-    func testWearAllWithNoWearableItems() async throws {
-        let rock = Item(id: "rock", .name("rock"), .in(.player)) // Not wearable
-        
-        let game = MinimalGame(items: [rock])
-        let mockIO = await MockIOHandler()
-        let mockParser = MockParser()
-        let engine = await GameEngine(blueprint: game, parser: mockParser, ioHandler: mockIO)
-        
-        // Act: Execute "wear all"
-        let command = Command(
-            verb: .wear,
-            directObjects: [.item("rock")],
-            isAllCommand: true,
-            rawInput: "wear all"
+
+        let game = MinimalGame(
+            player: Player(in: "darkRoom"),
+            locations: darkRoom,
+            items: scarf
         )
-        await engine.execute(command: command)
-        
-        // Assert: Should get appropriate message
+
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // When
+        try await engine.execute("wear scarf")
+
+        // Then
         let output = await mockIO.flush()
-        expectNoDifference(output, "You have nothing to wear.")
-    }
-    
-    @Test("WEAR ALL skips already worn items")
-    func testWearAllSkipsAlreadyWorn() async throws {
-        let cloak = Item(id: "cloak", .name("cloak"), .in(.player), .isWearable, .isWorn)
-        let boots = Item(id: "boots", .name("boots"), .in(.player), .isWearable)
-        
-        let game = MinimalGame(items: [cloak, boots])
-        let mockIO = await MockIOHandler()
-        let mockParser = MockParser()
-        let engine = await GameEngine(blueprint: game, parser: mockParser, ioHandler: mockIO)
-        
-        // Act: Execute "wear all"
-        let command = Command(
-            verb: .wear,
-            directObjects: [.item("cloak"), .item("boots")],
-            isAllCommand: true,
-            rawInput: "wear all"
+        expectNoDifference(
+            output,
+            """
+            > wear scarf
+            The darkness here is absolute, consuming all light and hope of
+            sight.
+            """
         )
-        await engine.execute(command: command)
-        
-        // Assert: Should wear only the boots
+    }
+
+    // MARK: - Processing Testing
+
+    @Test("Wear single item")
+    func testWearSingleItem() async throws {
+        // Given
+        let ring = Item(
+            id: "ring",
+            .name("gold ring"),
+            .description("A shiny gold ring."),
+            .isWearable,
+            .isTakable,
+            .in(.player)
+        )
+
+        let game = MinimalGame(
+            items: ring
+        )
+
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // When
+        try await engine.execute("wear ring")
+
+        // Then: Verify state change
+        let finalState = try await engine.item("ring")
+        #expect(await finalState.hasFlag(.isWorn) == true)
+        #expect(await finalState.hasFlag(.isTouched) == true)
+
+        // Verify message
         let output = await mockIO.flush()
-        expectNoDifference(output, "You put on the boots.")
-        
-        // Verify states
-        let updatedCloak = try await engine.item("cloak")
-        let updatedBoots = try await engine.item("boots")
-        #expect(updatedCloak.hasFlag(.isWorn) == true) // Already worn
-        #expect(updatedBoots.hasFlag(.isWorn) == true) // Newly worn
+        expectNoDifference(
+            output,
+            """
+            > wear ring
+            You don the gold ring with practiced ease.
+            """
+        )
+    }
+
+    @Test("Wear multiple items")
+    func testWearMultipleItems() async throws {
+        // Given
+        let shoes = Item(
+            id: "shoes",
+            .name("running shoes"),
+            .description("Comfortable running shoes."),
+            .isWearable,
+            .isTakable,
+            .in(.player)
+        )
+
+        let socks = Item(
+            id: "socks",
+            .name("cotton socks"),
+            .description("Soft cotton socks."),
+            .isWearable,
+            .isTakable,
+            .in(.player)
+        )
+
+        let game = MinimalGame(
+            items: shoes, socks
+        )
+
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // When
+        try await engine.execute("wear shoes and socks")
+
+        // Then
+        let finalShoes = try await engine.item("shoes")
+        let finalSocks = try await engine.item("socks")
+        #expect(await finalShoes.hasFlag(.isWorn) == true)
+        #expect(await finalSocks.hasFlag(.isWorn) == true)
+
+        let output = await mockIO.flush()
+        expectNoDifference(
+            output,
+            """
+            > wear shoes and socks
+            You don the running shoes and the cotton socks with practiced
+            ease.
+            """
+        )
+    }
+
+    @Test("Wear all with mixed wearable and non-wearable items")
+    func testWearAllMixedItems() async throws {
+        // Given
+        let shirt = Item(
+            id: "shirt",
+            .name("white shirt"),
+            .description("A clean white shirt."),
+            .isWearable,
+            .isTakable,
+            .in(.player)
+        )
+
+        let book = Item(
+            id: "book",
+            .name("leather book"),
+            .description("A bound leather book."),
+            .isTakable,
+            .in(.player)
+        )
+
+        let tie = Item(
+            id: "tie",
+            .name("silk tie"),
+            .description("An elegant silk tie."),
+            .isWearable,
+            .isTakable,
+            .in(.player)
+        )
+
+        let game = MinimalGame(
+            items: shirt, book, tie
+        )
+
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // When
+        try await engine.execute("wear all")
+
+        // Then: Only wearable items should be worn
+        let finalShirt = try await engine.item("shirt")
+        let finalBook = try await engine.item("book")
+        let finalTie = try await engine.item("tie")
+
+        #expect(await finalShirt.hasFlag(.isWorn) == true)
+        #expect(await finalBook.hasFlag(.isWorn) == false)
+        #expect(await finalTie.hasFlag(.isWorn) == true)
+
+        let output = await mockIO.flush()
+        expectNoDifference(
+            output,
+            """
+            > wear all
+            You don the white shirt and the silk tie with practiced ease.
+            """
+        )
+    }
+
+    @Test("Wear all with no wearable items")
+    func testWearAllNoWearableItems() async throws {
+        // Given
+        let coin = Item(
+            id: "coin",
+            .name("gold coin"),
+            .description("A valuable gold coin."),
+            .isTakable,
+            .in(.player)
+        )
+
+        let key = Item(
+            id: "key",
+            .name("brass key"),
+            .description("A brass key."),
+            .isTakable,
+            .in(.player)
+        )
+
+        let game = MinimalGame(
+            items: coin, key
+        )
+
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // When
+        try await engine.execute("wear all")
+
+        // Then
+        let output = await mockIO.flush()
+        expectNoDifference(
+            output,
+            """
+            > wear all
+            There is nothing here to wear.
+            """
+        )
+    }
+
+    @Test("Wear all with already worn items")
+    func testWearAllWithAlreadyWornItems() async throws {
+        // Given
+        let hat = Item(
+            id: "hat",
+            .name("winter hat"),
+            .description("A warm winter hat."),
+            .isWearable,
+            .isTakable,
+            .in(.player)
+        )
+
+        let mittens = Item(
+            id: "mittens",
+            .name("wool mittens"),
+            .description("Cozy wool mittens."),
+            .isWearable,
+            .isTakable,
+            .in(.player)
+        )
+
+        let game = MinimalGame(
+            items: hat, mittens
+        )
+
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // Set up: hat is already worn
+        try await engine.apply(
+            hat.proxy(engine).setFlag(.isWorn)
+        )
+
+        // When
+        try await engine.execute("wear all")
+
+        // Then: Only mittens should be newly worn
+        let finalHat = try await engine.item("hat")
+        let finalMittens = try await engine.item("mittens")
+
+        #expect(await finalHat.hasFlag(.isWorn) == true)
+        #expect(await finalMittens.hasFlag(.isWorn) == true)
+
+        let output = await mockIO.flush()
+        expectNoDifference(
+            output,
+            """
+            > wear all
+            You don the wool mittens with practiced ease.
+            """
+        )
+    }
+
+    // MARK: - Intent Testing
+
+    @Test("Handler exposes correct Verbs")
+    func testVerbs() async throws {
+        let handler = WearActionHandler()
+        #expect(handler.synonyms.contains(.wear))
+        #expect(handler.synonyms.contains(.don))
+        #expect(handler.synonyms.count == 2)
+    }
+
+    @Test("Handler requires light")
+    func testRequiresLightProperty() async throws {
+        let handler = WearActionHandler()
+        #expect(handler.requiresLight == true)
     }
 }

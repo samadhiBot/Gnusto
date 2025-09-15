@@ -2,15 +2,15 @@
 
 # Gnusto: A Modern Interactive Fiction Engine
 
-Gnusto is a powerful, flexible Swift-based framework for creating interactive fiction games. Drawing inspiration from the classic Infocom masterpieces, it provides a modern toolkit that makes building rich, dynamic text adventures easy and enjoyable—allowing you to focus on storytelling and world-building rather than engine mechanics.
+Gnusto is a powerful, flexible Swift-based framework for creating interactive fiction games. Drawing inspiration from the Infocom classics, it provides a modern toolkit that makes building rich, dynamic text adventures easy and enjoyable--allowing you to focus on storytelling and world-building rather than engine mechanics.
 
 ## For Game Creators
 
 ### Why Gnusto?
 
-- **Zero Boilerplate:** The GnustoAutoWiringPlugin automatically generates all ID constants and wires up your game components—no tedious manual setup required
+- **Zero Boilerplate:** The GnustoAutoWiringPlugin automatically generates all ID constants and wires up your game components--no tedious manual setup required
 - **Modern Swift Foundation:** Built with Swift 6 concurrency, SOLID principles, and clean architecture for maintainable, safe code
-- **Thoroughly Tested:** Engine maintains 80-90% test coverage  
+- **Thoroughly Tested:** Engine maintains 80%+ test coverage
 - **Cross-Platform Ready:** Deploy your game on macOS, iOS, Linux, Windows, and Android
 - **Powerful Yet Approachable:** Start with simple text adventures and scale up to complex, dynamic worlds with timed events and sophisticated puzzles
 - **Battle-Tested Patterns:** Leverage proven design patterns from the golden age of interactive fiction, rebuilt with modern tools
@@ -22,8 +22,11 @@ Gnusto is a powerful, flexible Swift-based framework for creating interactive fi
 - **Dynamic Content:** Create living, breathing worlds with state-driven descriptions and behaviors using ItemEventHandlers and LocationEventHandlers
 - **Rich Action System:** Support complex player interactions with a flexible action pipeline that's easy to customize
 - **Smart Parser:** Natural language understanding with support for complex commands, synonyms, adjectives, and object references
-- **Comprehensive State Management:** Track game progress, handle timed events (fuses and daemons), and manage complex game states with full Codable support
-- **Extensible Architecture:** Add custom behaviors and game mechanics without fighting the engine—everything is designed for modularity
+- **Comprehensive State Management:** Track game progress with the new Proxy system, handle timed events (fuses and daemons), and manage complex game states with full Codable support
+- **Combat & Character Systems:** Full RPG-style combat mechanics with character sheets, health/consciousness tracking, and combat state management
+- **Conversations & NPCs:** Simple dialogue systems and character interactions
+- **Localization Ready:** Centralized Messenger system enables easy customization of all player-facing text
+- **Extensible Architecture:** Add custom behaviors and game mechanics without fighting the engine--everything is designed for modularity
 
 ### Quick Start for Creators
 
@@ -32,7 +35,7 @@ Gnusto is a powerful, flexible Swift-based framework for creating interactive fi
    ```swift
    // Package.swift
    dependencies: [
-       .package(url: "https://github.com/samadhiBot/Gnusto", from: "1.0.0"),
+       .package(url: "https://github.com/samadhiBot/Gnusto", from: "0.1.0"),
    ],
    targets: [
        .executableTarget(
@@ -55,37 +58,36 @@ Here's how simple it is to create an interactive world with Gnusto:
 ```swift
 import GnustoEngine
 
-enum OperaHouse {  // Organize content into logical areas
-    static let foyer = Location(
+struct OperaHouse {  // Organize content into logical areas
+    let foyer = Location(
         id: .foyer,  // Plugin auto-generates LocationID.foyer
         .name("Foyer of the Opera House"),
         .description("""
             You are standing in a spacious hall, splendidly decorated in red
             and gold, with glittering chandeliers overhead. The entrance from
             the street is to the north, and there are doorways south and west.
-            """),
-        .exits([
-            .south: .to(.bar),
-            .west: .to(.cloakroom),
-            .north: Exit(
-                destination: .street,
-                blockedMessage: """
-                    You've only just arrived, and besides, the weather outside
-                    seems to be getting worse.
-                    """
-            )
-        ]),
+            """
+        ),
+        .exits(
+            .south(.bar),
+            .west(.cloakroom),
+            .north(blocked: """
+                You've only just arrived, and besides, the weather outside
+                seems to be getting worse.
+                """)
+        ),
         .inherentlyLit
     )
 
-    static let cloak = Item(
+    let cloak = Item(
         id: .cloak,  // Plugin auto-generates ItemID.cloak
         .name("velvet cloak"),
         .description("""
             A handsome cloak, of velvet trimmed with satin, and slightly
             spattered with raindrops. Its blackness is so deep that it
             almost seems to suck light from the room.
-            """),
+            """
+        ),
         .adjectives("handsome", "dark", "black", "velvet", "satin"),
         .in(.player),
         .isTakable,
@@ -93,28 +95,27 @@ enum OperaHouse {  // Organize content into logical areas
         .isWorn,
     )
 
-    static let hook = Item(
+    let hook = Item(
         id: .hook,  // Plugin auto-generates ItemID.hook
         .adjectives("small", "brass"),
-        .in(.location(.cloakroom)),
-        .isScenery,
+        .in(.cloakroom),
+        .omitDescription,
         .isSurface,
         .name("small brass hook"),
         .synonyms("peg"),
     )
 
     // Custom behavior for examining the hook
-    static let hookHandler = ItemEventHandler { engine, event in
-        guard event.type == .examine else { return false }
-
-        let cloak = try await engine.item(.cloak)
-        let hookDetail = if cloak?.parent == .item(.hook) {
-            "with a cloak hanging on it"
-        } else {
-            "screwed to the wall"
+    let hookHandler = ItemEventHandler(for: .hook) {
+        before(.examine) { context, command in
+            let hookDetail =
+                if try await context.item.isHolding(.cloak) {
+                    "with a cloak hanging on it"
+                } else {
+                    "screwed to the wall"
+                }
+            return ActionResult("It's just a small brass hook, \(hookDetail).")
         }
-
-        throw ActionResponse.custom("It's just a small brass hook, \(hookDetail).")
     }
 }
 ```
@@ -126,7 +127,7 @@ Gnusto includes a build tool plugin that **eliminates virtually all boilerplate 
 - **Discovers ID Patterns:** Scans `Location(id: .foyer, ...)` and generates `LocationID.foyer` extensions
 - **Aggregates Content:** Collects all your items and locations from multiple area files
 - **Wires Event Handlers:** Automatically connects your ItemEventHandlers and LocationEventHandlers
-- **Sets Up Time Registry:** Discovers and registers FuseDefinitions and DaemonDefinitions
+- **Sets Up Time Registry:** Discovers and registers Fuses and Daemons
 - **Handles Custom Actions:** Integrates custom ActionHandler implementations
 
 This means you can focus purely on creating your game world without worrying about the connection logic!
@@ -137,7 +138,8 @@ Check out our comprehensive resources:
 
 - **[Complete Documentation](Sources/GnustoEngine/Documentation.docc/Documentation.md):** Detailed guides and API reference
 - **[Cloak of Darkness](Executables/CloakOfDarkness):** A complete, playable example showcasing core features
-- **[Frobozz Magic Demo Kit](Executables/FrobozzMagicDemoKit):** Templates and advanced patterns
+- **[Frobozz Magic Demo Kit](Executables/FrobozzMagicDemoKit):** Templates and advanced patterns (in progress)
+- **[Zork 1](Executables/Zork1):** A faithful replica of _Zork I: The Great Underground Empire_ (in progress)
 - **[GnustoAutoWiringPlugin Guide](Sources/GnustoEngine/Documentation.docc/GnustoAutoWiringPlugin.md):** Master the automatic setup system
 
 ---
@@ -148,36 +150,40 @@ Check out our comprehensive resources:
 
 The project is organized with a clean separation between the core engine and example implementations:
 
-- **`Sources/GnustoEngine/`:** The complete interactive fiction engine
-- **`Executables/`:** Example games and demos showcasing engine capabilities
+- **`Sources/GnustoEngine`:** The complete interactive fiction engine
+- **`Executables`:** Example games and demos showcasing engine capabilities
 
 ### Core Engine Components
 
-- **`Core/`:** Fundamental types (GameState, Item, Location, ScopeResolver)
-- **`Engine/`:** The central GameEngine orchestrator
-- **`Actions/`:** Action handling pipeline and built-in ActionHandlers
-- **`Parsing/`:** Command parsing and vocabulary systems
-- **`IO/`:** Input/output abstraction for different frontends
-- **`Blueprints/`:** GameBlueprint system for defining game structure
-- **`Time/`:** Fuse and daemon system for timed events
-- **`Vocabulary/`:** Word recognition and synonym systems
-- **`Extensions/`:** Utility extensions
+- **`Core`:** Fundamental types (GameState, Item, Location, ScopeResolver)
+- **`Engine`:** The central GameEngine orchestrator
+- **`Actions`:** Action handling pipeline with 80+ built-in ActionHandlers
+- **`Proxies`:** Safe state mutation system using proxy objects
+- **`Combat`:** Complete combat mechanics and state management
+- **`Character`:** Character sheets, classifications, and condition tracking
+- **`Messenger`:** Centralized localization and message handling
+- **`Parsing`:** Command parsing and vocabulary systems
+- **`IO`:** Input/output abstraction for different frontends
+- **`Time`:** Fuse and daemon system for timed events
+- **`Vocabulary`:** Word recognition and synonym systems
+- **`Extensions`:** Utility extensions
 
 ## Core Concepts
 
 ### Modern Swift Architecture
 
 - **Sendable Throughout:** Full Swift 6 concurrency compliance with `Sendable` types
+- **Proxy-Based State Management:** Safe state mutations through proxy objects that provide access to both static and computed values
 - **State Change Pipeline:** All mutations flow through `StateChange` objects for proper validation and event handling
 - **Protocol-Oriented Design:** Extensible architecture using protocols like `ActionHandler`, `IOHandler`, and `GameBlueprint`
-- **Type Safety:** Strong typing with specialized ID types (`ItemID`, `LocationID`, `VerbID`) prevents common errors
+- **Type Safety:** Strong typing with specialized ID types (`ItemID`, `LocationID`, `Verb`) prevents common errors
 
 ### Game World Model
 
 - **Entities:** The game world consists of `Location` and `Item` objects with:
 
   - Static definition data (ID, name, vocabulary words)
-  - Dynamic state via `[AttributeID: StateValue]` attributes dictionary
+  - Dynamic state via `[PropertyID: StateValue]` properties dictionary
   - Optional event handlers for dynamic descriptions and custom behavior
   - Codable support for save/load functionality
 
@@ -210,7 +216,7 @@ The **GnustoAutoWiringPlugin** revolutionizes game development by:
 
 - **Event Handlers:** `ItemEventHandler` and `LocationEventHandler` enable custom responses
 - **State-Driven Descriptions:** Dynamic text based on current game state
-- **Flexible Attributes:** Custom properties on any game entity
+- **Flexible Properties:** Custom properties on any game entity
 - **Conditional Logic:** Easy branching based on game state
 
 #### Advanced Parser
@@ -243,7 +249,7 @@ Following SOLID principles and modern Swift best practices:
 ### Testing Excellence
 
 - **Framework:** Swift Testing for all new code
-- **Coverage:** 80-90% test coverage required for pull requests
+- **Coverage:** 80%+ test coverage required for pull requests
 - **Organization:** Tests mirror source structure
 - **Patterns:** Helper methods for common test scenarios
 
@@ -276,6 +282,16 @@ A comprehensive demonstration package featuring:
 - Time-based event demonstrations
 - Multi-area game organization
 
+### Zork 1 (In Progress)
+
+A faithful recreation of the original Zork I, featuring:
+
+- Complete world implementation with 15+ detailed areas (Forest, Underground, Dam, etc.)
+- Authentic Infocom-style messaging and interactions
+- Complex puzzles and treasure hunting mechanics
+- Full reference implementation of classic IF patterns
+- **Note:** This is a work-in-progress implementation planned for completion before the 1.0 release
+
 ## Getting Started as a Developer
 
 1. **Clone and Explore:**
@@ -290,6 +306,7 @@ A comprehensive demonstration package featuring:
    ```bash
    swift run CloakOfDarkness
    swift run FrobozzMagicDemoKit
+   swift run Zork1
    ```
 
 3. **Study the Architecture:**
@@ -306,14 +323,20 @@ A comprehensive demonstration package featuring:
 We welcome contributions! Please:
 
 1. Follow our development standards and Swift style guide
-2. Include comprehensive tests (80-90% coverage)
+2. Include comprehensive tests (80%+ coverage)
 3. Document your changes with clear `///` comments
 4. Reference the [Roadmap](Sources/GnustoEngine/Documentation.docc/Roadmap.md) for planned features
 5. Maintain the focus on developer ergonomics and zero-boilerplate experience
 
 ## What's Next?
 
-Check out our [development roadmap](Sources/GnustoEngine/Documentation.docc/Roadmap.md) to see upcoming features, including enhanced state change ergonomics, conditional exit systems, and expanded testing infrastructure.
+With major architectural systems now in place (Proxies, Combat, Characters, Messenger), current development priorities focus on:
+
+- **Completing Zork 1 Implementation:** Finishing the full Zork I recreation as a flagship demonstration
+- **Documentation Expansion:** Comprehensive guides for the new combat, character, and conversation systems
+- **API Stabilization:** Preparing for the 1.0 release with stable, ergonomic public APIs
+
+Check out our [development roadmap](Sources/GnustoEngine/Documentation.docc/Roadmap.md) for detailed feature planning and contribution opportunities.
 
 ## License
 

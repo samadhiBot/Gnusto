@@ -3,35 +3,36 @@ import Foundation
 /// Represents an interactive object or entity within the game world, such as a brass lantern,
 /// a rusty key, a treasure chest, or even a non-player character (NPC).
 ///
-/// Each `Item` has a unique `id` (`ItemID`) and a collection of `attributes` that define its
+/// Each `Item` has a unique `id` (`ItemID`) and a collection of `properties` that define its
 /// current state, characteristics, and behaviors (e.g., its name, description, location,
 /// whether it's openable, takable, etc.).
 ///
 /// Game developers define items by providing an `ItemID` and a list of initial
-/// `ItemAttribute`s. Many common attributes (like `name`, `parent`, `adjectives`)
+/// `ItemProperty`s. Many common properties (like `name`, `parent`, `adjectives`)
 /// have convenience computed properties for easy access and modification through the `GameEngine`.
-/// The raw state of all attributes is stored in the `attributes` dictionary using `AttributeID` as keys.
+/// The raw state of all properties is stored in the `properties` dictionary using `PropertyID`
+/// as keys.
 ///
 /// Items are a fundamental part of the `GameState` and are manipulated by player commands
 /// and game logic, often through `ActionHandler`s and `GameEngine` helper methods.
-public struct Item: Codable, Identifiable, Sendable {
+public struct Item: Codable, Hashable, Sendable {
     /// The item's unique `ItemID`, serving as its primary key within the game.
     public let id: ItemID
 
-    /// A dictionary holding the current state of all attributes for this item.
+    /// A dictionary holding the current state of all properties for this item.
     ///
-    /// Each key is an `AttributeID` (e.g., `.name`, `.description`, `.isLit`, `.itemParent`)
-    /// and the value is a `StateValue` wrapper containing the actual typed data for that attribute.
-    /// While direct access is possible, game logic typically interacts with these attributes
-    /// via convenience accessors on `Item` (for reading) or through `GameEngine` methods
-    /// (for modifications, which generate `StateChange`s).
-    public var attributes: [AttributeID: StateValue]
+    /// Each key is a `PropertyID` (e.g., `.name`, `.description`, `.itemParent`) and the value
+    /// is a `StateValue` wrapper containing the actual typed data for that property. While direct
+    /// access is possible, game logic typically interacts with these properties via convenience
+    /// accessors on `Item` (for reading) or through `GameEngine` methods (for modifications, which
+    /// generate `StateChange`s).
+    public var properties: [ItemPropertyID: StateValue]
 
-    /// Creates a new `Item` instance with a given ID and initial attributes.
+    /// Creates a new `Item` instance with a given ID and initial properties.
     ///
-    /// The `attributes` parameter takes a variadic list of `ItemAttribute` instances.
-    /// `ItemAttribute` is a helper enum that encapsulates both the `AttributeID` (the key)
-    /// and the initial `StateValue` for an attribute.
+    /// The `properties` parameter takes a variadic list of `ItemProperty` instances.
+    /// `ItemProperty` is a helper enum that encapsulates both the `PropertyID` (the key)
+    /// and the initial `StateValue` for a property.
     ///
     /// Example:
     /// ```swift
@@ -41,86 +42,64 @@ public struct Item: Codable, Identifiable, Sendable {
     ///     .description("A tarnished brass lantern, surprisingly heavy."),
     ///     .synonyms(["lantern", "light"]),
     ///     .adjectives(["brass", "tarnished", "heavy"]),
-    ///     .parent(.location("livingRoom")),
-    ///     .setFlag(.isTakable),
-    ///     .attribute(.size, .int(10))
+    ///     .in(.livingRoom),
+    ///     .isTakable,
+    ///     .isDevice,
+    ///     .isOn,
+    ///     .size(10)
     /// )
     /// ```
     ///
     /// - Parameters:
     ///   - id: The item's unique `ItemID`.
-    ///   - attributes: A variadic list of `ItemAttribute`s defining the item's initial state.
+    ///   - properties: A variadic list of `ItemProperty`s defining the item's initial state.
     public init(
         id: ItemID,
-        _ attributes: ItemAttribute...
+        _ properties: ItemProperty...
     ) {
         self.id = id
-        self.attributes = Dictionary(
-            uniqueKeysWithValues: attributes.map { ($0.id, $0.rawValue) }
+        self.properties = Dictionary(
+            uniqueKeysWithValues: properties.map { ($0.id, $0.rawValue) }
         )
     }
 
-    // MARK: - Convenience Accessors
-
-    /// A set of adjectives that can be used to describe or refer to the item (e.g., "brass",
-    /// "small", "glowing"). These are typically used by the parser for disambiguation.
-    /// Corresponds to the ZIL `ADJECTIVE` property.
-    /// Defaults to an empty set if the `.adjectives` attribute is not set.
-    public var adjectives: Set<String> {
-        attributes[.adjectives]?.toStrings ?? []
-    }
-
-    /// The item's capacity, relevant if it's a container (i.e., has the `.isContainer` flag).
-    /// It indicates how much "stuff" (sum of other items' `size`) it can hold.
-    /// A capacity of -1 often means infinite capacity.
-    /// Corresponds to the ZIL `CAPACITY` property.
-    /// Defaults to `1000` if the `.capacity` attribute is not set (a large default).
-    public var capacity: Int {
-        attributes[.capacity]?.toInt ?? 1000
-    }
-
-    /// Checks if a specific boolean attribute (a flag) is set to `true` on this item.
+    /// Checks whether the item has a specific boolean flag property set to `true`.
     ///
-    /// For example, `item.hasFlag(.isLit)` would return `true` if the `.isLit` attribute
-    /// exists for this item and its value is `true`.
+    /// This is a convenience method for testing boolean properties on items. If the property
+    /// exists and has a value of `.bool(true)`, this method returns `true`. If the property
+    /// doesn't exist or has any other value (including `.bool(false)`), it returns `false`.
     ///
-    /// - Parameter id: The `AttributeID` of the flag to check (e.g., `.isTakable`, `.isOpen`).
-    /// - Returns: `true` if the flag attribute exists and is `true`, `false` otherwise.
-    public func hasFlag(_ id: AttributeID) -> Bool {
-        attributes[id] == true
+    /// Common use cases include checking flags like `.isTakable`, `.isOpenable`, `.isOn`, etc.
+    ///
+    /// > Important: This should *only* be used in an `ItemComputer` or `LocationComputer` context,
+    /// when an `ItemProxy` is not available. This returns a static `GameState` value, and bypasses
+    /// any dynamic property calculation.
+    ///
+    /// - Parameter itemPropertyID: The `ItemPropertyID` of the boolean flag to check.
+    /// - Returns: `true` if the property exists and is set to `.bool(true)`, `false` otherwise.
+    public func hasFlag(_ itemPropertyID: ItemPropertyID) -> Bool {
+        if let value = properties[itemPropertyID] {
+            value == .bool(true)
+        } else {
+            false
+        }
     }
 
-    /// The primary noun or noun phrase used to refer to the item (e.g., "brass lantern", "key").
-    /// This is often displayed in room descriptions or inventory listings.
-    /// Corresponds to the ZIL `DESC` property (often the short description).
-    /// Defaults to the `id.rawValue` if the `.name` attribute is not set.
-    public var name: String {
-        attributes[.name]?.toString ?? id.rawValue
-    }
-
-    /// The `ParentEntity` that currently holds or contains this item. This determines the item's
-    /// location in the game world (e.g., a specific `LocationID`, the `.player` inventory,
-    /// or another `ItemID` if it's inside a container).
-    /// Corresponds to the ZIL `IN` property.
-    /// Defaults to `.nowhere` if the `.parentEntity` attribute is not set.
-    public var parent: ParentEntity {
-        attributes[.parentEntity]?.toParentEntity ?? .nowhere
-    }
-
-    /// The item's size or bulk, used for capacity calculations when placing it in containers
-    /// or for determining if the player can carry it.
-    /// Corresponds to the ZIL `SIZE` property.
-    /// Defaults to `1` if the `.size` attribute is not set.
-    public var size: Int {
-        attributes[.size]?.toInt ?? 1
-    }
-
-    /// A set of alternative nouns or noun phrases that can be used to refer to the item.
-    /// These are primarily used by the parser.
-    /// Corresponds to the ZIL `SYNONYM` property.
-    /// Defaults to an empty set if the `.synonyms` attribute is not set.
-    public var synonyms: Set<String> {
-        attributes[.synonyms]?.toStrings ?? []
+    /// Creates an `ItemProxy` for this item using the provided game engine.
+    ///
+    /// An `ItemProxy` provides a convenient interface for reading and modifying item properties
+    /// through the game engine, ensuring that all changes are properly tracked as `StateChange`s
+    /// and maintaining game state consistency.
+    ///
+    /// This is the recommended way to interact with items during gameplay, as it provides
+    /// type-safe access to properties and integrates with the engine's state management system.
+    ///
+    /// - Parameter engine: The `GameEngine` instance to use for creating the proxy.
+    /// - Returns: An `ItemProxy` instance for this item.
+    /// - Throws: Any errors that occur during proxy creation, typically if the item
+    ///   doesn't exist in the current game state.
+    public func proxy(_ engine: GameEngine) async throws -> ItemProxy {
+        try await engine.item(id)
     }
 }
 
@@ -129,5 +108,17 @@ public struct Item: Codable, Identifiable, Sendable {
 extension Item: Comparable {
     public static func < (lhs: Item, rhs: Item) -> Bool {
         lhs.id < rhs.id
+    }
+}
+
+// MARK: - RoughValue
+
+extension Item {
+    public enum RoughValue: Hashable {
+        case worthless
+        case low
+        case medium
+        case high
+        case priceless
     }
 }

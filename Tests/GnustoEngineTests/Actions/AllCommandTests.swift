@@ -1,216 +1,198 @@
 import CustomDump
+import GnustoEngine
+import GnustoTestSupport
 import Testing
-
-@testable import GnustoEngine
 
 @Suite("ALL Command Tests")
 struct AllCommandTests {
-    
+
     @Test("TAKE ALL with multiple takable items")
     func testTakeAllMultipleItems() async throws {
         // Arrange: Multiple takable items in the room
         let key = Item(
-            id: "key",
+            id: .startItem,
             .name("brass key"),
-            .in(.location(.startRoom)),
+            .in(.startRoom),
             .isTakable,
             .size(2)
         )
         let coin = Item(
             id: "coin",
             .name("gold coin"),
-            .in(.location(.startRoom)),
+            .in(.startRoom),
             .isTakable,
             .size(1)
         )
         let lamp = Item(
             id: "lamp",
             .name("brass lamp"),
-            .in(.location(.startRoom)),
+            .in(.startRoom),
             .isTakable,
             .size(3)
         )
-        
-        let player = Player(in: .startRoom, carryingCapacity: 20)
-        let game = MinimalGame(player: player, items: [key, coin, lamp])
-        let mockIO = await MockIOHandler()
-        let mockParser = MockParser()
-        let engine = await GameEngine(blueprint: game, parser: mockParser, ioHandler: mockIO)
 
-        let command = Command(
-            verb: .take,
-            directObjects: [.item("coin"), .item("key"), .item("lamp")], // Sorted by name
-            isAllCommand: true,
-            rawInput: "take all"
-        )
+        let player = Player(in: .startRoom, characterSheet: .weak)
+        let game = MinimalGame(player: player, items: key, coin, lamp)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // Act
-        await engine.execute(command: command)
+        try await engine.execute("take all")
 
         // Assert: All items should be taken
-        let finalKeyState = try await engine.item("key")
+        let finalKeyState = try await engine.item(.startItem)
         let finalCoinState = try await engine.item("coin")
         let finalLampState = try await engine.item("lamp")
-        
-        #expect(finalKeyState.parent == .player)
-        #expect(finalCoinState.parent == .player)
-        #expect(finalLampState.parent == .player)
+
+        #expect(try await finalKeyState.playerIsHolding)
+        #expect(try await finalCoinState.playerIsHolding)
+        #expect(try await finalLampState.playerIsHolding)
 
         // Assert: Appropriate message
         let output = await mockIO.flush()
-        expectNoDifference(output, "You take the gold coin, the brass key, and the brass lamp.")
-
-        // Assert: Pronouns updated to last item
-        #expect(await engine.getPronounReference(pronoun: "it") == [.item("lamp")])
+        expectNoDifference(
+            output,
+            """
+            > take all
+            You take the gold coin, the brass lamp, and the brass key.
+            """
+        )
     }
 
     @Test("TAKE ALL with no takable items")
     func testTakeAllNoItems() async throws {
         // Arrange: No takable items in the room
         let scenery = Item(
-            id: "wall",
+            id: .startItem,
             .name("stone wall"),
-            .in(.location(.startRoom))
+            .in(.startRoom)
             // No .isTakable flag
         )
-        
-        let game = MinimalGame(items: [scenery])
-        let mockIO = await MockIOHandler()
-        let mockParser = MockParser()
-        let engine = await GameEngine(blueprint: game, parser: mockParser, ioHandler: mockIO)
 
-        let command = Command(
-            verb: .take,
-            directObjects: [], // Empty because no valid objects found
-            isAllCommand: true,
-            rawInput: "take all"
-        )
+        let game = MinimalGame(items: scenery)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // Act
-        await engine.execute(command: command)
+        try await engine.execute("take all")
 
         // Assert: Appropriate message
         let output = await mockIO.flush()
-        #expect(output == "There is nothing here to take.")
-
-        // Assert: No state changes
-        #expect(await engine.gameState.changeHistory.isEmpty)
+        expectNoDifference(
+            output,
+            """
+            > take all
+            Take what?
+            """
+        )
     }
 
     @Test("TAKE ALL with mixed takable and non-takable items")
     func testTakeAllMixedItems() async throws {
         // Arrange: Mix of takable and non-takable items
         let key = Item(
-            id: "key",
+            id: .startItem,
             .name("brass key"),
-            .in(.location(.startRoom)),
+            .in(.startRoom),
             .isTakable,
             .size(2)
         )
         let wall = Item(
             id: "wall",
             .name("stone wall"),
-            .in(.location(.startRoom))
+            .in(.startRoom)
             // No .isTakable flag
         )
         let coin = Item(
             id: "coin",
             .name("gold coin"),
-            .in(.location(.startRoom)),
+            .in(.startRoom),
             .isTakable,
             .size(1)
         )
-        
-        let player = Player(in: .startRoom, carryingCapacity: 20)
-        let game = MinimalGame(player: player, items: [key, wall, coin])
-        let mockIO = await MockIOHandler()
-        let mockParser = MockParser()
-        let engine = await GameEngine(blueprint: game, parser: mockParser, ioHandler: mockIO)
 
-        let command = Command(
-            verb: .take,
-            directObjects: [.item("coin"), .item("key")], // Only takable items
-            isAllCommand: true,
-            rawInput: "take all"
-        )
+        let player = Player(in: .startRoom, characterSheet: .weak)
+        let game = MinimalGame(player: player, items: key, wall, coin)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // Act
-        await engine.execute(command: command)
+        try await engine.execute("take all")
 
         // Assert: Only takable items are taken
-        let finalKeyState = try await engine.item("key")
+        let finalKeyState = try await engine.item(.startItem)
         let finalCoinState = try await engine.item("coin")
         let finalWallState = try await engine.item("wall")
-        
-        #expect(finalKeyState.parent == .player)
-        #expect(finalCoinState.parent == .player)
-        #expect(finalWallState.parent == .location(.startRoom)) // Wall stays
+
+        #expect(try await finalKeyState.playerIsHolding)
+        #expect(try await finalCoinState.playerIsHolding)
+        #expect(try await finalWallState.parent == .location(engine.location(.startRoom)))  // Wall stays
 
         // Assert: Appropriate message
         let output = await mockIO.flush()
-        expectNoDifference(output, "You take the gold coin and the brass key.")
+        expectNoDifference(
+            output,
+            """
+            > take all
+            You take the gold coin and the brass key.
+            """
+        )
     }
 
     @Test("TAKE ALL with capacity limit")
     func testTakeAllCapacityLimit() async throws {
         // Arrange: Items that exceed player capacity
         let key = Item(
-            id: "key",
+            id: .startItem,
             .name("brass key"),
-            .in(.location(.startRoom)),
+            .in(.startRoom),
             .isTakable,
             .size(3)
         )
         let coin = Item(
             id: "coin",
             .name("gold coin"),
-            .in(.location(.startRoom)),
+            .in(.startRoom),
             .isTakable,
             .size(2)
         )
         let boulder = Item(
             id: "boulder",
             .name("heavy boulder"),
-            .in(.location(.startRoom)),
+            .in(.startRoom),
             .isTakable,
-            .size(10) // Too heavy
+            .size(100)  // Too heavy
         )
-        
-        let player = Player(in: .startRoom, carryingCapacity: 6) // Can only carry key + coin
-        let game = MinimalGame(player: player, items: [key, coin, boulder])
-        let mockIO = await MockIOHandler()
-        let mockParser = MockParser()
-        let engine = await GameEngine(blueprint: game, parser: mockParser, ioHandler: mockIO)
 
-        let command = Command(
-            verb: .take,
-            directObjects: [.item("coin"), .item("key")], // Boulder filtered out by capacity
-            isAllCommand: true,
-            rawInput: "take all"
-        )
+        let player = Player(in: .startRoom, characterSheet: .weak)  // Can only carry key + coin
+        let game = MinimalGame(player: player, items: key, coin, boulder)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // Act
-        await engine.execute(command: command)
+        try await engine.execute("take all")
 
         // Assert: Only items within capacity are taken
-        let finalKeyState = try await engine.item("key")
+        let finalKeyState = try await engine.item(.startItem)
         let finalCoinState = try await engine.item("coin")
         let finalBoulderState = try await engine.item("boulder")
-        
-        #expect(finalKeyState.parent == .player)
-        #expect(finalCoinState.parent == .player)
-        #expect(finalBoulderState.parent == .location(.startRoom)) // Boulder stays
+
+        #expect(try await finalKeyState.playerIsHolding)
+        #expect(try await finalCoinState.playerIsHolding)
+        #expect(try await finalBoulderState.parent == .location(engine.location(.startRoom)))
 
         // Assert: Appropriate message
         let output = await mockIO.flush()
-        expectNoDifference(output, "You take the gold coin and the brass key.")
+        expectNoDifference(
+            output,
+            """
+            > take all
+            You take the gold coin and the brass key.
+            """
+        )
     }
 
     @Test("DROP ALL with multiple held items")
     func testDropAllMultipleItems() async throws {
         // Arrange: Multiple items held by player
         let key = Item(
-            id: "key",
+            id: .startItem,
             .name("brass key"),
             .in(.player),
             .isTakable,
@@ -230,146 +212,133 @@ struct AllCommandTests {
             .isTakable,
             .size(3)
         )
-        
-        let game = MinimalGame(items: [key, coin, lamp])
-        let mockIO = await MockIOHandler()
-        let mockParser = MockParser()
-        let engine = await GameEngine(blueprint: game, parser: mockParser, ioHandler: mockIO)
 
-        let command = Command(
-            verb: .drop,
-            directObjects: [.item("coin"), .item("key"), .item("lamp")], // Sorted by name
-            isAllCommand: true,
-            rawInput: "drop all"
-        )
+        let game = MinimalGame(items: key, coin, lamp)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // Act
-        await engine.execute(command: command)
+        try await engine.execute("drop all")
 
         // Assert: All items should be dropped
-        let finalKeyState = try await engine.item("key")
         let finalCoinState = try await engine.item("coin")
         let finalLampState = try await engine.item("lamp")
-        
-        #expect(finalKeyState.parent == .location(.startRoom))
-        #expect(finalCoinState.parent == .location(.startRoom))
-        #expect(finalLampState.parent == .location(.startRoom))
+        let finalKeyState = try await engine.item(.startItem)
+
+        #expect(try await finalKeyState.parent == .location(engine.location(.startRoom)))
+        #expect(try await finalCoinState.parent == .location(engine.location(.startRoom)))
+        #expect(try await finalLampState.parent == .location(engine.location(.startRoom)))
 
         // Assert: Appropriate message
         let output = await mockIO.flush()
-        expectNoDifference(output, "You drop the gold coin, the brass key, and the brass lamp.")
+        expectNoDifference(
+            output,
+            """
+            > drop all
+            You drop the gold coin, the brass lamp, and the brass key.
+            """
+        )
 
         // Assert: Pronouns updated to last item
-        #expect(await engine.getPronounReference(pronoun: "it") == [.item("lamp")])
-        #expect(await engine.getPronounReference(pronoun: "them") == [
-            .item("lamp"),
-            .item("key"),
-            .item("coin"),
-        ])
+        guard case .them(let itemRefs) = await engine.gameState.pronoun else {
+            Issue.record("Expected pronoun to be .them")
+            return
+        }
+        let pronounIDs = itemRefs.compactMap { entityReference -> ItemID? in
+            guard case .item(let item) = entityReference else { return nil }
+            return item.id
+        }
+        expectNoDifference(pronounIDs, [coin.id, lamp.id, key.id])
     }
 
     @Test("DROP ALL with no held items")
     func testDropAllNoItems() async throws {
         // Arrange: Player holding nothing
-        let game = MinimalGame()
-        let mockIO = await MockIOHandler()
-        let mockParser = MockParser()
-        let engine = await GameEngine(blueprint: game, parser: mockParser, ioHandler: mockIO)
-
-        let command = Command(
-            verb: .drop,
-            directObjects: [], // Empty because player holds nothing
-            isAllCommand: true,
-            rawInput: "drop all"
-        )
+        let (engine, mockIO) = await GameEngine.test()
 
         // Act
-        await engine.execute(command: command)
+        try await engine.execute("drop all")
 
         // Assert: Appropriate message
         let output = await mockIO.flush()
-        #expect(output == "You aren’t carrying anything.")
-
-        // Assert: No state changes
-        #expect(await engine.gameState.changeHistory.isEmpty)
+        expectNoDifference(
+            output,
+            """
+            > drop all
+            Your hands are as empty as your pockets.
+            """
+        )
     }
 
     @Test("TAKE ALL single item uses singular message")
     func testTakeAllSingleItem() async throws {
         // Arrange: Only one takable item
         let key = Item(
-            id: "key",
+            id: .startItem,
             .name("brass key"),
-            .in(.location(.startRoom)),
+            .in(.startRoom),
             .isTakable,
             .size(2)
         )
-        
-        let player = Player(in: .startRoom, carryingCapacity: 20)
-        let game = MinimalGame(player: player, items: [key])
-        let mockIO = await MockIOHandler()
-        let mockParser = MockParser()
-        let engine = await GameEngine(blueprint: game, parser: mockParser, ioHandler: mockIO)
 
-        let command = Command(
-            verb: .take,
-            directObjects: [.item("key")],
-            isAllCommand: true,
-            rawInput: "take all"
-        )
+        let player = Player(in: .startRoom, characterSheet: .weak)
+        let game = MinimalGame(player: player, items: key)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // Act
-        await engine.execute(command: command)
+        try await engine.execute("take all")
 
         // Assert: Singular message format
         let output = await mockIO.flush()
-        #expect(output == "You take the brass key.")
+        expectNoDifference(
+            output,
+            """
+            > take all
+            You take the brass key.
+            """
+        )
 
         // Assert: Item is taken
-        let finalKeyState = try await engine.item("key")
-        #expect(finalKeyState.parent == .player)
+        let finalKeyState = try await engine.item(.startItem)
+        #expect(try await finalKeyState.playerIsHolding)
     }
 
     @Test("DROP ALL single item uses singular message")
     func testDropAllSingleItem() async throws {
         // Arrange: Player holding one item
         let key = Item(
-            id: "key",
+            id: .startItem,
             .name("brass key"),
             .in(.player),
             .isTakable,
             .size(2)
         )
-        
-        let game = MinimalGame(items: [key])
-        let mockIO = await MockIOHandler()
-        let mockParser = MockParser()
-        let engine = await GameEngine(blueprint: game, parser: mockParser, ioHandler: mockIO)
 
-        let command = Command(
-            verb: .drop,
-            directObjects: [.item("key")],
-            isAllCommand: true,
-            rawInput: "drop all"
-        )
+        let game = MinimalGame(items: key)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // Act
-        await engine.execute(command: command)
+        try await engine.execute("drop all")
 
         // Assert: Singular message format
         let output = await mockIO.flush()
-        #expect(output == "You drop the brass key.")
+        expectNoDifference(
+            output,
+            """
+            > drop all
+            You drop the brass key.
+            """
+        )
 
         // Assert: Item is dropped
-        let finalKeyState = try await engine.item("key")
-        #expect(finalKeyState.parent == .location(.startRoom))
+        let finalKeyState = try await engine.item(.startItem)
+        #expect(try await finalKeyState.parent == .location(engine.location(.startRoom)))
     }
 
     @Test("TAKE ALL skips items already held")
     func testTakeAllSkipsHeldItems() async throws {
         // Arrange: Mix of held and unheld items
         let heldKey = Item(
-            id: "heldKey",
+            id: .startItem,
             .name("silver key"),
             .in(.player),
             .isTakable,
@@ -378,36 +347,33 @@ struct AllCommandTests {
         let roomKey = Item(
             id: "roomKey",
             .name("brass key"),
-            .in(.location(.startRoom)),
+            .in(.startRoom),
             .isTakable,
             .size(2)
         )
-        
-        let player = Player(in: .startRoom, carryingCapacity: 20)
-        let game = MinimalGame(player: player, items: [heldKey, roomKey])
-        let mockIO = await MockIOHandler()
-        let mockParser = MockParser()
-        let engine = await GameEngine(blueprint: game, parser: mockParser, ioHandler: mockIO)
 
-        let command = Command(
-            verb: .take,
-            directObjects: [.item("roomKey")], // Only room key should be in the list
-            isAllCommand: true,
-            rawInput: "take all"
-        )
+        let player = Player(in: .startRoom, characterSheet: .weak)
+        let game = MinimalGame(player: player, items: heldKey, roomKey)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // Act
-        await engine.execute(command: command)
+        try await engine.execute("take all")
 
         // Assert: Only room key is taken (held key skipped)
-        let finalHeldKeyState = try await engine.item("heldKey")
+        let finalHeldKeyState = try await engine.item(.startItem)
         let finalRoomKeyState = try await engine.item("roomKey")
-        
-        #expect(finalHeldKeyState.parent == .player) // Still held
-        #expect(finalRoomKeyState.parent == .player) // Now taken
+
+        #expect(try await finalHeldKeyState.playerIsHolding)  // Still held
+        #expect(try await finalRoomKeyState.playerIsHolding)  // Now taken
 
         // Assert: Message only mentions newly taken item
         let output = await mockIO.flush()
-        #expect(output == "You take the brass key.")
+        expectNoDifference(
+            output,
+            """
+            > take all
+            You take the brass key.
+            """
+        )
     }
-} 
+}

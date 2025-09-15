@@ -61,7 +61,7 @@ struct Act1Area {
     let gnustoDog = Item(id: "gnustoDog", .takable) // Very special item
 
     // Event handlers following naming convention
-    let gnustoDogHandler = ItemEventHandler { engine, event in
+    let gnustoDogHandler = ItemEventHandler(for: .gnustoDog) {
         // Gnusto "helps" by trying to take things
     }
 
@@ -132,18 +132,18 @@ The bureaucratic encounter introduces time pressure and custom interactions:
 
 ```swift
 // Fuse: Butter softening creates urgency
-let butterSoftening = FuseDefinition(id: "butterSoftening", initialTurns: 20) { engine in
+let butterSoftening = Fuse(id: "butterSoftening", initialTurns: 20) { engine in
     await engine.ioHandler.print("The butter is becoming dangerously soft in the warm sun!")
     let change = StateChange(
         entityId: .item("butterCrock"),
-        attribute: .hasAttribute("melted"),
-        newValue: .bool(true)
+        property: .hasProperty("melted"),
+        newValue: true
     )
     try engine.applyStateChange(change)
 }
 
 // Daemon: Official's increasing impatience
-let impatientOfficial = DaemonDefinition(id: "impatientOfficial", frequency: 3) { engine in
+let impatientOfficial = Daemon(id: "impatientOfficial", frequency: 3) { engine in
     let patience = await engine.getGlobalFlag("officialPatience")
     if patience > 0 {
         let messages = [
@@ -158,7 +158,7 @@ let impatientOfficial = DaemonDefinition(id: "impatientOfficial", frequency: 3) 
 }
 
 // Daemon: Workshop atmosphere
-let workshopAmbience = DaemonDefinition(id: "workshopAmbience", frequency: 5) { engine in
+let workshopAmbience = Daemon(id: "workshopAmbience", frequency: 5) { engine in
     let messages = [
         "Magical apparatus bubbles quietly in the workshop.",
         "Ancient tomes rustle their pages in a mystical breeze.",
@@ -172,52 +172,38 @@ let workshopAmbience = DaemonDefinition(id: "workshopAmbience", frequency: 5) { 
 
 ```swift
 struct FillOutActionHandler: ActionHandler {
-    func validate(context: ActionContext) async throws {
-        guard let directObject = context.command.directObject,
-              case .item(let itemID) = directObject,
-              itemID == "bureaucraticForm" else {
-            throw ActionResponse.prerequisiteNotMet("Fill out what? You need the proper forms.")
-        }
-
-        let formProgress = await context.engine.getItemAttribute(itemID, "progress")?.toInt ?? 0
-        guard formProgress < 17 else {
-            throw ActionResponse.prerequisiteNotMet("The form is already completely filled out.")
-        }
-    }
-
     func process(context: ActionContext) async throws -> ActionResult {
         // Complex form completion logic with multiple steps
         // Each page requires different information
         return ActionResult(
-            message: "You begin the tedious process of form completion...",
-            stateChanges: [
-                StateChange(
-                    entityId: .item("bureaucraticForm"),
-                    attribute: .hasAttribute("progress"),
-                    newValue: .int(currentProgress + 1)
-                )
-            ]
+            "You begin the tedious process of form completion...",
+            StateChange(
+                entityId: .item("bureaucraticForm"),
+                property: .hasProperty("progress"),
+                newValue: .int(currentProgress + 1)
+            )
         )
     }
 }
 
 struct ReciteActionHandler: ActionHandler {
     func validate(context: ActionContext) async throws {
-        let hasOath = await context.engine.getGlobalFlag("knowsFlatheadOath")
+        let hasOath = await engine.getGlobalFlag("knowsFlatheadOath")
         guard hasOath else {
-            throw ActionResponse.prerequisiteNotMet("You don't know the Flathead Oath of Allegiance. Perhaps you should ask about it first.")
+            throw await ActionResponse.feedback("You don't know the Flathead Oath of Allegiance. Perhaps you should ask about it first.")
         }
     }
 
     func process(context: ActionContext) async throws -> ActionResult {
-        return ActionResult("""
+        ActionResult("""
             You begin reciting the absurdly long Flathead Oath:
             "I, a humble subject of the Great Underground Empire, do solemnly swear..."
             [The recitation continues for several minutes]
 
             The official nods approvingly. "Acceptable. Though your pronunciation of
             'thaumaturgical sovereignty' could use work."
-            """)
+            """
+        )
     }
 }
 ```
@@ -256,7 +242,7 @@ let bureaucraticCheckpointHandler = LocationEventHandler { engine, event in
 
 ### Learning Outcomes
 
-- Time-based event management (`FuseDefinition`, `DaemonDefinition`)
+- Time-based event management (`Fuse`, `Daemon`)
 - Custom action handler implementation
 - Dynamic location and item behaviors
 - Complex state tracking and conditional logic
@@ -290,40 +276,40 @@ The discovery phase showcases the engine's most sophisticated features:
 ```swift
 struct CastActionHandler: ActionHandler {
     func validate(context: ActionContext) async throws {
-        guard let directObject = context.command.directObject,
+        guard let directObject = command.directObject,
               case .item(let scrollID) = directObject else {
-            throw ActionResponse.prerequisiteNotMet("Cast what? You need to specify a scroll.")
+            throw await ActionResponse.feedback("Cast what? You need to specify a scroll.")
         }
 
-        let isScroll = await context.engine.hasItemProperty(scrollID, .scroll)
+        let isScroll = await engine.hasItemProperty(scrollID, .scroll)
         guard isScroll else {
-            throw ActionResponse.prerequisiteNotMet("You can only cast spells from scrolls.")
+            throw await ActionResponse.feedback("You can only cast spells from scrolls.")
         }
 
-        let isMemorized = await context.engine.getItemAttribute(scrollID, "memorized")?.toBool ?? false
+        let isMemorized = await engine.getItemProperty(scrollID, "memorized")?.toBool ?? false
         guard isMemorized else {
-            throw ActionResponse.prerequisiteNotMet("You must first memorize the spell before casting it.")
+            throw await ActionResponse.feedback("You must first memorize the spell before casting it.")
         }
     }
 
     func process(context: ActionContext) async throws -> ActionResult {
-        guard case .item(let scrollID) = context.command.directObject else {
+        guard case .item(let scrollID) = command.directObject else {
             throw ActionResponse.internalEngineError("Validated item disappeared")
         }
 
-        let spellType = await context.engine.getItemAttribute(scrollID, "spellType")?.toString ?? "unknown"
-        let potency = await context.engine.getItemAttribute(scrollID, "potency")?.toInt ?? 50
+        let spellType = await engine.getItemProperty(scrollID, "spellType")?.toString ?? "unknown"
+        let potency = await engine.getItemProperty(scrollID, "potency")?.toInt ?? 50
 
         // Check for nearby impregnated paper (the magic happens here!)
-        let nearbyItems = await context.engine.itemsInCurrentLocation()
+        let nearbyItems = await engine.itemsInCurrentLocation()
         let impregnatedNotebook = nearbyItems.first { item in
-            item.hasAttribute("butterStained") &&
-            item.hasAttribute("preserveStained") &&
-            item.hasAttribute("lemonadeStained")
+            item.hasProperty("butterStained") &&
+            item.hasProperty("preserveStained") &&
+            item.hasProperty("lemonadeStained")
         }
 
-        if let notebook = impregnatedNotebook {
-            return processSpellTransfer(scrollID: scrollID, notebook: notebook, potency: potency)
+        if let impregnatedNotebook {
+            return processSpellTransfer(scrollID: scrollID, notebook: impregnatedNotebook, potency: potency)
         } else {
             return processNormalSpellCasting(spellType: spellType, potency: potency)
         }
@@ -333,20 +319,18 @@ struct CastActionHandler: ActionHandler {
         let transferPotency = max(potency / 2, 25) // Initial transfer is half potency
 
         return ActionResult(
-            message: """
-                As you cast the \(spellType) spell, the scroll crumbles to dust as usual. But wait!
-                Something extraordinary happens. Faint letters begin to appear on the stained pages
-                of the notebook, like a developing Polaroid print. The spell is transferring to the paper!
+            """
+            As you cast the \(spellType) spell, the scroll crumbles to dust as usual. But wait!
+            Something extraordinary happens. Faint letters begin to appear on the stained pages
+            of the notebook, like a developing Polaroid print. The spell is transferring to the paper!
 
-                The magical writings glow softly for a moment, then settle into the page. You have
-                discovered something remarkable.
-                """,
-            stateChanges: [
-                StateChange(entityId: .item(scrollID), attribute: .removeFromGame, newValue: .bool(true)),
-                StateChange(entityId: .item(notebook.id), attribute: .addSpell(spellType), newValue: .int(transferPotency)),
-                StateChange(entityId: .global, attribute: .setFlag("discoveredSpellTransfer"), newValue: .bool(true))
-            ],
-            sideEffects: [
+            The magical writings glow softly for a moment, then settle into the page. You have
+            discovered something remarkable.
+            """,
+            StateChange(entityId: .item(scrollID), property: .removeFromGame, newValue: true),
+            StateChange(entityId: .item(notebook.id), property: .addSpell(spellType), newValue: .int(transferPotency)),
+            StateChange(entityId: .global, property: .setFlag("discoveredSpellTransfer"), newValue: true),
+            effects: [
                 SideEffect(type: .scheduleEvent, targetID: .global, parameters: ["message": "Berzio emerges from the workshop, drawn by the unusual magical resonance."])
             ]
         )
@@ -362,14 +346,14 @@ struct ExperimentActionHandler: ActionHandler {
 }
 ```
 
-#### Dynamic Attribute Computation
+#### Dynamic Property Computation
 
 ```swift
 // Register dynamic spell potency calculation
-dynamicAttributeRegistry.registerItemCompute(attributeID: "spellPotency") { item, gameState in
+dynamicPropertyRegistry.registerItemCompute(propertyID: "spellPotency") { item, gameState in
     let baseIngredients = ["butter", "preserves", "lemonade"]
     let hasAllIngredients = baseIngredients.allSatisfy { ingredient in
-        item.hasAttribute("\(ingredient)Stained")
+        item.hasProperty("\(ingredient)Stained")
     }
 
     if hasAllIngredients {
@@ -382,12 +366,12 @@ dynamicAttributeRegistry.registerItemCompute(attributeID: "spellPotency") { item
 }
 
 // Validate spell transfer attempts
-dynamicAttributeRegistry.registerItemValidate(attributeID: "canReceiveSpell") { item, newValue in
+dynamicPropertyRegistry.registerItemValidate(propertyID: "canReceiveSpell") { item, newValue in
     guard item.hasProperty(.paper) else { return false }
 
-    let isImpregnated = item.hasAttribute("butterStained") &&
-                       item.hasAttribute("preserveStained") &&
-                       item.hasAttribute("lemonadeStained")
+    let isImpregnated = item.hasProperty("butterStained") &&
+                       item.hasProperty("preserveStained") &&
+                       item.hasProperty("lemonadeStained")
 
     return isImpregnated
 }
@@ -396,18 +380,15 @@ dynamicAttributeRegistry.registerItemValidate(attributeID: "canReceiveSpell") { 
 #### ItemEventHandlers with Complex Logic
 
 ```swift
-let magicNotebookHandler = ItemEventHandler { engine, event in
-    switch event {
-    case .beforeTurn(let command):
-        if command.verb == .examine {
-            let description = await generateDynamicNotebookDescription(engine: engine)
-            return ActionResult(description)
-        }
-        return nil
-
-    case .afterTurn(let command):
-        if command.verb == .cast && await engine.getGlobalFlag("discoveredSpellTransfer") {
-            await engine.scheduleEvent("berzioReaction", delay: 1)
+let magicNotebookHandler = ItemEventHandler(for: .magicNotebook) {
+    before(.examine) { context, command in
+        let description = await generateDynamicNotebookDescription(engine: context.engine)
+        return ActionResult(description)
+    }
+    
+    after(.cast) { context, command in
+        if await context.engine.getGlobalFlag("discoveredSpellTransfer") {
+            await context.engine.scheduleEvent("berzioReaction", delay: 1)
         }
         return nil
     }
@@ -418,18 +399,18 @@ func generateDynamicNotebookDescription(engine: GameEngine) async -> String {
 
     var description = "A massive thousand-page notebook filled with thaumaturgical notes and diagrams."
 
-    if notebook.hasAttribute("butterStained") {
+    if notebook.hasProperty("butterStained") {
         description += " The pages are stained with butter"
-        if notebook.hasAttribute("preserveStained") {
+        if notebook.hasProperty("preserveStained") {
             description += " and cherry preserves"
-            if notebook.hasAttribute("lemonadeStained") {
+            if notebook.hasProperty("lemonadeStained") {
                 description += " and blackberry lemonade"
             }
         }
         description += ". The stains have created an unusual pattern on the paper."
     }
 
-    let spellCount = notebook.attributes.keys.filter { $0.starts(with: "spell_") }.count
+    let spellCount = notebook.properties.keys.filter { $0.starts(with: "spell_") }.count
     if spellCount > 0 {
         description += " Magical writings glow faintly on \(spellCount) of the stained pages."
     }
@@ -464,7 +445,7 @@ func generateDynamicNotebookDescription(engine: GameEngine) async -> String {
 ### Learning Outcomes
 
 - Complex custom action implementation
-- Dynamic attribute systems and computation
+- Dynamic property systems and computation
 - Multi-step puzzle design with multiple solution paths
 - Advanced state tracking and scoring
 - Integration of all previous features into cohesive systems
@@ -521,7 +502,7 @@ Executables/FrobozzMagicDemoKit/
 3. **Phase 3**: Implement Act III discovery
 
    - Complex spell system
-   - Dynamic attribute computation
+   - Dynamic property computation
    - Multiple solution paths
    - Comprehensive scoring
 
