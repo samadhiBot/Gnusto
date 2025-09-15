@@ -4,7 +4,7 @@ Eliminate boilerplate with automatic ID generation and game setup.
 
 ## Overview
 
-The GnustoAutoWiringPlugin is a Swift Package Manager build tool plugin that automatically discovers patterns in your game code and generates all the necessary ID constants, extensions, and GameBlueprint wiring. This eliminates the tedious and error-prone task of manually maintaining ID constants and connection code.
+The GnustoAutoWiringPlugin is a Swift Package Manager build tool plugin that automatically discovers patterns in your game code and generates all the necessary ID constants, extensions, and GameBlueprint wiring. This eliminates the tedious and error-prone task of manually maintaining ID constants and connection code. The plugin has been enhanced to work with the new proxy system, combat mechanics, character systems, and conversation features.
 
 ## What Gets Generated
 
@@ -47,6 +47,18 @@ extension DaemonID {
 // Generates:
 extension Verb {
     static let custom = Verb("custom")
+}
+
+// From: CharacterID usage in combat/conversation systems
+// Generates:
+extension CharacterID {
+    static let wizard = CharacterID("wizard")
+}
+
+// From: ConversationID usage
+// Generates:
+extension ConversationID {
+    static let wizardChat = ConversationID("wizardChat")
 }
 ```
 
@@ -98,6 +110,21 @@ extension MyGameBlueprint {
         registry.registerDaemon(AnotherArea.ambientDaemon)
         return registry
     }
+
+    // Auto-configured messenger system
+    var messenger: MessageProvider {
+        // Uses custom messenger if defined, otherwise defaults
+        return CustomGameMessenger()
+    }
+
+    // Auto-discovered character sheets and combat configurations
+    var characterSheets: [ItemID: CharacterSheet] {
+        [
+            .troll: CharacterSheet(health: 25, maxHealth: 25, attackPower: 8),
+            .wizard: CharacterSheet(health: 15, maxHealth: 15, attackPower: 5),
+            // ... all characters with sheets discovered
+        ]
+    }
 }
 ```
 
@@ -146,8 +173,24 @@ enum TownSquare {
         .omitDescription
     )
 
+    static let guard = Item(
+        id: .guard,       // Plugin generates ItemID.guard
+        .name("town guard"),
+        .isCharacter,
+        .characterSheet(
+            health: 20,
+            maxHealth: 20,
+            classification: .friendly
+        ),
+        .in(.townSquare)
+    )
+
     static let fountainHandler = ItemEventHandler(for: .fountain) {
         // Custom fountain behavior
+    }
+
+    static let guardHandler = ItemEventHandler(for: .guard) {
+        // Custom guard conversation and combat behavior
     }
 }
 ```
@@ -185,26 +228,35 @@ The plugin recognizes these patterns automatically:
 ### Entity Creation Patterns
 
 - `Location(id: .someID, ...)`
-- `Item(id: .someID, ...)`
+- `Item(id: .someID, ...)` including character items with `.isCharacter`
 - `Player(in: .someLocation)`
 - Exit destinations: `.to(.someLocation)`
 - Parent entities: `.location(.someLocation)`, `.item(.someItem)`
+- Character sheets: `.characterSheet(health: 20, ...)`
+- Combat configurations and weapon definitions
 
 ### ID Usage Patterns
 
 - `GlobalID("key")` and global state dictionary usage
 - `FuseID("timer")` and `DaemonID("background")`
 - `Verb("custom")` for game-specific verbs
+- `CharacterID("npc")` for character tracking
+- `ConversationID("dialogue")` for conversation systems
+- Combat state references and weapon IDs
 
 ### Event Handler Patterns
 
 - `let nameHandler = ItemEventHandler(for: .itemName) { ... }`
 - `static let nameHandler = LocationEventHandler { ... }`
+- Character event handlers with combat and conversation integration
+- Custom action handlers with proxy system support
 
 ### Time-Based Event Patterns
 
 - `let timerFuse = Fuse(id: .timer, ...)`
 - `let ambientDaemon = Daemon(id: .ambient, ...)`
+- Combat-related timing events and turn management
+- Conversation timeout and state management timers
 
 ## Advanced Features
 
@@ -287,30 +339,49 @@ extension LocationID {
 extension ItemID {
     static let cloak = ItemID("cloak")
     static let hook = ItemID("hook")
+    static let guard = ItemID("guard")
+}
+
+extension CharacterID {
+    static let guard = CharacterID("guard")
 }
 
 // Manual GameBlueprint implementation
 extension MyGameBlueprint {
     var items: [Item] {
-        [OperaHouse.cloak, OperaHouse.hook]
+        [OperaHouse.cloak, OperaHouse.hook, TownSquare.guard]
     }
 
     var locations: [Location] {
-        [OperaHouse.foyer, OperaHouse.cloakroom]
+        [OperaHouse.foyer, OperaHouse.cloakroom, TownSquare.square]
     }
 
     var itemEventHandlers: [ItemID: ItemEventHandler] {
-        [.cloak: OperaHouse.cloakHandler]
+        [
+            .cloak: OperaHouse.cloakHandler,
+            .guard: TownSquare.guardHandler
+        ]
+    }
+
+    var characterSheets: [ItemID: CharacterSheet] {
+        [.guard: CharacterSheet(health: 20, maxHealth: 20)]
+    }
+
+    var messenger: MessageProvider {
+        return CustomGameMessenger()
     }
 }
 ```
 
 ## Best Practices
 
-1. **Organize by Areas**: Group related locations, items, and handlers together
+1. **Organize by Areas**: Group related locations, items, characters, and handlers together
 2. **Use Descriptive Names**: Handler names should clearly indicate their purpose
 3. **Be Consistent**: Choose either static or instance properties and stick with it
 4. **Logical Grouping**: Keep related game content in the same file/area
-5. **Test Thoroughly**: The plugin generates code, so always verify your build succeeds
+5. **Character Integration**: Place character sheets and combat configurations near their item definitions
+6. **Proxy Compatibility**: Ensure event handlers work with the proxy system for safe state access
+7. **Test Thoroughly**: The plugin generates code, so always verify your build succeeds
+8. **Combat Organization**: Group combat-related items (weapons, armor, characters) logically
 
-The GnustoAutoWiringPlugin transforms game development from tedious boilerplate management to pure creative focus. Let it handle the connections while you craft amazing interactive experiences!
+The GnustoAutoWiringPlugin transforms game development from tedious boilerplate management to pure creative focus. With enhanced support for combat systems, character management, conversation mechanics, and the proxy architecture, it handles all the complex wiring while you craft amazing interactive experiences with rich NPCs, dynamic combat, and engaging dialogue!

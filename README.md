@@ -2,7 +2,7 @@
 
 # Gnusto: A Modern Interactive Fiction Engine
 
-Gnusto is a powerful, flexible Swift-based framework for creating interactive fiction games. Drawing inspiration from the classic Infocom masterpieces, it provides a modern toolkit that makes building rich, dynamic text adventures easy and enjoyable--allowing you to focus on storytelling and world-building rather than engine mechanics.
+Gnusto is a powerful, flexible Swift-based framework for creating interactive fiction games. Drawing inspiration from the Infocom classics, it provides a modern toolkit that makes building rich, dynamic text adventures easy and enjoyable--allowing you to focus on storytelling and world-building rather than engine mechanics.
 
 ## For Game Creators
 
@@ -24,8 +24,8 @@ Gnusto is a powerful, flexible Swift-based framework for creating interactive fi
 - **Smart Parser:** Natural language understanding with support for complex commands, synonyms, adjectives, and object references
 - **Comprehensive State Management:** Track game progress with the new Proxy system, handle timed events (fuses and daemons), and manage complex game states with full Codable support
 - **Combat & Character Systems:** Full RPG-style combat mechanics with character sheets, health/consciousness tracking, and combat state management
-- **Conversations & NPCs:** Rich dialogue systems and character interactions
-- **Localization Ready:** Centralized Messenger system enables easy translation and customization of all player-facing text
+- **Conversations & NPCs:** Simple dialogue systems and character interactions
+- **Localization Ready:** Centralized Messenger system enables easy customization of all player-facing text
 - **Extensible Architecture:** Add custom behaviors and game mechanics without fighting the engine--everything is designed for modularity
 
 ### Quick Start for Creators
@@ -138,7 +138,8 @@ Check out our comprehensive resources:
 
 - **[Complete Documentation](Sources/GnustoEngine/Documentation.docc/Documentation.md):** Detailed guides and API reference
 - **[Cloak of Darkness](Executables/CloakOfDarkness):** A complete, playable example showcasing core features
-- **[Frobozz Magic Demo Kit](Executables/FrobozzMagicDemoKit):** Templates and advanced patterns
+- **[Frobozz Magic Demo Kit](Executables/FrobozzMagicDemoKit):** Templates and advanced patterns (in progress)
+- **[Zork 1](Executables/Zork1):** A faithful replica of _Zork I: The Great Underground Empire_ (in progress)
 - **[GnustoAutoWiringPlugin Guide](Sources/GnustoEngine/Documentation.docc/GnustoAutoWiringPlugin.md):** Master the automatic setup system
 
 ---
@@ -149,23 +150,23 @@ Check out our comprehensive resources:
 
 The project is organized with a clean separation between the core engine and example implementations:
 
-- **`Sources/GnustoEngine/`:** The complete interactive fiction engine
-- **`Executables/`:** Example games and demos showcasing engine capabilities
+- **`Sources/GnustoEngine`:** The complete interactive fiction engine
+- **`Executables`:** Example games and demos showcasing engine capabilities
 
 ### Core Engine Components
 
-- **`Core/`:** Fundamental types (GameState, Item, Location, ScopeResolver)
-- **`Engine/`:** The central GameEngine orchestrator  
-- **`Actions/`:** Action handling pipeline with 80+ built-in ActionHandlers
-- **`Proxies/`:** Safe state mutation system using proxy objects
-- **`Combat/`:** Complete combat mechanics and state management
-- **`Character/`:** Character sheets, classifications, and condition tracking
-- **`Messenger/`:** Centralized localization and message handling
-- **`Parsing/`:** Command parsing and vocabulary systems
-- **`IO/`:** Input/output abstraction for different frontends
-- **`Time/`:** Fuse and daemon system for timed events
-- **`Vocabulary/`:** Word recognition and synonym systems
-- **`Extensions/`:** Utility extensions
+- **`Core`:** Fundamental types (GameState, Item, Location, ScopeResolver)
+- **`Engine`:** The central GameEngine orchestrator
+- **`Actions`:** Action handling pipeline with 80+ built-in ActionHandlers
+- **`Proxies`:** Safe state mutation system using proxy objects
+- **`Combat`:** Complete combat mechanics and state management
+- **`Character`:** Character sheets, classifications, and condition tracking
+- **`Messenger`:** Centralized localization and message handling
+- **`Parsing`:** Command parsing and vocabulary systems
+- **`IO`:** Input/output abstraction for different frontends
+- **`Time`:** Fuse and daemon system for timed events
+- **`Vocabulary`:** Word recognition and synonym systems
+- **`Extensions`:** Utility extensions
 
 ## Core Concepts
 

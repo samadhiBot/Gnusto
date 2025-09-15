@@ -1,6 +1,6 @@
 # Action Handler Development Guide
 
-Action handlers are the core components that process player commands in the Gnusto Interactive Fiction Engine. This guide covers the design principles, implementation patterns, and best practices for creating effective action handlers.
+Action handlers are the core components that process player commands in the Gnusto Interactive Fiction Engine. With 80+ built-in handlers covering everything from basic interactions to combat, conversations, and complex puzzle mechanics, this guide covers the design principles, implementation patterns, and best practices for creating effective action handlers that work with the modern proxy-based architecture.
 
 ## Overview
 
@@ -58,19 +58,19 @@ public func process(context: ActionContext) async throws -> ActionResult {
 
 ### Use MessageProvider for ActionHandler Responses
 
-Never hardcode `ActionHandler` response text. Use the `MessageProvider` for consistency and localization:
+Never hardcode `ActionHandler` response text. Always use the `Messenger` system (via `context.msg` or `engine.messenger`) for consistency and localization:
 
 ```swift
-// ✅ Good: Using MessageProvider
+// ✅ Good: Using Messenger system
 throw await ActionResponse.feedback(
-    engine.messenger.itemNotTakable(item.withDefiniteArticle)
+    context.msg.itemNotTakable(item.withDefiniteArticle)
 )
 
 // ❌ Bad: Hardcoded text
 throw await ActionResponse.feedback("You can't take that!")
 ```
 
-The `MessageProvider` contains default responses for a wide variety of commands. Game developers can subclass `MessageProvider` to replace the default responses as needed to fit their own game's language and tone.
+The `Messenger` system contains default responses for a wide variety of commands. Game developers can subclass `MessageProvider` to replace the default responses as needed to fit their own game's language and tone, and the engine automatically uses their custom messenger throughout all interactions.
 
 ## Action Handler Structure
 
@@ -115,27 +115,27 @@ public let synonyms: [Verb] = [.take, .get, .grab]  // Match the generic `.verb`
 
 ### Action Processing Patterns
 
-Real action handlers follow much simpler patterns than you might expect. Here are the most common patterns from actual handlers:
+Real action handlers follow much simpler patterns than you might expect, but now work through the proxy system for safe state access. Here are the most common patterns from actual handlers:
 
 #### Pattern 1: Simple Object Action (like BlowActionHandler)
 
 ```swift
 public func process(context: ActionContext) async throws -> ActionResult {
-    guard let targetItemID = command.directObjectItemID else {
+    guard let targetItemID = context.command.directObjectItemID else {
         // Handle no-object case
-        return ActionResult(engine.messenger.blow())
+        return ActionResult(context.msg.blow())
     }
 
-    guard await engine.playerCanReach(targetItemID) else {
+    guard await context.engine.playerCanReach(targetItemID) else {
         throw ActionResponse.itemNotAccessible(targetItemID)
     }
 
-    let targetItem = try await engine.item(targetItemID)
+    let targetItem = try await context.engine.item(targetItemID)
 
     return ActionResult(
-        engine.messenger.blowOn(item: targetItem.withDefiniteArticle),
-        await engine.setItemFlag(targetItemID, .isTouched, to: true),
-        await engine.updatePronouns(to: targetItem)
+        context.msg.blowOn(item: targetItem.withDefiniteArticle),
+        targetItem.setFlag(.isTouched),
+        await context.engine.updatePronouns(to: targetItem)
     )
 }
 ```
@@ -144,60 +144,60 @@ public func process(context: ActionContext) async throws -> ActionResult {
 
 ```swift
 public func process(context: ActionContext) async throws -> ActionResult {
-    guard let characterID = command.directObjectItemID else {
-        throw await ActionResponse.feedback(engine.messenger.askWhom())
+    guard let characterID = context.command.directObjectItemID else {
+        throw await ActionResponse.feedback(context.msg.askWhom())
     }
 
-    let character = try await engine.item(characterID)
+    let character = try await context.engine.item(characterID)
 
-    guard character.isCharacter else {
+    guard await character.isCharacter else {
         throw await ActionResponse.feedback(
-            engine.messenger.cannotAskAboutThat(item: character.withDefiniteArticle)
+            context.msg.cannotAskAboutThat(item: character.withDefiniteArticle)
         )
     }
 
-    guard await engine.playerCanReach(characterID) else {
+    guard await context.engine.playerCanReach(characterID) else {
         throw ActionResponse.itemNotAccessible(characterID)
     }
 
     // Handle different scenarios based on command structure
-    if let topic = command.indirectObject {
-        return try await processDirectAsk(character: character, topic: topic, engine: engine)
+    if let topic = context.command.indirectObject {
+        return try await processDirectAsk(character: character, topic: topic, context: context)
     } else {
-        return await promptForTopic(character: character, engine: engine)
+        return await promptForTopic(character: character, context: context)
     }
 }
 ```
 
-#### Pattern 3: Conditional Response (like AttackActionHandler)
+#### Pattern 3: Combat Action (like AttackActionHandler)
 
 ```swift
 public func process(context: ActionContext) async throws -> ActionResult {
-    guard let targetItemID = command.directObjectItemID else {
-        throw await ActionResponse.feedback(engine.messenger.doWhat(command.verb))
+    guard let targetItemID = context.command.directObjectItemID else {
+        throw await ActionResponse.feedback(context.msg.doWhat(context.command.verb))
     }
 
-    let targetItem = try await engine.item(targetItemID)
+    let targetItem = try await context.engine.item(targetItemID)
 
-    guard await engine.playerCanReach(targetItemID) else {
+    guard await context.engine.playerCanReach(targetItemID) else {
         throw ActionResponse.itemNotAccessible(targetItemID)
     }
 
     // Different responses based on target and weapon
     let message: String
-    if !targetItem.isCharacter {
-        message = engine.messenger.attackNonCharacter(item: targetItem.withDefiniteArticle)
-    } else if command.indirectObject == nil {
-        message = engine.messenger.attackWithBareHands(character: targetItem.withDefiniteArticle)
+    if !await targetItem.isCharacter {
+        message = context.msg.attackNonCharacter(item: targetItem.withDefiniteArticle)
+    } else if context.command.indirectObject == nil {
+        message = context.msg.attackWithBareHands(character: targetItem.withDefiniteArticle)
     } else {
-        // Handle weapon attacks...
-        message = engine.messenger.attackWithWeapon(/* ... */)
+        // Handle weapon attacks - may trigger combat system
+        return try await handleCombatAttack(target: targetItem, context: context)
     }
 
     return ActionResult(
         message,
-        await engine.setItemFlag(targetItemID, .isTouched, to: true),
-        await engine.updatePronouns(to: targetItem)
+        targetItem.setFlag(.isTouched),
+        await context.engine.updatePronouns(to: targetItem)
     )
 }
 ```
@@ -206,22 +206,22 @@ public func process(context: ActionContext) async throws -> ActionResult {
 
 ```swift
 public func process(context: ActionContext) async throws -> ActionResult {
-    guard let targetItemID = command.directObjectItemID else {
+    guard let targetItemID = context.command.directObjectItemID else {
         // No object - general action
-        return ActionResult(engine.messenger.breatheResponse())
+        return ActionResult(context.msg.breatheResponse())
     }
 
     // Object specified - targeted action
-    let targetItem = try await engine.item(targetItemID)
+    let targetItem = try await context.engine.item(targetItemID)
 
-    guard await engine.playerCanReach(targetItemID) else {
+    guard await context.engine.playerCanReach(targetItemID) else {
         throw ActionResponse.itemNotAccessible(targetItemID)
     }
 
     return ActionResult(
-        engine.messenger.breatheOnResponse(item: targetItem.withDefiniteArticle),
-        await engine.setItemFlag(targetItemID, .isTouched, to: true),
-        await engine.updatePronouns(to: targetItem)
+        context.msg.breatheOnResponse(item: targetItem.withDefiniteArticle),
+        targetItem.setFlag(.isTouched),
+        await context.engine.updatePronouns(to: targetItem)
     )
 }
 ```
@@ -229,9 +229,11 @@ public func process(context: ActionContext) async throws -> ActionResult {
 **Key Insights from Real Handlers:**
 
 - Most handlers are much simpler than you might expect
-- Common pattern: validate → get item → check accessibility → generate response
+- Common pattern: validate → get item proxy → check accessibility → generate response
 - State changes are minimal: usually just `.isTouched` and pronoun updates
 - Complex logic is often just conditional responses, not complex state manipulation
+- The proxy system provides safe, concurrent access to both static and computed properties
+- Combat and conversation handlers may delegate to specialized subsystems
 - ActionResult constructor accepts variadic StateChange arguments for convenience
 
 ## Universal Object Handling
@@ -248,15 +250,16 @@ public struct ExamineActionHandler: ActionHandler {
 
     public func process(context: ActionContext) async throws -> ActionResult {
         // Handle both items and universals
-        for directObjectRef in command.directObjects {
+        for directObjectRef in context.command.directObjects {
             switch directObjectRef {
             case .item(let itemID):
-                // Handle regular items
+                // Handle regular items through proxy system
+                let item = try await context.engine.item(itemID)
 
             case .universal(let universal):
                 // Handle universals like .sky, .ground, .walls
                 return ActionResult(
-                    engine.messenger.nothingSpecialAbout(universal.displayName)
+                    context.msg.nothingSpecialAbout(universal.displayName)
                 )
 
             default:
@@ -328,6 +331,25 @@ Test every supported pattern and verify unsupported patterns fail:
 ```swift
 @Test("TAKE syntax works")
 func testTakeSyntax() async throws {
+    let testRoom = Location(
+        id: .startRoom,
+        .name("Test Room"),
+        .inherentlyLit
+    )
+
+    let testItem = Item(
+        id: "lamp",
+        .name("brass lamp"),
+        .isTakable,
+        .in(.startRoom)
+    )
+
+    let game = MinimalGame(
+        player: Player(in: .startRoom),
+        locations: testRoom,
+        items: testItem
+    )
+
     let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
     try await engine.execute("take lamp")
@@ -379,12 +401,12 @@ func testTakeMovesItem() async throws {
 **Always test through the full engine pipeline!**
 
 ```swift
-// ✅ RIGHT: Test complete flow
+// ✅ RIGHT: Test complete flow through parser and action system
 try await engine.execute("take lamp")
 
 // ❌ WRONG: Skip parser (misses real bugs)
 let command = Command(verb: .take, directObject: "lamp", rawInput: "take lamp")
-try await handler.perform(command: command, engine: engine)
+try await handler.process(context: ActionContext(command: command, engine: engine))
 ```
 
 ### Standard Test Setup
@@ -425,7 +447,7 @@ func testSomething() async throws {
         """)
 
     let finalState = try await engine.item("testItem")
-    #expect(try await finalState.playerIsHolding)
+    #expect(await finalState.parent == .player)
 }
 ```
 
@@ -434,17 +456,16 @@ func testSomething() async throws {
 ### Handling ALL Commands
 
 ```swift
-if command.isAllCommand {
+if context.command.isAllCommand {
     // Skip problematic items, don't throw errors
-    guard await engine.playerCanReach(itemID) else {
+    guard await context.engine.playerCanReach(itemID) else {
         continue
     }
 
     // Provide summary message if nothing processed
     if processedItems.isEmpty {
         return ActionResult(
-            message: engine.messenger.nothingHereToTake(),
-            changes: []
+            context.msg.nothingHereToTake()
         )
     }
 }
@@ -463,15 +484,15 @@ if context.hasPreposition(.in, .on) {
 ### Multiple Object Processing
 
 ```swift
-var processedItems: [Item] = []
+var processedItems: [ItemProxy] = []
 
-for directObjectRef in command.directObjects {
-    // Process each object...
+for directObjectRef in context.command.directObjects {
+    // Process each object through proxy system...
     processedItems.append(item)
 }
 
 // Update pronouns appropriately
-let pronounChanges = await engine.updatePronouns(to: processedItems)
+let pronounChanges = await context.engine.updatePronouns(to: processedItems)
 allStateChanges.append(contentsOf: pronounChanges)
 ```
 
@@ -482,10 +503,10 @@ allStateChanges.append(contentsOf: pronounChanges)
 - ✅ Use specific verbs in syntax rules when possible
 - ✅ Test through the complete engine pipeline
 - ✅ Keep validation logic generic and reusable
-- ✅ Use MessageProvider for all responses
+- ✅ Use Messenger system (context.msg) for all responses
 - ✅ Handle ALL commands gracefully
 - ✅ Update pronouns after processing
-- ✅ Flow state changes through StateChange pipeline
+- ✅ Flow state changes through StateChange pipeline via proxy system
 
 ### Don'ts
 
@@ -520,15 +541,15 @@ expectNoDifference(output, "Taken.")
 For handlers that need to ask follow-up questions:
 
 ```swift
-// Two-phase asking pattern
-if command.indirectObject == nil {
+// Two-phase asking pattern integrated with conversation system
+if context.command.indirectObject == nil {
     let prompt = "What do you want to ask \(character.withDefiniteArticle) about?"
 
     let questionChanges = await ConversationManager.askForTopic(
         prompt: prompt,
         characterID: characterID,
-        originalCommand: command,
-        engine: engine
+        originalCommand: context.command,
+        context: context
     )
 
     return ActionResult(message: prompt, changes: questionChanges)
@@ -554,14 +575,21 @@ public struct TakeFromContainerActionHandler: ActionHandler {
 
 ### Item Event Handlers
 
-For item-specific behavior, use ItemEventHandlers instead of complex action handler logic:
+For item-specific behavior, use ItemEventHandlers with the proxy system:
 
 ```swift
 // In game code, not engine
-public struct MagicLampEventHandler: ItemEventHandler {
-    public func handleExamine(context: ActionContext) async -> ActionResult? {
-        // Custom examine behavior for magic lamp
-        return ActionResult(message: "The lamp glows with inner light...")
+let lampHandler = ItemEventHandler(for: .magicLamp) {
+    before(.examine) { context, command in
+        // Custom examine behavior for magic lamp with proxy access
+        let lamp = try await context.engine.item(.magicLamp)
+        let glowLevel = await lamp.property("glowLevel", type: Int.self) ?? 0
+        
+        let message = glowLevel > 0 ? 
+            "The lamp glows with inner light..." : 
+            "The lamp appears ordinary."
+            
+        return ActionResult(message)
     }
 }
 ```
