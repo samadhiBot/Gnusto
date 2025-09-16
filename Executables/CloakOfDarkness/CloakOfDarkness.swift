@@ -1,6 +1,17 @@
 import GnustoEngine
 
-/// A Gnusto Engine port of Roger Firth's Cloak of Darkness.
+/**
+ # Roger Firth's Cloak of Darkness.
+
+ Roger Firth's **Cloak of Darkness** is a minimalist interactive fiction (IF) game created in 1999 to serve as a cross-system demo for IF authoring engines. It is regarded as the "Hello, world!" of interactive fiction, designed as a reference implementation to help authors compare language features and basic capabilities across IF systems.
+
+ The game consists of:
+
+ - **Three rooms:** The Foyer (starting location, exits south and west), Cloakroom (west, contains a brass hook), and Bar (south, initially dark).
+ - **Three objects:** The player's black velvet cloak, the hook in the Cloakroom, and a message in the Bar.
+ - **Main puzzle:** To hang the cloak on the hook, which lights the Bar and reveals the message.
+ - **End condition:** Reading the message in the Bar (after lighting it) ends the game with either "You have won" or "You have lost," depending on how much the player disturbed the room while it was dark.
+ */
 public struct CloakOfDarkness: GameBlueprint {
     public let title = "Cloak of Darkness"
 

@@ -1,6 +1,12 @@
 import GnustoEngine
 
+/// A game world representing the classic tutorial game "Cloak of Darkness".
+///
+/// This struct contains all the locations, items, and event handlers that make up
+/// the simple adventure game where the player must navigate an opera house,
+/// hang up their cloak, and read a message in the bar.
 struct OperaHouse {
+
     // MARK: - Foyer of the Opera House
 
     let foyer = Location(
@@ -98,7 +104,7 @@ struct OperaHouse {
 
     let barHandler = LocationEventHandler(for: .bar) {
         // First: if location is lit, yield to normal processing
-        beforeEnter { context, command in
+        beforeEnter { context, _ in
             if try await context.location.isLit {
                 return ActionResult.yield
             }
@@ -118,12 +124,12 @@ struct OperaHouse {
         }
 
         // Third: handle meta commands in dark
-        beforeEnter(.meta) { context, command in
+        beforeEnter(.meta) { _, _ in
             return ActionResult.yield
         }
 
         // Fourth: catch-all for other commands in dark
-        beforeEnter { context, command in
+        beforeEnter { context, _ in
             return ActionResult(
                 "In the dark? You could easily disturb something!",
                 await context.engine.adjustGlobal(.barMessageDisturbances, by: 1)
@@ -134,7 +140,7 @@ struct OperaHouse {
     // MARK: - Item event handlers
 
     let cloakHandler = ItemEventHandler(for: .cloak) {
-        before(.drop, .insert) { context, command in
+        before(.drop, .insert) { context, _ in
             guard try await context.engine.player.location.id == .cloakroom else {
                 throw ActionResponse.feedback(
                     "This isn't the best place to leave a smart cloak lying around."
@@ -169,7 +175,7 @@ struct OperaHouse {
     }
 
     let hookHandler = ItemEventHandler(for: .hook) {
-        before(.examine) { context, command in
+        before(.examine) { context, _ in
             let hookDetail =
                 if try await context.item.isHolding(.cloak) {
                     "with a cloak hanging on it"
@@ -181,7 +187,7 @@ struct OperaHouse {
     }
 
     let messageHandler = ItemEventHandler(for: .message) {
-        before(.examine, .read) { context, command in
+        before(.examine, .read) { context, _ in
             guard try await context.engine.player.location.id == .bar else {
                 return nil
             }
@@ -192,7 +198,9 @@ struct OperaHouse {
             }
 
             let disturbedCount = await context.engine.global(.barMessageDisturbances)?.toInt ?? 0
+
             await context.engine.requestQuit()
+
             if disturbedCount < 2 {
                 return ActionResult(
                     """
