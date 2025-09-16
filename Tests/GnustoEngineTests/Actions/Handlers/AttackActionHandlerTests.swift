@@ -272,25 +272,24 @@ struct AttackActionHandlerTests {
             You catch the giant spider with minimal force, the blow almost
             gentle. The light wound barely seems to register.
 
+            The giant spider's counter-punch goes wide, rage making the
+            strike clumsy and predictable.
+
+            > kill the giant spider
+            You catch the giant spider with minimal force, the blow almost
+            gentle. The light wound barely seems to register.
+
+            The giant spider's retaliatory strike comes fast but you're
+            faster, sidestepping the violence with practiced grace.
+
+            > kill the giant spider
+            You land a punishing blow to the giant spider, and it grunts
+            from the force. You see the ripple of pain, but its body
+            absorbs it. It remains dangerous.
+
             In the tangle, the giant spider drives an elbow home--sudden
             pressure that blooms into dull pain. The wound is trivial
             against your battle fury.
-
-            > kill the giant spider
-            You catch the giant spider with minimal force, the blow almost
-            gentle. The strike lands, but doesn't slow it.
-
-            In the tangle, the giant spider drives an elbow home--sudden
-            pressure that blooms into dull pain. The strike lands but
-            doesn't slow you. Not yet.
-
-            > kill the giant spider
-            You catch the giant spider with minimal force, the blow almost
-            gentle. The sting adds to its growing catalog of pain.
-
-            In the scramble, the giant spider throws a desperate hook that
-            barely connects, all motion and no mass. The graze adds another
-            small discomfort to your growing list.
             """
         )
     }

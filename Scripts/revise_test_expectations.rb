@@ -2,6 +2,9 @@
 
 # Minimal updater: parses Swift Testing heredoc diffs from `swift test` output
 # and writes new heredoc content into the corresponding test files under ./Tests.
+#
+# Use this script when source code changes make test expectations obsolete. It finds
+# heredocs with test errors, and updates the expected text to match the actual output.
 
 def run_swift_tests
     output = +""
@@ -26,13 +29,15 @@ def parse_new_heredoc_content(diff)
     lines = diff.strip.lines
     inner = lines[1..-2] || []
     inner.map do |l|
-        s = l.lstrip
-        if s.start_with?('+ ')
+        # Check original line with indentation to distinguish diff markers from markdown
+        if l =~ /^\s{5}\+/
             nil
-        elsif s.start_with?('− ')
-            s[2..-1].to_s.chomp
+        elsif l =~ /^\s{5}\u2212/
+            # Remove the diff marker and indentation, keep the content
+            l[7..-1].to_s.chomp
         else
-            s.chomp
+            # Not a diff marker, just trim and keep the line
+            l.lstrip.chomp
         end
     end.compact
 end
@@ -193,7 +198,7 @@ def apply_changes(file_path, changes)
 
         # Process new content
         new_body = ch[:new].map { |ln|
-            if ln.start_with?('- ') || ln.start_with?('− ')
+            if ln.start_with?('− ')
                 ln[2..-1] || ""
             else
                 ln

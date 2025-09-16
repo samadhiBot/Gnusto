@@ -31,7 +31,7 @@ struct UndergroundTests {
             Your sword is glowing very brightly.
 
             >
-            May your adventures elsewhere prove fruitful!
+            Until we meet again in another tale...
             """
         )
     }
@@ -75,7 +75,7 @@ struct UndergroundTests {
             Your sword is glowing very brightly.
 
             > go north
-            The universe conspires against your movement that way.
+            You can't go that way.
 
             Your sword is glowing very brightly.
 
