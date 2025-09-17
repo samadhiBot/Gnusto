@@ -326,7 +326,7 @@ extension InsideHouse {
     /// - EXAMINE: Shows lamp state (burned out, on, or off)
     static let lampHandler = ItemEventHandler(for: .lamp) {
         before(.throw) { context, command in
-            let playerLocation = try await context.engine.player.location
+            let playerLocation = try await context.player.location
             let brokenLamp = try await context.engine.item(.brokenLamp)
 
             return try await ActionResult(
@@ -536,7 +536,7 @@ extension InsideHouse {
     /// - **Raise**: Treats `RAISE` as an alias for `OPEN`.
     static let trapDoorHandler = ItemEventHandler(for: .trapDoor) {
         before(.open, .pull) { context, command in
-            let location = try await context.engine.player.location.id
+            let location = try await context.player.location.id
             let isTrapDoorOpen = await context.item.hasFlag(.isOpen)
 
             return if isTrapDoorOpen {
@@ -555,7 +555,7 @@ extension InsideHouse {
         }
 
         before(.close) { context, command in
-            let location = try await context.engine.player.location.id
+            let location = try await context.player.location.id
             let isTrapDoorOpen = await context.item.hasFlag(.isOpen)
 
             return if !isTrapDoorOpen {

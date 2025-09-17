@@ -70,8 +70,8 @@ public struct ExamineActionHandler: ActionHandler {
                 )
 
             case .player:
-                let healthRatio = await Double(context.engine.player.health) /
-                                        Double(context.engine.player.maxHealth)
+                let healthRatio = await Double(context.player.health) /
+                                        Double(context.player.maxHealth)
                 addMessage(
                     context.msg.you(),
                     context.msg.examineYourself(healthRatio: healthRatio)

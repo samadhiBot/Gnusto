@@ -214,7 +214,7 @@ struct LocationEventHandlerTests {
     @Test("LocationEventHandler can override command behavior before turn")
     func testBeforeTurnOverride() async throws {
         let handler = LocationEventHandler(for: .startRoom) {
-            beforeEnter(.examine) { context, command in
+            beforeTurn(.examine) { context, command in
                 ActionResult("Custom look behavior!")
             }
         }
@@ -422,7 +422,7 @@ struct LocationEventHandlerTests {
     @Test("LocationEventHandler beforeTurn can prevent default action")
     func testBeforeTurnPreventsDefault() async throws {
         let handler = LocationEventHandler(for: .startRoom) {
-            beforeEnter(.examine) { context, command in
+            beforeTurn(.examine) { context, command in
                 ActionResult("You are not allowed to look here!")
             }
         }
@@ -616,7 +616,7 @@ struct LocationEventHandlerTests {
         let messageCapture = MessageCapture()
 
         let handler = LocationEventHandler(for: .startRoom) {
-            beforeEnter(.examine) { context, command in
+            beforeTurn(.examine) { context, command in
                 await messageCapture.addMessage(
                     "Context handler called for location: \(context.location.id)")
                 return ActionResult("Custom look message from context handler.")
@@ -645,7 +645,7 @@ struct LocationEventHandlerTests {
     func testYieldFunctionality() async throws {
         let handler = LocationEventHandler(for: .startRoom) {
             // First matcher: yield if room is lit
-            beforeEnter { context, command in
+            beforeTurn { context, command in
                 let isLit = await context.location.hasFlag(.isLit)
                 let isInherentlyLit = await context.location.hasFlag(.inherentlyLit)
                 if isLit || isInherentlyLit {
@@ -655,12 +655,12 @@ struct LocationEventHandlerTests {
             }
 
             // Second matcher: block movement in dark
-            beforeEnter(.move) { context, command in
+            beforeTurn(.move) { context, command in
                 return ActionResult("You stumble in the darkness!")
             }
 
             // Third matcher: block other actions in dark
-            beforeEnter { context, command in
+            beforeTurn { context, command in
                 return ActionResult("Too dark to do that!")
             }
         }

@@ -43,7 +43,7 @@ public struct ConsoleIOHandler: IOHandler {
         fflush(stdout)
 
         do {
-            try transcriptRecorder?.write(markdown)
+            try transcriptRecorder?.write("\(markdown)\n")
         } catch {
             logger.error("ConsoleIOHandler error: \(error)")
         }
@@ -84,7 +84,7 @@ public struct ConsoleIOHandler: IOHandler {
         Swift.print("\u{001B}[2J\u{001B}[H", terminator: "")
         fflush(stdout)
 
-        try? transcriptRecorder?.write("---")
+        try? transcriptRecorder?.write("\n---\n")
     }
 
     // --- Input Methods ---
@@ -102,7 +102,7 @@ public struct ConsoleIOHandler: IOHandler {
         let input = Swift.readLine()
 
         do {
-            try transcriptRecorder?.write("\n\(prompt)\(input ?? "<EOF>")")
+            try transcriptRecorder?.write("\n〉\(input ?? "<EOF>")\n\n")
         } catch {
             logger.error("ConsoleIOHandler error: \(error)")
         }

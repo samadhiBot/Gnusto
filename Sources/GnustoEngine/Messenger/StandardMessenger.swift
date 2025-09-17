@@ -2087,7 +2087,7 @@ open class StandardMessenger: @unchecked Sendable {
     }
 
     open func transcriptEnded(_ path: String) -> String {
-        output("Transcript recording ended at '\(path)'.")
+        output("Transcript recording ended at '\(path)'.", capitalize: false)
     }
 
     open func transcriptError(_ error: String) -> String {

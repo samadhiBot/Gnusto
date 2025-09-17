@@ -155,7 +155,7 @@ enum Troll {
     }
 
     static let trollRoomHandler = LocationEventHandler(for: .trollRoom) {
-        beforeEnter(.move) { context, command in
+        beforeTurn(.move) { context, command in
             let troll = try await context.engine.item(.troll)
 
             // Troll blocks the way if here in the room, alive, and conscious

@@ -36,14 +36,6 @@ public struct ItemEventContext: Sendable {
     /// game operations needed for processing the event.
     nonisolated public let engine: GameEngine
 
-    /// Convenience accessor for the game engine's message provider.
-    ///
-    /// Provides direct access to the messenger for generating localized text
-    /// responses within event handlers.
-    public var msg: StandardMessenger {
-        engine.messenger
-    }
-
     /// Creates a new item event context.
     ///
     /// - Parameters:
@@ -58,5 +50,23 @@ public struct ItemEventContext: Sendable {
         self.event = event
         self.item = item
         self.engine = engine
+    }
+
+    /// Convenience accessor for the game engine's message provider.
+    ///
+    /// Provides direct access to the messenger for generating localized text
+    /// responses within event handlers.
+    public var msg: StandardMessenger {
+        engine.messenger
+    }
+
+    /// Convenience accessor for the game engine's player.
+    ///
+    /// Provides direct access to the player proxy for accessing player state
+    /// and operations within event handlers.
+    public var player: PlayerProxy {
+        get async {
+            await engine.player
+        }
     }
 }

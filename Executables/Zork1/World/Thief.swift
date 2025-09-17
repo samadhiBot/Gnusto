@@ -416,11 +416,11 @@ extension Thief {
     ) async throws -> ActionResult? {
         let nastyKnife = try await context.engine.item(.knife)
 
-        guard try await context.engine.player.isHolding(nastyKnife.id) else { return nil }
+        guard try await context.player.isHolding(nastyKnife.id) else { return nil }
 
         let thief = try await context.engine.item(.thief)
         let largeBag = try await context.engine.item(.largeBag)
-        let playerLocation = try await context.engine.player.location
+        let playerLocation = try await context.player.location
 
         if await context.engine.rollD10(rollsAtLeast: 10) {
             return ActionResult(

@@ -234,7 +234,7 @@ extension OutsideHouse {
 
         before(.look) { context, command in
             guard command.preposition == Preposition("through") else { return nil }
-            let currentLocation = try await context.engine.player.location.id
+            let currentLocation = try await context.player.location.id
             if currentLocation == .kitchen {
                 return ActionResult("You can see a clear area leading towards a forest.")
             } else {
@@ -251,7 +251,7 @@ extension OutsideHouse {
 
     static let whiteHouseHandler = ItemEventHandler(for: .whiteHouse) {
         //        before(.find) { context, command in
-        //            let currentLocation = try await context.engine.player.location.id
+        //            let currentLocation = try await context.player.location.id
         //
         //            // Check if player is inside the house
         //            let insideHouseLocations: Set<LocationID> = [.kitchen, .livingRoom, .attic]
@@ -277,7 +277,7 @@ extension OutsideHouse {
         //        }
 
         before(.examine, .look) { context, command in
-            let currentLocation = try await context.engine.player.location.id
+            let currentLocation = try await context.player.location.id
             return
                 if [.eastOfHouse, .westOfHouse, .northOfHouse, .southOfHouse].contains(
                     currentLocation
@@ -295,7 +295,7 @@ extension OutsideHouse {
         }
 
         before(.open) { context, command in
-            let currentLocation = try await context.engine.player.location.id
+            let currentLocation = try await context.player.location.id
             let atHouseLocations: Set<LocationID> = [
                 .eastOfHouse, .westOfHouse, .northOfHouse, .southOfHouse,
             ]
@@ -309,7 +309,7 @@ extension OutsideHouse {
                         // Move player to kitchen
                         return ActionResult(
                             nil,
-                            await context.engine.player.move(to: .kitchen)
+                            await context.player.move(to: .kitchen)
                         )
                     } else {
                         return ActionResult("The window is closed.")
@@ -321,7 +321,7 @@ extension OutsideHouse {
         }
 
         before(.burn) { context, command in
-            let currentLocation = try await context.engine.player.location.id
+            let currentLocation = try await context.player.location.id
             let atHouseLocations: Set<LocationID> = [
                 .eastOfHouse, .westOfHouse, .northOfHouse, .southOfHouse,
             ]

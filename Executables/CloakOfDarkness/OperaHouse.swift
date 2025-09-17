@@ -104,7 +104,7 @@ struct OperaHouse {
 
     let barHandler = LocationEventHandler(for: .bar) {
         // First: if location is lit, yield to normal processing
-        beforeEnter { context, _ in
+        beforeTurn { context, _ in
             if try await context.location.isLit {
                 return ActionResult.yield
             }
@@ -112,7 +112,7 @@ struct OperaHouse {
         }
 
         // Second: handle north movement in dark
-        beforeEnter(.move) { context, command in
+        beforeTurn(.move) { context, command in
             if command.direction == .north {
                 return ActionResult.yield
             } else {
@@ -124,12 +124,12 @@ struct OperaHouse {
         }
 
         // Third: handle meta commands in dark
-        beforeEnter(.meta) { _, _ in
+        beforeTurn(.meta) { _, _ in
             return ActionResult.yield
         }
 
         // Fourth: catch-all for other commands in dark
-        beforeEnter { context, _ in
+        beforeTurn { context, _ in
             return ActionResult(
                 "In the dark? You could easily disturb something!",
                 await context.engine.adjustGlobal(.barMessageDisturbances, by: 1)
@@ -141,7 +141,7 @@ struct OperaHouse {
 
     let cloakHandler = ItemEventHandler(for: .cloak) {
         before(.drop, .insert) { context, _ in
-            guard try await context.engine.player.location.id == .cloakroom else {
+            guard try await context.player.location.id == .cloakroom else {
                 throw ActionResponse.feedback(
                     "This isn't the best place to leave a smart cloak lying around."
                 )
@@ -150,7 +150,7 @@ struct OperaHouse {
         }
 
         after { context, command in
-            guard try await context.engine.player.location.id == .cloakroom else {
+            guard try await context.player.location.id == .cloakroom else {
                 return nil
             }
 
@@ -158,8 +158,8 @@ struct OperaHouse {
                 var changes = [
                     try await context.engine.location(.bar).setFlag(.isLit)
                 ]
-                if await context.engine.player.score < 1 {
-                    changes.append(await context.engine.player.updateScore(by: 1))
+                if await context.player.score < 1 {
+                    changes.append(await context.player.updateScore(by: 1))
                 }
                 return ActionResult(changes: changes)
             }
@@ -188,7 +188,7 @@ struct OperaHouse {
 
     let messageHandler = ItemEventHandler(for: .message) {
         before(.examine, .read) { context, _ in
-            guard try await context.engine.player.location.id == .bar else {
+            guard try await context.player.location.id == .bar else {
                 return nil
             }
 
@@ -208,7 +208,7 @@ struct OperaHouse {
 
                     "You win."
                     """,
-                    await context.engine.player.updateScore(by: 1)
+                    await context.player.updateScore(by: 1)
                 )
             } else {
                 throw ActionResponse.feedback(

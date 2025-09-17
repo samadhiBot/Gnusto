@@ -348,7 +348,7 @@ extension Forest {
         }
 
         before(.lock) { context, command in
-            let currentLocation = try await context.engine.player.location
+            let currentLocation = try await context.player.location
             return if currentLocation.id == .gratingRoom {
                 ActionResult(
                     "The grate is locked.",
@@ -365,9 +365,9 @@ extension Forest {
                 keys.id == .keys
             {
                 // OPEN GRATE WITH KEYS -> handle as unlock
-                let currentLocation = try await context.engine.player.location
+                let currentLocation = try await context.player.location
 
-                guard try await context.engine.player.isHolding(keys.id) else {
+                guard try await context.player.isHolding(keys.id) else {
                     return ActionResult("You don't have the keys.")
                 }
 
@@ -385,7 +385,7 @@ extension Forest {
 
             // Check if grate is unlocked before allowing open/close
             let isLocked = try await context.engine.item(.grate).hasFlag(.isLocked)
-            let currentLocation = try await context.engine.player.location
+            let currentLocation = try await context.player.location
 
             if !isLocked {
                 let isOpen = try await context.engine.item(.grate).hasFlag(.isOpen)
@@ -418,9 +418,9 @@ extension Forest {
                 return nil
             }
 
-            let currentLocation = try await context.engine.player.location
+            let currentLocation = try await context.player.location
 
-            guard try await context.engine.player.isHolding(keys.id) else {
+            guard try await context.player.isHolding(keys.id) else {
                 return ActionResult("You don't have the keys.")
             }
 

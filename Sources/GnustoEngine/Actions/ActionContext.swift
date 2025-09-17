@@ -30,6 +30,23 @@ public struct ActionContext: Sendable {
 }
 
 extension ActionContext {
+    /// Checks if the command contains one of the specified prepositions.
+    ///
+    /// This method is commonly used in action handlers to branch logic based on
+    /// the preposition used in the command. For example, "put book on table" vs
+    /// "put book in drawer" would use different prepositions (.on vs .in).
+    ///
+    /// - Parameter prepositions: One or more prepositions to check for
+    /// - Returns: `true` if the command's preposition matches any of the provided prepositions
+    ///
+    /// Example:
+    /// ```swift
+    /// if context.hasPreposition(.on, .onto) {
+    ///     // Handle "put X on Y" or "put X onto Y"
+    /// } else if context.hasPreposition(.in, .into) {
+    ///     // Handle "put X in Y" or "put X into Y"
+    /// }
+    /// ```
     public func hasPreposition(_ prepositions: Preposition...) -> Bool {
         if let preposition = command.preposition {
             prepositions.contains(preposition)
@@ -41,7 +58,14 @@ extension ActionContext {
     /// Convenience accessor for the game engine's messenger.
     ///
     /// Provides direct access to the messenger for generating localized text responses
-    /// and error messages within action handlers.
+    /// and error messages within action handlers. This is the primary way action handlers
+    /// should generate player-facing text to ensure proper localization and consistency.
+    ///
+    /// Example:
+    /// ```swift
+    /// return ActionResult(context.msg.cannotDoThat())
+    /// return ActionResult(context.msg.itemNotInScope(noun))
+    /// ```
     public var msg: StandardMessenger {
         engine.messenger
     }
@@ -49,7 +73,16 @@ extension ActionContext {
     /// Convenience accessor for combat messaging.
     ///
     /// Provides access to the appropriate combat messenger for the current combat context.
-    /// Falls back to the default combat messenger if no enemy-specific messenger is configured.
+    /// This automatically selects the correct combat messenger based on the current enemy,
+    /// allowing for character-specific combat descriptions and responses. Falls back to the
+    /// default combat messenger if no enemy-specific messenger is configured or if not
+    /// currently in combat.
+    ///
+    /// Example:
+    /// ```swift
+    /// let hitMessage = await context.combatMsg.attackHit(damage: 5)
+    /// let missMessage = await context.combatMsg.attackMiss()
+    /// ```
     public var combatMsg: CombatMessenger {
         get async {
             if let combatState = await engine.combatState {
@@ -59,12 +92,41 @@ extension ActionContext {
         }
     }
 
+    /// Convenience accessor for the player proxy.
+    ///
+    /// Provides direct access to the current player state through a PlayerProxy,
+    /// which offers dynamic access to player properties like location, inventory,
+    /// score, and other player-specific state that may change during gameplay.
+    ///
+    /// Example:
+    /// ```swift
+    /// let currentLocation = try await context.player.location
+    /// let inventory = try await context.player.inventory
+    /// let score = await context.player.score
+    /// ```
     public var player: PlayerProxy {
         get async {
             await engine.player
         }
     }
 
+    /// Convenience accessor for the command's verb.
+    ///
+    /// Returns the verb that was parsed from the player's command. This is useful
+    /// for action handlers that handle multiple verbs or need to modify their
+    /// behavior based on the specific verb used.
+    ///
+    /// Example:
+    /// ```swift
+    /// switch context.verb {
+    /// case .take:
+    ///     // Handle taking
+    /// case .drop:
+    ///     // Handle dropping
+    /// default:
+    ///     // Handle other verbs
+    /// }
+    /// ```
     public var verb: Verb {
         command.verb
     }
@@ -141,6 +203,29 @@ extension ActionContext {
         }
     }
 
+    /// Validates and returns all direct objects as item proxies.
+    ///
+    /// This method processes commands that may have multiple direct objects (such as
+    /// "take all" or "take book and lamp"). It validates that each direct object is
+    /// an item that the player can reach, filtering out inaccessible items for bulk
+    /// commands while throwing errors for specific item commands.
+    ///
+    /// For "all" commands, items with the `.omitDescription` flag are automatically
+    /// excluded from the results, as these are typically scenery or background items
+    /// that shouldn't be included in bulk operations.
+    ///
+    /// - Parameter requiresLight: Whether the action requires light to see the objects
+    /// - Returns: Array of ItemProxy objects for all valid direct object items
+    /// - Throws: ActionResponse.cannotDoThat if any direct object is not an item (for specific commands)
+    /// - Throws: ActionResponse.itemNotAccessible if any item cannot be reached (for specific commands)
+    ///
+    /// Example:
+    /// ```swift
+    /// let items = try await context.itemDirectObjects()
+    /// for item in items {
+    ///     // Process each item
+    /// }
+    /// ```
     public func itemDirectObjects(requiresLight: Bool = true) async throws -> [ItemProxy] {
         var items = [ItemProxy]()
 
