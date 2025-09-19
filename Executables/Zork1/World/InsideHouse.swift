@@ -302,9 +302,8 @@ extension InsideHouse {
 extension InsideHouse {
     static let kitchenComputer = LocationComputer(for: .kitchen) {
         locationProperty(.description) { context in
-            let kitchenWindow = context.gameState.items[.kitchenWindow]
-            let isWindowOpen = kitchenWindow?.properties[.isOpen]?.toBool ?? false
-            let windowState = isWindowOpen ? "open" : "slightly ajar"
+            let kitchenWindow = await context.item(.kitchenWindow)
+            let windowState = await kitchenWindow.isOpen ? "open" : "slightly ajar"
             return .string(
                 """
                 You are in the kitchen of the white house. A table seems to
@@ -326,10 +325,10 @@ extension InsideHouse {
     /// - EXAMINE: Shows lamp state (burned out, on, or off)
     static let lampHandler = ItemEventHandler(for: .lamp) {
         before(.throw) { context, command in
-            let playerLocation = try await context.player.location
-            let brokenLamp = try await context.engine.item(.brokenLamp)
+            let playerLocation = await context.player.location
+            let brokenLamp = await context.item(.brokenLamp)
 
-            return try await ActionResult(
+            return await ActionResult(
                 "The lamp has smashed into the floor, and the light has gone out.",
                 context.item.clearFlag(.isOn),
                 context.item.remove(),
@@ -366,7 +365,7 @@ extension InsideHouse {
 
     static let waterHandler = ItemEventHandler(for: .water) {
         before(.drink) { context, command in
-            guard try await context.engine.item(.bottle).isOpen else {
+            guard await context.item(.bottle).isOpen else {
                 throw ActionResponse.feedback("You'll have to open the glass bottle first.")
             }
 
@@ -379,8 +378,8 @@ extension InsideHouse {
 
     static let bottleHandler = ItemEventHandler(for: .bottle) {
         before(.throw) { context, command in
-            let water = try await context.engine.item(.water)
-            let hasWater = try await water.parent == .item(context.item)
+            let water = await context.item(.water)
+            let hasWater = await water.parent == .item(context.item)
 
             return if hasWater {
                 ActionResult(
@@ -400,8 +399,8 @@ extension InsideHouse {
         }
 
         before(.attack) { context, command in
-            let water = try await context.engine.item(.water)
-            let hasWater = try await water.parent == .item(context.item)
+            let water = await context.item(.water)
+            let hasWater = await water.parent == .item(context.item)
 
             return if hasWater {
                 ActionResult(
@@ -421,8 +420,8 @@ extension InsideHouse {
         }
 
         before(.push) { context, command in
-            let water = try await context.engine.item(.water)
-            let hasWater = try await water.parent == .item(context.item)
+            let water = await context.item(.water)
+            let hasWater = await water.parent == .item(context.item)
             let isOpen = await context.item.hasFlag(.isOpen)
 
             return if isOpen && hasWater {
@@ -473,7 +472,7 @@ extension InsideHouse {
                 )
             } else {
                 // Move the rug and reveal the trap door
-                let trapDoor = try await context.engine.item(.trapDoor)
+                let trapDoor = await context.item(.trapDoor)
                 return ActionResult(
                     """
                     With a great effort, the rug is moved to one side of the room,
@@ -482,7 +481,7 @@ extension InsideHouse {
                     // Mark rug as moved
                     await context.engine.setFlag(.rugMoved),
                     // Make trap door visible
-                    try await trapDoor.clearFlag(.isInvisible)
+                    await trapDoor.clearFlag(.isInvisible)
                 )
             }
         }
@@ -493,7 +492,7 @@ extension InsideHouse {
 
         before(.look) { context, command in
             let wasRugMoved = await context.engine.hasFlag(.rugMoved)
-            let trapDoor = try await context.engine.item(.trapDoor)
+            let trapDoor = await context.item(.trapDoor)
             let trapDoorOpen = await trapDoor.hasFlag(.isOpen)
 
             // Only show trap door if rug hasn't been moved and trap door isn't open
@@ -511,7 +510,7 @@ extension InsideHouse {
 
         before(.climb) { context, command in
             let wasRugMoved = await context.engine.hasFlag(.rugMoved)
-            let trapDoor = try await context.engine.item(.trapDoor)
+            let trapDoor = await context.item(.trapDoor)
             let trapDoorOpen = await trapDoor.hasFlag(.isOpen)
 
             return if !wasRugMoved && !trapDoorOpen {
@@ -536,7 +535,7 @@ extension InsideHouse {
     /// - **Raise**: Treats `RAISE` as an alias for `OPEN`.
     static let trapDoorHandler = ItemEventHandler(for: .trapDoor) {
         before(.open, .pull) { context, command in
-            let location = try await context.player.location.id
+            let location = await context.player.location.id
             let isTrapDoorOpen = await context.item.hasFlag(.isOpen)
 
             return if isTrapDoorOpen {
@@ -549,13 +548,13 @@ extension InsideHouse {
                     The door reluctantly opens to reveal a rickety staircase
                     descending into darkness.
                     """,
-                    try await context.item.setFlag(.isOpen)
+                    await context.item.setFlag(.isOpen)
                 )
             }
         }
 
         before(.close) { context, command in
-            let location = try await context.player.location.id
+            let location = await context.player.location.id
             let isTrapDoorOpen = await context.item.hasFlag(.isOpen)
 
             return if !isTrapDoorOpen {
@@ -565,7 +564,7 @@ extension InsideHouse {
             } else {
                 ActionResult(
                     "The door swings shut and closes.",
-                    try await context.item.clearFlag(.isOpen)
+                    await context.item.clearFlag(.isOpen)
                 )
             }
         }
@@ -613,14 +612,14 @@ extension InsideHouse {
     /// - Level 1: Monster in adjacent location (faint blue glow)
     /// - Level 2: Monster in current location (very bright glow)
     static let swordDaemon = Daemon { engine in
-        let currentLocation = try await engine.player.location
+        let currentLocation = await engine.player.location
         var newGlowLevel = 0
 
         // Check for monsters in current location (highest priority)
-        let currentLocationItems = try await currentLocation.items
+        let currentLocationItems = await currentLocation.items
         var monstersInCurrentLocation: [ItemProxy] = []
         for item in currentLocationItems {
-            if try await item.isCharacter {
+            if await item.isCharacter {
                 monstersInCurrentLocation.append(item)
             }
         }
@@ -629,15 +628,15 @@ extension InsideHouse {
             newGlowLevel = 2  // Very bright glow
         } else {
             // Check adjacent locations for monsters
-            for exit in try await currentLocation.exits {
+            for exit in await currentLocation.exits {
                 guard let destination = exit.destinationID else {
                     continue
                 }
-                let adjacentLocation = try await engine.location(destination)
-                let adjacentLocationItems = try await adjacentLocation.items
+                let adjacentLocation = await engine.location(destination)
+                let adjacentLocationItems = await adjacentLocation.items
                 var monstersInAdjacentLocation: [ItemProxy] = []
                 for item in adjacentLocationItems {
-                    if try await item.isCharacter {
+                    if await item.isCharacter {
                         monstersInAdjacentLocation.append(item)
                     }
                 }

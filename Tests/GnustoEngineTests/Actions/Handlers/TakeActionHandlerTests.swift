@@ -38,8 +38,8 @@ struct TakeActionHandlerTests {
             """
         )
 
-        let finalState = try await engine.item("book")
-        #expect(try await finalState.playerIsHolding)
+        let finalState = await engine.item("book")
+        #expect(await finalState.playerIsHolding)
         #expect(await finalState.hasFlag(.isTouched) == true)
     }
 
@@ -73,8 +73,8 @@ struct TakeActionHandlerTests {
             """
         )
 
-        let finalState = try await engine.item("coin")
-        #expect(try await finalState.playerIsHolding)
+        let finalState = await engine.item("coin")
+        #expect(await finalState.playerIsHolding)
     }
 
     @Test("GRAB syntax works")
@@ -107,8 +107,8 @@ struct TakeActionHandlerTests {
             """
         )
 
-        let finalState = try await engine.item("key")
-        #expect(try await finalState.playerIsHolding)
+        let finalState = await engine.item("key")
+        #expect(await finalState.playerIsHolding)
     }
 
     @Test("STEAL syntax works")
@@ -141,8 +141,8 @@ struct TakeActionHandlerTests {
             """
         )
 
-        let finalState = try await engine.item("gem")
-        #expect(try await finalState.playerIsHolding)
+        let finalState = await engine.item("gem")
+        #expect(await finalState.playerIsHolding)
     }
 
     @Test("PICK UP syntax works")
@@ -175,8 +175,8 @@ struct TakeActionHandlerTests {
             """
         )
 
-        let finalState = try await engine.item("feather")
-        #expect(try await finalState.playerIsHolding)
+        let finalState = await engine.item("feather")
+        #expect(await finalState.playerIsHolding)
     }
 
     @Test("TAKE DIRECTOBJECT FROM INDIRECTOBJECT syntax works")
@@ -218,8 +218,8 @@ struct TakeActionHandlerTests {
             """
         )
 
-        let finalState = try await engine.item("ring")
-        #expect(try await finalState.playerIsHolding)
+        let finalState = await engine.item("ring")
+        #expect(await finalState.playerIsHolding)
     }
 
     @Test("TAKE ALL syntax works")
@@ -260,10 +260,10 @@ struct TakeActionHandlerTests {
             """
         )
 
-        let finalBook = try await engine.item("book")
-        let finalCoin = try await engine.item("coin")
-        #expect(try await finalBook.playerIsHolding)
-        #expect(try await finalCoin.playerIsHolding)
+        let finalBook = await engine.item("book")
+        let finalCoin = await engine.item("coin")
+        #expect(await finalBook.playerIsHolding)
+        #expect(await finalCoin.playerIsHolding)
     }
 
     // MARK: - Validation Testing
@@ -660,8 +660,8 @@ struct TakeActionHandlerTests {
             """
         )
 
-        let finalState = try await engine.item("vase")
-        #expect(try await finalState.playerIsHolding)
+        let finalState = await engine.item("vase")
+        #expect(await finalState.playerIsHolding)
         #expect(await finalState.hasFlag(.isTouched) == true)
     }
 
@@ -703,8 +703,8 @@ struct TakeActionHandlerTests {
             """
         )
 
-        let finalState = try await engine.item("candle")
-        #expect(try await finalState.playerIsHolding)
+        let finalState = await engine.item("candle")
+        #expect(await finalState.playerIsHolding)
     }
 
     @Test("Take multiple items with TAKE ALL")
@@ -753,14 +753,14 @@ struct TakeActionHandlerTests {
             """
         )
 
-        let finalBook = try await engine.item("book")
-        let finalPen = try await engine.item("pen")
-        let finalStatue = try await engine.item("statue")
-        let startRoom = try await engine.location(.startRoom)
+        let finalBook = await engine.item("book")
+        let finalPen = await engine.item("pen")
+        let finalStatue = await engine.item("statue")
+        let startRoom = await engine.location(.startRoom)
 
-        #expect(try await finalBook.playerIsHolding)
-        #expect(try await finalPen.playerIsHolding)
-        #expect(try await finalStatue.parent == .location(startRoom))  // Statue not taken
+        #expect(await finalBook.playerIsHolding)
+        #expect(await finalPen.playerIsHolding)
+        #expect(await finalStatue.parent == .location(startRoom))  // Statue not taken
     }
 
     @Test("TAKE ALL with nothing takable")
@@ -832,8 +832,8 @@ struct TakeActionHandlerTests {
             """
         )
 
-        let finalPen = try await engine.item("pen")
-        #expect(try await finalPen.playerIsHolding)
+        let finalPen = await engine.item("pen")
+        #expect(await finalPen.playerIsHolding)
     }
 
     @Test("Updates pronouns to refer to taken item")
@@ -905,8 +905,8 @@ struct TakeActionHandlerTests {
             engine: engine
         )
 
-        let basketProxy = try await basket.proxy(engine)
-        let jugProxy = try await jug.proxy(engine)
+        let basketProxy = await basket.proxy(engine)
+        let jugProxy = await jug.proxy(engine)
 
         expectNoDifference(
             result,

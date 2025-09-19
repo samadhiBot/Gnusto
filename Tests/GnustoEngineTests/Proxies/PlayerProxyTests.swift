@@ -40,7 +40,7 @@ struct PlayerProxyTests {
 
         // When
         let proxy = await engine.player
-        let location = try await proxy.location
+        let location = await proxy.location
 
         // Then
         #expect(location.id == .startRoom)
@@ -74,8 +74,8 @@ struct PlayerProxyTests {
 
         // When
         let proxy = await engine.player
-        let inventory = try await proxy.inventory
-        let completeInventory = try await proxy.completeInventory
+        let inventory = await proxy.inventory
+        let completeInventory = await proxy.completeInventory
 
         // Then
         #expect(inventory.isEmpty)
@@ -109,8 +109,8 @@ struct PlayerProxyTests {
 
         // When
         let proxy = await engine.player
-        let inventory = try await proxy.inventory
-        let completeInventory = try await proxy.completeInventory
+        let inventory = await proxy.inventory
+        let completeInventory = await proxy.completeInventory
 
         // Then
         #expect(inventory.count == 2)
@@ -166,8 +166,8 @@ struct PlayerProxyTests {
 
         // When
         let proxy = await engine.player
-        let inventory = try await proxy.inventory
-        let completeInventory = try await proxy.completeInventory
+        let inventory = await proxy.inventory
+        let completeInventory = await proxy.completeInventory
 
         // Then
         #expect(inventory.count == 2)  // bag and sword directly held
@@ -215,12 +215,12 @@ struct PlayerProxyTests {
 
         // When
         let proxy = await engine.player
-        let featherProxy = try await engine.item("feather")
-        let boulderProxy = try await engine.item("boulder")
+        let featherProxy = await engine.item("feather")
+        let boulderProxy = await engine.item("boulder")
 
         // Then
-        #expect(try await proxy.canCarry(featherProxy.id) == true)
-        #expect(try await proxy.canCarry(boulderProxy.id) == false)
+        #expect(await proxy.canCarry(featherProxy.id) == true)
+        #expect(await proxy.canCarry(boulderProxy.id) == false)
     }
 
     @Test("PlayerProxy carrying capacity with existing inventory")
@@ -258,15 +258,15 @@ struct PlayerProxyTests {
 
         // When
         let player = await engine.player
-        let lightProxy = try await engine.item("light")
-        let heavyProxy = try await engine.item("heavy")
+        let lightProxy = await engine.item("light")
+        let heavyProxy = await engine.item("heavy")
 
         #expect(player.carryingCapacity == 100)
 
         // Then
         // Player has 90/100 capacity used, so can carry size 1 but not size 5
-        #expect(try await player.canCarry(lightProxy.id) == true)
-        #expect(try await player.canCarry(heavyProxy.id) == false)
+        #expect(await player.canCarry(lightProxy.id) == true)
+        #expect(await player.canCarry(heavyProxy.id) == false)
     }
 
     @Test("PlayerProxy carrying capacity with nested containers")
@@ -316,12 +316,12 @@ struct PlayerProxyTests {
 
         // When
         let proxy = await engine.player
-        let newItemProxy = try await engine.item("newItem")
+        let newItemProxy = await engine.item("newItem")
 
         // Then
         // Player currently carries: bag(1) + box(2) + coin(1) = 4
         // Adding newItem(3) would make total 7, which is <= 10
-        #expect(try await proxy.canCarry(newItemProxy.id) == true)
+        #expect(await proxy.canCarry(newItemProxy.id) == true)
     }
 
     @Test("PlayerProxy carrying capacity edge cases")
@@ -359,14 +359,14 @@ struct PlayerProxyTests {
 
         // When
         let proxy = await engine.player
-        let exactFitProxy = try await engine.item("exactFit")
-        let oneOverProxy = try await engine.item("oneOver")
-        let zeroSizeProxy = try await engine.item("zeroSize")
+        let exactFitProxy = await engine.item("exactFit")
+        let oneOverProxy = await engine.item("oneOver")
+        let zeroSizeProxy = await engine.item("zeroSize")
 
         // Then
-        #expect(try await proxy.canCarry(exactFitProxy.id) == true)  // exactly at capacity
-        #expect(try await proxy.canCarry(oneOverProxy.id) == false)  // one over capacity
-        #expect(try await proxy.canCarry(zeroSizeProxy.id) == true)  // zero size always fits
+        #expect(await proxy.canCarry(exactFitProxy.id) == true)  // exactly at capacity
+        #expect(await proxy.canCarry(oneOverProxy.id) == false)  // one over capacity
+        #expect(await proxy.canCarry(zeroSizeProxy.id) == true)  // zero size always fits
     }
 
     // MARK: - Integration Tests
@@ -393,12 +393,12 @@ struct PlayerProxyTests {
 
         // Then - Verify through proxy
         let proxy = await engine.player
-        let inventory = try await proxy.inventory
-        let bookProxy = try await engine.item("book")
+        let inventory = await proxy.inventory
+        let bookProxy = await engine.item("book")
 
         #expect(inventory.count == 1)
         #expect(inventory[0].id == "book")
-        #expect(try await bookProxy.playerIsHolding == true)
+        #expect(await bookProxy.playerIsHolding == true)
 
         // Verify game output
         let output = await mockIO.flush()
@@ -500,13 +500,13 @@ struct PlayerProxyTests {
 
         // When
         let initialProxy = await engine.player
-        let initialLocation = try await initialProxy.location
+        let initialLocation = await initialProxy.location
         #expect(initialLocation.id == "room1")
 
         try await engine.execute("east")
 
         let afterMoveProxy = await engine.player
-        let afterMoveLocation = try await afterMoveProxy.location
+        let afterMoveLocation = await afterMoveProxy.location
         #expect(afterMoveLocation.id == "room2")
     }
 }

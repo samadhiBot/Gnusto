@@ -174,8 +174,8 @@ struct GameEnginePronounTests {
         )
 
         // And: Final state should be correct
-        let finalLamp = try await lamp.proxy(engine)
-        #expect(try await finalLamp.parent == .player)
+        let finalLamp = await lamp.proxy(engine)
+        #expect(await finalLamp.parent == .player)
         #expect(await finalLamp.isProvidingLight)
     }
 
@@ -224,10 +224,10 @@ struct GameEnginePronounTests {
         )
 
         // And: Both items should be held by player
-        let finalCoin1 = try await engine.item(coin1.id)
-        let finalCoin2 = try await engine.item(coin2.id)
-        #expect(try await finalCoin1.parent == .player)
-        #expect(try await finalCoin2.parent == .player)
+        let finalCoin1 = await engine.item(coin1.id)
+        let finalCoin2 = await engine.item(coin2.id)
+        #expect(await finalCoin1.parent == .player)
+        #expect(await finalCoin2.parent == .player)
     }
 
     // MARK: - Pronoun Overwriting Tests
@@ -280,12 +280,12 @@ struct GameEnginePronounTests {
         )
 
         // And: Coin should be taken, lamp should remain in room
-        let finalCoin = try await engine.item(coin.id)
-        let finalLamp = try await engine.item(lamp.id)
-        let startRoom = try await engine.location(.startRoom)
+        let finalCoin = await engine.item(coin.id)
+        let finalLamp = await engine.item(lamp.id)
+        let startRoom = await engine.location(.startRoom)
 
-        #expect(try await finalCoin.parent == .player)
-        #expect(try await finalLamp.parent == .location(startRoom))
+        #expect(await finalCoin.parent == .player)
+        #expect(await finalLamp.parent == .location(startRoom))
 
         // And: Final pronoun should refer to the coin
         let pronoun = await engine.gameState.pronoun
@@ -504,7 +504,7 @@ struct GameEnginePronounTests {
             id: "swarm",
             .name("bee swarm"),
             .description("A buzzing swarm of bees."),
-            .characterSheet(.init(        classification: .plural)),
+            .characterSheet(.init(classification: .plural)),
             .in(.startRoom)
         )
 
@@ -541,7 +541,7 @@ struct GameEnginePronounTests {
             id: "princess",
             .name("princess"),
             .description("A beautiful princess."),
-            .characterSheet(.init(        classification: .feminine)),
+            .characterSheet(.init(classification: .feminine)),
             .in(.startRoom)
         )
 
@@ -549,7 +549,7 @@ struct GameEnginePronounTests {
             id: "knight",
             .name("knight"),
             .description("A noble knight."),
-            .characterSheet(.init(        classification: .masculine)),
+            .characterSheet(.init(classification: .masculine)),
             .in(.startRoom)
         )
 
@@ -686,8 +686,8 @@ struct GameEnginePronounTests {
         )
 
         // And: Gem should be held by player
-        let finalGem = try await engine.item(gem.id)
-        #expect(try await finalGem.parent == .player)
+        let finalGem = await engine.item(gem.id)
+        #expect(await finalGem.parent == .player)
 
         // And: Pronoun should refer to the gem
         let pronoun = await engine.gameState.pronoun
@@ -737,8 +737,8 @@ struct GameEnginePronounTests {
         )
 
         // And: Book should be held by player
-        let finalBook = try await engine.item(book.id)
-        #expect(try await finalBook.parent == .player)
+        let finalBook = await engine.item(book.id)
+        #expect(await finalBook.parent == .player)
     }
 
     // MARK: - Edge Cases
@@ -802,8 +802,8 @@ struct GameEnginePronounTests {
         )
 
         // And: Red book should be taken
-        let finalRedBook = try await engine.item(redBook.id)
-        #expect(try await finalRedBook.parent == .player)
+        let finalRedBook = await engine.item(redBook.id)
+        #expect(await finalRedBook.parent == .player)
 
         // And: Pronoun should refer to red book
         let pronoun = await engine.gameState.pronoun
@@ -963,14 +963,14 @@ struct GameEnginePronounTests {
         )
 
         // And: Final states should be correct
-        let finalLamp = try await engine.item(lamp.id)
-        let finalCoin1 = try await engine.item(coin1.id)
-        let finalCoin2 = try await engine.item(coin2.id)
+        let finalLamp = await engine.item(lamp.id)
+        let finalCoin1 = await engine.item(coin1.id)
+        let finalCoin2 = await engine.item(coin2.id)
 
-        #expect(try await finalLamp.parent == .player)
+        #expect(await finalLamp.parent == .player)
         #expect(await finalLamp.hasFlag(.isOn) == true)
-        #expect(try await finalCoin1.parent == .player)
-        #expect(try await finalCoin2.parent == .player)
+        #expect(await finalCoin1.parent == .player)
+        #expect(await finalCoin2.parent == .player)
 
         // And: Final pronoun should refer to lamp (last single object)
         let pronoun = await engine.gameState.pronoun

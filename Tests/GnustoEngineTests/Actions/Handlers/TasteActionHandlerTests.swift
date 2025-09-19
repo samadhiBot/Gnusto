@@ -210,7 +210,7 @@ struct TasteActionHandlerTests {
             """
         )
 
-        let finalState = try await engine.item("wizard")
+        let finalState = await engine.item("wizard")
         #expect(await finalState.hasFlag(.isTouched) == true)
     }
 
@@ -271,7 +271,7 @@ struct TasteActionHandlerTests {
             """
         )
 
-        let finalState = try await engine.item("necromancer")
+        let finalState = await engine.item("necromancer")
         #expect(await finalState.hasFlag(.isTouched) == true)
     }
 

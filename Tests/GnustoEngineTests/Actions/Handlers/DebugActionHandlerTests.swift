@@ -102,31 +102,6 @@ struct DebugActionHandlerTests {
         )
     }
 
-    @Test("Cannot debug non-existent location")
-    func testCannotDebugNonExistentLocation() async throws {
-        // Given
-        let game = MinimalGame()
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
-
-        // When
-        try await engine.execute("debug nonexistentRoom")
-
-        // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
-            """
-            > debug nonexistentRoom
-            ```
-            Item(
-              id: .nonexistentroom,
-              properties: [:]
-            )
-            ```
-            """
-        )
-    }
-
     @Test("Does not require light to debug")
     func testDoesNotRequireLight() async throws {
         // Given: Dark room with item

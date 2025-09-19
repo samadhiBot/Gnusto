@@ -45,7 +45,7 @@ struct Zork1TrollCombatTests {
         try await engine.execute("go east")
 
         // Then - player should move successfully
-        #expect(try await engine.player.location.id == .eastWestPassage)
+        #expect(await engine.player.location.id == .eastWestPassage)
     }
 
     @Test("Giving weapon to troll has random outcomes")
@@ -84,9 +84,9 @@ struct Zork1TrollCombatTests {
         let (engine, _) = await GameEngine.zork1()
 
         // When - test different weapon effectiveness by checking flags
-        let sword = try await engine.item(.sword)
-        let knife = try await engine.item(.knife)
-        let advertisement = try await engine.item(.advertisement)
+        let sword = await engine.item(.sword)
+        let knife = await engine.item(.knife)
+        let advertisement = await engine.item(.advertisement)
 
         let swordEffective = await sword.hasFlag(.isWeapon)
         let knifeEffective = await knife.hasFlag(.isWeapon)

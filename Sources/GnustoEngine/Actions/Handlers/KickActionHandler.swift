@@ -29,10 +29,10 @@ public struct KickActionHandler: ActionHandler {
 
         // Determine appropriate response based on object type
         let message =
-            if try await item.isCharacter {
+            if await item.isCharacter {
                 // Kicking characters is generally not advisable
                 await context.msg.kickCharacter(item.withDefiniteArticle)
-            } else if try await item.playerIsHolding {
+            } else if await item.playerIsHolding {
                 // Generic kicking response for objects
                 await context.msg.kickHeldObject(item.withDefiniteArticle)
             } else if await item.hasFlag(.isTakable) {
@@ -43,12 +43,12 @@ public struct KickActionHandler: ActionHandler {
                 await context.msg.kickLargeObject(item.withDefiniteArticle)
             }
 
-        var changes = try await [
+        var changes = await [
             item.setFlag(.isTouched)
         ]
 
-        if try await item.playerIsHolding {
-            let locationID = try await context.player.location.id
+        if await item.playerIsHolding {
+            let locationID = await context.player.location.id
             changes.append(
                 item.move(to: .location(locationID))
             )

@@ -40,7 +40,7 @@ struct EatActionHandlerTests {
             """
         )
 
-        let finalState = try await engine.item("apple")
+        let finalState = await engine.item("apple")
         #expect(await finalState.hasFlag(.isTouched) == true)
     }
 
@@ -285,7 +285,7 @@ struct EatActionHandlerTests {
         try await engine.execute("eat orange")
 
         // Then
-        let finalState = try await engine.item("orange")
+        let finalState = await engine.item("orange")
         #expect(await finalState.hasFlag(.isTouched) == true)
 
         let output = await mockIO.flush()
@@ -427,8 +427,8 @@ struct EatActionHandlerTests {
         )
 
         // Both box and contents should be gone
-        let finalSandwich = try await engine.item("sandwich")
-        #expect(try await finalSandwich.parent == .item(box.proxy(engine)))
+        let finalSandwich = await engine.item("sandwich")
+        #expect(await finalSandwich.parent == .item(box.proxy(engine)))
     }
 
     @Test("Eat drinkable item")

@@ -42,7 +42,7 @@ public struct LaughActionHandler: ActionHandler {
 
         let changes: [StateChange?] =
             if case .item(let itemProxy) = proxyReference {
-                try await [
+                await [
                     itemProxy.setFlag(.isTouched)
                 ]
             } else {

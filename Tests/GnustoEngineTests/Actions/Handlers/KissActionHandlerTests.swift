@@ -39,7 +39,7 @@ struct KissActionHandlerTests {
             """
         )
 
-        let finalState = try await engine.item("princess")
+        let finalState = await engine.item("princess")
         #expect(await finalState.hasFlag(.isTouched))
     }
 
@@ -197,7 +197,7 @@ struct KissActionHandlerTests {
             """
         )
 
-        let finalState = try await engine.item("friend")
+        let finalState = await engine.item("friend")
         #expect(await finalState.hasFlag(.isTouched))
     }
 
@@ -236,7 +236,7 @@ struct KissActionHandlerTests {
             """
         )
 
-        let finalState = try await engine.item("enemy")
+        let finalState = await engine.item("enemy")
         #expect(await finalState.hasFlag(.isTouched))
     }
 
@@ -269,7 +269,7 @@ struct KissActionHandlerTests {
             """
         )
 
-        let finalState = try await engine.item("statue")
+        let finalState = await engine.item("statue")
         #expect(await finalState.hasFlag(.isTouched))
     }
 
@@ -294,7 +294,7 @@ struct KissActionHandlerTests {
         try await engine.execute("kiss cat")
 
         // Then: Verify state changes
-        let finalState = try await engine.item("cat")
+        let finalState = await engine.item("cat")
         #expect(await finalState.hasFlag(.isTouched))
 
         // Verify message
@@ -354,8 +354,8 @@ struct KissActionHandlerTests {
         )
 
         // Verify both items were touched
-        let knightState = try await engine.item("knight")
-        let flowerState = try await engine.item("flower")
+        let knightState = await engine.item("knight")
+        let flowerState = await engine.item("flower")
         #expect(await knightState.hasFlag(.isTouched))
         #expect(await flowerState.hasFlag(.isTouched))
     }
@@ -390,8 +390,8 @@ struct KissActionHandlerTests {
             """
         )
 
-        let finalState = try await engine.item("locket")
-        #expect(try await finalState.playerIsHolding)  // Still held by player
+        let finalState = await engine.item("locket")
+        #expect(await finalState.playerIsHolding)  // Still held by player
         #expect(await finalState.hasFlag(.isTouched))
     }
 
@@ -467,9 +467,9 @@ struct KissActionHandlerTests {
         )
 
         // Verify all characters were touched
-        let merchantState = try await engine.item("merchant")
-        let dragonState = try await engine.item("dragon")
-        let fairyState = try await engine.item("fairy")
+        let merchantState = await engine.item("merchant")
+        let dragonState = await engine.item("dragon")
+        let fairyState = await engine.item("fairy")
         #expect(await merchantState.hasFlag(.isTouched))
         #expect(await dragonState.hasFlag(.isTouched))
         #expect(await fairyState.hasFlag(.isTouched))

@@ -62,8 +62,8 @@ struct HealthSystemTests {
             )
         )
 
-        let creatureProxy = try await engine.item("testCreature")
-        let health = try await creatureProxy.health
+        let creatureProxy = await engine.item("testCreature")
+        let health = await creatureProxy.health
         #expect(health == 50)  // Default health
     }
 
@@ -82,8 +82,8 @@ struct HealthSystemTests {
             )
         )
 
-        let creatureProxy = try await engine.item("weakCreature")
-        let health = try await creatureProxy.health
+        let creatureProxy = await engine.item("weakCreature")
+        let health = await creatureProxy.health
         #expect(health == 25)
     }
 
@@ -102,25 +102,25 @@ struct HealthSystemTests {
             )
         )
 
-        let creatureProxy = try await engine.item("testCreature")
+        let creatureProxy = await engine.item("testCreature")
 
         // Test damage
         try await engine.apply(
             creatureProxy.takeDamage(30)
         )
-        #expect(try await creatureProxy.health == 50)
+        #expect(await creatureProxy.health == 50)
 
         // Test healing
         try await engine.apply(
             creatureProxy.heal(20)
         )
-        #expect(try await creatureProxy.health == 70)
+        #expect(await creatureProxy.health == 70)
 
         // Test damage to zero (should not go below 0)
         try await engine.apply(
             creatureProxy.takeDamage(100)
         )
-        #expect(try await creatureProxy.health == 0)
+        #expect(await creatureProxy.health == 0)
     }
 
     // MARK: - Self-Examination with Health Status
@@ -396,8 +396,8 @@ struct HealthSystemTests {
             )
         )
 
-        let creatureProxy = try await engine.item("testCreature")
-        let strength = try await creatureProxy.strength
+        let creatureProxy = await engine.item("testCreature")
+        let strength = await creatureProxy.strength
         #expect(strength == 10)  // Default strength
     }
 
@@ -416,8 +416,8 @@ struct HealthSystemTests {
             )
         )
 
-        let creatureProxy = try await engine.item("strongCreature")
-        let strength = try await creatureProxy.strength
+        let creatureProxy = await engine.item("strongCreature")
+        let strength = await creatureProxy.strength
         #expect(strength == 25)
     }
 
@@ -438,14 +438,14 @@ struct HealthSystemTests {
             )
         )
 
-        let creatureProxy = try await engine.item("testCreature")
+        let creatureProxy = await engine.item("testCreature")
 
         // Deal massive damage
-        if let damageChange = try await creatureProxy.takeDamage(50) {
+        if let damageChange = await creatureProxy.takeDamage(50) {
             try await engine.apply(damageChange)
         }
 
-        #expect(try await creatureProxy.health == 0)
+        #expect(await creatureProxy.health == 0)
     }
 
     @Test("Health caps at maxHealth for standard healing")
@@ -463,14 +463,14 @@ struct HealthSystemTests {
             )
         )
 
-        let creatureProxy = try await engine.item("testCreature")
+        let creatureProxy = await engine.item("testCreature")
 
         // Heal beyond maximum
-        if let healChange = try await creatureProxy.heal(50) {
+        if let healChange = await creatureProxy.heal(50) {
             try await engine.apply(healChange)
         }
 
-        #expect(try await creatureProxy.health == 90)
+        #expect(await creatureProxy.health == 90)
     }
 
     // MARK: - Basic Combat Health Integration
@@ -522,7 +522,7 @@ struct HealthSystemTests {
 
         // Health values should remain valid (0-100)
         let finalPlayerHealth = await engine.player.health
-        let finalCreatureHealth = try await engine.item("creature").health
+        let finalCreatureHealth = await engine.item("creature").health
 
         #expect(finalPlayerHealth >= 0)
         #expect(finalPlayerHealth <= 100)

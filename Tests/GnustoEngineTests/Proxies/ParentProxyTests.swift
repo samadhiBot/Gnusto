@@ -26,7 +26,7 @@ struct ParentProxyTests {
 
         // When/Then - Test location parent
         let locationEntity = ParentEntity.location(.startRoom)
-        let locationParent = try await engine.parent(from: locationEntity)
+        let locationParent = await engine.parent(from: locationEntity)
 
         if case .location(let locationProxy) = locationParent {
             #expect(locationProxy.id == .startRoom)
@@ -36,7 +36,7 @@ struct ParentProxyTests {
 
         // When/Then - Test item parent
         let itemEntity = ParentEntity.item("container")
-        let itemParent = try await engine.parent(from: itemEntity)
+        let itemParent = await engine.parent(from: itemEntity)
 
         if case .item(let itemProxy) = itemParent {
             #expect(itemProxy.id == "container")
@@ -46,12 +46,12 @@ struct ParentProxyTests {
 
         // When/Then - Test player parent
         let playerEntity = ParentEntity.player
-        let playerParent = try await engine.parent(from: playerEntity)
+        let playerParent = await engine.parent(from: playerEntity)
         #expect(playerParent == .player)
 
         // When/Then - Test nowhere parent
         let nowhereEntity = ParentEntity.nowhere
-        let nowhereParent = try await engine.parent(from: nowhereEntity)
+        let nowhereParent = await engine.parent(from: nowhereEntity)
         #expect(nowhereParent == .nowhere)
     }
 
@@ -86,19 +86,19 @@ struct ParentProxyTests {
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         // When
-        let locationParent1 = try await engine.parent(from: .location(.startRoom))
-        let locationParent2 = try await engine.parent(from: .location(.startRoom))
-        let differentLocationParent = try await engine.parent(from: .location("otherRoom"))
+        let locationParent1 = await engine.parent(from: .location(.startRoom))
+        let locationParent2 = await engine.parent(from: .location(.startRoom))
+        let differentLocationParent = await engine.parent(from: .location("otherRoom"))
 
-        let itemParent1 = try await engine.parent(from: .item("container1"))
-        let itemParent2 = try await engine.parent(from: .item("container1"))
-        let differentItemParent = try await engine.parent(from: .item("container2"))
+        let itemParent1 = await engine.parent(from: .item("container1"))
+        let itemParent2 = await engine.parent(from: .item("container1"))
+        let differentItemParent = await engine.parent(from: .item("container2"))
 
-        let playerParent1 = try await engine.parent(from: .player)
-        let playerParent2 = try await engine.parent(from: .player)
+        let playerParent1 = await engine.parent(from: .player)
+        let playerParent2 = await engine.parent(from: .player)
 
-        let nowhereParent1 = try await engine.parent(from: .nowhere)
-        let nowhereParent2 = try await engine.parent(from: .nowhere)
+        let nowhereParent1 = await engine.parent(from: .nowhere)
+        let nowhereParent2 = await engine.parent(from: .nowhere)
 
         // Then - Test same location parents
         #expect(locationParent1 == locationParent2)
@@ -140,17 +140,17 @@ struct ParentProxyTests {
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         // When
-        let locationParent1 = try await engine.parent(from: .location(.startRoom))
-        let locationParent2 = try await engine.parent(from: .location(.startRoom))
+        let locationParent1 = await engine.parent(from: .location(.startRoom))
+        let locationParent2 = await engine.parent(from: .location(.startRoom))
 
-        let itemParent1 = try await engine.parent(from: .item("container"))
-        let itemParent2 = try await engine.parent(from: .item("container"))
+        let itemParent1 = await engine.parent(from: .item("container"))
+        let itemParent2 = await engine.parent(from: .item("container"))
 
-        let playerParent1 = try await engine.parent(from: .player)
-        let playerParent2 = try await engine.parent(from: .player)
+        let playerParent1 = await engine.parent(from: .player)
+        let playerParent2 = await engine.parent(from: .player)
 
-        let nowhereParent1 = try await engine.parent(from: .nowhere)
-        let nowhereParent2 = try await engine.parent(from: .nowhere)
+        let nowhereParent1 = await engine.parent(from: .nowhere)
+        let nowhereParent2 = await engine.parent(from: .nowhere)
 
         // Then - Equal objects should have equal hash values
         #expect(locationParent1.hashValue == locationParent2.hashValue)
@@ -179,7 +179,7 @@ struct ParentProxyTests {
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         // When
-        let parent = try await engine.parent(from: .location("library"))
+        let parent = await engine.parent(from: .location("library"))
 
         // Then
         if case .location(let locationProxy) = parent {
@@ -208,7 +208,7 @@ struct ParentProxyTests {
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         // When
-        let parent = try await engine.parent(from: .item("treasureChest"))
+        let parent = await engine.parent(from: .item("treasureChest"))
 
         // Then
         if case .item(let itemProxy) = parent {
@@ -228,7 +228,7 @@ struct ParentProxyTests {
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         // When
-        let parent = try await engine.parent(from: .player)
+        let parent = await engine.parent(from: .player)
 
         // Then
         #expect(parent == .player)
@@ -249,7 +249,7 @@ struct ParentProxyTests {
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         // When
-        let parent = try await engine.parent(from: .nowhere)
+        let parent = await engine.parent(from: .nowhere)
 
         // Then
         #expect(parent == .nowhere)
@@ -259,42 +259,6 @@ struct ParentProxyTests {
             #expect(Bool(true))
         } else {
             #expect(Bool(false), "Expected nowhere case")
-        }
-    }
-
-    // MARK: - Error Handling Tests
-
-    @Test("ParentProxy with nonexistent location throws error")
-    func testParentProxyWithNonexistentLocation() async throws {
-        // Given
-        let game = MinimalGame()
-
-        let (engine, _) = await GameEngine.test(blueprint: game)
-
-        // When/Then
-        do {
-            let _ = try await engine.parent(from: .location("nonexistentRoom"))
-            #expect(Bool(false), "Should have thrown an error")
-        } catch {
-            // Expected to throw
-            #expect(error is ActionResponse)
-        }
-    }
-
-    @Test("ParentProxy with nonexistent item throws error")
-    func testParentProxyWithNonexistentItem() async throws {
-        // Given
-        let game = MinimalGame()
-
-        let (engine, _) = await GameEngine.test(blueprint: game)
-
-        // When/Then
-        do {
-            let _ = try await engine.parent(from: .item("nonexistentItem"))
-            #expect(Bool(false), "Should have thrown an error")
-        } catch {
-            // Expected to throw
-            #expect(error is ActionResponse)
         }
     }
 
@@ -330,8 +294,8 @@ struct ParentProxyTests {
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         // When/Then - Test coin in bag (item parent)
-        let coinProxy = try await engine.item("coin")
-        let coinParent = try await coinProxy.parent
+        let coinProxy = await engine.item("coin")
+        let coinParent = await coinProxy.parent
 
         if case .item(let bagProxy) = coinParent {
             #expect(bagProxy.id == "bag")
@@ -340,13 +304,13 @@ struct ParentProxyTests {
         }
 
         // When/Then - Test bag with player (player parent)
-        let bagProxy = try await engine.item("bag")
-        let bagParent = try await bagProxy.parent
+        let bagProxy = await engine.item("bag")
+        let bagParent = await bagProxy.parent
         #expect(bagParent == .player)
 
         // When/Then - Test book on floor (location parent)
-        let bookProxy = try await engine.item("book")
-        let bookParent = try await bookProxy.parent
+        let bookProxy = await engine.item("book")
+        let bookParent = await bookProxy.parent
 
         if case .location(let roomProxy) = bookParent {
             #expect(roomProxy.id == .startRoom)
@@ -372,8 +336,8 @@ struct ParentProxyTests {
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         // When - Initially in room
-        let coinProxy = try await engine.item("coin")
-        let initialParent = try await coinProxy.parent
+        let coinProxy = await engine.item("coin")
+        let initialParent = await coinProxy.parent
 
         if case .location(let roomProxy) = initialParent {
             #expect(roomProxy.id == .startRoom)
@@ -385,7 +349,7 @@ struct ParentProxyTests {
         try await engine.execute("take coin")
 
         // Then - Now with player
-        let finalParent = try await coinProxy.parent
+        let finalParent = await coinProxy.parent
         #expect(finalParent == .player)
     }
 
@@ -406,11 +370,11 @@ struct ParentProxyTests {
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         // When
-        let playerParent1 = try await engine.parent(from: .player)
-        let playerParent2 = try await engine.parent(from: .player)
-        let bagItemParent = try await engine.parent(from: .item("bag"))
-        let roomLocationParent = try await engine.parent(from: .location(.startRoom))
-        let nowhereParent = try await engine.parent(from: .nowhere)
+        let playerParent1 = await engine.parent(from: .player)
+        let playerParent2 = await engine.parent(from: .player)
+        let bagItemParent = await engine.parent(from: .item("bag"))
+        let roomLocationParent = await engine.parent(from: .location(.startRoom))
+        let nowhereParent = await engine.parent(from: .nowhere)
 
         // Then - Test in Set (requires Hashable)
         let parentSet: Set<ParentProxy> = [

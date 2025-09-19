@@ -160,7 +160,7 @@ struct SaveActionHandlerTests {
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // Record initial state
-        let initialBook = try await engine.item("book")
+        let initialBook = await engine.item("book")
         let initialScore = await engine.player.score
         let initialTurnCount = await engine.player.moves
 
@@ -168,11 +168,11 @@ struct SaveActionHandlerTests {
         try await engine.execute("save")
 
         // Then: State should be unchanged
-        let finalBook = try await engine.item("book")
+        let finalBook = await engine.item("book")
         let finalScore = await engine.player.score
         let finalTurnCount = await engine.player.moves
 
-        #expect(try await finalBook.parent == initialBook.parent)
+        #expect(await finalBook.parent == initialBook.parent)
         #expect(await finalBook.hasFlag(.isTouched) == initialBook.hasFlag(.isTouched))
         #expect(finalScore == initialScore)
         #expect(finalTurnCount == initialTurnCount)

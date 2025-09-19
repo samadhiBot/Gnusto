@@ -40,7 +40,7 @@ struct ExtinguishActionHandlerTests {
             """
         )
 
-        let finalCandle = try await engine.item("candle")
+        let finalCandle = await engine.item("candle")
         #expect(await finalCandle.hasFlag(.isBurning) == false)
         #expect(await finalCandle.isTouched)
     }
@@ -77,7 +77,7 @@ struct ExtinguishActionHandlerTests {
             """
         )
 
-        let finalTorch = try await engine.item("torch")
+        let finalTorch = await engine.item("torch")
         #expect(await finalTorch.hasFlag(.isBurning) == false)
         #expect(await finalTorch.isTouched)
     }
@@ -112,7 +112,7 @@ struct ExtinguishActionHandlerTests {
             """
         )
 
-        let finalFire = try await engine.item("fire")
+        let finalFire = await engine.item("fire")
         #expect(await finalFire.hasFlag(.isBurning) == false)
         #expect(await finalFire.isTouched)
     }
@@ -256,7 +256,7 @@ struct ExtinguishActionHandlerTests {
             """
         )
 
-        let finalLamp = try await engine.item("lamp")
+        let finalLamp = await engine.item("lamp")
         #expect(await finalLamp.hasFlag(.isBurning) == false)
         #expect(await finalLamp.hasFlag(.isOn) == false)
         #expect(await finalLamp.isTouched)
@@ -293,7 +293,7 @@ struct ExtinguishActionHandlerTests {
             """
         )
 
-        let finalTorch = try await engine.item("torch")
+        let finalTorch = await engine.item("torch")
         #expect(await finalTorch.hasFlag(.isBurning) == false)
         #expect(await finalTorch.hasFlag(.isOn) == false)
         #expect(await finalTorch.hasFlag(.isTouched) == false)
@@ -332,7 +332,7 @@ struct ExtinguishActionHandlerTests {
             """
         )
 
-        let finalPaper = try await engine.item("paper")
+        let finalPaper = await engine.item("paper")
         #expect(await finalPaper.hasFlag(.isBurning) == false)
         #expect(await finalPaper.isTouched)
     }
@@ -367,7 +367,7 @@ struct ExtinguishActionHandlerTests {
             """
         )
 
-        let finalBook = try await engine.item("book")
+        let finalBook = await engine.item("book")
         #expect(await finalBook.hasFlag(.isBurning) == false)
         #expect(await finalBook.hasFlag(.isTouched) == false)
     }
@@ -393,14 +393,14 @@ struct ExtinguishActionHandlerTests {
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         // Verify item starts without touched flag
-        let initialCandle = try await engine.item("candle")
+        let initialCandle = await engine.item("candle")
         #expect(await initialCandle.hasFlag(.isTouched) == false)
 
         // When
         try await engine.execute("extinguish candle")
 
         // Then
-        let finalCandle = try await engine.item("candle")
+        let finalCandle = await engine.item("candle")
         #expect(await finalCandle.isTouched)
     }
 
@@ -444,8 +444,8 @@ struct ExtinguishActionHandlerTests {
             """
         )
 
-        let finalCandle = try await engine.item("candle")
-        let finalTorch = try await engine.item("torch")
+        let finalCandle = await engine.item("candle")
+        let finalTorch = await engine.item("torch")
         #expect(await finalCandle.hasFlag(.isBurning) == false)
         #expect(await finalTorch.hasFlag(.isBurning) == true)
     }
@@ -499,7 +499,7 @@ struct ExtinguishActionHandlerTests {
             """
         )
 
-        let finalCandle = try await engine.item("candle")
+        let finalCandle = await engine.item("candle")
         #expect(await finalCandle.hasFlag(.isBurning) == false)
     }
 
@@ -546,7 +546,7 @@ struct ExtinguishActionHandlerTests {
             """
         )
 
-        let finalCandle = try await engine.item("candle")
+        let finalCandle = await engine.item("candle")
         #expect(await finalCandle.hasFlag(.isBurning) == false)
     }
 
@@ -595,7 +595,7 @@ struct ExtinguishActionHandlerTests {
 
         // Test each synonym
         for verb in ["extinguish", "douse"] {
-            let candleProxy = try await candle.proxy(engine)
+            let candleProxy = await candle.proxy(engine)
 
             // Reset candle state
             try await engine.apply(
@@ -619,7 +619,7 @@ struct ExtinguishActionHandlerTests {
             """
         )
 
-        let finalCandle = try await engine.item("candle")
+        let finalCandle = await engine.item("candle")
         #expect(await finalCandle.hasFlag(.isBurning) == false)
     }
 }

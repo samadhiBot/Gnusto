@@ -38,7 +38,7 @@ struct ExamineActionHandlerTests {
             """
         )
 
-        let finalState = try await engine.item("book")
+        let finalState = await engine.item("book")
         #expect(await finalState.hasFlag(.isTouched) == true)
     }
 
@@ -72,7 +72,7 @@ struct ExamineActionHandlerTests {
             """
         )
 
-        let finalState = try await engine.item("gem")
+        let finalState = await engine.item("gem")
         #expect(await finalState.hasFlag(.isTouched) == true)
     }
 
@@ -137,7 +137,7 @@ struct ExamineActionHandlerTests {
             """
         )
 
-        let finalState = try await engine.item("ruby")
+        let finalState = await engine.item("ruby")
         #expect(await finalState.hasFlag(.isTouched) == true)
     }
 
@@ -658,8 +658,8 @@ struct ExamineActionHandlerTests {
             """
         )
 
-        let finalState = try await engine.item("book")
-        #expect(try await finalState.playerIsHolding)
+        let finalState = await engine.item("book")
+        #expect(await finalState.playerIsHolding)
     }
 
     @Test("EXAMINE ALL with nothing to examine")

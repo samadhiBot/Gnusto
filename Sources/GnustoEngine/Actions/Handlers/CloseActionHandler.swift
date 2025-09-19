@@ -42,7 +42,7 @@ public struct CloseActionHandler: ActionHandler {
             )
         }
 
-        return try await ActionResult(
+        return await ActionResult(
             context.msg.closed(),
             targetItem.clearFlag(.isOpen),
             targetItem.setFlag(.isTouched)

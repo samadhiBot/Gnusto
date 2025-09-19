@@ -93,7 +93,7 @@ struct OperaHouse {  // Organize content into logical areas
     let hookHandler = ItemEventHandler(for: .hook) {
         before(.examine) { context, command in
             let hookDetail =
-                if try await context.item.isHolding(.cloak) {
+                if await context.item.isHolding(.cloak) {
                     "with a cloak hanging on it"
                 } else {
                     "screwed to the wall"
@@ -106,7 +106,7 @@ struct OperaHouse {  // Organize content into logical areas
 
 For a complete working example, see the [Cloak of Darkness](Executables/CloakOfDarkness/) implementation that demonstrates these concepts in a playable game.
 
-The GnustoAutoWiringPlugin automatically handles the tedious parts of game setup—it scans your code for game content patterns, generates ID constants, aggregates content from multiple files, and wires up event handlers. This lets you focus on creating your game world rather than managing boilerplate code to wire everything together.
+The `GnustoAutoWiringPlugin` automatically handles the tedious parts of game setup—it scans your code for game content patterns, generates ID constants, aggregates content from multiple files, and wires up event handlers. This lets you focus on creating your game world rather than managing boilerplate code to wire everything together.
 
 ## Example Games
 

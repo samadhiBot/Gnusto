@@ -33,8 +33,7 @@ public struct RestartActionHandler: ActionHandler {
 
         guard let response = await context.engine.ioHandler.readLine(prompt: "") else {
             // Handle EOF/nil input as restart confirmation
-            await context.engine.requestRestart()
-            return ActionResult.yield
+            return ActionResult(.requestGameRestart)
         }
 
         let trimmedResponse = response.trimmingCharacters(
@@ -43,8 +42,7 @@ public struct RestartActionHandler: ActionHandler {
 
         if ["yes", "y"].contains(trimmedResponse) {
             // User confirmed restart
-            await context.engine.requestRestart()
-            return ActionResult.yield
+            return ActionResult(.requestGameRestart)
         } else if ["no", "n"].contains(trimmedResponse) {
             // User cancelled restart
             return ActionResult(

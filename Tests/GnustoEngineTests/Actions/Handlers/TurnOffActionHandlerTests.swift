@@ -45,7 +45,7 @@ struct TurnOffActionHandlerTests {
             """
         )
 
-        let finalState = try await engine.item("lamp")
+        let finalState = await engine.item("lamp")
         #expect(await finalState.hasFlag(.isOn) == false)
         #expect(await finalState.hasFlag(.isTouched) == true)
     }
@@ -87,7 +87,7 @@ struct TurnOffActionHandlerTests {
             """
         )
 
-        let finalState = try await engine.item("flashlight")
+        let finalState = await engine.item("flashlight")
         #expect(await finalState.hasFlag(.isOn) == false)
         #expect(await finalState.hasFlag(.isTouched) == true)
     }
@@ -274,7 +274,7 @@ struct TurnOffActionHandlerTests {
             """
         )
 
-        let finalState = try await engine.item("computer")
+        let finalState = await engine.item("computer")
         #expect(await finalState.hasFlag(.isOn) == false)
         #expect(await finalState.hasFlag(.isTouched) == true)
     }
@@ -387,7 +387,7 @@ struct TurnOffActionHandlerTests {
         )
 
         // Room should still be lit due to flashlight
-        let isLit = try await engine.player.location.isLit
+        let isLit = await engine.player.location.isLit
         #expect(isLit == true)
     }
 
@@ -429,7 +429,7 @@ struct TurnOffActionHandlerTests {
         )
 
         // Room should still be lit due to inherent lighting
-        let isLit = try await engine.player.location.isLit
+        let isLit = await engine.player.location.isLit
         #expect(isLit == true)
     }
 
@@ -469,7 +469,7 @@ struct TurnOffActionHandlerTests {
             """
         )
 
-        let finalState = try await engine.item("fan")
+        let finalState = await engine.item("fan")
         #expect(await finalState.hasFlag(.isOn) == false)
         #expect(await finalState.hasFlag(.isTouched) == true)
     }
@@ -499,14 +499,14 @@ struct TurnOffActionHandlerTests {
         )
 
         // Verify initial state
-        let initialDevice = try await engine.item("device")
+        let initialDevice = await engine.item("device")
         #expect(await initialDevice.hasFlag(.isTouched) == false)
 
         // When
         try await engine.execute("turn off device")
 
         // Then
-        let finalDevice = try await engine.item("device")
+        let finalDevice = await engine.item("device")
         #expect(await finalDevice.hasFlag(.isTouched) == true)
     }
 
@@ -584,7 +584,7 @@ struct TurnOffActionHandlerTests {
                 """
             )
 
-            let finalDevice = try await engine.item("device")
+            let finalDevice = await engine.item("device")
             #expect(await finalDevice.hasFlag(.isOn) == false)
         }
     }

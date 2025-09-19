@@ -46,8 +46,8 @@ struct GiveActionHandlerTests {
             """
         )
 
-        let finalCoinState = try await engine.item("coin")
-        #expect(try await finalCoinState.parent == .item(merchant.proxy(engine)))
+        let finalCoinState = await engine.item("coin")
+        #expect(await finalCoinState.parent == .item(merchant.proxy(engine)))
         #expect(await finalCoinState.hasFlag(.isTouched))
     }
 
@@ -89,8 +89,8 @@ struct GiveActionHandlerTests {
             """
         )
 
-        let finalScrollState = try await engine.item("scroll")
-        #expect(try await finalScrollState.parent == .item(wizard.proxy(engine)))
+        let finalScrollState = await engine.item("scroll")
+        #expect(await finalScrollState.parent == .item(wizard.proxy(engine)))
     }
 
     @Test("OFFER syntax works")
@@ -438,8 +438,8 @@ struct GiveActionHandlerTests {
         try await engine.execute("give book to librarian")
 
         // Then: Verify state changes
-        let finalBookState = try await engine.item("book")
-        #expect(try await finalBookState.parent == .item(librarian.proxy(engine)))
+        let finalBookState = await engine.item("book")
+        #expect(await finalBookState.parent == .item(librarian.proxy(engine)))
         #expect(await finalBookState.hasFlag(.isTouched))
 
         // Verify message
@@ -503,10 +503,10 @@ struct GiveActionHandlerTests {
         )
 
         // Verify both coins transferred
-        let finalCoin1State = try await engine.item("coin1")
-        let finalCoin2State = try await engine.item("coin2")
-        #expect(try await finalCoin1State.parent == .item(merchant.proxy(engine)))
-        #expect(try await finalCoin2State.parent == .item(merchant.proxy(engine)))
+        let finalCoin1State = await engine.item("coin1")
+        let finalCoin2State = await engine.item("coin2")
+        #expect(await finalCoin1State.parent == .item(merchant.proxy(engine)))
+        #expect(await finalCoin2State.parent == .item(merchant.proxy(engine)))
     }
 
     @Test("Give all items to character")
@@ -557,10 +557,10 @@ struct GiveActionHandlerTests {
         )
 
         // Verify all items transferred
-        let finalSwordState = try await engine.item("sword")
-        let finalShieldState = try await engine.item("shield")
-        #expect(try await finalSwordState.parent == .item(knight.proxy(engine)))
-        #expect(try await finalShieldState.parent == .item(knight.proxy(engine)))
+        let finalSwordState = await engine.item("sword")
+        let finalShieldState = await engine.item("shield")
+        #expect(await finalSwordState.parent == .item(knight.proxy(engine)))
+        #expect(await finalShieldState.parent == .item(knight.proxy(engine)))
     }
 
     @Test("Give all when player has nothing")
@@ -623,9 +623,9 @@ struct GiveActionHandlerTests {
         try await engine.execute("give crystal to mage")
 
         // Then: Verify state changes
-        let finalCrystalState = try await engine.item("crystal")
+        let finalCrystalState = await engine.item("crystal")
         #expect(await finalCrystalState.hasFlag(.isTouched))
-        #expect(try await finalCrystalState.parent == .item(mage.proxy(engine)))
+        #expect(await finalCrystalState.parent == .item(mage.proxy(engine)))
 
         // Verify message
         let output = await mockIO.flush()
@@ -706,10 +706,10 @@ struct GiveActionHandlerTests {
         )
 
         // Verify items transferred to correct recipients
-        let finalFoodState = try await engine.item("food")
-        let finalMoneyState = try await engine.item("money")
-        #expect(try await finalFoodState.parent == .item(chef.proxy(engine)))
-        #expect(try await finalMoneyState.parent == .item(banker.proxy(engine)))
+        let finalFoodState = await engine.item("food")
+        let finalMoneyState = await engine.item("money")
+        #expect(await finalFoodState.parent == .item(chef.proxy(engine)))
+        #expect(await finalMoneyState.parent == .item(banker.proxy(engine)))
     }
 
     // MARK: - Intent Testing

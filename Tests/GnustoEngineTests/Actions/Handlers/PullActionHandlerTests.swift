@@ -37,7 +37,7 @@ struct PullActionHandlerTests {
             """
         )
 
-        let finalState = try await engine.item("rope")
+        let finalState = await engine.item("rope")
         #expect(await finalState.hasFlag(.isTouched) == true)
     }
 
@@ -71,7 +71,7 @@ struct PullActionHandlerTests {
             """
         )
 
-        let finalState = try await engine.item("guard")
+        let finalState = await engine.item("guard")
         #expect(await finalState.hasFlag(.isTouched) == true)
     }
 
@@ -98,7 +98,7 @@ struct PullActionHandlerTests {
             """
         )
 
-        let finalState = try await engine.item("troll")
+        let finalState = await engine.item("troll")
         #expect(await finalState.hasFlag(.isTouched) == true)
     }
 
@@ -219,14 +219,14 @@ struct PullActionHandlerTests {
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         // Verify initial state
-        let initialState = try await engine.item("bell")
+        let initialState = await engine.item("bell")
         #expect(await initialState.hasFlag(.isTouched) == false)
 
         // When
         try await engine.execute("pull bell")
 
         // Then
-        let finalState = try await engine.item("bell")
+        let finalState = await engine.item("bell")
         #expect(await finalState.hasFlag(.isTouched) == true)
     }
 
@@ -272,8 +272,8 @@ struct PullActionHandlerTests {
             """
         )
 
-        let rope1State = try await engine.item("rope1")
-        let rope2State = try await engine.item("rope2")
+        let rope1State = await engine.item("rope1")
+        let rope2State = await engine.item("rope2")
         #expect(await rope1State.hasFlag(.isTouched) == true)
         #expect(await rope2State.hasFlag(.isTouched) == true)
     }

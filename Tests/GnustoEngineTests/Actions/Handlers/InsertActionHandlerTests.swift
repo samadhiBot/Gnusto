@@ -47,9 +47,9 @@ struct InsertActionHandlerTests {
             """
         )
 
-        let finalCoinState = try await engine.item("coin")
-        let finalBoxState = try await engine.item("box")
-        #expect(try await finalCoinState.parent == .item(box.proxy(engine)))
+        let finalCoinState = await engine.item("coin")
+        let finalBoxState = await engine.item("box")
+        #expect(await finalCoinState.parent == .item(box.proxy(engine)))
         #expect(await finalCoinState.hasFlag(.isTouched))
         #expect(await finalBoxState.hasFlag(.isTouched))
     }
@@ -605,9 +605,9 @@ struct InsertActionHandlerTests {
         try await engine.execute("insert ring in box")
 
         // Then: Verify state changes
-        let finalRingState = try await engine.item("ring")
-        let finalBoxState = try await engine.item("jewelryBox")
-        #expect(try await finalRingState.parent == .item(jewelryBox.proxy(engine)))
+        let finalRingState = await engine.item("ring")
+        let finalBoxState = await engine.item("jewelryBox")
+        #expect(await finalRingState.parent == .item(jewelryBox.proxy(engine)))
         #expect(await finalRingState.hasFlag(.isTouched))
         #expect(await finalBoxState.hasFlag(.isTouched))
 
@@ -671,10 +671,10 @@ struct InsertActionHandlerTests {
         )
 
         // Verify both coins transferred
-        let finalCoin1State = try await engine.item("coin1")
-        let finalCoin2State = try await engine.item("coin2")
-        #expect(try await finalCoin1State.parent == .item(purse.proxy(engine)))
-        #expect(try await finalCoin2State.parent == .item(purse.proxy(engine)))
+        let finalCoin1State = await engine.item("coin1")
+        let finalCoin2State = await engine.item("coin2")
+        #expect(await finalCoin1State.parent == .item(purse.proxy(engine)))
+        #expect(await finalCoin2State.parent == .item(purse.proxy(engine)))
     }
 
     @Test("Insert all items into container")
@@ -726,10 +726,10 @@ struct InsertActionHandlerTests {
         )
 
         // Verify all items transferred
-        let finalBookState = try await engine.item("book")
-        let finalScrollState = try await engine.item("scroll")
-        #expect(try await finalBookState.parent == .item(satchel.proxy(engine)))
-        #expect(try await finalScrollState.parent == .item(satchel.proxy(engine)))
+        let finalBookState = await engine.item("book")
+        let finalScrollState = await engine.item("scroll")
+        #expect(await finalBookState.parent == .item(satchel.proxy(engine)))
+        #expect(await finalScrollState.parent == .item(satchel.proxy(engine)))
     }
 
     @Test("Insert all when player has nothing")
@@ -795,11 +795,11 @@ struct InsertActionHandlerTests {
         try await engine.execute("insert crystal in pouch")
 
         // Then: Verify state changes
-        let finalCrystalState = try await engine.item("crystal")
-        let finalPouchState = try await engine.item("pouch")
+        let finalCrystalState = await engine.item("crystal")
+        let finalPouchState = await engine.item("pouch")
         #expect(await finalCrystalState.hasFlag(.isTouched))
         #expect(await finalPouchState.hasFlag(.isTouched))
-        #expect(try await finalCrystalState.parent == .item(pouch.proxy(engine)))
+        #expect(await finalCrystalState.parent == .item(pouch.proxy(engine)))
 
         // Verify message
         let output = await mockIO.flush()
@@ -860,10 +860,10 @@ struct InsertActionHandlerTests {
         )
 
         // Verify new coin is in wallet alongside existing coin
-        let finalNewCoinState = try await engine.item("newCoin")
-        let finalExistingCoinState = try await engine.item("existingCoin")
-        #expect(try await finalNewCoinState.parent == .item(wallet.proxy(engine)))
-        #expect(try await finalExistingCoinState.parent == .item(wallet.proxy(engine)))
+        let finalNewCoinState = await engine.item("newCoin")
+        let finalExistingCoinState = await engine.item("existingCoin")
+        #expect(await finalNewCoinState.parent == .item(wallet.proxy(engine)))
+        #expect(await finalExistingCoinState.parent == .item(wallet.proxy(engine)))
     }
 
     @Test("Insert using different verb synonyms")
@@ -948,12 +948,12 @@ struct InsertActionHandlerTests {
         )
 
         // Verify all gems are in box
-        let gem1State = try await engine.item("gem1")
-        let gem2State = try await engine.item("gem2")
-        let gem3State = try await engine.item("gem3")
-        #expect(try await gem1State.parent == .item(box.proxy(engine)))
-        #expect(try await gem2State.parent == .item(box.proxy(engine)))
-        #expect(try await gem3State.parent == .item(box.proxy(engine)))
+        let gem1State = await engine.item("gem1")
+        let gem2State = await engine.item("gem2")
+        let gem3State = await engine.item("gem3")
+        #expect(await gem1State.parent == .item(box.proxy(engine)))
+        #expect(await gem2State.parent == .item(box.proxy(engine)))
+        #expect(await gem3State.parent == .item(box.proxy(engine)))
     }
 
     // MARK: - Intent Testing

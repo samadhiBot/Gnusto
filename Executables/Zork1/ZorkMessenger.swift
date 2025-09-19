@@ -6,7 +6,7 @@ import Logging
 /// This messenger extends the standard messages with Zork-specific phrases,
 /// particularly the iconic darkness messages that players expect from the
 /// original Zork experience.
-public class ZorkMessageProvider: StandardMessenger, @unchecked Sendable {
+public class ZorkMessenger: StandardMessenger, @unchecked Sendable {
     let logger = Logger(label: "com.samadhibot.Gnusto.StandardMessenger")
 
     public override func nowDark() -> String {

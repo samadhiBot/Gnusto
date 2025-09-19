@@ -32,14 +32,15 @@ public struct ReadActionHandler: ActionHandler {
         }
 
         // Determine read text
-        let readText = if let textToRead = await targetItem.readText, textToRead.isNotEmpty {
-            textToRead
-        } else {
-            await context.msg.nothingWrittenOn(targetItem.withDefiniteArticle)
-        }
+        let readText =
+            if let textToRead = await targetItem.readText, textToRead.isNotEmpty {
+                textToRead
+            } else {
+                await context.msg.nothingWrittenOn(targetItem.withDefiniteArticle)
+            }
 
-        return if try await targetItem.shouldTakeFirst {
-            try await ActionResult(
+        return if await targetItem.shouldTakeFirst {
+            await ActionResult(
                 """
                 \(context.msg.takenImplied())
                 \(readText)
@@ -48,7 +49,7 @@ public struct ReadActionHandler: ActionHandler {
                 targetItem.setFlag(.isTouched)
             )
         } else {
-            try await ActionResult(
+            await ActionResult(
                 readText,
                 targetItem.setFlag(.isTouched)
             )

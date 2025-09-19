@@ -29,17 +29,21 @@ public struct PourActionHandler: ActionHandler {
     /// - Returns: An `ActionResult` with appropriate pouring message and state changes.
     public func process(context: ActionContext) async throws -> ActionResult {
         // Pour requires a direct object (what to pour)
-        guard let source = try await context.itemDirectObject(
-            failureMessage: context.msg.pourFail()
-        ) else {
+        guard
+            let source = try await context.itemDirectObject(
+                failureMessage: context.msg.pourFail()
+            )
+        else {
             throw ActionResponse.doWhat(context)
         }
 
         // Pour requires an indirect object (what to pour on)
-        guard let targetItem = try await context.itemIndirectObject(
-            playerMessage: context.msg.pourItemOnSelf(source.withDefiniteArticle),
-            failureMessage: context.msg.pourTargetFail()
-        ) else {
+        guard
+            let targetItem = try await context.itemIndirectObject(
+                playerMessage: context.msg.pourItemOnSelf(source.withDefiniteArticle),
+                failureMessage: context.msg.pourTargetFail()
+            )
+        else {
             throw ActionResponse.feedback(
                 await context.msg.pourItemOnWhat(source.withDefiniteArticle)
             )
@@ -57,8 +61,8 @@ public struct PourActionHandler: ActionHandler {
                 source.withDefiniteArticle,
                 target: targetItem.withDefiniteArticle
             ),
-            try await source.setFlag(.isTouched),
-            try await targetItem.setFlag(.isTouched)
+            await source.setFlag(.isTouched),
+            await targetItem.setFlag(.isTouched)
         )
     }
 }

@@ -200,7 +200,7 @@ struct UnscriptActionHandlerTests {
         )
 
         // Record initial state
-        let initialBook = try await engine.item("book")
+        let initialBook = await engine.item("book")
         let initialScore = await engine.player.score
         let initialTurnCount = await engine.player.moves
 
@@ -208,11 +208,11 @@ struct UnscriptActionHandlerTests {
         try await engine.execute("unscript")
 
         // Then: Game state should remain unchanged (except for scripting flag)
-        let finalBook = try await engine.item("book")
+        let finalBook = await engine.item("book")
         let finalScore = await engine.player.score
         let finalTurnCount = await engine.player.moves
 
-        #expect(try await finalBook.parent == initialBook.parent)
+        #expect(await finalBook.parent == initialBook.parent)
         #expect(await finalBook.hasFlag(.isTouched) == initialBook.hasFlag(.isTouched))
         #expect(finalScore == initialScore)
         #expect(finalTurnCount == initialTurnCount)

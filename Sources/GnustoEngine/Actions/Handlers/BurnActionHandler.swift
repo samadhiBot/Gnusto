@@ -47,7 +47,7 @@ public struct BurnActionHandler: ActionHandler {
         }
 
         // Redirect if the intent is to attack an enemy with something burning
-        if (try? await target.isHostileEnemy) == true {
+        if await target.isHostileEnemy == true {
             return try await AttackActionHandler().process(context: context)
         }
 
@@ -59,7 +59,7 @@ public struct BurnActionHandler: ActionHandler {
             )
         ) {
             // Validate that the player is holding the igniter
-            guard try await igniter.playerIsHolding else {
+            guard await igniter.playerIsHolding else {
                 throw ActionResponse.itemNotHeld(igniter)
             }
 
@@ -70,13 +70,13 @@ public struct BurnActionHandler: ActionHandler {
 
             // Check whether the target is flammable
             return if await target.hasFlag(.isFlammable) {
-                try await ActionResult(
+                await ActionResult(
                     context.msg.itemBeginsToBurn(target.withDefiniteArticle),
                     target.setFlag(.isBurning),
                     target.setFlag(.isTouched)
                 )
             } else {
-                try await ActionResult(
+                await ActionResult(
                     context.msg.burnItemWithTool(
                         context.command,
                         item: target.withDefiniteArticle,
@@ -89,7 +89,7 @@ public struct BurnActionHandler: ActionHandler {
 
         // Check if target can self-ignite, like a match, i.e. nothing else is needed to light it
         if await target.hasFlag(.isSelfIgnitable) {
-            return try await ActionResult(
+            return await ActionResult(
                 context.msg.itemBeginsToBurn(target.withDefiniteArticle),
                 target.setFlag(.isBurning),
                 target.setFlag(.isTouched)
@@ -97,7 +97,7 @@ public struct BurnActionHandler: ActionHandler {
         }
 
         // Most items cannot be burned
-        return try await ActionResult(
+        return await ActionResult(
             target.response(
                 object: { context.msg.cannotDo(context.command, item: $0) },
                 character: { context.msg.burnCharacter(context.command, character: $0) }
@@ -130,7 +130,7 @@ public struct BurnActionHandler: ActionHandler {
 
         // Check if it can self-ignite, like a match, i.e. nothing else is needed to light it
         if await lightSource.hasFlag(.isSelfIgnitable) {
-            return try await ActionResult(
+            return await ActionResult(
                 context.msg.lightIsNowBurning(lightSource.withDefiniteArticle),
                 lightSource.setFlag(.isBurning),
                 lightSource.setFlag(.isTouched)
@@ -154,7 +154,7 @@ public struct BurnActionHandler: ActionHandler {
             )
         }
 
-        return try await ActionResult(
+        return await ActionResult(
             context.msg.lightIsNowBurning(lightSource.withDefiniteArticle),
             lightSource.setFlag(.isBurning),
             lightSource.setFlag(.isTouched),

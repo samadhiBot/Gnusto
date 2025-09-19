@@ -131,7 +131,7 @@ struct YesNoQuestionHandlerTests {
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // Set up a command question
-        let appleProxy = try await engine.item("apple")
+        let appleProxy = await engine.item("apple")
         let eatCommand = Command(
             verb: .eat,
             directObject: .item(appleProxy),
@@ -250,7 +250,7 @@ struct YesNoQuestionHandlerTests {
 
         let (engine, _) = await GameEngine.test(blueprint: game)
 
-        let appleProxy = try await engine.item("apple")
+        let appleProxy = await engine.item("apple")
         let eatCommand = Command(
             verb: .eat,
             directObject: .item(appleProxy),
@@ -322,7 +322,7 @@ struct YesNoQuestionHandlerTests {
 
         let (engine, _) = await GameEngine.test(blueprint: game)
 
-        let redAppleProxy = try await engine.item("redApple")
+        let redAppleProxy = await engine.item("redApple")
         let clarifiedCommand = Command(
             verb: .take,
             directObject: .item(redAppleProxy),
@@ -369,7 +369,7 @@ struct YesNoQuestionHandlerTests {
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // Set up disambiguation question manually (simulating what parser would do)
-        let redAppleProxy = try await engine.item("redApple")
+        let redAppleProxy = await engine.item("redApple")
         let clarifiedCommand = Command(
             verb: .take,
             directObject: .item(redAppleProxy),
@@ -399,8 +399,8 @@ struct YesNoQuestionHandlerTests {
         )
 
         // Verify apple was taken
-        let apple = try await engine.item("redApple")
-        #expect(try await apple.parent == .player)
+        let apple = await engine.item("redApple")
+        #expect(await apple.parent == .player)
 
         let hasPending = await engine.conversationManager.hasPendingQuestion
         #expect(hasPending == false)
@@ -424,7 +424,7 @@ struct YesNoQuestionHandlerTests {
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // Set up disambiguation question manually
-        let redAppleProxy = try await engine.item("redApple")
+        let redAppleProxy = await engine.item("redApple")
         let clarifiedCommand = Command(
             verb: .take,
             directObject: .item(redAppleProxy),
@@ -454,9 +454,9 @@ struct YesNoQuestionHandlerTests {
         )
 
         // Verify apple was NOT taken
-        let apple = try await engine.item("redApple")
-        let roomProxy = try await engine.location(.startRoom)
-        #expect(try await apple.parent == .location(roomProxy))
+        let apple = await engine.item("redApple")
+        let roomProxy = await engine.location(.startRoom)
+        #expect(await apple.parent == .location(roomProxy))
 
         let hasPending = await engine.conversationManager.hasPendingQuestion
         #expect(hasPending == false)

@@ -38,7 +38,7 @@ struct TouchActionHandlerTests {
             """
         )
 
-        let finalState = try await engine.item("vase")
+        let finalState = await engine.item("vase")
         let wasTouched = await finalState.hasFlag(.isTouched)
         #expect(wasTouched == true)
     }
@@ -173,7 +173,7 @@ struct TouchActionHandlerTests {
             """
         )
 
-        let finalState = try await engine.item("table")
+        let finalState = await engine.item("table")
         let wasTouched = await finalState.hasFlag(.isTouched)
         #expect(wasTouched == true)
     }
@@ -209,7 +209,7 @@ struct TouchActionHandlerTests {
             """
         )
 
-        let finalState = try await engine.item("coin")
+        let finalState = await engine.item("coin")
         let wasTouched = await finalState.hasFlag(.isTouched)
         #expect(wasTouched == true)
     }
@@ -254,7 +254,7 @@ struct TouchActionHandlerTests {
             """
         )
 
-        let finalState = try await engine.item("gem")
+        let finalState = await engine.item("gem")
         let wasTouched = await finalState.hasFlag(.isTouched)
         #expect(wasTouched == true)
     }
@@ -276,7 +276,7 @@ struct TouchActionHandlerTests {
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         // Verify initial state
-        let initialState = try await engine.item("crystal")
+        let initialState = await engine.item("crystal")
         let initiallyTouched = await initialState.hasFlag(.isTouched)
         #expect(initiallyTouched == false)
 
@@ -284,7 +284,7 @@ struct TouchActionHandlerTests {
         try await engine.execute("touch crystal")
 
         // Then
-        let finalState = try await engine.item("crystal")
+        let finalState = await engine.item("crystal")
         let finallyTouched = await finalState.hasFlag(.isTouched)
         #expect(finallyTouched == true)
     }
@@ -332,8 +332,8 @@ struct TouchActionHandlerTests {
             """
         )
 
-        let wallState = try await engine.item("wall")
-        let doorState = try await engine.item("door")
+        let wallState = await engine.item("wall")
+        let doorState = await engine.item("door")
         let wallTouched = await wallState.hasFlag(.isTouched)
         let doorTouched = await doorState.hasFlag(.isTouched)
         #expect(wallTouched == true)
@@ -371,7 +371,7 @@ struct TouchActionHandlerTests {
             """
         )
 
-        let finalState = try await engine.item("orb")
+        let finalState = await engine.item("orb")
         let wasTouched = await finalState.hasFlag(.isTouched)
         #expect(wasTouched == true)
     }
@@ -406,7 +406,7 @@ struct TouchActionHandlerTests {
             """
         )
 
-        let finalWizard = try await engine.item("wizard")
+        let finalWizard = await engine.item("wizard")
         let wasTouched = await finalWizard.hasFlag(.isTouched)
         #expect(wasTouched == true)
     }
@@ -433,7 +433,7 @@ struct TouchActionHandlerTests {
             """
         )
 
-        let finalTroll = try await engine.item("troll")
+        let finalTroll = await engine.item("troll")
         let wasTouched = await finalTroll.hasFlag(.isTouched)
         #expect(wasTouched == true)
     }
@@ -640,7 +640,7 @@ struct TouchActionHandlerTests {
             """
         )
 
-        let finalFairy = try await engine.item("fairy")
+        let finalFairy = await engine.item("fairy")
         let wasTouched = await finalFairy.hasFlag(.isTouched)
         #expect(wasTouched == true)
     }
@@ -694,9 +694,9 @@ struct TouchActionHandlerTests {
             """
         )
 
-        let wizardState = try await engine.item("wizard")
-        let trollState = try await engine.item("troll")
-        let statueState = try await engine.item("statue")
+        let wizardState = await engine.item("wizard")
+        let trollState = await engine.item("troll")
+        let statueState = await engine.item("statue")
 
         let wizardTouched = await wizardState.hasFlag(.isTouched)
         let trollTouched = await trollState.hasFlag(.isTouched)

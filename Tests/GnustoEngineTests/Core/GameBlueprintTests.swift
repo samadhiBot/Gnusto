@@ -303,7 +303,7 @@ struct GameBlueprintTests {
         let itemComputer = blueprint.itemComputers[ItemID("testSword")]
         #expect(itemComputer != nil)
 
-        let computedDescription = try await itemComputer?.compute(
+        let computedDescription = await itemComputer?.compute(
             ItemComputeContext(
                 propertyID: .description,
                 item: gameState.items[ItemID("testSword")]!,
@@ -312,7 +312,7 @@ struct GameBlueprintTests {
         )
         #expect(computedDescription == .string("A dynamically computed description"))
 
-        let nonComputedProperty = try await itemComputer?.compute(
+        let nonComputedProperty = await itemComputer?.compute(
             ItemComputeContext(
                 propertyID: .name,
                 item: gameState.items[ItemID("testSword")]!,
@@ -325,7 +325,7 @@ struct GameBlueprintTests {
         let locationComputer = blueprint.locationComputers[LocationID("entrance")]
         #expect(locationComputer != nil)
 
-        let computedLocationDescription = try await locationComputer?.compute(
+        let computedLocationDescription = await locationComputer?.compute(
             LocationComputeContext(
                 propertyID: .description,
                 location: gameState.locations[LocationID("entrance")]!,
@@ -336,7 +336,7 @@ struct GameBlueprintTests {
             computedLocationDescription == .string("A dynamically computed location description")
         )
 
-        let nonComputedLocationProperty = try await locationComputer?.compute(
+        let nonComputedLocationProperty = await locationComputer?.compute(
             LocationComputeContext(
                 propertyID: .name,
                 location: gameState.locations[LocationID("entrance")]!,

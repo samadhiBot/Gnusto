@@ -288,9 +288,9 @@ struct NibbleActionHandlerTests {
         #expect(stillPending == false)
 
         // Verify apple is still there (not eaten)
-        let apple = try await engine.item("apple")
-        let testRoom = try await engine.location(.startRoom)
-        #expect(try await apple.parent == .location(testRoom))
+        let apple = await engine.item("apple")
+        let testRoom = await engine.location(.startRoom)
+        #expect(await apple.parent == .location(testRoom))
     }
 
     @Test("Different command clears nibble question")
@@ -326,9 +326,9 @@ struct NibbleActionHandlerTests {
         #expect(stillPending == false)
 
         // Verify apple is still there (not eaten)
-        let apple = try await engine.item("apple")
-        let testRoom = try await engine.location(.startRoom)
-        #expect(try await apple.parent == .location(testRoom))
+        let apple = await engine.item("apple")
+        let testRoom = await engine.location(.startRoom)
+        #expect(await apple.parent == .location(testRoom))
     }
 
     // MARK: - Disambiguation Testing
@@ -388,22 +388,22 @@ struct NibbleActionHandlerTests {
         let (engine, _) = await createTestEngine()
 
         // Get initial apple state
-        let initialApple = try await engine.item("apple")
-        let initialParent = try await initialApple.parent
+        let initialApple = await engine.item("apple")
+        let initialParent = await initialApple.parent
 
         // Nibble the apple (just sets up question)
         try await engine.execute("nibble apple")
 
         // Verify apple hasn't changed yet
-        let appleAfterQuestion = try await engine.item("apple")
-        #expect(try await appleAfterQuestion.parent == initialParent)
+        let appleAfterQuestion = await engine.item("apple")
+        #expect(await appleAfterQuestion.parent == initialParent)
 
         // Cancel the action
         try await engine.execute("no")
 
         // Verify apple is still unchanged
-        let finalApple = try await engine.item("apple")
-        #expect(try await finalApple.parent == initialParent)
+        let finalApple = await engine.item("apple")
+        #expect(await finalApple.parent == initialParent)
     }
 
     // MARK: - Intent and Verb Testing

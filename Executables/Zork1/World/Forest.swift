@@ -264,7 +264,7 @@ extension Forest {
 
     static let gratingClearingComputer = LocationComputer(for: .gratingClearing) {
         locationProperty(.description) { context in
-            let grate = try await context.engine.item(.grate)
+            let grate = await context.item(.grate)
             var description = [
                 """
                 You are in a clearing, with a forest surrounding you on all sides.
@@ -287,7 +287,7 @@ extension Forest {
     static let gratingClearingHandler = LocationEventHandler(for: .gratingClearing) {
         onEnter { context in
             // ZIL M-ENTER: If grate is not revealed, set it invisible
-            let isGrateInvisible = try await context.engine.item(.grate).hasFlag(.isInvisible)
+            let isGrateInvisible = await context.item(.grate).hasFlag(.isInvisible)
             if !isGrateInvisible {
                 // Check if we need to hide it again (this would be unusual but following ZIL)
                 // In ZIL, this sets INVISIBLE if GRATE-REVEALED is false
@@ -301,13 +301,13 @@ extension Forest {
 
     static let pileOfLeavesHandler = ItemEventHandler(for: .pileOfLeaves) {
         before(.move) { context, command in
-            let grate = try await context.engine.item(.grate)
+            let grate = await context.item(.grate)
 
             // Check if grate is invisible
             let isGrateInvisible = await grate.hasFlag(.isInvisible)
 
             // Update the leaves description to show they've been disturbed
-            let leaves = try await context.engine.item(.pileOfLeaves)
+            let leaves = await context.item(.pileOfLeaves)
 
             let message =
                 if isGrateInvisible {
@@ -316,7 +316,7 @@ extension Forest {
                     "Done."
                 }
 
-            return try await ActionResult(
+            return await ActionResult(
                 message,
                 grate.clearFlag(.isInvisible),
                 context.item.setProperty(
@@ -340,7 +340,7 @@ extension Forest {
             if await context.item.hasFlag(.isOpen) {
                 ActionResult(
                     "The grating is closed.",
-                    try await context.engine.item(.grate).clearFlag(.isOpen)
+                    await context.item(.grate).clearFlag(.isOpen)
                 )
             } else {
                 ActionResult("The grating is already closed.")
@@ -348,11 +348,11 @@ extension Forest {
         }
 
         before(.lock) { context, command in
-            let currentLocation = try await context.player.location
+            let currentLocation = await context.player.location
             return if currentLocation.id == .gratingRoom {
                 ActionResult(
                     "The grate is locked.",
-                    try await context.engine.item(.grate).setFlag(.isLocked)
+                    await context.item(.grate).setFlag(.isLocked)
                 )
             } else {
                 ActionResult("You can't lock it from this side.")
@@ -365,16 +365,16 @@ extension Forest {
                 keys.id == .keys
             {
                 // OPEN GRATE WITH KEYS -> handle as unlock
-                let currentLocation = try await context.player.location
+                let currentLocation = await context.player.location
 
-                guard try await context.player.isHolding(keys.id) else {
+                guard await context.player.isHolding(keys.id) else {
                     return ActionResult("You don't have the keys.")
                 }
 
                 if currentLocation.id == .gratingRoom {
                     return ActionResult(
                         "The grate is unlocked.",
-                        try await context.engine.item(.grate).clearFlag(.isLocked)
+                        await context.item(.grate).clearFlag(.isLocked)
                     )
                 } else if currentLocation.id == .gratingClearing {
                     return ActionResult("You can't reach the lock from here.")
@@ -384,11 +384,11 @@ extension Forest {
             }
 
             // Check if grate is unlocked before allowing open/close
-            let isLocked = try await context.engine.item(.grate).hasFlag(.isLocked)
-            let currentLocation = try await context.player.location
+            let isLocked = await context.item(.grate).hasFlag(.isLocked)
+            let currentLocation = await context.player.location
 
             if !isLocked {
-                let isOpen = try await context.engine.item(.grate).hasFlag(.isOpen)
+                let isOpen = await context.item(.grate).hasFlag(.isOpen)
                 if !isOpen {
                     let message =
                         if currentLocation.id == .gratingClearing {
@@ -398,7 +398,7 @@ extension Forest {
                         }
                     return ActionResult(
                         message,
-                        try await context.engine.item(.grate).setFlag(.isOpen)
+                        await context.item(.grate).setFlag(.isOpen)
                     )
                 } else {
                     return ActionResult("The grating is already open.")
@@ -418,16 +418,16 @@ extension Forest {
                 return nil
             }
 
-            let currentLocation = try await context.player.location
+            let currentLocation = await context.player.location
 
-            guard try await context.player.isHolding(keys.id) else {
+            guard await context.player.isHolding(keys.id) else {
                 return ActionResult("You don't have the keys.")
             }
 
             if currentLocation.id == .gratingRoom {
                 return ActionResult(
                     "The grate is unlocked.",
-                    try await context.engine.item(.grate).clearFlag(.isLocked)
+                    await context.item(.grate).clearFlag(.isLocked)
                 )
             } else if currentLocation.id == .gratingClearing {
                 return ActionResult("You can't reach the lock from here.")

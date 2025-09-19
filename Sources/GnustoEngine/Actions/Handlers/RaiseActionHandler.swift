@@ -31,7 +31,7 @@ public struct RaiseActionHandler: ActionHandler {
         }
 
         // Default behavior: You can't raise most things
-        return try await ActionResult(
+        return await ActionResult(
             context.msg.almostDo(
                 context.verb,
                 item: item.withDefiniteArticle

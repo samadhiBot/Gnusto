@@ -29,10 +29,10 @@ public struct EatActionHandler: ActionHandler {
 
         var message = [String]()
         var changes: [StateChange?] = [
-            try await targetItem.setFlag(.isTouched)
+            await targetItem.setFlag(.isTouched)
         ]
 
-        if try await !targetItem.playerIsHolding {
+        if await !targetItem.playerIsHolding {
             message.append(context.msg.taken())
             changes.append(
                 targetItem.move(to: .player)
@@ -41,9 +41,9 @@ public struct EatActionHandler: ActionHandler {
 
         // Handle direct edible item
         message.append(
-            await targetItem.hasFlag(.isEdible) ?
-                context.msg.eatEdibleDenied(targetItem.withDefiniteArticle) :
-                context.msg.eatInedibleDenied(targetItem.withDefiniteArticle)
+            await targetItem.hasFlag(.isEdible)
+                ? context.msg.eatEdibleDenied(targetItem.withDefiniteArticle)
+                : context.msg.eatInedibleDenied(targetItem.withDefiniteArticle)
         )
 
         return ActionResult(

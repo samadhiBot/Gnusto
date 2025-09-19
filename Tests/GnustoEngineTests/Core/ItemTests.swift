@@ -201,18 +201,18 @@ struct ItemTests {
         let game = MinimalGame(items: item)
         let (engine, _) = await GameEngine.test(blueprint: game)
 
-        let proxy = try await engine.item("customItem")
+        let proxy = await engine.item("customItem")
 
         // Test that proxy correctly accesses static properties
         #expect(proxy.id == "customItem")
 
-        let nameValue = try await proxy.property(.name)
+        let nameValue = await proxy.property(.name)
         #expect(nameValue?.toString == "lantern")
 
-        let sizeValue = try await proxy.property(.size)
+        let sizeValue = await proxy.property(.size)
         #expect(sizeValue == 10)
 
-        let isTakableValue = try await proxy.property(.isTakable)
+        let isTakableValue = await proxy.property(.isTakable)
         #expect(isTakableValue?.toBool == true)
     }
 
@@ -224,9 +224,9 @@ struct ItemTests {
         let game = MinimalGame(items: item1, item2)
         let (engine, _) = await GameEngine.test(blueprint: game)
 
-        let proxy1a = try await engine.item("item1")
-        let proxy1b = try await engine.item("item1")  // Same item, different proxy instances
-        let proxy2 = try await engine.item("item2")
+        let proxy1a = await engine.item("item1")
+        let proxy1b = await engine.item("item1")  // Same item, different proxy instances
+        let proxy2 = await engine.item("item2")
 
         // Test equality - same item should be equal
         #expect(proxy1a == proxy1b)  // Same item, different proxy instances
@@ -252,26 +252,17 @@ struct ItemTests {
         let game = MinimalGame(items: item)
         let (engine, _) = await GameEngine.test(blueprint: game)
 
-        let proxy = try await engine.item("minimal")
+        let proxy = await engine.item("minimal")
 
         // Test that proxy returns nil for unset properties
-        let descriptionValue = try await proxy.property(.description)
+        let descriptionValue = await proxy.property(.description)
         #expect(descriptionValue == nil)
 
-        let capacityValue = try await proxy.property(.capacity)
+        let capacityValue = await proxy.property(.capacity)
         #expect(capacityValue == nil)  // Not set, so nil
 
-        let isTakableValue = try await proxy.property(.isTakable)
+        let isTakableValue = await proxy.property(.isTakable)
         #expect(isTakableValue == nil)  // Not set, so nil
-    }
-
-    @Test("Engine item lookup throws for unknown items")
-    func testEngineItemLookupFailure() async throws {
-        let (engine, _) = await GameEngine.test()
-
-        await #expect(throws: ActionResponse.self) {
-            _ = try await engine.item("nonexistent")
-        }
     }
 
     @Test("ItemProxy comparison and sorting")
@@ -283,9 +274,9 @@ struct ItemTests {
         let game = MinimalGame(items: itemA, itemB, itemC)
         let (engine, _) = await GameEngine.test(blueprint: game)
 
-        let proxyA = try await engine.item("apple")
-        let proxyB = try await engine.item("banana")
-        let proxyC = try await engine.item("cherry")
+        let proxyA = await engine.item("apple")
+        let proxyB = await engine.item("banana")
+        let proxyC = await engine.item("cherry")
 
         // Test comparison based on ID
         #expect(proxyA < proxyB)

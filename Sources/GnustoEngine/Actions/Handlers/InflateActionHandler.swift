@@ -47,7 +47,7 @@ public struct InflateActionHandler: ActionHandler {
                 await context.msg.inflateSuccess(item.withDefiniteArticle)
             }
 
-        return try await ActionResult(
+        return await ActionResult(
             message,
             item.setFlag(.isTouched),
             item.setFlag(.isInflated)

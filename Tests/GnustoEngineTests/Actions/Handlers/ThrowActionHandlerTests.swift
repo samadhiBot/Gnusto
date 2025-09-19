@@ -39,10 +39,10 @@ struct ThrowActionHandlerTests {
             """
         )
 
-        let finalState = try await engine.item("ball")
-        let startRoom = try await engine.location(.startRoom)
+        let finalState = await engine.item("ball")
+        let startRoom = await engine.location(.startRoom)
         #expect(await finalState.hasFlag(.isTouched) == true)
-        #expect(try await finalState.parent == .location(startRoom))
+        #expect(await finalState.parent == .location(startRoom))
     }
 
     @Test("THROW DIRECTOBJECT AT INDIRECTOBJECT syntax works")
@@ -83,12 +83,12 @@ struct ThrowActionHandlerTests {
             """
         )
 
-        let finalRock = try await engine.item("rock")
-        let finalTarget = try await engine.item("target")
-        let startRoom = try await engine.location(.startRoom)
+        let finalRock = await engine.item("rock")
+        let finalTarget = await engine.item("target")
+        let startRoom = await engine.location(.startRoom)
 
         #expect(await finalRock.hasFlag(.isTouched) == true)
-        #expect(try await finalRock.parent == .location(startRoom))
+        #expect(await finalRock.parent == .location(startRoom))
         #expect(await finalTarget.hasFlag(.isTouched) == true)
     }
 
@@ -131,10 +131,10 @@ struct ThrowActionHandlerTests {
             """
         )
 
-        let finalKey = try await engine.item("key")
-        let finalGuard = try await engine.item("guard")
+        let finalKey = await engine.item("key")
+        let finalGuard = await engine.item("guard")
         #expect(await finalKey.hasFlag(.isTouched) == true)
-        #expect(try await finalKey.parent == .item(castleGuard.proxy(engine)))
+        #expect(await finalKey.parent == .item(castleGuard.proxy(engine)))
         #expect(await finalGuard.hasFlag(.isTouched) == true)
     }
 
@@ -461,11 +461,11 @@ struct ThrowActionHandlerTests {
         )
 
         // Verify state changes
-        let finalState = try await engine.item("bottle")
-        let startRoom = try await engine.location(.startRoom)
+        let finalState = await engine.item("bottle")
+        let startRoom = await engine.location(.startRoom)
 
         #expect(await finalState.hasFlag(.isTouched) == true)
-        #expect(try await finalState.parent == .location(startRoom))
+        #expect(await finalState.parent == .location(startRoom))
     }
 
     @Test("Throw item at character")
@@ -512,12 +512,12 @@ struct ThrowActionHandlerTests {
         )
 
         // Verify state changes
-        let finalApple = try await engine.item("apple")
-        let finalWizard = try await engine.item("wizard")
-        let startRoom = try await engine.location(.startRoom)
+        let finalApple = await engine.item("apple")
+        let finalWizard = await engine.item("wizard")
+        let startRoom = await engine.location(.startRoom)
 
         #expect(await finalApple.hasFlag(.isTouched) == true)
-        #expect(try await finalApple.parent == .location(startRoom))
+        #expect(await finalApple.parent == .location(startRoom))
         #expect(await finalWizard.hasFlag(.isTouched) == true)
     }
 
@@ -572,12 +572,12 @@ struct ThrowActionHandlerTests {
         )
 
         // Verify state changes
-        let finalApple = try await engine.item("apple")
-        let finalWizard = try await engine.item("wizard")
-        let startRoom = try await engine.location(.startRoom)
+        let finalApple = await engine.item("apple")
+        let finalWizard = await engine.item("wizard")
+        let startRoom = await engine.location(.startRoom)
 
         #expect(await finalApple.hasFlag(.isTouched) == true)
-        #expect(try await finalApple.parent == .location(startRoom))
+        #expect(await finalApple.parent == .location(startRoom))
         #expect(await finalWizard.hasFlag(.isTouched) == true)
     }
 
@@ -623,12 +623,12 @@ struct ThrowActionHandlerTests {
         )
 
         // Verify state changes
-        let finalDart = try await engine.item("dart")
-        let finalBoard = try await engine.item("board")
-        let startRoom = try await engine.location(.startRoom)
+        let finalDart = await engine.item("dart")
+        let finalBoard = await engine.item("board")
+        let startRoom = await engine.location(.startRoom)
 
         #expect(await finalDart.hasFlag(.isTouched) == true)
-        #expect(try await finalDart.parent == .location(startRoom))
+        #expect(await finalDart.parent == .location(startRoom))
         #expect(await finalBoard.hasFlag(.isTouched) == true)
     }
 
@@ -675,10 +675,10 @@ struct ThrowActionHandlerTests {
         )
 
         // Verify state changes
-        let finalCoin = try await engine.item("coin")
-        let finalMerchant = try await engine.item("merchant")
+        let finalCoin = await engine.item("coin")
+        let finalMerchant = await engine.item("merchant")
         #expect(await finalCoin.hasFlag(.isTouched) == true)
-        #expect(try await finalCoin.parent == .item(merchant.proxy(engine)))
+        #expect(await finalCoin.parent == .item(merchant.proxy(engine)))
         #expect(await finalMerchant.hasFlag(.isTouched) == true)
     }
 
@@ -725,10 +725,10 @@ struct ThrowActionHandlerTests {
         )
 
         // Verify state changes
-        let finalCoin = try await engine.item("coin")
-        let finalMerchant = try await engine.item("merchant")
+        let finalCoin = await engine.item("coin")
+        let finalMerchant = await engine.item("merchant")
         #expect(await finalCoin.hasFlag(.isTouched) == true)
-        #expect(try await finalCoin.parent == .item(merchant.proxy(engine)))
+        #expect(await finalCoin.parent == .item(merchant.proxy(engine)))
         #expect(await finalMerchant.hasFlag(.isTouched) == true)
     }
 
@@ -775,12 +775,12 @@ struct ThrowActionHandlerTests {
         )
 
         // Verify state changes
-        let finalBall = try await engine.item("ball")
-        let finalBasket = try await engine.item("basket")
-        let startRoom = try await engine.location(.startRoom)
+        let finalBall = await engine.item("ball")
+        let finalBasket = await engine.item("basket")
+        let startRoom = await engine.location(.startRoom)
 
         #expect(await finalBall.hasFlag(.isTouched) == true)
-        #expect(try await finalBall.parent == .location(startRoom))
+        #expect(await finalBall.parent == .location(startRoom))
         #expect(await finalBasket.hasFlag(.isTouched) == true)
     }
 
@@ -830,13 +830,13 @@ struct ThrowActionHandlerTests {
             """
         )
 
-        let startRoom = try await engine.location(.startRoom)
+        let startRoom = await engine.location(.startRoom)
 
-        let finalBall1 = try await engine.item("ball1")
-        #expect(try await finalBall1.parent == .location(startRoom))
+        let finalBall1 = await engine.item("ball1")
+        #expect(await finalBall1.parent == .location(startRoom))
 
-        let finalBall2 = try await engine.item("ball2")
-        #expect(try await finalBall2.parent == .location(startRoom))
+        let finalBall2 = await engine.item("ball2")
+        #expect(await finalBall2.parent == .location(startRoom))
     }
 
     // MARK: - Intent Testing

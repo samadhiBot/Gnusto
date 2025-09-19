@@ -29,18 +29,19 @@ public struct DrinkActionHandler: ActionHandler {
             throw ActionResponse.doWhat(context)
         }
 
-        let message = if let container = try await context.itemIndirectObject() {
-            // Handle "drink water from bottle" syntax
-            try await drinkItemFromContainer(context, item, container)
-        } else if await item.isContainer {
-            // Handle "drink [from] bottle" syntax
-            try await drinkFromContainer(context, item)
-        } else {
-            // Handle "drink water" syntax
-            try await drinkItem(context, item)
-        }
+        let message =
+            if let container = try await context.itemIndirectObject() {
+                // Handle "drink water from bottle" syntax
+                try await drinkItemFromContainer(context, item, container)
+            } else if await item.isContainer {
+                // Handle "drink [from] bottle" syntax
+                try await drinkFromContainer(context, item)
+            } else {
+                // Handle "drink water" syntax
+                try await drinkItem(context, item)
+            }
 
-        return try await ActionResult(
+        return await ActionResult(
             message,
             item.setFlag(.isTouched)
         )
@@ -56,7 +57,7 @@ extension DrinkActionHandler {
         _ container: ItemProxy
     ) async throws -> String {
         // Verify the item is actually in the specified container
-        if try await !container.contents.contains(contents) {
+        if await !container.contents.contains(contents) {
             return await context.msg.takeItemNotInContainer(
                 contents.withDefiniteArticle,
                 container: container.withDefiniteArticle
@@ -75,7 +76,7 @@ extension DrinkActionHandler {
     ) async throws -> String {
         // Find anything drinkable in the container
         var drinkableContents: ItemProxy?
-        for item in try await container.contents {
+        for item in await container.contents {
             if await item.hasFlag(.isDrinkable) {
                 drinkableContents = item
                 break

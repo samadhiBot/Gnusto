@@ -40,7 +40,7 @@ struct RubActionHandlerTests {
             """
         )
 
-        let finalState = try await engine.item("lamp")
+        let finalState = await engine.item("lamp")
         #expect(await finalState.hasFlag(.isTouched) == true)
     }
 
@@ -82,7 +82,7 @@ struct RubActionHandlerTests {
             """
         )
 
-        let finalState = try await engine.item("table")
+        let finalState = await engine.item("table")
         #expect(await finalState.hasFlag(.isTouched) == true)
     }
 
@@ -321,7 +321,7 @@ struct RubActionHandlerTests {
             """
         )
 
-        let finalState = try await engine.item("wizard")
+        let finalState = await engine.item("wizard")
         #expect(await finalState.hasFlag(.isTouched) == true)
     }
 
@@ -361,7 +361,7 @@ struct RubActionHandlerTests {
             """
         )
 
-        let finalState = try await engine.item("necromancer")
+        let finalState = await engine.item("necromancer")
         #expect(await finalState.hasFlag(.isTouched) == true)
     }
 
@@ -395,7 +395,7 @@ struct RubActionHandlerTests {
             """
         )
 
-        let finalState = try await engine.item("wall")
+        let finalState = await engine.item("wall")
         #expect(await finalState.hasFlag(.isTouched) == true)
     }
 
@@ -438,7 +438,7 @@ struct RubActionHandlerTests {
             """
         )
 
-        let finalState = try await engine.item("vase")
+        let finalState = await engine.item("vase")
         #expect(await finalState.hasFlag(.isTouched) == true)
     }
 

@@ -163,12 +163,12 @@ public actor GameEngine: Sendable {
     /// Internal flag to control the main game loop's continuation.
     /// Game developers can call `requestQuit()` to set this flag to `true`,
     /// causing the game to end after the current turn completes.
-    public internal(set) var shouldQuit: Bool = false
+    var shouldQuit: Bool = false
 
     /// Internal flag to control game restart.
     /// Game developers can call `requestRestart()` to set this flag to `true`,
     /// causing the game to restart after the current turn completes.
-    public internal(set) var shouldRestart: Bool = false
+    var shouldRestart: Bool = false
 
     /// Blueprint data for game restart and computed properties
     let gameBlueprint: GameBlueprint

@@ -36,7 +36,7 @@ public struct ExtinguishActionHandler: ActionHandler {
 
         // Check if it's a light source that's currently lit
         if await item.hasFlags(all: .isLightSource, .isOn) {
-            return try await ActionResult(
+            return await ActionResult(
                 context.msg.extinguishSuccess(
                     context.command,
                     item: item.withDefiniteArticle
@@ -69,12 +69,12 @@ public struct ExtinguishActionHandler: ActionHandler {
 //
 //        // If this light source was providing light and room becomes dark, mention it
 //        if wasProvidingLight {
-//            let currentLocation = try await context.player.location
+//            let currentLocation = await context.player.location
 //            let locationIsInherentlyLit = await currentLocation.hasFlag(.inherentlyLit)
 //
 //            if !locationIsInherentlyLit {
 //                // Check if there are other light sources still providing light
-//                let otherLightSources = try await currentLocation.items.asyncFilter { item in
+//                let otherLightSources = await currentLocation.items.asyncFilter { item in
 //                    await item.hasFlags(all: .isLightSource, .isOn) && item.id != item.id
 //                }
 //
@@ -84,7 +84,7 @@ public struct ExtinguishActionHandler: ActionHandler {
 //            }
 //        }
 
-        return try await ActionResult(
+        return await ActionResult(
             context.msg.extinguishSuccess(
                 context.command,
                 item: item.withDefiniteArticle

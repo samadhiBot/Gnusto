@@ -57,9 +57,7 @@ extension GameEngine {
     /// - Parameter change: The `StateChange` to apply to the game state.
     /// - Throws: Re-throws any errors from `GameState.apply()`, including validation failures.
     public func apply(_ changes: StateChange?...) async throws {
-        for change in changes.compactMap(\.self) {
-            try gameState.apply(change)
-        }
+        try applyActionResultChanges(changes)
     }
 
     /// Executes multiple string commands in sequence.

@@ -34,13 +34,13 @@ public struct MoveActionHandler: ActionHandler {
         }
 
         guard let target = try await context.itemIndirectObject() else {
-            return try await ActionResult(
+            return await ActionResult(
                 context.msg.moveItem(item.withDefiniteArticle),
                 item.setFlag(.isTouched)
             )
         }
 
-        return try await ActionResult(
+        return await ActionResult(
             context.msg.moveItemToTarget(
                 item.withDefiniteArticle,
                 target: target.withDefiniteArticle

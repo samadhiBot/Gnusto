@@ -45,7 +45,7 @@ public struct TurnOnActionHandler: ActionHandler {
             )
         }
 
-        return try await ActionResult(
+        return await ActionResult(
             context.msg.youDo(
                 context.command,
                 item: targetItem.withDefiniteArticle

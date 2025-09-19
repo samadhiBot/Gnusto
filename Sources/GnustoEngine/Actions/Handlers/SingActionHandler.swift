@@ -27,7 +27,7 @@ public struct SingActionHandler: ActionHandler {
     /// A classic atmospheric command from ZIL traditions.
     public func process(context: ActionContext) async throws -> ActionResult {
         if let item = try await context.itemDirectObject() {
-            return try await ActionResult(
+            return await ActionResult(
                 item.response(
                     object: { context.msg.singToObject(context.command, item: $0) },
                     character: { context.msg.singToCharacter(context.verb, character: $0) },

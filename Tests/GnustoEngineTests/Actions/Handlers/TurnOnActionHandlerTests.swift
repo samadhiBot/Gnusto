@@ -40,7 +40,7 @@ struct TurnOnActionHandlerTests {
             """
         )
 
-        let finalState = try await engine.item("flashlight")
+        let finalState = await engine.item("flashlight")
         #expect(await finalState.hasFlag(.isOn) == true)
     }
 
@@ -76,7 +76,7 @@ struct TurnOnActionHandlerTests {
             """
         )
 
-        let finalState = try await engine.item("lantern")
+        let finalState = await engine.item("lantern")
         #expect(await finalState.hasFlag(.isOn) == true)
     }
 
@@ -112,7 +112,7 @@ struct TurnOnActionHandlerTests {
             """
         )
 
-        let finalState = try await engine.item("flashlight")
+        let finalState = await engine.item("flashlight")
         #expect(await finalState.hasFlag(.isOn) == true)
     }
 
@@ -310,7 +310,7 @@ struct TurnOnActionHandlerTests {
             """
         )
 
-        let finalState = try await engine.item("lamp")
+        let finalState = await engine.item("lamp")
         #expect(await finalState.hasFlag(.isOn) == true)
     }
 
@@ -355,7 +355,7 @@ struct TurnOnActionHandlerTests {
             """
         )
 
-        let finalState = try await engine.item("lamp")
+        let finalState = await engine.item("lamp")
         #expect(await finalState.hasFlag(.isOn) == false)
     }
 
@@ -425,7 +425,7 @@ struct TurnOnActionHandlerTests {
         try await engine.execute("turn on lamp")
 
         // Then
-        let finalState = try await engine.item("lamp")
+        let finalState = await engine.item("lamp")
         #expect(await finalState.hasFlag(.isOn) == true)
         #expect(await finalState.hasFlag(.isTouched) == true)
 
@@ -496,7 +496,7 @@ struct TurnOnActionHandlerTests {
         )
 
         // Verify room is now lit
-        let isLit = try await engine.player.location.isLit
+        let isLit = await engine.player.location.isLit
         #expect(isLit == false)
     }
 
@@ -531,7 +531,7 @@ struct TurnOnActionHandlerTests {
             """
         )
 
-        let finalState = try await engine.item("radio")
+        let finalState = await engine.item("radio")
         #expect(await finalState.hasFlag(.isOn) == true)
     }
 

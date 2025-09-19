@@ -37,7 +37,7 @@ struct PushActionHandlerTests {
             """
         )
 
-        let finalState = try await engine.item("button")
+        let finalState = await engine.item("button")
         #expect(await finalState.hasFlag(.isTouched) == true)
     }
 
@@ -72,7 +72,7 @@ struct PushActionHandlerTests {
             """
         )
 
-        let finalState = try await engine.item("guard")
+        let finalState = await engine.item("guard")
         #expect(await finalState.hasFlag(.isTouched) == true)
     }
 
@@ -99,7 +99,7 @@ struct PushActionHandlerTests {
             """
         )
 
-        let finalState = try await engine.item("troll")
+        let finalState = await engine.item("troll")
         #expect(await finalState.hasFlag(.isTouched) == true)
     }
 
@@ -132,7 +132,7 @@ struct PushActionHandlerTests {
             """
         )
 
-        let finalState = try await engine.item("button")
+        let finalState = await engine.item("button")
         #expect(await finalState.hasFlag(.isTouched) == true)
     }
 
@@ -422,7 +422,7 @@ struct PushActionHandlerTests {
             """
         )
 
-        let finalState = try await engine.item("lightSwitch")
+        let finalState = await engine.item("lightSwitch")
         #expect(await finalState.hasFlag(.isTouched) == true)
     }
 
@@ -519,14 +519,14 @@ struct PushActionHandlerTests {
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         // Verify initial state
-        let initialState = try await engine.item("doorbell")
+        let initialState = await engine.item("doorbell")
         #expect(await initialState.hasFlag(.isTouched) == false)
 
         // When
         try await engine.execute("push doorbell")
 
         // Then
-        let finalState = try await engine.item("doorbell")
+        let finalState = await engine.item("doorbell")
         #expect(await finalState.hasFlag(.isTouched) == true)
     }
 
@@ -632,8 +632,8 @@ struct PushActionHandlerTests {
             """
         )
 
-        let leverState = try await engine.item("lever")
-        let dialState = try await engine.item("dial")
+        let leverState = await engine.item("lever")
+        let dialState = await engine.item("dial")
         #expect(await leverState.hasFlag(.isTouched) == true)
         #expect(await dialState.hasFlag(.isTouched) == true)
     }

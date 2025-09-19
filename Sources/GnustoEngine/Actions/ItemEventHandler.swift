@@ -68,7 +68,7 @@ public struct ItemEventHandler: Sendable {
             @Sendable @escaping () async throws -> [ItemEventMatcher]
     ) {
         self.handle = { engine, event in
-            let item = try await engine.item(itemID)
+            let item = await engine.item(itemID)
             let context = ItemEventContext(event: event, item: item, engine: engine)
 
             let matcherList = try await matchers()

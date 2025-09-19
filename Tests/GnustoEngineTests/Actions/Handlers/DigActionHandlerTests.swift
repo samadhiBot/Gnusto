@@ -342,7 +342,7 @@ struct DigActionHandlerTests {
         )
 
         // Verify .isTouched flag was set
-        let finalMound = try await engine.item("mound")
+        let finalMound = await engine.item("mound")
         #expect(await finalMound.hasFlag(.isTouched) == true)
     }
 
@@ -382,7 +382,7 @@ struct DigActionHandlerTests {
         )
 
         // Verify .isTouched flag was set
-        let finalMound = try await engine.item("mound")
+        let finalMound = await engine.item("mound")
         #expect(await finalMound.hasFlag(.isTouched) == true)
     }
 
@@ -422,7 +422,7 @@ struct DigActionHandlerTests {
         )
 
         // Verify .isTouched flag was set
-        let finalMound = try await engine.item("mound")
+        let finalMound = await engine.item("mound")
         #expect(await finalMound.hasFlag(.isTouched) == true)
     }
 
@@ -534,7 +534,7 @@ struct DigActionHandlerTests {
         )
 
         // Verify .isTouched flag was set
-        let finalMound = try await engine.item("mound")
+        let finalMound = await engine.item("mound")
         #expect(await finalMound.hasFlag(.isTouched) == true)
     }
 

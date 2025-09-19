@@ -30,6 +30,28 @@ public struct ActionContext: Sendable {
 }
 
 extension ActionContext {
+    /// Convenience accessor for combat messaging.
+    ///
+    /// Provides access to the appropriate combat messenger for the current combat context.
+    /// This automatically selects the correct combat messenger based on the current enemy,
+    /// allowing for character-specific combat descriptions and responses. Falls back to the
+    /// default combat messenger if no enemy-specific messenger is configured or if not
+    /// currently in combat.
+    ///
+    /// Example:
+    /// ```swift
+    /// let hitMessage = await context.combatMsg.attackHit(damage: 5)
+    /// let missMessage = await context.combatMsg.attackMiss()
+    /// ```
+    public var combatMsg: CombatMessenger {
+        get async {
+            if let combatState = await engine.combatState {
+                return await engine.combatMessenger(for: combatState.enemyID)
+            }
+            return engine.defaultCombatMessenger
+        }
+    }
+
     /// Checks if the command contains one of the specified prepositions.
     ///
     /// This method is commonly used in action handlers to branch logic based on
@@ -55,6 +77,28 @@ extension ActionContext {
         }
     }
 
+    /// Convenience accessor for getting an item proxy by ID.
+    ///
+    /// Provides direct access to any item in the game through the engine,
+    /// allowing event handlers to easily reference and manipulate other items.
+    ///
+    /// - Parameter itemID: The unique identifier of the item to retrieve
+    /// - Returns: A proxy for the specified item
+    public func item(_ itemID: ItemID) async -> ItemProxy {
+        await engine.item(itemID)
+    }
+
+    /// Convenience accessor for getting a location proxy by ID.
+    ///
+    /// Provides direct access to any location in the game through the engine,
+    /// allowing event handlers to easily reference and manipulate other locations.
+    ///
+    /// - Parameter locationID: The unique identifier of the location to retrieve
+    /// - Returns: A proxy for the specified location
+    public func location(_ locationID: LocationID) async -> LocationProxy {
+        await engine.location(locationID)
+    }
+
     /// Convenience accessor for the game engine's messenger.
     ///
     /// Provides direct access to the messenger for generating localized text responses
@@ -70,28 +114,6 @@ extension ActionContext {
         engine.messenger
     }
 
-    /// Convenience accessor for combat messaging.
-    ///
-    /// Provides access to the appropriate combat messenger for the current combat context.
-    /// This automatically selects the correct combat messenger based on the current enemy,
-    /// allowing for character-specific combat descriptions and responses. Falls back to the
-    /// default combat messenger if no enemy-specific messenger is configured or if not
-    /// currently in combat.
-    ///
-    /// Example:
-    /// ```swift
-    /// let hitMessage = await context.combatMsg.attackHit(damage: 5)
-    /// let missMessage = await context.combatMsg.attackMiss()
-    /// ```
-    public var combatMsg: CombatMessenger {
-        get async {
-            if let combatState = await engine.combatState {
-                return await engine.combatMessenger(for: combatState.enemyID)
-            }
-            return engine.defaultCombatMessenger
-        }
-    }
-
     /// Convenience accessor for the player proxy.
     ///
     /// Provides direct access to the current player state through a PlayerProxy,
@@ -100,8 +122,8 @@ extension ActionContext {
     ///
     /// Example:
     /// ```swift
-    /// let currentLocation = try await context.player.location
-    /// let inventory = try await context.player.inventory
+    /// let currentLocation = await context.player.location
+    /// let inventory = await context.player.inventory
     /// let score = await context.player.score
     /// ```
     public var player: PlayerProxy {

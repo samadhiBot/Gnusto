@@ -188,9 +188,8 @@ extension OutsideHouse {
 extension OutsideHouse {
     static let eastOfHouseComputer = LocationComputer(for: .eastOfHouse) {
         locationProperty(.description) { context in
-            let kitchenWindow = try await context.engine.item(.kitchenWindow)
-            let isWindowOpen = await kitchenWindow.isOpen
-            let windowState = isWindowOpen ? "open" : "slightly ajar"
+            let kitchenWindow = await context.item(.kitchenWindow)
+            let windowState = await kitchenWindow.isOpen ? "open" : "slightly ajar"
             return .string(
                 """
                 You are behind the white house. A path leads into the forest
@@ -202,11 +201,9 @@ extension OutsideHouse {
 
     static let kitchenWindowComputer = ItemComputer(for: .kitchenWindow) {
         itemProperty(ItemPropertyID.description) { context in
-            .string(
-                context.item.hasFlag(.isOpen)
-                    ? "The window is now open wide enough to allow entry."
-                    : "The window is slightly ajar, but not enough to allow entry."
-            )
+            await context.item.hasFlag(.isOpen)
+                ? "The window is now open wide enough to allow entry."
+                : "The window is slightly ajar, but not enough to allow entry."
         }
     }
 }
@@ -225,7 +222,7 @@ extension OutsideHouse {
             if await context.item.hasFlag(.isOpen) {
                 return ActionResult("Too late for that, the window is already open.")
             } else {
-                return try await ActionResult(
+                return await ActionResult(
                     "With great effort, you open the window far enough to allow entry.",
                     context.item.setFlag(.isOpen)
                 )
@@ -234,7 +231,7 @@ extension OutsideHouse {
 
         before(.look) { context, command in
             guard command.preposition == Preposition("through") else { return nil }
-            let currentLocation = try await context.player.location.id
+            let currentLocation = await context.player.location.id
             if currentLocation == .kitchen {
                 return ActionResult("You can see a clear area leading towards a forest.")
             } else {
@@ -251,7 +248,7 @@ extension OutsideHouse {
 
     static let whiteHouseHandler = ItemEventHandler(for: .whiteHouse) {
         //        before(.find) { context, command in
-        //            let currentLocation = try await context.player.location.id
+        //            let currentLocation = await context.player.location.id
         //
         //            // Check if player is inside the house
         //            let insideHouseLocations: Set<LocationID> = [.kitchen, .livingRoom, .attic]
@@ -277,7 +274,7 @@ extension OutsideHouse {
         //        }
 
         before(.examine, .look) { context, command in
-            let currentLocation = try await context.player.location.id
+            let currentLocation = await context.player.location.id
             return
                 if [.eastOfHouse, .westOfHouse, .northOfHouse, .southOfHouse].contains(
                     currentLocation
@@ -295,7 +292,7 @@ extension OutsideHouse {
         }
 
         before(.open) { context, command in
-            let currentLocation = try await context.player.location.id
+            let currentLocation = await context.player.location.id
             let atHouseLocations: Set<LocationID> = [
                 .eastOfHouse, .westOfHouse, .northOfHouse, .southOfHouse,
             ]
@@ -304,7 +301,7 @@ extension OutsideHouse {
             } else {
                 // Only east of house has an openable window
                 if currentLocation == .eastOfHouse {
-                    let kitchenWindow = try await context.engine.item(.kitchenWindow)
+                    let kitchenWindow = await context.item(.kitchenWindow)
                     if await kitchenWindow.hasFlag(.isOpen) {
                         // Move player to kitchen
                         return ActionResult(
@@ -321,7 +318,7 @@ extension OutsideHouse {
         }
 
         before(.burn) { context, command in
-            let currentLocation = try await context.player.location.id
+            let currentLocation = await context.player.location.id
             let atHouseLocations: Set<LocationID> = [
                 .eastOfHouse, .westOfHouse, .northOfHouse, .southOfHouse,
             ]

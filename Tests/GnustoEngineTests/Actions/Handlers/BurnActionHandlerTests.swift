@@ -312,7 +312,7 @@ struct BurnActionHandlerTests {
             """
         )
 
-        let finalFlashlight = try await engine.item("flashlight")
+        let finalFlashlight = await engine.item("flashlight")
         #expect(await finalFlashlight.hasFlag(.isTouched) == true)
         #expect(await finalFlashlight.hasFlag(.isBurning) == false)
     }
@@ -388,7 +388,7 @@ struct BurnActionHandlerTests {
             """
         )
 
-        let finalCandle = try await engine.item("candle")
+        let finalCandle = await engine.item("candle")
         #expect(await finalCandle.hasFlag(.isBurning) == true)
         #expect(await finalCandle.hasFlag(.isTouched) == true)
     }
@@ -472,8 +472,8 @@ struct BurnActionHandlerTests {
             """
         )
 
-        let finalTorch = try await engine.item("torch")
-        let finalMatch = try await engine.item("match")
+        let finalTorch = await engine.item("torch")
+        let finalMatch = await engine.item("match")
         #expect(await finalTorch.hasFlag(.isBurning) == true)
         #expect(await finalTorch.hasFlag(.isTouched) == true)
         #expect(await finalMatch.hasFlag(.isTouched) == true)
@@ -520,8 +520,8 @@ struct BurnActionHandlerTests {
             """
         )
 
-        let finalTorch = try await engine.item("torch")
-        let finalLighter = try await engine.item("lighter")
+        let finalTorch = await engine.item("torch")
+        let finalLighter = await engine.item("lighter")
         #expect(await finalTorch.hasFlag(.isBurning) == true)
         #expect(await finalTorch.hasFlag(.isTouched) == true)
         #expect(await finalLighter.hasFlag(.isTouched) == true)
@@ -737,7 +737,7 @@ struct BurnActionHandlerTests {
             """
         )
 
-        let finalTroll = try await engine.item("troll")
+        let finalTroll = await engine.item("troll")
         #expect(await finalTroll.hasFlag(.isTouched) == true)
     }
 
@@ -781,7 +781,7 @@ struct BurnActionHandlerTests {
             """
         )
 
-        let finalGuard = try await engine.item("guard")
+        let finalGuard = await engine.item("guard")
         #expect(await finalGuard.hasFlag(.isTouched) == true)
     }
 
@@ -938,7 +938,7 @@ struct BurnActionHandlerTests {
             """
         )
 
-        let finalCandle = try await engine.item("candle")
+        let finalCandle = await engine.item("candle")
         #expect(await finalCandle.hasFlag(.isBurning) == true)
     }
 }

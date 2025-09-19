@@ -46,10 +46,11 @@ struct LocationTests {
         #expect(location.properties[.description] == .string("A nondescript room."))
         #expect(location.properties[.shortDescription] == nil)
         #expect(location.properties[.exits] == nil)  // Not set, so nil
-        #expect(location.properties == [
-            .name: "Room",
-            .description: "A nondescript room.",
-        ])
+        #expect(
+            location.properties == [
+                .name: "Room",
+                .description: "A nondescript room.",
+            ])
         #expect(location.properties[.inherentlyLit] == nil)
         #expect(location.properties[.localGlobals] == nil)  // Not set, so nil
     }
@@ -67,10 +68,12 @@ struct LocationTests {
             .string("A comfortably furnished living room. There are exits west and east.")
         )
         #expect(location.properties[.shortDescription] == nil)
-        expectNoDifference(location.properties[.exits]?.toExits, [
-            .east(blocked: "A solid wall blocks your path."),
-            .west(blocked: "You head west."),
-        ])
+        expectNoDifference(
+            location.properties[.exits]?.toExits,
+            [
+                .east(blocked: "A solid wall blocks your path."),
+                .west(blocked: "You head west."),
+            ])
         #expect(location.properties[.inherentlyLit]?.toBool == true)
         #expect(location.properties[.localGlobals]?.toItemIDs?.count == 2)
         #expect(location.properties[.localGlobals]?.toItemIDs?.contains(rugID) == true)
@@ -177,12 +180,14 @@ struct LocationTests {
             decodedLocation.properties[.description] == originalLocation.properties[.description])
         #expect(
             decodedLocation.properties[.shortDescription]
-            == originalLocation.properties[.shortDescription]
+                == originalLocation.properties[.shortDescription]
         )
-        expectNoDifference(decodedLocation.properties[.exits]?.toExits, [
-            .east(blocked: "A solid wall blocks your path."),
-            .west(blocked: "You head west."),
-        ])
+        expectNoDifference(
+            decodedLocation.properties[.exits]?.toExits,
+            [
+                .east(blocked: "A solid wall blocks your path."),
+                .west(blocked: "You head west."),
+            ])
         #expect(decodedLocation.properties == originalLocation.properties)
         #expect(
             decodedLocation.properties[.localGlobals] == originalLocation.properties[.localGlobals])
@@ -205,7 +210,7 @@ struct LocationTests {
         // Assert that the original (location1) is unchanged
         #expect(location1.properties[.name]?.toString == originalName)  // Check against captured default
         #expect(location1.properties[.isVisited] == nil)  // Not set, so nil
-                                                          // Check original dynamic value
+        // Check original dynamic value
         #expect(location1.properties[.description] == originalDescValue)
 
         // Assert that location2 has the changes
@@ -229,20 +234,20 @@ struct LocationTests {
         )
         let (engine, _) = await GameEngine.test(blueprint: game)
 
-        let proxy = try await engine.location("livingRoom")
+        let proxy = await engine.location("livingRoom")
 
         // Test that proxy correctly accesses static properties
         #expect(proxy.id == "livingRoom")
 
-        let nameValue = try await proxy.property(.name)
+        let nameValue = await proxy.property(.name)
         #expect(nameValue?.toString == "Living Room")
 
-        let descriptionValue = try await proxy.property(.description)
+        let descriptionValue = await proxy.property(.description)
         #expect(
             descriptionValue?.toString
-            == "A comfortably furnished living room. There are exits west and east.")
+                == "A comfortably furnished living room. There are exits west and east.")
 
-        let inherentlyLitValue = try await proxy.property(.inherentlyLit)
+        let inherentlyLitValue = await proxy.property(.inherentlyLit)
         #expect(inherentlyLitValue?.toBool == true)
     }
 
@@ -258,9 +263,9 @@ struct LocationTests {
         )
         let (engine, _) = await GameEngine.test(blueprint: game)
 
-        let proxy1 = try await engine.location("room1")
-        let proxy2 = try await engine.location("room2")
-        let proxy1Copy = try await location1Copy.proxy(engine)
+        let proxy1 = await engine.location("room1")
+        let proxy2 = await engine.location("room2")
+        let proxy1Copy = await location1Copy.proxy(engine)
 
         // Test equality
         #expect(proxy1 == proxy1Copy)  // Same location content
@@ -289,26 +294,17 @@ struct LocationTests {
         )
         let (engine, _) = await GameEngine.test(blueprint: game)
 
-        let proxy = try await engine.location("minimal")
+        let proxy = await engine.location("minimal")
 
         // Test that proxy returns nil for unset properties
-        let shortDescValue = try await proxy.property(.shortDescription)
+        let shortDescValue = await proxy.property(.shortDescription)
         #expect(shortDescValue == nil)
 
-        let exitsValue = try await proxy.property(.exits)
+        let exitsValue = await proxy.property(.exits)
         #expect(exitsValue == nil)  // Not set, so nil
 
-        let inherentlyLitValue = try await proxy.property(.inherentlyLit)
+        let inherentlyLitValue = await proxy.property(.inherentlyLit)
         #expect(inherentlyLitValue == nil)  // Not set, so nil
-    }
-
-    @Test("Engine location lookup throws for unknown locations")
-    func testEngineLocationLookupFailure() async throws {
-        let (engine, _) = await GameEngine.test()
-
-        await #expect(throws: ActionResponse.self) {
-            _ = try await engine.location("nonexistent")
-        }
     }
 
     @Test("LocationProxy handles exits correctly")
@@ -320,15 +316,17 @@ struct LocationTests {
         )
         let (engine, _) = await GameEngine.test(blueprint: game)
 
-        let proxy = try await engine.location("livingRoom")
+        let proxy = await engine.location("livingRoom")
 
-        let exitsValue = try await proxy.property(.exits)
+        let exitsValue = await proxy.property(.exits)
         let exits = exitsValue?.toExits
 
-        expectNoDifference(exits, [
-            .east(blocked: "A solid wall blocks your path."),
-            .west(blocked: "You head west."),
-        ])
+        expectNoDifference(
+            exits,
+            [
+                .east(blocked: "A solid wall blocks your path."),
+                .west(blocked: "You head west."),
+            ])
     }
 
     @Test("LocationProxy handles localGlobals correctly")
@@ -340,9 +338,9 @@ struct LocationTests {
         )
         let (engine, _) = await GameEngine.test(blueprint: game)
 
-        let proxy = try await engine.location("livingRoom")
+        let proxy = await engine.location("livingRoom")
 
-        let localGlobalsValue = try await proxy.property(.localGlobals)
+        let localGlobalsValue = await proxy.property(.localGlobals)
         let localGlobals = localGlobalsValue?.toItemIDs
 
         #expect(localGlobals?.count == 2)

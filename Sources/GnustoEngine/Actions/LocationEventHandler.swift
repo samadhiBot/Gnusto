@@ -67,7 +67,7 @@ public struct LocationEventHandler: Sendable {
             @Sendable @escaping () async throws -> [LocationEventMatcher]
     ) {
         self.handle = { engine, event in
-            let location = try await engine.location(locationID)
+            let location = await engine.location(locationID)
             let context = LocationEventContext(event: event, location: location, engine: engine)
 
             let matcherList = try await matchers()
@@ -278,7 +278,7 @@ public func afterTurn(
 ///         return ActionResult(
 ///             "The trap door crashes shut, and you hear someone barring it!",
 ///             context.engine.setFlag(.cellarTrapTriggered),
-///             context.engine.item(.trapDoor).clearFlag(.isOpen)
+///             context.item(.trapDoor).clearFlag(.isOpen)
 ///         )
 ///     }
 ///     return nil

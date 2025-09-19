@@ -24,18 +24,22 @@ public struct PutOnActionHandler: ActionHandler {
     /// Checks that both objects exist, the item is held, and the surface is accessible.
     public func process(context: ActionContext) async throws -> ActionResult {
         // Get direct object (item to put)
-        guard let itemToPut = try await context.itemDirectObject(
-            locationMessage: { await context.msg.putItemOn($0.withDefiniteArticle) },
-            universalMessage: { context.msg.putItemOn($0.withDefiniteArticle) },
-            playerMessage: context.msg.putMeOn()
-        ) else {
+        guard
+            let itemToPut = try await context.itemDirectObject(
+                locationMessage: { await context.msg.putItemOn($0.withDefiniteArticle) },
+                universalMessage: { context.msg.putItemOn($0.withDefiniteArticle) },
+                playerMessage: context.msg.putMeOn()
+            )
+        else {
             throw ActionResponse.doWhat(context)
         }
 
         // Get indirect object (surface)
-        guard let surfaceItem = try await context.itemIndirectObject(
-            failureMessage: context.msg.putOnBadTarget(itemToPut.withDefiniteArticle)
-        ) else {
+        guard
+            let surfaceItem = try await context.itemIndirectObject(
+                failureMessage: context.msg.putOnBadTarget(itemToPut.withDefiniteArticle)
+            )
+        else {
             throw ActionResponse.feedback(
                 await context.msg.putOnWhat(
                     itemToPut.withDefiniteArticle
@@ -44,7 +48,7 @@ public struct PutOnActionHandler: ActionHandler {
         }
 
         // Check if player is holding the item
-        guard try await itemToPut.playerIsHolding else {
+        guard await itemToPut.playerIsHolding else {
             throw ActionResponse.itemNotHeld(itemToPut)
         }
 
@@ -56,7 +60,7 @@ public struct PutOnActionHandler: ActionHandler {
         }
 
         // Recursive check: is the target surface inside the item we are putting?
-        var currentParent = try await surfaceItem.parent
+        var currentParent = await surfaceItem.parent
         while case .item(let parentItem) = currentParent {
             if parentItem == itemToPut {
                 throw ActionResponse.feedback(
@@ -66,7 +70,7 @@ public struct PutOnActionHandler: ActionHandler {
                     )
                 )
             }
-            currentParent = try await parentItem.parent
+            currentParent = await parentItem.parent
         }
 
         // Check if target is actually a surface
@@ -80,7 +84,7 @@ public struct PutOnActionHandler: ActionHandler {
         }
 
         // Perform the action
-        return try await ActionResult(
+        return await ActionResult(
             context.msg.youPutItemOnSurface(
                 context.verb,
                 item: itemToPut.withDefiniteArticle,

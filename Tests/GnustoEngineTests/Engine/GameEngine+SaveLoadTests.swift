@@ -116,7 +116,7 @@ struct GameEngineSaveLoadTests {
 
         // Then: State should be restored to saved values
         let currentScore = await engine.player.score
-        let currentLocation = try await engine.player.location.id
+        let currentLocation = await engine.player.location.id
         #expect(currentScore == 25)
         #expect(currentLocation == "foyer")
 
@@ -320,7 +320,7 @@ struct GameEngineSaveLoadTests {
 
         // Then: All state should be restored correctly
         let playerScore = await engine.player.score
-        let testItemLocation = try await engine.item("testItem").parent
+        let testItemLocation = await engine.item("testItem").parent
 
         #expect(playerScore == 50)
         #expect(testItemLocation == .player)

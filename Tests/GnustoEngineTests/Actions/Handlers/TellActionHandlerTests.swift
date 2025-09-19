@@ -38,7 +38,7 @@ struct TellActionHandlerTests {
             """
         )
 
-        let finalState = try await engine.item("wizard")
+        let finalState = await engine.item("wizard")
         #expect(await finalState.hasFlag(.isTouched) == true)
     }
 
@@ -80,7 +80,7 @@ struct TellActionHandlerTests {
             """
         )
 
-        let finalState = try await engine.item("sage")
+        let finalState = await engine.item("sage")
         #expect(await finalState.hasFlag(.isTouched) == true)
     }
 
@@ -434,7 +434,7 @@ struct TellActionHandlerTests {
             """
         )
 
-        let finalState = try await engine.item("wizard")
+        let finalState = await engine.item("wizard")
         #expect(await finalState.hasFlag(.isTouched) == true)
     }
 
@@ -499,7 +499,7 @@ struct TellActionHandlerTests {
             """
         )
 
-        let finalState = try await engine.item("troll")
+        let finalState = await engine.item("troll")
         #expect(await finalState.hasFlag(.isTouched) == true)
     }
 
@@ -584,7 +584,7 @@ struct TellActionHandlerTests {
             """
         )
 
-        let finalState = try await engine.item("statue")
+        let finalState = await engine.item("statue")
         #expect(await finalState.hasFlag(.isTouched) == true)
     }
 

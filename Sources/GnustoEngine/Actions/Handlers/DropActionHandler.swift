@@ -38,12 +38,12 @@ public struct DropActionHandler: ActionHandler {
         var droppedItems: [ItemProxy] = []
 
         // Get current location for dropping items
-        let currentLocation = try await ParentEntity.location(
+        let currentLocation = await ParentEntity.location(
             context.player.location.id
         )
 
         for dropItem in dropItems {
-            guard try await dropItem.playerIsHolding else {
+            guard await dropItem.playerIsHolding else {
                 if context.command.isAllCommand { continue }
                 throw ActionResponse.itemNotHeld(dropItem)
             }
@@ -53,7 +53,7 @@ public struct DropActionHandler: ActionHandler {
                 throw ActionResponse.cannotDo(context, dropItem)
             }
 
-            try await allStateChanges.append(
+            await allStateChanges.append(
                 contentsOf: [
                     dropItem.move(to: currentLocation),
                     dropItem.setFlag(.isTouched),

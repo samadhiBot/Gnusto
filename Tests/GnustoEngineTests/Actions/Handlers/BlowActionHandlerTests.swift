@@ -38,7 +38,7 @@ struct BlowActionHandlerTests {
             """
         )
 
-        let finalState = try await engine.item("feather")
+        let finalState = await engine.item("feather")
         #expect(await finalState.hasFlag(.isTouched) == true)
     }
 

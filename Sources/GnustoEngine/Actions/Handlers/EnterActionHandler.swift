@@ -38,7 +38,7 @@ public struct EnterActionHandler: ActionHandler {
             }
         }
 
-        let currentLocation = try await context.player.location
+        let currentLocation = await context.player.location
 
         // Find if this item serves as a door for any exit from current location
         guard
@@ -64,13 +64,13 @@ public struct EnterActionHandler: ActionHandler {
         in context: ActionContext
     ) async throws -> [(doorItem: ItemProxy, direction: Direction)] {
         var enterableDoors = [(doorItem: ItemProxy, direction: Direction)]()
-        let location = try await context.player.location
+        let location = await context.player.location
 
-        for exit in try await location.exits {
+        for exit in await location.exits {
             // Skip exits without doorIDs (they're not associated with objects)
             guard let doorID = exit.doorID else { continue }
 
-            let door = try await context.engine.item(doorID)
+            let door = await context.item(doorID)
 
             if await door.playerCanReach {
                 enterableDoors.append(
@@ -92,9 +92,11 @@ public struct EnterActionHandler: ActionHandler {
         for item: ItemProxy,
         in location: LocationProxy
     ) async throws -> Direction? {
-        guard let exit = try await location.exits.first(
-            where: { $0.doorID == item.id }
-        ) else {
+        guard
+            let exit = await location.exits.first(
+                where: { $0.doorID == item.id }
+            )
+        else {
             return nil
         }
         return exit.direction
@@ -120,7 +122,7 @@ public struct EnterActionHandler: ActionHandler {
         // Combine door interaction effects with movement result
         return ActionResult(
             message: goResult.message,
-            changes: [try await doorItem.setFlag(.isTouched)] + goResult.changes
+            changes: [await doorItem.setFlag(.isTouched)] + goResult.changes
         )
     }
 }

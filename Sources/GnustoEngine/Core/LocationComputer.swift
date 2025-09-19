@@ -7,26 +7,26 @@
 /// ```swift
 /// static let enchantedForestComputer = LocationComputer(for: .enchantedForest) {
 ///     locationProperty(.description) { context in
-///         let timeOfDay = try await context.gameState.value(of: .timeOfDay) ?? "day"
+///         let timeOfDay = await context.gameState.value(of: .timeOfDay) ?? "day"
 ///         let weather = context.location.properties[.weather]?.stringValue ?? "clear"
 ///         return .string(timeOfDay == "night" ? "Dark woods loom." : "Sunlight filters through trees.")
 ///     }
 ///     
 ///     locationProperty(.isLit) { context in
-///         let timeOfDay = try await context.gameState.value(of: .timeOfDay) ?? "day"
+///         let timeOfDay = await context.gameState.value(of: .timeOfDay) ?? "day"
 ///         return .bool(timeOfDay == "day")
 ///     }
 /// }
 /// ```
 public struct LocationComputer: Sendable {
-    public let compute: @Sendable (LocationComputeContext) async throws -> StateValue?
+    public let compute: @Sendable (LocationComputeContext) async -> StateValue?
 
     /// Creates a new LocationComputer with a compute closure.
     ///
     /// - Parameter compute: The function that computes property values for a location.
     ///   Returns `nil` if the property is not handled by this computer.
     public init(
-        compute: @escaping @Sendable (LocationComputeContext) async throws -> StateValue?
+        compute: @escaping @Sendable (LocationComputeContext) async -> StateValue?
     ) {
         self.compute = compute
     }
@@ -43,24 +43,24 @@ public struct LocationComputer: Sendable {
     /// ```swift
     /// static let enchantedForestComputer = LocationComputer(for: .enchantedForest) {
     ///     locationProperty(.description) { context in
-    ///         let timeOfDay = try await context.gameState.value(of: .timeOfDay) ?? "day"
+    ///         let timeOfDay = await context.gameState.value(of: .timeOfDay) ?? "day"
     ///         return .string(timeOfDay == "night" ? "Dark woods loom." : "Sunlight filters through trees.")
     ///     }
     ///     
     ///     locationProperty(.isLit) { context in
-    ///         let timeOfDay = try await context.gameState.value(of: .timeOfDay) ?? "day"
+    ///         let timeOfDay = await context.gameState.value(of: .timeOfDay) ?? "day"
     ///         return .bool(timeOfDay == "day")
     ///     }
     /// }
     /// ```
     public init(
         for locationID: LocationID,
-        @LocationComputeMatcherBuilder _ matchers: @Sendable @escaping () async throws -> [LocationComputeMatcher]
+        @LocationComputeMatcherBuilder _ matchers: @Sendable @escaping () async -> [LocationComputeMatcher]
     ) {
         self.compute = { context in
-            let matcherList = try await matchers()
+            let matcherList = await matchers()
             for matcher in matcherList {
-                if let result = try await matcher(context) {
+                if let result = await matcher(context) {
                     return result
                 }
             }
@@ -72,7 +72,7 @@ public struct LocationComputer: Sendable {
 // MARK: - Property Matching Result Builder
 
 /// A type alias for context-aware location property matcher functions.
-public typealias LocationComputeMatcher = (LocationComputeContext) async throws -> StateValue?
+public typealias LocationComputeMatcher = (LocationComputeContext) async -> StateValue?
 
 /// Result builder for creating clean, declarative location property computing.
 ///
@@ -80,12 +80,12 @@ public typealias LocationComputeMatcher = (LocationComputeContext) async throws 
 /// ```swift
 /// static let enchantedForestComputer = LocationComputer(for: .enchantedForest) {
 ///     locationProperty(.description) { context in
-///         let timeOfDay = try await context.gameState.value(of: .timeOfDay) ?? "day"
+///         let timeOfDay = await context.gameState.value(of: .timeOfDay) ?? "day"
 ///         return .string(timeOfDay == "night" ? "Dark woods loom." : "Sunlight filters through trees.")
 ///     }
 ///     
 ///     locationProperty(.isLit) { context in
-///         let timeOfDay = try await context.gameState.value(of: .timeOfDay) ?? "day"
+///         let timeOfDay = await context.gameState.value(of: .timeOfDay) ?? "day"
 ///         return .bool(timeOfDay == "day")
 ///     }
 /// }
@@ -107,11 +107,11 @@ public struct LocationComputeMatcherBuilder {
 /// - Returns: A LocationComputeMatcher that can be used in the result builder
 public func locationProperty(
     _ properties: LocationPropertyID...,
-    result: @escaping (LocationComputeContext) async throws -> StateValue?
+    result: @escaping (LocationComputeContext) async -> StateValue?
 ) -> LocationComputeMatcher {
     { context in
         if properties.contains(context.propertyID) {
-            try await result(context)
+            await result(context)
         } else {
             nil
         }

@@ -39,14 +39,14 @@ public struct GiveActionHandler: ActionHandler {
 
         if gifts.isEmpty {
             throw await ActionResponse.feedback(
-                context.command.preposition == .to ?
-                    context.msg.giveWhatToRecipient(recipient.withDefiniteArticle) :
-                    context.msg.giveWhatToWhom()
+                context.command.preposition == .to
+                    ? context.msg.giveWhatToRecipient(recipient.withDefiniteArticle)
+                    : context.msg.giveWhatToWhom()
             )
         }
 
         // Validate recipient exists and is a character
-        guard try await recipient.isCharacter else {
+        guard await recipient.isCharacter else {
             throw ActionResponse.feedback(
                 context.msg.canOnlyDoCharacters(context.command)
             )
@@ -58,14 +58,14 @@ public struct GiveActionHandler: ActionHandler {
         // Process each object individually
         for gift in gifts {
             do {
-                guard try await gift.playerIsHolding else {
+                guard await gift.playerIsHolding else {
                     throw await ActionResponse.feedback(
                         context.msg.youDontHave(gift.withDefiniteArticle)
                     )
                 }
 
                 // Move item to recipient
-                try await allStateChanges.append(
+                await allStateChanges.append(
                     gift.move(to: .item(recipient.id)),
                     gift.setFlag(.isTouched)
                 )
@@ -82,20 +82,21 @@ public struct GiveActionHandler: ActionHandler {
 
         // Mark recipient as touched if any items were given
         if givenItems.isNotEmpty {
-            try await allStateChanges.append(
+            await allStateChanges.append(
                 recipient.setFlag(.isTouched)
             )
         }
 
         // Generate appropriate message
-        let message = if givenItems.isEmpty {
-            context.msg.youAreEmptyHanded()
-        } else {
-            await context.msg.itemGivenTo(
-                givenItems.listWithDefiniteArticles() ?? "",
-                recipient: recipient.withDefiniteArticle
-            )
-        }
+        let message =
+            if givenItems.isEmpty {
+                context.msg.youAreEmptyHanded()
+            } else {
+                await context.msg.itemGivenTo(
+                    givenItems.listWithDefiniteArticles() ?? "",
+                    recipient: recipient.withDefiniteArticle
+                )
+            }
 
         return ActionResult(
             message: message,

@@ -42,13 +42,13 @@ struct ItemProxyRelativeValueTests {
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         // When: Getting relative values
-        let lowItem = try await engine.item("lowItem")
-        let mediumItem = try await engine.item("mediumItem")
-        let highItem = try await engine.item("highItem")
+        let lowItem = await engine.item("lowItem")
+        let mediumItem = await engine.item("mediumItem")
+        let highItem = await engine.item("highItem")
 
-        let lowRelativeValue = try await lowItem.relativeValue
-        let mediumRelativeValue = try await mediumItem.relativeValue
-        let highRelativeValue = try await highItem.relativeValue
+        let lowRelativeValue = await lowItem.relativeValue
+        let mediumRelativeValue = await mediumItem.relativeValue
+        let highRelativeValue = await highItem.relativeValue
 
         // Then: Values should use smart distribution
         // With values 5, 50, 100, the low item (5) actually falls into worthless range
@@ -65,8 +65,8 @@ struct ItemProxyRelativeValueTests {
         )
 
         // When: Getting relative value
-        let item = try await engine.item("axe")
-        let relativeValue = try await item.relativeValue
+        let item = await engine.item("axe")
+        let relativeValue = await item.relativeValue
 
         // Then: Should return 0.5 (default for edge cases)
         #expect(relativeValue == 0.5)
@@ -106,8 +106,8 @@ struct ItemProxyRelativeValueTests {
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         // When: Getting relative values
-        let firstItem = try await engine.item("item1")
-        let relativeValue = try await firstItem.relativeValue
+        let firstItem = await engine.item("item1")
+        let relativeValue = await firstItem.relativeValue
 
         // Then: Should return 0.5 (default when all values equal)
         #expect(relativeValue == 0.5)
@@ -179,12 +179,12 @@ struct ItemProxyRelativeValueTests {
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         // When: Getting relative value of test item
-        let item = try await engine.item("testItem")
-        let relativeValue = try await item.relativeValue
+        let item = await engine.item("testItem")
+        let relativeValue = await item.relativeValue
 
         // Then: Should be low in normal range (outlier filtered out)
         #expect(relativeValue == 0.3945054945054945)
-        #expect(try await item.relativeValueCategory == .low)
+        #expect(await item.relativeValueCategory == .low)
     }
 
     // MARK: - Relative Weapon Damage Tests
@@ -226,13 +226,13 @@ struct ItemProxyRelativeValueTests {
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         // When: Getting relative weapon damage
-        let weak = try await engine.item("weakWeapon")
-        let medium = try await engine.item("mediumWeapon")
-        let strong = try await engine.item("strongWeapon")
+        let weak = await engine.item("weakWeapon")
+        let medium = await engine.item("mediumWeapon")
+        let strong = await engine.item("strongWeapon")
 
-        let weakRelativeDamage = try await weak.relativeWeaponDamage
-        let mediumRelativeDamage = try await medium.relativeWeaponDamage
-        let strongRelativeDamage = try await strong.relativeWeaponDamage
+        let weakRelativeDamage = await weak.relativeWeaponDamage
+        let mediumRelativeDamage = await medium.relativeWeaponDamage
+        let strongRelativeDamage = await strong.relativeWeaponDamage
 
         // Then: Damage should use smart distribution, clustering middle values
         // With damage 2, 10, 20, algorithm prevents artificial spreading to extremes
@@ -268,11 +268,11 @@ struct ItemProxyRelativeValueTests {
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         // When: Getting relative weapon damage
-        let weaponItem = try await engine.item("weapon")
-        let bookItem = try await engine.item("nonWeapon")
+        let weaponItem = await engine.item("weapon")
+        let bookItem = await engine.item("nonWeapon")
 
-        let weaponRelativeDamage = try await weaponItem.relativeWeaponDamage
-        let bookRelativeDamage = try await bookItem.relativeWeaponDamage
+        let weaponRelativeDamage = await weaponItem.relativeWeaponDamage
+        let bookRelativeDamage = await bookItem.relativeWeaponDamage
 
         // Then: Weapon should be high, book should be low
         #expect(abs(weaponRelativeDamage - 0.78) < 0.01)
@@ -356,13 +356,13 @@ struct ItemProxyRelativeValueTests {
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         // When: Getting relative values for different percentiles
-        let lowItem = try await engine.item("item1")  // Value 10, should be low
-        let midItem = try await engine.item("item4")  // Value 40, should be medium
-        let highItem = try await engine.item("item7")  // Value 70, should be high
+        let lowItem = await engine.item("item1")  // Value 10, should be low
+        let midItem = await engine.item("item4")  // Value 40, should be medium
+        let highItem = await engine.item("item7")  // Value 70, should be high
 
-        let lowRelative = try await lowItem.relativeValue
-        let midRelative = try await midItem.relativeValue
-        let highRelative = try await highItem.relativeValue
+        let lowRelative = await lowItem.relativeValue
+        let midRelative = await midItem.relativeValue
+        let highRelative = await highItem.relativeValue
 
         // Then: Should distribute with smart scaling that prevents artificial extremes
         // With values 0-80, the algorithm uses meaningful distribution
@@ -414,13 +414,13 @@ struct ItemProxyRelativeValueTests {
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         // When: Getting rough values
-        let valuable = try await engine.item("valuableItem")
-        let weapon = try await engine.item("weaponItem")
-        let balanced = try await engine.item("startItem")
+        let valuable = await engine.item("valuableItem")
+        let weapon = await engine.item("weaponItem")
+        let balanced = await engine.item("startItem")
 
-        let valuableRough = try await valuable.roughValue
-        let weaponRough = try await weapon.roughValue
-        let balancedRough = try await balanced.roughValue
+        let valuableRough = await valuable.roughValue
+        let weaponRough = await weapon.roughValue
+        let balancedRough = await balanced.roughValue
 
         // Then: Should use the higher relative value
         // Valuable item should be high due to value
@@ -450,8 +450,8 @@ struct ItemProxyRelativeValueTests {
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         // When: Getting rough value for single item
-        let item = try await engine.item("startItem")
-        let roughValue = try await item.roughValue
+        let item = await engine.item("startItem")
+        let roughValue = await item.roughValue
 
         // Then: Should return medium (both relatives return 0.5)
         #expect(roughValue == .medium)
@@ -493,13 +493,13 @@ struct ItemProxyRelativeValueTests {
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         // When: Getting category values
-        let lowItem = try await engine.item("lowItem")
-        let mediumItem = try await engine.item("mediumItem")
-        let highItem = try await engine.item("highItem")
+        let lowItem = await engine.item("lowItem")
+        let mediumItem = await engine.item("mediumItem")
+        let highItem = await engine.item("highItem")
 
-        let lowCategory = try await lowItem.relativeValueCategory
-        let mediumCategory = try await mediumItem.relativeValueCategory
-        let highCategory = try await highItem.relativeValueCategory
+        let lowCategory = await lowItem.relativeValueCategory
+        let mediumCategory = await mediumItem.relativeValueCategory
+        let highCategory = await highItem.relativeValueCategory
 
         // Then: Categories should reflect smart distribution (reserving extremes for outliers)
         // With values 5, 50, 100, the low value (5) is actually worthless relative to the range
@@ -545,13 +545,13 @@ struct ItemProxyRelativeValueTests {
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         // When: Getting category values
-        let weak = try await engine.item("weakWeapon")
-        let medium = try await engine.item("mediumWeapon")
-        let strong = try await engine.item("strongWeapon")
+        let weak = await engine.item("weakWeapon")
+        let medium = await engine.item("mediumWeapon")
+        let strong = await engine.item("strongWeapon")
 
-        let weakCategory = try await weak.relativeWeaponDamageCategory
-        let mediumCategory = try await medium.relativeWeaponDamageCategory
-        let strongCategory = try await strong.relativeWeaponDamageCategory
+        let weakCategory = await weak.relativeWeaponDamageCategory
+        let mediumCategory = await medium.relativeWeaponDamageCategory
+        let strongCategory = await strong.relativeWeaponDamageCategory
 
         // Then: Categories should reflect smart distribution
         // With damage 2, 10, 20, the weak weapon (2) is actually worthless relative to the range
@@ -603,17 +603,17 @@ struct ItemProxyRelativeValueTests {
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         // When: Getting categories for items in different percentile ranges
-        let worthlessItem = try await engine.item(ItemID("item0"))  // Should be in 0-20th percentile
-        let lowItem = try await engine.item(ItemID("item2"))  // Should be in 20-40th percentile
-        let mediumItem = try await engine.item(ItemID("item4"))  // Should be in 40-60th percentile
-        let highItem = try await engine.item(ItemID("item7"))  // Should be in 60-80th percentile
-        let pricelessItem = try await engine.item(ItemID("item9"))  // Should be in 80-100th percentile
+        let worthlessItem = await engine.item(ItemID("item0"))  // Should be in 0-20th percentile
+        let lowItem = await engine.item(ItemID("item2"))  // Should be in 20-40th percentile
+        let mediumItem = await engine.item(ItemID("item4"))  // Should be in 40-60th percentile
+        let highItem = await engine.item(ItemID("item7"))  // Should be in 60-80th percentile
+        let pricelessItem = await engine.item(ItemID("item9"))  // Should be in 80-100th percentile
 
-        let worthlessCategory = try await worthlessItem.relativeValueCategory
-        let lowCategory = try await lowItem.relativeValueCategory
-        let mediumCategory = try await mediumItem.relativeValueCategory
-        let highCategory = try await highItem.relativeValueCategory
-        let pricelessCategory = try await pricelessItem.relativeValueCategory
+        let worthlessCategory = await worthlessItem.relativeValueCategory
+        let lowCategory = await lowItem.relativeValueCategory
+        let mediumCategory = await mediumItem.relativeValueCategory
+        let highCategory = await highItem.relativeValueCategory
+        let pricelessCategory = await pricelessItem.relativeValueCategory
 
         // Then: All 5 categories should be represented correctly
         #expect(worthlessCategory == .worthless)
@@ -672,11 +672,11 @@ struct ItemProxyRelativeValueTests {
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         // When: Getting rough values
-        let worthless = try await engine.item("worthlessTest")
-        let priceless = try await engine.item("pricelessTest")
+        let worthless = await engine.item("worthlessTest")
+        let priceless = await engine.item("pricelessTest")
 
-        let worthlessRough = try await worthless.roughValue
-        let pricelessRough = try await priceless.roughValue
+        let worthlessRough = await worthless.roughValue
+        let pricelessRough = await priceless.roughValue
 
         // Then: Should use the 5-category system correctly
         #expect(worthlessRough == .worthless)

@@ -116,6 +116,14 @@ extension GameState {
     private mutating func apply(change: StateChange) throws {
         switch change {
 
+        // MARK: - GameEngine State Changes
+
+        case .requestGameQuit:
+            break
+
+        case .requestGameRestart:
+            break
+
         // MARK: - Item State Changes
 
         case .moveItem(let itemID, let newParent):

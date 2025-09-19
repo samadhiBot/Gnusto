@@ -69,7 +69,7 @@ struct GameEngineActionResultTests {
         expectNoDifference(output, "Lamp activated with multiple changes!")
 
         // And: State changes should be applied
-        let finalLamp = try await engine.item("lamp")
+        let finalLamp = await engine.item("lamp")
         #expect(await finalLamp.hasFlag(.isOn) == true)
         #expect(await finalLamp.hasFlag(.isTouched) == true)
     }
@@ -168,17 +168,18 @@ struct GameEngineActionResultTests {
         expectNoDifference(output, "Control panel activated! Emergency systems online.")
 
         // State changes applied
-        let finalPanel = try await engine.item("panel")
+        let finalPanel = await engine.item("panel")
         #expect(await finalPanel.hasFlag(.isOn) == true)
         #expect(await finalPanel.hasFlag(.isTouched) == true)
 
         // Side effects processed
         let finalState = await engine.gameState
         #expect(
-            finalState.activeFuses["emergencyFuse"] == FuseState(
-                turns: 3,
-                state: [:]
-            )
+            finalState.activeFuses["emergencyFuse"]
+                == FuseState(
+                    turns: 3,
+                    state: [:]
+                )
         )
     }
 
@@ -326,7 +327,7 @@ struct GameEngineActionResultTests {
         )
 
         // State changes applied
-        let finalDevice = try await engine.item("device")
+        let finalDevice = await engine.item("device")
         #expect(await finalDevice.hasFlag(.isOn) == true)
         #expect(await finalDevice.hasFlag(.isTouched) == true)
 
@@ -380,8 +381,8 @@ struct GameEngineActionResultTests {
         let output = await mockIO.flush()
         expectNoDifference(output, "Counter incremented three times.")
 
-        let finalCounter = try await engine.item("counter")
-        #expect(try await finalCounter.property(.testCounter) == .int(3))
+        let finalCounter = await engine.item("counter")
+        #expect(await finalCounter.property(.testCounter) == .int(3))
 
         // And: Change history should preserve order
         let history = await engine.changeHistory
@@ -556,7 +557,7 @@ struct GameEngineActionResultTests {
 
         // And: All changes should be applied
         for i in 1...20 {
-            let item = try await engine.item(ItemID("item\(i)"))
+            let item = await engine.item(ItemID("item\(i)"))
             #expect(await item.hasFlag(.isTouched) == true)
         }
 
@@ -640,7 +641,7 @@ struct GameEngineActionResultTests {
         let output = await mockIO.flush()
         expectNoDifference(output, "Device fully activated.")
 
-        let finalDevice = try await engine.item("device")
+        let finalDevice = await engine.item("device")
         #expect(await finalDevice.hasFlag(.isOn) == true)
         #expect(await engine.hasFlag("deviceActivated") == true)
 
@@ -695,8 +696,8 @@ struct GameEngineActionResultTests {
         )
 
         // And: State should be updated
-        let finalCoin = try await engine.item("coin")
-        #expect(try await finalCoin.parent == .player)
+        let finalCoin = await engine.item("coin")
+        #expect(await finalCoin.parent == .player)
 
         // And: Pronouns should be updated
         let pronoun = await engine.gameState.pronoun
@@ -741,8 +742,8 @@ struct GameEngineActionResultTests {
         )
 
         // And: Final state should reflect both actions
-        let finalLamp = try await engine.item("lamp")
-        #expect(try await finalLamp.parent == .player)
+        let finalLamp = await engine.item("lamp")
+        #expect(await finalLamp.parent == .player)
         #expect(await finalLamp.hasFlag(.isOn) == true)
         #expect(await finalLamp.hasFlag(.isTouched) == true)
     }

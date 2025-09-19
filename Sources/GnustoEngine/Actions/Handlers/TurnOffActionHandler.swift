@@ -46,7 +46,7 @@ public struct TurnOffActionHandler: ActionHandler {
             )
         }
 
-        return try await ActionResult(
+        return await ActionResult(
             context.msg.lightIsNowOff(targetItem.withDefiniteArticle),
             targetItem.setFlag(.isTouched),
             targetItem.clearFlag(.isOn)

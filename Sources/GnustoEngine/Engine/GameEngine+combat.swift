@@ -35,13 +35,14 @@ extension GameEngine {
     public func enemyAttacks(
         enemy: ItemProxy,
         playerWeapon: ItemProxy? = nil
-    ) async throws -> ActionResult {
-        let playerWeapon = if let playerWeapon {
-            playerWeapon
-        } else {
-            try await player.preferredWeapon
-        }
-        return try await ActionResult(
+    ) async -> ActionResult {
+        let playerWeapon =
+            if let playerWeapon {
+                playerWeapon
+            } else {
+                await player.preferredWeapon
+            }
+        return await ActionResult(
             combatMessenger(for: enemy.id).enemyAttacks(
                 enemy: enemy,
                 playerWeapon: playerWeapon,
@@ -73,18 +74,20 @@ extension GameEngine {
         enemy: ItemProxy,
         playerWeapon: ItemProxy?,
         enemyWeapon: ItemProxy?,
-    ) async throws -> ActionResult {
-        let playerWeapon = if let playerWeapon {
-            playerWeapon
-        } else {
-            try await player.preferredWeapon
-        }
-        let enemyWeapon = if let enemyWeapon {
-            enemyWeapon
-        } else {
-            try await enemy.preferredWeapon
-        }
-        return try await ActionResult(
+    ) async -> ActionResult {
+        let playerWeapon =
+            if let playerWeapon {
+                playerWeapon
+            } else {
+                await player.preferredWeapon
+            }
+        let enemyWeapon =
+            if let enemyWeapon {
+                enemyWeapon
+            } else {
+                await enemy.preferredWeapon
+            }
+        return await ActionResult(
             combatMessenger(for: enemy.id).playerAttacks(
                 enemy: enemy,
                 playerWeapon: playerWeapon,
@@ -114,16 +117,17 @@ extension GameEngine {
     ///           state changes, and side effects
     /// - Throws: `ActionResponse.internalEngineError` if not currently in combat,
     ///           or other `ActionResponse` errors from combat processing
-    func getCombatResult(for command: Command) async throws -> ActionResult {
+    func getCombatResult(for command: Command) async -> ActionResult {
         guard let combatState else {
-            throw ActionResponse.internalEngineError("processCombatTurn invalid state")
+            assertionFailure("GameEngine.processCombatTurn invalid state")
+            return .yield
         }
 
         // Get the combat system for this enemy
         let combatSystem = combatSystem(versus: combatState.enemyID)
 
         // Process the combat turn through the system
-        return try await combatSystem.processCombatTurn(
+        return await combatSystem.processCombatTurn(
             playerAction: getPlayerAction(for: command, in: combatState),
             in: ActionContext(command, self)
         )
@@ -160,7 +164,7 @@ extension GameEngine {
     func getPlayerAction(
         for command: Command,
         in combatState: CombatState
-    ) async throws -> PlayerAction {
+    ) async -> PlayerAction {
         switch true {
         case command.hasIntent(.attack, .burn, .cut, .eat):
             .attack
@@ -191,34 +195,16 @@ extension GameEngine {
     ///
     /// - Parameter enemy: The enemy currently engaged in combat
     /// - Returns: `true` if combat should end, `false` if it should continue
-    func shouldEndCombat(enemy: ItemProxy) async throws -> Bool {
+    func shouldEndCombat(enemy: ItemProxy) async -> Bool {
         // Check if enemy is dead or unconscious
-        guard try await enemy.isCharacter else { return true }
-
-        do {
-            let isDead = try await enemy.isDead
-            let isUnconscious = try await enemy.isUnconscious
-            if isDead || isUnconscious {
-                return true
-            }
-        } catch {
-            // If we can't get character state, assume combat should end
-            return true
-        }
+        if await !enemy.isAwake { return true }
 
         // Check if player is dead
-        if await isPlayerDead {
-            return true
-        }
+        if await isPlayerDead { return true }
 
         // Check health conditions
-        do {
-            let playerHealth = await player.health
-            let enemyHealth = try await enemy.health
-            return playerHealth <= 0 || enemyHealth <= 0
-        } catch {
-            // If we can't get health, assume one character is dead
-            return true
-        }
+        let playerHealth = await player.health
+        let enemyHealth = await enemy.health
+        return playerHealth <= 0 || enemyHealth <= 0
     }
 }

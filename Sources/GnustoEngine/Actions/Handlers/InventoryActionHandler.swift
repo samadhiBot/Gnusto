@@ -27,7 +27,7 @@ public struct InventoryActionHandler: ActionHandler {
     /// This action does not typically consume game time or cause state changes.
     public func process(context: ActionContext) async throws -> ActionResult {
         // Get inventory item snapshots
-        let inventoryItems = try await context.player.inventory
+        let inventoryItems = await context.player.inventory
 
         // Construct the message
         let message: String

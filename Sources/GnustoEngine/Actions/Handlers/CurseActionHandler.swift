@@ -33,14 +33,15 @@ public struct CurseActionHandler: ActionHandler {
             )
         }
 
-        let message = if try await targetItem.isCharacter {
-            await context.msg.curseCharacter(targetItem.withDefiniteArticle)
-        } else {
-            await context.msg.curseTarget(targetItem.withDefiniteArticle)
-        }
+        let message =
+            if await targetItem.isCharacter {
+                await context.msg.curseCharacter(targetItem.withDefiniteArticle)
+            } else {
+                await context.msg.curseTarget(targetItem.withDefiniteArticle)
+            }
 
         // Cursing at something
-        return try await ActionResult(
+        return await ActionResult(
             message,
             targetItem.setFlag(.isTouched)
         )

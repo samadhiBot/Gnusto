@@ -38,7 +38,7 @@ struct LookUnderActionHandlerTests {
             """
         )
 
-        let finalState = try await engine.item("table")
+        let finalState = await engine.item("table")
         #expect(await finalState.hasFlag(.isTouched) == true)
     }
 
@@ -313,14 +313,14 @@ struct LookUnderActionHandlerTests {
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // Verify chest is not touched initially
-        let initialState = try await engine.item("chest")
+        let initialState = await engine.item("chest")
         #expect(await initialState.hasFlag(.isTouched) == false)
 
         // When
         try await engine.execute("look under chest")
 
         // Then
-        let finalState = try await engine.item("chest")
+        let finalState = await engine.item("chest")
         #expect(await finalState.hasFlag(.isTouched) == true)
 
         let output = await mockIO.flush()
@@ -414,7 +414,7 @@ struct LookUnderActionHandlerTests {
             """
         )
 
-        let finalState = try await engine.item("box")
+        let finalState = await engine.item("box")
         #expect(await finalState.hasFlag(.isTouched) == true)
     }
 
@@ -459,7 +459,7 @@ struct LookUnderActionHandlerTests {
             """
         )
 
-        let finalState = try await engine.item("coin")
+        let finalState = await engine.item("coin")
         #expect(await finalState.hasFlag(.isTouched) == true)
     }
 

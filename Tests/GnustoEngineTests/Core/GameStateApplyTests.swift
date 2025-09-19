@@ -551,40 +551,6 @@ struct GameStateApplyTests {
         #expect(state.changeHistory.first == change)
     }
 
-    // MARK: - Error Handling Tests
-
-    @Test("Apply change to non-existent item")
-    func testApplyChangeToNonExistentItem() throws {
-        var state = createTestGameState()
-
-        let change = StateChange.setItemName(
-            id: "nonExistentItem",
-            name: "new name"
-        )
-
-        #expect(throws: ActionResponse.self) {
-            try state.apply(change)
-        }
-
-        #expect(state.changeHistory.count == 0)
-    }
-
-    @Test("Apply change to non-existent location")
-    func testApplyChangeToNonExistentLocation() throws {
-        var state = createTestGameState()
-
-        let change = StateChange.setLocationName(
-            id: "nonExistentLocation",
-            name: "new name"
-        )
-
-        #expect(throws: ActionResponse.self) {
-            try state.apply(change)
-        }
-
-        #expect(state.changeHistory.count == 0)
-    }
-
     // MARK: - Combat State Tests
 
     @Test("Apply valid set combat state change")

@@ -257,8 +257,8 @@ public actor ConversationManager: Sendable {
         // If we found a topic, create an ASK command
         if let topicItemID {
             do {
-                let characterProxy = try await engine.item(question.characterID)
-                let topicProxy = try await engine.item(topicItemID)
+                let characterProxy = await engine.item(question.characterID)
+                let topicProxy = await engine.item(topicItemID)
 
                 let askCommand = Command(
                     verb: .ask,

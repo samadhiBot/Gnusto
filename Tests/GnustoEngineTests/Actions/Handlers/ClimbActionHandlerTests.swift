@@ -58,7 +58,7 @@ struct ClimbActionHandlerTests {
             """
         )
 
-        let finalState = try await engine.item("tree")
+        let finalState = await engine.item("tree")
         #expect(await finalState.hasFlag(.isTouched) == true)
     }
 
@@ -225,7 +225,7 @@ struct ClimbActionHandlerTests {
             """
         )
 
-        let finalState = try await engine.item("rope")
+        let finalState = await engine.item("rope")
         #expect(await finalState.hasFlag(.isTouched) == true)
     }
 
@@ -258,7 +258,7 @@ struct ClimbActionHandlerTests {
             """
         )
 
-        let finalState = try await engine.item("table")
+        let finalState = await engine.item("table")
         #expect(await finalState.hasFlag(.isTouched) == true)
     }
 
@@ -330,7 +330,7 @@ struct ClimbActionHandlerTests {
         )
 
         // Verify player moved
-        let playerLocation = try await engine.player.location.id
+        let playerLocation = await engine.player.location.id
         #expect(playerLocation == "upperRoom")
     }
 
@@ -354,7 +354,7 @@ struct ClimbActionHandlerTests {
         try await engine.execute("climb wall")
 
         // Then
-        let finalState = try await engine.item("wall")
+        let finalState = await engine.item("wall")
         #expect(await finalState.hasFlag(.isTouched) == true)
     }
 

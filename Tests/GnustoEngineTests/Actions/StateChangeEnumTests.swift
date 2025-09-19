@@ -97,27 +97,6 @@ struct StateChangeEnumTests {
         #expect(change1 != change2)
     }
 
-    // MARK: - StateChange Description Tests
-
-    @Test("StateChange.moveItem description")
-    func testMoveItemDescription() {
-        let change = StateChange.moveItem(id: "lamp", to: .player)
-        let description = change.description
-
-        #expect(description.contains("moveItem"))
-        #expect(description.contains("lamp"))
-        #expect(description.contains("player"))
-    }
-
-    @Test("StateChange.setFlag description")
-    func testSetFlagDescription() {
-        let change = StateChange.setFlag(.isNoOp)
-        let description = change.description
-
-        #expect(description.contains("setFlag"))
-        #expect(description.contains("isNoOp"))
-    }
-
     // MARK: - Complex StateChange Tests
 
     @Test("StateChange.setGlobalInt creation and properties")

@@ -74,24 +74,24 @@ extension Fuse {
             guard
                 let enemyID = state.getItemID("enemyID"),
                 let wakeUpLocationID = state.getLocationID("locationID"),
-                let message = state.getString("message"),
-                let enemy = try? await engine.item(enemyID)
+                let message = state.getString("message")
             else {
                 engine.logger.warning(".enemyWakeUp fuse called without required state")
                 return nil
             }
+            let enemy = await engine.item(enemyID)
 
-            guard try await enemy.isUnconscious else { return nil }
+            guard await enemy.isUnconscious else { return nil }
 
             // Only include a message if the player present when the enemy wakes up
             let wakeUpMessage: String? =
-                if try await engine.player.location == enemy.location {
+                if await engine.player.location == enemy.location {
                     message
                 } else {
                     nil
                 }
 
-            return try await ActionResult(
+            return await ActionResult(
                 message: wakeUpMessage,
                 changes: [
                     enemy.setCharacterAttributes(consciousness: .alert)
@@ -117,16 +117,17 @@ extension Fuse {
             guard
                 let enemyID = state.getItemID("enemyID"),
                 let returnLocationID = state.getLocationID("locationID"),
-                let message = state.getString("message"),
-                let enemy = try? await engine.item(enemyID)
+                let message = state.getString("message")
             else {
                 engine.logger.warning(".enemyReturn fuse called without required state")
                 return nil
             }
 
+            let enemy = await engine.item(enemyID)
+
             // Only include a message if the player is at the return location
             let enemyReturnMessage: String? =
-                if try await engine.player.location.id == returnLocationID {
+                if await engine.player.location.id == returnLocationID {
                     message
                 } else {
                     nil
@@ -157,12 +158,13 @@ extension Fuse {
             // Specific character and effect must be provided in the state
             guard
                 let itemID = state.getItemID("itemID"),
-                let effectName = state.getString("effectName"),
-                let character = try? await engine.item(itemID)
+                let effectName = state.getString("effectName")
             else {
                 engine.logger.warning(".statusEffectExpiry fuse called without required state")
                 return nil
             }
+
+            let character = await engine.item(itemID)
 
             // Determine what type of effect we're dealing with and clear it
             let message: String?
@@ -172,7 +174,7 @@ extension Fuse {
             // General conditions
             case "poisoned":
                 guard
-                    try await character.characterSheet.generalCondition == GeneralCondition.poisoned
+                    await character.characterSheet.generalCondition == GeneralCondition.poisoned
                 else { return nil }
                 message = await determineStatusExpiryMessage(
                     for: character,
@@ -180,11 +182,11 @@ extension Fuse {
                     recoveryMessage:
                         "\(await character.withDefiniteArticle.capitalized) looks healthier as the poison wears off."
                 )
-                stateChange = try await character.setCharacterAttributes(
+                stateChange = await character.setCharacterAttributes(
                     generalCondition: GeneralCondition.normal)
 
             case "cursed":
-                guard try await character.characterSheet.generalCondition == GeneralCondition.cursed
+                guard await character.characterSheet.generalCondition == GeneralCondition.cursed
                 else { return nil }
                 message = await determineStatusExpiryMessage(
                     for: character,
@@ -192,12 +194,12 @@ extension Fuse {
                     recoveryMessage:
                         "\(await character.withDefiniteArticle.capitalized) seems relieved as the curse lifts."
                 )
-                stateChange = try await character.setCharacterAttributes(
+                stateChange = await character.setCharacterAttributes(
                     generalCondition: GeneralCondition.normal)
 
             case "blessed":
                 guard
-                    try await character.characterSheet.generalCondition == GeneralCondition.blessed
+                    await character.characterSheet.generalCondition == GeneralCondition.blessed
                 else { return nil }
                 message = await determineStatusExpiryMessage(
                     for: character,
@@ -205,12 +207,12 @@ extension Fuse {
                     recoveryMessage:
                         "The divine blessing around \(await character.withDefiniteArticle) fades away."
                 )
-                stateChange = try await character.setCharacterAttributes(
+                stateChange = await character.setCharacterAttributes(
                     generalCondition: GeneralCondition.normal)
 
             case "charmed":
                 guard
-                    try await character.characterSheet.generalCondition == GeneralCondition.charmed
+                    await character.characterSheet.generalCondition == GeneralCondition.charmed
                 else { return nil }
                 message = await determineStatusExpiryMessage(
                     for: character,
@@ -218,12 +220,12 @@ extension Fuse {
                     recoveryMessage:
                         "\(await character.withDefiniteArticle.capitalized) shakes off the magical compulsion."
                 )
-                stateChange = try await character.setCharacterAttributes(
+                stateChange = await character.setCharacterAttributes(
                     generalCondition: GeneralCondition.normal)
 
             case "terrified":
                 guard
-                    try await character.characterSheet.generalCondition
+                    await character.characterSheet.generalCondition
                         == GeneralCondition.terrified
                 else { return nil }
                 message = await determineStatusExpiryMessage(
@@ -232,11 +234,11 @@ extension Fuse {
                     recoveryMessage:
                         "\(await character.withDefiniteArticle.capitalized) regains composure as the supernatural fear subsides."
                 )
-                stateChange = try await character.setCharacterAttributes(
+                stateChange = await character.setCharacterAttributes(
                     generalCondition: GeneralCondition.normal)
 
             case "drunk":
-                guard try await character.characterSheet.generalCondition == GeneralCondition.drunk
+                guard await character.characterSheet.generalCondition == GeneralCondition.drunk
                 else { return nil }
                 message = await determineStatusExpiryMessage(
                     for: character,
@@ -244,12 +246,12 @@ extension Fuse {
                     recoveryMessage:
                         "\(await character.withDefiniteArticle.capitalized) sobers up."
                 )
-                stateChange = try await character.setCharacterAttributes(
+                stateChange = await character.setCharacterAttributes(
                     generalCondition: GeneralCondition.normal)
 
             case "diseased":
                 guard
-                    try await character.characterSheet.generalCondition == GeneralCondition.diseased
+                    await character.characterSheet.generalCondition == GeneralCondition.diseased
                 else { return nil }
                 message = await determineStatusExpiryMessage(
                     for: character,
@@ -257,13 +259,13 @@ extension Fuse {
                     recoveryMessage:
                         "\(await character.withDefiniteArticle.capitalized) recovers from the illness."
                 )
-                stateChange = try await character.setCharacterAttributes(
+                stateChange = await character.setCharacterAttributes(
                     generalCondition: GeneralCondition.normal)
 
             // Combat conditions
             case "offbalance", "off-balance":
                 guard
-                    try await character.characterSheet.combatCondition == CombatCondition.offBalance
+                    await character.characterSheet.combatCondition == CombatCondition.offBalance
                 else { return nil }
                 message = await determineStatusExpiryMessage(
                     for: character,
@@ -271,12 +273,12 @@ extension Fuse {
                     recoveryMessage:
                         "\(await character.withDefiniteArticle.capitalized) regains balance."
                 )
-                stateChange = try await character.setCharacterAttributes(
+                stateChange = await character.setCharacterAttributes(
                     combatCondition: CombatCondition.normal)
 
             case "uncertain":
                 guard
-                    try await character.characterSheet.combatCondition == CombatCondition.uncertain
+                    await character.characterSheet.combatCondition == CombatCondition.uncertain
                 else { return nil }
                 message = await determineStatusExpiryMessage(
                     for: character,
@@ -284,12 +286,12 @@ extension Fuse {
                     recoveryMessage:
                         "\(await character.withDefiniteArticle.capitalized) appears more confident."
                 )
-                stateChange = try await character.setCharacterAttributes(
+                stateChange = await character.setCharacterAttributes(
                     combatCondition: CombatCondition.normal)
 
             case "vulnerable":
                 guard
-                    try await character.characterSheet.combatCondition == CombatCondition.vulnerable
+                    await character.characterSheet.combatCondition == CombatCondition.vulnerable
                 else { return nil }
                 message = await determineStatusExpiryMessage(
                     for: character,
@@ -297,11 +299,11 @@ extension Fuse {
                     recoveryMessage:
                         "\(await character.withDefiniteArticle.capitalized) recovers a defensive posture."
                 )
-                stateChange = try await character.setCharacterAttributes(
+                stateChange = await character.setCharacterAttributes(
                     combatCondition: CombatCondition.normal)
 
             case "disarmed":
-                guard try await character.characterSheet.combatCondition == CombatCondition.disarmed
+                guard await character.characterSheet.combatCondition == CombatCondition.disarmed
                 else { return nil }
                 message = await determineStatusExpiryMessage(
                     for: character,
@@ -309,7 +311,7 @@ extension Fuse {
                     recoveryMessage:
                         "\(await character.withDefiniteArticle.capitalized) adapts to fighting without a weapon."
                 )
-                stateChange = try await character.setCharacterAttributes(
+                stateChange = await character.setCharacterAttributes(
                     combatCondition: CombatCondition.normal)
 
             default:
@@ -355,12 +357,6 @@ extension Fuse {
         recoveryMessage: String
     ) async -> String? {
         // Only show message if player is present to witness the recovery
-        do {
-            return try await engine.player.location == character.location ? recoveryMessage : nil
-        } catch {
-            engine.logger.warning(
-                "Failed to determine location for status expiry message: \(error)")
-            return nil
-        }
+        await engine.player.location == character.location ? recoveryMessage : nil
     }
 }

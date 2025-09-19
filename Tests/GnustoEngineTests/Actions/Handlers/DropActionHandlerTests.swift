@@ -38,9 +38,9 @@ struct DropActionHandlerTests {
             """
         )
 
-        let finalState = try await engine.item("book")
-        let startRoom = try await engine.location(.startRoom)
-        #expect(try await finalState.parent == .location(startRoom))
+        let finalState = await engine.item("book")
+        let startRoom = await engine.location(.startRoom)
+        #expect(await finalState.parent == .location(startRoom))
         #expect(await finalState.hasFlag(.isTouched) == true)
     }
 
@@ -113,11 +113,11 @@ struct DropActionHandlerTests {
             """
         )
 
-        let bookState = try await engine.item("book")
-        let coinState = try await engine.item("coin")
-        let startRoom = try await engine.location(.startRoom)
-        #expect(try await bookState.parent == .location(startRoom))
-        #expect(try await coinState.parent == .location(startRoom))
+        let bookState = await engine.item("book")
+        let coinState = await engine.item("coin")
+        let startRoom = await engine.location(.startRoom)
+        #expect(await bookState.parent == .location(startRoom))
+        #expect(await coinState.parent == .location(startRoom))
     }
 
     // MARK: - Validation Testing
@@ -276,9 +276,9 @@ struct DropActionHandlerTests {
             """
         )
 
-        let finalState = try await engine.item("sword")
-        let startRoom = try await engine.location(.startRoom)
-        #expect(try await finalState.parent == .location(startRoom))
+        let finalState = await engine.item("sword")
+        let startRoom = await engine.location(.startRoom)
+        #expect(await finalState.parent == .location(startRoom))
         #expect(await finalState.hasFlag(.isTouched) == true)
     }
 
@@ -328,13 +328,13 @@ struct DropActionHandlerTests {
             """
         )
 
-        let lampState = try await engine.item("lamp")
-        let keyState = try await engine.item("key")
-        let ropeState = try await engine.item("rope")
-        let startRoom = try await engine.location(.startRoom)
-        #expect(try await lampState.parent == .location(startRoom))
-        #expect(try await keyState.parent == .location(startRoom))
-        #expect(try await ropeState.parent == .location(startRoom))
+        let lampState = await engine.item("lamp")
+        let keyState = await engine.item("key")
+        let ropeState = await engine.item("rope")
+        let startRoom = await engine.location(.startRoom)
+        #expect(await lampState.parent == .location(startRoom))
+        #expect(await keyState.parent == .location(startRoom))
+        #expect(await ropeState.parent == .location(startRoom))
     }
 
     @Test("Drop all when player has nothing")
@@ -379,10 +379,10 @@ struct DropActionHandlerTests {
         try await engine.execute("drop hat")
 
         // Then
-        let finalState = try await engine.item("hat")
+        let finalState = await engine.item("hat")
         #expect(await finalState.hasFlag(.isWorn) == false)
-        let startRoom = try await engine.location(.startRoom)
-        #expect(try await finalState.parent == .location(startRoom))
+        let startRoom = await engine.location(.startRoom)
+        #expect(await finalState.parent == .location(startRoom))
     }
 
     @Test("Drop sets isTouched flag")
@@ -406,7 +406,7 @@ struct DropActionHandlerTests {
         try await engine.execute("drop gem")
 
         // Then
-        let finalState = try await engine.item("gem")
+        let finalState = await engine.item("gem")
         #expect(await finalState.hasFlag(.isTouched) == true)
     }
 
@@ -448,11 +448,11 @@ struct DropActionHandlerTests {
             """
         )
 
-        let droppableState = try await engine.item("droppableItem")
-        let nonDroppableState = try await engine.item("nonDroppableItem")
-        let startRoom = try await engine.location(.startRoom)
-        #expect(try await droppableState.parent == .location(startRoom))
-        #expect(try await nonDroppableState.playerIsHolding)
+        let droppableState = await engine.item("droppableItem")
+        let nonDroppableState = await engine.item("nonDroppableItem")
+        let startRoom = await engine.location(.startRoom)
+        #expect(await droppableState.parent == .location(startRoom))
+        #expect(await nonDroppableState.playerIsHolding)
     }
 
     // MARK: - Intent Testing

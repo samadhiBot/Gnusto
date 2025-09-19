@@ -54,12 +54,12 @@ struct ModernizationSuccessTests {
         try await engine.execute("examine modern item")
 
         // Then: ItemProxy shows modern async properties
-        let itemProxy = try await engine.item("modernItem")
+        let itemProxy = await engine.item("modernItem")
         #expect(await itemProxy.name == "modern item")
         #expect(await itemProxy.hasFlag(ItemPropertyID.isTouched) == true)
 
         // Verify parent relationship using pattern matching
-        let parent = try await itemProxy.parent
+        let parent = await itemProxy.parent
         if case .player = parent {
             // Success - item is with player
         } else {
@@ -103,14 +103,14 @@ struct ModernizationSuccessTests {
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         // When: Accessing modern LocationProxy features
-        let brightProxy = try await engine.location("brightRoom")
-        let darkProxy = try await engine.location("darkRoom")
+        let brightProxy = await engine.location("brightRoom")
+        let darkProxy = await engine.location("darkRoom")
 
         // Then: Async properties work correctly
         #expect(await brightProxy.name == "Bright Room")
         #expect(await darkProxy.name == "Dark Room")
-        #expect(try await brightProxy.isLit == true)
-        #expect(try await darkProxy.isLit == false)
+        #expect(await brightProxy.isLit == true)
+        #expect(await darkProxy.isLit == false)
     }
 
     @Test("PlayerProxy demonstrates modern inventory management")
@@ -142,14 +142,14 @@ struct ModernizationSuccessTests {
 
         // Then: PlayerProxy shows modern async inventory
         let playerProxy = await engine.player
-        let inventory = try await playerProxy.inventory
+        let inventory = await playerProxy.inventory
 
         #expect(inventory.count == 2)
         #expect(inventory.contains { $0.id == ItemID("coin") })
         #expect(inventory.contains { $0.id == ItemID("key") })
 
         // Verify player location using modern syntax
-        let currentLocation = try await playerProxy.location
+        let currentLocation = await playerProxy.location
         #expect(currentLocation.id == .startRoom)
     }
 
@@ -179,7 +179,7 @@ struct ModernizationSuccessTests {
         try await engine.execute("turn on device")
 
         // Then: All state changes applied atomically
-        let deviceProxy = try await engine.item("device")
+        let deviceProxy = await engine.item("device")
 
         // Verify device state using modern async flags
         #expect(await deviceProxy.hasFlag(ItemPropertyID.isDevice) == true)
@@ -188,30 +188,11 @@ struct ModernizationSuccessTests {
         #expect(await deviceProxy.hasFlag(ItemPropertyID.isTouched) == true)
 
         // Verify parent using pattern matching
-        let parent = try await deviceProxy.parent
+        let parent = await deviceProxy.parent
         if case .player = parent {
             // Success - device is with player
         } else {
             #expect(Bool(false), "Device should be with player")
-        }
-    }
-
-    // MARK: - Error Handling Modernization
-
-    @Test("Modern error handling with async/await")
-    func testModernErrorHandling() async throws {
-        // Given: Basic game setup
-        let game = MinimalGame()
-
-        let (engine, _) = await GameEngine.test(blueprint: game)
-
-        // When/Then: Modern error expectations
-        await #expect(throws: Error.self) {
-            try await engine.item("nonexistent")
-        }
-
-        await #expect(throws: Error.self) {
-            try await engine.location("nonexistent")
         }
     }
 
@@ -271,8 +252,8 @@ struct ModernizationSuccessTests {
         #expect(output.contains("Got it."))
 
         // Verify modern proxy states
-        let hammerProxy = try await engine.item("hammer")
-        let toolboxProxy = try await engine.item("toolbox")
+        let hammerProxy = await engine.item("hammer")
+        let toolboxProxy = await engine.item("toolbox")
         let playerProxy = await engine.player
 
         // Modern async property checks
@@ -280,8 +261,8 @@ struct ModernizationSuccessTests {
         #expect(await toolboxProxy.name == "toolbox")
 
         // Modern parent relationship checks
-        let hammerParent = try await hammerProxy.parent
-        let toolboxParent = try await toolboxProxy.parent
+        let hammerParent = await hammerProxy.parent
+        let toolboxParent = await toolboxProxy.parent
 
         if case .player = hammerParent, case .player = toolboxParent {
             // Success - both items with player
@@ -290,11 +271,11 @@ struct ModernizationSuccessTests {
         }
 
         // Modern inventory check
-        let inventory = try await playerProxy.inventory
+        let inventory = await playerProxy.inventory
         #expect(inventory.count == 2)
 
         // Modern location check
-        let currentLocation = try await playerProxy.location
+        let currentLocation = await playerProxy.location
         #expect(currentLocation.id == LocationID("workshop"))
         #expect(await currentLocation.name == "Modern Workshop")
     }

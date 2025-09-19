@@ -81,8 +81,8 @@ struct UnlockActionHandlerTests {
             """
         )
 
-        let finalDoor = try await engine.item("door")
-        let finalKey = try await engine.item("brassKey")
+        let finalDoor = await engine.item("door")
+        let finalKey = await engine.item("brassKey")
         #expect(await finalDoor.hasFlag(.isLocked) == false)
         #expect(await finalDoor.hasFlag(.isTouched) == true)
         #expect(await finalKey.hasFlag(.isTouched) == true)
@@ -436,8 +436,8 @@ struct UnlockActionHandlerTests {
         try await engine.execute("unlock lockbox with key")
 
         // Then: Verify state changes
-        let finalLockbox = try await engine.item("lockbox")
-        let finalKey = try await engine.item("steelKey")
+        let finalLockbox = await engine.item("lockbox")
+        let finalKey = await engine.item("steelKey")
 
         #expect(await finalLockbox.hasFlag(.isLocked) == false)
         #expect(await finalLockbox.hasFlag(.isTouched) == true)
@@ -526,8 +526,8 @@ struct UnlockActionHandlerTests {
         )
 
         // Verify both items are unlocked
-        let finalDoor = try await engine.item("door")
-        let finalChest = try await engine.item("chest")
+        let finalDoor = await engine.item("door")
+        let finalChest = await engine.item("chest")
         #expect(await finalDoor.hasFlag(.isLocked) == false)
         #expect(await finalChest.hasFlag(.isLocked) == false)
     }
@@ -565,7 +565,7 @@ struct UnlockActionHandlerTests {
         try await engine.execute("unlock container with key")
 
         // Then: Verify unlocking preserves other properties
-        let finalContainer = try await engine.item("container")
+        let finalContainer = await engine.item("container")
 
         #expect(await finalContainer.hasFlag(.isLocked) == false)
         #expect(await finalContainer.isContainer == true)

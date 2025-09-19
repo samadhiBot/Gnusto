@@ -105,7 +105,7 @@ struct OperaHouse {
     let barHandler = LocationEventHandler(for: .bar) {
         // First: if location is lit, yield to normal processing
         beforeTurn { context, _ in
-            if try await context.location.isLit {
+            if await context.location.isLit {
                 return ActionResult.yield
             }
             return nil  // not handled, try next matcher
@@ -141,7 +141,7 @@ struct OperaHouse {
 
     let cloakHandler = ItemEventHandler(for: .cloak) {
         before(.drop, .insert) { context, _ in
-            guard try await context.player.location.id == .cloakroom else {
+            guard await context.player.location.id == .cloakroom else {
                 throw ActionResponse.feedback(
                     "This isn't the best place to leave a smart cloak lying around."
                 )
@@ -150,13 +150,13 @@ struct OperaHouse {
         }
 
         after { context, command in
-            guard try await context.player.location.id == .cloakroom else {
+            guard await context.player.location.id == .cloakroom else {
                 return nil
             }
 
             if command.hasIntent(.drop, .insert) {
                 var changes = [
-                    try await context.engine.location(.bar).setFlag(.isLit)
+                    await context.location(.bar).setFlag(.isLit)
                 ]
                 if await context.player.score < 1 {
                     changes.append(await context.player.updateScore(by: 1))
@@ -166,7 +166,7 @@ struct OperaHouse {
 
             if command.hasIntent(.take) {
                 return ActionResult(
-                    try await context.engine.location(.bar).clearFlag(.isLit)
+                    await context.location(.bar).clearFlag(.isLit)
                 )
             }
 
@@ -177,7 +177,7 @@ struct OperaHouse {
     let hookHandler = ItemEventHandler(for: .hook) {
         before(.examine) { context, _ in
             let hookDetail =
-                if try await context.item.isHolding(.cloak) {
+                if await context.item.isHolding(.cloak) {
                     "with a cloak hanging on it"
                 } else {
                     "screwed to the wall"
@@ -188,36 +188,37 @@ struct OperaHouse {
 
     let messageHandler = ItemEventHandler(for: .message) {
         before(.examine, .read) { context, _ in
-            guard try await context.player.location.id == .bar else {
-                return nil
+            guard await context.player.location.id == .bar else {
+                return .yield
             }
 
-            let bar = try await context.engine.location(.bar)
+            let bar = await context.location(.bar)
             guard await bar.hasFlag(.isLit) else {
                 throw ActionResponse.feedback("It's too dark to do that.")
             }
 
             let disturbedCount = await context.engine.global(.barMessageDisturbances)?.toInt ?? 0
 
-            await context.engine.requestQuit()
-
-            if disturbedCount < 2 {
-                return ActionResult(
+            return if disturbedCount < 2 {
+                await ActionResult(
                     """
                     The message, neatly marked in the sawdust, reads...
 
                     "You win."
                     """,
-                    await context.player.updateScore(by: 1)
+                    context.player.updateScore(by: 1),
+                    .requestGameQuit
                 )
             } else {
-                throw ActionResponse.feedback(
+                ActionResult(
                     """
                     The message has been carelessly trampled, making it
                     difficult to read. You can just distinguish the words...
 
                     "You lose."
-                    """)
+                    """,
+                    .requestGameQuit
+                )
             }
         }
     }

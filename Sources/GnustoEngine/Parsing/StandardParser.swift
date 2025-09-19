@@ -1219,7 +1219,7 @@ public struct StandardParser: Parser {
                     for itemID in itemIDs {
                         // Only consider this alternative if the item is specifically identified by this modifier
                         // and also has the current noun as part of its name/synonyms
-                        guard let itemProxy = try? await engine.item(itemID) else { continue }
+                        let itemProxy = await engine.item(itemID)
 
                         let itemNameWords = Set(
                             await itemProxy.name.lowercased().split(separator: " ").map(String.init)
@@ -1242,24 +1242,26 @@ public struct StandardParser: Parser {
         // Check for items using the main noun
         if let itemIDs = vocabulary.items[lowercasedNoun] {
             for itemID in itemIDs {
-                if let item = try? await engine.item(itemID) {
-                    potentialEntities.append(.item(item))
-                }
+                let item = await engine.item(itemID)
+                potentialEntities.append(
+                    .item(item)
+                )
             }
         }
 
         // Check for locations
         if let locationID = vocabulary.locationNames[lowercasedNoun] {
-            if let location = try? await engine.location(locationID) {
-                potentialEntities.append(.location(location))
-            }
+            let location = await engine.location(locationID)
+            potentialEntities.append(
+                .location(location)
+            )
         }
 
         // If no entities found in vocabulary, check for universal objects as fallback
         if potentialEntities.isEmpty {
             // Check if the noun matches any universal objects
             if let universalObjects = vocabulary.universals[lowercasedNoun],
-               let closestMatch = universalObjects.closestMatch(to: lowercasedNoun)
+                let closestMatch = universalObjects.closestMatch(to: lowercasedNoun)
             {
                 return .success(.universal(closestMatch))
             }
@@ -1339,7 +1341,7 @@ public struct StandardParser: Parser {
                 // Look through all items to see if any have this full phrase as a synonym
                 for (_, itemIDs) in vocabulary.items {
                     for itemID in itemIDs {
-                        guard let item = try? await engine.item(itemID) else { continue }
+                        let item = await engine.item(itemID)
 
                         // Check if the full phrase matches the item's name or any synonym
                         let itemNameLowercase = await item.name.lowercased()
@@ -1348,9 +1350,10 @@ public struct StandardParser: Parser {
                         if itemNameLowercase == fullPhrase || itemSynonyms.contains(fullPhrase) {
                             // This exact phrase refers to a specific item, but it's not accessible
                             // Return an unresolved reference to trigger "Any such thing lurks beyond your reach."
-                            if let proxy = try? await engine.item(ItemID(fullPhrase)) {
-                                return .success(.item(proxy))
-                            }
+                            let proxy = await engine.item(ItemID(fullPhrase))
+                            return .success(
+                                .item(proxy)
+                            )
                         }
                     }
                 }
@@ -1403,7 +1406,7 @@ public struct StandardParser: Parser {
                 ) { group in
                     for item in itemEntities {
                         group.addTask {
-                            (item, try await item.playerIsHolding)
+                            (item, await item.playerIsHolding)
                         }
                     }
                     var results: [(ItemProxy, Bool)] = []
@@ -1543,7 +1546,7 @@ public struct StandardParser: Parser {
         at currentLocationID: LocationID
     ) async throws -> Bool {
         // Get dynamic parent of container
-        let containerParent = try await container.parent
+        let containerParent = await container.parent
 
         // Check if container is accessible
         let containerAccessible = try await checkItemAccessibility(

@@ -167,7 +167,7 @@ struct GameEngineCombatTests {
         )
 
         // And: Enemy should be marked as touched
-        let finalDragon = try await engine.item("dragon")
+        let finalDragon = await engine.item("dragon")
         #expect(await finalDragon.hasFlag(.isTouched) == true)
     }
 
@@ -269,7 +269,7 @@ struct GameEngineCombatTests {
         expectNoDifference(combatState, expectedSkeleton)
 
         // And: Enemy should be marked as touched
-        let finalSkeleton = try await engine.item("skeleton")
+        let finalSkeleton = await engine.item("skeleton")
         #expect(await finalSkeleton.hasFlag(.isTouched) == true)
     }
 
@@ -331,18 +331,6 @@ struct GameEngineCombatTests {
 
     // MARK: - Get Combat Result Tests
 
-    @Test("getCombatResult throws error when not in combat")
-    func testGetCombatResultThrowsWhenNotInCombat() async throws {
-        let game = MinimalGame()
-        let (engine, _) = await GameEngine.test(blueprint: game)
-
-        let command = Command(verb: .attack)
-
-        await #expect(throws: ActionResponse.self) {
-            try await engine.getCombatResult(for: command)
-        }
-    }
-
     @Test("getCombatResult uses default StandardCombatSystem when none specified")
     func testGetCombatResultUsesDefaultCombatSystem() async throws {
         let goblin = Item(
@@ -392,7 +380,7 @@ struct GameEngineCombatTests {
 
         for verb in attackVerbs {
             let command = Command(verb: verb)
-            let action = try await engine.getPlayerAction(
+            let action = await engine.getPlayerAction(
                 for: command,
                 in: combatState
             )
@@ -409,7 +397,7 @@ struct GameEngineCombatTests {
 
         // Test ask without topic
         let command = Command(verb: .ask)
-        let askAction = try await engine.getPlayerAction(for: command, in: combatState)
+        let askAction = await engine.getPlayerAction(for: command, in: combatState)
         if case .talk(let topic) = askAction {
             #expect(topic == nil)
         } else {
@@ -418,7 +406,7 @@ struct GameEngineCombatTests {
 
         // Test tell - since we can't easily create indirectObject, test basic tell
         let tellCommand = Command(verb: .tell)
-        let tellAction = try await engine.getPlayerAction(for: tellCommand, in: combatState)
+        let tellAction = await engine.getPlayerAction(for: tellCommand, in: combatState)
         if case .talk(let topic) = tellAction {
             #expect(topic == nil)
         } else {
@@ -434,7 +422,7 @@ struct GameEngineCombatTests {
         let combatState = CombatState(enemyID: "enemy", roundCount: 1)
 
         let moveCommand = Command(verb: .move, direction: .north)
-        let action = try await engine.getPlayerAction(for: moveCommand, in: combatState)
+        let action = await engine.getPlayerAction(for: moveCommand, in: combatState)
 
         if case .flee(let direction) = action {
             #expect(direction == .north)
@@ -451,7 +439,7 @@ struct GameEngineCombatTests {
     //        let combatState = CombatState(enemyID: "enemy", roundCount: 1)
     //
     //        let defendCommand = Command(verb: .block)  // Using block as defensive verb
-    //        let action = try await engine.getPlayerAction(for: defendCommand, in: combatState)
+    //        let action = await engine.getPlayerAction(for: defendCommand, in: combatState)
     //        switch action {
     //        case .defend:
     //            // Expected case
@@ -477,10 +465,10 @@ struct GameEngineCombatTests {
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         let combatState = CombatState(enemyID: "enemy", roundCount: 1)
-        let potionProxy = try await engine.item("potion")
+        let potionProxy = await engine.item("potion")
 
         let giveCommand = Command(verb: .give, directObject: .item(potionProxy))
-        let action = try await engine.getPlayerAction(for: giveCommand, in: combatState)
+        let action = await engine.getPlayerAction(for: giveCommand, in: combatState)
 
         if case .useItem(let item) = action {
             #expect(item.id == "potion")
@@ -497,7 +485,7 @@ struct GameEngineCombatTests {
         let combatState = CombatState(enemyID: "enemy", roundCount: 1)
 
         let unknownCommand = Command(verb: .look)
-        let action = try await engine.getPlayerAction(for: unknownCommand, in: combatState)
+        let action = await engine.getPlayerAction(for: unknownCommand, in: combatState)
         switch action {
         case .other:
             // Expected case
@@ -524,8 +512,8 @@ struct GameEngineCombatTests {
 
         let (engine, _) = await GameEngine.test(blueprint: game)
 
-        let enemyProxy = try await engine.item("deadEnemy")
-        let shouldEnd = try await engine.shouldEndCombat(enemy: enemyProxy)
+        let enemyProxy = await engine.item("deadEnemy")
+        let shouldEnd = await engine.shouldEndCombat(enemy: enemyProxy)
         #expect(shouldEnd == true)
     }
 
@@ -544,8 +532,8 @@ struct GameEngineCombatTests {
 
         let (engine, _) = await GameEngine.test(blueprint: game)
 
-        let enemyProxy = try await engine.item("unconsciousEnemy")
-        let shouldEnd = try await engine.shouldEndCombat(enemy: enemyProxy)
+        let enemyProxy = await engine.item("unconsciousEnemy")
+        let shouldEnd = await engine.shouldEndCombat(enemy: enemyProxy)
         #expect(shouldEnd == true)
     }
 
@@ -566,8 +554,8 @@ struct GameEngineCombatTests {
             engine.player.setHealth(to: 0)
         )
 
-        let enemyProxy = try await engine.item("enemy")
-        let shouldEnd = try await engine.shouldEndCombat(enemy: enemyProxy)
+        let enemyProxy = await engine.item("enemy")
+        let shouldEnd = await engine.shouldEndCombat(enemy: enemyProxy)
         #expect(shouldEnd == true)
     }
 
@@ -592,8 +580,8 @@ struct GameEngineCombatTests {
 
         let (engine, _) = await GameEngine.test(blueprint: game)
 
-        let enemyProxy = try await engine.item("enemy")
-        let shouldEnd = try await engine.shouldEndCombat(enemy: enemyProxy)
+        let enemyProxy = await engine.item("enemy")
+        let shouldEnd = await engine.shouldEndCombat(enemy: enemyProxy)
         #expect(shouldEnd == true)
     }
 
@@ -612,8 +600,8 @@ struct GameEngineCombatTests {
 
         let (engine, _) = await GameEngine.test(blueprint: game)
 
-        let enemyProxy = try await engine.item("weakEnemy")
-        let shouldEnd = try await engine.shouldEndCombat(enemy: enemyProxy)
+        let enemyProxy = await engine.item("weakEnemy")
+        let shouldEnd = await engine.shouldEndCombat(enemy: enemyProxy)
         #expect(shouldEnd == true)
     }
 
@@ -638,8 +626,8 @@ struct GameEngineCombatTests {
 
         let (engine, _) = await GameEngine.test(blueprint: game)
 
-        let enemyProxy = try await engine.item("healthyEnemy")
-        let shouldEnd = try await engine.shouldEndCombat(enemy: enemyProxy)
+        let enemyProxy = await engine.item("healthyEnemy")
+        let shouldEnd = await engine.shouldEndCombat(enemy: enemyProxy)
         #expect(shouldEnd == false)
     }
 
@@ -684,7 +672,7 @@ struct GameEngineCombatTests {
 
         // 2. Process combat turn that ends combat
         let command = Command(verb: .attack)
-        let combatResult = try await engine.getCombatResult(for: command)
+        let combatResult = await engine.getCombatResult(for: command)
 
         // Process the result to apply state changes
         try await engine.processActionResult(combatResult)
@@ -744,7 +732,7 @@ struct GameEngineCombatTests {
         // Process multiple combat turns
         for _ in 1...3 {
             let command = Command(verb: .attack)
-            _ = try await engine.getCombatResult(for: command)
+            _ = await engine.getCombatResult(for: command)
 
             // Combat state should persist
             #expect(await engine.isInCombat == true)
@@ -833,52 +821,5 @@ struct GameEngineCombatTests {
             causing your steel sword to drop from shocked fingers.
             """
         )
-    }
-
-    // MARK: - Error Handling Tests
-
-    @Test("combat methods handle invalid items gracefully")
-    func testCombatHandlesInvalidItems() async throws {
-        let (engine, _) = await GameEngine.test()
-
-        // Test with non-existent enemy should throw
-        await #expect(throws: ActionResponse.self) {
-            try await engine.item("nonExistentEnemy")
-        }
-    }
-
-    @Test("combat system handles missing enemy gracefully")
-    func testCombatSystemHandlesMissingEnemy() async throws {
-        let ghost = Item(
-            id: "ghost",
-            .name("ghost"),
-            .characterSheet(.default),
-            .in(.startRoom)
-        )
-
-        let game = MinimalGame(
-            items: ghost
-        )
-
-        let (engine, _) = await GameEngine.test(blueprint: game)
-
-        // Initiate combat
-        let ghostProxy = try await engine.item("ghost")
-        _ = try await engine.playerAttacks(enemy: ghostProxy, playerWeapon: nil, enemyWeapon: nil)
-
-        // Remove the enemy from the game world
-        try await engine.apply(ghostProxy.remove())
-
-        // Combat system should handle missing enemy
-        let command = Command(verb: .attack)
-
-        // This might throw or return a default result depending on StandardCombatSystem implementation
-        // The test verifies it doesn't crash the engine
-        do {
-            _ = try await engine.getCombatResult(for: command)
-        } catch {
-            // Expected if StandardCombatSystem validates enemy existence
-            #expect(error is ActionResponse)
-        }
     }
 }

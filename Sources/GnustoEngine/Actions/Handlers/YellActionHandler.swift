@@ -31,7 +31,7 @@ public struct YellActionHandler: ActionHandler {
             )
         }
 
-        return try await ActionResult(
+        return await ActionResult(
             recipient.response(
                 object: context.msg.yellAtObject,
                 character: context.msg.yellAtCharacter,

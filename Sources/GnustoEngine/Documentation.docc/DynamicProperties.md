@@ -1,18 +1,18 @@
-# Dynamic Properties and the Proxy System
+# Dynamic Properties and Events
 
-Learn how to work with dynamic game objects that evolve and respond to player actions through the powerful proxy system.
+Learn how to work with dynamic game objects that evolve and respond to player actions.
 
 ## Overview
 
-In Gnusto, you define static game objects (items and locations) in separate files within your game target, but once the game is running, you work primarily with **proxy objects** (`ItemProxy`, `LocationProxy`, `PlayerProxy`) that provide access to dynamic, evolving game state.
+In Gnusto, you define static game objects--Items and Locations--within your game target, but once the game is running, you'll be working with dynamic _proxy_ objects: ``ItemProxy``, ``LocationProxy`` and ``PlayerProxy``.
 
-These proxies give you access to objects that can change with every turn in response to actions, environmental factors, time-based events, and game logic. This enables sophisticated interactive fiction mechanics while maintaining Swift 6 concurrency safety.
+These proxies are the key to a living, breathing game world. While your static definitions provide the initial blueprint, proxies give you access to objects that evolve with every turn. They respond to player actions, environmental changes, time-based events, and complex game logic--all while maintaining Swift 6 concurrency safety.
 
 ## Game Structure and Organization
 
-### GameBlueprint: Game Metadata
+### The Game Blueprint
 
-Your `GameBlueprint` implementation contains essential game metadata--not the actual game objects:
+Your ``GameBlueprint`` implementation contains essential game metadata, like the title and introductory text.
 
 ```swift
 public struct CloakOfDarkness: GameBlueprint {
@@ -33,67 +33,55 @@ public struct CloakOfDarkness: GameBlueprint {
 }
 ```
 
-### Static Game Objects: Defined Separately
+### Static Object Definitions
 
-You define your actual game content (items, locations, event handlers) in other files within your game target, organized however you like. Here's a real example from _Cloak of Darkness_:
+You define your game's ``Item`` and ``Location`` objects in logical groupings that represent parts of the world. Looking at the included example games, you'll see several organizational approaches.
+
+The _Zork_ contents are principally organized by map region. However the Thief and Troll objects are complex enough to deserve their own files.
+
+```
+Zork1/
+├── main.swift
+├── World
+│   ├── BeneathHouse.swift
+│   ├── CoalMine.swift
+│   ├── CyclopsHideaway.swift
+│   ├── Dam.swift
+│   ├── Forest.swift
+│   ├── ...
+│   ├── Temple.swift
+│   ├── Thief.swift
+│   ├── Troll.swift
+│   └── Underground.swift
+├── Zork1.swift
+└── ZorkMessenger.swift
+```
+
+_Cloak of Darkness_, on the other hand, is small enough for everything to fit in a single file that represents the contents of the Opera House.
+
+```
+CloakOfDarkness/
+├── CloakOfDarkness.swift
+├── main.swift
+└── OperaHouse.swift
+```
+
+Opening [OperaHouse.swift](https://github.com/samadhiBot/Gnusto/blob/main/Executables/CloakOfDarkness/OperaHouse.swift) reveals the game's static locations and items:
 
 ```swift
 struct OperaHouse {
-    // MARK: - Locations
-
-    let foyer = Location(
-        id: .foyer,
-        .name("Foyer of the Opera House"),
+    // ...
+    let cloakroom = Location(
+        id: .cloakroom,
+        .name("Cloakroom"),
         .description(
             """
-            You are standing in a spacious hall, splendidly decorated in red
-            and gold, with glittering chandeliers overhead. The entrance from
-            the street is to the north, and there are doorways south and west.
+            The walls of this small room were clearly once lined with hooks,
+            though now only one remains. The exit is a door to the east.
             """
         ),
-        .exits(
-            .south(.bar),
-            .west(.cloakroom),
-            .north(
-                blocked: """
-                    You've only just arrived, and besides, the weather outside
-                    seems to be getting worse.
-                    """
-            )
-        ),
+        .exits(.east(.foyer)),
         .inherentlyLit
-    )
-
-    let bar = Location(
-        id: .bar,
-        .name("Bar"),
-        .description(
-            """
-            The bar, much rougher than you'd have guessed after the opulence
-            of the foyer to the north, is completely empty. There seems to
-            be some sort of message scrawled in the sawdust on the floor.
-            """
-        ),
-        .exits(.north(.foyer))
-    )
-
-    // MARK: - Items
-
-    let cloak = Item(
-        id: .cloak,
-        .name("velvet cloak"),
-        .description(
-            """
-            A handsome cloak, of velvet trimmed with satin, and slightly
-            spattered with raindrops. Its blackness is so deep that it
-            almost seems to suck light from the room.
-            """
-        ),
-        .adjectives("handsome", "dark", "black", "velvet", "satin"),
-        .in(.player),
-        .isTakable,
-        .isWearable,
-        .isWorn
     )
 
     let hook = Item(
@@ -103,36 +91,56 @@ struct OperaHouse {
         .omitDescription,
         .isSurface,
         .name("small brass hook"),
-        .synonyms("peg")
+        .synonyms("peg"),
     )
+    // ...
 }
 ```
 
-## From Static Definitions to Dynamic Proxies
+These locations and items represent the state of the game world as the adventure begins. However once a player sets out in your game world, your focus as the game's architect moves beyond the static places and things.
 
-### Dynamic Item Proxies
+The state of the world evolves with every player command. The Gnusto engine translates the player's natural language commands into a stream of events that touch the various locations, items and characters in your game.
 
-Once the game is running, you access these objects through proxies that reflect their current, dynamic state. Here's how event handlers work with real proxies:
+You as the game's architect can anticipate events, and write handlers that respond to them. When a player enters a location, or performs some action there, you can respond. When they interact with an item, you'll receive an event on that item, and can respond however you choose.
+
+This is how you construct layers of dynamic behavior around the locations, items and characters in your game, and this is where the magic happens--where your game world comes alive.
+
+## Dynamic Proxies
+
+When you work with items and locations, you almost never work with the simple ``Item`` or ``Location`` objects directly.
+
+Instead, you'll work with ``ItemProxy``, ``LocationProxy``, and ``PlayerProxy`` objects. These proxies take into account:
+
+- The underlying object's current properties
+- Event handlers that can intervene and modify behavior
+- Property computers that calculate values dynamically
+- The broader context of the living game world
+
+This architecture enables sophisticated interactions while keeping your game definitions clean and declarative.
+
+### Item Event Handlers
+
+``ItemEventHandler`` objects are your primary tool for making items behave dynamically. They intercept player commands and can modify, replace, or enhance the default behavior. Here's how the cloak in _Cloak of Darkness_ responds to being dropped:
 
 ```swift
 let cloakHandler = ItemEventHandler(for: .cloak) {
     before(.drop, .insert) { context, _ in
-        guard try await context.player.location.id == .cloakroom else {
+        guard await context.player.location.id == .cloakroom else {
             throw ActionResponse.feedback(
                 "This isn't the best place to leave a smart cloak lying around."
             )
         }
-        return nil
+        return nil  // Pass control back to default action handling
     }
 
     after { context, command in
-        guard try await context.player.location.id == .cloakroom else {
+        guard await context.player.location.id == .cloakroom else {
             return nil
         }
 
         if command.hasIntent(.drop, .insert) {
             var changes = [
-                try await context.engine.location(.bar).setFlag(.isLit)
+                await context.location(.bar).setFlag(.isLit)
             ]
             if await context.player.score < 1 {
                 changes.append(await context.player.updateScore(by: 1))
@@ -142,7 +150,7 @@ let cloakHandler = ItemEventHandler(for: .cloak) {
 
         if command.hasIntent(.take) {
             return ActionResult(
-                try await context.engine.location(.bar).clearFlag(.isLit)
+                await context.location(.bar).clearFlag(.isLit)
             )
         }
 
@@ -151,21 +159,40 @@ let cloakHandler = ItemEventHandler(for: .cloak) {
 }
 ```
 
-### Dynamic Location Proxies
+Notice how the handler works with proxy objects through the `context` parameter. The `context.player` is a `PlayerProxy`, and `context.player.location` and `context.location(.bar)` are `LocationProxy` objects. These proxies have access to the current, dynamic state of the game world.
 
-Location handlers work with `LocationProxy` objects that provide dynamic location state:
+### Location Event Handlers
+
+``LocationEventHandler`` objects work similarly for locations, allowing you to create rooms that respond to their environment and the player's actions:
 
 ```swift
 let barHandler = LocationEventHandler(for: .bar) {
     // First: if location is lit, yield to normal processing
     beforeTurn { context, _ in
-        if try await context.location.isLit {
+        if await context.location.isLit {
             return ActionResult.yield
         }
         return nil  // not handled, try next matcher
     }
 
-    // Handle commands in the dark
+    // Second: handle north movement in dark
+    beforeTurn(.move) { context, command in
+        if command.direction == .north {
+            return ActionResult.yield
+        } else {
+            return ActionResult(
+                "Blundering around in the dark isn't a good idea!",
+                await context.engine.adjustGlobal(.barMessageDisturbances, by: 2)
+            )
+        }
+    }
+
+    // Third: handle meta commands in dark
+    beforeTurn(.meta) { _, _ in
+        return ActionResult.yield
+    }
+
+    // Fourth: catch-all for other commands in dark
     beforeTurn { context, _ in
         return ActionResult(
             "In the dark? You could easily disturb something!",
@@ -175,16 +202,17 @@ let barHandler = LocationEventHandler(for: .bar) {
 }
 ```
 
-### Dynamic Computed Properties
+The `context.location` here is a `LocationProxy` for the Bar location that knows whether the room is currently light or dark--not just from a static flag, but considering potential light sources, the cloak's magical darkness effect, and any other dynamic factors.
 
-You can define properties that are calculated dynamically based on game state using computers:
+### Computed Properties
+
+While event handlers respond to player commands, ``ItemComputer`` and ``LocationComputer`` property computers calculate dynamic property values on demand based on the current game state. This allows properties like an object `.description` to change as the world evolves:
 
 ```swift
-static let kitchenComputer = LocationComputer(for: .kitchen) {
+let kitchenComputer = LocationComputer(for: .kitchen) {
     locationProperty(.description) { context in
-        let kitchenWindow = context.gameState.items[.kitchenWindow]
-        let isWindowOpen = kitchenWindow?.properties[.isOpen]?.toBool ?? false
-        let windowState = isWindowOpen ? "open" : "slightly ajar"
+        let kitchenWindow = await context.item(.kitchenWindow)
+        let windowState = await kitchenWindow.isOpen ? "open" : "slightly ajar"
         return .string(
             """
             You are in the kitchen of the white house. A table seems to
@@ -198,20 +226,22 @@ static let kitchenComputer = LocationComputer(for: .kitchen) {
 }
 ```
 
+Property computers work seamlessly with the proxy system. When you check the `kitchen.description`, the proxy finds the computed property and uses it. For another object without a computed property, it falls back to the static description.
+
 ## Working with Proxies in Daemons
 
-Daemons use proxies to implement recurring game world events. Here's a real example from Zork 1 where a sword glows when monsters are nearby:
+The ``Daemon`` demonstrates another aspect of the living world. It's a recurring event that happens independently of player actions. It works exclusively with proxy objects to implement time-based behaviors:
 
 ```swift
 static let swordDaemon = Daemon { engine in
-    let currentLocation = try await engine.player.location
+    let currentLocation = await engine.player.location
     var newGlowLevel = 0
 
     // Check for monsters in current location (highest priority)
-    let currentLocationItems = try await currentLocation.items
+    let currentLocationItems = await currentLocation.items
     var monstersInCurrentLocation: [ItemProxy] = []
     for item in currentLocationItems {
-        if try await item.isCharacter {
+        if await item.isCharacter {
             monstersInCurrentLocation.append(item)
         }
     }
@@ -220,15 +250,15 @@ static let swordDaemon = Daemon { engine in
         newGlowLevel = 2  // Very bright glow
     } else {
         // Check adjacent locations for monsters
-        for exit in try await currentLocation.exits {
+        for exit in await currentLocation.exits {
             guard let destination = exit.destinationID else {
                 continue
             }
-            let adjacentLocation = try await engine.location(destination)
-            let adjacentLocationItems = try await adjacentLocation.items
+            let adjacentLocation = await engine.location(destination)
+            let adjacentLocationItems = await adjacentLocation.items
             var monstersInAdjacentLocation: [ItemProxy] = []
             for item in adjacentLocationItems {
-                if try await item.isCharacter {
+                if await item.isCharacter {
                     monstersInAdjacentLocation.append(item)
                 }
             }
@@ -272,20 +302,26 @@ static let swordDaemon = Daemon { engine in
 }
 ```
 
+This daemon creates a sword that responds to the presence of monsters--a perfect example of how proxies enable dynamic, context-aware behavior. The daemon uses `engine.player.location` to get the player's current `LocationProxy`, checks for monsters using `ItemProxy` properties, and explores adjacent locations through more proxy objects.
+
 ## Understanding Dynamic vs Static Properties
+
+The distinction between static and dynamic properties is fundamental to understanding Gnusto's architecture.
 
 ### Static Properties
 
-These describe the state of your game's locations, items, NPCs, etc. at the start of the game. Examples include:
+These describe the initial state of your game world--how things are when the adventure begins:
 
 - Basic flags like `.isTakable`, `.isLightSource`, `.isDevice`
 - Initial names and descriptions
 - Starting locations
 - Base item properties
 
+Static properties are what you define when creating your `Item` and `Location` objects. They're the blueprint.
+
 ### Dynamic Properties
 
-These describe the state of your game's locations, items, NPCs, etc. in realtime, based on an evolving game state and dynamic event handlers and property computers. Examples include:
+These describe the real-time state of your game world as it evolves:
 
 - **Location lighting**: `isLit` considers all light sources present
 - **Item visibility**: `isVisible` accounts for darkness and container states
@@ -293,9 +329,11 @@ These describe the state of your game's locations, items, NPCs, etc. in realtime
 - **Container states**: `isEmpty`, `currentLoad` reflect actual contents
 - **Location accessibility**: Exit availability may change with game state
 
+Dynamic properties are what you access through proxy objects during gameplay. They represent the living world.
+
 ## Key ItemProxy Accessors
 
-Here are some of the most useful `ItemProxy` accessors for dynamic game logic:
+When working with `ItemProxy` objects in your event handlers and daemons, these are the most useful dynamic accessors:
 
 - **`isProvidingLight`**: Whether the item is currently providing light
 - **`isVisible`**: Can the player see this item (affects command recognition)
@@ -309,7 +347,7 @@ Here are some of the most useful `ItemProxy` accessors for dynamic game logic:
 
 ## Key LocationProxy Accessors
 
-Essential `LocationProxy` accessors for dynamic location behavior:
+Essential `LocationProxy` accessors for implementing dynamic location behavior:
 
 - **`isLit`**: Whether the location is currently illuminated
 - **`description`**: Current location description (may change based on state)
@@ -320,19 +358,23 @@ Essential `LocationProxy` accessors for dynamic location behavior:
 
 ## Why Proxies Matter
 
-ItemProxy, LocationProxy and PlayerProxy provide automatic state synchronization. As places and objects evolve over time through player actions, proxies automatically handle state computations as needed. For example, `isLit` considers:
+The proxy system is what transforms your static game definitions into a living, breathing world. Here's why this architecture is so powerful:
 
-- Location's inherent lighting (`.inherentlyLit` flag)
-- All light sources in the location
-- Player's carried light sources
-- Environmental modifiers
+**Automatic State Synchronization**: Proxies automatically compute the current state based on all relevant factors. When you check if a location `isLit`, the proxy considers the room's inherent lighting, all light sources present, items the player is carrying, and any magical effects--all without you having to write that logic explicitly.
+
+**Clean Separation of Concerns**: Your static definitions remain simple and declarative. Dynamic behaviors are added through event handlers and property computers, keeping different aspects of your game logic organized and maintainable.
+
+**Concurrency Safety**: The proxy system handles all the complexity of concurrent state access, ensuring your game remains thread-safe even as it grows more complex.
+
+**Extensibility**: New behaviors can be added without modifying existing code. Want a room that changes description based on time of day? Add a property computer. Need an item that behaves differently when wet? Add an event handler.
 
 ## Next Steps
 
 This article focused on reading and accessing dynamic properties through proxies. For information about modifying game state through proxies, see:
 
-- **State Changes and the action Pipeline**: How to safely modify game state through the action pipeline
+- **State Changes and the Action Pipeline**: How to safely modify game state through the action pipeline
 - **Time-Based Events**: Using daemons and fuses with dynamic properties
 - **Custom Computed Properties**: Adding your own dynamic property calculations
 
-The proxy system is the foundation of Gnusto's dynamic, evolving game world - master it to create sophisticated interactive fiction experiences.
+The proxy system is the foundation of Gnusto's dynamic, evolving game world--master it to create sophisticated interactive fiction experiences.
+

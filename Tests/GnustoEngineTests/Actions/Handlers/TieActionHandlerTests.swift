@@ -38,7 +38,7 @@ struct TieActionHandlerTests {
             """
         )
 
-        let finalState = try await engine.item("rope")
+        let finalState = await engine.item("rope")
         #expect(await finalState.hasFlag(.isTouched) == true)
     }
 
@@ -79,8 +79,8 @@ struct TieActionHandlerTests {
             """
         )
 
-        let finalRope = try await engine.item("rope")
-        let finalPost = try await engine.item("post")
+        let finalRope = await engine.item("rope")
+        let finalPost = await engine.item("post")
         #expect(await finalRope.hasFlag(.isTouched) == true)
         #expect(await finalPost.hasFlag(.isTouched) == true)
     }
@@ -433,7 +433,7 @@ struct TieActionHandlerTests {
         )
 
         // Verify character was touched
-        let finalWizard = try await engine.item("wizard")
+        let finalWizard = await engine.item("wizard")
         let wasTouched = await finalWizard.hasFlag(.isTouched)
         #expect(wasTouched == true)
     }
@@ -461,7 +461,7 @@ struct TieActionHandlerTests {
             """
         )
 
-        let finalTroll = try await engine.item("troll")
+        let finalTroll = await engine.item("troll")
         #expect(await finalTroll.hasFlag(.isTouched) == true)
     }
 
@@ -502,8 +502,8 @@ struct TieActionHandlerTests {
             """
         )
 
-        let finalGuard = try await engine.item("guard")
-        let finalPost = try await engine.item("post")
+        let finalGuard = await engine.item("guard")
+        let finalPost = await engine.item("post")
         let guardTouched = await finalGuard.hasFlag(.isTouched)
         let postTouched = await finalPost.hasFlag(.isTouched)
         #expect(guardTouched == true)
@@ -552,8 +552,8 @@ struct TieActionHandlerTests {
             """
         )
 
-        let finalOrc = try await engine.item("orc")
-        let finalRope = try await engine.item("rope")
+        let finalOrc = await engine.item("orc")
+        let finalRope = await engine.item("rope")
         #expect(await finalOrc.hasFlag(.isTouched) == true)
         #expect(await finalRope.hasFlag(.isTouched) == true)
     }
@@ -597,8 +597,8 @@ struct TieActionHandlerTests {
             """
         )
 
-        let finalMerchant = try await engine.item("merchant")
-        let finalRope = try await engine.item("rope")
+        let finalMerchant = await engine.item("merchant")
+        let finalRope = await engine.item("rope")
         #expect(await finalMerchant.hasFlag(.isTouched) == true)
         #expect(await finalRope.hasFlag(.isTouched) == true)
     }
@@ -842,8 +842,8 @@ struct TieActionHandlerTests {
             """
         )
 
-        let finalWizard = try await engine.item("wizard")
-        let finalGuard = try await engine.item("guard")
+        let finalWizard = await engine.item("wizard")
+        let finalGuard = await engine.item("guard")
         #expect(await finalWizard.hasFlag(.isTouched) == true)
         #expect(await finalGuard.hasFlag(.isTouched) == true)
     }

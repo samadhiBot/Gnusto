@@ -42,7 +42,7 @@ public struct EmptyActionHandler: ActionHandler {
         }
 
         // Get current contents of the container
-        let contents = try await container.contents
+        let contents = await container.contents
 
         guard contents.isNotEmpty else {
             throw ActionResponse.feedback(
@@ -76,7 +76,7 @@ public struct EmptyActionHandler: ActionHandler {
 
         } else {
             // Default: empty into current location
-            let currentLocationID = try await context.player.location.id
+            let currentLocationID = await context.player.location.id
 
             destination = .location(currentLocationID)
 
@@ -89,7 +89,7 @@ public struct EmptyActionHandler: ActionHandler {
 
         // Move all contents to destination
         for item in contents {
-            try await allStateChanges.append(
+            await allStateChanges.append(
                 contentsOf: [
                     item.move(to: destination),
                     item.setFlag(.isTouched),
@@ -99,7 +99,7 @@ public struct EmptyActionHandler: ActionHandler {
 
         // Add standard state changes
         allStateChanges.append(
-            try await container.setFlag(.isTouched)
+            await container.setFlag(.isTouched)
         )
 
         return ActionResult(

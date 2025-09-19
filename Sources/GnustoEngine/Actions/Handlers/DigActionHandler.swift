@@ -29,20 +29,23 @@ public struct DigActionHandler: ActionHandler {
     /// - Digging with bare hands
     /// - Digging specific objects vs. general digging
     public func process(context: ActionContext) async throws -> ActionResult {
-        guard let targetItem = try await context.itemDirectObject(
-            universalMessage: { universal in
-                guard universal.isDiggable else {
-                    throw ActionResponse.cannotDoThat(context)
+        guard
+            let targetItem = try await context.itemDirectObject(
+                universalMessage: { universal in
+                    guard universal.isDiggable else {
+                        throw ActionResponse.cannotDoThat(context)
+                    }
+                    return try await diggingMessage(
+                        in: context, item: universal.withDefiniteArticle)
                 }
-                return try await diggingMessage(in: context, item: universal.withDefiniteArticle)
-            }
-        ) else {
+            )
+        else {
             throw ActionResponse.feedback(
                 context.msg.dig()
             )
         }
 
-        return try await ActionResult(
+        return await ActionResult(
             try await diggingMessage(in: context, item: targetItem.withDefiniteArticle),
             targetItem.setFlag(.isTouched)
         )
@@ -54,10 +57,10 @@ public struct DigActionHandler: ActionHandler {
     ) async throws -> String {
         // Check for digging tool
         if let toolItem = try await context.itemIndirectObject(
-//            failureMessage: <#T##String?#>
-               failureMessage: context.msg.cannotDoWithThat(context.command, item: item)
-           ),
-           try await !toolItem.playerIsHolding
+            //            failureMessage: <#T##String?#>
+            failureMessage: context.msg.cannotDoWithThat(context.command, item: item)
+        ),
+            await !toolItem.playerIsHolding
         {
             throw ActionResponse.itemNotHeld(toolItem)
         }

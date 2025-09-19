@@ -39,7 +39,7 @@ struct ReadActionHandlerTests {
             """
         )
 
-        let finalState = try await engine.item("book")
+        let finalState = await engine.item("book")
         #expect(await finalState.hasFlag(.isTouched) == true)
     }
 
@@ -340,8 +340,8 @@ struct ReadActionHandlerTests {
             """
         )
 
-        let finalState = try await engine.item("leaflet")
-        #expect(try await finalState.playerIsHolding)
+        let finalState = await engine.item("leaflet")
+        #expect(await finalState.playerIsHolding)
     }
 
     @Test("Read non-takable item doesn't auto-take")
@@ -375,9 +375,9 @@ struct ReadActionHandlerTests {
             """
         )
 
-        let finalState = try await engine.item("sign")
-        let startRoom = try await engine.location(.startRoom)
-        #expect(try await finalState.parent == .location(startRoom))
+        let finalState = await engine.item("sign")
+        let startRoom = await engine.location(.startRoom)
+        #expect(await finalState.parent == .location(startRoom))
     }
 
     @Test("Reading sets isTouched flag")
@@ -402,7 +402,7 @@ struct ReadActionHandlerTests {
         try await engine.execute("read manuscript")
 
         // Then
-        let finalState = try await engine.item("manuscript")
+        let finalState = await engine.item("manuscript")
         #expect(await finalState.hasFlag(.isTouched) == true)
     }
 

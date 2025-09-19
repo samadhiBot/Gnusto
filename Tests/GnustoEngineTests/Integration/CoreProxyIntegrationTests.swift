@@ -28,8 +28,8 @@ struct CoreProxyIntegrationTests {
         try await engine.execute("examine test item")
 
         // Then: ItemProxy should reflect changes
-        let itemProxy = try await engine.item("testItem")
-        #expect(try await itemProxy.parent == .player)
+        let itemProxy = await engine.item("testItem")
+        #expect(await itemProxy.parent == .player)
         #expect(await itemProxy.hasFlag(ItemPropertyID.isTouched) == true)
         #expect(await itemProxy.name == "test item")
 
@@ -70,8 +70,8 @@ struct CoreProxyIntegrationTests {
         try await engine.execute("turn on lamp")
 
         // Then: ItemProxy should show correct state
-        let lampProxy = try await engine.item("lamp")
-        #expect(try await lampProxy.parent == .player)
+        let lampProxy = await engine.item("lamp")
+        #expect(await lampProxy.parent == .player)
         #expect(await lampProxy.hasFlag(ItemPropertyID.isOn) == true)
         #expect(await lampProxy.hasFlag(ItemPropertyID.isTouched) == true)
         #expect(await lampProxy.hasFlag(ItemPropertyID.isLightSource) == true)
@@ -104,14 +104,14 @@ struct CoreProxyIntegrationTests {
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         // When: Accessing location proxies
-        let brightProxy = try await engine.location("brightRoom")
-        let darkProxy = try await engine.location("darkRoom")
+        let brightProxy = await engine.location("brightRoom")
+        let darkProxy = await engine.location("darkRoom")
 
         // Then: LocationProxy should show correct properties
         #expect(await brightProxy.name == "Bright Room")
         #expect(await darkProxy.name == "Dark Room")
-        #expect(try await brightProxy.isLit == true)
-        #expect(try await darkProxy.isLit == false)
+        #expect(await brightProxy.isLit == true)
+        #expect(await darkProxy.isLit == false)
     }
 
     @Test("LocationProxy shows correct items")
@@ -140,8 +140,8 @@ struct CoreProxyIntegrationTests {
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         // When: Accessing location items
-        let roomProxy = try await engine.location(.startRoom)
-        let roomItems = try await roomProxy.items
+        let roomProxy = await engine.location(.startRoom)
+        let roomItems = await roomProxy.items
 
         // Then: Should show correct items
         #expect(roomItems.count == 2)
@@ -170,10 +170,10 @@ struct CoreProxyIntegrationTests {
 
         // Then: PlayerProxy should reflect changes
         let playerProxy = await engine.player
-        let currentLocation = try await playerProxy.location
+        let currentLocation = await playerProxy.location
         #expect(currentLocation.id == .startRoom)
 
-        let inventory = try await playerProxy.inventory
+        let inventory = await playerProxy.inventory
         #expect(inventory.count == 1)
         #expect(inventory.first?.id == ItemID("testItem"))
     }
@@ -208,7 +208,7 @@ struct CoreProxyIntegrationTests {
 
         // Then: PlayerProxy should show all items
         let playerProxy = await engine.player
-        let inventory = try await playerProxy.inventory
+        let inventory = await playerProxy.inventory
         #expect(inventory.count == 2)
         #expect(inventory.contains { $0.id == ItemID("coin") })
         #expect(inventory.contains { $0.id == ItemID("key") })
@@ -216,25 +216,6 @@ struct CoreProxyIntegrationTests {
         let output = await mockIO.flush()
         #expect(output.contains("gold coin"))
         #expect(output.contains("silver key"))
-    }
-
-    // MARK: - Proxy Error Handling Tests
-
-    @Test("Proxy error handling works correctly")
-    func testProxyErrorHandling() async throws {
-        // Given
-        let game = MinimalGame()
-
-        let (engine, _) = await GameEngine.test(blueprint: game)
-
-        // When/Then: Accessing non-existent entities should throw
-        await #expect(throws: Error.self) {
-            try await engine.item("nonexistent")
-        }
-
-        await #expect(throws: Error.self) {
-            try await engine.location("nonexistent")
-        }
     }
 
     // MARK: - Proxy Consistency Tests
@@ -258,22 +239,22 @@ struct CoreProxyIntegrationTests {
         try await engine.execute("drop test item")
 
         // Then: All proxies should be consistent
-        let itemProxy = try await engine.item("testItem")
-        let roomProxy = try await engine.location(.startRoom)
+        let itemProxy = await engine.item("testItem")
+        let roomProxy = await engine.location(.startRoom)
         let playerProxy = await engine.player
 
         // Item should be back in room
-        let itemParent = try await itemProxy.parent
+        let itemParent = await itemProxy.parent
         if case .location(let parentLocation) = itemParent {
             #expect(parentLocation.id == .startRoom)
         }
 
         // Room should contain the item
-        let roomItems = try await roomProxy.items
+        let roomItems = await roomProxy.items
         #expect(roomItems.contains { $0.id == ItemID("testItem") })
 
         // Player should not have the item
-        let playerInventory = try await playerProxy.inventory
+        let playerInventory = await playerProxy.inventory
         #expect(playerInventory.isEmpty)
     }
 
@@ -313,14 +294,14 @@ struct CoreProxyIntegrationTests {
         try await engine.execute("take box")
 
         // Then: Container proxy should show correct state
-        let boxProxy = try await engine.item("box")
-        let gemProxy = try await engine.item("gem")
+        let boxProxy = await engine.item("box")
+        let gemProxy = await engine.item("gem")
 
-        #expect(try await boxProxy.parent == .player)
+        #expect(await boxProxy.parent == .player)
         #expect(await boxProxy.hasFlag(ItemPropertyID.isOpen) == true)
-        #expect(try await gemProxy.parent == .player)
+        #expect(await gemProxy.parent == .player)
 
-        let boxContents = try await boxProxy.contents
+        let boxContents = await boxProxy.contents
         #expect(boxContents.isEmpty)  // Gem was taken out
 
         let output = await mockIO.flush()
@@ -350,8 +331,8 @@ struct CoreProxyIntegrationTests {
         try await engine.execute("take heavy rock")
 
         // Then: State should remain unchanged
-        let itemProxy = try await engine.item("heavyItem")
-        let itemParent = try await itemProxy.parent
+        let itemProxy = await engine.item("heavyItem")
+        let itemParent = await itemProxy.parent
 
         if case .location(let parentLocation) = itemParent {
             #expect(parentLocation.id == .startRoom)

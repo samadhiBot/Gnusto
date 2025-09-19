@@ -29,7 +29,7 @@ public struct BlowActionHandler: ActionHandler {
             )
         }
 
-        return try await ActionResult(
+        return await ActionResult(
             context.msg.blowOn(
                 target.withDefiniteArticle
             ),

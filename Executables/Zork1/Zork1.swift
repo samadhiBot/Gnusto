@@ -32,7 +32,7 @@ public struct Zork1: GameBlueprint {
         rng: RandomNumberGenerator & Sendable = SystemRandomNumberGenerator()
     ) {
         self.randomNumberGenerator = rng
-        self.messenger = ZorkMessageProvider(randomNumberGenerator: rng)
+        self.messenger = ZorkMessenger(randomNumberGenerator: rng)
     }
 
     // Note: All game content registration (items, locations, handlers, etc.)

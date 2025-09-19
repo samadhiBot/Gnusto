@@ -13,7 +13,7 @@ struct SequenceExtensionTests {
     func testAsyncCompactMapBasicFunctionality() async throws {
         let numbers = [1, 2, 3, 4, 5]
 
-        let result = try await numbers.asyncCompactMap { number in
+        let result = await numbers.asyncCompactMap { number in
             await Task.yield()  // Simulate async work
             return number > 3 ? number * 2 : nil
         }
@@ -25,8 +25,8 @@ struct SequenceExtensionTests {
     func testAsyncCompactMapEmptySequence() async throws {
         let empty: [Int] = []
 
-        let result = try await empty.asyncCompactMap { number in
-            return number * 2
+        let result = await empty.asyncCompactMap { number in
+            number * 2
         }
 
         #expect(result.isEmpty)
@@ -36,8 +36,8 @@ struct SequenceExtensionTests {
     func testAsyncCompactMapAllNil() async throws {
         let numbers = [1, 2, 3]
 
-        let result = try await numbers.asyncCompactMap { _ in
-            return nil as Int?
+        let result = await numbers.asyncCompactMap { _ in
+            nil as Int?
         }
 
         #expect(result.isEmpty)
@@ -63,7 +63,7 @@ struct SequenceExtensionTests {
     func testAsyncCompactMapOrder() async throws {
         let strings = ["1", "not_a_number", "3", "4", "not_a_number_either", "6"]
 
-        let result = try await strings.asyncCompactMap { string in
+        let result = await strings.asyncCompactMap { string in
             await Task.yield()
             return Int(string)
         }
@@ -77,7 +77,7 @@ struct SequenceExtensionTests {
     func testAsyncFilterBasicFunctionality() async throws {
         let numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 
-        let result = try await numbers.asyncFilter { number in
+        let result = await numbers.asyncFilter { number in
             await Task.yield()  // Simulate async work
             return number % 2 == 0
         }
@@ -89,7 +89,7 @@ struct SequenceExtensionTests {
     func testAsyncFilterEmptySequence() async throws {
         let empty: [Int] = []
 
-        let result = try await empty.asyncFilter { _ in
+        let result = await empty.asyncFilter { _ in
             return true
         }
 
@@ -100,7 +100,7 @@ struct SequenceExtensionTests {
     func testAsyncFilterAllExcluded() async throws {
         let numbers = [1, 2, 3, 4, 5]
 
-        let result = try await numbers.asyncFilter { _ in
+        let result = await numbers.asyncFilter { _ in
             return false
         }
 
@@ -111,7 +111,7 @@ struct SequenceExtensionTests {
     func testAsyncFilterAllIncluded() async throws {
         let numbers = [1, 2, 3, 4, 5]
 
-        let result = try await numbers.asyncFilter { _ in
+        let result = await numbers.asyncFilter { _ in
             return true
         }
 
@@ -138,7 +138,7 @@ struct SequenceExtensionTests {
     func testAsyncFilterOrder() async throws {
         let numbers = [5, 1, 8, 2, 9, 3, 7, 4, 6]
 
-        let result = try await numbers.asyncFilter { number in
+        let result = await numbers.asyncFilter { number in
             await Task.yield()
             return number > 5
         }
@@ -270,7 +270,7 @@ struct SequenceExtensionTests {
         struct TestError: Error, Equatable {}
 
         #expect(throws: TestError.self) {
-             try numbers.contains { number in
+            try numbers.contains { number in
                 if number == 2 {
                     throw TestError()
                 }
@@ -304,11 +304,11 @@ struct SequenceExtensionTests {
         #expect(mapped.last == 2000)
 
         // Test asyncFilter
-        let filtered = try await largeArray.asyncFilter { $0 % 100 == 0 }
+        let filtered = await largeArray.asyncFilter { $0 % 100 == 0 }
         #expect(filtered == [100, 200, 300, 400, 500, 600, 700, 800, 900, 1000])
 
         // Test asyncCompactMap
-        let compactMapped = try await largeArray.asyncCompactMap { $0 > 995 ? $0 : nil }
+        let compactMapped = await largeArray.asyncCompactMap { $0 > 995 ? $0 : nil }
         #expect(compactMapped == [996, 997, 998, 999, 1000])
 
         // Test contains

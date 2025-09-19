@@ -67,7 +67,7 @@ struct KnockActionHandlerTests {
             """
         )
 
-        let finalState = try await engine.item("table")
+        let finalState = await engine.item("table")
         #expect(await finalState.hasFlag(.isTouched))
     }
 
@@ -262,7 +262,7 @@ struct KnockActionHandlerTests {
             """
         )
 
-        let finalState = try await engine.item("chest")
+        let finalState = await engine.item("chest")
         #expect(await finalState.hasFlag(.isTouched))
     }
 
@@ -316,7 +316,7 @@ struct KnockActionHandlerTests {
         try await engine.execute("tap post")
 
         // Then: Verify state changes
-        let finalState = try await engine.item("post")
+        let finalState = await engine.item("post")
         #expect(await finalState.hasFlag(.isTouched))
 
         // Verify message
@@ -385,9 +385,9 @@ struct KnockActionHandlerTests {
         )
 
         // Verify all items were touched
-        let doorState = try await engine.item("door")
-        let boxState = try await engine.item("box")
-        let barrelState = try await engine.item("barrel")
+        let doorState = await engine.item("door")
+        let boxState = await engine.item("box")
+        let barrelState = await engine.item("barrel")
         #expect(await doorState.hasFlag(.isTouched))
         #expect(await boxState.hasFlag(.isTouched))
         #expect(await barrelState.hasFlag(.isTouched))

@@ -51,6 +51,30 @@ public struct ItemEventContext: Sendable {
         self.item = item
         self.engine = engine
     }
+}
+
+extension ItemEventContext {
+    /// Convenience accessor for getting an item proxy by ID.
+    ///
+    /// Provides direct access to any item in the game through the engine,
+    /// allowing event handlers to easily reference and manipulate other items.
+    ///
+    /// - Parameter itemID: The unique identifier of the item to retrieve
+    /// - Returns: A proxy for the specified item
+    public func item(_ itemID: ItemID) async -> ItemProxy {
+        await engine.item(itemID)
+    }
+
+    /// Convenience accessor for getting a location proxy by ID.
+    ///
+    /// Provides direct access to any location in the game through the engine,
+    /// allowing event handlers to easily reference and manipulate other locations.
+    ///
+    /// - Parameter locationID: The unique identifier of the location to retrieve
+    /// - Returns: A proxy for the specified location
+    public func location(_ locationID: LocationID) async -> LocationProxy {
+        await engine.location(locationID)
+    }
 
     /// Convenience accessor for the game engine's message provider.
     ///

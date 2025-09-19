@@ -47,7 +47,7 @@ public struct ItemProxy: Sendable, Identifiable {
     /// - Returns: The property value as a `StateValue`, or `nil` if the property is not set.
     /// - Throws: `ActionResponse.circularDependency` if a computation cycle is detected.
     /// - Throws: An error if there's an issue accessing the computed value.
-    public func property(_ propertyID: ItemPropertyID) async throws -> StateValue? {
+    public func property(_ propertyID: ItemPropertyID) async -> StateValue? {
         // Create a unique computation key
         let computationKey = PropertyComputationTracker.key(for: id, property: propertyID)
 
@@ -63,9 +63,9 @@ public struct ItemProxy: Sendable, Identifiable {
         }
 
         // Compute with tracking
-        return try await PropertyComputationTracker.withTracking(computationKey) {
+        return await PropertyComputationTracker.withTracking(computationKey) {
             guard
-                let computedValue = try await computer.compute(
+                let computedValue = await computer.compute(
                     ItemComputeContext(
                         propertyID: propertyID,
                         item: item,
@@ -84,13 +84,19 @@ public struct ItemProxy: Sendable, Identifiable {
 // MARK: - Convenience Extensions
 
 extension GameEngine {
-    /// Creates an `ItemProxy` for the specified item ID.
+    /// Creates an `ItemProxy` for the `Item` with the specified ID.
+    ///
+    /// If the item is not found in the game state, this method will trigger an assertion failure
+    /// in debug builds and return a placeholder `ItemProxy` with an empty item. This allows the
+    /// game to continue running in release builds while alerting developers to missing item
+    /// references during development.
     ///
     /// - Parameter itemID: The unique identifier of the item.
     /// - Returns: An `ItemProxy` instance for dynamic property access.
-    public func item(_ itemID: ItemID) async throws -> ItemProxy {
+    public func item(_ itemID: ItemID) -> ItemProxy {
         guard let item = gameState.items[itemID] else {
-            throw ActionResponse.unknownItem(itemID)
+            assertionFailure("GameEngine.item(\(itemID)): Item not found")
+            return ItemProxy(item: Item(id: itemID), engine: self)
         }
         return ItemProxy(item: item, engine: self)
     }

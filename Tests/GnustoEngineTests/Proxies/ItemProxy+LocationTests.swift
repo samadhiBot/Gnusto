@@ -30,8 +30,8 @@ struct ItemProxyLocationTests {
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         // When: Getting the item's location
-        let item = try await engine.item("testItem")
-        let location = try await item.location
+        let item = await engine.item("testItem")
+        let location = await item.location
 
         // Then: Location should be the test room
         #expect(location?.id == .testRoom)
@@ -68,8 +68,8 @@ struct ItemProxyLocationTests {
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         // When: Getting the nested item's location
-        let item = try await engine.item("testItem")
-        let location = try await item.location
+        let item = await engine.item("testItem")
+        let location = await item.location
 
         // Then: Location should be the test room (not the container)
         #expect(location?.id == .testRoom)
@@ -113,8 +113,8 @@ struct ItemProxyLocationTests {
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         // When: Getting the deeply nested item's location
-        let item = try await engine.item("sandwich")
-        let location = try await item.location
+        let item = await engine.item("sandwich")
+        let location = await item.location
 
         // Then: Location should be the kitchen (ultimate location)
         #expect(location?.id == .kitchen)
@@ -145,8 +145,8 @@ struct ItemProxyLocationTests {
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         // When: Getting the held item's location
-        let item = try await engine.item("testItem")
-        let location = try await item.location
+        let item = await engine.item("testItem")
+        let location = await item.location
 
         // Then: Location should be the test room (where player is)
         #expect(location?.id == .testRoom)
@@ -184,8 +184,8 @@ struct ItemProxyLocationTests {
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         // When: Getting the nested item's location
-        let item = try await engine.item("testItem")
-        let location = try await item.location
+        let item = await engine.item("testItem")
+        let location = await item.location
 
         // Then: Location should be the test room (where player is)
         #expect(location?.id == .testRoom)
@@ -215,8 +215,8 @@ struct ItemProxyLocationTests {
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         // When: Getting the nowhere item's location
-        let item = try await engine.item("testItem")
-        let location = try await item.location
+        let item = await engine.item("testItem")
+        let location = await item.location
 
         // Then: Location should be nil
         #expect(location == nil)
@@ -284,16 +284,16 @@ struct ItemProxyLocationTests {
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         // When/Then: Test each item's location computation
-        let lampProxy = try await engine.item("lamp")
-        let lampLocation = try await lampProxy.location
+        let lampProxy = await engine.item("lamp")
+        let lampLocation = await lampProxy.location
         #expect(lampLocation?.id == .livingRoom)
 
-        let milkProxy = try await engine.item("milk")
-        let milkLocation = try await milkProxy.location
+        let milkProxy = await engine.item("milk")
+        let milkLocation = await milkProxy.location
         #expect(milkLocation?.id == .kitchen)
 
-        let keysProxy = try await engine.item("keys")
-        let keysLocation = try await keysProxy.location
+        let keysProxy = await engine.item("keys")
+        let keysLocation = await keysProxy.location
         #expect(keysLocation?.id == .livingRoom)  // Where player is
     }
 
@@ -330,23 +330,23 @@ struct ItemProxyLocationTests {
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         // Initial state: item directly in room
-        let item = try await engine.item("testItem")
-        var location = try await item.location
+        let item = await engine.item("testItem")
+        var location = await item.location
         #expect(location?.id == .testRoom)
 
         // Move item to container
         try await engine.execute("put test item in container")
-        location = try await item.location
+        location = await item.location
         #expect(location?.id == .testRoom)  // Still in room, but via container
 
         // Take container (with item inside)
         try await engine.execute("take container")
-        location = try await item.location
+        location = await item.location
         #expect(location?.id == .testRoom)  // Still in room, but now via player
 
         // Take item out of container
         try await engine.execute("take test item")
-        location = try await item.location
+        location = await item.location
         #expect(location?.id == .testRoom)  // Still in room, now directly held by player
     }
 }

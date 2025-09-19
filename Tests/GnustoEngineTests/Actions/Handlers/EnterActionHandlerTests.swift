@@ -59,7 +59,7 @@ struct EnterActionHandlerTests {
         )
 
         // Verify player moved
-        let playerLocation = try await engine.player.location.id
+        let playerLocation = await engine.player.location.id
         #expect(playerLocation == "inside")
     }
 
@@ -113,7 +113,7 @@ struct EnterActionHandlerTests {
         )
 
         // Verify player moved
-        let playerLocation = try await engine.player.location.id
+        let playerLocation = await engine.player.location.id
         #expect(playerLocation == "inside")
     }
 
@@ -167,7 +167,7 @@ struct EnterActionHandlerTests {
         )
 
         // Verify player moved
-        let playerLocation = try await engine.player.location.id
+        let playerLocation = await engine.player.location.id
         #expect(playerLocation == "inside")
     }
 
@@ -221,7 +221,7 @@ struct EnterActionHandlerTests {
         )
 
         // Verify player moved
-        let playerLocation = try await engine.player.location.id
+        let playerLocation = await engine.player.location.id
         #expect(playerLocation == "inside")
     }
 
@@ -297,7 +297,7 @@ struct EnterActionHandlerTests {
         )
 
         // Verify player moved
-        let playerLocation = try await engine.player.location.id
+        let playerLocation = await engine.player.location.id
         #expect(playerLocation == "inside")
     }
 
@@ -524,11 +524,11 @@ struct EnterActionHandlerTests {
         try await engine.execute("enter door")
 
         // Then: Verify door was touched
-        let finalDoorState = try await engine.item("door")
+        let finalDoorState = await engine.item("door")
         #expect(await finalDoorState.hasFlag(.isTouched))
 
         // Verify movement occurred
-        let playerLocation = try await engine.player.location.id
+        let playerLocation = await engine.player.location.id
         #expect(playerLocation == "inside")
     }
 
@@ -583,7 +583,7 @@ struct EnterActionHandlerTests {
         )
 
         // Verify player moved to correct location
-        let playerLocation = try await engine.player.location.id
+        let playerLocation = await engine.player.location.id
         #expect(playerLocation == "office")
     }
 
@@ -671,7 +671,7 @@ struct EnterActionHandlerTests {
         )
 
         // Verify location
-        let playerLocation1 = try await engine.player.location.id
+        let playerLocation1 = await engine.player.location.id
         #expect(playerLocation1 == "shop")
 
         // When: Go back to plaza and enter cave
@@ -698,7 +698,7 @@ struct EnterActionHandlerTests {
         )
 
         // Verify location
-        let playerLocation2 = try await engine.player.location.id
+        let playerLocation2 = await engine.player.location.id
         #expect(playerLocation2 == "cave")
     }
 

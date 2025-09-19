@@ -117,8 +117,8 @@ struct GameEngineDisambiguationTests {
         #expect(handled == true)
 
         // Verify the item was moved to the table
-        let finalNewBook = try await engine.item("newBook")
-        #expect(try await finalNewBook.parent == .item(table.proxy(engine)))
+        let finalNewBook = await engine.item("newBook")
+        #expect(await finalNewBook.parent == .item(table.proxy(engine)))
     }
 
     @Test("Disambiguation response handles case insensitive matching")
@@ -297,11 +297,11 @@ struct GameEngineDisambiguationTests {
         )
 
         // Verify the new book was moved to the table
-        let finalNewBook = try await engine.item("newBook")
-        #expect(try await finalNewBook.parent == .item(table.proxy(engine)))
+        let finalNewBook = await engine.item("newBook")
+        #expect(await finalNewBook.parent == .item(table.proxy(engine)))
 
         // Verify the old book is still with the player
-        let finalOldBook = try await engine.item("oldBook")
-        #expect(try await finalOldBook.parent == .player)
+        let finalOldBook = await engine.item("oldBook")
+        #expect(await finalOldBook.parent == .player)
     }
 }

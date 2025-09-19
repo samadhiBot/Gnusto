@@ -35,7 +35,7 @@ struct StandardCombatSystemUnitTests {
     }
 
     func attackContext(for engine: GameEngine) async throws -> ActionContext {
-        let command = try await Command(
+        let command = await Command(
             verb: .attack,
             directObject: .item(Lab.troll.proxy(engine))
         )
@@ -100,7 +100,7 @@ struct StandardCombatSystemUnitTests {
     func testDetermineEnemyActionBasic() async throws {
         let (engine, _) = await createTestGame()
         let combatSystem = StandardCombatSystem(versus: "troll")
-        let troll = try await engine.item("troll")
+        let troll = await engine.item("troll")
         let playerAction = PlayerAction.attack
         let enemyEvent = try await combatSystem.determineEnemyAction(
             against: playerAction,
@@ -117,7 +117,7 @@ struct StandardCombatSystemUnitTests {
     @Test("determineEnemyAction handles unconscious enemy")
     func testDetermineEnemyActionUnconsciousEnemy() async throws {
         let (engine, _) = await createTestGame()
-        let troll = try await engine.item("troll")
+        let troll = await engine.item("troll")
 
         // Make troll unconscious
         try await engine.apply(
@@ -142,8 +142,8 @@ struct StandardCombatSystemUnitTests {
     func testSelectTaunt() async throws {
         let (engine, _) = await createTestGame()
         let combatSystem = StandardCombatSystem(versus: "troll")
-        let troll = try await engine.item("troll")
-        let tauntEvent = try await combatSystem.selectTaunt(
+        let troll = await engine.item("troll")
+        let tauntEvent = await combatSystem.selectTaunt(
             from: troll,
             in: CombatTurn(
                 playerEvent: .enemyMissed(enemy: troll, playerWeapon: nil, enemyWeapon: nil),
@@ -167,8 +167,8 @@ struct StandardCombatSystemUnitTests {
     func testPlayerCombatEventAttack() async throws {
         let (engine, _) = await createTestGame()
         let combatSystem = StandardCombatSystem(versus: "troll")
-        let troll = try await engine.item("troll")
-        let sword = try await engine.item("sword")
+        let troll = await engine.item("troll")
+        let sword = await engine.item("sword")
         let playerEvent = try await combatSystem.playerCombatEvent(
             for: .attack,
             against: troll,
@@ -190,7 +190,7 @@ struct StandardCombatSystemUnitTests {
     func testPlayerCombatEventFlee() async throws {
         let (engine, _) = await createTestGame()
         let combatSystem = StandardCombatSystem(versus: "troll")
-        let troll = try await engine.item("troll")
+        let troll = await engine.item("troll")
         let playerEvent = try await combatSystem.playerCombatEvent(
             for: .flee(direction: .south),
             against: troll,
@@ -206,8 +206,8 @@ struct StandardCombatSystemUnitTests {
     func testRecalculateCombatState() async throws {
         let (engine, _) = await createTestGame()
         let combatSystem = StandardCombatSystem(versus: "troll")
-        let troll = try await engine.item("troll")
-        let sword = try await engine.item("sword")
+        let troll = await engine.item("troll")
+        let sword = await engine.item("sword")
         try await engine.apply(
             engine.setCombatState(
                 to: CombatState(
@@ -326,8 +326,8 @@ struct StandardCombatSystemUnitTests {
     func testGenerateTurnResult() async throws {
         let (engine, _) = await createTestGame()
         let combatSystem = StandardCombatSystem(versus: "troll")
-        let troll = try await engine.item("troll")
-        let sword = try await engine.item("sword")
+        let troll = await engine.item("troll")
+        let sword = await engine.item("sword")
 
         let combatTurn = CombatTurn(
             playerEvent: .enemyInjured(
@@ -359,7 +359,7 @@ struct StandardCombatSystemUnitTests {
             """
         )
         #expect(
-            result.changes == [try await troll.setCharacterAttributes(health: 46)]
+            result.changes == [await troll.setCharacterAttributes(health: 46)]
         )
     }
 
@@ -369,8 +369,8 @@ struct StandardCombatSystemUnitTests {
     func testGenerateEventResultDamage() async throws {
         let (engine, _) = await createTestGame()
         let combatSystem = StandardCombatSystem(versus: "troll")
-        let troll = try await engine.item("troll")
-        let sword = try await engine.item("sword")
+        let troll = await engine.item("troll")
+        let sword = await engine.item("sword")
 
         let damageEvent = CombatEvent.enemyInjured(
             enemy: troll,
@@ -384,7 +384,7 @@ struct StandardCombatSystemUnitTests {
             in: attackContext(for: engine)
         )
 
-        let expected = try await ActionResult(
+        let expected = await ActionResult(
             """
             Your blow with your iron sword catches the creature cleanly,
             tearing flesh and drawing crimson. The blow lands solidly, drawing blood. He
@@ -401,7 +401,7 @@ struct StandardCombatSystemUnitTests {
     func testGenerateEventResultKnockout() async throws {
         let (engine, mockIO) = await createTestGame()
         let combatSystem = StandardCombatSystem(versus: .troll)
-        let troll = try await engine.item(.troll)
+        let troll = await engine.item(.troll)
 
         try await engine.apply(
             engine.player.move(to: "entrance"),
@@ -528,10 +528,10 @@ struct StandardCombatSystemUnitTests {
 
         let player = await engine.player
         let attacker = Combatant.player(player)
-        let weapon = try await engine.item("sword")
+        let weapon = await engine.item("sword")
         let intensity = 1.0
 
-        let modifier = try await combatSystem.computeOffenseModifier(
+        let modifier = await combatSystem.computeOffenseModifier(
             for: attacker,
             weapon: weapon,
             intensity: intensity
@@ -549,7 +549,7 @@ struct StandardCombatSystemUnitTests {
         let attacker = Combatant.player(player)
         let intensity = 1.0
 
-        let modifier = try await combatSystem.computeOffenseModifier(
+        let modifier = await combatSystem.computeOffenseModifier(
             for: attacker,
             weapon: nil,
             intensity: intensity
@@ -565,10 +565,10 @@ struct StandardCombatSystemUnitTests {
         let (engine, _) = await createTestGame()
         let combatSystem = StandardCombatSystem(versus: "troll")
 
-        let troll = try await engine.item("troll")
+        let troll = await engine.item("troll")
         let defender = Combatant.enemy(troll)
 
-        let adjustment = try await combatSystem.computeDefenseAdjustment(
+        let adjustment = await combatSystem.computeDefenseAdjustment(
             for: defender
         )
 
@@ -584,12 +584,12 @@ struct StandardCombatSystemUnitTests {
 
         let player = await engine.player
         let attacker = Combatant.player(player)
-        let troll = try await engine.item("troll")
+        let troll = await engine.item("troll")
         let defender = Combatant.enemy(troll)
-        let weapon = try await engine.item("sword")
+        let weapon = await engine.item("sword")
         let intensity = 1.5
 
-        let adjustment = try await combatSystem.computeDamageAdjustment(
+        let adjustment = await combatSystem.computeDamageAdjustment(
             attacker: attacker,
             defender: defender,
             weapon: weapon,
@@ -608,12 +608,12 @@ struct StandardCombatSystemUnitTests {
 
         let player = await engine.player
         let attacker = Combatant.player(player)
-        let troll = try await engine.item("troll")
+        let troll = await engine.item("troll")
         let defender = Combatant.enemy(troll)
-        let weapon = try await engine.item("sword")
+        let weapon = await engine.item("sword")
         let intensity = 1.0
 
-        let adjustment = try await combatSystem.computeDamageAdjustment(
+        let adjustment = await combatSystem.computeDamageAdjustment(
             attacker: attacker,
             defender: defender,
             weapon: weapon,
@@ -671,8 +671,8 @@ struct StandardCombatSystemUnitTests {
     func testDefaultCombatDescription() async throws {
         let (engine, _) = await createTestGame()
         let combatSystem = StandardCombatSystem(versus: "troll")
-        let troll = try await engine.item("troll")
-        let sword = try await engine.item("sword")
+        let troll = await engine.item("troll")
+        let sword = await engine.item("sword")
 
         let hitEvent = CombatEvent.enemyInjured(
             enemy: troll,
@@ -683,7 +683,7 @@ struct StandardCombatSystemUnitTests {
 
         let messenger = await engine.combatMessenger(for: "troll")
 
-        let description = try await combatSystem.defaultCombatDescription(
+        let description = await combatSystem.defaultCombatDescription(
             of: hitEvent,
             via: messenger
         )
@@ -698,8 +698,8 @@ struct StandardCombatSystemUnitTests {
     func testDefaultCombatDescriptionMiss() async throws {
         let (engine, _) = await createTestGame()
         let combatSystem = StandardCombatSystem(versus: "troll")
-        let troll = try await engine.item("troll")
-        let sword = try await engine.item("sword")
+        let troll = await engine.item("troll")
+        let sword = await engine.item("sword")
 
         let missEvent = CombatEvent.enemyMissed(
             enemy: troll,
@@ -709,7 +709,7 @@ struct StandardCombatSystemUnitTests {
 
         let messenger = await engine.combatMessenger(for: "troll")
 
-        let description = try await combatSystem.defaultCombatDescription(
+        let description = await combatSystem.defaultCombatDescription(
             of: missEvent,
             via: messenger
         )
@@ -724,8 +724,8 @@ struct StandardCombatSystemUnitTests {
     func testDefaultCombatDescriptionCritical() async throws {
         let (engine, _) = await createTestGame()
         let combatSystem = StandardCombatSystem(versus: "troll")
-        let troll = try await engine.item("troll")
-        let sword = try await engine.item("sword")
+        let troll = await engine.item("troll")
+        let sword = await engine.item("sword")
 
         let criticalEvent = CombatEvent.enemyCriticallyWounded(
             enemy: troll,
@@ -736,7 +736,7 @@ struct StandardCombatSystemUnitTests {
 
         let messenger = await engine.combatMessenger(for: "troll")
 
-        let description = try await combatSystem.defaultCombatDescription(
+        let description = await combatSystem.defaultCombatDescription(
             of: criticalEvent,
             via: messenger
         )
@@ -757,7 +757,7 @@ struct StandardCombatSystemUnitTests {
         let player = await engine.player
 
         // Test computeOffenseModifier with nil weapon
-        let modifier = try await combatSystem.computeOffenseModifier(
+        let modifier = await combatSystem.computeOffenseModifier(
             for: .player(player),
             weapon: nil,
             intensity: 1.0
@@ -777,7 +777,7 @@ struct StandardCombatSystemUnitTests {
         let player = await engine.player
 
         // Test with very high intensity
-        let highIntensityModifier = try await combatSystem.computeOffenseModifier(
+        let highIntensityModifier = await combatSystem.computeOffenseModifier(
             for: .player(player),
             weapon: nil,
             intensity: 10.0
@@ -785,7 +785,7 @@ struct StandardCombatSystemUnitTests {
         #expect(highIntensityModifier >= -20)
 
         // Test with zero intensity
-        let zeroIntensityModifier = try await combatSystem.computeOffenseModifier(
+        let zeroIntensityModifier = await combatSystem.computeOffenseModifier(
             for: .player(player),
             weapon: nil,
             intensity: 0.0

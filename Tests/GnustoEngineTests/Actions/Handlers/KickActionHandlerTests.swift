@@ -38,7 +38,7 @@ struct KickActionHandlerTests {
             """
         )
 
-        let finalState = try await engine.item("rock")
+        let finalState = await engine.item("rock")
         #expect(await finalState.hasFlag(.isTouched) == true)
     }
 
@@ -165,7 +165,7 @@ struct KickActionHandlerTests {
             """
         )
 
-        let finalState = try await engine.item("troll")
+        let finalState = await engine.item("troll")
         #expect(await finalState.hasFlag(.isTouched) == true)
     }
 
@@ -199,7 +199,7 @@ struct KickActionHandlerTests {
             """
         )
 
-        let finalState = try await engine.item("box")
+        let finalState = await engine.item("box")
         #expect(await finalState.hasFlag(.isTouched) == true)
     }
 
@@ -254,7 +254,7 @@ struct KickActionHandlerTests {
         try await engine.execute("kick door")
 
         // Then
-        let finalState = try await engine.item("door")
+        let finalState = await engine.item("door")
         #expect(await finalState.hasFlag(.isTouched) == true)
     }
 
@@ -299,8 +299,8 @@ struct KickActionHandlerTests {
             """
         )
 
-        let tableState = try await engine.item("table")
-        let chairState = try await engine.item("chair")
+        let tableState = await engine.item("table")
+        let chairState = await engine.item("chair")
         #expect(await tableState.hasFlag(.isTouched) == true)
         #expect(await chairState.hasFlag(.isTouched) == true)
     }

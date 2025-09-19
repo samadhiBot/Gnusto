@@ -19,10 +19,10 @@ extension PlayerProxy {
     /// - Parameter item: The item to check if the player can carry.
     /// - Returns: `true` if the player can carry the item without exceeding capacity, `false` otherwise.
     /// - Throws: An error if there's an issue accessing the player's inventory or item properties.
-    public func canCarry(_ itemID: ItemID) async throws -> Bool {
-        let item = try await engine.item(itemID)
+    public func canCarry(_ itemID: ItemID) async -> Bool {
+        let item = await engine.item(itemID)
         var totalWeight = await item.size
-        for item in try await completeInventory {
+        for item in await completeInventory {
             let size = await item.size
             totalWeight += size
         }
@@ -49,12 +49,12 @@ extension PlayerProxy {
 
     /// The player's current inventory, including contents of containers.
     public var completeInventory: [ItemProxy] {
-        get async throws {
+        get async {
             var allItems = [ItemProxy]()
-            let directInventory = try await inventory
+            let directInventory = await inventory
             for item in directInventory {
                 allItems.append(item)
-                allItems.append(contentsOf: try await item.allContents)
+                allItems.append(contentsOf: await item.allContents)
             }
             return allItems
         }
@@ -75,10 +75,10 @@ extension PlayerProxy {
     /// This inventory does not include the contents of any containers the player is holding.
     /// Use `completeInventory` for a full player inventory list.
     public var inventory: [ItemProxy] {
-        get async throws {
-            try await engine.gameState.items.values.asyncCompactMap { item -> ItemProxy? in
-                let proxy = try await engine.item(item.id)
-                guard try await proxy.parent == .player else { return nil }
+        get async {
+            await engine.gameState.items.values.asyncCompactMap { item -> ItemProxy? in
+                let proxy = await engine.item(item.id)
+                guard await proxy.parent == .player else { return nil }
                 return proxy
             }
         }
@@ -89,14 +89,14 @@ extension PlayerProxy {
     /// - Parameter itemID: The item identifier to check for in the player's inventory.
     /// - Returns: `true` if the player is carrying the item, `false` otherwise.
     /// - Throws: An error if there's an issue accessing the player's inventory.
-    public func isHolding(_ itemID: ItemID) async throws -> Bool {
-        try await completeInventory.contains { $0.id == itemID }
+    public func isHolding(_ itemID: ItemID) async -> Bool {
+        await completeInventory.contains { $0.id == itemID }
     }
 
     /// The player's current location.
     public var location: LocationProxy {
-        get async throws {
-            try await engine.location(player.currentLocationID)
+        get async {
+            await engine.location(player.currentLocationID)
         }
     }
 
@@ -112,8 +112,8 @@ extension PlayerProxy {
 
     /// Selects the player's best weapon in their inventory.
     public var preferredWeapon: ItemProxy? {
-        get async throws {
-            try await inventory.sortedByWeaponDamage.first
+        get async {
+            await inventory.sortedByWeaponDamage.first
         }
     }
 

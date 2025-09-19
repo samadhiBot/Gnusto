@@ -43,8 +43,8 @@ extension GameEngine {
         var shouldConsumeTurn = true  // Default to consuming turn unless meta-command is used
 
         // Store the player's current location and lighting state before executing the command
-        let locationBeforeCommand = try await player.location
-        let wasLitBeforeCommand = try await locationBeforeCommand.isLit
+        let locationBeforeCommand = await player.location
+        let wasLitBeforeCommand = await locationBeforeCommand.isLit
 
         // --- Room BeforeTurn Hook ---
         if let locationHandler = locationEventHandlers[locationBeforeCommand.id] {
@@ -84,7 +84,7 @@ extension GameEngine {
                 }
 
                 // Ensure item is present before calling handler
-                guard try await itemProxy.hasSameLocationAsPlayer else {
+                guard await itemProxy.hasSameLocationAsPlayer else {
                     continue
                 }
 
@@ -116,7 +116,7 @@ extension GameEngine {
             !command.isAllCommand,
             case .item(let itemProxy) = command.indirectObject,
             let itemHandler = itemEventHandlers[itemProxy.id],
-            try await itemProxy.hasSameLocationAsPlayer
+            await itemProxy.hasSameLocationAsPlayer
         {
             do {
                 if let result = try await itemHandler.handle(self, .beforeTurn(command)) {
@@ -150,7 +150,7 @@ extension GameEngine {
         } else if !actionHandled {
             // No object handler took charge, check for darkness before running default verb handler
 
-            let isLit = try await player.location.isLit
+            let isLit = await player.location.isLit
 
             // Retrieve verb definition to check requiresLight property
             // Note: Parser should ensure command.verbID exists in vocabulary
@@ -250,7 +250,7 @@ extension GameEngine {
                 }
 
                 // Ensure item is present before calling handler
-                guard try await itemProxy.hasSameLocationAsPlayer else {
+                guard await itemProxy.hasSameLocationAsPlayer else {
                     continue
                 }
 
@@ -273,7 +273,7 @@ extension GameEngine {
         // 2. Check Indirect Object AfterTurn Handler
         if case .item(let itemProxy) = command.indirectObject,
             let itemHandler = itemEventHandlers[itemProxy.id],
-            try await itemProxy.hasSameLocationAsPlayer
+            await itemProxy.hasSameLocationAsPlayer
         {
             do {
                 if let result = try await itemHandler.handle(self, .afterTurn(command)) {
@@ -509,7 +509,7 @@ extension GameEngine {
         // Handle location description after movement or light change
         var shouldDescribe = false
         var forceFullDescription = false
-        let playerLocationID = try await player.location.id
+        let playerLocationID = await player.location.id
 
         // Handle .onEnter event for new location
         if locationBeforeCommand != playerLocationID {
@@ -526,7 +526,7 @@ extension GameEngine {
         }
 
         // Handle lighting transition messages
-        let isLitAfterCommand = try await player.location.isLit
+        let isLitAfterCommand = await player.location.isLit
 
         if wasLitBeforeCommand && !isLitAfterCommand {
             // Moved from lit to dark (or light went out) - show transition message and darkness message
@@ -563,9 +563,7 @@ extension GameEngine {
     /// - Throws: Re-throws errors encountered during state application.
     func processActionResult(_ result: ActionResult) async throws {
         // 1. Apply State Changes
-        for change in result.changes {
-            try gameState.apply(change)
-        }
+        try applyActionResultChanges(result.changes)
 
         // 2. Print the result message
         if let message = result.message {
@@ -587,9 +585,7 @@ extension GameEngine {
     /// - Throws: Re-throws errors encountered during state application.
     private func processEventResult(_ result: ActionResult) async throws -> Bool {
         // Apply state changes and side effects
-        for change in result.changes {
-            try gameState.apply(change)
-        }
+        try applyActionResultChanges(result.changes)
 
         if result.effects.isNotEmpty {
             do {
@@ -612,6 +608,29 @@ extension GameEngine {
 
         // Return whether we should yield to engine
         return result.shouldYieldToEngine
+    }
+
+    /// Applies state changes from an ActionResult to the game state.
+    ///
+    /// This method processes an array of `StateChange` objects, handling special
+    /// engine-level changes (quit/restart requests) directly and delegating
+    /// game state modifications to the `gameState.apply()` method.
+    ///
+    /// - Parameter changes: Array of optional `StateChange` objects to apply
+    /// - Throws: Re-throws any errors from `gameState.apply()` calls
+    func applyActionResultChanges(_ changes: [StateChange?]) throws {
+        for change in changes {
+            switch change {
+            case .none:
+                break
+            case .requestGameQuit:
+                shouldQuit = true
+            case .requestGameRestart:
+                shouldRestart = true
+            default:
+                try gameState.apply(change)
+            }
+        }
     }
 
     /// Updates pronoun based on a command's direct objects.
@@ -637,8 +656,8 @@ extension GameEngine {
             }
             if await item.hasFlag(.isPlural) {
                 gameState.updatePronoun(to: .them([entity]))
-            } else if try await item.isCharacter {
-                let classification = try await item.classification
+            } else if await item.isCharacter {
+                let classification = await item.classification
                 gameState.updatePronoun(
                     to: .forEntity(entity, classification: classification)
                 )

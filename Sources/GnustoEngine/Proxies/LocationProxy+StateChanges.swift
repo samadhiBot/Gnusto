@@ -13,9 +13,9 @@ extension LocationProxy {
     ///   - propertyID: The `LocationPropertyID` of the flag to clear.
     /// - Returns: A `StateChange` to set the flag to `false`, or `nil` if the flag is not currently
     ///            `true`.
-    public func clearFlag(_ propertyID: LocationPropertyID) async throws -> StateChange? {
-        if try await property(propertyID)?.toBool == true {
-            try await setProperty(propertyID, to: false)
+    public func clearFlag(_ propertyID: LocationPropertyID) async -> StateChange? {
+        if await property(propertyID)?.toBool == true {
+            await setProperty(propertyID, to: false)
         } else {
             nil
         }
@@ -34,8 +34,8 @@ extension LocationProxy {
     public func setProperty(
         _ propertyID: LocationPropertyID,
         to stateValue: StateValue
-    ) async throws -> StateChange? {
-        let currentValue = try await property(propertyID)
+    ) async -> StateChange? {
+        let currentValue = await property(propertyID)
         guard currentValue != stateValue else { return nil }
 
         return StateChange.setLocationProperty(id: id, property: propertyID, value: stateValue)
@@ -50,11 +50,11 @@ extension LocationProxy {
     ///   - propertyID: The `LocationPropertyID` of the flag to set.
     /// - Returns: A `StateChange` to set the flag to `true`, or `nil` if the flag is already
     ///            `true`.
-    public func setFlag(_ propertyID: LocationPropertyID) async throws -> StateChange? {
-        if try await property(propertyID)?.toBool == true {
+    public func setFlag(_ propertyID: LocationPropertyID) async -> StateChange? {
+        if await property(propertyID)?.toBool == true {
             nil
         } else {
-            try await setProperty(propertyID, to: true)
+            await setProperty(propertyID, to: true)
         }
     }
 }
@@ -70,8 +70,8 @@ extension LocationProxy {
     /// - Parameters:
     ///   - description: The new description text.
     /// - Returns: A `StateChange` to set the description, or `nil` if it wouldn't change.
-    public func setDescription(to description: String) async throws -> StateChange? {
-        try await setProperty(.description, to: .string(description))
+    public func setDescription(to description: String) async -> StateChange? {
+        await setProperty(.description, to: .string(description))
     }
 
     /// Creates a `StateChange` to set a boolean flag property on a location.
@@ -86,8 +86,8 @@ extension LocationProxy {
     public func setProperty(
         _ flag: LocationPropertyID,
         to value: Bool
-    ) async throws -> StateChange? {
-        try await setProperty(flag, to: .bool(value))
+    ) async -> StateChange? {
+        await setProperty(flag, to: .bool(value))
     }
 
     /// Creates a `StateChange` to set an integer property on a location.
@@ -101,8 +101,8 @@ extension LocationProxy {
     public func setProperty(
         _ propertyID: LocationPropertyID,
         to value: Int
-    ) async throws -> StateChange? {
-        try await setProperty(propertyID, to: .int(value))
+    ) async -> StateChange? {
+        await setProperty(propertyID, to: .int(value))
     }
 
     /// Creates a `StateChange` to set a string property on a location.
@@ -116,7 +116,7 @@ extension LocationProxy {
     public func setProperty(
         _ propertyID: LocationPropertyID,
         to value: String
-    ) async throws -> StateChange? {
-        try await setProperty(propertyID, to: .string(value))
+    ) async -> StateChange? {
+        await setProperty(propertyID, to: .string(value))
     }
 }

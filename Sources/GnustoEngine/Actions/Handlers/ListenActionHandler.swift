@@ -41,12 +41,12 @@ public struct ListenActionHandler: ActionHandler {
                 await context.msg.listenFor(item.withDefiniteArticle)
             }
 
-            return try await ActionResult(
+            return await ActionResult(
                 message,
                 item.setFlag(.isTouched)
             )
         } catch {
-            guard try await context.player.location.isLit else {
+            guard await context.player.location.isLit else {
                 throw ActionResponse.feedback(
                     context.msg.listenInDarkness()
                 )

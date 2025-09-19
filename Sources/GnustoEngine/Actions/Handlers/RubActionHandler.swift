@@ -33,7 +33,7 @@ public struct RubActionHandler: ActionHandler {
             throw ActionResponse.doWhat(context)
         }
 
-        return try await ActionResult(
+        return await ActionResult(
             item.response(
                 object: { context.msg.rubObject(context.verb, item: $0) },
                 character: { context.msg.rubCharacter(context.verb, character: $0) },

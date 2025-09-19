@@ -98,8 +98,8 @@ public struct Item: Codable, Hashable, Sendable {
     /// - Returns: An `ItemProxy` instance for this item.
     /// - Throws: Any errors that occur during proxy creation, typically if the item
     ///   doesn't exist in the current game state.
-    public func proxy(_ engine: GameEngine) async throws -> ItemProxy {
-        try await engine.item(id)
+    public func proxy(_ engine: GameEngine) async -> ItemProxy {
+        await engine.item(id)
     }
 }
 

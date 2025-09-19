@@ -50,17 +50,12 @@ extension GameEngine {
     ///
     /// - Parameter parentEntity: The parent entity to convert into a proxy.
     /// - Returns: A `ParentProxy` instance that wraps the appropriate proxy type.
-    /// - Throws: An error if the specified item or location cannot be found.
-    public func parent(from parentEntity: ParentEntity) async throws -> ParentProxy {
+    public func parent(from parentEntity: ParentEntity) -> ParentProxy {
         switch parentEntity {
         case .item(let itemID):
-            try await .item(
-                self.item(itemID)
-            )
+            .item(self.item(itemID))
         case .location(let locationID):
-            try await .location(
-                self.location(locationID)
-            )
+            .location(self.location(locationID))
         case .nowhere:
             .nowhere
         case .player:

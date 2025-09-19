@@ -54,15 +54,10 @@ enum Troll {
     static let trollComputer = ItemComputer(for: .troll) {
         itemProperty(.description, .firstDescription) { context in
             let troll = context.item
-            let axe = try await context.engine.item(.axe)
-
-            guard let trollSheet = troll.properties[.characterSheet]?.toCharacterSheet else {
-                return nil
-            }
 
             // Check if troll is unconscious
-            if trollSheet.isUnconscious {
-                return .string(
+            return if await troll.isUnconscious {
+                .string(
                     """
                     An unconscious troll is sprawled on the floor. All passages
                     out of the room are open.
@@ -71,18 +66,18 @@ enum Troll {
             }
 
             // Check if troll has the axe
-            if case .item(let axeParent) = try await axe.parent,
-               axeParent.id == .troll
-            {
-                return .string(
+            else if await troll.isHolding(.axe) {
+                .string(
                     """
                     A nasty-looking troll, brandishing a bloody axe, blocks all
                     passages out of the room.
                     """
                 )
-            } else {
-                // Disarmed troll
-                return .string("A pathetically babbling troll is here.")
+            }
+
+            // Disarmed troll
+            else {
+                .string("A pathetically babbling troll is here.")
             }
         }
     }
@@ -101,18 +96,18 @@ enum Troll {
 
         before(.attack) { context, command in
             // Wake the troll first if unconscious
-            return try await wakeTroll(engine: context.engine)
+            return await wakeTroll(engine: context.engine)
         }
 
         before(.give, .throw) { context, command in
-            return try await handleTrollGiveOrThrow(
+            return await handleTrollGiveOrThrow(
                 engine: context.engine,
                 command: command
             )
         }
 
         before(.take, .move) { context, command in
-            return try await ActionResult(
+            return await ActionResult(
                 """
                 The troll spits in your face, grunting "Better luck next time"
                 in a rather barbarous accent.
@@ -125,7 +120,7 @@ enum Troll {
         before(.mung, .pull, .push) { context, command in
             // Non-attack mung verbs include `rip`, `break`, etc.
             if !command.hasIntent(.attack) {
-                return try await ActionResult(
+                return await ActionResult(
                     "The troll laughs at your puny gesture.",
                 ).prepended(
                     by: wakeTroll(engine: context.engine)
@@ -135,7 +130,7 @@ enum Troll {
         }
 
         before(.listen) { context, command in
-            if try await context.item.isAwake {
+            if await context.item.isAwake {
                 return ActionResult(
                     """
                     Every so often the troll says something, probably uncomplimentary, in
@@ -147,7 +142,7 @@ enum Troll {
         }
 
         before(.ask, .tell) { context, command in
-            if try await !context.item.isAwake {
+            if await !context.item.isAwake {
                 return ActionResult("Unfortunately, the troll can't hear you.")
             }
             return nil
@@ -156,11 +151,11 @@ enum Troll {
 
     static let trollRoomHandler = LocationEventHandler(for: .trollRoom) {
         beforeTurn(.move) { context, command in
-            let troll = try await context.engine.item(.troll)
+            let troll = await context.item(.troll)
 
             // Troll blocks the way if here in the room, alive, and conscious
-            if try await context.location.items.contains(troll),
-               try await troll.isAwake,
+            if await context.location.items.contains(troll),
+               await troll.isAwake,
                let direction = command.direction,
                [.east, .west].contains(direction)
             {
@@ -172,29 +167,29 @@ enum Troll {
 
     /// Handles the troll's periodic behavior (picking up axe, etc.)
     static let trollDaemon = Daemon(frequency: 2) { engine in
-        let troll = try await engine.item(.troll)
-        let axe = try await engine.item(.axe)
+        let troll = await engine.item(.troll)
+        let axe = await engine.item(.axe)
 
         // Don't do anything if troll is dead
-        guard try await !troll.isDead else { return .yield }
+        guard await !troll.isDead else { return .yield }
 
         // Don't do anything if troll already has axe
-        if try await troll.isHolding(axe.id) { return .yield }
+        if await troll.isHolding(axe.id) { return .yield }
 
         // If troll is unconscious, don't pick up axe
-        guard try await !troll.isUnconscious else { return .yield }
+        guard await !troll.isUnconscious else { return .yield }
 
         // Check if axe is in the troll room and troll should pick it up
-        if case .location(let axeLocationProxy) = try await axe.parent,
+        if case .location(let axeLocationProxy) = await axe.parent,
            axeLocationProxy.id == LocationID.trollRoom,
-           case .location(let trollLocationProxy) = try await troll.parent,
+           case .location(let trollLocationProxy) = await troll.parent,
            trollLocationProxy.id == LocationID.trollRoom
         {
             // 75-90% chance (using 80% as middle ground)
             let shouldPickUp = await engine.randomPercentage(chance: 80)
 
             if shouldPickUp {
-                return try await ActionResult(
+                return await ActionResult(
                     """
                     The troll, angered and humiliated, recovers his weapon. He appears to have
                     an axe to grind with you.
@@ -217,12 +212,12 @@ enum Troll {
 
 extension Troll {
     /// If the troll is unconscious, wake up and
-    private static func wakeTroll(engine: GameEngine) async throws -> ActionResult? {
-        let troll = try await engine.item(.troll)
+    private static func wakeTroll(engine: GameEngine) async -> ActionResult? {
+        let troll = await engine.item(.troll)
 
         // Small chance to start fighting on first encounter
-        if try await !troll.isAwake {
-            return try await ActionResult(
+        if await !troll.isAwake {
+            return await ActionResult(
                 "The troll stirs, quickly resuming a fighting stance.",
                 troll.setCharacterAttributes(isFighting: true),
             )
@@ -232,12 +227,12 @@ extension Troll {
     }
 
     /// Handles troll death
-    static func handleTrollDeath(engine: GameEngine) async throws -> ActionResult {
-        let troll = try await engine.item(.troll)
-        let axe = try await engine.item(.axe)
+    static func handleTrollDeath(engine: GameEngine) async -> ActionResult {
+        let troll = await engine.item(.troll)
+        let axe = await engine.item(.axe)
 
         // If troll had axe, drop it and restore weapon properties
-        var changes: [StateChange?] = try await [
+        var changes: [StateChange?] = await [
             troll.setCharacterAttributes(
                 consciousness: .dead,
                 isFighting: false,
@@ -245,8 +240,8 @@ extension Troll {
             troll.remove(),  // Remove from game
         ]
 
-        if try await troll.isHolding(axe.id) {
-            try await changes.append(contentsOf: [
+        if await troll.isHolding(axe.id) {
+            await changes.append(contentsOf: [
                 axe.move(to: .location(.trollRoom)),
                 axe.clearFlag(.omitDescription),
                 axe.setFlag(.isWeapon),
@@ -264,11 +259,11 @@ extension Troll {
     }
 
     /// Handles troll becoming unconscious
-    static func handleTrollUnconscious(engine: GameEngine) async throws -> ActionResult {
-        let troll = try await engine.item(.troll)
-        let axe = try await engine.item(.axe)
+    static func handleTrollUnconscious(engine: GameEngine) async -> ActionResult {
+        let troll = await engine.item(.troll)
+        let axe = await engine.item(.axe)
 
-        var changes: [StateChange?] = try await [
+        var changes: [StateChange?] = await [
             troll.setCharacterAttributes(
                 consciousness: .unconscious,
                 isFighting: false
@@ -276,10 +271,10 @@ extension Troll {
         ]
 
         // If troll had axe, drop it and restore weapon properties
-        if case .item(let axeParent) = try await axe.parent,
+        if case .item(let axeParent) = await axe.parent,
            axeParent.id == .troll
         {
-            try await changes.append(contentsOf: [
+            await changes.append(contentsOf: [
                 axe.move(to: .location(.trollRoom)),
                 axe.clearFlag(.omitDescription),
                 axe.setFlag(.isWeapon),
@@ -296,16 +291,16 @@ extension Troll {
     }
 
     /// Handles troll waking up
-    static func handleTrollConscious(engine: GameEngine) async throws -> ActionResult? {
-        let troll = try await engine.item(.troll)
+    static func handleTrollConscious(engine: GameEngine) async -> ActionResult? {
+        let troll = await engine.item(.troll)
 
         guard
-            case .location(let trollLocationProxy) = try await troll.parent,
+            case .location(let trollLocationProxy) = await troll.parent,
             trollLocationProxy.id == LocationID.trollRoom
         else { return nil }
 
-        let axe = try await engine.item(.axe)
-        var changes: [StateChange?] = try await [
+        let axe = await engine.item(.axe)
+        var changes: [StateChange?] = await [
             troll.setCharacterAttributes(
                 consciousness: .unconscious,
                 isFighting: false
@@ -313,10 +308,10 @@ extension Troll {
         ]
 
         // Check if axe is available to pick up
-        if case .location(let axeLocationProxy) = try await axe.parent,
+        if case .location(let axeLocationProxy) = await axe.parent,
            axeLocationProxy.id == LocationID.trollRoom
         {
-            try await changes.append(contentsOf: [
+            await changes.append(contentsOf: [
                 axe.setFlag(.omitDescription),
                 axe.clearFlag(.isWeapon),
                 axe.move(to: .item(.troll)),
@@ -336,16 +331,16 @@ extension Troll {
     private static func handleTrollGiveOrThrow(
         engine: GameEngine,
         command: Command
-    ) async throws -> ActionResult? {
+    ) async -> ActionResult? {
         guard case .item(let item) = command.directObject else { return nil }
-        let axe = try await engine.item(.axe)
+        let axe = await engine.item(.axe)
         let theItem = await item.withDefiniteArticle
-        let troll = try await engine.item(.troll)
-        let wakeChange = try await wakeTroll(engine: engine)
+        let troll = await engine.item(.troll)
+        let wakeChange = await wakeTroll(engine: engine)
 
         // Special case: giving/throwing the axe to the troll
         if item == axe {
-            return if try await engine.player.isHolding(axe.id) {
+            return if await engine.player.isHolding(axe.id) {
                 ActionResult(
                     "The troll scratches his head in confusion, then takes \(theItem).",
                     axe.move(to: .item(.troll))
@@ -371,7 +366,7 @@ extension Troll {
         if await item.isWeapon {
             // 20% chance the troll eats the weapon and dies
             if await engine.randomPercentage(chance: 20) {
-                return try await ActionResult(
+                return await ActionResult(
                     """
                     \(baseMessage) and eats it hungrily. Poor troll,
                     he dies from an internal hemorrhage and his carcass

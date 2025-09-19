@@ -44,10 +44,10 @@ struct RemoveActionHandlerTests {
             """
         )
 
-        let finalState = try await engine.item("hat")
+        let finalState = await engine.item("hat")
         #expect(await finalState.hasFlag(.isWorn) == false)
         #expect(await finalState.hasFlag(.isTouched) == true)
-        #expect(try await finalState.playerIsHolding)
+        #expect(await finalState.playerIsHolding)
     }
 
     @Test("DOFF syntax works")
@@ -86,7 +86,7 @@ struct RemoveActionHandlerTests {
             """
         )
 
-        let finalState = try await engine.item("cloak")
+        let finalState = await engine.item("cloak")
         #expect(await finalState.hasFlag(.isWorn) == false)
     }
 
@@ -126,7 +126,7 @@ struct RemoveActionHandlerTests {
             """
         )
 
-        let finalState = try await engine.item("shoes")
+        let finalState = await engine.item("shoes")
         #expect(await finalState.hasFlag(.isWorn) == false)
     }
 
@@ -176,8 +176,8 @@ struct RemoveActionHandlerTests {
             """
         )
 
-        let finalHat = try await engine.item("hat")
-        let finalGloves = try await engine.item("gloves")
+        let finalHat = await engine.item("hat")
+        let finalGloves = await engine.item("gloves")
         #expect(await finalHat.hasFlag(.isWorn) == false)
         #expect(await finalGloves.hasFlag(.isWorn) == false)
     }
@@ -353,10 +353,10 @@ struct RemoveActionHandlerTests {
         )
 
         // Verify state changes
-        let finalState = try await engine.item("jacket")
+        let finalState = await engine.item("jacket")
         #expect(await finalState.hasFlag(.isWorn) == false)
         #expect(await finalState.hasFlag(.isTouched) == true)
-        #expect(try await finalState.playerIsHolding)
+        #expect(await finalState.playerIsHolding)
     }
 
     @Test("Remove multiple worn items")
@@ -417,9 +417,9 @@ struct RemoveActionHandlerTests {
         )
 
         // Verify all items are no longer worn
-        let finalCoat = try await engine.item("coat")
-        let finalScarf = try await engine.item("scarf")
-        let finalMittens = try await engine.item("mittens")
+        let finalCoat = await engine.item("coat")
+        let finalScarf = await engine.item("scarf")
+        let finalMittens = await engine.item("mittens")
 
         #expect(await finalCoat.hasFlag(.isWorn) == false)
         #expect(await finalScarf.hasFlag(.isWorn) == false)
@@ -488,9 +488,9 @@ struct RemoveActionHandlerTests {
         )
 
         // Verify all items are no longer worn
-        let finalShirt = try await engine.item("shirt")
-        let finalPants = try await engine.item("pants")
-        let finalWatch = try await engine.item("watch")
+        let finalShirt = await engine.item("shirt")
+        let finalPants = await engine.item("pants")
+        let finalWatch = await engine.item("watch")
 
         #expect(await finalShirt.hasFlag(.isWorn) == false)
         #expect(await finalPants.hasFlag(.isWorn) == false)
@@ -576,8 +576,8 @@ struct RemoveActionHandlerTests {
         )
 
         // Verify only removable item was removed
-        let finalHat = try await engine.item("removableHat")
-        let finalRing = try await engine.item("fixedRing")
+        let finalHat = await engine.item("removableHat")
+        let finalRing = await engine.item("fixedRing")
 
         #expect(await finalHat.hasFlag(.isWorn) == false)
         #expect(await finalRing.hasFlag(.isWorn) == true)  // Still worn

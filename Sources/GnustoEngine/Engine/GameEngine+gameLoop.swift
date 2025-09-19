@@ -3,6 +3,64 @@ import Foundation
 // MARK: - Game Loop
 
 extension GameEngine {
+    /// Starts and runs the main game loop.
+    ///
+    /// This method is the primary entry point for beginning and playing the game.
+    /// It performs the following sequence:
+    /// 1. Sets up the `IOHandler` (e.g., preparing the console or UI).
+    /// 2. Prints the game's title and introduction message.
+    /// 3. Marks the player's starting location as visited and describes it.
+    /// 4. Enters the main turn-based loop, which continues until `shouldQuit` becomes `true`.
+    ///    Each iteration of the loop involves:
+    ///    a. Displaying the status line (current location, score, moves) via `showStatus()`.
+    ///    b. Processing a single player turn via `processTurn()`.
+    /// 5. After the loop terminates (e.g., player quits), performs teardown for the `IOHandler`.
+    ///
+    /// Game developers typically do not call this method directly after initialization;
+    /// it is intended to be the engine's top-level execution flow.
+    public func run() async {
+        await ioHandler.setup()
+
+        // Game initialization and main loop
+        repeat {
+            // Print title and introduction (only on first start or restart)
+            await ioHandler.print(title, style: .strong)
+            await ioHandler.print(introduction)
+
+            do {
+                try await printCurrentLocationDescription(forceFullDescription: true)
+            } catch {
+                logError("\(error)")
+            }
+
+            // Main game loop
+            while !shouldQuit && !shouldRestart {
+                do {
+                    try await showStatus()
+                    try await processTurn()
+                } catch {
+                    logError("\(error)")
+                }
+            }
+
+            // Handle restart if requested
+            if shouldRestart {
+                await ioHandler.print(
+                    messenger.restarting()
+                )
+                await resetGameState()
+                // Continue the outer loop to restart the game
+            }
+
+        } while shouldRestart
+
+        await ioHandler.teardown()
+    }
+}
+
+// MARK: - Internal helpers
+
+extension GameEngine {
     /// Processes a single turn of the game, including player input, parsing, command execution, and clock ticks.
     ///
     /// This method orchestrates the core sequence of events within a single game turn:
@@ -48,9 +106,7 @@ extension GameEngine {
                 }
 
                 // Apply state changes
-                for change in questionResponse.changes {
-                    try gameState.apply(change)
-                }
+                try applyActionResultChanges(questionResponse.changes)
 
                 // Process side effects
                 for effect in questionResponse.effects {
@@ -69,10 +125,10 @@ extension GameEngine {
 
         // 3. Check for disambiguation responses when no pending question but recent disambiguation
         if let disambiguationContext = lastDisambiguationContext,
-           await tryHandleDisambiguationResponse(
-            input: input,
-            context: disambiguationContext
-           )
+            await tryHandleDisambiguationResponse(
+                input: input,
+                context: disambiguationContext
+            )
         {
             // Disambiguation response was handled, skip normal command processing
             return
@@ -96,7 +152,7 @@ extension GameEngine {
 
             // When in combat mode, get and process the enemy response
             if isInCombat {
-                let combatResult = try await getCombatResult(for: command)
+                let combatResult = await getCombatResult(for: command)
                 try await processActionResult(combatResult)
             }
 
@@ -108,10 +164,10 @@ extension GameEngine {
 
         // 6. Check for hostile characters after player's action (if turn was consumed)
         if shouldConsumeTurn && !shouldQuit && !shouldRestart && !isInCombat {
-            let currentLocation = try await player.location
-            let locationItems = try await currentLocation.items
+            let currentLocation = await player.location
+            let locationItems = await currentLocation.items
 
-            for creature in locationItems where (try? await creature.isHostileEnemy) == true {
+            for creature in locationItems where await creature.isHostileEnemy {
                 // Hostile character present - initiate combat
                 try await processActionResult(
                     enemyAttacks(
@@ -185,7 +241,7 @@ extension GameEngine {
     /// to the player via the `IOHandler`.
     /// This is called automatically at the start of each turn before `processTurn()`.
     func showStatus() async throws {
-        try await ioHandler.showStatusLine(
+        await ioHandler.showStatusLine(
             roomName: player.location.name,
             score: gameState.player.score,
             turns: gameState.player.moves
@@ -198,7 +254,7 @@ extension GameEngine {
     /// 1. Announces death with final score
     /// 2. Offers restart, restore, or quit options
     /// 3. Processes the player's choice
-    private func handlePlayerDeath() async throws {
+    func handlePlayerDeath() async throws {
         // Display death message and final score
         await ioHandler.print(
             messenger.youHaveDied()
@@ -250,84 +306,11 @@ extension GameEngine {
         } while true
     }
 
-    /// Starts and runs the main game loop.
-    ///
-    /// This method is the primary entry point for beginning and playing the game.
-    /// It performs the following sequence:
-    /// 1. Sets up the `IOHandler` (e.g., preparing the console or UI).
-    /// 2. Prints the game's title and introduction message.
-    /// 3. Marks the player's starting location as visited and describes it.
-    /// 4. Enters the main turn-based loop, which continues until `shouldQuit` becomes `true`.
-    ///    Each iteration of the loop involves:
-    ///    a. Displaying the status line (current location, score, moves) via `showStatus()`.
-    ///    b. Processing a single player turn via `processTurn()`.
-    /// 5. After the loop terminates (e.g., player quits), performs teardown for the `IOHandler`.
-    ///
-    /// Game developers typically do not call this method directly after initialization;
-    /// it is intended to be the engine's top-level execution flow.
-    public func run() async {
-        await ioHandler.setup()
-
-        // Game initialization and main loop
-        repeat {
-            // Print title and introduction (only on first start or restart)
-            await ioHandler.print(title, style: .strong)
-            await ioHandler.print(introduction)
-
-            do {
-                try await printCurrentLocationDescription(forceFullDescription: true)
-            } catch {
-                logError("\(error)")
-            }
-
-            // Main game loop
-            while !shouldQuit && !shouldRestart {
-                do {
-                    try await showStatus()
-                    try await processTurn()
-                } catch {
-                    logError("\(error)")
-                }
-            }
-
-            // Handle restart if requested
-            if shouldRestart {
-                await ioHandler.print(
-                    messenger.restarting()
-                )
-                await resetGameState()
-                // Continue the outer loop to restart the game
-            }
-
-        } while shouldRestart
-
-        await ioHandler.teardown()
-    }
-
-    /// Signals the engine to stop the main game loop and end the game after the
-    /// current turn has been fully processed.
-    ///
-    /// This is the standard way to programmatically quit the game from within an
-    /// action handler or game hook.
-    public func requestQuit() {
-        self.shouldQuit = true
-    }
-
-    /// Signals the engine to restart the game after the current turn has been
-    /// fully processed.
-    ///
-    /// This resets the game state back to its initial configuration and starts
-    /// the game from the beginning. This is the standard way to programmatically
-    /// restart the game from within an action handler or game hook.
-    public func requestRestart() {
-        self.shouldRestart = true
-    }
-
     /// Resets the game state back to its initial configuration.
     ///
-    /// This private method recreates the GameState using the stored initial parameters,
+    /// This method recreates the GameState using the stored initial parameters,
     /// effectively resetting all game progress and returning to the starting state.
-    private func resetGameState() async {
+    func resetGameState() async {
         // Recreate the initial game state from blueprint (vocabulary remains unchanged)
         let (newGameState, _) = await Self.buildInitialGameState(from: gameBlueprint)
         self.gameState = newGameState
@@ -343,5 +326,4 @@ extension GameEngine {
         // Reset the conversation manager
         await conversationManager.clearQuestion()
     }
-
 }

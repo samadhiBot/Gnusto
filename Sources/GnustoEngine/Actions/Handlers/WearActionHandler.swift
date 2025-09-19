@@ -43,7 +43,7 @@ public struct WearActionHandler: ActionHandler {
         for item in items {
             do {
                 // Check if player is holding the item
-                guard try await item.playerIsHolding else {
+                guard await item.playerIsHolding else {
                     throw ActionResponse.itemNotHeld(item)
                 }
 
@@ -60,12 +60,12 @@ public struct WearActionHandler: ActionHandler {
                 }
 
                 // Set .isWorn flag
-                try await allStateChanges.append(
+                await allStateChanges.append(
                     item.setFlag(.isWorn)
                 )
 
                 // Set .isTouched flag if not already set
-                try await allStateChanges.append(
+                await allStateChanges.append(
                     item.setFlag(.isTouched)
                 )
 

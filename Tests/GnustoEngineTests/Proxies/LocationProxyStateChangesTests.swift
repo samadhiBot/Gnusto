@@ -14,10 +14,10 @@ struct LocationProxyStateChangesTests {
         // Given
         let game = MinimalGame()
         let (engine, _) = await GameEngine.test(blueprint: game)
-        let proxy = try await engine.location(.startRoom)
+        let proxy = await engine.location(.startRoom)
 
         // When
-        let change = try await proxy.setFlag(.isVisited)
+        let change = await proxy.setFlag(.isVisited)
 
         // Then
         #expect(change != nil)
@@ -46,10 +46,10 @@ struct LocationProxyStateChangesTests {
         )
         let game = MinimalGame(locations: testRoom)
         let (engine, _) = await GameEngine.test(blueprint: game)
-        let proxy = try await engine.location(.startRoom)
+        let proxy = await engine.location(.startRoom)
 
         // When
-        let change = try await proxy.setFlag(.isVisited)
+        let change = await proxy.setFlag(.isVisited)
 
         // Then
         #expect(change == nil)
@@ -65,10 +65,10 @@ struct LocationProxyStateChangesTests {
         )
         let game = MinimalGame(locations: testRoom)
         let (engine, _) = await GameEngine.test(blueprint: game)
-        let proxy = try await engine.location(.startRoom)
+        let proxy = await engine.location(.startRoom)
 
         // When
-        let change = try await proxy.clearFlag(.isVisited)
+        let change = await proxy.clearFlag(.isVisited)
 
         // Then
         #expect(change != nil)
@@ -97,10 +97,10 @@ struct LocationProxyStateChangesTests {
         )
         let game = MinimalGame(locations: testRoom)
         let (engine, _) = await GameEngine.test(blueprint: game)
-        let proxy = try await engine.location(.startRoom)
+        let proxy = await engine.location(.startRoom)
 
         // When
-        let change = try await proxy.clearFlag(.isVisited)
+        let change = await proxy.clearFlag(.isVisited)
 
         // Then
         #expect(change == nil)
@@ -118,10 +118,10 @@ struct LocationProxyStateChangesTests {
         )
         let game = MinimalGame(locations: testRoom)
         let (engine, _) = await GameEngine.test(blueprint: game)
-        let proxy = try await engine.location(.startRoom)
+        let proxy = await engine.location(.startRoom)
 
         // When
-        let change = try await proxy.clearFlag(.inherentlyLit)
+        let change = await proxy.clearFlag(.inherentlyLit)
 
         // Then
         #expect(change != nil)
@@ -145,10 +145,10 @@ struct LocationProxyStateChangesTests {
         // Given
         let game = MinimalGame()
         let (engine, _) = await GameEngine.test(blueprint: game)
-        let proxy = try await engine.location(.startRoom)
+        let proxy = await engine.location(.startRoom)
 
         // When
-        let change = try await proxy.setProperty(.description, to: "New description")
+        let change = await proxy.setProperty(.description, to: "New description")
 
         // Then
         #expect(change != nil)
@@ -177,10 +177,10 @@ struct LocationProxyStateChangesTests {
         )
         let game = MinimalGame(locations: testRoom)
         let (engine, _) = await GameEngine.test(blueprint: game)
-        let proxy = try await engine.location(.startRoom)
+        let proxy = await engine.location(.startRoom)
 
         // When
-        let change = try await proxy.setProperty(.description, to: "Existing description")
+        let change = await proxy.setProperty(.description, to: "Existing description")
 
         // Then
         #expect(change == nil)
@@ -193,7 +193,7 @@ struct LocationProxyStateChangesTests {
         // Given
         let game = MinimalGame()
         let (engine, _) = await GameEngine.test(blueprint: game)
-        let startRoom = try await engine.location(.startRoom)
+        let startRoom = await engine.location(.startRoom)
 
         // When
         try await engine.apply(
@@ -201,7 +201,7 @@ struct LocationProxyStateChangesTests {
         )
 
         // Then
-        #expect(try await startRoom.description == "New description")
+        #expect(await startRoom.description == "New description")
     }
 
     // MARK: - Bool Property Operations
@@ -211,10 +211,10 @@ struct LocationProxyStateChangesTests {
         // Given
         let game = MinimalGame()
         let (engine, _) = await GameEngine.test(blueprint: game)
-        let proxy = try await engine.location(.startRoom)
+        let proxy = await engine.location(.startRoom)
 
         // When
-        let change = try await proxy.setProperty(.isVisited, to: true)
+        let change = await proxy.setProperty(.isVisited, to: true)
 
         // Then
         #expect(change != nil)
@@ -240,10 +240,10 @@ struct LocationProxyStateChangesTests {
         // Given
         let game = MinimalGame()
         let (engine, _) = await GameEngine.test(blueprint: game)
-        let proxy = try await engine.location(.startRoom)
+        let proxy = await engine.location(.startRoom)
 
         // When
-        let change = try await proxy.setProperty(LocationPropertyID("visitCount"), to: 5)
+        let change = await proxy.setProperty(LocationPropertyID("visitCount"), to: 5)
 
         // Then
         #expect(change != nil)
@@ -269,10 +269,10 @@ struct LocationProxyStateChangesTests {
         // Given
         let game = MinimalGame()
         let (engine, _) = await GameEngine.test(blueprint: game)
-        let proxy = try await engine.location(.startRoom)
+        let proxy = await engine.location(.startRoom)
 
         // When
-        let change = try await proxy.setProperty(.name, to: "New Room Name")
+        let change = await proxy.setProperty(.name, to: "New Room Name")
 
         // Then
         #expect(change != nil)
@@ -303,10 +303,10 @@ struct LocationProxyStateChangesTests {
         )
         let game = MinimalGame(locations: testRoom)
         let (engine, _) = await GameEngine.test(blueprint: game)
-        let proxy = try await engine.location(.startRoom)
+        let proxy = await engine.location(.startRoom)
 
         // When/Then: Set a new flag
-        let setChange = try await proxy.setFlag(.isVisited)
+        let setChange = await proxy.setFlag(.isVisited)
         #expect(setChange != nil)
         if let setChange {
             if case .setLocationProperty(let id, let property, let value) = setChange {
@@ -322,7 +322,7 @@ struct LocationProxyStateChangesTests {
         try await engine.apply(setChange!)
 
         // Clear an existing flag
-        let clearChange = try await proxy.clearFlag(.inherentlyLit)
+        let clearChange = await proxy.clearFlag(.inherentlyLit)
         #expect(clearChange != nil)
         if let clearChange {
             if case .setLocationProperty(let id, let property, let value) = clearChange {
@@ -340,10 +340,10 @@ struct LocationProxyStateChangesTests {
         // Given
         let game = MinimalGame()
         let (engine, _) = await GameEngine.test(blueprint: game)
-        let proxy = try await engine.location(.startRoom)
+        let proxy = await engine.location(.startRoom)
 
         // When/Then: Set various property types
-        let stringChange = try await proxy.setProperty(.name, to: "New Room Name")
+        let stringChange = await proxy.setProperty(.name, to: "New Room Name")
         #expect(stringChange != nil)
         if let stringChange {
             if case .setLocationName(let id, let name) = stringChange {
@@ -353,7 +353,7 @@ struct LocationProxyStateChangesTests {
         }
 
         // Set description property
-        let descChange = try await proxy.setProperty(.description, to: "New Description")
+        let descChange = await proxy.setProperty(.description, to: "New Description")
         #expect(descChange != nil)
         if let descChange {
             if case .setLocationProperty(let id, let property, let value) = descChange {

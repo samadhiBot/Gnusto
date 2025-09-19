@@ -48,7 +48,7 @@ struct GoActionHandlerTests {
             """
         )
 
-        let playerLocation = try await engine.player.location.id
+        let playerLocation = await engine.player.location.id
         #expect(playerLocation == "northRoom")
     }
 
@@ -91,7 +91,7 @@ struct GoActionHandlerTests {
             """
         )
 
-        let playerLocation = try await engine.player.location.id
+        let playerLocation = await engine.player.location.id
         #expect(playerLocation == "southRoom")
     }
 
@@ -134,7 +134,7 @@ struct GoActionHandlerTests {
             """
         )
 
-        let playerLocation = try await engine.player.location.id
+        let playerLocation = await engine.player.location.id
         #expect(playerLocation == "eastRoom")
     }
 
@@ -179,7 +179,7 @@ struct GoActionHandlerTests {
             """
         )
 
-        let playerLocation = try await engine.player.location.id
+        let playerLocation = await engine.player.location.id
         #expect(playerLocation == "northRoom")
     }
 
@@ -222,7 +222,7 @@ struct GoActionHandlerTests {
             """
         )
 
-        let playerLocation = try await engine.player.location.id
+        let playerLocation = await engine.player.location.id
         #expect(playerLocation == "northRoom")
     }
 
@@ -283,25 +283,25 @@ struct GoActionHandlerTests {
 
         // Test each direction
         try await engine.execute("north")
-        var playerLocation = try await engine.player.location.id
+        var playerLocation = await engine.player.location.id
         #expect(playerLocation == "northRoom")
 
         try await engine.execute("south")
-        playerLocation = try await engine.player.location.id
+        playerLocation = await engine.player.location.id
         #expect(playerLocation == "centerRoom")
 
         try await engine.execute("south")
-        playerLocation = try await engine.player.location.id
+        playerLocation = await engine.player.location.id
         #expect(playerLocation == "southRoom")
 
         try await engine.execute("north")
         try await engine.execute("east")
-        playerLocation = try await engine.player.location.id
+        playerLocation = await engine.player.location.id
         #expect(playerLocation == "eastRoom")
 
         try await engine.execute("west")
         try await engine.execute("west")
-        playerLocation = try await engine.player.location.id
+        playerLocation = await engine.player.location.id
         #expect(playerLocation == "westRoom")
 
         // Clear output
@@ -623,7 +623,7 @@ struct GoActionHandlerTests {
             """
         )
 
-        let playerLocation = try await engine.player.location.id
+        let playerLocation = await engine.player.location.id
         #expect(playerLocation == "northRoom")
     }
 
@@ -675,7 +675,7 @@ struct GoActionHandlerTests {
             """
         )
 
-        let playerLocation = try await engine.player.location.id
+        let playerLocation = await engine.player.location.id
         #expect(playerLocation == "upperRoom")
     }
 
@@ -706,14 +706,14 @@ struct GoActionHandlerTests {
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // Verify initial location
-        var playerLocation = try await engine.player.location.id
+        var playerLocation = await engine.player.location.id
         #expect(playerLocation == "startRoom")
 
         // When
         try await engine.execute("north")
 
         // Then
-        playerLocation = try await engine.player.location.id
+        playerLocation = await engine.player.location.id
         #expect(playerLocation == "endRoom")
 
         let output = await mockIO.flush()
@@ -768,7 +768,7 @@ struct GoActionHandlerTests {
             """
         )
 
-        let playerLocation = try await engine.player.location.id
+        let playerLocation = await engine.player.location.id
         #expect(playerLocation == "litRoom")
     }
 
@@ -813,7 +813,7 @@ struct GoActionHandlerTests {
             """
         )
 
-        let playerLocation = try await engine.player.location.id
+        let playerLocation = await engine.player.location.id
         #expect(playerLocation == "darkRoom")
     }
 
@@ -872,7 +872,7 @@ struct GoActionHandlerTests {
             """
         )
 
-        let playerLocation = try await engine.player.location.id
+        let playerLocation = await engine.player.location.id
         #expect(playerLocation == "darkRoom")
     }
 
@@ -904,11 +904,11 @@ struct GoActionHandlerTests {
 
         // When - go east then west
         try await engine.execute("east")
-        var playerLocation = try await engine.player.location.id
+        var playerLocation = await engine.player.location.id
         #expect(playerLocation == "roomB")
 
         try await engine.execute("west")
-        playerLocation = try await engine.player.location.id
+        playerLocation = await engine.player.location.id
         #expect(playerLocation == "roomA")
 
         let output = await mockIO.flush()

@@ -19,10 +19,10 @@ struct ProxyStateChangeTests {
         )
         let game = MinimalGame(items: item)
         let (engine, _) = await GameEngine.test(blueprint: game)
-        let itemProxy = try await engine.item("testItem")
+        let itemProxy = await engine.item("testItem")
 
         // When
-        let change = try await itemProxy.clearFlag(.testItemFlag)
+        let change = await itemProxy.clearFlag(.testItemFlag)
 
         // Then
         #expect(change != nil)
@@ -46,10 +46,10 @@ struct ProxyStateChangeTests {
         )
         let game = MinimalGame(items: item)
         let (engine, _) = await GameEngine.test(blueprint: game)
-        let itemProxy = try await engine.item("testItem")
+        let itemProxy = await engine.item("testItem")
 
         // When
-        let change = try await itemProxy.clearFlag(.testItemFlag)
+        let change = await itemProxy.clearFlag(.testItemFlag)
 
         // Then
         #expect(change == nil)
@@ -64,10 +64,10 @@ struct ProxyStateChangeTests {
         )
         let game = MinimalGame(items: item)
         let (engine, _) = await GameEngine.test(blueprint: game)
-        let itemProxy = try await engine.item("testItem")
+        let itemProxy = await engine.item("testItem")
 
         // When
-        let change = try await itemProxy.setFlag(.testItemFlag)
+        let change = await itemProxy.setFlag(.testItemFlag)
 
         // Then
         #expect(change != nil)
@@ -92,10 +92,10 @@ struct ProxyStateChangeTests {
         )
         let game = MinimalGame(items: item)
         let (engine, _) = await GameEngine.test(blueprint: game)
-        let itemProxy = try await engine.item("testItem")
+        let itemProxy = await engine.item("testItem")
 
         // When
-        let change = try await itemProxy.setFlag(.testItemFlag)
+        let change = await itemProxy.setFlag(.testItemFlag)
 
         // Then
         #expect(change == nil)
@@ -111,7 +111,7 @@ struct ProxyStateChangeTests {
         )
         let game = MinimalGame(items: item)
         let (engine, _) = await GameEngine.test(blueprint: game)
-        let itemProxy = try await engine.item("testItem")
+        let itemProxy = await engine.item("testItem")
 
         // When
         let change = itemProxy.move(to: .player)
@@ -135,7 +135,7 @@ struct ProxyStateChangeTests {
         )
         let game = MinimalGame(items: item)
         let (engine, _) = await GameEngine.test(blueprint: game)
-        let itemProxy = try await engine.item("testItem")
+        let itemProxy = await engine.item("testItem")
 
         // When
         let change = itemProxy.remove()
@@ -158,10 +158,10 @@ struct ProxyStateChangeTests {
         )
         let game = MinimalGame(items: item)
         let (engine, _) = await GameEngine.test(blueprint: game)
-        let itemProxy = try await engine.item("testItem")
+        let itemProxy = await engine.item("testItem")
 
         // When
-        let change = try await itemProxy.setProperty(.testItemCounter, to: .int(42))
+        let change = await itemProxy.setProperty(.testItemCounter, to: .int(42))
 
         // Then
         #expect(change != nil)
@@ -186,10 +186,10 @@ struct ProxyStateChangeTests {
         )
         let game = MinimalGame(items: item)
         let (engine, _) = await GameEngine.test(blueprint: game)
-        let itemProxy = try await engine.item("testItem")
+        let itemProxy = await engine.item("testItem")
 
         // When
-        let change = try await itemProxy.setProperty(.testItemCounter, to: .int(42))
+        let change = await itemProxy.setProperty(.testItemCounter, to: .int(42))
 
         // Then
         #expect(change == nil)
@@ -204,10 +204,10 @@ struct ProxyStateChangeTests {
         )
         let game = MinimalGame(items: item)
         let (engine, _) = await GameEngine.test(blueprint: game)
-        let itemProxy = try await engine.item("testItem")
+        let itemProxy = await engine.item("testItem")
 
         // When
-        let change = try await itemProxy.setProperty(.testItemFlag, to: true)
+        let change = await itemProxy.setProperty(.testItemFlag, to: true)
 
         // Then
         #expect(change != nil)
@@ -231,10 +231,10 @@ struct ProxyStateChangeTests {
         )
         let game = MinimalGame(items: item)
         let (engine, _) = await GameEngine.test(blueprint: game)
-        let itemProxy = try await engine.item("testItem")
+        let itemProxy = await engine.item("testItem")
 
         // When
-        let change = try await itemProxy.setProperty(.testItemCounter, to: 100)
+        let change = await itemProxy.setProperty(.testItemCounter, to: 100)
 
         // Then
         #expect(change != nil)
@@ -258,10 +258,10 @@ struct ProxyStateChangeTests {
         )
         let game = MinimalGame(items: item)
         let (engine, _) = await GameEngine.test(blueprint: game)
-        let itemProxy = try await engine.item("testItem")
+        let itemProxy = await engine.item("testItem")
 
         // When
-        let change = try await itemProxy.setProperty(.testItemText, to: "Hello World")
+        let change = await itemProxy.setProperty(.testItemText, to: "Hello World")
 
         // Then
         #expect(change != nil)
@@ -285,10 +285,10 @@ struct ProxyStateChangeTests {
         )
         let game = MinimalGame(items: item)
         let (engine, _) = await GameEngine.test(blueprint: game)
-        let itemProxy = try await engine.item("testItem")
+        let itemProxy = await engine.item("testItem")
 
         // When
-        let change = try await itemProxy.setDescription(to: "A newly described item.")
+        let change = await itemProxy.setDescription(to: "A newly described item.")
 
         // Then
         #expect(change != nil)
@@ -313,10 +313,10 @@ struct ProxyStateChangeTests {
         )
         let game = MinimalGame(items: item)
         let (engine, _) = await GameEngine.test(blueprint: game)
-        let itemProxy = try await engine.item("testItem")
+        let itemProxy = await engine.item("testItem")
 
         // When
-        let change = try await itemProxy.setDescription(to: "A newly described item.")
+        let change = await itemProxy.setDescription(to: "A newly described item.")
 
         // Then
         #expect(change == nil)
@@ -334,10 +334,10 @@ struct ProxyStateChangeTests {
         )
         let game = MinimalGame(locations: location)
         let (engine, _) = await GameEngine.test(blueprint: game)
-        let locationProxy = try await engine.location("testLocation")
+        let locationProxy = await engine.location("testLocation")
 
         // When
-        let change = try await locationProxy.clearFlag(.testLocationFlag)
+        let change = await locationProxy.clearFlag(.testLocationFlag)
 
         // Then
         #expect(change != nil)
@@ -361,10 +361,10 @@ struct ProxyStateChangeTests {
         )
         let game = MinimalGame(locations: location)
         let (engine, _) = await GameEngine.test(blueprint: game)
-        let locationProxy = try await engine.location("testLocation")
+        let locationProxy = await engine.location("testLocation")
 
         // When
-        let change = try await locationProxy.clearFlag(.testLocationFlag)
+        let change = await locationProxy.clearFlag(.testLocationFlag)
 
         // Then
         #expect(change == nil)
@@ -379,10 +379,10 @@ struct ProxyStateChangeTests {
         )
         let game = MinimalGame(locations: location)
         let (engine, _) = await GameEngine.test(blueprint: game)
-        let locationProxy = try await engine.location("testLocation")
+        let locationProxy = await engine.location("testLocation")
 
         // When
-        let change = try await locationProxy.setFlag(.testLocationFlag)
+        let change = await locationProxy.setFlag(.testLocationFlag)
 
         // Then
         #expect(change != nil)
@@ -407,10 +407,10 @@ struct ProxyStateChangeTests {
         )
         let game = MinimalGame(locations: location)
         let (engine, _) = await GameEngine.test(blueprint: game)
-        let locationProxy = try await engine.location("testLocation")
+        let locationProxy = await engine.location("testLocation")
 
         // When
-        let change = try await locationProxy.setFlag(.testLocationFlag)
+        let change = await locationProxy.setFlag(.testLocationFlag)
 
         // Then
         #expect(change == nil)
@@ -425,10 +425,10 @@ struct ProxyStateChangeTests {
         )
         let game = MinimalGame(locations: location)
         let (engine, _) = await GameEngine.test(blueprint: game)
-        let locationProxy = try await engine.location("testLocation")
+        let locationProxy = await engine.location("testLocation")
 
         // When
-        let change = try await locationProxy.setProperty(.testLocationCounter, to: .int(99))
+        let change = await locationProxy.setProperty(.testLocationCounter, to: .int(99))
 
         // Then
         #expect(change != nil)
@@ -453,10 +453,10 @@ struct ProxyStateChangeTests {
         )
         let game = MinimalGame(locations: location)
         let (engine, _) = await GameEngine.test(blueprint: game)
-        let locationProxy = try await engine.location("testLocation")
+        let locationProxy = await engine.location("testLocation")
 
         // When
-        let change = try await locationProxy.setProperty(.testLocationCounter, to: .int(99))
+        let change = await locationProxy.setProperty(.testLocationCounter, to: .int(99))
 
         // Then
         #expect(change == nil)
@@ -471,10 +471,10 @@ struct ProxyStateChangeTests {
         )
         let game = MinimalGame(locations: location)
         let (engine, _) = await GameEngine.test(blueprint: game)
-        let locationProxy = try await engine.location("testLocation")
+        let locationProxy = await engine.location("testLocation")
 
         // When
-        let change = try await locationProxy.setProperty(.testLocationFlag, to: true)
+        let change = await locationProxy.setProperty(.testLocationFlag, to: true)
 
         // Then
         #expect(change != nil)
@@ -498,10 +498,10 @@ struct ProxyStateChangeTests {
         )
         let game = MinimalGame(locations: location)
         let (engine, _) = await GameEngine.test(blueprint: game)
-        let locationProxy = try await engine.location("testLocation")
+        let locationProxy = await engine.location("testLocation")
 
         // When
-        let change = try await locationProxy.setProperty(.testLocationCounter, to: 200)
+        let change = await locationProxy.setProperty(.testLocationCounter, to: 200)
 
         // Then
         #expect(change != nil)
@@ -525,10 +525,10 @@ struct ProxyStateChangeTests {
         )
         let game = MinimalGame(locations: location)
         let (engine, _) = await GameEngine.test(blueprint: game)
-        let locationProxy = try await engine.location("testLocation")
+        let locationProxy = await engine.location("testLocation")
 
         // When
-        let change = try await locationProxy.setProperty(.testLocationText, to: "Location Text")
+        let change = await locationProxy.setProperty(.testLocationText, to: "Location Text")
 
         // Then
         #expect(change != nil)
@@ -553,10 +553,10 @@ struct ProxyStateChangeTests {
         )
         let game = MinimalGame(locations: location)
         let (engine, _) = await GameEngine.test(blueprint: game)
-        let locationProxy = try await engine.location("testLocation")
+        let locationProxy = await engine.location("testLocation")
 
         // When
-        let change = try await locationProxy.setDescription(to: "A newly described location.")
+        let change = await locationProxy.setDescription(to: "A newly described location.")
 
         // Then
         #expect(change != nil)
@@ -581,10 +581,10 @@ struct ProxyStateChangeTests {
         )
         let game = MinimalGame(locations: location)
         let (engine, _) = await GameEngine.test(blueprint: game)
-        let locationProxy = try await engine.location("testLocation")
+        let locationProxy = await engine.location("testLocation")
 
         // When
-        let change = try await locationProxy.setDescription(to: "A newly described location.")
+        let change = await locationProxy.setDescription(to: "A newly described location.")
 
         // Then
         #expect(change == nil)
@@ -602,25 +602,25 @@ struct ProxyStateChangeTests {
         )
         let game = MinimalGame(items: item)
         let (engine, _) = await GameEngine.test(blueprint: game)
-        let itemProxy = try await engine.item("testItem")
+        let itemProxy = await engine.item("testItem")
 
         // When - Apply multiple changes in sequence
         let moveChange = itemProxy.move(to: .player)
         try await engine.apply(moveChange)
 
-        let flagChange = try await itemProxy.setFlag(.testItemFlag)
+        let flagChange = await itemProxy.setFlag(.testItemFlag)
         if let flagChange {
             try await engine.apply(flagChange)
         }
 
-        let descriptionChange = try await itemProxy.setDescription(to: "A modified item.")
+        let descriptionChange = await itemProxy.setDescription(to: "A modified item.")
         if let descriptionChange {
             try await engine.apply(descriptionChange)
         }
 
         // Then - Verify final state
-        let finalItemProxy = try await engine.item("testItem")
-        #expect(try await finalItemProxy.parent == .player)
+        let finalItemProxy = await engine.item("testItem")
+        #expect(await finalItemProxy.parent == .player)
         #expect(await finalItemProxy.hasFlag(.testItemFlag) == true)
         #expect(await finalItemProxy.description == "A modified item.")
     }
@@ -634,53 +634,29 @@ struct ProxyStateChangeTests {
         )
         let game = MinimalGame(locations: location)
         let (engine, _) = await GameEngine.test(blueprint: game)
-        let locationProxy = try await engine.location("testLocation")
+        let locationProxy = await engine.location("testLocation")
 
         // When - Apply multiple changes in sequence
-        let flagChange = try await locationProxy.setFlag(.testLocationFlag)
+        let flagChange = await locationProxy.setFlag(.testLocationFlag)
         if let flagChange {
             try await engine.apply(flagChange)
         }
 
-        let counterChange = try await locationProxy.setProperty(.testLocationCounter, to: 42)
+        let counterChange = await locationProxy.setProperty(.testLocationCounter, to: 42)
         if let counterChange {
             try await engine.apply(counterChange)
         }
 
-        let descriptionChange = try await locationProxy.setDescription(to: "A modified location.")
+        let descriptionChange = await locationProxy.setDescription(to: "A modified location.")
         if let descriptionChange {
             try await engine.apply(descriptionChange)
         }
 
         // Then - Verify final state
-        let finalLocationProxy = try await engine.location("testLocation")
+        let finalLocationProxy = await engine.location("testLocation")
         #expect(await finalLocationProxy.hasFlag(.testLocationFlag) == true)
-        #expect(try await finalLocationProxy.property(.testLocationCounter) == .int(42))
-        #expect(try await finalLocationProxy.description == "A modified location.")
-    }
-
-    // MARK: - Error Handling Tests
-
-    @Test("Proxy creation with non-existent item throws")
-    func testProxyCreationNonExistentItemThrows() async throws {
-        // Given
-        let (engine, _) = await GameEngine.test()
-
-        // When/Then
-        await #expect(throws: ActionResponse.self) {
-            try await engine.item("nonExistentItem")
-        }
-    }
-
-    @Test("Proxy creation with non-existent location throws")
-    func testProxyCreationNonExistentLocationThrows() async throws {
-        // Given
-        let (engine, _) = await GameEngine.test()
-
-        // When/Then
-        await #expect(throws: ActionResponse.self) {
-            try await engine.location("nonExistentLocation")
-        }
+        #expect(await finalLocationProxy.property(.testLocationCounter) == .int(42))
+        #expect(await finalLocationProxy.description == "A modified location.")
     }
 }
 

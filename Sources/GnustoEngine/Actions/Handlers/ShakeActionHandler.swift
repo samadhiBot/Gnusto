@@ -33,7 +33,7 @@ public struct ShakeActionHandler: ActionHandler {
             )
         }
 
-        return try await ActionResult(
+        return await ActionResult(
             item.response(
                 object: { context.msg.shakeObject(context.verb, item: $0) },
                 character: { context.msg.shakeCharacter(context.verb, character: $0) },

@@ -252,15 +252,15 @@ public struct CombatState: Codable, Equatable, Sendable, Hashable {
     ///
     /// ## Usage
     /// ```swift
-    /// let enemy = try await combatState.enemy(with: engine)
-    /// let enemyHealth = try await enemy.health
+    /// let enemy = await combatState.enemy(with: engine)
+    /// let enemyHealth = await enemy.health
     /// let enemyName = enemy.withDefiniteArticle
     /// ```
     ///
     /// - Important: Always use this method rather than directly accessing items by ID
     ///   to ensure proper proxy behavior and computed value resolution.
-    func enemy(with engine: GameEngine) async throws -> ItemProxy {
-        try await Item(id: enemyID).proxy(engine)
+    func enemy(with engine: GameEngine) async -> ItemProxy {
+        await Item(id: enemyID).proxy(engine)
     }
 
     /// Retrieves the player's weapon as an `ItemProxy`, if one is being used.
@@ -274,7 +274,7 @@ public struct CombatState: Codable, Equatable, Sendable, Hashable {
     ///
     /// ## Usage
     /// ```swift
-    /// let weapon = try await combatState.playerWeapon(with: engine)
+    /// let weapon = await combatState.playerWeapon(with: engine)
     /// if let weapon {
     ///     let damage = await weapon.weaponAttributes.damage
     ///     let weaponName = weapon.withIndefiniteArticle
@@ -285,9 +285,9 @@ public struct CombatState: Codable, Equatable, Sendable, Hashable {
     ///
     /// - Note: This method only returns `nil` if `playerWeaponID` is `nil`. If a weapon
     ///   ID is stored but the weapon cannot be found, this method will throw an error.
-    func playerWeapon(with engine: GameEngine) async throws -> ItemProxy? {
+    func playerWeapon(with engine: GameEngine) async -> ItemProxy? {
         guard let playerWeaponID else { return nil }
-        return try await Item(id: playerWeaponID).proxy(engine)
+        return await Item(id: playerWeaponID).proxy(engine)
     }
 
     /// Retrieves the enemy's weapon as an `ItemProxy`, if one is being used.
@@ -301,7 +301,7 @@ public struct CombatState: Codable, Equatable, Sendable, Hashable {
     ///
     /// ## Usage
     /// ```swift
-    /// let enemyWeapon = try await combatState.enemyWeapon(with: engine)
+    /// let enemyWeapon = await combatState.enemyWeapon(with: engine)
     /// if let enemyWeapon {
     ///     let damage = await enemyWeapon.weaponAttributes.damage
     ///     let weaponType = enemyWeapon.weaponType
@@ -309,9 +309,9 @@ public struct CombatState: Codable, Equatable, Sendable, Hashable {
     ///     // Enemy uses natural weapons (claws, fists, etc.)
     /// }
     /// ```
-    func enemyWeapon(with engine: GameEngine) async throws -> ItemProxy? {
+    func enemyWeapon(with engine: GameEngine) async -> ItemProxy? {
         guard let enemyWeaponID else { return nil }
-        return try await Item(id: enemyWeaponID).proxy(engine)
+        return await Item(id: enemyWeaponID).proxy(engine)
     }
 
     // MARK: - Combat Progression Methods

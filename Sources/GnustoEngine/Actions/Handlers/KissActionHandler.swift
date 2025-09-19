@@ -32,7 +32,7 @@ public struct KissActionHandler: ActionHandler {
             throw ActionResponse.doWhat(context)
         }
 
-        return try await ActionResult(
+        return await ActionResult(
             item.response(
                 object: context.msg.kissObject,
                 character: context.msg.kissCharacter,

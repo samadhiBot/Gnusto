@@ -38,7 +38,7 @@ import Foundation
 ///     func processCombatTurn(
 ///         playerAction: PlayerAction,
 ///         in context: ActionContext
-///     ) async throws -> ActionResult {
+///     ) async -> ActionResult {
 ///         // Custom dragon combat logic
 ///     }
 /// }
@@ -64,7 +64,7 @@ public protocol CombatSystem: Sendable {
     var description: @Sendable (
         CombatEvent,
         CombatMessenger
-    ) async throws -> String? { get }
+    ) async -> String? { get }
 
     /// Processes a complete turn of combat including player action and enemy reaction.
     ///
@@ -88,7 +88,7 @@ public protocol CombatSystem: Sendable {
     func processCombatTurn(
         playerAction: PlayerAction,
         in context: ActionContext
-    ) async throws -> ActionResult
+    ) async -> ActionResult
 
     /// Calculates the outcome of a combat attack.
     ///
@@ -115,7 +115,7 @@ public protocol CombatSystem: Sendable {
         defender: Combatant,
         weapon: ItemProxy?,
         in context: ActionContext
-    ) async throws -> CombatEvent
+    ) async -> CombatEvent
 
     /// Determines the enemy's action for this turn.
     ///
@@ -137,5 +137,5 @@ public protocol CombatSystem: Sendable {
         against playerAction: PlayerAction,
         enemy: ItemProxy,
         in context: ActionContext
-    ) async throws -> CombatEvent?
+    ) async -> CombatEvent?
 }

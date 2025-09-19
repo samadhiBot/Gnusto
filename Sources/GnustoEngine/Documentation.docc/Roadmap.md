@@ -32,23 +32,22 @@ With the completion of the "giga-branch" development phase, Gnusto has undergone
 
 - [ ] **Reference Implementation Goals**
   - [ ] Complete playable Zork 1 experience
-  - [x] Authentic messaging and tone matching original
+  - ✅ Authentic messaging and tone matching original
   - [ ] Comprehensive example of all engine capabilities
   - [ ] Flagship demonstration for 1.0 release
 
 ### 1.2 Documentation Expansion
 
-- [x] ✅ **Core Documentation Updates**
+- ✅ **Core Documentation Updates**
   - ✅ Updated main documentation to reflect new systems
-  - ✅ Enhanced ActionHandlerGuide for proxy system
-  - ✅ Comprehensive DynamicAttributes guide update
+  - ✅ Enhanced ActionHandler guide
+  - ✅ Comprehensive DynamicAttributes guide
   - ✅ GnustoAutoWiringPlugin documentation improvements
 
 - [ ] **New System Documentation**
   - [ ] Combat system developer guide
   - [ ] Character system reference documentation
   - [ ] Conversation system patterns and best practices
-  - [ ] Proxy system deep-dive guide
   - [ ] Messenger system customization guide
 
 - [ ] **Example and Tutorial Content**

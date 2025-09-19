@@ -48,26 +48,7 @@ The core challenge demonstrates basic item management:
 
 ```swift
 struct Act1Area {
-    // Locations with increasing complexity
-    let yourHouse = Location(id: "yourHouse", ...)
-    let stoneBridge = Location(id: "stoneBridge", ...)
-    let countryRoad = Location(id: "countryRoad", ...)
-    let berziosGate = Location(id: "berziosGate", ...)
-    let berziosGarden = Location(id: "berziosGarden", ...)
-
-    // Items with special behaviors
-    let basket = Item(id: "basket", .container(capacity: 3), .takable)
-    let lemonade = Item(id: "lemonade", .takable, .wearable) // Can balance on head!
-    let gnustoDog = Item(id: "gnustoDog", .takable) // Very special item
-
-    // Event handlers following naming convention
-    let gnustoDogHandler = ItemEventHandler(for: .gnustoDog) {
-        // Gnusto "helps" by trying to take things
-    }
-
-    let stoneBridgeHandler = LocationEventHandler { engine, event in
-        // Wobbling effects, magical sparks
-    }
+    // ...
 }
 ```
 
@@ -131,101 +112,19 @@ The bureaucratic encounter introduces time pressure and custom interactions:
 #### Time-Based Events
 
 ```swift
-// Fuse: Butter softening creates urgency
-let butterSoftening = Fuse(id: "butterSoftening", initialTurns: 20) { engine in
-    await engine.ioHandler.print("The butter is becoming dangerously soft in the warm sun!")
-    let change = StateChange(
-        entityId: .item("butterCrock"),
-        property: .hasProperty("melted"),
-        newValue: true
-    )
-    try engine.applyStateChange(change)
-}
-
-// Daemon: Official's increasing impatience
-let impatientOfficial = Daemon(id: "impatientOfficial", frequency: 3) { engine in
-    let patience = await engine.getGlobalFlag("officialPatience")
-    if patience > 0 {
-        let messages = [
-            "*tap tap*",
-            "The official checks his timepiece.",
-            "\"Bureaucracy waits for no one!\"",
-            "The official drums his fingers impatiently."
-        ]
-        await engine.ioHandler.print(messages.randomElement()!)
-        await engine.setGlobalFlag("officialPatience", patience - 1)
-    }
-}
-
-// Daemon: Workshop atmosphere
-let workshopAmbience = Daemon(id: "workshopAmbience", frequency: 5) { engine in
-    let messages = [
-        "Magical apparatus bubbles quietly in the workshop.",
-        "Ancient tomes rustle their pages in a mystical breeze.",
-        "A distant sound of thaumaturgical experimentation echoes."
-    ]
-    await engine.ioHandler.print(messages.randomElement()!)
-}
+    // ...
 ```
 
 #### Custom Action Handlers
 
 ```swift
-struct FillOutActionHandler: ActionHandler {
-    func process(context: ActionContext) async throws -> ActionResult {
-        // Complex form completion logic with multiple steps
-        // Each page requires different information
-        return ActionResult(
-            "You begin the tedious process of form completion...",
-            StateChange(
-                entityId: .item("bureaucraticForm"),
-                property: .hasProperty("progress"),
-                newValue: .int(currentProgress + 1)
-            )
-        )
-    }
-}
-
-struct ReciteActionHandler: ActionHandler {
-    func validate(context: ActionContext) async throws {
-        let hasOath = await engine.getGlobalFlag("knowsFlatheadOath")
-        guard hasOath else {
-            throw await ActionResponse.feedback("You don't know the Flathead Oath of Allegiance. Perhaps you should ask about it first.")
-        }
-    }
-
-    func process(context: ActionContext) async throws -> ActionResult {
-        ActionResult("""
-            You begin reciting the absurdly long Flathead Oath:
-            "I, a humble subject of the Great Underground Empire, do solemnly swear..."
-            [The recitation continues for several minutes]
-
-            The official nods approvingly. "Acceptable. Though your pronunciation of
-            'thaumaturgical sovereignty' could use work."
-            """
-        )
-    }
-}
+    // ...
 ```
 
 #### Dynamic Location Behaviors
 
 ```swift
-let bureaucraticCheckpointHandler = LocationEventHandler { engine, event in
-    switch event {
-    case .beforeTurn(let command):
-        let officialPresent = await engine.isItemInLocation("impatientOfficial", "bureaucraticCheckpoint")
-        if officialPresent && command.verb != .fillOut && command.verb != .present {
-            return ActionResult("The official clears his throat meaningfully. \"The forms, citizen. The forms must be completed.\"")
-        }
-        return nil
-    case .onEnter:
-        await engine.ioHandler.print("The official has set up a small folding table with an impressive stack of forms.")
-        return nil
-    case .afterTurn:
-        return nil
-    }
-}
+    // ...
 ```
 
 ### New Items
@@ -274,149 +173,19 @@ The discovery phase showcases the engine's most sophisticated features:
 #### Complex Custom Verbs
 
 ```swift
-struct CastActionHandler: ActionHandler {
-    func validate(context: ActionContext) async throws {
-        guard let directObject = command.directObject,
-              case .item(let scrollID) = directObject else {
-            throw await ActionResponse.feedback("Cast what? You need to specify a scroll.")
-        }
-
-        let isScroll = await engine.hasItemProperty(scrollID, .scroll)
-        guard isScroll else {
-            throw await ActionResponse.feedback("You can only cast spells from scrolls.")
-        }
-
-        let isMemorized = await engine.getItemProperty(scrollID, "memorized")?.toBool ?? false
-        guard isMemorized else {
-            throw await ActionResponse.feedback("You must first memorize the spell before casting it.")
-        }
-    }
-
-    func process(context: ActionContext) async throws -> ActionResult {
-        guard case .item(let scrollID) = command.directObject else {
-            throw ActionResponse.internalEngineError("Validated item disappeared")
-        }
-
-        let spellType = await engine.getItemProperty(scrollID, "spellType")?.toString ?? "unknown"
-        let potency = await engine.getItemProperty(scrollID, "potency")?.toInt ?? 50
-
-        // Check for nearby impregnated paper (the magic happens here!)
-        let nearbyItems = await engine.itemsInCurrentLocation()
-        let impregnatedNotebook = nearbyItems.first { item in
-            item.hasProperty("butterStained") &&
-            item.hasProperty("preserveStained") &&
-            item.hasProperty("lemonadeStained")
-        }
-
-        if let impregnatedNotebook {
-            return processSpellTransfer(scrollID: scrollID, notebook: impregnatedNotebook, potency: potency)
-        } else {
-            return processNormalSpellCasting(spellType: spellType, potency: potency)
-        }
-    }
-
-    private func processSpellTransfer(scrollID: ItemID, notebook: Item, potency: Int) -> ActionResult {
-        let transferPotency = max(potency / 2, 25) // Initial transfer is half potency
-
-        return ActionResult(
-            """
-            As you cast the \(spellType) spell, the scroll crumbles to dust as usual. But wait!
-            Something extraordinary happens. Faint letters begin to appear on the stained pages
-            of the notebook, like a developing Polaroid print. The spell is transferring to the paper!
-
-            The magical writings glow softly for a moment, then settle into the page. You have
-            discovered something remarkable.
-            """,
-            StateChange(entityId: .item(scrollID), property: .removeFromGame, newValue: true),
-            StateChange(entityId: .item(notebook.id), property: .addSpell(spellType), newValue: .int(transferPotency)),
-            StateChange(entityId: .global, property: .setFlag("discoveredSpellTransfer"), newValue: true),
-            effects: [
-                SideEffect(type: .scheduleEvent, targetID: .global, parameters: ["message": "Berzio emerges from the workshop, drawn by the unusual magical resonance."])
-            ]
-        )
-    }
-}
-
-struct ExperimentActionHandler: ActionHandler {
-    func process(context: ActionContext) async throws -> ActionResult {
-        // Complex experimentation logic
-        // Players can try different combinations and sequences
-        // Success depends on understanding the proper order and proportions
-    }
-}
+    // ...
 ```
 
 #### Dynamic Property Computation
 
 ```swift
-// Register dynamic spell potency calculation
-dynamicPropertyRegistry.registerItemCompute(propertyID: "spellPotency") { item, gameState in
-    let baseIngredients = ["butter", "preserves", "lemonade"]
-    let hasAllIngredients = baseIngredients.allSatisfy { ingredient in
-        item.hasProperty("\(ingredient)Stained")
-    }
-
-    if hasAllIngredients {
-        let orderBonus = calculateSequenceBonus(item: item, gameState: gameState)
-        let qualityBonus = calculateIngredientQuality(item: item, gameState: gameState)
-        return .int(50 + orderBonus + qualityBonus) // Base 50%, up to 100%
-    }
-
-    return .int(0)
-}
-
-// Validate spell transfer attempts
-dynamicPropertyRegistry.registerItemValidate(propertyID: "canReceiveSpell") { item, newValue in
-    guard item.hasProperty(.paper) else { return false }
-
-    let isImpregnated = item.hasProperty("butterStained") &&
-                       item.hasProperty("preserveStained") &&
-                       item.hasProperty("lemonadeStained")
-
-    return isImpregnated
-}
+    // ...
 ```
 
 #### ItemEventHandlers with Complex Logic
 
 ```swift
-let magicNotebookHandler = ItemEventHandler(for: .magicNotebook) {
-    before(.examine) { context, command in
-        let description = await generateDynamicNotebookDescription(engine: context.engine)
-        return ActionResult(description)
-    }
-    
-    after(.cast) { context, command in
-        if await context.engine.getGlobalFlag("discoveredSpellTransfer") {
-            await context.engine.scheduleEvent("berzioReaction", delay: 1)
-        }
-        return nil
-    }
-}
-
-func generateDynamicNotebookDescription(engine: GameEngine) async -> String {
-    let notebook = await engine.itemSnapshot(with: "magicNotebook")!
-
-    var description = "A massive thousand-page notebook filled with thaumaturgical notes and diagrams."
-
-    if notebook.hasProperty("butterStained") {
-        description += " The pages are stained with butter"
-        if notebook.hasProperty("preserveStained") {
-            description += " and cherry preserves"
-            if notebook.hasProperty("lemonadeStained") {
-                description += " and blackberry lemonade"
-            }
-        }
-        description += ". The stains have created an unusual pattern on the paper."
-    }
-
-    let spellCount = notebook.properties.keys.filter { $0.starts(with: "spell_") }.count
-    if spellCount > 0 {
-        description += " Magical writings glow faintly on \(spellCount) of the stained pages."
-    }
-
-    return description
-}
+    // ...
 ```
 
 ### New Items
@@ -450,67 +219,6 @@ func generateDynamicNotebookDescription(engine: GameEngine) async -> String {
 - Advanced state tracking and scoring
 - Integration of all previous features into cohesive systems
 
----
-
-## Progressive Feature Integration
-
-### File Organization Strategy
-
-```
-Executables/FrobozzMagicDemoKit/
-├── STORY.md # This document
-├── ACT1.md # Existing story outline
-├── README.md # Existing overview
-├── TONE_BACKSTORY.md # Existing lore
-├── main.swift # Entry point
-├── Areas/
-│ ├── Act1Area.swift # Basic mechanics demonstration
-│ ├── Act2Area.swift # Time events and custom actions
-│ └── Act3Area.swift # Complex systems integration
-├── ActionHandlers/
-│ ├── FillOutActionHandler.swift
-│ ├── ReciteActionHandler.swift
-│ ├── CastActionHandler.swift
-│ └── ExperimentActionHandler.swift
-├── EventHandlers/
-│ ├── BureaucraticHandlers.swift
-│ ├── MagicalHandlers.swift
-│ └── WorkshopHandlers.swift
-├── TimeEvents/
-│ ├── Act2Fuses.swift # Butter melting, official patience
-│ ├── Act2Daemons.swift # Workshop ambience, bureaucratic pressure
-│ └── Act3Events.swift # Discovery reactions, spell effects
-└── FrobozzMagicDemoKit.swift # Main GameBlueprint implementation
-```
-
-### Implementation Phases
-
-1. **Phase 1**: Complete Act I implementation
-
-   - Basic area structure
-   - Standard action handlers
-   - Simple puzzle mechanics
-   - Foundation for Acts II & III
-
-2. **Phase 2**: Add Act II complexity
-
-   - Time-based event system
-   - Custom action handlers
-   - Dynamic location behaviors
-   - Bureaucratic encounter mechanics
-
-3. **Phase 3**: Implement Act III discovery
-
-   - Complex spell system
-   - Dynamic property computation
-   - Multiple solution paths
-   - Comprehensive scoring
-
-4. **Phase 4**: Polish and documentation
-   - Extensive code comments
-   - Developer tutorials
-   - Engine feature demonstrations
-   - Performance optimization
 
 ## Educational Value
 
@@ -521,32 +229,3 @@ Each act serves as a tutorial for specific engine capabilities:
 - **Expert Developers**: Examine Act III for complex system design
 
 The progression ensures developers can learn incrementally while seeing how features combine to create rich, interactive experiences.
-
----
-
-## ZIL Homages & Easter Eggs
-
-Throughout all acts, we maintain connection to IF classics:
-
-### Phrases & Responses
-
-- "It is pitch black. You are likely to be eaten by a grue." (dark workshop)
-- "You are carrying..." (inventory formatting)
-- "I don't understand that." (parser failures)
-- "You can't see that here." (scope violations)
-
-### Mechanical Homages
-
-- Light source requirements for certain areas
-- Container logic matching Zork behavior
-- Score notifications matching classic format
-- Turn counting and time passage
-
-### Hidden References
-
-- `xyzzy` command produces appropriate response
-- Grue encounters in truly dark areas
-- References to the Great Underground Empire
-- Flathead bureaucracy callbacks
-
-The demo celebrates IF history while showcasing modern engine capabilities, honoring the past while building for the future.

@@ -49,7 +49,7 @@ public struct WaveActionHandler: ActionHandler {
             )
         }
 
-        return try await ActionResult(
+        return await ActionResult(
             object.response(
                 object: context.msg.waveAtObject,
                 character: context.msg.waveAtCharacter,

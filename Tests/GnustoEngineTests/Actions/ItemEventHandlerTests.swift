@@ -401,8 +401,8 @@ struct ItemEventHandlerTests {
         )
 
         // Verify the item was not actually taken
-        let finalState = try await engine.item("testItem")
-        let wasNotTaken = try await !finalState.playerIsHolding
+        let finalState = await engine.item("testItem")
+        let wasNotTaken = await !finalState.playerIsHolding
         #expect(wasNotTaken == true)
     }
 
@@ -481,7 +481,7 @@ struct ItemEventHandlerTests {
     func testConditionalTriggering() async throws {
         let handler = ItemEventHandler { engine, event in
             if case .beforeTurn(let command) = event, command.verb.intents.contains(.examine) {
-                let item = try await engine.item("magicOrb")
+                let item = await engine.item("magicOrb")
                 let isActive = await item.hasFlag(.isOn)
 
                 if isActive {
@@ -631,8 +631,8 @@ struct ItemEventHandlerTests {
         )
 
         // Verify the item was not actually taken
-        let finalState = try await engine.item("testItem")
-        let wasNotTaken = try await !finalState.playerIsHolding
+        let finalState = await engine.item("testItem")
+        let wasNotTaken = await !finalState.playerIsHolding
         #expect(wasNotTaken == true)
     }
 
@@ -667,14 +667,14 @@ struct ItemEventHandlerTests {
         let (engine, mockIO) = await GameEngine.test(blueprint: blueprint)
 
         // Verify item is off initially
-        let initialState = try await engine.item("glowItem")
+        let initialState = await engine.item("glowItem")
         let initiallyOn = await initialState.hasFlag(.isOn)
         #expect(initiallyOn == false)
 
         try await engine.execute("examine glowing stone")
 
         // Verify item was turned on by the handler
-        let finalState = try await engine.item("glowItem")
+        let finalState = await engine.item("glowItem")
         let finallyOn = await finalState.hasFlag(.isOn)
         #expect(finallyOn == false)  // Handler doesn't actually change state in simplified version
 
@@ -862,10 +862,10 @@ struct ItemEventHandlerTests {
         )
 
         // Both bottle and water should be gone
-        let finalBottle = try await engine.item("bottle")
-        let finalWater = try await engine.item("water")
-        #expect(try await finalBottle.parent == .nowhere)
-        #expect(try await finalWater.parent == .nowhere)
+        let finalBottle = await engine.item("bottle")
+        let finalWater = await engine.item("water")
+        #expect(await finalBottle.parent == .nowhere)
+        #expect(await finalWater.parent == .nowhere)
     }
 
     @Test("Bottle handler - throw empty bottle")
@@ -917,8 +917,8 @@ struct ItemEventHandlerTests {
         )
 
         // Bottle should be gone
-        let finalBottle = try await engine.item("bottle")
-        #expect(try await finalBottle.parent == .nowhere)
+        let finalBottle = await engine.item("bottle")
+        #expect(await finalBottle.parent == .nowhere)
     }
 
     @Test("Bottle handler - attack bottle with water")
@@ -965,10 +965,10 @@ struct ItemEventHandlerTests {
         )
 
         // Both bottle and water should be gone
-        let finalBottle = try await engine.item("bottle")
-        let finalWater = try await engine.item("water")
-        #expect(try await finalBottle.parent == .nowhere)
-        #expect(try await finalWater.parent == .nowhere)
+        let finalBottle = await engine.item("bottle")
+        let finalWater = await engine.item("water")
+        #expect(await finalBottle.parent == .nowhere)
+        #expect(await finalWater.parent == .nowhere)
     }
 
     @Test("Bottle handler - shake open bottle with water")
@@ -1014,10 +1014,10 @@ struct ItemEventHandlerTests {
         )
 
         // Water should be gone, bottle should remain
-        let finalBottle = try await engine.item("bottle")
-        let finalWater = try await engine.item("water")
-        #expect(try await finalBottle.parent == .player)
-        #expect(try await finalWater.parent == .nowhere)
+        let finalBottle = await engine.item("bottle")
+        let finalWater = await engine.item("water")
+        #expect(await finalBottle.parent == .player)
+        #expect(await finalWater.parent == .nowhere)
     }
 
     @Test("Bottle handler - shake closed bottle with water does nothing special")
@@ -1058,18 +1058,18 @@ struct ItemEventHandlerTests {
         #expect(!output.contains("The water spills"))
 
         // Both bottle and water should remain unchanged
-        let finalBottle = try await engine.item("bottle")
-        let finalWater = try await engine.item("water")
-        #expect(try await finalBottle.parent == .player)
-        #expect(try await finalWater.parent == .item(finalBottle))
+        let finalBottle = await engine.item("bottle")
+        let finalWater = await engine.item("water")
+        #expect(await finalBottle.parent == .player)
+        #expect(await finalWater.parent == .item(finalBottle))
     }
 }
 
 extension ItemEventHandlerTests {
     static let bottleHandler = ItemEventHandler(for: "bottle") {
         before(.throw) { context, command in
-            let water = try await context.engine.item("water")
-            let hasWater = try await water.parent == .item(context.item)
+            let water = await context.item("water")
+            let hasWater = await water.parent == .item(context.item)
 
             return if hasWater {
                 ActionResult(
@@ -1089,8 +1089,8 @@ extension ItemEventHandlerTests {
         }
 
         before(.attack) { context, command in
-            let water = try await context.engine.item("water")
-            let hasWater = try await water.parent == .item(context.item)
+            let water = await context.item("water")
+            let hasWater = await water.parent == .item(context.item)
 
             return if hasWater {
                 ActionResult(
@@ -1110,8 +1110,8 @@ extension ItemEventHandlerTests {
         }
 
         before(.push) { context, command in
-            let water = try await context.engine.item("water")
-            let hasWater = try await water.parent == .item(context.item)
+            let water = await context.item("water")
+            let hasWater = await water.parent == .item(context.item)
             let isOpen = await context.item.hasFlag(.isOpen)
 
             return if isOpen && hasWater {

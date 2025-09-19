@@ -22,7 +22,7 @@ struct LocationProxyTests {
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         // When
-        let proxy = try await engine.location(.startRoom)
+        let proxy = await engine.location(.startRoom)
 
         // Then
         #expect(proxy.id == .startRoom)
@@ -41,16 +41,16 @@ struct LocationProxyTests {
 
         let game = MinimalGame(locations: testRoom)
         let (engine, _) = await GameEngine.test(blueprint: game)
-        let proxy = try await engine.location(.startRoom)
+        let proxy = await engine.location(.startRoom)
 
         // When/Then - Test basic property access
-        let name = try await proxy.property(.name)?.toString
+        let name = await proxy.property(.name)?.toString
         #expect(name == "Test Room")
 
-        let description = try await proxy.property(.description)?.toString
+        let description = await proxy.property(.description)?.toString
         #expect(description == "A room for testing.")
 
-        let isLit = try await proxy.property(.inherentlyLit)?.toBool
+        let isLit = await proxy.property(.inherentlyLit)?.toBool
         #expect(isLit == true)
     }
 
@@ -77,9 +77,9 @@ struct LocationProxyTests {
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         // When
-        let proxy1a = try await engine.location("room1")
-        let proxy1b = try await engine.location("room1")
-        let proxy2 = try await engine.location("room2")
+        let proxy1a = await engine.location("room1")
+        let proxy1b = await engine.location("room1")
+        let proxy2 = await engine.location("room2")
 
         // Then
         #expect(proxy1a == proxy1b)
@@ -113,15 +113,15 @@ struct LocationProxyTests {
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         // When/Then
-        let libraryProxy = try await engine.location("library")
+        let libraryProxy = await engine.location("library")
         let name = await libraryProxy.name
         #expect(name == "Grand Library")
 
-        let description = try await libraryProxy.description
+        let description = await libraryProxy.description
         #expect(description == "A vast library filled with ancient tomes.")
 
-        let emptyProxy = try await engine.location("emptyRoom")
-        let emptyDescription = try await emptyProxy.description
+        let emptyProxy = await engine.location("emptyRoom")
+        let emptyDescription = await emptyProxy.description
         #expect(!emptyDescription.isEmpty)  // Should get one of the random undescribed location messages
     }
 
@@ -155,14 +155,14 @@ struct LocationProxyTests {
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         // When/Then
-        let litProxy = try await engine.location("litRoom")
+        let litProxy = await engine.location("litRoom")
         #expect(await litProxy.hasFlag(.inherentlyLit) == true)
         #expect(await litProxy.hasFlag(.omitArticle) == false)
 
-        let darkProxy = try await engine.location("darkRoom")
+        let darkProxy = await engine.location("darkRoom")
         #expect(await darkProxy.hasFlag(.inherentlyLit) == false)
 
-        let specialProxy = try await engine.location("specialRoom")
+        let specialProxy = await engine.location("specialRoom")
         #expect(await specialProxy.hasFlags(any: .inherentlyLit, .omitArticle) == true)
         #expect(await specialProxy.hasFlag(.inherentlyLit) == true)
         #expect(await specialProxy.hasFlag(.omitArticle) == true)
@@ -218,18 +218,18 @@ struct LocationProxyTests {
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         // When/Then
-        let litProxy = try await engine.location("litRoom")
-        #expect(try await litProxy.isLit == true)  // Inherently lit
+        let litProxy = await engine.location("litRoom")
+        #expect(await litProxy.isLit == true)  // Inherently lit
 
-        let darkProxy = try await engine.location("darkRoom")
-        #expect(try await darkProxy.isLit == true)  // Has burning torch
+        let darkProxy = await engine.location("darkRoom")
+        #expect(await darkProxy.isLit == true)  // Has burning torch
 
         // Move player to dark room without lamp
         try await engine.execute("drop lamp")
         try await engine.execute("go to darkRoom")
 
         // Dark room should still be lit due to burning torch
-        #expect(try await darkProxy.isLit == true)
+        #expect(await darkProxy.isLit == true)
     }
 
     @Test("LocationProxy items and contents")
@@ -289,16 +289,16 @@ struct LocationProxyTests {
         )
 
         let (engine, _) = await GameEngine.test(blueprint: game)
-        let proxy = try await engine.location(.startRoom)
+        let proxy = await engine.location(.startRoom)
 
         // When/Then
-        let allItems = try await proxy.allItems
+        let allItems = await proxy.allItems
         #expect(allItems.count == 7)  // All items including hidden ones and contents
 
-        let directItems = try await proxy.items
+        let directItems = await proxy.items
         #expect(directItems.count == 5)  // Only items directly in room
 
-        let visibleItems = try await proxy.visibleItems
+        let visibleItems = await proxy.visibleItems
         #expect(visibleItems.count == 4)  // book, openBox, gem (visible through open container), closedBox
     }
 
@@ -339,10 +339,10 @@ struct LocationProxyTests {
         )
 
         let (engine, _) = await GameEngine.test(blueprint: game)
-        let proxy = try await engine.location("room1")
+        let proxy = await engine.location("room1")
 
         // When/Then
-        let exits = try await proxy.exits
+        let exits = await proxy.exits
         expectNoDifference(
             exits,
             [
@@ -363,10 +363,10 @@ struct LocationProxyTests {
 
         let game = MinimalGame(locations: testRoom)
         let (engine, _) = await GameEngine.test(blueprint: game)
-        let proxy = try await engine.location(.startRoom)
+        let proxy = await engine.location(.startRoom)
 
         // When/Then
-        let globals = try await proxy.localGlobals
+        let globals = await proxy.localGlobals
         #expect(globals.count == 3)
         #expect(globals.contains("globalItem1"))
         #expect(globals.contains("globalItem2"))
@@ -397,10 +397,10 @@ struct LocationProxyTests {
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         // When/Then
-        let libraryProxy = try await engine.location("library")
+        let libraryProxy = await engine.location("library")
         #expect(await libraryProxy.withDefiniteArticle == "the Grand Library")
 
-        let nowhereProxy = try await engine.location("nowhere")
+        let nowhereProxy = await engine.location("nowhere")
         #expect(await nowhereProxy.withDefiniteArticle == "Nowhere")
     }
 
@@ -412,12 +412,12 @@ struct LocationProxyTests {
         let game = MinimalGame()
 
         let (engine, _) = await GameEngine.test(blueprint: game)
-        let proxy = try await engine.location(.startRoom)
+        let proxy = await engine.location(.startRoom)
 
         // When/Then - Test setting a flag
         #expect(await proxy.hasFlag(.isVisited) == false)
 
-        let setChange = try await proxy.setFlag(.isVisited)
+        let setChange = await proxy.setFlag(.isVisited)
         #expect(setChange != nil)
         if let setChange {
             if case .setLocationProperty(let id, _, _) = setChange {
@@ -431,18 +431,18 @@ struct LocationProxyTests {
         try await engine.apply(setChange)
 
         // Test setting the same flag again returns nil
-        let noChange = try await proxy.setFlag(.isVisited)
+        let noChange = await proxy.setFlag(.isVisited)
         #expect(noChange == nil)
 
         // Test clearing a flag
-        let clearChange = try await proxy.clearFlag(.isVisited)
+        let clearChange = await proxy.clearFlag(.isVisited)
         #expect(clearChange != nil)
 
         // Apply the change to update the game state
         try await engine.apply(clearChange)
 
         // Test clearing an already false flag returns nil
-        let noClearChange = try await proxy.clearFlag(.isVisited)
+        let noClearChange = await proxy.clearFlag(.isVisited)
         #expect(noClearChange == nil)
     }
 
@@ -458,42 +458,25 @@ struct LocationProxyTests {
 
         let game = MinimalGame(locations: testRoom)
         let (engine, _) = await GameEngine.test(blueprint: game)
-        let proxy = try await engine.location(.startRoom)
+        let proxy = await engine.location(.startRoom)
 
         // When/Then - Test setting string property
-        let descChange = try await proxy.setDescription(to: "New description")
+        let descChange = await proxy.setDescription(to: "New description")
         #expect(descChange != nil)
 
-        let sameDescChange = try await proxy.setDescription(to: "Original description")
+        let sameDescChange = await proxy.setDescription(to: "Original description")
         #expect(sameDescChange == nil)  // No change needed
 
         // Test setting boolean property
-        let boolChange = try await proxy.setProperty(.isVisited, to: true)
+        let boolChange = await proxy.setProperty(.isVisited, to: true)
         #expect(boolChange != nil)
 
         // Test setting integer property (if any exist)
         // Most location properties are booleans or strings
 
         // Test setting string property directly
-        let stringChange = try await proxy.setProperty(.name, to: "New Name")
+        let stringChange = await proxy.setProperty(.name, to: "New Name")
         #expect(stringChange != nil)
-    }
-
-    @Test("LocationProxy unknown location error")
-    func testUnknownLocationError() async throws {
-        // Given
-        let game = MinimalGame()
-
-        let (engine, _) = await GameEngine.test(blueprint: game)
-
-        // When/Then
-        do {
-            let _ = try await engine.location("nonexistentRoom")
-            #expect(Bool(false), "Should have thrown an error")
-        } catch {
-            // Expected to throw
-            #expect(error is ActionResponse)
-        }
     }
 
     @Test("LocationProxy complex lighting scenarios")
@@ -528,19 +511,19 @@ struct LocationProxyTests {
         )
 
         let (engine, _) = await GameEngine.test(blueprint: game)
-        let proxy = try await engine.location("darkRoom")
+        let proxy = await engine.location("darkRoom")
 
         // When/Then - Room should be lit due to burning candle
-        #expect(try await proxy.isLit == true)
+        #expect(await proxy.isLit == true)
 
         // Turn on lamp - should still be lit
         try await engine.execute("turn on lamp")
-        #expect(try await proxy.isLit == true)
+        #expect(await proxy.isLit == true)
 
         // Put out candle and turn off lamp - should be dark
         // (This would require implementing extinguish command and state changes)
         // For now, just test that burning items provide light
-        let candleProxy = try await engine.item("candle")
+        let candleProxy = await engine.item("candle")
         #expect(await candleProxy.isProvidingLight == true)
     }
 
@@ -579,10 +562,10 @@ struct LocationProxyTests {
         )
 
         let (engine, _) = await GameEngine.test(blueprint: game)
-        let proxy = try await engine.location(.startRoom)
+        let proxy = await engine.location(.startRoom)
 
         // When/Then
-        let visibleItems = try await proxy.visibleItems
+        let visibleItems = await proxy.visibleItems
 
         // Should include: glassBox, gem (through transparent container), table, book (on surface)
         let itemNames = Set(visibleItems.map { $0.id.rawValue })

@@ -65,8 +65,8 @@ struct StandardCombatSystemIntegrationTests {
         #expect(combatState?.enemyID == "goblin")
 
         // Goblin should still be fighting
-        let finalGoblin = try await engine.item("goblin")
-        #expect(try await finalGoblin.isFighting == true)
+        let finalGoblin = await engine.item("goblin")
+        #expect(await finalGoblin.isFighting == true)
     }
 
     @Test("Combat ends when enemy dies")
@@ -125,8 +125,8 @@ struct StandardCombatSystemIntegrationTests {
         #expect(combatState == nil)
 
         // Goblin should be dead
-        let finalGoblin = try await engine.item("goblin")
-        #expect(try await finalGoblin.isDead)
+        let finalGoblin = await engine.item("goblin")
+        #expect(await finalGoblin.isDead)
     }
 
     @Test("Damage categories are properly calculated")
@@ -195,8 +195,8 @@ struct StandardCombatSystemIntegrationTests {
         )
 
         // Enemy has been slain
-        let finalEnemy = try await engine.item("guard")
-        #expect(try await finalEnemy.isDead)
+        let finalEnemy = await engine.item("guard")
+        #expect(await finalEnemy.isDead)
     }
 
     @Test("Critical hits deal increased damage")
@@ -324,8 +324,8 @@ struct StandardCombatSystemIntegrationTests {
             || output.lowercased().contains("powerful")
 
         // At minimum, enemy should have taken damage
-        let finalEnemy = try await engine.item("enemy")
-        let finalHealth = try await finalEnemy.health
+        let finalEnemy = await engine.item("enemy")
+        let finalHealth = await finalEnemy.health
         #expect(finalHealth < 100)
     }
 
@@ -560,8 +560,8 @@ struct StandardCombatSystemIntegrationTests {
             #expect(finalState.playerFatigue > 0.05)  // Meaningful fatigue accumulation
         } else {
             // If combat ended, verify it was due to escalation, not immediate death
-            let finalEnemy = try await engine.item("warrior")
-            let finalEnemyHealth = try await finalEnemy.health
+            let finalEnemy = await engine.item("warrior")
+            let finalEnemyHealth = await finalEnemy.health
             let playerHealth = await engine.player.health
 
             // Either someone died from accumulated damage or combat mechanics worked
@@ -684,8 +684,8 @@ struct StandardCombatSystemIntegrationTests {
         #expect(output.contains("attack enemy"))
 
         // Enemy should have taken damage
-        let finalEnemy = try await engine.item("enemy")
-        let finalHealth = try await finalEnemy.health
+        let finalEnemy = await engine.item("enemy")
+        let finalHealth = await finalEnemy.health
         #expect(finalHealth < 60)
     }
 
@@ -731,8 +731,8 @@ struct StandardCombatSystemIntegrationTests {
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // Severely wound the bandit to trigger flee behavior
-        let banditProxy = try await engine.item("bandit")
-        if let damageChange = try await banditProxy.takeDamage(15) {
+        let banditProxy = await engine.item("bandit")
+        if let damageChange = await banditProxy.takeDamage(15) {
             try await engine.apply(damageChange)
         }
 
@@ -816,8 +816,8 @@ struct StandardCombatSystemIntegrationTests {
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // Wound the scholar to make surrender more likely
-        let scholarProxy = try await engine.item("scholar")
-        if let damageChange = try await scholarProxy.takeDamage(12) {
+        let scholarProxy = await engine.item("scholar")
+        if let damageChange = await scholarProxy.takeDamage(12) {
             try await engine.apply(damageChange)
         }
 
@@ -914,8 +914,8 @@ struct StandardCombatSystemIntegrationTests {
         #expect(output.contains("talk") || output.contains("guard"))
 
         // Guard state should be affected
-        let finalGuard = try await engine.item("guard")
-        let guardHealth = try await finalGuard.health
+        let finalGuard = await engine.item("guard")
+        let guardHealth = await finalGuard.health
         #expect(guardHealth <= 30)  // Health may have changed from combat
     }
 
@@ -1031,8 +1031,8 @@ struct StandardCombatSystemIntegrationTests {
         #expect(output.contains("warrior"))
 
         // Player should have taken the sword
-        let finalSword = try await engine.item("sword")
-        let swordParent = try await finalSword.parent
+        let finalSword = await engine.item("sword")
+        let swordParent = await finalSword.parent
         #expect(swordParent == .player)
     }
 

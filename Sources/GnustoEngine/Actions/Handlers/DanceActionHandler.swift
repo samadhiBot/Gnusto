@@ -33,7 +33,7 @@ public struct DanceActionHandler: ActionHandler {
             )
         }
 
-        return try await ActionResult(
+        return await ActionResult(
             other.response(
                 object: context.msg.danceWith,
                 character: context.msg.danceWithPartner,

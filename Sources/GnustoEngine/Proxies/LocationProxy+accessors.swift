@@ -10,12 +10,12 @@ extension LocationProxy {
     /// This is useful for systems like the sword glow daemon that need to detect monsters
     /// even in dark locations.
     public var allItems: [ItemProxy] {
-        get async throws {
+        get async {
             var allItems = [ItemProxy]()
-            let directContents = try await items
+            let directContents = await items
             for item in directContents {
                 allItems.append(item)
-                try await allItems.append(contentsOf: item.allContents)
+                await allItems.append(contentsOf: item.allContents)
             }
             return allItems
         }
@@ -27,8 +27,8 @@ extension LocationProxy {
     /// "undescribed location" message. This is the main descriptive text shown when
     /// the player looks around or enters the location.
     public var description: String {
-        get async throws {
-            if let description = try await property(.description)?.toString {
+        get async {
+            if let description = await property(.description)?.toString {
                 description
             } else {
                 engine.messenger.undescribedLocation()
@@ -42,8 +42,8 @@ extension LocationProxy {
     /// typically providing more detailed or atmospheric text than the standard description.
     /// Returns `nil` if no first description is set.
     public var firstDescription: String? {
-        get async throws {
-            try await property(.firstDescription)?.toString
+        get async {
+            await property(.firstDescription)?.toString
         }
     }
 
@@ -53,22 +53,17 @@ extension LocationProxy {
     /// describes where that direction leads and any travel conditions. Empty dictionary
     /// indicates no exits are available from this location.
     public var exits: Set<Exit> {
-        get async throws {
-            try await property(.exits)?.toExits ?? []
+        get async {
+            await property(.exits)?.toExits ?? []
         }
     }
 
-    /// Checks if a specific boolea property (flag) is set to `true` on this location.
+    /// Checks if a specific boolean property (flag) is set to `true` on this location.
     ///
     /// - Parameter id: The `LocationPropertyID` of the flag to check.
     /// - Returns: `true` if the flag is set to `true`, `false` otherwise.
     public func hasFlag(_ locationPropertyID: LocationPropertyID) async -> Bool {
-        do {
-            return try await property(locationPropertyID)?.toBool ?? false
-        } catch {
-            assertionFailure("LocationProxy: Failed to check flag \(locationPropertyID): \(error)")
-            return false
-        }
+        await property(locationPropertyID)?.toBool ?? false
     }
 
     /// Checks if this location has any of the specified flags set to `true`.
@@ -86,13 +81,13 @@ extension LocationProxy {
 
     /// Whether this location is currently lit (considering both inherent lighting and items).
     public var isLit: Bool {
-        get async throws {
+        get async {
             if await hasFlags(any: .inherentlyLit, .isLit) { return true }
 
-            let locationItems = try await items
-            let playerInventory = try await engine.player.inventory
+            let locationItems = await items
+            let playerInventory = await engine.player.inventory
 
-            return try await (playerInventory + locationItems).contains {
+            return await (playerInventory + locationItems).asyncContains {
                 await $0.isProvidingLight
             }
         }
@@ -104,10 +99,10 @@ extension LocationProxy {
     /// or visibility. This includes items that may be invisible or in darkness.
     /// Does not include items inside containers within the location.
     public var items: [ItemProxy] {
-        get async throws {
-            try await engine.gameState.items.values.asyncCompactMap { item -> ItemProxy? in
-                let proxy = try await engine.item(item.id)
-                let parent = try await proxy.parent
+        get async {
+            await engine.gameState.items.values.asyncCompactMap { item -> ItemProxy? in
+                let proxy = await engine.item(item.id)
+                let parent = await proxy.parent
                 guard
                     case .location(let itemLocation) = parent,
                     itemLocation.id == location.id
@@ -122,8 +117,8 @@ extension LocationProxy {
     /// A set of item IDs that are considered "globally" present or relevant to this location.
     /// Corresponds to ZIL's `GLOBAL` objects scoped to rooms.
     public var localGlobals: Set<ItemID> {
-        get async throws {
-            try await property(.localGlobals)?.toItemIDs ?? []
+        get async {
+            await property(.localGlobals)?.toItemIDs ?? []
         }
     }
 
@@ -131,7 +126,7 @@ extension LocationProxy {
     /// Corresponds to the ZIL `DESC` or room name property.
     public var name: String {
         get async {
-            (try? await property(.name)?.toString) ?? id.rawValue
+            await property(.name)?.toString ?? id.rawValue
         }
     }
 
@@ -140,15 +135,15 @@ extension LocationProxy {
     /// This method is used when you need to know which items can be seen in a location,
     /// regardless of whether there is adequate light.
     public var visibleItems: [ItemProxy] {
-        get async throws {
+        get async {
             var allItems = [ItemProxy]()
-            let directContents = try await items
+            let directContents = await items
             for item in directContents {
                 if await item.hasFlags(any: .isInvisible, .omitDescription) { continue }
                 allItems.append(item)
                 if await item.contentsAreVisible {
                     allItems.append(
-                        contentsOf: try await item.visibleItems
+                        contentsOf: await item.visibleItems
                     )
                 }
             }

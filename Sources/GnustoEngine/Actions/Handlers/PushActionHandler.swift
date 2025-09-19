@@ -27,7 +27,7 @@ public struct PushActionHandler: ActionHandler {
             throw ActionResponse.doWhat(context)
         }
 
-        return try await ActionResult(
+        return await ActionResult(
             item.response(
                 object: context.msg.pushObject,
                 character: context.msg.pushCharacter,

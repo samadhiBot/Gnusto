@@ -29,7 +29,7 @@ public struct TakeActionHandler: ActionHandler {
         // Get items based on command type
         let items: [ItemProxy]
         if context.command.isAllCommand {
-            let allLocationItems = try await context.player.location.items
+            let allLocationItems = await context.player.location.items
 
             // Collect all accessible items: direct location items + items on surfaces
             var accessibleItems: [ItemProxy] = []
@@ -40,12 +40,12 @@ public struct TakeActionHandler: ActionHandler {
 
                 // If this item is a surface, add items on it
                 if await locationItem.hasFlag(.isSurface) {
-                    let itemsOnSurface = try await locationItem.contents
+                    let itemsOnSurface = await locationItem.contents
                     accessibleItems.append(contentsOf: itemsOnSurface)
                 }
             }
 
-            let filteredItems = try await accessibleItems.asyncFilter { item in
+            let filteredItems = await accessibleItems.asyncFilter { item in
                 // Must be takable
                 return await item.isTakable
             }
@@ -67,7 +67,7 @@ public struct TakeActionHandler: ActionHandler {
         for item in items.sorted() {
             do {
                 if let container = try await context.itemIndirectObject(),
-                    try await item.parent != .item(container)
+                    await item.parent != .item(container)
                 {
                     throw ActionResponse.feedback(
                         context.msg.takeItemNotInContainer(
@@ -78,7 +78,7 @@ public struct TakeActionHandler: ActionHandler {
                 }
 
                 // Check if player already has this item
-                if try await item.playerIsHolding {
+                if await item.playerIsHolding {
                     throw ActionResponse.feedback(
                         context.msg.youAlreadyHaveThat()
                     )
@@ -98,7 +98,7 @@ public struct TakeActionHandler: ActionHandler {
 
                     // Check capacity considering cumulative size of items being taken
                     var currentLoad = 0
-                    for inventoryItem in try await context.player.completeInventory {
+                    for inventoryItem in await context.player.completeInventory {
                         currentLoad += await inventoryItem.size
                     }
                     let itemSize = await item.size
@@ -120,10 +120,10 @@ public struct TakeActionHandler: ActionHandler {
                 } else {  // For single item commands, perform full validation
 
                     // Check if item is inside something invalid (non-container/non-surface)
-                    let itemParent = try await item.parent
+                    let itemParent = await item.parent
 
                     if case .item(let container) = itemParent,
-                       await container.hasFlags(all: .isContainer, none: .isOpen)
+                        await container.hasFlags(all: .isContainer, none: .isOpen)
                     {
                         if await item.hasFlags(any: .isTouched, .isTransparent) {
                             throw ActionResponse.containerIsClosed(container)
@@ -143,7 +143,7 @@ public struct TakeActionHandler: ActionHandler {
                     }
 
                     // Check capacity
-                    guard try await item.playerCanCarry else {
+                    guard await item.playerCanCarry else {
                         throw ActionResponse.playerCannotCarryMore
                     }
                 }
@@ -156,7 +156,7 @@ public struct TakeActionHandler: ActionHandler {
                 itemStateChanges.append(moveChange)
 
                 // Set .isTouched flag if not already set
-                try await itemStateChanges.append(
+                await itemStateChanges.append(
                     item.setFlag(.isTouched)
                 )
 

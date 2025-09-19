@@ -45,7 +45,7 @@ public struct FillActionHandler: ActionHandler {
                 context.msg.fillContainerWithWhat(
                     await containerItem.withDefiniteArticle
                 ),
-                try await containerItem.setFlag(.isTouched)
+                await containerItem.setFlag(.isTouched)
             )
         }
 
@@ -54,7 +54,7 @@ public struct FillActionHandler: ActionHandler {
                 await containerItem.withDefiniteArticle,
                 source: await sourceItem.withDefiniteArticle
             ),
-            try await containerItem.setFlag(.isTouched)
+            await containerItem.setFlag(.isTouched)
         )
     }
 }

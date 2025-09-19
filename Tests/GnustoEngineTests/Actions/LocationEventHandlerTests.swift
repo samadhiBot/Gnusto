@@ -186,7 +186,7 @@ struct LocationEventHandlerTests {
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // Verify initial state
-        let initialLocation = try await engine.player.location.id
+        let initialLocation = await engine.player.location.id
         #expect(initialLocation == "anotherRoom")
 
         // Verify blueprint has the handler registered
@@ -197,7 +197,7 @@ struct LocationEventHandlerTests {
         try await engine.execute("north")
 
         // Verify movement worked
-        let finalLocation = try await engine.player.location.id
+        let finalLocation = await engine.player.location.id
         #expect(finalLocation == .startRoom)
 
         // Check if handler was triggered
@@ -633,9 +633,11 @@ struct LocationEventHandlerTests {
         try await engine.execute("look")
 
         let messages = await messageCapture.getMessages()
-        expectNoDifference(messages, [
-            "Context handler called for location: .startRoom"
-        ])
+        expectNoDifference(
+            messages,
+            [
+                "Context handler called for location: .startRoom"
+            ])
 
         let output = await mockIO.flush()
         #expect(output.contains("Custom look message from context handler."))

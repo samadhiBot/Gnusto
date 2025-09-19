@@ -78,7 +78,7 @@ struct ActionHandlerScoringTests {
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         let handler = GenericVerbHandler()
-        let command = try await Command(
+        let command = await Command(
             verb: .take,
             directObject: .item(testItem.proxy(engine))
         )
@@ -102,7 +102,7 @@ struct ActionHandlerScoringTests {
 
         let genericHandler = GenericVerbHandler()
         let specificHandler = SpecificVerbHandler()
-        let command = try await Command(
+        let command = await Command(
             verb: .take,
             directObject: .item(testItem.proxy(engine))
         )
@@ -144,7 +144,7 @@ struct ActionHandlerScoringTests {
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         let handler = ParticleHandler()
-        let command = try await Command(
+        let command = await Command(
             verb: .put,
             directObject: .item(key.proxy(engine)),
             indirectObject: .item(box.proxy(engine)),
@@ -179,7 +179,7 @@ struct ActionHandlerScoringTests {
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         let handler = ParticleHandler()
-        let command = try await Command(
+        let command = await Command(
             verb: .put,
             directObject: .item(key.proxy(engine)),
             indirectObject: .item(box.proxy(engine))
@@ -213,7 +213,7 @@ struct ActionHandlerScoringTests {
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         let handler = ParticleHandler()
-        let command = try await Command(
+        let command = await Command(
             verb: .put,
             directObject: .item(key.proxy(engine)),
             indirectObject: .item(box.proxy(engine)),
@@ -252,7 +252,7 @@ struct ActionHandlerScoringTests {
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         let handler = GenericVerbHandler()  // Expects .take
-        let command = try await Command(
+        let command = await Command(
             verb: "xyz123",  // Wrong verb
             directObject: .item(testItem.proxy(engine))
         )
@@ -282,7 +282,7 @@ struct ActionHandlerScoringTests {
 
         let handler = MultiRuleHandler()
 
-        let command = try await Command(
+        let command = await Command(
             verb: .turn,
             directObject: .item(lamp.proxy(engine)),
             preposition: "on"
@@ -311,7 +311,7 @@ struct ActionHandlerScoringTests {
 
         let handler = MultiRuleHandler()
 
-        let command = try await Command(
+        let command = await Command(
             verb: .turn,
             directObject: .item(lamp.proxy(engine))
             // No preposition
@@ -337,7 +337,7 @@ struct ActionHandlerScoringTests {
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         let rule = SyntaxRule.match(.specificVerb(.take), .directObject)
-        let command = try await Command(
+        let command = await Command(
             verb: .take,
             directObject: .item(testItem.proxy(engine))
         )
@@ -360,7 +360,7 @@ struct ActionHandlerScoringTests {
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         let rule = SyntaxRule.match(.verb, .directObject)
-        let command = try await Command(
+        let command = await Command(
             verb: .take,
             directObject: .item(testItem.proxy(engine))
         )
@@ -395,7 +395,7 @@ struct ActionHandlerScoringTests {
         let rule = SyntaxRule.match(
             .specificVerb(.put), .directObject, .particle("in"), .indirectObject,
         )
-        let command = try await Command(
+        let command = await Command(
             verb: .put,
             directObject: .item(key.proxy(engine)),
             indirectObject: .item(box.proxy(engine)),
@@ -420,7 +420,7 @@ struct ActionHandlerScoringTests {
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         let rule = SyntaxRule.match(.specificVerb(.take), .directObject)
-        let command = try await Command(
+        let command = await Command(
             verb: .drop,  // Wrong verb
             directObject: .item(testItem.proxy(engine))
         )
@@ -452,7 +452,7 @@ struct ActionHandlerScoringTests {
 
         let (engine, _) = await GameEngine.test(blueprint: game)
 
-        let command = try await Command(
+        let command = await Command(
             verb: .take,
             directObject: .item(testItem.proxy(engine))
         )
@@ -474,7 +474,7 @@ struct ActionHandlerScoringTests {
         let game = MinimalGame(items: testItem)
         let (engine, _) = await GameEngine.test(blueprint: game)
 
-        let command = try await Command(
+        let command = await Command(
             verb: "xyz123",  // No handler for .xyz123
             directObject: .item(testItem.proxy(engine))
         )
@@ -499,7 +499,7 @@ struct ActionHandlerScoringTests {
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         let handler = GenericVerbHandler()
-        let command = try await Command(
+        let command = await Command(
             verb: .take,
             directObject: .item(testItem.proxy(engine))
         )
@@ -522,7 +522,7 @@ struct ActionHandlerScoringTests {
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         let handler = GenericVerbHandler()
-        let command = try await Command(
+        let command = await Command(
             verb: .drop,  // Wrong verb
             directObject: .item(testItem.proxy(engine))
         )
@@ -553,7 +553,7 @@ struct ActionHandlerScoringTests {
         let climbOnHandler = ClimbOnActionHandler()
 
         // Test "climb on table" command with proper preposition
-        let commandWithPreposition = try await Command(
+        let commandWithPreposition = await Command(
             verb: .climb,
             directObject: .item(table.proxy(engine)),
             preposition: "on"
@@ -569,7 +569,7 @@ struct ActionHandlerScoringTests {
         #expect(climbOnScore > climbScore)
 
         // Test "climb table" command without preposition
-        let commandWithoutPreposition = try await Command(
+        let commandWithoutPreposition = await Command(
             verb: .climb,
             directObject: .item(table.proxy(engine))
         )
@@ -636,7 +636,7 @@ struct ActionHandlerScoringTests {
         let handler = ParticleHandler()
 
         // Test with uppercase particle
-        let commandUppercase = try await Command(
+        let commandUppercase = await Command(
             verb: .put,
             directObject: .item(key.proxy(engine)),
             indirectObject: .item(box.proxy(engine)),
@@ -647,7 +647,7 @@ struct ActionHandlerScoringTests {
             handler: handler, command: commandUppercase)
 
         // Test with lowercase particle
-        let commandLowercase = try await Command(
+        let commandLowercase = await Command(
             verb: .put,
             directObject: .item(key.proxy(engine)),
             indirectObject: .item(box.proxy(engine)),

@@ -55,10 +55,10 @@ public struct RemoveActionHandler: ActionHandler {
                     }
 
                     // Create state changes for this item
-                    try await allStateChanges.append(
+                    await allStateChanges.append(
                         item.clearFlag(.isWorn)
                     )
-                    try await allStateChanges.append(
+                    await allStateChanges.append(
                         item.setFlag(.isTouched)
                     )
 

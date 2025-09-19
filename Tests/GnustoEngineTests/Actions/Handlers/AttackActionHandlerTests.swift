@@ -450,7 +450,7 @@ struct AttackActionHandlerTests {
             """
         )
 
-        let finalState = try await engine.item("rock")
+        let finalState = await engine.item("rock")
         #expect(await finalState.hasFlag(.isTouched) == true)
     }
 

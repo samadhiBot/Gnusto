@@ -39,7 +39,7 @@ struct WearActionHandlerTests {
             """
         )
 
-        let finalState = try await engine.item("hat")
+        let finalState = await engine.item("hat")
         #expect(await finalState.hasFlag(.isWorn) == true)
         #expect(await finalState.hasFlag(.isTouched) == true)
     }
@@ -75,7 +75,7 @@ struct WearActionHandlerTests {
             """
         )
 
-        let finalState = try await engine.item("jacket")
+        let finalState = await engine.item("jacket")
         #expect(await finalState.hasFlag(.isWorn) == true)
     }
 
@@ -151,8 +151,8 @@ struct WearActionHandlerTests {
             """
         )
 
-        let finalHat = try await engine.item("hat")
-        let finalGloves = try await engine.item("gloves")
+        let finalHat = await engine.item("hat")
+        let finalGloves = await engine.item("gloves")
         #expect(await finalHat.hasFlag(.isWorn) == true)
         #expect(await finalGloves.hasFlag(.isWorn) == true)
     }
@@ -345,7 +345,7 @@ struct WearActionHandlerTests {
         try await engine.execute("wear ring")
 
         // Then: Verify state change
-        let finalState = try await engine.item("ring")
+        let finalState = await engine.item("ring")
         #expect(await finalState.hasFlag(.isWorn) == true)
         #expect(await finalState.hasFlag(.isTouched) == true)
 
@@ -391,8 +391,8 @@ struct WearActionHandlerTests {
         try await engine.execute("wear shoes and socks")
 
         // Then
-        let finalShoes = try await engine.item("shoes")
-        let finalSocks = try await engine.item("socks")
+        let finalShoes = await engine.item("shoes")
+        let finalSocks = await engine.item("socks")
         #expect(await finalShoes.hasFlag(.isWorn) == true)
         #expect(await finalSocks.hasFlag(.isWorn) == true)
 
@@ -446,9 +446,9 @@ struct WearActionHandlerTests {
         try await engine.execute("wear all")
 
         // Then: Only wearable items should be worn
-        let finalShirt = try await engine.item("shirt")
-        let finalBook = try await engine.item("book")
-        let finalTie = try await engine.item("tie")
+        let finalShirt = await engine.item("shirt")
+        let finalBook = await engine.item("book")
+        let finalTie = await engine.item("tie")
 
         #expect(await finalShirt.hasFlag(.isWorn) == true)
         #expect(await finalBook.hasFlag(.isWorn) == false)
@@ -539,8 +539,8 @@ struct WearActionHandlerTests {
         try await engine.execute("wear all")
 
         // Then: Only mittens should be newly worn
-        let finalHat = try await engine.item("hat")
-        let finalMittens = try await engine.item("mittens")
+        let finalHat = await engine.item("hat")
+        let finalMittens = await engine.item("mittens")
 
         #expect(await finalHat.hasFlag(.isWorn) == true)
         #expect(await finalMittens.hasFlag(.isWorn) == true)
