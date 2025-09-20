@@ -239,14 +239,14 @@ let kitchenComputer = LocationComputer(for: .kitchen) {
 }
 ```
 
-The proxy system seamlessly integrates computed properties--when you access `kitchen.description`, the proxy checks for a computed property first, falling back to the static definition if none exists.
+The proxy system seamlessly integrates computed properties--when you access `kitchen.description`, the proxy checks for a computed property first, and falls back to the static definition if none exists.
 
 ## Time-Based Behaviors: Daemons
 
 Daemons run independently of player actions, using proxies to implement autonomous behaviors:
 
 ```swift
-static let swordDaemon = Daemon { engine in
+let swordDaemon = Daemon { engine in
     let currentLocation = await engine.player.location
     var newGlowLevel = 0
 

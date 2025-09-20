@@ -1,4 +1,5 @@
 import CustomDump
+import Foundation
 
 /// A type-safe enumeration that represents the various kinds of values that game state
 /// properties can hold.
@@ -17,6 +18,14 @@ public enum StateValue: Codable, Sendable, Hashable {
 
     /// Comprehensive character sheet containing all attributes, properties, and states.
     case characterSheet(CharacterSheet)
+
+    /// Represents a type-erased codable value that can be JSON encoded/decoded.
+    /// Use this for custom game-specific types that conform to `Codable & Sendable`.
+    case codable(AnyCodableSendable)
+
+    /// Represents the current combat state, containing information about an active
+    /// combat encounter including participants, turn order, and combat-specific state.
+    case combatState(CombatState?)
 
     /// Character consciousness level (awake, asleep, unconscious, etc.).
     case consciousness(ConsciousnessLevel)
@@ -61,15 +70,6 @@ public enum StateValue: Codable, Sendable, Hashable {
 
     /// Represents a set of unique string values (e.g., for adjectives or synonyms).
     case stringSet(Set<String>)
-
-    /// Represents an explicitly undefined, uninitialized, or intentionally absent value.
-    /// This can be distinct from `nil` when a property might optionally hold a typed value
-    /// or be truly undefined.
-    case undefined
-
-    /// Represents the current combat state, containing information about an active
-    /// combat encounter including participants, turn order, and combat-specific state.
-    case combatState(CombatState?)
 }
 
 // MARK: - Public casting helpers
@@ -85,6 +85,15 @@ extension StateValue {
     /// - Returns: The `CharacterSheet` value if this `StateValue` is a `.characterSheet` case; otherwise, `nil`.
     public var toCharacterSheet: CharacterSheet? {
         underlyingValue as? CharacterSheet
+    }
+
+    /// Attempts to decode and return the underlying value as the specified codable type.
+    /// - Parameter type: The type to decode as (must be `Codable & Sendable`).
+    /// - Returns: The decoded value of the specified type, or `nil` if this `StateValue`
+    ///   is not a `.codable` case or if decoding fails.
+    public func toCodable<T: Codable & Sendable>(as type: T.Type) -> T? {
+        guard case .codable(let wrapper) = self else { return nil }
+        return wrapper.tryDecode(as: type)
     }
 
     /// Attempts to cast and return the underlying value as a `ConsciousnessLevel`.
@@ -181,6 +190,17 @@ extension StateValue {
     }
 }
 
+// MARK: - Convenience initializers
+
+extension StateValue {
+    /// Creates a `StateValue` from any `Codable & Sendable` value by wrapping it in a type-erased container.
+    /// - Parameter value: The value to wrap, which must conform to `Codable & Sendable`.
+    /// - Throws: An error if the value cannot be JSON encoded.
+    public static func wrap<T: Codable & Sendable>(_ value: T) throws -> StateValue {
+        return .codable(try AnyCodableSendable(value))
+    }
+}
+
 // MARK: - Private helpers
 
 extension StateValue {
@@ -189,6 +209,7 @@ extension StateValue {
         switch self {
         case .bool(let value): value
         case .characterSheet(let value): value
+        case .codable(let value): value
         case .consciousness(let value): value
         case .combatCondition(let value): value
         case .generalCondition(let value): value
@@ -204,7 +225,6 @@ extension StateValue {
         case .parentEntity(let value): value
         case .string(let value): value
         case .stringSet(let value): value
-        case .undefined: "⚠️ undefined ⚠️"
         }
     }
 }
@@ -279,6 +299,8 @@ extension StateValue: CustomDumpStringConvertible {
             "\(bool)"
         case .characterSheet(let characterSheet):
             "\(characterSheet)"
+        case .codable(let codable):
+            "codable(\(codable.typeName))"
         case .consciousness(let consciousness):
             "\(consciousness)"
         case .combatCondition(let combatCondition):
@@ -313,8 +335,6 @@ extension StateValue: CustomDumpStringConvertible {
             } else {
                 "CombatState(nil)"
             }
-        case .undefined:
-            ".undefined"
         }
     }
 }

@@ -72,27 +72,17 @@ struct UndergroundTests {
             > walk east
             The troll fends you off with a menacing gesture.
 
-            Your sword is glowing very brightly.
-
             > go north
             You can't go that way.
-
-            Your sword is glowing very brightly.
 
             > head west
             The troll fends you off with a menacing gesture.
 
-            Your sword is glowing very brightly.
-
             > talk to the troll
             The troll isn't much of a conversationalist.
 
-            Your sword is glowing very brightly.
-
             > push the troll
             The troll laughs at your puny gesture.
-
-            Your sword is glowing very brightly.
 
             > hit the troll with the lantern
             No more waiting as you attack with your lantern raised and the
@@ -105,16 +95,12 @@ struct UndergroundTests {
             The troll's retaliatory strike with his ax cuts toward you but
             your body knows how to flow around death.
 
-            Your sword is glowing very brightly.
-
             > head west
             The troll fends you off with a menacing gesture.
 
             In the exchange, his ax slips through to mark you--a stinging
             reminder that the troll still has teeth. The wound is trivial
             against your battle fury.
-
-            Your sword is glowing very brightly.
 
             >
             May your adventures elsewhere prove fruitful!

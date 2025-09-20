@@ -128,40 +128,25 @@ public enum StateChange: Codable, Equatable, Sendable {
     case setCombatState(CombatState?)
 
     /// Sets a global boolean value.
-    case setGlobalBool(
-        id: GlobalID,
-        value: Bool
-    )
+    case setGlobalBool(id: GlobalID, value: Bool)
+
+    /// Sets a global codable value.
+    case setGlobalCodable(id: GlobalID, value: AnyCodableSendable)
 
     /// Sets a global integer value.
-    case setGlobalInt(
-        id: GlobalID,
-        value: Int
-    )
+    case setGlobalInt(id: GlobalID, value: Int)
 
     /// Sets a global ItemID reference.
-    case setGlobalItemID(
-        id: GlobalID,
-        value: ItemID
-    )
+    case setGlobalItemID(id: GlobalID, value: ItemID)
 
     /// Sets a global LocationID reference.
-    case setGlobalLocationID(
-        id: GlobalID,
-        value: LocationID
-    )
+    case setGlobalLocationID(id: GlobalID, value: LocationID)
 
     /// Sets a global string value.
-    case setGlobalString(
-        id: GlobalID,
-        value: String
-    )
+    case setGlobalString(id: GlobalID, value: String)
 
     /// Sets a global state value of any supported type.
-    case setGlobalState(
-        id: GlobalID,
-        value: StateValue
-    )
+    case setGlobalState(id: GlobalID, value: StateValue)
 
     // MARK: - Timed Events (Fuses & Daemons)
 

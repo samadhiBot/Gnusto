@@ -259,6 +259,9 @@ extension GameState {
         case .setGlobalBool(let globalID, let value):
             globalState[globalID] = .bool(value)
 
+        case .setGlobalCodable(let globalID, let value):
+            globalState[globalID] = .codable(value)
+
         case .setGlobalInt(let globalID, let value):
             globalState[globalID] = .int(value)
 

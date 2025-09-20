@@ -613,70 +613,65 @@ extension InsideHouse {
     /// - Level 2: Monster in current location (very bright glow)
     static let swordDaemon = Daemon { engine in
         let currentLocation = await engine.player.location
-        var newGlowLevel = 0
+        var newGlowLevel: SwordBrightness = .notGlowing
 
         // Check for monsters in current location (highest priority)
-        let currentLocationItems = await currentLocation.items
-        var monstersInCurrentLocation: [ItemProxy] = []
-        for item in currentLocationItems {
-            if await item.isCharacter {
-                monstersInCurrentLocation.append(item)
-            }
+        for item in await currentLocation.items where await item.isCharacter {
+            newGlowLevel = .glowingBrightly
+            break
         }
 
-        if monstersInCurrentLocation.isNotEmpty {
-            newGlowLevel = 2  // Very bright glow
-        } else {
+        if newGlowLevel != .glowingBrightly {
             // Check adjacent locations for monsters
             for exit in await currentLocation.exits {
-                guard let destination = exit.destinationID else {
-                    continue
-                }
+                guard let destination = exit.destinationID else { continue }
                 let adjacentLocation = await engine.location(destination)
-                let adjacentLocationItems = await adjacentLocation.items
-                var monstersInAdjacentLocation: [ItemProxy] = []
-                for item in adjacentLocationItems {
-                    if await item.isCharacter {
-                        monstersInAdjacentLocation.append(item)
-                    }
-                }
-
-                if monstersInAdjacentLocation.isNotEmpty {
-                    newGlowLevel = 1  // Faint blue glow
+                for item in await adjacentLocation.items where await item.isCharacter {
+                    newGlowLevel = .glowingFaintly
                     break
                 }
             }
         }
 
         // Always update the glow level and show message if glowing
-        let currentGlowLevel = await engine.global(.swordGlowLevel) ?? 0
+        let currentGlowLevel = await engine.global(.swordGlowLevel)?
+                                           .toCodable(as: SwordBrightness.self)
 
         // Determine the glow message based on current level
-        let message =
-            switch newGlowLevel {
-            case 1:
-                "Your sword is glowing with a faint blue glow."
-            case 2:
-                "Your sword is glowing very brightly."
-            default:
-                ""  // Level 0 - no message when not glowing
-            }
+        let message = newGlowLevel.description
 
         // Update the glow level if it changed
-        if newGlowLevel != (currentGlowLevel.toInt ?? 0) {
-            let glowChange = StateChange.setGlobalInt(id: .swordGlowLevel, value: newGlowLevel)
-
+        if newGlowLevel != currentGlowLevel {
+            let glowChange = try StateChange.setGlobalCodable(
+                id: .swordGlowLevel,
+                value: AnyCodableSendable(newGlowLevel)
+            )
             return if message.isEmpty {
                 ActionResult(glowChange)
             } else {
                 ActionResult(message, glowChange)
             }
-        } else if message.isNotEmpty {
-            // Level didn't change but sword is still glowing - show the message
-            return ActionResult(message)
         }
+//        else if message.isNotEmpty {
+//            // Level didn't change but sword is still glowing - show the message
+//            return ActionResult(message)
+//        }
 
         return nil
+    }
+}
+
+enum SwordBrightness: Codable, CustomStringConvertible, Sendable {
+    case glowingBrightly
+    case glowingFaintly
+    case notGlowing
+
+    var description: String {
+        switch self {
+        case .glowingBrightly: "Your sword is glowing very brightly."
+        case .glowingFaintly: "Your sword is glowing with a faint blue glow."
+        case .notGlowing: ""
+        }
     }
 }
 
