@@ -17,7 +17,7 @@ public enum ProxyReference: Hashable, Sendable {
     case player(PlayerProxy)
 
     /// Reference to a universal object (abstract concepts like "self", "all", etc.).
-    case universal(UniversalObject)
+    case universal(Universal)
 
     /// Creates a new ProxyReference from an EntityReference using the specified game engine.
     ///

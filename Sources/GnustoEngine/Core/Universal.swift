@@ -20,7 +20,7 @@ import Foundation
 ///     switch command.directObject {
 ///     case .item(let targetItemID): ...
 ///     case .universal(let universal):
-///         if UniversalObject.diggableUniversals.contains(universal) {
+///         if Universal.diggableUniversals.contains(universal) {
 ///             ActionResult(
 ///                 engine.messenger.digUniversalIneffective()
 ///             )
@@ -33,7 +33,7 @@ import Foundation
 ///     }
 /// }
 /// ```
-public enum UniversalObject: String, CaseIterable, Sendable, Codable {
+public enum Universal: String, CaseIterable, Sendable, Codable {
     // MARK: - Ground and Earth
 
     /// The ground, earth, or floor surface
@@ -177,13 +177,13 @@ public enum UniversalObject: String, CaseIterable, Sendable, Codable {
     }
 }
 
-extension UniversalObject {
-    public func matches(_ other: UniversalObject) -> Bool {
+extension Universal {
+    public func matches(_ other: Universal) -> Bool {
         self.relatedUniversals.contains(other)
     }
 
     /// Related universal objects that share similar properties or behaviors
-    public var relatedUniversals: Set<UniversalObject> {
+    public var relatedUniversals: Set<Universal> {
         switch self {
         case .ground, .floor:
             [.ground, .floor, .earth, .soil, .dirt]
@@ -302,13 +302,13 @@ extension UniversalObject {
 
 // MARK: - Conformances
 
-extension UniversalObject: Comparable {
-    public static func < (lhs: UniversalObject, rhs: UniversalObject) -> Bool {
+extension Universal: Comparable {
+    public static func < (lhs: Universal, rhs: Universal) -> Bool {
         lhs.rawValue < rhs.rawValue
     }
 }
 
-extension UniversalObject: CustomStringConvertible {
+extension Universal: CustomStringConvertible {
     public var description: String {
         rawValue
     }
@@ -316,26 +316,26 @@ extension UniversalObject: CustomStringConvertible {
 
 // MARK: - Set helpers
 
-extension Set where Element == UniversalObject {
-    /// Finds the closest matching UniversalObject to the given raw input string.
+extension Set where Element == Universal {
+    /// Finds the closest matching Universal to the given raw input string.
     ///
     /// This method first attempts to find an exact match by comparing the raw input
-    /// to the raw values of UniversalObjects in the set. If no exact match is found,
+    /// to the raw values of Universals in the set. If no exact match is found,
     /// it returns the first element when the set is sorted alphabetically.
     ///
-    /// - Parameter rawInput: The raw string input to match against UniversalObject raw values
-    /// - Returns: The matching UniversalObject if found, or the first sorted element as a fallback,
+    /// - Parameter rawInput: The raw string input to match against Universal raw values
+    /// - Returns: The matching Universal if found, or the first sorted element as a fallback,
     ///           or nil if the set is empty
     ///
     /// ## Example Usage
     ///
     /// ```swift
-    /// let universals: Set<UniversalObject> = [.ground, .sky, .water]
+    /// let universals: Set<Universal> = [.ground, .sky, .water]
     /// let match = universals.closestMatch(to: "ground") // Returns .ground
     /// let fallback = universals.closestMatch(to: "invalid") // Returns .ground (first sorted)
     /// ```
-    public func closestMatch(to rawInput: String) -> UniversalObject? {
-        if let exactMatch = first(where: { $0 == UniversalObject(rawValue: rawInput) }) {
+    public func closestMatch(to rawInput: String) -> Universal? {
+        if let exactMatch = first(where: { $0 == Universal(rawValue: rawInput) }) {
             return exactMatch
         }
         return sorted().first

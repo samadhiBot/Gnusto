@@ -172,7 +172,7 @@ extension ActionContext {
     public func itemDirectObject(
         requiresLight: Bool = true,
         locationMessage: ((LocationProxy) async throws -> String)? = nil,
-        universalMessage: ((UniversalObject) async throws -> String)? = nil,
+        universalMessage: ((Universal) async throws -> String)? = nil,
         playerMessage: String? = nil,
         failureMessage: String? = nil
     ) async throws -> ItemProxy? {
@@ -298,7 +298,7 @@ extension ActionContext {
     public func itemIndirectObject(
         requiresLight: Bool = true,
         locationMessage: ((LocationProxy) async throws -> String)? = nil,
-        universalMessage: ((UniversalObject) async throws -> String)? = nil,
+        universalMessage: ((Universal) async throws -> String)? = nil,
         playerMessage: String? = nil,
         failureMessage: String? = nil
     ) async throws -> ItemProxy? {

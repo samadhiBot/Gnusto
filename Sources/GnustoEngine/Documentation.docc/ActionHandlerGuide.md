@@ -273,21 +273,21 @@ public struct ExamineActionHandler: ActionHandler {
 
 ```swift
 // Digging handler that works with ground/earth universals
-UniversalObject.diggableUniversals.contains(universal)
+Universal.diggableUniversals.contains(universal)
 
 // Movement handler that only works with architectural features
-UniversalObject.architecturalUniversals.contains(universal)
+Universal.architecturalUniversals.contains(universal)
 ```
 
 ### Universal Object Categories
 
 Universal objects are pre-categorized for convenience:
 
-- `UniversalObject.diggableUniversals`: ground, earth, soil, dirt, mud, sand
-- `UniversalObject.waterUniversals`: water, river, stream, lake, pond, ocean, sea
-- `UniversalObject.architecturalUniversals`: floor, walls, wall, ceiling, roof
-- `UniversalObject.outdoorUniversals`: sky, sun, moon, stars, clouds, etc.
-- `UniversalObject.indoorUniversals`: ceiling, walls, floor, etc.
+- `Universal.diggableUniversals`: ground, earth, soil, dirt, mud, sand
+- `Universal.waterUniversals`: water, river, stream, lake, pond, ocean, sea
+- `Universal.architecturalUniversals`: floor, walls, wall, ceiling, roof
+- `Universal.outdoorUniversals`: sky, sun, moon, stars, clouds, etc.
+- `Universal.indoorUniversals`: ceiling, walls, floor, etc.
 
 This system ensures players get reasonable responses to common interactions without requiring game developers to create explicit items for every possible universal concept.
 

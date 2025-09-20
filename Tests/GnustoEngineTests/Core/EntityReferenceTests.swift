@@ -56,7 +56,7 @@ struct EntityReferenceTests {
         }
     }
 
-    @Test("EntityReference.universal can be created with UniversalObject")
+    @Test("EntityReference.universal can be created with Universal")
     func testUniversalCase() throws {
         let universalRef = EntityReference.universal(.ground)
 

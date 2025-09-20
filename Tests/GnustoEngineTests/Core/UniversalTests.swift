@@ -5,40 +5,40 @@ import Testing
 
 @testable import GnustoEngine
 
-@Suite("UniversalObject Tests")
-struct UniversalObjectTests {
+@Suite("Universal Tests")
+struct UniversalTests {
 
     // MARK: - Basic Property Tests
 
-    @Test("UniversalObject id property returns raw value")
+    @Test("Universal id property returns raw value")
     func testIdProperty() {
-        #expect(UniversalObject.ground.id == "ground")
-        #expect(UniversalObject.sky.id == "sky")
-        #expect(UniversalObject.water.id == "water")
-        #expect(UniversalObject.walls.id == "walls")
+        #expect(Universal.ground.id == "ground")
+        #expect(Universal.sky.id == "sky")
+        #expect(Universal.water.id == "water")
+        #expect(Universal.walls.id == "walls")
     }
 
-    @Test("UniversalObject displayName property returns capitalized raw value")
+    @Test("Universal displayName property returns capitalized raw value")
     func testDisplayNameProperty() {
-        #expect(UniversalObject.ground.displayName == "Ground")
-        #expect(UniversalObject.sky.displayName == "Sky")
-        #expect(UniversalObject.water.displayName == "Water")
-        #expect(UniversalObject.walls.displayName == "Walls")
+        #expect(Universal.ground.displayName == "Ground")
+        #expect(Universal.sky.displayName == "Sky")
+        #expect(Universal.water.displayName == "Water")
+        #expect(Universal.walls.displayName == "Walls")
     }
 
-    @Test("UniversalObject withDefiniteArticle property formats correctly")
+    @Test("Universal withDefiniteArticle property formats correctly")
     func testWithDefiniteArticleProperty() {
-        #expect(UniversalObject.ground.withDefiniteArticle == "the ground")
-        #expect(UniversalObject.sky.withDefiniteArticle == "the sky")
-        #expect(UniversalObject.water.withDefiniteArticle == "the water")
-        #expect(UniversalObject.walls.withDefiniteArticle == "the walls")
+        #expect(Universal.ground.withDefiniteArticle == "the ground")
+        #expect(Universal.sky.withDefiniteArticle == "the sky")
+        #expect(Universal.water.withDefiniteArticle == "the water")
+        #expect(Universal.walls.withDefiniteArticle == "the walls")
     }
 
     // MARK: - CaseIterable Tests
 
-    @Test("UniversalObject conforms to CaseIterable")
+    @Test("Universal conforms to CaseIterable")
     func testCaseIterable() {
-        let allCases = UniversalObject.allCases
+        let allCases = Universal.allCases
 
         #expect(allCases.count > 0)
         #expect(allCases.contains(.ground))
@@ -51,9 +51,9 @@ struct UniversalObjectTests {
         #expect(uniqueCases.count == allCases.count)
     }
 
-    @Test("UniversalObject contains expected cases")
+    @Test("Universal contains expected cases")
     func testExpectedCases() {
-        let allCases = UniversalObject.allCases
+        let allCases = Universal.allCases
 
         // Ground and Earth
         #expect(allCases.contains(.ground))
@@ -108,59 +108,59 @@ struct UniversalObjectTests {
 
     // MARK: - Codable Tests
 
-    @Test("UniversalObject encodes and decodes correctly")
+    @Test("Universal encodes and decodes correctly")
     func testCodable() throws {
         let encoder = JSONEncoder()
         let decoder = JSONDecoder()
 
-        for universalObject in UniversalObject.allCases {
+        for universalObject in Universal.allCases {
             let encoded = try encoder.encode(universalObject)
-            let decoded = try decoder.decode(UniversalObject.self, from: encoded)
+            let decoded = try decoder.decode(Universal.self, from: encoded)
             #expect(decoded == universalObject)
         }
     }
 
-    @Test("UniversalObject encodes to expected JSON string")
+    @Test("Universal encodes to expected JSON string")
     func testEncodesToString() throws {
         let encoder = JSONEncoder()
 
-        let groundData = try encoder.encode(UniversalObject.ground)
+        let groundData = try encoder.encode(Universal.ground)
         let groundString = String(data: groundData, encoding: .utf8)
         #expect(groundString == "\"ground\"")
 
-        let skyData = try encoder.encode(UniversalObject.sky)
+        let skyData = try encoder.encode(Universal.sky)
         let skyString = String(data: skyData, encoding: .utf8)
         #expect(skyString == "\"sky\"")
     }
 
     // MARK: - Matches Method Tests
 
-    @Test("UniversalObject matches method works with related objects")
+    @Test("Universal matches method works with related objects")
     func testMatchesMethod() {
         // Ground-related objects should match each other
-        #expect(UniversalObject.ground.matches(.floor))
-        #expect(UniversalObject.ground.matches(.earth))
-        #expect(UniversalObject.floor.matches(.ground))
+        #expect(Universal.ground.matches(.floor))
+        #expect(Universal.ground.matches(.earth))
+        #expect(Universal.floor.matches(.ground))
 
         // Sky-related objects should match each other
-        #expect(UniversalObject.sky.matches(.heavens))
-        #expect(UniversalObject.heavens.matches(.sky))
-        #expect(UniversalObject.sky.matches(.air))
+        #expect(Universal.sky.matches(.heavens))
+        #expect(Universal.heavens.matches(.sky))
+        #expect(Universal.sky.matches(.air))
 
         // Water-related objects should match each other
-        #expect(UniversalObject.water.matches(.river))
-        #expect(UniversalObject.river.matches(.water))
-        #expect(UniversalObject.lake.matches(.ocean))
+        #expect(Universal.water.matches(.river))
+        #expect(Universal.river.matches(.water))
+        #expect(Universal.lake.matches(.ocean))
 
         // Unrelated objects should not match
-        #expect(!UniversalObject.ground.matches(.sky))
-        #expect(!UniversalObject.water.matches(.fire))
-        #expect(!UniversalObject.walls.matches(.river))
+        #expect(!Universal.ground.matches(.sky))
+        #expect(!Universal.water.matches(.fire))
+        #expect(!Universal.walls.matches(.river))
     }
 
-    @Test("UniversalObject matches itself through relatedUniversals")
+    @Test("Universal matches itself through relatedUniversals")
     func testMatchesSelf() {
-        for universalObject in UniversalObject.allCases {
+        for universalObject in Universal.allCases {
             #expect(universalObject.relatedUniversals.contains(universalObject))
         }
     }
@@ -169,88 +169,88 @@ struct UniversalObjectTests {
 
     @Test("Ground and floor related universals are correct")
     func testGroundRelatedUniversals() {
-        let groundRelated = UniversalObject.ground.relatedUniversals
-        let expectedGroundRelated: Set<UniversalObject> = [.ground, .floor, .earth, .soil, .dirt]
+        let groundRelated = Universal.ground.relatedUniversals
+        let expectedGroundRelated: Set<Universal> = [.ground, .floor, .earth, .soil, .dirt]
         expectNoDifference(groundRelated, expectedGroundRelated)
 
-        let floorRelated = UniversalObject.floor.relatedUniversals
+        let floorRelated = Universal.floor.relatedUniversals
         expectNoDifference(floorRelated, expectedGroundRelated)
     }
 
     @Test("Earth, soil, dirt related universals are correct")
     func testEarthRelatedUniversals() {
-        let earthRelated = UniversalObject.earth.relatedUniversals
-        let expectedEarthRelated: Set<UniversalObject> = [.ground, .earth, .soil, .dirt]
+        let earthRelated = Universal.earth.relatedUniversals
+        let expectedEarthRelated: Set<Universal> = [.ground, .earth, .soil, .dirt]
         expectNoDifference(earthRelated, expectedEarthRelated)
 
-        let soilRelated = UniversalObject.soil.relatedUniversals
+        let soilRelated = Universal.soil.relatedUniversals
         expectNoDifference(soilRelated, expectedEarthRelated)
 
-        let dirtRelated = UniversalObject.dirt.relatedUniversals
+        let dirtRelated = Universal.dirt.relatedUniversals
         expectNoDifference(dirtRelated, expectedEarthRelated)
     }
 
     @Test("Sky and heavens related universals are correct")
     func testSkyRelatedUniversals() {
-        let skyRelated = UniversalObject.sky.relatedUniversals
-        let expectedSkyRelated: Set<UniversalObject> = [.sky, .heavens, .air, .clouds]
+        let skyRelated = Universal.sky.relatedUniversals
+        let expectedSkyRelated: Set<Universal> = [.sky, .heavens, .air, .clouds]
         expectNoDifference(skyRelated, expectedSkyRelated)
 
-        let heavensRelated = UniversalObject.heavens.relatedUniversals
+        let heavensRelated = Universal.heavens.relatedUniversals
         expectNoDifference(heavensRelated, expectedSkyRelated)
     }
 
     @Test("Air and clouds related universals are correct")
     func testAirRelatedUniversals() {
-        let airRelated = UniversalObject.air.relatedUniversals
-        let expectedAirRelated: Set<UniversalObject> = [.sky, .air, .clouds]
+        let airRelated = Universal.air.relatedUniversals
+        let expectedAirRelated: Set<Universal> = [.sky, .air, .clouds]
         expectNoDifference(airRelated, expectedAirRelated)
 
-        let cloudsRelated = UniversalObject.clouds.relatedUniversals
+        let cloudsRelated = Universal.clouds.relatedUniversals
         expectNoDifference(cloudsRelated, expectedAirRelated)
     }
 
     @Test("Celestial objects related universals are correct")
     func testCelestialRelatedUniversals() {
-        let expectedCelestialRelated: Set<UniversalObject> = [.sun, .moon, .stars, .sky, .heavens]
+        let expectedCelestialRelated: Set<Universal> = [.sun, .moon, .stars, .sky, .heavens]
 
-        let sunRelated = UniversalObject.sun.relatedUniversals
+        let sunRelated = Universal.sun.relatedUniversals
         expectNoDifference(sunRelated, expectedCelestialRelated)
 
-        let moonRelated = UniversalObject.moon.relatedUniversals
+        let moonRelated = Universal.moon.relatedUniversals
         expectNoDifference(moonRelated, expectedCelestialRelated)
 
-        let starsRelated = UniversalObject.stars.relatedUniversals
+        let starsRelated = Universal.stars.relatedUniversals
         expectNoDifference(starsRelated, expectedCelestialRelated)
     }
 
     @Test("Wall related universals are correct")
     func testWallRelatedUniversals() {
-        let wallsRelated = UniversalObject.walls.relatedUniversals
-        let expectedWallRelated: Set<UniversalObject> = [.walls, .wall, .ceiling, .floor]
+        let wallsRelated = Universal.walls.relatedUniversals
+        let expectedWallRelated: Set<Universal> = [.walls, .wall, .ceiling, .floor]
         expectNoDifference(wallsRelated, expectedWallRelated)
 
-        let wallRelated = UniversalObject.wall.relatedUniversals
+        let wallRelated = Universal.wall.relatedUniversals
         expectNoDifference(wallRelated, expectedWallRelated)
     }
 
     @Test("Ceiling and roof related universals are correct")
     func testCeilingRelatedUniversals() {
-        let ceilingRelated = UniversalObject.ceiling.relatedUniversals
-        let expectedCeilingRelated: Set<UniversalObject> = [.ceiling, .roof]
+        let ceilingRelated = Universal.ceiling.relatedUniversals
+        let expectedCeilingRelated: Set<Universal> = [.ceiling, .roof]
         expectNoDifference(ceilingRelated, expectedCeilingRelated)
 
-        let roofRelated = UniversalObject.roof.relatedUniversals
+        let roofRelated = Universal.roof.relatedUniversals
         expectNoDifference(roofRelated, expectedCeilingRelated)
     }
 
     @Test("Water related universals are correct")
     func testWaterRelatedUniversals() {
-        let expectedWaterRelated: Set<UniversalObject> = [
+        let expectedWaterRelated: Set<Universal> = [
             .water, .river, .stream, .lake, .pond, .ocean, .sea,
         ]
 
-        for waterObject in [UniversalObject.water, .river, .stream, .lake, .pond, .ocean, .sea] {
+        for waterObject in [Universal.water, .river, .stream, .lake, .pond, .ocean, .sea] {
             let related = waterObject.relatedUniversals
             expectNoDifference(related, expectedWaterRelated)
         }
@@ -258,64 +258,64 @@ struct UniversalObjectTests {
 
     @Test("Fire related universals are correct")
     func testFireRelatedUniversals() {
-        let fireRelated = UniversalObject.fire.relatedUniversals
-        let expectedFireRelated: Set<UniversalObject> = [.fire, .flames, .smoke, .light]
+        let fireRelated = Universal.fire.relatedUniversals
+        let expectedFireRelated: Set<Universal> = [.fire, .flames, .smoke, .light]
         expectNoDifference(fireRelated, expectedFireRelated)
 
-        let flamesRelated = UniversalObject.flames.relatedUniversals
+        let flamesRelated = Universal.flames.relatedUniversals
         expectNoDifference(flamesRelated, expectedFireRelated)
     }
 
     @Test("Remaining related universals are correct")
     func testRemainingRelatedUniversals() {
         // Wind
-        let windRelated = UniversalObject.wind.relatedUniversals
+        let windRelated = Universal.wind.relatedUniversals
         expectNoDifference(windRelated, [.wind, .air])
 
         // Smoke
-        let smokeRelated = UniversalObject.smoke.relatedUniversals
+        let smokeRelated = Universal.smoke.relatedUniversals
         expectNoDifference(smokeRelated, [.smoke, .fire, .air])
 
         // Dust, mud, sand
-        let dustRelated = UniversalObject.dust.relatedUniversals
-        let expectedDustRelated: Set<UniversalObject> = [.dust, .mud, .sand, .dirt, .earth]
+        let dustRelated = Universal.dust.relatedUniversals
+        let expectedDustRelated: Set<Universal> = [.dust, .mud, .sand, .dirt, .earth]
         expectNoDifference(dustRelated, expectedDustRelated)
 
-        let mudRelated = UniversalObject.mud.relatedUniversals
+        let mudRelated = Universal.mud.relatedUniversals
         expectNoDifference(mudRelated, expectedDustRelated)
 
-        let sandRelated = UniversalObject.sand.relatedUniversals
+        let sandRelated = Universal.sand.relatedUniversals
         expectNoDifference(sandRelated, expectedDustRelated)
 
         // Rock and stone
-        let rockRelated = UniversalObject.rock.relatedUniversals
-        let expectedRockRelated: Set<UniversalObject> = [.rock, .stone, .earth]
+        let rockRelated = Universal.rock.relatedUniversals
+        let expectedRockRelated: Set<Universal> = [.rock, .stone, .earth]
         expectNoDifference(rockRelated, expectedRockRelated)
 
-        let stoneRelated = UniversalObject.stone.relatedUniversals
+        let stoneRelated = Universal.stone.relatedUniversals
         expectNoDifference(stoneRelated, expectedRockRelated)
 
         // Darkness and shadows
-        let darknessRelated = UniversalObject.darkness.relatedUniversals
-        let expectedDarknessRelated: Set<UniversalObject> = [.darkness, .shadows]
+        let darknessRelated = Universal.darkness.relatedUniversals
+        let expectedDarknessRelated: Set<Universal> = [.darkness, .shadows]
         expectNoDifference(darknessRelated, expectedDarknessRelated)
 
-        let shadowsRelated = UniversalObject.shadows.relatedUniversals
+        let shadowsRelated = Universal.shadows.relatedUniversals
         expectNoDifference(shadowsRelated, expectedDarknessRelated)
 
         // Light
-        let lightRelated = UniversalObject.light.relatedUniversals
+        let lightRelated = Universal.light.relatedUniversals
         expectNoDifference(lightRelated, [.light, .fire, .flames, .sun])
 
         // Sound related
-        let silenceRelated = UniversalObject.silence.relatedUniversals
-        let expectedSoundRelated: Set<UniversalObject> = [.silence, .sound, .noise]
+        let silenceRelated = Universal.silence.relatedUniversals
+        let expectedSoundRelated: Set<Universal> = [.silence, .sound, .noise]
         expectNoDifference(silenceRelated, expectedSoundRelated)
 
-        let soundRelated = UniversalObject.sound.relatedUniversals
+        let soundRelated = Universal.sound.relatedUniversals
         expectNoDifference(soundRelated, expectedSoundRelated)
 
-        let noiseRelated = UniversalObject.noise.relatedUniversals
+        let noiseRelated = Universal.noise.relatedUniversals
         expectNoDifference(noiseRelated, expectedSoundRelated)
     }
 
@@ -324,7 +324,7 @@ struct UniversalObjectTests {
     @Test("isOutdoorElement property is correct")
     func testIsOutdoorElement() {
         // Should be outdoor elements
-        let outdoorElements: [UniversalObject] = [
+        let outdoorElements: [Universal] = [
             .clouds, .dirt, .earth, .heavens, .moon, .sky, .soil, .stars, .sun, .wind,
         ]
         for element in outdoorElements {
@@ -332,14 +332,14 @@ struct UniversalObjectTests {
         }
 
         // Should not be outdoor elements
-        let notOutdoorElements: [UniversalObject] = [.ceiling, .floor, .roof]
+        let notOutdoorElements: [Universal] = [.ceiling, .floor, .roof]
         for element in notOutdoorElements {
             #expect(!element.isOutdoorElement, "\(element) should not be an outdoor element")
         }
 
         // All others should be false (default case)
         let allOutdoorAndIndoorSpecific = Set(outdoorElements + notOutdoorElements)
-        for element in UniversalObject.allCases {
+        for element in Universal.allCases {
             if !allOutdoorAndIndoorSpecific.contains(element) {
                 #expect(
                     !element.isOutdoorElement,
@@ -351,20 +351,20 @@ struct UniversalObjectTests {
     @Test("isIndoorElement property is correct")
     func testIsIndoorElement() {
         // Should be indoor elements
-        let indoorElements: [UniversalObject] = [.ceiling, .floor, .roof, .wall, .walls]
+        let indoorElements: [Universal] = [.ceiling, .floor, .roof, .wall, .walls]
         for element in indoorElements {
             #expect(element.isIndoorElement, "\(element) should be an indoor element")
         }
 
         // Should not be indoor elements
-        let notIndoorElements: [UniversalObject] = [.heavens, .moon, .sky, .stars, .sun]
+        let notIndoorElements: [Universal] = [.heavens, .moon, .sky, .stars, .sun]
         for element in notIndoorElements {
             #expect(!element.isIndoorElement, "\(element) should not be an indoor element")
         }
 
         // All others should be true (default case)
         let allSpecified = Set(indoorElements + notIndoorElements)
-        for element in UniversalObject.allCases {
+        for element in Universal.allCases {
             if !allSpecified.contains(element) {
                 #expect(
                     element.isIndoorElement, "\(element) should be an indoor element (default case)"
@@ -376,7 +376,7 @@ struct UniversalObjectTests {
     @Test("isPhysical property is correct")
     func testIsPhysical() {
         // Should be physical
-        let physicalElements: [UniversalObject] = [
+        let physicalElements: [Universal] = [
             .ceiling, .dirt, .earth, .floor, .ground, .lake, .mud, .ocean, .pond, .river,
             .rock, .roof, .sand, .sea, .soil, .stone, .stream, .wall, .walls, .water,
         ]
@@ -385,7 +385,7 @@ struct UniversalObjectTests {
         }
 
         // Should not be physical
-        let nonPhysicalElements: [UniversalObject] = [
+        let nonPhysicalElements: [Universal] = [
             .air, .clouds, .darkness, .dust, .fire, .flames, .heavens, .light, .moon, .noise,
             .shadows, .silence, .sky, .smoke, .sound, .stars, .sun, .wind,
         ]
@@ -396,13 +396,13 @@ struct UniversalObjectTests {
         // Verify we've covered all cases
         let allSpecified = Set(physicalElements + nonPhysicalElements)
         #expect(
-            allSpecified.count == UniversalObject.allCases.count,
+            allSpecified.count == Universal.allCases.count,
             "Should have specified physical property for all cases")
     }
 
     @Test("isOutdoors property is correct")
     func testIsOutdoors() {
-        let outdoorsElements: [UniversalObject] = [
+        let outdoorsElements: [Universal] = [
             .air, .clouds, .darkness, .dirt, .dust, .earth, .fire, .flames, .ground, .heavens,
             .lake, .light, .moon, .mud, .ocean, .pond, .river, .rock, .sand, .sea, .shadows,
             .sky, .smoke, .soil, .stars, .stone, .stream, .sun, .water, .wind,
@@ -414,7 +414,7 @@ struct UniversalObjectTests {
 
         // All others should be false
         let outdoorsSet = Set(outdoorsElements)
-        for element in UniversalObject.allCases {
+        for element in Universal.allCases {
             if !outdoorsSet.contains(element) {
                 #expect(!element.isOutdoors, "\(element) should not be found outdoors")
             }
@@ -423,7 +423,7 @@ struct UniversalObjectTests {
 
     @Test("isIndoors property is correct")
     func testIsIndoors() {
-        let indoorsElements: [UniversalObject] = [
+        let indoorsElements: [Universal] = [
             .air, .ceiling, .darkness, .dust, .fire, .flames, .floor, .light, .noise, .roof,
             .shadows, .silence, .smoke, .sound, .wall, .walls, .water,
         ]
@@ -434,7 +434,7 @@ struct UniversalObjectTests {
 
         // All others should be false
         let indoorsSet = Set(indoorsElements)
-        for element in UniversalObject.allCases {
+        for element in Universal.allCases {
             if !indoorsSet.contains(element) {
                 #expect(!element.isIndoors, "\(element) should not be found indoors")
             }
@@ -443,7 +443,7 @@ struct UniversalObjectTests {
 
     @Test("isDiggable property is correct")
     func testIsDiggable() {
-        let diggableElements: [UniversalObject] = [.dirt, .earth, .ground, .mud, .sand, .soil]
+        let diggableElements: [Universal] = [.dirt, .earth, .ground, .mud, .sand, .soil]
 
         for element in diggableElements {
             #expect(element.isDiggable, "\(element) should be diggable")
@@ -451,7 +451,7 @@ struct UniversalObjectTests {
 
         // All others should be false
         let diggableSet = Set(diggableElements)
-        for element in UniversalObject.allCases {
+        for element in Universal.allCases {
             if !diggableSet.contains(element) {
                 #expect(!element.isDiggable, "\(element) should not be diggable")
             }
@@ -460,7 +460,7 @@ struct UniversalObjectTests {
 
     @Test("isWater property is correct")
     func testIsWater() {
-        let waterElements: [UniversalObject] = [
+        let waterElements: [Universal] = [
             .lake, .ocean, .pond, .river, .sea, .stream, .water,
         ]
 
@@ -470,7 +470,7 @@ struct UniversalObjectTests {
 
         // All others should be false
         let waterSet = Set(waterElements)
-        for element in UniversalObject.allCases {
+        for element in Universal.allCases {
             if !waterSet.contains(element) {
                 #expect(!element.isWater, "\(element) should not be water")
             }
@@ -479,7 +479,7 @@ struct UniversalObjectTests {
 
     @Test("isArchitectural property is correct")
     func testIsArchitectural() {
-        let architecturalElements: [UniversalObject] = [.ceiling, .floor, .roof, .wall, .walls]
+        let architecturalElements: [Universal] = [.ceiling, .floor, .roof, .wall, .walls]
 
         for element in architecturalElements {
             #expect(element.isArchitectural, "\(element) should be architectural")
@@ -487,7 +487,7 @@ struct UniversalObjectTests {
 
         // All others should be false
         let architecturalSet = Set(architecturalElements)
-        for element in UniversalObject.allCases {
+        for element in Universal.allCases {
             if !architecturalSet.contains(element) {
                 #expect(!element.isArchitectural, "\(element) should not be architectural")
             }
@@ -498,18 +498,18 @@ struct UniversalObjectTests {
 
     @Test("CustomStringConvertible description returns raw value")
     func testCustomStringConvertible() {
-        for universalObject in UniversalObject.allCases {
+        for universalObject in Universal.allCases {
             #expect(universalObject.description == universalObject.rawValue)
         }
     }
 
     @Test("String interpolation uses description")
     func testStringInterpolation() {
-        let ground = UniversalObject.ground
+        let ground = Universal.ground
         let interpolated = "The universal object is \(ground)"
         #expect(interpolated == "The universal object is ground")
 
-        let sky = UniversalObject.sky
+        let sky = Universal.sky
         let skyInterpolated = "Look at \(sky)"
         #expect(skyInterpolated == "Look at sky")
     }
@@ -518,7 +518,7 @@ struct UniversalObjectTests {
 
     @Test("All universal objects have non-empty related universals")
     func testAllHaveRelatedUniversals() {
-        for universalObject in UniversalObject.allCases {
+        for universalObject in Universal.allCases {
             #expect(
                 !universalObject.relatedUniversals.isEmpty,
                 "\(universalObject) should have related universals")
@@ -531,7 +531,7 @@ struct UniversalObjectTests {
     @Test("Related universals are symmetric where expected")
     func testRelatedUniversalsSymmetry() {
         // Test specific symmetric relationships
-        let symmetricPairs: [(UniversalObject, UniversalObject)] = [
+        let symmetricPairs: [(Universal, Universal)] = [
             (.ground, .floor),
             (.sky, .heavens),
             (.walls, .wall),
@@ -553,39 +553,39 @@ struct UniversalObjectTests {
         // but some are exclusive (like ceiling vs sky)
 
         // Ceiling should be indoor only
-        #expect(UniversalObject.ceiling.isIndoorElement)
-        #expect(!UniversalObject.ceiling.isOutdoorElement)
+        #expect(Universal.ceiling.isIndoorElement)
+        #expect(!Universal.ceiling.isOutdoorElement)
 
         // Sky should be outdoor only
-        #expect(UniversalObject.sky.isOutdoorElement)
-        #expect(!UniversalObject.sky.isIndoorElement)
+        #expect(Universal.sky.isOutdoorElement)
+        #expect(!Universal.sky.isIndoorElement)
 
         // Floor should be indoor only
-        #expect(UniversalObject.floor.isIndoorElement)
-        #expect(!UniversalObject.floor.isOutdoorElement)
+        #expect(Universal.floor.isIndoorElement)
+        #expect(!Universal.floor.isOutdoorElement)
     }
 
     @Test("Logical property relationships")
     func testLogicalPropertyRelationships() {
         // All architectural elements should be physical
-        for element in UniversalObject.allCases where element.isArchitectural {
+        for element in Universal.allCases where element.isArchitectural {
             #expect(element.isPhysical, "Architectural element \(element) should be physical")
         }
 
         // All water elements should be physical
-        for element in UniversalObject.allCases where element.isWater {
+        for element in Universal.allCases where element.isWater {
             #expect(element.isPhysical, "Water element \(element) should be physical")
         }
 
         // All diggable elements should be physical
-        for element in UniversalObject.allCases where element.isDiggable {
+        for element in Universal.allCases where element.isDiggable {
             #expect(element.isPhysical, "Diggable element \(element) should be physical")
         }
     }
 
     @Test("Raw value uniqueness")
     func testRawValueUniqueness() {
-        let rawValues = UniversalObject.allCases.map(\.rawValue)
+        let rawValues = Universal.allCases.map(\.rawValue)
         let uniqueRawValues = Set(rawValues)
         #expect(rawValues.count == uniqueRawValues.count, "All raw values should be unique")
     }
@@ -596,15 +596,15 @@ struct UniversalObjectTests {
         // It serves as a reminder to update tests when the enum changes
         let expectedMinimumCount = 36  // Based on the cases visible in the enum
         #expect(
-            UniversalObject.allCases.count >= expectedMinimumCount,
+            Universal.allCases.count >= expectedMinimumCount,
             "Should have at least \(expectedMinimumCount) cases")
     }
 
-    // MARK: - Set<UniversalObject>.closestMatch Tests
+    // MARK: - Set<Universal>.closestMatch Tests
 
     @Test("Set closestMatch returns exact match when found")
     func testClosestMatchExactMatch() {
-        let universals: Set<UniversalObject> = [.ground, .sky, .water, .fire]
+        let universals: Set<Universal> = [.ground, .sky, .water, .fire]
 
         #expect(universals.closestMatch(to: "ground") == .ground)
         #expect(universals.closestMatch(to: "sky") == .sky)
@@ -615,7 +615,7 @@ struct UniversalObjectTests {
     @Test("Set closestMatch returns first sorted element when no exact match")
     func testClosestMatchFallback() {
         // When sorted: [.fire, .ground, .sky, .water]
-        let universals: Set<UniversalObject> = [.water, .ground, .sky, .fire]
+        let universals: Set<Universal> = [.water, .ground, .sky, .fire]
 
         #expect(universals.closestMatch(to: "invalid") == .fire)
         #expect(universals.closestMatch(to: "nonexistent") == .fire)
@@ -625,7 +625,7 @@ struct UniversalObjectTests {
     @Test("Set closestMatch deterministic fallback ordering")
     func testClosestMatchDeterministicFallback() {
         // Test that the fallback is deterministic by using same set multiple times
-        let universals: Set<UniversalObject> = [.walls, .air, .moon, .dust]
+        let universals: Set<Universal> = [.walls, .air, .moon, .dust]
 
         let results = (1...10).map { _ in
             universals.closestMatch(to: "invalid")
@@ -643,7 +643,7 @@ struct UniversalObjectTests {
 
     @Test("Set closestMatch with single element")
     func testClosestMatchSingleElement() {
-        let universals: Set<UniversalObject> = [.ground]
+        let universals: Set<Universal> = [.ground]
 
         // Exact match
         #expect(universals.closestMatch(to: "ground") == .ground)
@@ -654,7 +654,7 @@ struct UniversalObjectTests {
 
     @Test("Set closestMatch with empty set")
     func testClosestMatchEmptySet() {
-        let universals: Set<UniversalObject> = []
+        let universals: Set<Universal> = []
 
         #expect(universals.closestMatch(to: "ground") == nil)
         #expect(universals.closestMatch(to: "invalid") == nil)
@@ -663,7 +663,7 @@ struct UniversalObjectTests {
 
     @Test("Set closestMatch is case sensitive")
     func testClosestMatchCaseSensitive() {
-        let universals: Set<UniversalObject> = [.ground, .sky, .water]
+        let universals: Set<Universal> = [.ground, .sky, .water]
 
         // Exact case matches
         #expect(universals.closestMatch(to: "ground") == .ground)
@@ -677,7 +677,7 @@ struct UniversalObjectTests {
 
     @Test("Set closestMatch with edge case inputs")
     func testClosestMatchEdgeCases() {
-        let universals: Set<UniversalObject> = [.ground, .sky]
+        let universals: Set<Universal> = [.ground, .sky]
 
         // Empty string should not match - falls back to first sorted
         #expect(universals.closestMatch(to: "") == .ground)  // sorted = [.ground, .sky]
@@ -693,7 +693,7 @@ struct UniversalObjectTests {
 
     @Test("Set closestMatch with all universal objects")
     func testClosestMatchWithAllObjects() {
-        let universals = Set(UniversalObject.allCases)
+        let universals = Set(Universal.allCases)
 
         // Test a few exact matches
         #expect(universals.closestMatch(to: "ground") == .ground)
@@ -701,7 +701,7 @@ struct UniversalObjectTests {
         #expect(universals.closestMatch(to: "fire") == .fire)
 
         // Test fallback with invalid input - should return first alphabetically
-        let sortedAll = UniversalObject.allCases.sorted { $0.rawValue < $1.rawValue }
+        let sortedAll = Universal.allCases.sorted { $0.rawValue < $1.rawValue }
         let expectedFirst = sortedAll.first!
         #expect(universals.closestMatch(to: "invalid") == expectedFirst)
     }
@@ -709,9 +709,9 @@ struct UniversalObjectTests {
     @Test("Set closestMatch preserves order independence")
     func testClosestMatchOrderIndependence() {
         // Same elements in different orders should produce same results
-        let set1: Set<UniversalObject> = [.water, .fire, .air, .earth]
-        let set2: Set<UniversalObject> = [.earth, .air, .fire, .water]
-        let set3: Set<UniversalObject> = [.fire, .earth, .water, .air]
+        let set1: Set<Universal> = [.water, .fire, .air, .earth]
+        let set2: Set<Universal> = [.earth, .air, .fire, .water]
+        let set3: Set<Universal> = [.fire, .earth, .water, .air]
 
         // Exact matches should be same regardless of set creation order
         #expect(set1.closestMatch(to: "water") == set2.closestMatch(to: "water"))
@@ -725,7 +725,7 @@ struct UniversalObjectTests {
     @Test("Set closestMatch with related universals")
     func testClosestMatchWithRelatedUniversals() {
         // Test with ground-related universals
-        let groundRelated: Set<UniversalObject> = [.ground, .floor, .earth, .soil, .dirt]
+        let groundRelated: Set<Universal> = [.ground, .floor, .earth, .soil, .dirt]
 
         // Exact matches work
         #expect(groundRelated.closestMatch(to: "ground") == .ground)
@@ -736,7 +736,7 @@ struct UniversalObjectTests {
         #expect(groundRelated.closestMatch(to: "invalid") == .dirt)
 
         // Test with water-related universals
-        let waterRelated: Set<UniversalObject> = [.water, .river, .lake, .ocean, .sea]
+        let waterRelated: Set<Universal> = [.water, .river, .lake, .ocean, .sea]
 
         // Exact matches work
         #expect(waterRelated.closestMatch(to: "ocean") == .ocean)

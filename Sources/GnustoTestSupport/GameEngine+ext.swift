@@ -39,14 +39,8 @@ extension GameEngine {
 
     /// Applies a `StateChange` directly to the game state.
     ///
-    /// > Important: **Internal/Test Use Only**: This method is provided for internal engine
-    ///   operations and testing scenarios where direct state manipulation is necessary. Game
-    ///   developers should use the action handler system (`ActionResult.changes`) rather
-    ///   than calling this method directly.
-    ///
     /// This method bypasses the normal action handler pipeline, including:
     /// - Before/after turn event handlers
-    /// - Action validation
     /// - Side effect processing
     ///
     /// Use this method only when:
@@ -54,7 +48,7 @@ extension GameEngine {
     /// - Internal engine operations that need direct state access
     /// - Implementing low-level engine functionality
     ///
-    /// - Parameter change: The `StateChange` to apply to the game state.
+    /// - Parameter changes: A collection of `StateChange` instances to apply to the game state.
     /// - Throws: Re-throws any errors from `GameState.apply()`, including validation failures.
     public func apply(_ changes: StateChange?...) async throws {
         try applyActionResultChanges(changes)

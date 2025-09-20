@@ -13,7 +13,7 @@ public enum EntityReference: Hashable, Sendable, Codable {
     case player
 
     /// A reference to a universal object concept.
-    case universal(UniversalObject)
+    case universal(Universal)
 }
 
 extension EntityReference: CustomStringConvertible {
