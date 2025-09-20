@@ -18,7 +18,7 @@ open class StandardMessenger: @unchecked Sendable {
     /// A random number generator used for response randomization.
     ///
     /// For testing purposes, a deterministic random number generator can specified when
-    /// initializing the GnustoMessenger. By default the SystemRandomNumberGenerator is used.
+    /// initializing the StandardMessenger. By default the SystemRandomNumberGenerator is used.
     private var randomNumberGenerator: RandomNumberGenerator
 
     public init(

@@ -1,8 +1,21 @@
 import Foundation
 
+/// A messenger class that provides combat-related narrative text generation.
+///
+/// `CombatMessenger` extends `StandardMessenger` to provide specialized messaging
+/// for combat scenarios in a text-based game. It generates dynamic, contextual
+/// descriptions for various combat situations including attacks, outcomes, and
+/// status effects.
+///
+/// The class uses weapon state and combat context to generate appropriate narrative
+/// text that varies based on whether participants are armed or unarmed, creating
+/// immersive combat descriptions.
+///
+/// `StandardMessenger`, `CombatMessenger` and its subclasses are forced to declare
+/// `@unchecked Sendable` because they are open classes.
 open class CombatMessenger: StandardMessenger, @unchecked Sendable {
 
-    // MARK:--Opening Attacks
+    // MARK: - Opening Attacks
 
     /// An enemy attacks the player.
     open func enemyAttacks(
@@ -171,7 +184,7 @@ open class CombatMessenger: StandardMessenger, @unchecked Sendable {
         }
     }
 
-    // MARK:--Player Attack Outcomes
+    // MARK: - Player Attack Outcomes
 
     /// Player kills the enemy outright.
     open func enemySlain(
@@ -2031,7 +2044,7 @@ open class CombatMessenger: StandardMessenger, @unchecked Sendable {
         }
     }
 
-    // MARK:--Enemy Attack Outcomes
+    // MARK: - Enemy Attack Outcomes
 
     /// Enemy kills the player.
     open func playerSlain(
@@ -3022,7 +3035,7 @@ open class CombatMessenger: StandardMessenger, @unchecked Sendable {
         }
     }
 
-    // MARK:--Special Outcomes
+    // MARK: - Special Outcomes
 
     /// Enemy flees from combat.
     open func enemyFlees(

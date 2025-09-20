@@ -209,9 +209,10 @@ For VS Code users, the Debug Console does not support interactive keyboard input
 
 ## Topics
 
-### Essential Game Development Guides
+### Game Development Guides
 - <doc:DynamicProperties>
 - <doc:GnustoAutoWiringPlugin>
+- <doc:Combat>
 
 ### Core Types
 - ``GameBlueprint``
