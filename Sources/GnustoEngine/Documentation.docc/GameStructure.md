@@ -111,14 +111,18 @@ Proxies bridge the gap between your static definitions and the dynamic game worl
 
 ### Static vs. Dynamic Properties
 
-Understanding this distinction is key to mastering Gnusto:
+Learning this distinction is key to understanding Gnusto:
 
-**Static properties** (defined at compile time):
+#### Static properties
+
+- Defined at compile time
 - Initial flags: `.isTakable`, `.isLightSource`, `.isContainer`
 - Starting descriptions, names, adjectives and synonyms
 - Base item properties and initial locations
 
-**Dynamic properties** (computed at runtime through proxies):
+#### Dynamic properties
+
+- Computed at runtime through proxies
 - `isLit`: Considers all light sources, darkness effects, and conditions
 - `isVisible`: Accounts for darkness, container states, and concealment
 - `description`: Can change based on world state via property computers
