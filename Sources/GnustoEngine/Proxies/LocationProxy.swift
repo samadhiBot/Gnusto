@@ -124,4 +124,13 @@ extension LocationProxy: Hashable {
     public static func == (lhs: LocationProxy, rhs: LocationProxy) -> Bool {
         lhs.id == rhs.id
     }
+
+    /// A convenience comparator that enables comparisons like `player.location == .forest`.
+    ///
+    /// - Parameters:
+    ///   - proxy: A `LocationProxy` to compare.
+    ///   - id: A `LocationID` to compare.
+    public static func == (proxy: LocationProxy, id: LocationID) -> Bool {
+        proxy.id == id
+    }
 }

@@ -141,7 +141,7 @@ struct OperaHouse {
 
     let cloakHandler = ItemEventHandler(for: .cloak) {
         before(.drop, .insert) { context, _ in
-            guard await context.player.location.id == .cloakroom else {
+            guard await context.player.location == .cloakroom else {
                 throw ActionResponse.feedback(
                     "This isn't the best place to leave a smart cloak lying around."
                 )
@@ -150,7 +150,7 @@ struct OperaHouse {
         }
 
         after { context, command in
-            guard await context.player.location.id == .cloakroom else {
+            guard await context.player.location == .cloakroom else {
                 return nil
             }
 
@@ -188,7 +188,7 @@ struct OperaHouse {
 
     let messageHandler = ItemEventHandler(for: .message) {
         before(.examine, .read) { context, _ in
-            guard await context.player.location.id == .bar else {
+            guard await context.player.location == .bar else {
                 return .yield
             }
 

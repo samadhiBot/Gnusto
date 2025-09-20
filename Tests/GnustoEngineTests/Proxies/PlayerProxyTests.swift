@@ -43,7 +43,7 @@ struct PlayerProxyTests {
         let location = await proxy.location
 
         // Then
-        #expect(location.id == .startRoom)
+        #expect(location == .startRoom)
         #expect(await location.name == "Laboratory")
     }
 

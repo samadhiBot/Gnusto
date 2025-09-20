@@ -136,7 +136,7 @@ Make items respond intelligently to player actions:
 ```swift
 let cloakHandler = ItemEventHandler(for: .cloak) {
     before(.drop, .insert) { context, _ in
-        guard await context.player.location.id == .cloakroom else {
+        guard await context.player.location == .cloakroom else {
             throw ActionResponse.feedback(
                 "This isn't the best place to leave a smart cloak lying around."
             )
@@ -145,7 +145,7 @@ let cloakHandler = ItemEventHandler(for: .cloak) {
     }
 
     after { context, command in
-        guard await context.player.location.id == .cloakroom else {
+        guard await context.player.location == .cloakroom else {
             return nil
         }
 

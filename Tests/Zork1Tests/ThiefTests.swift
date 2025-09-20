@@ -668,7 +668,7 @@ struct ThiefTests {
         // Then - bag should be accessible after thief is gone
         switch bagLocation {
         case .location(let location):
-            #expect(location.id == .roundRoom)  // Should drop in current location
+            #expect(location == .roundRoom)  // Should drop in current location
         case .nowhere:
             // Bag might be removed with thief - that's also valid
             break

@@ -45,7 +45,7 @@ struct Zork1TrollCombatTests {
         try await engine.execute("go east")
 
         // Then - player should move successfully
-        #expect(await engine.player.location.id == .eastWestPassage)
+        #expect(await engine.player.location == .eastWestPassage)
     }
 
     @Test("Giving weapon to troll has random outcomes")
