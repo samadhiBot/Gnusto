@@ -75,7 +75,11 @@ struct AnyCodableSendableTests {
 
     @Test("TryDecode returns nil for wrong type")
     func testTryDecodeWrongType() throws {
-        let original = TestGameSettings(difficulty: "Easy", musicVolume: 0.5, effectsVolume: 0.4)
+        let original = TestGameSettings(
+            difficulty: "Easy",
+            musicVolume: 0.5,
+            effectsVolume: 0.4
+        )
         let wrapper = try AnyCodableSendable(original)
 
         let decoded = wrapper.tryDecode(as: TestPlayerInventory.self)
@@ -84,7 +88,11 @@ struct AnyCodableSendableTests {
 
     @Test("Decode throws for wrong type")
     func testDecodeThrowsForWrongType() throws {
-        let original = TestGameSettings(difficulty: "Easy", musicVolume: 0.5, effectsVolume: 0.4)
+        let original = TestGameSettings(
+            difficulty: "Easy",
+            musicVolume: 0.5,
+            effectsVolume: 0.4
+        )
         let wrapper = try AnyCodableSendable(original)
 
         #expect(throws: DecodingError.self) {
@@ -96,8 +104,16 @@ struct AnyCodableSendableTests {
 
     @Test("Type name is correctly stored")
     func testTypeNameStorage() throws {
-        let settings = TestGameSettings(difficulty: "Normal", musicVolume: 0.7, effectsVolume: 0.5)
-        let inventory = TestPlayerInventory(items: ["map"], capacity: 10, weight: 2.0)
+        let settings = TestGameSettings(
+            difficulty: "Normal",
+            musicVolume: 0.7,
+            effectsVolume: 0.5
+        )
+        let inventory = TestPlayerInventory(
+            items: ["map"],
+            capacity: 10,
+            weight: 2.0
+        )
 
         let settingsWrapper = try AnyCodableSendable(settings)
         let inventoryWrapper = try AnyCodableSendable(inventory)
@@ -113,7 +129,11 @@ struct AnyCodableSendableTests {
         let original = TestComplexData(
             id: UUID(),
             timestamp: Date(),
-            settings: TestGameSettings(difficulty: "Hard", musicVolume: 0.9, effectsVolume: 0.8),
+            settings: TestGameSettings(
+                difficulty: "Hard",
+                musicVolume: 0.9,
+                effectsVolume: 0.8
+            ),
             difficulty: .nightmare,
             scores: [100, 250, 500, 1000],
             metadata: ["version": "1.0", "platform": "iOS"]
@@ -184,7 +204,11 @@ struct AnyCodableSendableTests {
         let original = TestComplexData(
             id: UUID(),
             timestamp: Date(),
-            settings: TestGameSettings(difficulty: "Insane", musicVolume: 1.0, effectsVolume: 0.9),
+            settings: TestGameSettings(
+                difficulty: "Insane",
+                musicVolume: 1.0,
+                effectsVolume: 0.9
+            ),
             difficulty: .hard,
             scores: [42, 100, 999],
             metadata: ["creator": "test", "build": "debug"]
@@ -226,8 +250,16 @@ struct AnyCodableSendableTests {
 
     @Test("Wrappers of different types are not equal")
     func testDifferentTypesNotEqual() throws {
-        let settings = TestGameSettings(difficulty: "Normal", musicVolume: 0.5, effectsVolume: 0.5)
-        let inventory = TestPlayerInventory(items: ["item"], capacity: 1, weight: 1.0)
+        let settings = TestGameSettings(
+            difficulty: "Normal",
+            musicVolume: 0.5,
+            effectsVolume: 0.5
+        )
+        let inventory = TestPlayerInventory(
+            items: ["item"],
+            capacity: 1,
+            weight: 1.0
+        )
 
         let wrapper1 = try AnyCodableSendable(settings)
         let wrapper2 = try AnyCodableSendable(inventory)
@@ -241,7 +273,7 @@ struct AnyCodableSendableTests {
     func testEncodingError() {
         // Create a type that will fail encoding
         struct NonEncodableData: Codable, Sendable {
-            let date = Date.distantFuture  // This should encode fine actually
+            var date = Date.distantFuture  // This should encode fine actually
 
             func encode(to encoder: Encoder) throws {
                 throw EncodingError.invalidValue(
@@ -311,7 +343,10 @@ struct AnyCodableSendableTests {
             id: UUID(),
             timestamp: Date(),
             settings: TestGameSettings(
-                difficulty: "Custom", musicVolume: 0.42, effectsVolume: 0.73),
+                difficulty: "Custom",
+                musicVolume: 0.42,
+                effectsVolume: 0.73
+            ),
             difficulty: .easy,
             scores: [1, 2, 3],
             metadata: ["test": "value"]

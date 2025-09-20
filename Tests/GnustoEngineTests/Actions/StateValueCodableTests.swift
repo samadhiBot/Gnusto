@@ -258,7 +258,7 @@ struct StateValueCodableTests {
     @Test("StateValue.wrap throws for non-encodable data")
     func testWrapThrowsForNonEncodableData() {
         struct NonEncodableData: Codable, Sendable {
-            let value = "test"
+            var value = "test"
 
             func encode(to encoder: Encoder) throws {
                 throw EncodingError.invalidValue(
