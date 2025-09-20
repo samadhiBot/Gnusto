@@ -93,6 +93,7 @@ let cloak = Item(
     ├── main.swift                    ├── World
     └── OperaHouse.swift              │   ├── Forest.swift
                                       │   ├── OutsideHouse.swift
+                                      │   ├── ...
                                       │   ├── Thief.swift
                                       │   ├── Troll.swift
                                       │   └── Underground.swift
@@ -136,9 +137,9 @@ let cloak = Item(
         }
     }
     ```
-5. **Customize default responses** by overriding the standard messages
+5. **Customize default responses** by overriding standard messaging
     ```swift
-    class ZorkMessageProvider: StandardMessenger {
+    class ZorkMessenger: StandardMessenger {
         override func roomIsDark() -> String {
             output("It is pitch black. You are likely to be eaten by a grue.")
         }
@@ -179,20 +180,20 @@ let cloak = Item(
 
 The easiest way to understand Gnusto is by looking at working examples:
 
-- **[Cloak of Darkness](https://github.com/samadhiBot/Gnusto/blob/main/Executables/CloakOfDarkness)**: Roger Firth's standard interactive fiction demo, showcasing core concepts
-- **[Zork 1](https://github.com/samadhiBot/Gnusto/blob/main/Executables/Zork1)**: A comprehensive recreation with combat, characters, and complex interactions (still in progress, but playable, and plenty to learn from)
+- **[Cloak of Darkness](https://github.com/samadhiBot/Gnusto/blob/main/Executables/CloakOfDarkness)**:
+    A minimalist interactive fiction game created by Roger Firth in 1999. It is regarded as the "Hello, world!" of interactive fiction, and is used as a reference implementation to compare features and capabilities across IF systems.
 
-Start with _Cloak of Darkness_ to see how things fit together, then explore _Zork 1_ for advanced patterns.
+- **[Zork 1: The Great Underground Empire](https://github.com/samadhiBot/Gnusto/blob/main/Executables/Zork1)**:
+    A pioneering text adventure game released by Infocom in 1980, based on the original MIT mainframe game developed in the late 1970s. It is widely recognized as one of the most influential works of interactive fiction, notable for its sophisticated parser, rich puzzles, and imaginative setting. This comprehensive recreation is still in progress, but already features combat, characters, and complex interactions.
+
+Start with _Cloak of Darkness_ to see how a whole game fits together, then explore _Zork 1_ to study the more advanced patterns.
 
 ## How to Run the Example Games
 
-In your terminal, you can do the following:
+To run the example games in a terminal, first clone the Gnusto repository and `cd` into the project folder, then `swift run` either `CloakOfDarkness` or `Zork1`.
 
 ```zsh
-# Clone the Gnusto repository
 git clone https://github.com/samadhiBot/Gnusto.git
-
-# CD into the Gnusto project
 cd Gnusto
 
 # Run Cloak of Darkness
@@ -202,7 +203,9 @@ swift run CloakOfDarkness
 swift run Zork1
 ```
 
-In Xcode, you can select the `CloakOfDarkness` or `Zork1` scheme and type `cmd-r` to run the active scheme. The game will appear in the Xcode console. 
+Xcode users can select `CloakOfDarkness` or `Zork1` as the active scheme, Run the scheme, and play the game in the Xcode console.
+
+For VS Code users, the Debug Console does not support interactive keyboard input, and the Swift debug adapter does not support rerouting to a different terminal. For now, the best option is to run the commands above in the integrated terminal.
 
 ## Topics
 
@@ -211,19 +214,27 @@ In Xcode, you can select the `CloakOfDarkness` or `Zork1` scheme and type `cmd-r
 - <doc:GnustoAutoWiringPlugin>
 
 ### Core Types
-- ``GameEngine``
 - ``GameBlueprint``
-- ``Location``
 - ``Item``
-- ``ActionHandler``
+- ``ItemProxy``
+- ``Location``
+- ``LocationProxy``
 
 ### Advanced Systems
 - ``ItemEventHandler``
+- ``ItemComputer``
 - ``LocationEventHandler``
-- ``Parser``
-- ``Messenger``
+- ``LocationComputer``
+
+### Default Systems
+- ``StandardMessenger``
+- ``StandardCombatSystem``
 
 ### Engine Development Guides
 - <doc:ActionHandlerGuide>
+
+### Main Types
+- ``GameEngine``
+- ``ActionHandler``
 
 Ready to start building? Check out the [Cloak of Darkness](https://github.com/samadhiBot/Gnusto/blob/main/Executables/CloakOfDarkness) source code to see these concepts in action!
