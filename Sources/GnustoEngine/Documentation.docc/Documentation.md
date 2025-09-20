@@ -210,7 +210,7 @@ For VS Code users, the Debug Console does not support interactive keyboard input
 ## Topics
 
 ### Game Development Guides
-- <doc:DynamicProperties>
+- <doc:GameStructure>
 - <doc:GnustoAutoWiringPlugin>
 - <doc:Combat>
 
