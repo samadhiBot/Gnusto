@@ -36,8 +36,8 @@ public struct LockActionHandler: ActionHandler {
 
         // Check if already locked
         if await lockItem.hasFlag(.isLocked) {
-            return ActionResult(
-                await context.msg.alreadyDone(context.command, item: lockItem.withDefiniteArticle)
+            return await ActionResult(
+                context.msg.alreadyDone(context.command, item: lockItem.withDefiniteArticle)
             )
         }
 

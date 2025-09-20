@@ -104,7 +104,7 @@ During gameplay, you never work with static ``Item`` or ``Location`` objects dir
 Proxies bridge the gap between your static definitions and the dynamic game world. They:
 
 - **Track current state**: Is the door open? Is the room lit? Where is the sword now?
-- **Apply context**: A room's lighting depends on _any_ *light sources present, not just static flags
+- **Apply context**: A room's lighting depends on _any_ light sources present, not just a static flag
 - **Enable intervention**: Event handlers can modify behaviors on the fly
 - **Compute properties**: Descriptions can change based on game state
 - **Ensure safety**: Handle concurrent access in Swift 6's strict concurrency model
@@ -164,8 +164,8 @@ let cloakHandler = ItemEventHandler(for: .cloak) {
         }
 
         if command.hasIntent(.take) {
-            return ActionResult(
-                await context.location(.bar).clearFlag(.isLit)
+            return await ActionResult(
+                context.location(.bar).clearFlag(.isLit)
             )
         }
 
