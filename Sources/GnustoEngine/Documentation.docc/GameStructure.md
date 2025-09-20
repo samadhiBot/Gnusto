@@ -273,49 +273,30 @@ let swordDaemon = Daemon { engine in
         as: SwordBrightness.self
     )
 
-    // Update the glow level if it changed
-    return if newGlowLevel == currentGlowLevel {
-        nil
-    } else {
-        try ActionResult(
-            newGlowLevel.description,
-            .setGlobalCodable(
-                id: .swordGlowLevel,
-                value: AnyCodableSendable(newGlowLevel)
-            )
+    // Do nothing if the glow level has not changed
+    if newGlowLevel == currentGlowLevel { return nil }
+
+    // Update and announce the glow level if it has changed
+    return try ActionResult(
+        newGlowLevel.description,
+        .setGlobalCodable(
+            id: .swordGlowLevel,
+            value: AnyCodableSendable(newGlowLevel)
         )
-    }
+    )
 }
 ```
-
-## Key Proxy Methods
-
-### Essential ItemProxy Accessors
-
-- `isProvidingLight`: Currently illuminating?
-- `isVisible`: Can the player see it?
-- `isTakable`: Can it be picked up? (may change dynamically)
-- `isOpen`/`isEmpty`: Container states
-- `capacity`/`currentLoad`: Container metrics
-- `location`: Current location (resolves recursively)
-
-### Essential LocationProxy Accessors
-
-- `isLit`: Currently illuminated?
-- `exits`: Available exits (may change)
-- `items`: All items present
-- `description`: Current description (may be computed)
 
 ## Putting It All Together
 
 The power of Gnusto's architecture becomes clear when these pieces work together:
 
 1. **You define** clean, declarative items and locations
-2. **The plugin generates** all the wiring and boilerplate
+2. **The auto-wiring plugin generates** strongly-typed IDs and connective boilerplate
 3. **Proxies provide** access to the living, dynamic world
 4. **Event handlers** add sophisticated behaviors
 5. **Property computers** make descriptions and states contextual
-6. **Daemons** create autonomous, time-based effects
+6. **Daemons and Fuses** create autonomous, time-based effects
 
 This separation keeps your code organized, maintainable, and powerful--letting you focus on crafting compelling interactive fiction rather than wrestling with infrastructure.
 

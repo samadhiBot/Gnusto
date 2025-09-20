@@ -57,7 +57,7 @@ public struct Fuse: Sendable {
 }
 
 extension Fuse {
-    /// A predefined fuse that wakes up an unconscious enemy after 3 turns.
+    /// A predefined fuse that wakes up an unconscious enemy after some number of turns.
     ///
     /// This fuse requires specific state data to be provided when activated:
     /// - `"enemyID"`: The ID of the enemy item to wake up
