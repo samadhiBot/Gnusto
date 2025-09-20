@@ -24,7 +24,8 @@ playground.xcworkspace
 #
 # Xcode automatically generates this directory with a .xcworkspacedata file and xcuserdata
 # hence it is not needed unless you have added a package configuration file to your project
-.swiftpm
+# .swiftpm
+xcuserdata
 
 .build/
 
@@ -42,5 +43,9 @@ References/*
 !References/Zork 1/
 
 .vscode
-Cloak
+
 Scripts/__pycache__
+
+Cloak
+FrobozzMagicDemoKit
+Zork1
