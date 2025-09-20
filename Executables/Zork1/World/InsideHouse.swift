@@ -634,56 +634,21 @@ extension InsideHouse {
         }
 
         // Always update the glow level and show message if glowing
-        let currentGlowLevel = await engine.global(.swordGlowLevel)?
-                                           .toCodable(as: SwordBrightness.self)
-
-        // Determine the glow message based on current level
-        let message = newGlowLevel.description
+        let currentGlowLevel = await engine.global(.swordGlowLevel)?.toCodable(
+            as: SwordBrightness.self
+        )
 
         // Update the glow level if it changed
-        if newGlowLevel != currentGlowLevel {
-            let glowChange = try StateChange.setGlobalCodable(
-                id: .swordGlowLevel,
-                value: AnyCodableSendable(newGlowLevel)
+        return if newGlowLevel == currentGlowLevel {
+            nil
+        } else {
+            try ActionResult(
+                newGlowLevel.description,
+                .setGlobalCodable(
+                    id: .swordGlowLevel,
+                    value: AnyCodableSendable(newGlowLevel)
+                )
             )
-            return if message.isEmpty {
-                ActionResult(glowChange)
-            } else {
-                ActionResult(message, glowChange)
-            }
-        }
-//        else if message.isNotEmpty {
-//            // Level didn't change but sword is still glowing - show the message
-//            return ActionResult(message)
-//        }
-
-        return nil
-    }
-}
-
-enum SwordBrightness: Codable, CustomStringConvertible, Sendable {
-    case glowingBrightly
-    case glowingFaintly
-    case notGlowing
-
-    var description: String {
-        switch self {
-        case .glowingBrightly: "Your sword is glowing very brightly."
-        case .glowingFaintly: "Your sword is glowing with a faint blue glow."
-        case .notGlowing: ""
         }
     }
-}
-
-extension Item {
-    fileprivate var isMonster: Bool {
-        switch id {
-        case .troll, .thief, .cyclops, .bat, .ghosts: true
-        default: false
-        }
-    }
-}
-
-extension ItemPropertyID {
-    static let isBurnedOut = ItemPropertyID("isBurnedOut")
 }

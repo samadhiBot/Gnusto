@@ -39,6 +39,30 @@ public struct Zork1: GameBlueprint {
     // is automatically handled by GnustoAutoWiringPlugin
 }
 
+// MARK: - SwordBrightness
+
+enum SwordBrightness: Codable, CustomStringConvertible, Sendable {
+    case glowingBrightly
+    case glowingFaintly
+    case notGlowing
+
+    var description: String {
+        switch self {
+        case .glowingBrightly: "Your sword is glowing very brightly."
+        case .glowingFaintly: "Your sword is glowing with a faint blue glow."
+        case .notGlowing: ""
+        }
+    }
+}
+
+// MARK: - Custom IDs and Properties
+
+extension Item {
+    var isMonster: Bool {
+        [.bat, .cyclops, .ghosts, .thief, .troll].contains(id)
+    }
+}
+
 extension ItemProperty {
     /// The `SACREDBIT` is a Zork 1 specific flag whose job was to prevent the Thief from entering
     /// a location or stealing an object.
@@ -52,5 +76,6 @@ extension ItemProperty {
 }
 
 extension ItemPropertyID {
+    static let isBurnedOut = ItemPropertyID("isBurnedOut")
     static let isSacred = ItemPropertyID(rawValue: "isSacred")
 }
