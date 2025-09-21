@@ -90,8 +90,8 @@ extension GameEngine {
         }
 
         // --- Process Daemons ---
-        // Daemons are only checked against gameState.activeDaemons, no direct state change here.
-        for daemonID in gameState.activeDaemons {
+        // Iterate through active daemons and their states
+        for (daemonID, daemonState) in gameState.activeDaemons {
             // Get definition from registry
             guard let definition = daemons[daemonID] else {
                 logger.warning(
@@ -103,10 +103,31 @@ extension GameEngine {
             // Check if it's time for this daemon to run based on frequency
             // Skip execution on turn 0 and run only on turns where currentTurn % frequency == 0
             if currentTurn > 0 && currentTurn % definition.frequency == 0 {
-                // Execute the daemon's action
-                if let actionResult = try await definition.action(self) {
+                // Update execution tracking before running the daemon
+                let updatedStateForExecution = daemonState.incrementingExecution(
+                    currentTurn: currentTurn)
+
+                // Execute the daemon's action with current state
+                let (actionResult, newDaemonState) = try await definition.action(
+                    self, updatedStateForExecution)
+
+                // Process any action result
+                if let actionResult = actionResult {
                     try await processActionResult(actionResult)
                 }
+
+                // Update daemon state if the daemon returned a new one
+                if let newState = newDaemonState {
+                    let updateChange = StateChange.updateDaemonState(
+                        daemonID: daemonID, daemonState: newState)
+                    try gameState.apply(updateChange)
+                } else {
+                    // If daemon didn't return new state, still update execution tracking
+                    let updateChange = StateChange.updateDaemonState(
+                        daemonID: daemonID, daemonState: updatedStateForExecution)
+                    try gameState.apply(updateChange)
+                }
+
                 if shouldQuit || shouldRestart { return }
             }
         }

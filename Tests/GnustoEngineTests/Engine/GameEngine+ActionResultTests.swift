@@ -80,8 +80,8 @@ struct GameEngineActionResultTests {
             ActionResult(message: "💣 Test fuse triggered!")
         }
 
-        let testDaemon = Daemon { engine in
-            ActionResult(message: "🤖 Test daemon running")
+        let testDaemon = Daemon { engine, state in
+            (ActionResult(message: "🤖 Test daemon running"), nil)
         }
 
         let game = MinimalGame(
@@ -113,7 +113,7 @@ struct GameEngineActionResultTests {
         // And: Side effects should be processed
         let finalState = await engine.gameState
         #expect(finalState.activeFuses["testFuse"]?.turns == 5)
-        #expect(finalState.activeDaemons.contains("testDaemon"))
+        #expect(finalState.activeDaemons["testDaemon"] != nil)
     }
 
     @Test("ActionResult with message, changes, and effects")

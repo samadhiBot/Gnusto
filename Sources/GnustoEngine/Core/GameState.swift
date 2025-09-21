@@ -29,9 +29,9 @@ public struct GameState: Codable, Equatable, Sendable {
     /// the fuse instance. Fuses are timed events that can optionally store contextual information.
     public private(set) var activeFuses: [FuseID: FuseState]
 
-    /// A set of `DaemonID`s for all currently active "daemons" (background game logic
-    /// components that run periodically).
-    public private(set) var activeDaemons: Set<DaemonID>
+    /// A dictionary of active daemon states, keyed by `DaemonID`.
+    /// Each daemon maintains its own state that persists between executions.
+    public private(set) var activeDaemons: [DaemonID: DaemonState]
 
     /// A pronoun (e.g., "it", "them", "her") that refers to one or more `EntityReference`s.
     ///
@@ -63,7 +63,7 @@ public struct GameState: Codable, Equatable, Sendable {
 
     ///   - pronoun: Optional. Initial pronoun reference.
     ///   - activeFuses: Optional. Initially active fuses and their states.
-    ///   - activeDaemons: Optional. Initially active daemons.
+    ///   - activeDaemons: Optional. Initially active daemons and their states.
     ///   - globalState: Optional. Initial game-specific global key-value data.
     ///   - changeHistory: Optional. An initial history of changes, typically empty for a new game.
     public init(
@@ -72,7 +72,7 @@ public struct GameState: Codable, Equatable, Sendable {
         player: Player,
         pronoun: Pronoun? = nil,
         activeFuses: [FuseID: FuseState] = [:],
-        activeDaemons: Set<DaemonID> = [],
+        activeDaemons: [DaemonID: DaemonState] = [:],
         globalState: [GlobalID: StateValue] = [:],
         changeHistory: [StateChange] = []
     ) {
@@ -289,11 +289,14 @@ extension GameState {
 
         // MARK: - Timed Events (Fuses & Daemons)
 
-        case .addActiveDaemon(let daemonID):
-            activeDaemons.insert(daemonID)
+        case .addActiveDaemon(let daemonID, let daemonState):
+            activeDaemons[daemonID] = daemonState
 
         case .removeActiveDaemon(let daemonID):
-            activeDaemons.remove(daemonID)
+            activeDaemons.removeValue(forKey: daemonID)
+
+        case .updateDaemonState(let daemonID, let daemonState):
+            activeDaemons[daemonID] = daemonState
 
         case .addActiveFuse(let fuseID, let fuseState):
             activeFuses[fuseID] = fuseState

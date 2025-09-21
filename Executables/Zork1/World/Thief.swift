@@ -187,7 +187,7 @@ extension Thief {
     /// The `thiefDaemon` controls the thief's movement and tendency to steal.
     ///
     /// Based on Zork's `THIEF-VS-ADVENTURER` routine.
-    static let thiefDaemon = Daemon(frequency: 1) { engine in
+    static let thiefDaemon = Daemon(frequency: 1) { engine, state in
         let playerLocation = await engine.player.location
         let thief = await engine.item(.thief)
         let thiefLargeBag = await engine.item(.largeBag)
@@ -199,30 +199,34 @@ extension Thief {
             await !thief.isFighting,
             await thief.isAllowed(in: playerLocation.id)
         else {
-            return .yield
+            return (ActionResult.yield, nil)
         }
 
         if await thief.parent == .nowhere {
             // Thief is not here, has 30% chance to spawn into the current location
             if await engine.randomPercentage(chance: 30) {
                 if await thief.isHolding(.stiletto) {
-                    return ActionResult(
-                        """
-                        Someone carrying a large bag is casually leaning against one of the
-                        walls here. He does not speak, but it is clear from his aspect that
-                        the bag will be taken only over his dead body.
-                        """,
-                        thief.move(to: playerLocation.id)
+                    return (
+                        ActionResult(
+                            """
+                            Someone carrying a large bag is casually leaning against one of the
+                            walls here. He does not speak, but it is clear from his aspect that
+                            the bag will be taken only over his dead body.
+                            """,
+                            thief.move(to: playerLocation.id)
+                        ), nil
                     )
                 }
                 if await engine.player.isHolding(.stiletto) {
-                    return await ActionResult(
-                        """
-                        You feel a light finger-touch, and turning, notice a grinning figure
-                        holding a large bag in one hand and a stiletto in the other.
-                        """,
-                        thief.move(to: playerLocation.id),
-                        engine.item(.stiletto).move(to: .item(.thief))
+                    return (
+                        await ActionResult(
+                            """
+                            You feel a light finger-touch, and turning, notice a grinning figure
+                            holding a large bag in one hand and a stiletto in the other.
+                            """,
+                            thief.move(to: playerLocation.id),
+                            engine.item(.stiletto).move(to: .item(.thief))
+                        ), nil
                     )
                 }
             }
@@ -258,26 +262,30 @@ extension Thief {
                     } else {
                         "The thief, finding nothing of value, left disgusted."
                     }
-                return ActionResult(
-                    message: message,
-                    changes: changes
+                return (
+                    ActionResult(
+                        message: message,
+                        changes: changes
+                    ), nil
                 )
             }
 
             // Thief didn't steal anything; 30% chance that he now leaves
             if await engine.randomPercentage(chance: 30) {
-                return ActionResult(
-                    """
-                    The holder of the large bag just left, looking disgusted.
-                    Fortunately, he took nothing.
-                    """,
-                    thief.remove()
+                return (
+                    ActionResult(
+                        """
+                        The holder of the large bag just left, looking disgusted.
+                        Fortunately, he took nothing.
+                        """,
+                        thief.remove()
+                    ), nil
                 )
             }
         }
 
         // Otherwise, thief is no longer in the same room as the player, therefore remove.
-        return .yield
+        return (ActionResult.yield, nil)
     }
 }
 
@@ -307,7 +315,7 @@ extension Thief {
                 """,
                 "The thief knocks you out."
             )
-        case let .playerDisarmed(enemy, playerWeapon, enemyWeapon, wasFumble):
+        case .playerDisarmed(let enemy, let playerWeapon, let enemyWeapon, let wasFumble):
             let weapon = await playerWeapon.alias(.withPossessiveAdjective)
             let weaponAlt = await playerWeapon.alias(.withPossessiveAdjective)
             return msg.oneOf(

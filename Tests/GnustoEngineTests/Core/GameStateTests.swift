@@ -309,11 +309,11 @@ struct GameStateTests {
             locations: [createTestLocation(id: .startRoom)],
             items: [createTestItem(id: "testItem")],
             player: Player(in: .startRoom),
-            activeDaemons: ["testDaemon"]
+            activeDaemons: ["testDaemon": DaemonState()]
         )
 
         #expect(state.activeDaemons.count == 1)
-        #expect(state.activeDaemons.contains("testDaemon"))
+        #expect(state.activeDaemons["testDaemon"] != nil)
     }
 
     // MARK: - Complex Integration Tests

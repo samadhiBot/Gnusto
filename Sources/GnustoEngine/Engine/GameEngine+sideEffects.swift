@@ -92,15 +92,16 @@ extension GameEngine {
                     "No Daemon found for daemon ID '\(daemonID)' in runDaemon side effect."
                 )
             }
-            if !gameState.activeDaemons.contains(daemonID) {
+            if gameState.activeDaemons[daemonID] == nil {
+                let initialState = DaemonState()
                 try gameState.apply(
-                    StateChange.addActiveDaemon(daemonID: daemonID)
+                    StateChange.addActiveDaemon(daemonID: daemonID, daemonState: initialState)
                 )
             }
 
         case .stopDaemon:
             let daemonID = try effect.targetID.daemonID()
-            if gameState.activeDaemons.contains(daemonID) {
+            if gameState.activeDaemons[daemonID] != nil {
                 try gameState.apply(
                     StateChange.removeActiveDaemon(daemonID: daemonID)
                 )

@@ -33,10 +33,12 @@ struct GameEngineSideEffectsTests {
         }
 
         // Test daemon action - increment a counter using state changes
-        let testDaemon = Daemon { engine in
-            await ActionResult(
-                "🕰️ Daemon tick",
-                engine.adjustGlobal("daemonTicks", by: 1)
+        let testDaemon = Daemon { engine, state in
+            (
+                await ActionResult(
+                    "🕰️ Daemon tick",
+                    engine.adjustGlobal("daemonTicks", by: 1)
+                ), nil
             )
         }
 
@@ -46,10 +48,12 @@ struct GameEngineSideEffectsTests {
         }
 
         // Another test daemon action - return state change via ActionResult
-        let anotherDaemon = Daemon { engine in
-            await ActionResult(
-                "🎻 Music is playing",
-                engine.setFlag("musicPlaying")
+        let anotherDaemon = Daemon { engine, state in
+            (
+                await ActionResult(
+                    "🎻 Music is playing",
+                    engine.setFlag("musicPlaying")
+                ), nil
             )
         }
 
@@ -186,7 +190,7 @@ struct GameEngineSideEffectsTests {
 
         // Verify daemon is not initially active
         let initialState = await engine.gameState
-        #expect(!initialState.activeDaemons.contains(testDaemonID))
+        #expect(initialState.activeDaemons[testDaemonID] == nil)
 
         // Run daemon
         let sideEffect = SideEffect.runDaemon(testDaemonID)
@@ -195,7 +199,7 @@ struct GameEngineSideEffectsTests {
 
         // Verify daemon is now active
         let finalState = await engine.gameState
-        #expect(finalState.activeDaemons.contains(testDaemonID))
+        #expect(finalState.activeDaemons[testDaemonID] != nil)
     }
 
     @Test("Run daemon side effect with undefined daemon throws error")
@@ -220,14 +224,14 @@ struct GameEngineSideEffectsTests {
 
         // Verify daemon is active
         let midState = await engine.gameState
-        #expect(midState.activeDaemons.contains(testDaemonID))
+        #expect(midState.activeDaemons[testDaemonID] != nil)
 
         // Run daemon second time (should be idempotent)
         try await engine.processSideEffects([sideEffect])
 
         // Should still be active (no duplicate)
         let finalState = await engine.gameState
-        #expect(finalState.activeDaemons.contains(testDaemonID))
+        #expect(finalState.activeDaemons[testDaemonID] != nil)
         #expect(finalState.activeDaemons.count == 1)
     }
 
@@ -243,7 +247,7 @@ struct GameEngineSideEffectsTests {
 
         // Verify daemon is active
         let midState = await engine.gameState
-        #expect(midState.activeDaemons.contains(testDaemonID))
+        #expect(midState.activeDaemons[testDaemonID] != nil)
 
         // Stop daemon
         let stopEffect = SideEffect.stopDaemon(testDaemonID)
@@ -251,7 +255,7 @@ struct GameEngineSideEffectsTests {
 
         // Verify daemon is no longer active
         let finalState = await engine.gameState
-        #expect(!finalState.activeDaemons.contains(testDaemonID))
+        #expect(finalState.activeDaemons[testDaemonID] == nil)
     }
 
     @Test("Stop daemon side effect on non-active daemon succeeds silently")
@@ -260,7 +264,7 @@ struct GameEngineSideEffectsTests {
 
         // Verify daemon is not active
         let initialState = await engine.gameState
-        #expect(!initialState.activeDaemons.contains(testDaemonID))
+        #expect(initialState.activeDaemons[testDaemonID] == nil)
 
         // Stop the non-active daemon (should not throw)
         let stopEffect = SideEffect.stopDaemon(testDaemonID)
@@ -269,7 +273,7 @@ struct GameEngineSideEffectsTests {
 
         // Should still not be active
         let finalState = await engine.gameState
-        #expect(!finalState.activeDaemons.contains(testDaemonID))
+        #expect(finalState.activeDaemons[testDaemonID] == nil)
     }
 
     // MARK: - Multiple Side Effects Tests
@@ -291,8 +295,8 @@ struct GameEngineSideEffectsTests {
         let finalState = await engine.gameState
         #expect(finalState.activeFuses[testFuseID]?.turns == 3)
         #expect(finalState.activeFuses[anotherFuseID]?.turns == 5)
-        #expect(finalState.activeDaemons.contains(testDaemonID))
-        #expect(finalState.activeDaemons.contains(anotherDaemonID))
+        #expect(finalState.activeDaemons[testDaemonID] != nil)
+        #expect(finalState.activeDaemons[anotherDaemonID] != nil)
     }
 
     @Test("Side effects with mixed success and failure")
@@ -314,7 +318,7 @@ struct GameEngineSideEffectsTests {
         // (depends on processing order - currently they're processed sequentially)
         let finalState = await engine.gameState
         #expect(finalState.activeFuses[testFuseID]?.turns == 3)
-        #expect(finalState.activeDaemons.contains(testDaemonID))
+        #expect(finalState.activeDaemons[testDaemonID] != nil)
     }
 
     // MARK: - Integration Tests with ActionResult
@@ -341,7 +345,7 @@ struct GameEngineSideEffectsTests {
         // Verify side effects were processed
         let finalState = await engine.gameState
         #expect(finalState.activeFuses[testFuseID]?.turns == 3)
-        #expect(finalState.activeDaemons.contains(testDaemonID))
+        #expect(finalState.activeDaemons[testDaemonID] != nil)
     }
 
     // MARK: - Error Cases Tests

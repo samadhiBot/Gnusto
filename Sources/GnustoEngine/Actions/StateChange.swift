@@ -150,11 +150,14 @@ public enum StateChange: Codable, Equatable, Sendable {
 
     // MARK: - Timed Events (Fuses & Daemons)
 
-    /// Activates a daemon for periodic background processing.
-    case addActiveDaemon(daemonID: DaemonID)
+    /// Activates a daemon for periodic background processing with initial state.
+    case addActiveDaemon(daemonID: DaemonID, daemonState: DaemonState)
 
     /// Deactivates a currently running daemon.
     case removeActiveDaemon(daemonID: DaemonID)
+
+    /// Updates the state of an active daemon.
+    case updateDaemonState(daemonID: DaemonID, daemonState: DaemonState)
 
     /// Starts a fuse with the specified initial state.
     case addActiveFuse(fuseID: FuseID, state: FuseState)

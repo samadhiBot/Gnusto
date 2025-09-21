@@ -611,7 +611,7 @@ extension InsideHouse {
     /// - Level 0: No monsters nearby (no glow)
     /// - Level 1: Monster in adjacent location (faint blue glow)
     /// - Level 2: Monster in current location (very bright glow)
-    static let swordDaemon = Daemon { engine in
+    static let swordDaemon = Daemon { engine, state in
         let currentLocation = await engine.player.location
         var newGlowLevel: SwordBrightness = .notGlowing
 
@@ -639,15 +639,17 @@ extension InsideHouse {
         )
 
         // Do nothing if the glow level has not changed
-        if newGlowLevel == currentGlowLevel { return nil }
+        if newGlowLevel == currentGlowLevel { return (nil, nil) }
 
         // Update and announce the glow level if it has changed
-        return try ActionResult(
-            newGlowLevel.description,
-            .setGlobalCodable(
-                id: .swordGlowLevel,
-                value: AnyCodableSendable(newGlowLevel)
-            )
+        return (
+            try ActionResult(
+                newGlowLevel.description,
+                .setGlobalCodable(
+                    id: .swordGlowLevel,
+                    value: AnyCodableSendable(newGlowLevel)
+                )
+            ), nil
         )
     }
 }

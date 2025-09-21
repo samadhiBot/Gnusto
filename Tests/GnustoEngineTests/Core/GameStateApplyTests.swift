@@ -47,7 +47,7 @@ struct GameStateApplyTests {
             items: [testItem, containerItem],
             player: Player(in: .startRoom),
             activeFuses: ["testFuse": FuseState(turns: 5)],
-            activeDaemons: ["testDaemon"],
+            activeDaemons: ["testDaemon": DaemonState()],
             globalState: [
                 "testFlag": .bool(true),
                 "testCounter": .int(42),
@@ -529,11 +529,11 @@ struct GameStateApplyTests {
     func testApplyValidAddActiveDaemonChange() throws {
         var state = createTestGameState()
 
-        let change = StateChange.addActiveDaemon(daemonID: "newDaemon")
+        let change = StateChange.addActiveDaemon(daemonID: "newDaemon", daemonState: DaemonState())
 
         try state.apply(change)
 
-        #expect(state.activeDaemons.contains("newDaemon"))
+        #expect(state.activeDaemons["newDaemon"] != nil)
         #expect(state.changeHistory.count == 1)
         #expect(state.changeHistory.first == change)
     }
@@ -546,7 +546,7 @@ struct GameStateApplyTests {
 
         try state.apply(change)
 
-        #expect(!state.activeDaemons.contains("testDaemon"))
+        #expect(state.activeDaemons["testDaemon"] == nil)
         #expect(state.changeHistory.count == 1)
         #expect(state.changeHistory.first == change)
     }
