@@ -105,26 +105,32 @@ extension GameEngine {
             if currentTurn > 0 && currentTurn % definition.frequency == 0 {
                 // Update execution tracking before running the daemon
                 let updatedStateForExecution = daemonState.incrementingExecution(
-                    currentTurn: currentTurn)
+                    currentTurn: currentTurn
+                )
 
                 // Execute the daemon's action with current state
-                let (actionResult, newDaemonState) = try await definition.action(
-                    self, updatedStateForExecution)
+                let actionResult = try await definition.action(self, updatedStateForExecution)
+
+                // Check if the daemon explicitly updated its own state
+                let daemonExplicitlyUpdatedState =
+                    actionResult?.changes.contains { change in
+                        if case .updateDaemonState(let id, _) = change {
+                            return id == daemonID
+                        }
+                        return false
+                    } ?? false
 
                 // Process any action result
                 if let actionResult = actionResult {
                     try await processActionResult(actionResult)
                 }
 
-                // Update daemon state if the daemon returned a new one
-                if let newState = newDaemonState {
+                // If daemon didn't explicitly update its state, ensure execution tracking is applied
+                if !daemonExplicitlyUpdatedState {
                     let updateChange = StateChange.updateDaemonState(
-                        daemonID: daemonID, daemonState: newState)
-                    try gameState.apply(updateChange)
-                } else {
-                    // If daemon didn't return new state, still update execution tracking
-                    let updateChange = StateChange.updateDaemonState(
-                        daemonID: daemonID, daemonState: updatedStateForExecution)
+                        daemonID: daemonID,
+                        daemonState: updatedStateForExecution
+                    )
                     try gameState.apply(updateChange)
                 }
 

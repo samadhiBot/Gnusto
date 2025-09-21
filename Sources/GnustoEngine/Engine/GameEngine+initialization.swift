@@ -40,8 +40,7 @@ extension GameEngine {
                 let extractionResult = vocabularyEnhancer.extractAdjectivesAndSynonyms(from: item)
                 let combinedTerms = vocabularyEnhancer.combineExtractedTerms(
                     for: item,
-                    extractedAdjectives: needsAdjectiveEnhancement
-                        ? extractionResult.adjectives : [],
+                    extractedAdjectives: needsAdjectiveEnhancement ? extractionResult.adjectives : [],
                     extractedSynonyms: needsSynonymEnhancement ? extractionResult.synonyms : []
                 )
                 enhancedAdjectives = combinedTerms.adjectives

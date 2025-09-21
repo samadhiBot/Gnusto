@@ -171,42 +171,40 @@ enum Troll {
         let axe = await engine.item(.axe)
 
         // Don't do anything if troll is dead
-        guard await !troll.isDead else { return (ActionResult.yield, nil) }
+        guard await !troll.isDead else { return .yield }
 
         // Don't do anything if troll already has axe
-        if await troll.isHolding(axe.id) { return (ActionResult.yield, nil) }
+        if await troll.isHolding(axe.id) { return .yield }
 
         // If troll is unconscious, don't pick up axe
-        guard await !troll.isUnconscious else { return (ActionResult.yield, nil) }
+        guard await !troll.isUnconscious else { return .yield }
 
         // Check if axe is in the troll room and troll should pick it up
         if case .location(let axeLocationProxy) = await axe.parent,
-            axeLocationProxy.id == LocationID.trollRoom,
-            case .location(let trollLocationProxy) = await troll.parent,
-            trollLocationProxy.id == LocationID.trollRoom
+           axeLocationProxy.id == LocationID.trollRoom,
+           case .location(let trollLocationProxy) = await troll.parent,
+           trollLocationProxy.id == LocationID.trollRoom
         {
             // 75-90% chance (using 80% as middle ground)
             let shouldPickUp = await engine.randomPercentage(chance: 80)
 
             if shouldPickUp {
-                return (
-                    await ActionResult(
-                        """
-                        The troll, angered and humiliated, recovers his weapon. He appears to have
-                        an axe to grind with you.
-                        """,
-                        axe.setFlag(.omitDescription),
-                        axe.clearFlag(.isWeapon),
-                        axe.move(to: .item(.troll))
-                    )
-                    .appending(
-                        engine.enemyAttacks(enemy: troll)
-                    ), nil
+                return await ActionResult(
+                    """
+                    The troll, angered and humiliated, recovers his weapon. He appears to have
+                    an axe to grind with you.
+                    """,
+                    axe.setFlag(.omitDescription),
+                    axe.clearFlag(.isWeapon),
+                    axe.move(to: .item(.troll))
+                )
+                .appending(
+                    engine.enemyAttacks(enemy: troll)
                 )
             }
         }
 
-        return (nil, nil)
+        return nil
     }
 }
 
@@ -274,7 +272,7 @@ extension Troll {
 
         // If troll had axe, drop it and restore weapon properties
         if case .item(let axeParent) = await axe.parent,
-            axeParent.id == .troll
+           axeParent.id == .troll
         {
             await changes.append(contentsOf: [
                 axe.move(to: .location(.trollRoom)),
@@ -311,7 +309,7 @@ extension Troll {
 
         // Check if axe is available to pick up
         if case .location(let axeLocationProxy) = await axe.parent,
-            axeLocationProxy.id == LocationID.trollRoom
+           axeLocationProxy.id == LocationID.trollRoom
         {
             await changes.append(contentsOf: [
                 axe.setFlag(.omitDescription),
@@ -358,12 +356,12 @@ extension Troll {
 
         // Build base message
         let baseMessage =
-            if command.hasIntent(.throw) {
-                "The troll, who is remarkably coordinated, catches \(theItem)"
-            } else {
-                // otherwise intent was .give
-                "The troll, who is not overly proud, graciously accepts the gift"
-            }
+        if command.hasIntent(.throw) {
+            "The troll, who is remarkably coordinated, catches \(theItem)"
+        } else {
+            // otherwise intent was .give
+            "The troll, who is not overly proud, graciously accepts the gift"
+        }
 
         if await item.isWeapon {
             // 20% chance the troll eats the weapon and dies

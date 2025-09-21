@@ -34,11 +34,9 @@ struct GameEngineSideEffectsTests {
 
         // Test daemon action - increment a counter using state changes
         let testDaemon = Daemon { engine, state in
-            (
-                await ActionResult(
-                    "🕰️ Daemon tick",
-                    engine.adjustGlobal("daemonTicks", by: 1)
-                ), nil
+            await ActionResult(
+                "🕰️ Daemon tick",
+                engine.adjustGlobal("daemonTicks", by: 1)
             )
         }
 
@@ -49,11 +47,9 @@ struct GameEngineSideEffectsTests {
 
         // Another test daemon action - return state change via ActionResult
         let anotherDaemon = Daemon { engine, state in
-            (
-                await ActionResult(
-                    "🎻 Music is playing",
-                    engine.setFlag("musicPlaying")
-                ), nil
+            await ActionResult(
+                "🎻 Music is playing",
+                engine.setFlag("musicPlaying")
             )
         }
 

@@ -23,17 +23,19 @@ public struct Daemon: Sendable {
     ///
     /// This closure is executed on the `GameEngine`'s actor context, allowing you to
     /// safely query and modify the `GameState` through the provided `GameEngine` instance.
-    /// The daemon receives its current state and can return both an `ActionResult` for
-    /// immediate effects and an updated `DaemonState` to persist between executions.
+    /// The daemon receives its current state and can return an `ActionResult` containing
+    /// any messages, state changes (including daemon state updates), and side effects.
+    ///
+    /// To update the daemon's state, include a `StateChange.updateDaemonState` in the
+    /// returned `ActionResult`'s changes array.
     ///
     /// - Parameter engine: The `GameEngine` instance, providing access to game state
     ///                     and mutation methods.
     /// - Parameter state: The current `DaemonState` for this daemon instance, containing
     ///                    any persistent data and execution tracking.
-    /// - Returns: A tuple containing an optional `ActionResult` with message and/or side
-    ///            effects, and an optional updated `DaemonState` to persist. Return `nil`
-    ///            for the state to keep it unchanged.
-    public var action: @Sendable (GameEngine, DaemonState) async throws -> (ActionResult?, DaemonState?)
+    /// - Returns: An optional `ActionResult` with message, state changes, and/or side
+    ///            effects to be processed by the engine.
+    public var action: @Sendable (GameEngine, DaemonState) async throws -> ActionResult?
 
     /// Initializes a new daemon definition.
     ///
@@ -41,14 +43,49 @@ public struct Daemon: Sendable {
     ///   - frequency: The number of turns between executions (must be >= 1).
     ///                Defaults to 1 (every turn).
     ///   - action: The closure to execute when the daemon runs. It receives the `GameEngine`
-    ///             instance and current `DaemonState`, and returns a tuple containing an
-    ///             optional `ActionResult` and optional updated `DaemonState`.
+    ///             instance and current `DaemonState`, and returns an optional `ActionResult`
+    ///             containing any messages, state changes, and side effects.
+    ///
+    /// ## Example Usage
+    ///
+    /// ### Simple daemon with no state updates:
+    /// ```swift
+    /// let weatherDaemon = Daemon(frequency: 5) { engine, state in
+    ///     ActionResult("The wind blows gently.")
+    /// }
+    /// ```
+    ///
+    /// ### Daemon that updates its own state:
+    /// ```swift
+    /// let counterDaemon = Daemon(frequency: 1) { engine, state in
+    ///     let count = state.executionCount + 1
+    ///     let payload = state.getPayload(as: CounterPayload.self)
+    ///     let newState = try state.updatingPayload(
+    ///         payload.withUpdates()
+    ///     )
+    ///     return ActionResult(
+    ///         "Counter: \(count)",
+    ///         .updateDaemonState(
+    ///             daemonID: "counterDaemon",
+    ///             daemonState: newState
+    ///         )
+    ///     )
+    /// }
+    /// ```
+    ///
+    /// ### Daemon that performs game state changes:
+    /// ```swift
+    /// let lampDaemon = Daemon(frequency: 3) { engine, state in
+    ///     let lamp = await engine.item(.lamp)
+    ///     return await ActionResult(
+    ///         "The lamp flickers ominously.",
+    ///         lamp.adjustFlag(.batteryLevel, by: -1)
+    ///     )
+    /// }
+    /// ```
     public init(
         frequency: Int = 1,
-        action:
-            @escaping @Sendable (GameEngine, DaemonState) async throws -> (
-                ActionResult?, DaemonState?
-            )
+        action: @escaping @Sendable (GameEngine, DaemonState) async throws -> ActionResult?
     ) {
         precondition(frequency >= 1, "Daemon frequency must be 1 or greater.")
         self.frequency = frequency

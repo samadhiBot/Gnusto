@@ -52,13 +52,14 @@ public struct DaemonState: Codable, Sendable, Equatable, Hashable {
     }
 
     /// Internal initializer that takes a payload directly without re-encoding.
+    ///
     /// Used by the engine for operations like daemon state updates.
     ///
     /// - Parameters:
     ///   - payload: The payload to use directly.
     ///   - executionCount: The number of times this daemon has executed.
     ///   - lastExecutionTurn: The turn when this daemon was last executed.
-    internal init(
+    init(
         payload: AnyCodableSendable?,
         executionCount: Int,
         lastExecutionTurn: Int

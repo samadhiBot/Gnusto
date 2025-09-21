@@ -82,7 +82,7 @@ struct GameBlueprintTests {
 
         let daemons = [
             DaemonID("testDaemon"): Daemon(
-                action: { _, _ in (ActionResult("Daemon running!"), nil) }
+                action: { _, _ in ActionResult("Daemon running!") }
             )
         ]
 

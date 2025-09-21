@@ -81,7 +81,7 @@ struct GameEngineActionResultTests {
         }
 
         let testDaemon = Daemon { engine, state in
-            (ActionResult(message: "🤖 Test daemon running"), nil)
+            ActionResult(message: "🤖 Test daemon running")
         }
 
         let game = MinimalGame(

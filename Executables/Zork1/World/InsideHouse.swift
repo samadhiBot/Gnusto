@@ -639,17 +639,15 @@ extension InsideHouse {
         )
 
         // Do nothing if the glow level has not changed
-        if newGlowLevel == currentGlowLevel { return (nil, nil) }
+        if newGlowLevel == currentGlowLevel { return nil }
 
         // Update and announce the glow level if it has changed
-        return (
-            try ActionResult(
-                newGlowLevel.description,
-                .setGlobalCodable(
-                    id: .swordGlowLevel,
-                    value: AnyCodableSendable(newGlowLevel)
-                )
-            ), nil
+        return try ActionResult(
+            newGlowLevel.description,
+            .setGlobalCodable(
+                id: .swordGlowLevel,
+                value: AnyCodableSendable(newGlowLevel)
+            )
         )
     }
 }

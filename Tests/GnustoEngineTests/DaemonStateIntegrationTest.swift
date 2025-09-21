@@ -1,10 +1,10 @@
+import CustomDump
+import GnustoTestSupport
 import Testing
 
 @testable import GnustoEngine
-@testable import GnustoTestSupport
 
 struct DaemonStateIntegrationTest {
-
     @Test("Daemon can maintain state between executions")
     func testDaemonStateIntegration() async throws {
         // Given: A daemon that tracks its execution count and maintains custom state
@@ -15,12 +15,11 @@ struct DaemonStateIntegrationTest {
 
         let statefulDaemon = Daemon(frequency: 2) { engine, state in
             // Get current payload or create initial state
-            var payload =
-                state.getPayload(as: CounterPayload.self)
-                ?? CounterPayload(
-                    counter: 0,
-                    message: "Starting"
-                )
+            var payload = state.getPayload(as: CounterPayload.self)
+                          ?? CounterPayload(
+                              counter: 0,
+                              message: "Starting"
+                          )
 
             // Update the counter and message
             payload.counter += 1
@@ -29,18 +28,17 @@ struct DaemonStateIntegrationTest {
             // Create new daemon state with updated payload
             let newState = try state.updatingPayload(payload)
 
-            return (
-                ActionResult(message: "🤖 Daemon tick #\(payload.counter)"),
-                newState
+            return ActionResult(
+                "🤖 Daemon tick #\(payload.counter)",
+                .updateDaemonState(
+                    daemonID: "counterDaemon",
+                    daemonState: newState
+                )
             )
         }
 
         let game = MinimalGame(
-            player: Player(in: .startRoom),
-            locations: Location(id: .startRoom, .name("Test Room"), .inherentlyLit),
-            daemons: [
-                "counterDaemon": statefulDaemon
-            ]
+            daemons: ["counterDaemon": statefulDaemon]
         )
 
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
@@ -54,7 +52,18 @@ struct DaemonStateIntegrationTest {
 
         // Then: Daemon should have executed once
         let output1 = await mockIO.flush()
-        #expect(output1.contains("🤖 Daemon tick #1"))
+        expectNoDifference(
+            output1,
+            """
+            > wait
+            Time flows onward, indifferent to your concerns.
+
+            > wait
+            The universe's clock ticks inexorably forward.
+
+            🤖 Daemon tick #1
+            """
+        )
 
         let state1 = await engine.gameState
         let daemonState1 = state1.activeDaemons["counterDaemon"]!
@@ -71,7 +80,18 @@ struct DaemonStateIntegrationTest {
 
         // Then: Daemon should have executed twice with updated state
         let output2 = await mockIO.flush()
-        #expect(output2.contains("🤖 Daemon tick #2"))
+        expectNoDifference(
+            output2,
+            """
+            > wait
+            Moments slip away like sand through fingers.
+
+            > wait
+            The universe's clock ticks inexorably forward.
+
+            🤖 Daemon tick #2
+            """
+        )
 
         let state2 = await engine.gameState
         let daemonState2 = state2.activeDaemons["counterDaemon"]!
@@ -87,7 +107,7 @@ struct DaemonStateIntegrationTest {
     func testDaemonStatePersistenceWithoutPayload() async throws {
         let simpleDaemon = Daemon(frequency: 1) { engine, state in
             // Return nil for state to keep it unchanged
-            return (ActionResult(message: "Simple tick"), nil)
+            return ActionResult(message: "Simple tick")
         }
 
         let game = MinimalGame(
@@ -107,7 +127,15 @@ struct DaemonStateIntegrationTest {
 
         // Then: Execution tracking should still work even without payload changes
         let output1 = await mockIO.flush()
-        #expect(output1.contains("Simple tick"))
+        expectNoDifference(
+            output1,
+            """
+            > wait
+            Time flows onward, indifferent to your concerns.
+
+            Simple tick
+            """
+        )
 
         let state1 = await engine.gameState
         let daemonState1 = state1.activeDaemons["simpleDaemon"]!
@@ -120,7 +148,15 @@ struct DaemonStateIntegrationTest {
 
         // Then: Execution tracking should increment
         let output2 = await mockIO.flush()
-        #expect(output2.contains("Simple tick"))
+        expectNoDifference(
+            output2,
+            """
+            > wait
+            The universe's clock ticks inexorably forward.
+
+            Simple tick
+            """
+        )
 
         let state2 = await engine.gameState
         let daemonState2 = state2.activeDaemons["simpleDaemon"]!
@@ -136,28 +172,44 @@ struct DaemonStateIntegrationTest {
             var count: Int
         }
 
-        let daemon1 = Daemon(frequency: 1) { engine, state in
+        let daemon1 = Daemon(frequency: 1) {
+            engine,
+            state in
             var payload =
-                state.getPayload(as: DaemonPayload.self)
-                ?? DaemonPayload(
-                    name: "Alpha",
-                    count: 0
-                )
+            state.getPayload(as: DaemonPayload.self)
+            ?? DaemonPayload(
+                name: "Alpha",
+                count: 0
+            )
             payload.count += 10
             let newState = try state.updatingPayload(payload)
-            return (ActionResult(message: "Alpha: \(payload.count)"), newState)
+            return ActionResult(
+                "Alpha: \(payload.count)",
+                .updateDaemonState(
+                    daemonID: "daemon1",
+                    daemonState: newState
+                )
+            )
         }
 
-        let daemon2 = Daemon(frequency: 1) { engine, state in
+        let daemon2 = Daemon(frequency: 1) {
+            engine,
+            state in
             var payload =
-                state.getPayload(as: DaemonPayload.self)
-                ?? DaemonPayload(
-                    name: "Beta",
-                    count: 0
-                )
+            state.getPayload(as: DaemonPayload.self)
+            ?? DaemonPayload(
+                name: "Beta",
+                count: 0
+            )
             payload.count += 5
             let newState = try state.updatingPayload(payload)
-            return (ActionResult(message: "Beta: \(payload.count)"), newState)
+            return ActionResult(
+                "Beta: \(payload.count)",
+                .updateDaemonState(
+                    daemonID: "daemon2",
+                    daemonState: newState
+                )
+            )
         }
 
         let game = MinimalGame(
@@ -181,8 +233,17 @@ struct DaemonStateIntegrationTest {
 
         // Then: Each daemon should maintain its own state
         let output = await mockIO.flush()
-        #expect(output.contains("Alpha: 10"))
-        #expect(output.contains("Beta: 5"))
+        expectNoDifference(
+            output,
+            """
+            > wait
+            Time flows onward, indifferent to your concerns.
+
+            Alpha: 10
+
+            Beta: 5
+            """
+        )
 
         let finalState = await engine.gameState
 
