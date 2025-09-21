@@ -1,3 +1,5 @@
+import Foundation
+
 // MARK: - State Change & Side Effect Application
 
 extension GameEngine {
@@ -40,12 +42,38 @@ extension GameEngine {
                 )
             }
 
-            let initialTurns = effect.parameters["--turns"]?.toInt ?? definition.initialTurns
+            let fuseState: FuseState
 
-            // Extract custom state (everything except "--turns" key)
-            let customState = effect.parameters.filter { $0.key != "--turns" }
+            // Check if we have a modern encoded FuseState
+            if let encodedStateString = effect.parameters["--fuseState"]?.toString,
+                let encodedData = encodedStateString.data(using: .utf8),
+                let decodedState = try? JSONDecoder().decode(FuseState.self, from: encodedData)
+            {
+                // Use the decoded FuseState directly
+                fuseState = decodedState
+            } else {
+                // Fall back to legacy dictionary-based approach
+                let initialTurns = effect.parameters["--turns"]?.toInt ?? definition.initialTurns
 
-            let fuseState = FuseState(turns: initialTurns, state: customState)
+                // Extract custom state (everything except "--turns" and "--fuseState" keys)
+                let customState = effect.parameters.filter {
+                    $0.key != "--turns" && $0.key != "--fuseState"
+                }
+
+                // Convert legacy dictionary to strongly-typed payload for backward compatibility
+                if customState.isEmpty {
+                    fuseState = FuseState(turns: initialTurns)
+                } else {
+                    // Try to create payload from dictionary
+                    do {
+                        fuseState = try FuseState(turns: initialTurns, payload: customState)
+                    } catch {
+                        // If encoding fails, create without payload
+                        fuseState = FuseState(turns: initialTurns)
+                    }
+                }
+            }
+
             let addChange = StateChange.addActiveFuse(
                 fuseID: fuseID,
                 state: fuseState

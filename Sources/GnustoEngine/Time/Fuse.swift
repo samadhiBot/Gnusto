@@ -70,15 +70,16 @@ extension Fuse {
     static let enemyWakeUp = Fuse(
         initialTurns: 3,
         action: { engine, state in
-            // Specific enemy and location must be provided in the state
-            guard
-                let enemyID = state.getItemID("enemyID"),
-                let wakeUpLocationID = state.getLocationID("locationID"),
-                let message = state.getString("message")
-            else {
-                engine.logger.warning(".enemyWakeUp fuse called without required state")
+            // Specific enemy and location must be provided in the payload
+            guard let payload = state.getPayload(as: FuseState.EnemyLocationPayload.self) else {
+                engine.logger.warning(
+                    ".enemyWakeUp fuse called without required EnemyLocationPayload")
                 return nil
             }
+
+            let enemyID = payload.enemyID
+            let wakeUpLocationID = payload.locationID
+            let message = payload.message
             let enemy = await engine.item(enemyID)
 
             guard await enemy.isUnconscious else { return nil }
@@ -113,15 +114,16 @@ extension Fuse {
     static let enemyReturn = Fuse(
         initialTurns: 3,
         action: { engine, state in
-            // Specific enemy and location must be provided in the state
-            guard
-                let enemyID = state.getItemID("enemyID"),
-                let returnLocationID = state.getLocationID("locationID"),
-                let message = state.getString("message")
-            else {
-                engine.logger.warning(".enemyReturn fuse called without required state")
+            // Specific enemy and location must be provided in the payload
+            guard let payload = state.getPayload(as: FuseState.EnemyLocationPayload.self) else {
+                engine.logger.warning(
+                    ".enemyReturn fuse called without required EnemyLocationPayload")
                 return nil
             }
+
+            let enemyID = payload.enemyID
+            let returnLocationID = payload.locationID
+            let message = payload.message
 
             let enemy = await engine.item(enemyID)
 
@@ -155,14 +157,15 @@ extension Fuse {
     static let statusEffectExpiry = Fuse(
         initialTurns: 3,
         action: { engine, state in
-            // Specific character and effect must be provided in the state
-            guard
-                let itemID = state.getItemID("itemID"),
-                let effectName = state.getString("effectName")
-            else {
-                engine.logger.warning(".statusEffectExpiry fuse called without required state")
+            // Specific character and effect must be provided in the payload
+            guard let payload = state.getPayload(as: FuseState.StatusEffectPayload.self) else {
+                engine.logger.warning(
+                    ".statusEffectExpiry fuse called without required StatusEffectPayload")
                 return nil
             }
+
+            let itemID = payload.itemID
+            let effectName = payload.effectName
 
             let character = await engine.item(itemID)
 
@@ -339,7 +342,13 @@ extension Fuse {
     static let environmentalChange = Fuse(
         initialTurns: 2,
         action: { engine, state in
-            engine.logger.info("Environmental change triggered with state: \(state.dictionary)")
+            if let payload = state.getPayload(as: FuseState.EnvironmentalPayload.self) {
+                engine.logger.info(
+                    "Environmental change triggered: \(payload.changeType) with parameters: \(payload.parameters)"
+                )
+            } else {
+                engine.logger.info("Environmental change triggered with no specific payload")
+            }
             return nil
         }
     )

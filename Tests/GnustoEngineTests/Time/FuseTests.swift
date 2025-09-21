@@ -9,59 +9,68 @@ struct FuseTests {
 
     // MARK: - FuseState Tests
 
-    @Test("FuseState stores and retrieves custom data correctly")
-    func testFuseState() {
-        let state = FuseState(
-            turns: 5,
-            state: [
-                "enemyID": .string("goblin"),
-                "locationID": .string("cave"),
-                "damage": .int(10),
-                "isActive": .bool(true),
-            ]
+    @Test("FuseState stores and retrieves typed payload correctly")
+    func testFuseStateTypedPayload() throws {
+        struct CustomPayload: Codable, Sendable, Equatable {
+            let enemyID: ItemID
+            let locationID: LocationID
+            let damage: Int
+            let isActive: Bool
+        }
+
+        let payload = CustomPayload(
+            enemyID: ItemID("goblin"),
+            locationID: LocationID("cave"),
+            damage: 10,
+            isActive: true
         )
+
+        let state = try FuseState(turns: 5, payload: payload)
 
         #expect(state.turns == 5)
-        #expect(state.getString("enemyID") == "goblin")
-        #expect(state.getItemID("enemyID")?.rawValue == "goblin")
-        #expect(state.getLocationID("locationID")?.rawValue == "cave")
-        #expect(state.getInt("damage") == 10)
-        #expect(state.getBool("isActive") == true)
-        #expect(state.getString("nonexistent") == nil)
+        #expect(state.hasPayload(ofType: CustomPayload.self))
+
+        let retrievedPayload = state.getPayload(as: CustomPayload.self)
+        #expect(retrievedPayload?.enemyID == ItemID("goblin"))
+        #expect(retrievedPayload?.locationID == LocationID("cave"))
+        #expect(retrievedPayload?.damage == 10)
+        #expect(retrievedPayload?.isActive == true)
+        #expect(retrievedPayload == payload)
     }
 
-    @Test("FuseState convenience accessors work correctly")
-    func testFuseStateAccessors() {
-        let state = FuseState(
-            turns: 3,
-            state: [
-                "itemRef": .string("sword"),
-                "locationRef": .string("dungeon"),
-                "count": .int(42),
-                "enabled": .bool(false),
-                "missing": .string(""),
-            ]
+    @Test("FuseState predefined payload types work correctly")
+    func testFuseStatePredefinedPayloadTypes() throws {
+        // Test EnemyLocationPayload
+        let enemyPayload = FuseState.EnemyLocationPayload(
+            enemyID: ItemID("sword"),
+            locationID: LocationID("dungeon"),
+            message: "The sword gleams."
         )
 
-        // Test successful conversions
-        #expect(state.getItemID("itemRef")?.rawValue == "sword")
-        #expect(state.getLocationID("locationRef")?.rawValue == "dungeon")
-        #expect(state.getInt("count") == 42)
-        #expect(state.getBool("enabled") == false)
+        let enemyState = try FuseState(turns: 3, payload: enemyPayload)
+        let retrievedEnemyPayload = enemyState.getPayload(as: FuseState.EnemyLocationPayload.self)
+        #expect(retrievedEnemyPayload?.enemyID == ItemID("sword"))
+        #expect(retrievedEnemyPayload?.locationID == LocationID("dungeon"))
+        #expect(retrievedEnemyPayload?.message == "The sword gleams.")
 
-        // Test failed conversions (wrong types)
-        #expect(state.getInt("itemRef") == nil)
-        #expect(state.getBool("count") == nil)
-        #expect(state.getString("count") == nil)
+        // Test StatusEffectPayload
+        let statusPayload = FuseState.StatusEffectPayload(
+            itemID: ItemID("wizard"),
+            effectName: "poisoned"
+        )
 
-        // Test missing keys
-        #expect(state.getString("notThere") == nil)
-        #expect(state.getItemID("notThere") == nil)
-        #expect(state.getLocationID("notThere") == nil)
+        let statusState = try FuseState(turns: 2, payload: statusPayload)
+        let retrievedStatusPayload = statusState.getPayload(as: FuseState.StatusEffectPayload.self)
+        #expect(retrievedStatusPayload?.itemID == ItemID("wizard"))
+        #expect(retrievedStatusPayload?.effectName == "poisoned")
+
+        // Test cross-type access returns nil
+        #expect(enemyState.getPayload(as: FuseState.StatusEffectPayload.self) == nil)
+        #expect(statusState.getPayload(as: FuseState.EnemyLocationPayload.self) == nil)
     }
 
-    @Test("Basic fuse scheduling works")
-    func testBasicFuseScheduling() async throws {
+    @Test("Basic fuse scheduling works with typed payloads")
+    func testBasicFuseSchedulingWithTypedPayloads() async throws {
         let testRoom = Location(
             id: .startRoom,
             .name("Test Room"),
@@ -71,145 +80,191 @@ struct FuseTests {
         let game = MinimalGame(locations: testRoom)
         let (engine, _) = await GameEngine.test(blueprint: game)
 
-        // Schedule a basic event with custom state
-        let result = ActionResult(
-            .startFuse(
-                .statusEffectExpiry,
-                turns: 3,
-                state: [
-                    "effectType": .string("poison"),
-                    "severity": .int(2),
-                ]
-            )
-        )
-        try await engine.processActionResult(result)
+        // Create a custom payload for the fuse
+        struct TestPayload: Codable, Sendable, Equatable {
+            let effectType: String
+            let severity: Int
+        }
 
-        // Verify event was scheduled with correct state
-        let gameState = await engine.gameState
-        #expect(gameState.activeFuses.count == 1)
+        let payload = TestPayload(effectType: "poison", severity: 2)
 
-        let event = gameState.activeFuses[FuseID.statusEffectExpiry]
-        #expect(event?.turns == 3)
-        #expect(event?.getString("effectType") == "poison")
-        #expect(event?.getInt("severity") == 2)
-    }
-
-    @Test("Scheduled event turn countdown works")
-    func testFuseTurnCountdown() async throws {
-        let testRoom = Location(
-            id: .startRoom,
-            .name("Test Room"),
-            .inherentlyLit
-        )
-
-        let game = MinimalGame(locations: testRoom)
-        let (engine, _) = await GameEngine.test(blueprint: game)
-
-        // Schedule event with 3 turns
+        // Schedule a fuse with typed payload
+        let fuseState = try FuseState(turns: 3, payload: payload)
         let result = ActionResult(
             effects: [
                 .startFuse(
                     .statusEffectExpiry,
-                    turns: 3,
-                    state: ["test": .string("value")]
+                    state: fuseState
                 )
             ]
         )
         try await engine.processActionResult(result)
 
-        // Check countdown over turns
+        // Verify fuse was scheduled with correct payload
+        let gameState = await engine.gameState
+        #expect(gameState.activeFuses.count == 1)
+
+        let scheduledFuse = gameState.activeFuses[FuseID.statusEffectExpiry]
+        #expect(scheduledFuse?.turns == 3)
+
+        let retrievedPayload = scheduledFuse?.getPayload(as: TestPayload.self)
+        #expect(retrievedPayload?.effectType == "poison")
+        #expect(retrievedPayload?.severity == 2)
+    }
+
+    @Test("Scheduled fuse turn countdown preserves payload")
+    func testFuseTurnCountdownPreservesPayload() async throws {
+        let testRoom = Location(
+            id: .startRoom,
+            .name("Test Room"),
+            .inherentlyLit
+        )
+
+        let wizard = Lab.wizard
+        let game = MinimalGame(locations: testRoom, items: wizard)
+        let (engine, _) = await GameEngine.test(blueprint: game)
+
+        // Schedule fuse with payload
+        let payload = FuseState.StatusEffectPayload(
+            itemID: ItemID("wizard"),
+            effectName: "blessed"
+        )
+
+        let fuseState = try FuseState(turns: 3, payload: payload)
+        let result = ActionResult(
+            effects: [
+                .startFuse(.statusEffectExpiry, state: fuseState)
+            ]
+        )
+        try await engine.processActionResult(result)
+
+        // Check countdown over turns while preserving payload
         for expectedTurns in [3, 2, 1] {
             let gameState = await engine.gameState
-            let event = gameState.activeFuses[FuseID.statusEffectExpiry]
-            #expect(event?.turns == expectedTurns)
-            #expect(event?.getString("test") == "value")  // State preserved
+            let fuse = gameState.activeFuses[FuseID.statusEffectExpiry]
+            #expect(fuse?.turns == expectedTurns)
+
+            // Payload should be preserved throughout countdown
+            let retrievedPayload = fuse?.getPayload(as: FuseState.StatusEffectPayload.self)
+            #expect(retrievedPayload?.itemID == ItemID("wizard"))
+            #expect(retrievedPayload?.effectName == "blessed")
 
             if expectedTurns > 1 {
                 try await engine.execute("wait")
             }
         }
 
-        // Final turn should remove the event
+        // Final turn should remove the fuse
         try await engine.execute("wait")
         let finalState = await engine.gameState
         #expect(finalState.activeFuses[FuseID.statusEffectExpiry] == nil)
     }
 
-    @Test("Multiple fuses work independently")
-    func testMultipleFuses() async throws {
+    @Test("Multiple fuses with different payloads work independently")
+    func testMultipleFusesWithDifferentPayloads() async throws {
         let testRoom = Location(
             id: .startRoom,
             .name("Test Room"),
             .inherentlyLit
         )
 
-        let game = MinimalGame(locations: testRoom)
+        let wizard = Lab.wizard
+        let game = MinimalGame(locations: testRoom, items: wizard)
         let (engine, _) = await GameEngine.test(blueprint: game)
 
-        // Schedule two events with different timing and state
+        // Create two different payload types
+        let statusPayload = FuseState.StatusEffectPayload(
+            itemID: ItemID("wizard"),
+            effectName: "poison"
+        )
+
+        let environmentalPayload = FuseState.EnvironmentalPayload(
+            changeType: "weather",
+            parameters: ["condition": "rain"]
+        )
+
+        // Schedule two fuses with different timing and payloads
         let result = ActionResult(
             effects: [
                 .startFuse(
                     .statusEffectExpiry,
-                    turns: 1,
-                    state: ["type": .string("poison")]
+                    state: try FuseState(turns: 1, payload: statusPayload)
                 ),
                 .startFuse(
                     .environmentalChange,
-                    turns: 2,
-                    state: ["weather": .string("rain")]
+                    state: try FuseState(turns: 2, payload: environmentalPayload)
                 ),
             ]
         )
         try await engine.processActionResult(result)
 
-        // Verify both events scheduled
+        // Verify both fuses scheduled with correct payloads
         var gameState = await engine.gameState
         #expect(gameState.activeFuses.count == 2)
 
-        // After 1 turn, first event should be gone
+        let statusFuse = gameState.activeFuses[FuseID.statusEffectExpiry]
+        let envFuse = gameState.activeFuses[FuseID.environmentalChange]
+
+        #expect(statusFuse?.getPayload(as: FuseState.StatusEffectPayload.self) == statusPayload)
+        #expect(
+            envFuse?.getPayload(as: FuseState.EnvironmentalPayload.self) == environmentalPayload)
+
+        // After 1 turn, first fuse should be gone, second should remain
         try await engine.execute("wait")
         gameState = await engine.gameState
         #expect(gameState.activeFuses.count == 1)
         #expect(gameState.activeFuses[FuseID.statusEffectExpiry] == nil)
-        #expect(gameState.activeFuses[FuseID.environmentalChange] != nil)
 
-        // After 2 turns, second event should be gone
+        let remainingFuse = gameState.activeFuses[FuseID.environmentalChange]
+        #expect(
+            remainingFuse?.getPayload(as: FuseState.EnvironmentalPayload.self)
+                == environmentalPayload)
+
+        // After 2 turns, second fuse should be gone
         try await engine.execute("wait")
         gameState = await engine.gameState
         #expect(gameState.activeFuses.count == 0)
     }
 
-    @Test("Convenience methods create correct state")
-    func testConvenienceMethods() async throws {
+    @Test("Convenience constructors create correct payloads")
+    func testConvenienceConstructors() async throws {
         let testRoom = Location(
             id: .startRoom,
             .name("Test Room"),
             .inherentlyLit
         )
 
-        let game = MinimalGame(locations: testRoom)
+        let wizard = Lab.wizard
+        let troll = Lab.troll
+        let game = MinimalGame(locations: testRoom, items: wizard, troll)
         let (engine, _) = await GameEngine.test(blueprint: game)
 
-        // Test all convenience methods
+        // Test convenience constructors
+        let enemyLocationState = try FuseState.enemyLocation(
+            turns: 5,
+            enemyID: ItemID("troll"),
+            locationID: LocationID("startRoom"),
+            message: "The troll is awake!"
+        )
+
+        let statusEffectState = try FuseState.statusEffect(
+            turns: 3,
+            itemID: ItemID("wizard"),
+            effectName: "paralysis"
+        )
+
+        let environmentalState = try FuseState.environmental(
+            turns: 2,
+            changeType: "lighting",
+            parameters: ["brightness": "dim"]
+        )
+
+        // Schedule all three fuses
         let result = ActionResult(
             effects: [
-                .startEnemyWakeUpFuse(
-                    enemyID: ItemID("orc"),
-                    message: "The orc is awake!",
-                    turns: 5
-                ),
-                .startEnemyReturnFuse(
-                    enemyID: ItemID("dragon"),
-                    to: LocationID("cave"),
-                    message: "The dragon has returned!",
-                    turns: 3
-                ),
-                .startStatusEffectExpiryFuse(
-                    for: ItemID("player"),
-                    effectName: "paralysis",
-                    turns: 2
-                ),
+                .startFuse(.enemyWakeUp, state: enemyLocationState),
+                .startFuse(.statusEffectExpiry, state: statusEffectState),
+                .startFuse(.environmentalChange, state: environmentalState),
             ]
         )
         try await engine.processActionResult(result)
@@ -217,26 +272,70 @@ struct FuseTests {
         let gameState = await engine.gameState
         #expect(gameState.activeFuses.count == 3)
 
-        // Verify enemy wake-up event
-        let wakeUpEvent = gameState.activeFuses[FuseID.enemyWakeUp]
-        #expect(wakeUpEvent?.turns == 5)
-        #expect(wakeUpEvent?.getString("enemyID") == "orc")
+        // Verify enemy location fuse
+        let enemyFuse = gameState.activeFuses[FuseID.enemyWakeUp]
+        #expect(enemyFuse?.turns == 5)
+        let enemyPayload = enemyFuse?.getPayload(as: FuseState.EnemyLocationPayload.self)
+        #expect(enemyPayload?.enemyID == ItemID("troll"))
+        #expect(enemyPayload?.locationID == LocationID("startRoom"))
+        #expect(enemyPayload?.message == "The troll is awake!")
 
-        // Verify enemy return event
-        let returnEvent = gameState.activeFuses[FuseID.enemyReturn]
-        #expect(returnEvent?.turns == 3)
-        #expect(returnEvent?.getString("enemyID") == "dragon")
-        #expect(returnEvent?.getString("locationID") == "cave")
+        // Verify status effect fuse
+        let statusFuse = gameState.activeFuses[FuseID.statusEffectExpiry]
+        #expect(statusFuse?.turns == 3)
+        let statusPayload = statusFuse?.getPayload(as: FuseState.StatusEffectPayload.self)
+        #expect(statusPayload?.itemID == ItemID("wizard"))
+        #expect(statusPayload?.effectName == "paralysis")
 
-        // Verify status effect event
-        let statusEvent = gameState.activeFuses[FuseID.statusEffectExpiry]
-        #expect(statusEvent?.turns == 2)
-        #expect(statusEvent?.getString("itemID") == "player")
-        #expect(statusEvent?.getString("effectName") == "paralysis")
+        // Verify environmental fuse
+        let envFuse = gameState.activeFuses[FuseID.environmentalChange]
+        #expect(envFuse?.turns == 2)
+        let envPayload = envFuse?.getPayload(as: FuseState.EnvironmentalPayload.self)
+        #expect(envPayload?.changeType == "lighting")
+        #expect(envPayload?.parameters["brightness"] == "dim")
     }
 
-    @Test("Custom turns override default event turns")
-    func testCustomTurnsOverride() async throws {
+    @Test("Custom turns override work with typed payloads")
+    func testCustomTurnsOverrideWithTypedPayloads() async throws {
+        let testRoom = Location(
+            id: .startRoom,
+            .name("Test Room"),
+            .inherentlyLit
+        )
+
+        let troll = Lab.troll
+        let game = MinimalGame(locations: testRoom, items: troll)
+        let (engine, _) = await GameEngine.test(blueprint: game)
+
+        // Create fuse with custom turns (7 instead of default)
+        let fuseState = try FuseState.enemyLocation(
+            turns: 7,
+            enemyID: ItemID("troll"),
+            locationID: LocationID("startRoom"),
+            message: "The troll awakens!"
+        )
+
+        let result = ActionResult(
+            effects: [
+                .startFuse(.enemyWakeUp, state: fuseState)
+            ]
+        )
+        try await engine.processActionResult(result)
+
+        // Verify custom turns are used
+        let gameState = await engine.gameState
+        let scheduledFuse = gameState.activeFuses[FuseID.enemyWakeUp]
+        #expect(scheduledFuse?.turns == 7)
+
+        // Verify payload is still correct
+        let payload = scheduledFuse?.getPayload(as: FuseState.EnemyLocationPayload.self)
+        #expect(payload?.enemyID == ItemID("troll"))
+        #expect(payload?.locationID == LocationID("startRoom"))
+        #expect(payload?.message == "The troll awakens!")
+    }
+
+    @Test("Fuse without payload works correctly")
+    func testFuseWithoutPayload() async throws {
         let testRoom = Location(
             id: .startRoom,
             .name("Test Room"),
@@ -246,20 +345,99 @@ struct FuseTests {
         let game = MinimalGame(locations: testRoom)
         let (engine, _) = await GameEngine.test(blueprint: game)
 
-        // Schedule with custom turns (default for enemyWakeUp would be 3, we use 7)
+        // Create fuse without payload
+        let fuseState = FuseState(turns: 3)
         let result = ActionResult(
             effects: [
-                .startEnemyWakeUpFuse(
-                    enemyID: ItemID("orc"),
-                    message: "The orc awakens!",
-                    turns: 7
-                )
+                .startFuse(.statusEffectExpiry, state: fuseState)
             ]
         )
         try await engine.processActionResult(result)
 
-        // Verify custom turns are used
+        // Verify fuse scheduled without payload
         let gameState = await engine.gameState
-        #expect(gameState.activeFuses[FuseID.enemyWakeUp]?.turns == 7)
+        let scheduledFuse = gameState.activeFuses[FuseID.statusEffectExpiry]
+        #expect(scheduledFuse?.turns == 3)
+        #expect(scheduledFuse?.payload == nil)
+        #expect(!(scheduledFuse?.hasPayload(ofType: String.self) ?? true))
+    }
+
+    @Test("Fuse state equality works with payloads")
+    func testFuseStateEqualityWithPayloads() throws {
+        let payload1 = FuseState.StatusEffectPayload(
+            itemID: ItemID("wizard"),
+            effectName: "blessed"
+        )
+
+        let payload2 = FuseState.StatusEffectPayload(
+            itemID: ItemID("wizard"),
+            effectName: "blessed"
+        )
+
+        let payload3 = FuseState.StatusEffectPayload(
+            itemID: ItemID("wizard"),
+            effectName: "cursed"
+        )
+
+        let fuse1 = try FuseState(turns: 3, payload: payload1)
+        let fuse2 = try FuseState(turns: 3, payload: payload2)
+        let fuse3 = try FuseState(turns: 3, payload: payload3)
+
+        // Same payloads should be equal
+        #expect(fuse1 == fuse2)
+
+        // Different payloads should not be equal
+        #expect(fuse1 != fuse3)
+        #expect(fuse2 != fuse3)
+    }
+
+    @Test("Complex payload structures work in fuses")
+    func testComplexPayloadStructuresInFuses() async throws {
+        struct ComplexPayload: Codable, Sendable, Equatable {
+            let id: String
+            let items: [ItemID]
+            let locations: [LocationID]
+            let metadata: [String: String]
+        }
+
+        let testRoom = Location(
+            id: .startRoom,
+            .name("Test Room"),
+            .inherentlyLit
+        )
+
+        let game = MinimalGame(locations: testRoom)
+        let (engine, _) = await GameEngine.test(blueprint: game)
+
+        let complexPayload = ComplexPayload(
+            id: "complex-event",
+            items: [ItemID("sword"), ItemID("shield"), ItemID("potion")],
+            locations: [LocationID("cave"), LocationID("forest")],
+            metadata: [
+                "type": "multi-item-event",
+                "priority": "high",
+                "source": "spell",
+            ]
+        )
+
+        let fuseState = try FuseState(turns: 4, payload: complexPayload)
+        let result = ActionResult(
+            effects: [
+                .startFuse(.environmentalChange, state: fuseState)
+            ]
+        )
+        try await engine.processActionResult(result)
+
+        // Verify complex payload is preserved
+        let gameState = await engine.gameState
+        let scheduledFuse = gameState.activeFuses[FuseID.environmentalChange]
+        let retrievedPayload = scheduledFuse?.getPayload(as: ComplexPayload.self)
+
+        #expect(retrievedPayload?.id == "complex-event")
+        #expect(retrievedPayload?.items == [ItemID("sword"), ItemID("shield"), ItemID("potion")])
+        #expect(retrievedPayload?.locations == [LocationID("cave"), LocationID("forest")])
+        #expect(retrievedPayload?.metadata["type"] == "multi-item-event")
+        #expect(retrievedPayload?.metadata["priority"] == "high")
+        #expect(retrievedPayload?.metadata["source"] == "spell")
     }
 }

@@ -77,7 +77,7 @@ extension GameEngine {
             if fuseToExecute.definition.repeats {
                 let newFuseState = FuseState(
                     turns: fuseToExecute.definition.initialTurns,
-                    state: fuseToExecute.state.dictionary
+                    payload: fuseToExecute.state.payload
                 )
                 let restartChange = StateChange.addActiveFuse(
                     fuseID: fuseToExecute.id,

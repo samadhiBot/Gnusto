@@ -59,6 +59,50 @@ extension SideEffect {
         )
     }
 
+    /// Creates a new `SideEffect` instance with type `.startFuse` using a strongly-typed `FuseState`.
+    ///
+    /// This is the modern approach for starting fuses with type-safe payload data.
+    /// The `FuseState` contains both the turn count and any custom payload data.
+    ///
+    /// - Parameters:
+    ///   - fuseID: The `FuseID` of the fuse to start.
+    ///   - state: The `FuseState` containing turns and payload data.
+    public static func startFuse(
+        _ fuseID: FuseID,
+        state: FuseState
+    ) -> SideEffect {
+        var parameters: [String: StateValue] = [:]
+        parameters["--turns"] = .int(state.turns)
+
+        // Store the FuseState directly as encoded data
+        if let encodedState = try? JSONEncoder().encode(state),
+            let encodedString = String(data: encodedState, encoding: .utf8)
+        {
+            parameters["--fuseState"] = .string(encodedString)
+        }
+
+        return SideEffect(
+            type: .startFuse,
+            targetID: .fuse(fuseID),
+            parameters: parameters
+        )
+    }
+
+    /// Creates a new `SideEffect` instance with type `.startFuse` using a strongly-typed `FuseState` (string overload).
+    ///
+    /// This is the modern approach for starting fuses with type-safe payload data.
+    /// The `FuseState` contains both the turn count and any custom payload data.
+    ///
+    /// - Parameters:
+    ///   - fuseID: The string identifier of the fuse to start.
+    ///   - state: The `FuseState` containing turns and payload data.
+    public static func startFuse(
+        _ fuseID: String,
+        state: FuseState
+    ) -> SideEffect {
+        return startFuse(FuseID(fuseID), state: state)
+    }
+
     /// Creates a new `SideEffect` instance with type `.stopFuse`.
     ///
     /// - Parameters:
@@ -112,10 +156,10 @@ extension SideEffect {
 
 extension SideEffect {
     /// Starts an enemy wake-up fuse with a specific enemy ID.
-    /// 
+    ///
     /// This convenience method creates a properly configured side effect for waking up
     /// an unconscious enemy after a specified number of turns.
-    /// 
+    ///
     /// - Parameters:
     ///   - enemyID: The ID of the enemy that should wake up.
     ///   - message: The message to display if the player is present when the enemy wakes up.
@@ -137,11 +181,11 @@ extension SideEffect {
     }
 
     /// Starts an enemy return fuse with specific enemy and location IDs.
-    /// 
+    ///
     /// This convenience method creates a properly configured side effect for returning
     /// an enemy to a specific location after a specified number of turns. This prevents
     /// the enemy from spawning in the player's current location.
-    /// 
+    ///
     /// - Parameters:
     ///   - enemyID: The ID of the enemy that should return.
     ///   - locationID: The ID of the location where the enemy should return.
