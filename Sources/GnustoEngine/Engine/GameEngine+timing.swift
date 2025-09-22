@@ -112,16 +112,15 @@ extension GameEngine {
                 let actionResult = try await definition.action(self, updatedStateForExecution)
 
                 // Check if the daemon explicitly updated its own state
-                let daemonExplicitlyUpdatedState =
-                    actionResult?.changes.contains { change in
-                        if case .updateDaemonState(let id, _) = change {
-                            return id == daemonID
-                        }
-                        return false
-                    } ?? false
+                let daemonExplicitlyUpdatedState = actionResult?.changes.contains { change in
+                    if case .updateDaemonState(let id, _) = change {
+                        return id == daemonID
+                    }
+                    return false
+                } ?? false
 
                 // Process any action result
-                if let actionResult = actionResult {
+                if let actionResult {
                     try await processActionResult(actionResult)
                 }
 

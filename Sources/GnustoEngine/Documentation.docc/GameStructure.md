@@ -246,7 +246,7 @@ The proxy system seamlessly integrates computed properties--when you access `kit
 Daemons run independently of player actions, using proxies to implement autonomous behaviors:
 
 ```swift
-let swordDaemon = Daemon { engine in
+let swordDaemon = Daemon { engine, state in
     let currentLocation = await engine.player.location
     var newGlowLevel: SwordBrightness = .notGlowing
 
@@ -269,9 +269,7 @@ let swordDaemon = Daemon { engine in
     }
 
     // Always update the glow level and show message if glowing
-    let currentGlowLevel = await engine.global(.swordGlowLevel)?.toCodable(
-        as: SwordBrightness.self
-    )
+    let currentGlowLevel = state.getPayload(as: SwordBrightness.self) ?? .notGlowing
 
     // Do nothing if the glow level has not changed
     if newGlowLevel == currentGlowLevel { return nil }
@@ -279,9 +277,9 @@ let swordDaemon = Daemon { engine in
     // Update and announce the glow level if it has changed
     return try ActionResult(
         newGlowLevel.description,
-        .setGlobalCodable(
-            id: .swordGlowLevel,
-            value: AnyCodableSendable(newGlowLevel)
+        .updateDaemonState(
+            daemonID: .swordDaemon,
+            daemonState: state.updatingPayload(newGlowLevel)
         )
     )
 }
