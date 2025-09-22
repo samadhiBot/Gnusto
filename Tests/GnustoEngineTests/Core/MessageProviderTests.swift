@@ -1,6 +1,6 @@
 import CustomDump
 import Foundation
-import Logging
+import GnustoTestSupport
 import Testing
 
 @testable import GnustoEngine
