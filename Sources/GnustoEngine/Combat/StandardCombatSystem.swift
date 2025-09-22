@@ -63,6 +63,18 @@ public struct StandardCombatSystem: CombatSystem {
             )
         }
 
+        // Check if enemy and player are still in the same location
+        let playerLocationID = await context.player.location.id
+        let enemyParent = await enemy.parent
+        guard case .location(let enemyLocationID) = enemyParent,
+            enemyLocationID == playerLocationID
+        else {
+            // Enemy and player are in different locations - end combat
+            return await ActionResult(
+                context.engine.endCombat()
+            )
+        }
+
         // Check if player can act
         let playerCanAct = await context.player.canAct
         guard playerCanAct else {

@@ -107,23 +107,15 @@ struct UndergroundTests {
             > go south
             --- Cellar ---
 
-            In the exchange, his bloody ax slips through to mark you--a
-            stinging reminder that the troll still has teeth. The wound is
-            trivial against your battle fury.
-
             Your sword is glowing with a faint blue glow.
 
-            > walk south
-            --- East of Chasm ---
+            > walk west
+            --- Bottom of Ramp ---
 
-            You are on the east edge of a chasm, the bottom of which cannot
-            be seen. A narrow passage goes north, and the path you are on
-            continues to the east.
+            You are at the bottom of a steep metal ramp. The ramp leads up
+            to the west, but it is too steep and smooth to climb.
 
-            Suddenly the pathetic troll slips past your guard. His axe
-            opens a wound that will mark you, and your blood flows out
-            steady and sure. The blow lands hard, adding to your growing
-            collection of injuries.
+            Your sword is no longer glowing.
 
             >
             May your adventures elsewhere prove fruitful!

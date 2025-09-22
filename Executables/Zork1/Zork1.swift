@@ -50,7 +50,7 @@ enum SwordBrightness: Codable, CustomStringConvertible, Sendable {
         switch self {
         case .glowingBrightly: "Your sword is glowing very brightly."
         case .glowingFaintly: "Your sword is glowing with a faint blue glow."
-        case .notGlowing: ""
+        case .notGlowing: "Your sword is no longer glowing."
         }
     }
 }
