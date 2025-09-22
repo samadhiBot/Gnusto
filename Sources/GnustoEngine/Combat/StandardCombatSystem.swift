@@ -1,10 +1,10 @@
 import Foundation
 import Logging
 
-/// Default implementation of turn-based combat system with D&D-style mechanics.
+/// Default implementation of turn-based melee combat system with D&D-style mechanics.
 ///
 /// This combat system provides:
-/// - Turn-based combat with player actions and enemy reactions
+/// - Turn-based melee combat with player actions and enemy reactions
 /// - D&D-style d20 attack rolls and damage calculations
 /// - Character attribute-based combat modifiers
 /// - Dynamic enemy AI that responds to combat state

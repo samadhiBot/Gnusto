@@ -149,15 +149,15 @@ For engine developers, we follow modern Swift development practices with compreh
 
 ## What's Next?
 
-Current development priorities focus on:
+Ongoing development priorities:
 
 1. **Improving documentation:** More how-to articles and guides covering combat systems, character development, and messaging
 2. **Completing Zork 1 implementation:** Finishing the full Zork I recreation as a flagship demonstration
 3. **Improved conversation management:** Better tools for building dialogue systems and NPC interactions
-4. **Refine and balance combat:** The combat system is functional but still needs polish
+4. **Refine and balance melee combat:** The melee combat system is functional but still needs polish
 5. **Enhanced character sheet integration:** Making better use of character attributes throughout the engine
-
-Check out our [development roadmap](Sources/GnustoEngine/Documentation.docc/Roadmap.md) for detailed feature planning and contribution opportunities.
+6. **Enhanced platform integration:** Improved I/O wrappers and user interface components for different deployment targets
+7. **Expanded combat systems:** Adding ranged and magical combat to complement the existing melee system
 
 ---
 
