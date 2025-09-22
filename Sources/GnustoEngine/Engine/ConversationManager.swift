@@ -161,6 +161,7 @@ public actor ConversationManager: Sendable {
     /// Processes player input as a potential response to a pending question.
     ///
     /// - Parameter input: The player's input string.
+    /// - Parameter engine: The game engine for accessing game state and context.
     /// - Returns: ActionResult if the input was handled as a question response, nil otherwise.
     public func processResponse(
         _ input: String,

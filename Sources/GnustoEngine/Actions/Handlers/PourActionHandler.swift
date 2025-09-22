@@ -24,8 +24,7 @@ public struct PourActionHandler: ActionHandler {
     /// Handles pouring attempts with different types of liquids and targets.
     /// Provides appropriate responses following ZIL traditions.
     ///
-    /// - Parameter command: The command being processed.
-    /// - Parameter engine: The game context.engine.
+    /// - Parameter context: The action context containing the command and game state.
     /// - Returns: An `ActionResult` with appropriate pouring message and state changes.
     public func process(context: ActionContext) async throws -> ActionResult {
         // Pour requires a direct object (what to pour)

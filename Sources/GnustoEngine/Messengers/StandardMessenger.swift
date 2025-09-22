@@ -1816,11 +1816,12 @@ open class StandardMessenger: @unchecked Sendable {
     }
 
     open func thereAreIndefiniteItemsHere(_ items: [ItemProxy]) async -> String {
-        let isAre = if items.count == 1 {
-            await items.first?.hasFlag(.isPlural) == true ? "are" : "is"
-        } else {
-            "are"
-        }
+        let isAre =
+            if items.count == 1 {
+                await items.first?.hasFlag(.isPlural) == true ? "are" : "is"
+            } else {
+                "are"
+            }
         let listWithDefiniteArticles = await items.listWithIndefiniteArticles() ?? "nothing"
         return oneOf(
             "There \(isAre) \(listWithDefiniteArticles) here.",
@@ -2452,7 +2453,11 @@ open class StandardMessenger: @unchecked Sendable {
     /// For testing purposes, a deterministic random number generator can specified when
     /// initializing the StandardMessenger. By default the SystemRandomNumberGenerator is used.
     ///
-    /// - Parameter responses: A collection of responses.
+    /// - Parameters:
+    ///   - responses: A collection of responses.
+    ///   - logLevel: The logging level for debug output (defaults to .debug).
+    ///   - capitalize: Whether to capitalize the first letter of the response (defaults to true).
+    ///   - function: The calling function name for debugging (defaults to #function).
     /// - Returns: A randomly selected response.
     open func oneOf(
         _ responses: String...,

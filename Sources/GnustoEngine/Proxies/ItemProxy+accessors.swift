@@ -250,7 +250,7 @@ extension ItemProxy {
 
     /// Checks if a specific boolean property (flag) is set to `true` on this item.
     ///
-    /// - Parameter id: The `ItemPropertyID` of the flag to check.
+    /// - Parameter itemPropertyID: The `ItemPropertyID` of the flag to check.
     /// - Returns: `true` if the flag is set to `true`, `false` otherwise.
     public func hasFlag(_ itemPropertyID: ItemPropertyID) async -> Bool {
         await property(itemPropertyID)?.toBool == true
@@ -359,7 +359,7 @@ extension ItemProxy {
     /// This method determines whether the given item is contained within this
     /// container or any of its sub-containers.
     ///
-    /// - Parameter item: The `Item` identifier to check for containment.
+    /// - Parameter itemID: The `Item` identifier to check for containment.
     /// - Returns: `true` if this container is holding the item, `false` otherwise.
     public func isHolding(_ itemID: ItemID) async -> Bool {
         await allContents.contains { $0.id == itemID }

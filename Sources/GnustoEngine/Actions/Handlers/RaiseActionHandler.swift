@@ -21,8 +21,7 @@ public struct RaiseActionHandler: ActionHandler {
 
     /// Processes the raise action.
     ///
-    /// - Parameter command: The command being processed.
-    /// - Parameter engine: The game context.engine.
+    /// - Parameter context: The action context containing the command and game state.
     /// - Returns: An `ActionResult` with the action outcome.
     public func process(context: ActionContext) async throws -> ActionResult {
         // Raise requires a direct object (what to raise)

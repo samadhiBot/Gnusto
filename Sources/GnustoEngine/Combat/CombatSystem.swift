@@ -61,10 +61,12 @@ public protocol CombatSystem: Sendable {
     /// - Parameter event: The combat event to describe
     /// - Returns: A descriptive string for the event, or nil to use default descriptions
     /// - Throws: If description generation fails
-    var description: @Sendable (
-        CombatEvent,
-        CombatMessenger
-    ) async -> String? { get }
+    var description:
+        @Sendable (
+            CombatEvent,
+            CombatMessenger
+        ) async -> String?
+    { get }
 
     /// Processes a complete turn of combat including player action and enemy reaction.
     ///
@@ -129,7 +131,7 @@ public protocol CombatSystem: Sendable {
     ///
     /// - Parameters:
     ///   - playerAction: What the player did this turn
-    ///   - enemyState: Current state of the enemy enemy
+    ///   - enemy: Current state of the enemy
     ///   - context: The action context for accessing game state
     /// - Returns: The enemy's chosen action for this turn, or nil if no action
     /// - Throws: If enemy AI decision fails

@@ -60,7 +60,7 @@ extension LocationProxy {
 
     /// Checks if a specific boolean property (flag) is set to `true` on this location.
     ///
-    /// - Parameter id: The `LocationPropertyID` of the flag to check.
+    /// - Parameter locationPropertyID: The `LocationPropertyID` of the flag to check.
     /// - Returns: `true` if the flag is set to `true`, `false` otherwise.
     public func hasFlag(_ locationPropertyID: LocationPropertyID) async -> Bool {
         await property(locationPropertyID)?.toBool ?? false

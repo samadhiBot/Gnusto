@@ -162,6 +162,7 @@ extension ActionContext {
     /// types of invalid direct objects.
     ///
     /// - Parameters:
+    ///   - requiresLight: Whether the action requires light to identify the item (defaults to true).
     ///   - locationMessage: Custom error message when direct object is a location.
     ///   - universalMessage: Custom error message when direct object is universal.
     ///   - playerMessage: Custom error message when direct object is the player.
@@ -288,9 +289,10 @@ extension ActionContext {
     /// types of invalid indirect objects.
     ///
     /// - Parameters:
-    ///   - locationMessage: Custom error message when indirect object is a location.
-    ///   - universalMessage: Custom error message when indirect object is universal.
-    ///   - playerMessage: Custom error message when indirect object is the player.
+    ///   - requiresLight: Whether the action requires light to identify the item (defaults to true).
+    ///   - locationMessage: Custom error message when direct object is a location.
+    ///   - universalMessage: Custom error message when direct object is universal.
+    ///   - playerMessage: Custom error message when direct object is the player.
     ///   - failureMessage: Fallback error message used when specific type messages are not provided.
     /// - Returns: An ItemProxy for the indirect object item, or nil if no indirect object exists.
     /// - Throws: ActionResponse.prerequisiteNotMet if indirect object is not an item.

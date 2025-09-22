@@ -25,8 +25,7 @@ public struct ThrowActionHandler: ActionHandler {
     /// - Throwing at specific targets
     /// - General throwing (drops item in current location)
     ///
-    /// - Parameter command: The command being processed.
-    /// - Parameter engine: The game context.engine.
+    /// - Parameter context: The action context containing the command and game state.
     /// - Returns: An `ActionResult` with appropriate throwing message and state changes.
     public func process(context: ActionContext) async throws -> ActionResult {
         // Throw requires a direct object (what to throw)

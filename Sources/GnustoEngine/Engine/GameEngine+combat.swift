@@ -67,7 +67,8 @@ extension GameEngine {
     ///
     /// - Parameters:
     ///   - enemy: The enemy item that the player is attacking
-    ///   - weapon: The weapon the player is using for the attack, if any
+    ///   - playerWeapon: The weapon the player is using for the attack, if any
+    ///   - enemyWeapon: The weapon the enemy is using for defense, if any
     /// - Returns: An `ActionResult` containing the attack message and state changes
     /// - Throws: `ActionResponse` if there are issues with state changes
     public func playerAttacks(

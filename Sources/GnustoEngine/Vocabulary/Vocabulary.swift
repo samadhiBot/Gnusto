@@ -355,6 +355,7 @@ public struct Vocabulary: Equatable, Sendable {
     ///   - locations: An array of `Location` objects specific to the game.
     ///   - verbs: An array of `Verb` objects specific to the game.
     ///   - verbToSyntax: A mapping from verbs to their syntax rules from ActionHandlers.
+    ///   - enhancer: An optional vocabulary enhancer for customizing word recognition.
     /// - Returns: A populated `Vocabulary` instance.
     public static func build(
         items: [Item] = [],

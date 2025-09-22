@@ -31,8 +31,7 @@ public struct DebugActionHandler: ActionHandler {
     /// Retrieves the specified entity (item, location, or player) from the `GameState`
     /// and uses `customDump` to generate a string representation of its properties and values.
     ///
-    /// - Parameter command: The command being processed.
-    /// - Parameter engine: The game context.engine.
+    /// - Parameter context: The action context containing the command and game state.
     /// - Returns: An `ActionResult` containing the detailed dump of the target entity.
     public func process(context: ActionContext) async throws -> ActionResult {
         guard let directObjectRef = context.command.directObject else {

@@ -49,6 +49,8 @@ struct UndergroundTests {
             push the troll
             hit the troll with the lantern
             head west
+            go south
+            walk west
             """
         )
         await engine.run()
@@ -101,6 +103,27 @@ struct UndergroundTests {
             In the exchange, his ax slips through to mark you--a stinging
             reminder that the troll still has teeth. The wound is trivial
             against your battle fury.
+
+            > go south
+            --- Cellar ---
+
+            In the exchange, his bloody ax slips through to mark you--a
+            stinging reminder that the troll still has teeth. The wound is
+            trivial against your battle fury.
+
+            Your sword is glowing with a faint blue glow.
+
+            > walk south
+            --- East of Chasm ---
+
+            You are on the east edge of a chasm, the bottom of which cannot
+            be seen. A narrow passage goes north, and the path you are on
+            continues to the east.
+
+            Suddenly the pathetic troll slips past your guard. His axe
+            opens a wound that will mark you, and your blood flows out
+            steady and sure. The blow lands hard, adding to your growing
+            collection of injuries.
 
             >
             May your adventures elsewhere prove fruitful!

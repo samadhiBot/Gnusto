@@ -64,7 +64,7 @@ extension ItemProperty {
     /// Defines behavioral and statistical properties for characters, including personality traits,
     /// dialogue preferences, and social interactions.
     ///
-    /// - Parameter attributes: The character's behavioral and social attributes.
+    /// - Parameter sheet: The character's behavioral and social attributes.
     /// - Returns: A .characterSheet property.
     public static func characterSheet(_ sheet: CharacterSheet) -> ItemProperty {
         ItemProperty(

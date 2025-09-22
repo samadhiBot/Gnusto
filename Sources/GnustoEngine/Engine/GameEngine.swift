@@ -182,11 +182,6 @@ public actor GameEngine: Sendable {
     ///
     /// - Parameters:
     ///   - blueprint: The `GameBlueprint` containing all game definitions, custom handlers, and hooks.
-    ///   - vocabulary: Optional. The `Vocabulary` for the game. If `nil`, it's auto-generated from items.
-    ///   - pronoun: Optional. Initial pronoun reference.
-    ///   - activeFuses: Optional. Initially active fuses and their remaining turns.
-    ///   - activeDaemons: Optional. Initially active daemons.
-    ///   - globalState: Optional. Initial game-specific global key-value data.
     ///   - parser: The `Parser` instance to be used for understanding player input.
     ///   - ioHandler: The `IOHandler` instance for interacting with the player (text input/output).
     ///   - filesystemHandler: The `FilesystemHandler` for save files and transcripts (defaults to production handler).

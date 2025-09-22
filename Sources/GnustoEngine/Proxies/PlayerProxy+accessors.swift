@@ -16,7 +16,7 @@ extension PlayerProxy {
     /// to the player's complete inventory (including contents of containers) and compares it
     /// against the player's carrying capacity.
     ///
-    /// - Parameter item: The item to check if the player can carry.
+    /// - Parameter itemID: The item to check if the player can carry.
     /// - Returns: `true` if the player can carry the item without exceeding capacity, `false` otherwise.
     /// - Throws: An error if there's an issue accessing the player's inventory or item properties.
     public func canCarry(_ itemID: ItemID) async -> Bool {

@@ -83,7 +83,7 @@ public struct StandardParser: Parser {
     ///                 (verbs, nouns, adjectives, prepositions, noise words, directions)
     ///                 and verb syntax rules. This is the primary source of grammatical
     ///                 and lexical knowledge for the parser.
-    ///   - gameState: The current `GameState`, providing essential context for resolving
+    ///   - engine: The game engine providing essential context for resolving
     ///                object references (e.g., player inventory, item locations, current
     ///                pronoun meanings, items visible or accessible to the player).
     /// - Returns: A `Result` which is either:
