@@ -116,7 +116,10 @@ public struct MinimalGame: GameBlueprint {
         messenger: StandardMessenger? = nil,
         randomSeed: UInt64 = 71
     ) {
-        let rng = SeededRandomNumberGenerator(seed: randomSeed)
+        // Create separate random number generators to avoid interference between
+        // GameEngine and StandardMessenger random number consumption
+        let gameEngineRng = SeededRandomNumberGenerator(seed: randomSeed)
+        let messengerRng = SeededRandomNumberGenerator(seed: randomSeed)
 
         self.player = player
         self.items = items  // Self.allItems(from: items)
@@ -129,8 +132,8 @@ public struct MinimalGame: GameBlueprint {
         self.daemons = daemons
         self.itemComputers = itemComputers
         self.locationComputers = locationComputers
-        self.messenger = messenger ?? StandardMessenger(randomNumberGenerator: rng)
-        self.randomNumberGenerator = rng
+        self.messenger = messenger ?? StandardMessenger(randomNumberGenerator: messengerRng)
+        self.randomNumberGenerator = gameEngineRng
     }
 }
 
