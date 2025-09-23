@@ -68,15 +68,15 @@ struct FuseIDTests {
     @Test("FuseID Hashability")
     func testHashability() throws {
         let fuseDict = [
-            FuseID("bombFuse"): "Explosive timer",
-            FuseID("candleTimer"): "Candle burndown",
-            FuseID("alarmClock"): "Scheduled alarm",
+            "bombFuse": "Explosive timer",
+            "candleTimer": "Candle burndown",
+            "alarmClock": "Scheduled alarm",
         ]
 
-        #expect(fuseDict[FuseID("bombFuse")] == "Explosive timer")
-        #expect(fuseDict[FuseID("candleTimer")] == "Candle burndown")
-        #expect(fuseDict[FuseID("alarmClock")] == "Scheduled alarm")
-        #expect(fuseDict[FuseID("nonexistent")] == nil)
+        #expect(fuseDict["bombFuse"] == "Explosive timer")
+        #expect(fuseDict["candleTimer"] == "Candle burndown")
+        #expect(fuseDict["alarmClock"] == "Scheduled alarm")
+        #expect(fuseDict["nonexistent"] == nil)
     }
 
     @Test("FuseID Set Operations")

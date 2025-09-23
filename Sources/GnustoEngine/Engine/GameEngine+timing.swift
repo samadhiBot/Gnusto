@@ -41,7 +41,14 @@ extension GameEngine {
                 continue
             }
 
-            let newTurns = currentFuseState.turns - 1
+            guard let currentTurns = currentFuseState.turns else {
+                logger.error("Active fuse '\(fuseID)' has nil turns - this should never happen")
+                let removeChangeOnError = StateChange.removeActiveFuse(fuseID: fuseID)
+                try gameState.apply(removeChangeOnError)
+                continue
+            }
+
+            let newTurns = currentTurns - 1
 
             let updateChange = StateChange.updateFuseTurns(fuseID: fuseID, turns: newTurns)
             try gameState.apply(updateChange)
@@ -112,12 +119,13 @@ extension GameEngine {
                 let actionResult = try await definition.action(self, updatedStateForExecution)
 
                 // Check if the daemon explicitly updated its own state
-                let daemonExplicitlyUpdatedState = actionResult?.changes.contains { change in
-                    if case .updateDaemonState(let id, _) = change {
-                        return id == daemonID
-                    }
-                    return false
-                } ?? false
+                let daemonExplicitlyUpdatedState =
+                    actionResult?.changes.contains { change in
+                        if case .updateDaemonState(let id, _) = change {
+                            return id == daemonID
+                        }
+                        return false
+                    } ?? false
 
                 // Process any action result
                 if let actionResult {

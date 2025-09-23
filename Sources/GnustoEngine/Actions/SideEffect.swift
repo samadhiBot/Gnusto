@@ -93,7 +93,7 @@ extension SideEffect {
         // We need to get the default turns from somewhere. Since we can't access the fuse definition
         // here, we'll create a simple FuseState with a reasonable default and let the engine
         // override with the actual definition's initialTurns if needed.
-        let fuseState = FuseState(turns: 1)  // Engine will use definition's initialTurns
+        let fuseState = FuseState(turns: nil)  // Engine will use definition's initialTurns
         return startFuse(fuseID, state: fuseState)
     }
 

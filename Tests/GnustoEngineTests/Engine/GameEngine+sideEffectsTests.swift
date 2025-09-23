@@ -24,7 +24,7 @@ struct GameEngineSideEffectsTests {
                 message: "💥 The fuse exploded!",
                 effects: [
                     .startFuse(
-                        FuseID("globalFlag"),
+                        "globalFlag",
                         turns: 1
                     )
                 ]

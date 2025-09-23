@@ -10,7 +10,8 @@ import Foundation
 public struct FuseState: Codable, Sendable, Equatable, Hashable {
     /// The number of game turns remaining until this fuse triggers.
     /// This value is decremented each turn by the game engine's timing system.
-    public var turns: Int
+    /// If nil, the engine will use the fuse definition's initialTurns.
+    public var turns: Int?
 
     /// Type-safe codable payload containing custom state data for this fuse instance.
     /// This can store any `Codable & Sendable` type, providing compile-time type safety
@@ -22,11 +23,13 @@ public struct FuseState: Codable, Sendable, Equatable, Hashable {
     /// Initializes a new fuse state with a type-safe payload.
     ///
     /// - Parameters:
-    ///   - turns: The number of turns until the fuse triggers (must be > 0).
+    ///   - turns: The number of turns until the fuse triggers (must be > 0 if provided).
     ///   - payload: Optional strongly-typed payload data for the fuse.
     /// - Throws: An error if the payload cannot be encoded to JSON.
-    public init<T: Codable & Sendable>(turns: Int, payload: T?) throws {
-        precondition(turns > 0, "Fuse state must have a positive turn count.")
+    public init<T: Codable & Sendable>(turns: Int?, payload: T?) throws {
+        if let turns = turns {
+            precondition(turns > 0, "Fuse state must have a positive turn count.")
+        }
         self.turns = turns
         self.payload = try payload.map(AnyCodableSendable.init)
     }
@@ -34,9 +37,11 @@ public struct FuseState: Codable, Sendable, Equatable, Hashable {
     /// Initializes a new fuse state with no payload data.
     ///
     /// - Parameters:
-    ///   - turns: The number of turns until the fuse triggers (must be > 0).
-    public init(turns: Int) {
-        precondition(turns > 0, "Fuse state must have a positive turn count.")
+    ///   - turns: The number of turns until the fuse triggers (must be > 0 if provided).
+    public init(turns: Int?) {
+        if let turns = turns {
+            precondition(turns > 0, "Fuse state must have a positive turn count.")
+        }
         self.turns = turns
         self.payload = nil
     }
@@ -45,10 +50,12 @@ public struct FuseState: Codable, Sendable, Equatable, Hashable {
     /// Used by the engine for operations like fuse repetition.
     ///
     /// - Parameters:
-    ///   - turns: Number of turns until the fuse triggers (must be > 0).
+    ///   - turns: Number of turns until the fuse triggers (must be > 0 if provided).
     ///   - payload: The payload to use directly.
-    internal init(turns: Int, payload: AnyCodableSendable?) {
-        precondition(turns > 0, "Fuse state must have a positive turn count.")
+    internal init(turns: Int?, payload: AnyCodableSendable?) {
+        if let turns = turns {
+            precondition(turns > 0, "Fuse state must have a positive turn count.")
+        }
         self.turns = turns
         self.payload = payload
     }
@@ -123,13 +130,13 @@ extension FuseState {
     /// Creates a fuse state with enemy/location payload data.
     ///
     /// - Parameters:
-    ///   - turns: Number of turns until the fuse triggers.
+    ///   - turns: Number of turns until the fuse triggers (must be > 0 if provided).
     ///   - enemyID: The ID of the enemy item.
     ///   - locationID: The location ID for context.
     ///   - message: The message to display when triggered.
     /// - Throws: An error if the payload cannot be encoded.
     public static func enemyLocation(
-        turns: Int,
+        turns: Int?,
         enemyID: ItemID,
         locationID: LocationID,
         message: String
@@ -145,12 +152,12 @@ extension FuseState {
     /// Creates a fuse state with status effect payload data.
     ///
     /// - Parameters:
-    ///   - turns: Number of turns until the fuse triggers.
+    ///   - turns: Number of turns until the fuse triggers (must be > 0 if provided).
     ///   - itemID: The ID of the affected character/item.
     ///   - effectName: The name of the effect to remove.
     /// - Throws: An error if the payload cannot be encoded.
     public static func statusEffect(
-        turns: Int,
+        turns: Int?,
         itemID: ItemID,
         effectName: String
     ) throws -> FuseState {
@@ -164,12 +171,12 @@ extension FuseState {
     /// Creates a fuse state with environmental change payload data.
     ///
     /// - Parameters:
-    ///   - turns: Number of turns until the fuse triggers.
+    ///   - turns: Number of turns until the fuse triggers (must be > 0 if provided).
     ///   - changeType: The type of environmental change.
     ///   - parameters: Additional parameters for the change.
     /// - Throws: An error if the payload cannot be encoded.
     public static func environmental(
-        turns: Int,
+        turns: Int?,
         changeType: String,
         parameters: [String: String] = [:]
     ) throws -> FuseState {

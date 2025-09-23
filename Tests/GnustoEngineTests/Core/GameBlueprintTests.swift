@@ -74,7 +74,7 @@ struct GameBlueprintTests {
         ]
 
         let fuses = [
-            FuseID("testFuse"): Fuse(
+            "testFuse": Fuse(
                 initialTurns: 5,
                 action: { _, _ in ActionResult("Fuse triggered!") }
             )
@@ -199,7 +199,7 @@ struct GameBlueprintTests {
         let blueprint = CompleteGameBlueprint()
 
         #expect(blueprint.fuses.count == 1)
-        #expect(blueprint.fuses[FuseID("testFuse")] != nil)
+        #expect(blueprint.fuses["testFuse"] != nil)
 
         #expect(blueprint.daemons.count == 1)
         #expect(blueprint.daemons[DaemonID("testDaemon")] != nil)

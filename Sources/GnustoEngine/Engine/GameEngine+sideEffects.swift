@@ -47,8 +47,8 @@ extension GameEngine {
             // Extract FuseState from the strongly-typed payload
             if let fuseStateFromPayload = effect.getPayload(as: FuseState.self) {
                 fuseState = fuseStateFromPayload
-                // If the FuseState has a placeholder turns value (1), use the definition's initialTurns
-                if fuseState.turns == 1 {
+                // If the FuseState has nil turns, use the definition's initialTurns
+                if fuseState.turns == nil {
                     fuseState.turns = definition.initialTurns
                 }
             } else if let dictionaryPayload = effect.getPayload(as: [String: StateValue].self) {

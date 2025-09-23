@@ -11,7 +11,7 @@ struct ActionResultTests {
 
     // - Simple Examples for Initialization Tests -
     let simpleChange = StateChange.setItemProperty(id: "lamp", property: .isOn, value: .bool(true))
-    let simpleEffect = SideEffect.startFuse(FuseID("bomb"), turns: 10)
+    let simpleEffect = SideEffect.startFuse("bomb", turns: 10)
 
     // - Examples for Merging/Applying Tests -
     // Note: These are now instance properties. `testResult` uses them,
@@ -213,7 +213,7 @@ struct ActionResultTests {
 
     // Corrected SideEffect initialization:
     let sideEffect1 = SideEffect.startFuse(
-        FuseID("fuse"),
+        "fuse",
         turns: 5
     )
 
@@ -235,7 +235,7 @@ struct ActionResultTests {
         // Check if the side effect is the correct type and has params
         let effect = resultWithChangesAndEffects.effects.first
         #expect(effect?.type == .startFuse)
-        #expect(effect?.targetID == .fuse(FuseID("fuse")))
+        #expect(effect?.targetID == .fuse("fuse"))
         #expect(effect?.payload != nil)
     }
 
