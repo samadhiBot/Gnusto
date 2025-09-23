@@ -63,28 +63,6 @@ public struct Item: Codable, Hashable, Sendable {
         )
     }
 
-    /// Checks whether the item has a specific boolean flag property set to `true`.
-    ///
-    /// This is a convenience method for testing boolean properties on items. If the property
-    /// exists and has a value of `.bool(true)`, this method returns `true`. If the property
-    /// doesn't exist or has any other value (including `.bool(false)`), it returns `false`.
-    ///
-    /// Common use cases include checking flags like `.isTakable`, `.isOpenable`, `.isOn`, etc.
-    ///
-    /// > Important: This should *only* be used in an `ItemComputer` or `LocationComputer` context,
-    /// when an `ItemProxy` is not available. This returns a static `GameState` value, and bypasses
-    /// any dynamic property calculation.
-    ///
-    /// - Parameter itemPropertyID: The `ItemPropertyID` of the boolean flag to check.
-    /// - Returns: `true` if the property exists and is set to `.bool(true)`, `false` otherwise.
-    public func hasFlag(_ itemPropertyID: ItemPropertyID) -> Bool {
-        if let value = properties[itemPropertyID] {
-            value == .bool(true)
-        } else {
-            false
-        }
-    }
-
     /// Creates an `ItemProxy` for this item using the provided game engine.
     ///
     /// An `ItemProxy` provides a convenient interface for reading and modifying item properties

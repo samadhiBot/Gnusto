@@ -77,7 +77,7 @@ struct ScriptActionHandlerTests {
 
         // Set up: scripting is already active
         try await engine.apply(
-            engine.setGlobal(.isScripting, to: true)
+            engine.setFlag(.isScripting)
         )
 
         // When
@@ -284,7 +284,7 @@ struct ScriptActionHandlerTests {
 
         // Set up: scripting is already active
         try await engine.apply(
-            engine.setGlobal(.isScripting, to: true)
+            engine.setFlag(.isScripting)
         )
 
         let command = Command(

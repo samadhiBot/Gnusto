@@ -440,7 +440,7 @@ struct ItemEventHandlerTests {
         let handler = ItemEventHandler { engine, event in
             if case .beforeTurn(let command) = event, command.verb.intents.contains(.examine) {
                 // Set a custom flag when player examines this item
-                let stateChange = await engine.setGlobal(.isVerboseMode, to: true)
+                let stateChange = await engine.setFlag(.isVerboseMode)
                 return ActionResult(
                     "You feel a strange energy emanating from the item...",
                     stateChange

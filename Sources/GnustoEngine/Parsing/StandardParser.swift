@@ -1523,48 +1523,6 @@ public struct StandardParser: Parser {
         )
     }
 
-    /// Helper method to check if an item is accessible to the player.
-    private func checkItemAccessibility(
-        of parent: ParentProxy,
-        at currentLocationID: LocationID
-    ) async throws -> Bool {
-        switch parent {
-        case .item(let item):
-            try await checkContainerAccessibility(item, at: currentLocationID)
-        case .location(let location):
-            location.id == currentLocationID
-        case .nowhere:
-            false
-        case .player:
-            true
-        }
-    }
-
-    /// Helper method to check if a container is accessible and its contents are visible
-    private func checkContainerAccessibility(
-        _ container: ItemProxy,
-        at currentLocationID: LocationID
-    ) async throws -> Bool {
-        // Get dynamic parent of container
-        let containerParent = await container.parent
-
-        // Check if container is accessible
-        let containerAccessible = try await checkItemAccessibility(
-            of: containerParent,
-            at: currentLocationID
-        )
-
-        guard containerAccessible else { return false }
-
-        // True if parent container is a surface
-        if await container.isSurface { return true }
-
-        // True if parent container contents are visible (open, transparent, or surface)
-        if await container.contentsAreVisible { return true }
-
-        return false
-    }
-
     /// Filters a set of candidate ItemIDs based on a list of required modifiers (adjectives).
     func filterCandidates(
         item: ItemProxy,

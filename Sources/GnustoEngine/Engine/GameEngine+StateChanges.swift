@@ -39,14 +39,6 @@ extension GameEngine {
         setCombatState(to: nil)
     }
 
-//    public func requestQuit() -> StateChange {
-//        .requestQuit
-//    }
-//
-//    public func requestRestart() -> StateChange {
-//        .requestRestart
-//    }
-
     /// Creates a `StateChange` to update the global combat state.
     ///
     /// This factory method creates a `StateChange` that sets the current combat state,
@@ -69,16 +61,6 @@ extension GameEngine {
         } else {
             StateChange.setFlag(globalID)
         }
-    }
-
-    /// Sets a global variable to a boolean value.
-    ///
-    /// - Parameters:
-    ///   - globalID: The `GlobalID` of the global variable to set.
-    ///   - value: The boolean value to set.
-    /// - Returns: A `StateChange` representing this modification.
-    public func setGlobal(_ globalID: GlobalID, to value: Bool) -> StateChange {
-        StateChange.setGlobalBool(id: globalID, value: value)
     }
 
     /// Sets a global variable to an integer value.

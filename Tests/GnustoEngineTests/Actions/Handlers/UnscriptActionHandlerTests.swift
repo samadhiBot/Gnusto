@@ -16,7 +16,7 @@ struct UnscriptActionHandlerTests {
 
         // Set up: scripting is active
         try await engine.apply(
-            engine.setGlobal(.isScripting, to: true)
+            engine.setFlag(.isScripting)
         )
 
         // When
@@ -56,7 +56,7 @@ struct UnscriptActionHandlerTests {
 
         // Set up: scripting is active
         try await engine.apply(
-            engine.setGlobal(.isScripting, to: true)
+            engine.setFlag(.isScripting)
         )
 
         // When: UNSCRIPT should work even in darkness
@@ -118,7 +118,7 @@ struct UnscriptActionHandlerTests {
 
         // Set up complex game state including scripting
         try await engine.apply(
-            engine.setGlobal(.isScripting, to: true),
+            engine.setFlag(.isScripting),
             await lamp.proxy(engine).setFlag(.isOn),
             engine.player.updateScore(by: 100)
         )
@@ -149,7 +149,7 @@ struct UnscriptActionHandlerTests {
 
         // Set up: scripting is active
         try await engine.apply(
-            engine.setGlobal(.isScripting, to: true)
+            engine.setFlag(.isScripting)
         )
 
         // Verify initial state
@@ -195,7 +195,7 @@ struct UnscriptActionHandlerTests {
 
         // Set up initial state including scripting
         try await engine.apply(
-            engine.setGlobal(.isScripting, to: true),
+            engine.setFlag(.isScripting),
             engine.player.updateScore(by: 50)
         )
 
@@ -341,7 +341,7 @@ struct UnscriptActionHandlerTests {
 
         // Set up: scripting is active
         try await engine.apply(
-            engine.setGlobal(.isScripting, to: true)
+            engine.setFlag(.isScripting)
         )
 
         // Verify initial state
@@ -416,7 +416,7 @@ struct UnscriptActionHandlerTests {
 
         // Set up: scripting is active
         try await engine.apply(
-            engine.setGlobal(.isScripting, to: true)
+            engine.setFlag(.isScripting)
         )
 
         // When: Perform other actions and then unscript
