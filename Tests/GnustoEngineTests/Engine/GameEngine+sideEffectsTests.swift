@@ -24,9 +24,8 @@ struct GameEngineSideEffectsTests {
                 message: "💥 The fuse exploded!",
                 effects: [
                     .startFuse(
-                        "globalFlag",
-                        turns: 1,
-                        state: ["flag": .string("fuseExploded")]
+                        FuseID("globalFlag"),
+                        turns: 1
                     )
                 ]
             )
@@ -350,12 +349,8 @@ struct GameEngineSideEffectsTests {
     func testInvalidParameterTypes() async throws {
         let (engine, _) = await createTestEngine()
 
-        // Start fuse with invalid parameter type for turns
-        let sideEffect = SideEffect.startFuse(
-            testFuseID,
-            turns: nil,  // Will use default
-            state: ["invalid": .string("not_a_number")]  // Non-turns data
-        )
+        // Start fuse with default turns (no custom payload)
+        let sideEffect = SideEffect.startFuse(testFuseID)
 
         // Should fall back to definition's initialTurns when parameter is wrong type
         try await engine.processSideEffects([sideEffect])

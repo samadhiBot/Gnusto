@@ -204,7 +204,7 @@ struct FuseStatePayloadTests {
         let originalFuseState = try FuseState(turns: 10, payload: originalPayload)
 
         // Encode to JSON
-        let jsonData = try JSONEncoder().encode(originalFuseState)
+        let jsonData = try JSONEncoder.sorted().encode(originalFuseState)
         #expect(!jsonData.isEmpty)
 
         // Decode from JSON
@@ -226,7 +226,7 @@ struct FuseStatePayloadTests {
 
         let originalFuse = try FuseState(turns: 7, payload: enemyPayload)
 
-        let jsonData = try JSONEncoder().encode(originalFuse)
+        let jsonData = try JSONEncoder.sorted().encode(originalFuse)
         let decodedFuse = try JSONDecoder().decode(FuseState.self, from: jsonData)
 
         #expect(decodedFuse == originalFuse)
@@ -239,7 +239,7 @@ struct FuseStatePayloadTests {
     func testFuseStateWithoutPayloadSerialization() throws {
         let originalFuseState = FuseState(turns: 3)
 
-        let jsonData = try JSONEncoder().encode(originalFuseState)
+        let jsonData = try JSONEncoder.sorted().encode(originalFuseState)
         let decodedFuseState = try JSONDecoder().decode(FuseState.self, from: jsonData)
 
         #expect(decodedFuseState.turns == 3)

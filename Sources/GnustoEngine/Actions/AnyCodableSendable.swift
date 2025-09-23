@@ -11,7 +11,7 @@ public struct AnyCodableSendable: Codable, Sendable, Hashable {
     /// Creates an `AnyCodableSendable` wrapper around any `Codable & Sendable` value.
     /// - Parameter value: The value to wrap, which must conform to `Codable & Sendable`.
     public init<T: Codable & Sendable>(_ value: T) throws {
-        self.data = try JSONEncoder().encode(value)
+        self.data = try JSONEncoder.sorted().encode(value)
         self.typeName = String(describing: T.self)
     }
 

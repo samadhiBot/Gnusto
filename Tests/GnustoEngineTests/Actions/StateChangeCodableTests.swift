@@ -186,7 +186,7 @@ struct StateChangeCodableTests {
         let change = StateChange.setGlobalCodable(id: "serializationTest", value: wrapper)
 
         // Encode to JSON
-        let jsonData = try JSONEncoder().encode(change)
+        let jsonData = try JSONEncoder.sorted().encode(change)
         #expect(!jsonData.isEmpty)
 
         // Decode from JSON
@@ -221,7 +221,7 @@ struct StateChangeCodableTests {
         let wrapper = try AnyCodableSendable(complexData)
         let originalChange = StateChange.setGlobalCodable(id: "roundTripTest", value: wrapper)
 
-        let jsonData = try JSONEncoder().encode(originalChange)
+        let jsonData = try JSONEncoder.sorted().encode(originalChange)
         let decodedChange = try JSONDecoder().decode(StateChange.self, from: jsonData)
 
         #expect(decodedChange == originalChange)

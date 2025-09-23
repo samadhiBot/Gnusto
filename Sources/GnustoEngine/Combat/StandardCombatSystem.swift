@@ -53,7 +53,7 @@ public struct StandardCombatSystem: CombatSystem {
     public func processCombatTurn(
         playerAction: PlayerAction,
         in context: ActionContext
-    ) async -> ActionResult {
+    ) async throws -> ActionResult {
         let enemy = await context.item(enemyID)
 
         guard await enemy.isAlive else {
@@ -116,7 +116,7 @@ public struct StandardCombatSystem: CombatSystem {
         )
 
         // Generate narrative and state changes
-        let result = await generateTurnResult(combatTurn, in: context)
+        let result = try await generateTurnResult(combatTurn, in: context)
 
         // Add combat state update to the result only if combat continues
         let combinedChanges: [StateChange]
@@ -1211,9 +1211,9 @@ public struct StandardCombatSystem: CombatSystem {
     func generateTurnResult(
         _ turn: CombatTurn,
         in context: ActionContext
-    ) async -> ActionResult {
-        await turn.allEvents.asyncMap {
-            await generateEventResult(for: $0, in: context)
+    ) async throws -> ActionResult {
+        try await turn.allEvents.asyncMap {
+            try await generateEventResult(for: $0, in: context)
         }
         .merged()
     }
@@ -1236,7 +1236,7 @@ public struct StandardCombatSystem: CombatSystem {
     func generateEventResult(
         for event: CombatEvent,
         in context: ActionContext
-    ) async -> ActionResult {
+    ) async throws -> ActionResult {
         let description =
             if let custom = await description(event, context.combatMsg) {
                 custom
@@ -1276,6 +1276,7 @@ public struct StandardCombatSystem: CombatSystem {
                 effects: [
                     .startEnemyWakeUpFuse(
                         enemyID: enemy.id,
+                        locationID: await context.player.location.id,
                         message: context.combatMsg.enemyWakes(enemy: enemy),
                         turns: context.engine.randomInt(in: 3...6)
                     )
@@ -1310,7 +1311,7 @@ public struct StandardCombatSystem: CombatSystem {
             )
 
         case .playerUnconscious(let enemy, _, let damage):
-            let currentLocation = await context.player.location
+
             return await ActionResult(
                 message: description,
                 changes: [
@@ -1321,7 +1322,7 @@ public struct StandardCombatSystem: CombatSystem {
                 effects: [
                     .startEnemyReturnFuse(
                         enemyID: enemy.id,
-                        to: currentLocation.id,
+                        to: await context.player.location.id,
                         message: context.combatMsg.enemyReturns(enemy: enemy),
                         turns: context.engine.randomInt(in: 2...4)
                     )

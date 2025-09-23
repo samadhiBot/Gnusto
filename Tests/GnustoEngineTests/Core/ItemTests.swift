@@ -143,7 +143,7 @@ struct ItemTests {
         originalItem.properties[.readText] = .string("Readable text.")
         originalItem.properties[.lockKey] = "key1"
 
-        let encoder = JSONEncoder()
+        let encoder = JSONEncoder.sorted()
         encoder.outputFormatting = [.prettyPrinted, .sortedKeys]  // For easier debugging
         let decoder = JSONDecoder()
 

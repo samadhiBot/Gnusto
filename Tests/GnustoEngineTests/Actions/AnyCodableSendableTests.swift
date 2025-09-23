@@ -188,7 +188,7 @@ struct AnyCodableSendableTests {
         let wrapper = try AnyCodableSendable(original)
 
         // Encode to JSON
-        let jsonData = try JSONEncoder().encode(wrapper)
+        let jsonData = try JSONEncoder.sorted().encode(wrapper)
         #expect(!jsonData.isEmpty)
 
         // Decode from JSON
@@ -215,7 +215,7 @@ struct AnyCodableSendableTests {
         )
 
         let wrapper1 = try AnyCodableSendable(original)
-        let jsonData = try JSONEncoder().encode(wrapper1)
+        let jsonData = try JSONEncoder.sorted().encode(wrapper1)
         let wrapper2 = try JSONDecoder().decode(AnyCodableSendable.self, from: jsonData)
         let decoded = try wrapper2.decode(as: TestComplexData.self)
 

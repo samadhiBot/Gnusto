@@ -16,50 +16,54 @@ public struct SideEffect: Sendable, Equatable {
     /// For effects not tied to a specific entity, `.global` might be used.
     public let targetID: EntityID
 
-    /// A dictionary holding any additional data or configuration required to execute
-    /// this side effect. The keys are `String`s and values are `StateValue`s.
-    /// For example, a `.startFuse` effect might include a parameter for the fuse's duration.
-    public let parameters: [String: StateValue]
+    /// Strongly-typed payload data required to execute this side effect.
+    /// The payload type depends on the `SideEffectType` and contains all necessary
+    /// configuration and data for the operation.
+    public let payload: AnyCodableSendable?
 
-    public init(type: SideEffectType, targetID: EntityID, parameters: [String: StateValue]) {
+    /// Creates a new `SideEffect` with a strongly-typed payload.
+    ///
+    /// - Parameters:
+    ///   - type: The category of side effect to create.
+    ///   - targetID: The primary entity involved in this side effect.
+    ///   - payload: Strongly-typed payload data for the operation.
+    public init<T: Codable & Sendable>(
+        type: SideEffectType,
+        targetID: EntityID,
+        payload: T
+    ) throws {
         self.type = type
         self.targetID = targetID
-        self.parameters = parameters
+        self.payload = try AnyCodableSendable(payload)
+    }
+
+    /// Creates a new `SideEffect` without payload data.
+    ///
+    /// - Parameters:
+    ///   - type: The category of side effect to create.
+    ///   - targetID: The primary entity involved in this side effect.
+    public init(
+        type: SideEffectType,
+        targetID: EntityID
+    ) {
+        self.type = type
+        self.targetID = targetID
+        self.payload = nil
+    }
+
+    /// Retrieves the payload as a specific type.
+    ///
+    /// - Parameter type: The expected type of the payload.
+    /// - Returns: The decoded payload, or `nil` if no payload exists or decoding fails.
+    public func getPayload<T: Codable & Sendable>(as type: T.Type) -> T? {
+        return payload?.tryDecode(as: type)
     }
 }
 
 // MARK: - SideEffect Factories
 
 extension SideEffect {
-    /// Creates a new `SideEffect` instance with type `.startFuse`.
-    ///
-    /// This unified fuse system supports both simple timers and complex context-aware events.
-    /// The `turns` parameter controls timing, while `state` provides application-specific data.
-    ///
-    /// - Parameters:
-    ///   - fuseID: The `FuseID` of the fuse to start.
-    ///   - turns: Optional number of turns until the fuse triggers. If not provided,
-    ///            uses the default turns from the Fuse definition.
-    ///   - state: Optional custom state data to associate with this fuse instance.
-    ///            This data will be available to the fuse's action when it triggers.
-    public static func startFuse(
-        _ fuseID: FuseID,
-        turns: Int? = nil,
-        state: [String: StateValue] = [:]
-    ) -> SideEffect {
-        var parameters = state
-        if let turns = turns {
-            parameters["--turns"] = .int(turns)
-        }
-
-        return SideEffect(
-            type: .startFuse,
-            targetID: .fuse(fuseID),
-            parameters: parameters
-        )
-    }
-
-    /// Creates a new `SideEffect` instance with type `.startFuse` using a strongly-typed `FuseState`.
+    /// Creates a new `SideEffect` instance with type `.startFuse` using a `FuseState`.
     ///
     /// This is the modern approach for starting fuses with type-safe payload data.
     /// The `FuseState` contains both the turn count and any custom payload data.
@@ -67,87 +71,90 @@ extension SideEffect {
     /// - Parameters:
     ///   - fuseID: The `FuseID` of the fuse to start.
     ///   - state: The `FuseState` containing turns and payload data.
+    /// - Returns: A configured `SideEffect` for starting the fuse.
     public static func startFuse(
         _ fuseID: FuseID,
         state: FuseState
     ) -> SideEffect {
-        var parameters: [String: StateValue] = [:]
-        parameters["--turns"] = .int(state.turns)
-
-        // Store the FuseState directly as encoded data
-        if let encodedState = try? JSONEncoder().encode(state),
-            let encodedString = String(data: encodedState, encoding: .utf8)
-        {
-            parameters["--fuseState"] = .string(encodedString)
-        }
-
-        return SideEffect(
+        return try! SideEffect(
             type: .startFuse,
             targetID: .fuse(fuseID),
-            parameters: parameters
+            payload: state
         )
     }
 
-    /// Creates a new `SideEffect` instance with type `.startFuse` using a strongly-typed `FuseState` (string overload).
+    /// Creates a new `SideEffect` instance with type `.startFuse` using default turns from the fuse definition.
     ///
-    /// This is the modern approach for starting fuses with type-safe payload data.
-    /// The `FuseState` contains both the turn count and any custom payload data.
+    /// This convenience method creates a `FuseState` with no custom payload data.
+    ///
+    /// - Parameter fuseID: The `FuseID` of the fuse to start.
+    /// - Returns: A configured `SideEffect` for starting the fuse.
+    public static func startFuse(_ fuseID: FuseID) -> SideEffect {
+        // We need to get the default turns from somewhere. Since we can't access the fuse definition
+        // here, we'll create a simple FuseState with a reasonable default and let the engine
+        // override with the actual definition's initialTurns if needed.
+        let fuseState = FuseState(turns: 1)  // Engine will use definition's initialTurns
+        return startFuse(fuseID, state: fuseState)
+    }
+
+    /// Creates a new `SideEffect` instance with type `.startFuse` with custom turns and no payload.
     ///
     /// - Parameters:
-    ///   - fuseID: The string identifier of the fuse to start.
-    ///   - state: The `FuseState` containing turns and payload data.
-    public static func startFuse(
-        _ fuseID: String,
-        state: FuseState
-    ) -> SideEffect {
-        return startFuse(FuseID(fuseID), state: state)
+    ///   - fuseID: The `FuseID` of the fuse to start.
+    ///   - turns: The number of turns until the fuse triggers.
+    /// - Returns: A configured `SideEffect` for starting the fuse.
+    public static func startFuse(_ fuseID: FuseID, turns: Int) -> SideEffect {
+        let fuseState = FuseState(turns: turns)
+        return startFuse(fuseID, state: fuseState)
     }
 
     /// Creates a new `SideEffect` instance with type `.stopFuse`.
     ///
-    /// - Parameters:
-    ///   - fuseID: The `FuseID` of the entity primarily affected or involved.
-    ///   - parameters: An optional dictionary of additional parameters.
-    public static func stopFuse(
-        _ fuseID: FuseID,
-        parameters: [String: StateValue] = [:]
-    ) -> SideEffect {
-        SideEffect(
+    /// - Parameter fuseID: The `FuseID` of the fuse to stop.
+    /// - Returns: A configured `SideEffect` for stopping the fuse.
+    public static func stopFuse(_ fuseID: FuseID) -> SideEffect {
+        return SideEffect(
             type: .stopFuse,
-            targetID: .fuse(fuseID),
-            parameters: parameters
+            targetID: .fuse(fuseID)
         )
     }
 
-    /// Creates a new `SideEffect` instance with type `.runDaemon`.
+    /// Creates a new `SideEffect` instance with type `.runDaemon` using a `DaemonState`.
     ///
     /// - Parameters:
-    ///   - daemonID: The `DaemonID` of the entity primarily affected or involved.
-    ///   - parameters: An optional dictionary of additional parameters.
+    ///   - daemonID: The `DaemonID` of the daemon to run.
+    ///   - state: The `DaemonState` containing execution data and payload.
+    /// - Returns: A configured `SideEffect` for running the daemon.
     public static func runDaemon(
         _ daemonID: DaemonID,
-        parameters: [String: StateValue] = [:]
+        state: DaemonState
     ) -> SideEffect {
-        SideEffect(
+        return try! SideEffect(
             type: .runDaemon,
             targetID: .daemon(daemonID),
-            parameters: parameters
+            payload: state
+        )
+    }
+
+    /// Creates a new `SideEffect` instance with type `.runDaemon` without initial state.
+    ///
+    /// - Parameter daemonID: The `DaemonID` of the daemon to run.
+    /// - Returns: A configured `SideEffect` for running the daemon.
+    public static func runDaemon(_ daemonID: DaemonID) -> SideEffect {
+        return SideEffect(
+            type: .runDaemon,
+            targetID: .daemon(daemonID)
         )
     }
 
     /// Creates a new `SideEffect` instance with type `.stopDaemon`.
     ///
-    /// - Parameters:
-    ///   - daemonID: The `DaemonID` of the entity primarily affected or involved.
-    ///   - parameters: An optional dictionary of additional parameters.
-    public static func stopDaemon(
-        _ daemonID: DaemonID,
-        parameters: [String: StateValue] = [:]
-    ) -> SideEffect {
-        SideEffect(
+    /// - Parameter daemonID: The `DaemonID` of the daemon to stop.
+    /// - Returns: A configured `SideEffect` for stopping the daemon.
+    public static func stopDaemon(_ daemonID: DaemonID) -> SideEffect {
+        return SideEffect(
             type: .stopDaemon,
-            targetID: .daemon(daemonID),
-            parameters: parameters
+            targetID: .daemon(daemonID)
         )
     }
 }
@@ -162,22 +169,23 @@ extension SideEffect {
     ///
     /// - Parameters:
     ///   - enemyID: The ID of the enemy that should wake up.
+    ///   - locationID: The ID of the location where the wake-up occurs.
     ///   - message: The message to display if the player is present when the enemy wakes up.
     ///   - turns: Number of turns until the enemy wakes up. Defaults to 3.
     /// - Returns: A configured SideEffect for the enemy wake-up fuse.
     public static func startEnemyWakeUpFuse(
         enemyID: ItemID,
+        locationID: LocationID,
         message: String,
-        turns: Int
+        turns: Int = 3
     ) -> SideEffect {
-        .startFuse(
-            .enemyWakeUp,
-            turns: turns,
-            state: [
-                "enemyID": .string(enemyID.rawValue),
-                "message": .string(message),
-            ]
+        let payload = FuseState.EnemyLocationPayload(
+            enemyID: enemyID,
+            locationID: locationID,
+            message: message
         )
+        let fuseState = try! FuseState(turns: turns, payload: payload)
+        return startFuse(.enemyWakeUp, state: fuseState)
     }
 
     /// Starts an enemy return fuse with specific enemy and location IDs.
@@ -196,17 +204,15 @@ extension SideEffect {
         enemyID: ItemID,
         to locationID: LocationID,
         message: String,
-        turns: Int
+        turns: Int = 3
     ) -> SideEffect {
-        .startFuse(
-            .enemyReturn,
-            turns: turns,
-            state: [
-                "enemyID": .string(enemyID.rawValue),
-                "locationID": .string(locationID.rawValue),
-                "message": .string(message),
-            ]
+        let payload = FuseState.EnemyLocationPayload(
+            enemyID: enemyID,
+            locationID: locationID,
+            message: message
         )
+        let fuseState = try! FuseState(turns: turns, payload: payload)
+        return startFuse(.enemyReturn, state: fuseState)
     }
 
     /// Starts a status effect expiry fuse with item and effect details.
@@ -224,14 +230,35 @@ extension SideEffect {
         effectName: String,
         turns: Int = 5
     ) -> SideEffect {
-        return .startFuse(
-            .statusEffectExpiry,
-            turns: turns,
-            state: [
-                "itemID": .string(itemID.rawValue),
-                "effectName": .string(effectName),
-            ]
+        let payload = FuseState.StatusEffectPayload(
+            itemID: itemID,
+            effectName: effectName
         )
+        let fuseState = try! FuseState(turns: turns, payload: payload)
+        return startFuse(.statusEffectExpiry, state: fuseState)
+    }
+
+    /// Starts an environmental change fuse with custom parameters.
+    ///
+    /// This convenience method creates a side effect for delayed environmental changes
+    /// such as weather transitions, lighting changes, or atmospheric modifications.
+    ///
+    /// - Parameters:
+    ///   - changeType: A string describing the type of environmental change.
+    ///   - parameters: A dictionary of additional parameters for the change.
+    ///   - turns: Number of turns until the change occurs. Defaults to 2.
+    /// - Returns: A configured SideEffect for the environmental change fuse.
+    public static func startEnvironmentalChangeFuse(
+        changeType: String,
+        parameters: [String: String] = [:],
+        turns: Int = 2
+    ) throws -> SideEffect {
+        let payload = FuseState.EnvironmentalPayload(
+            changeType: changeType,
+            parameters: parameters
+        )
+        let fuseState = try! FuseState(turns: turns, payload: payload)
+        return startFuse(.environmentalChange, state: fuseState)
     }
 }
 
@@ -244,15 +271,21 @@ extension SideEffect {
 public enum SideEffectType: String, Codable, Sendable, Equatable {
     /// Indicates that a timed event (a "fuse") should be started.
     /// The `targetID` in the `SideEffect` should be the `EntityID.fuse(fuseID)` of the fuse.
-    /// `parameters` might include the duration of the fuse (e.g., key "duration" with an `.int` value).
+    /// The payload should contain a `FuseState` with timing and custom data.
     case startFuse
+
     /// Indicates that an active fuse should be stopped before it naturally concludes.
     /// The `targetID` should be the `EntityID.fuse(fuseID)` of the fuse to stop.
+    /// No payload is required.
     case stopFuse
+
     /// Indicates that a background game logic component (a "daemon") should be activated.
     /// The `targetID` should be the `EntityID.daemon(daemonID)` of the daemon to run.
+    /// The payload may contain a `DaemonState` with initial execution data.
     case runDaemon
+
     /// Indicates that an active daemon should be deactivated.
     /// The `targetID` should be the `EntityID.daemon(daemonID)` of the daemon to stop.
+    /// No payload is required.
     case stopDaemon
 }

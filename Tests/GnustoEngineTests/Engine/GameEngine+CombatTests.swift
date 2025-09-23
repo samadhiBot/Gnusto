@@ -672,7 +672,7 @@ struct GameEngineCombatTests {
 
         // 2. Process combat turn that ends combat
         let command = Command(verb: .attack)
-        let combatResult = await engine.getCombatResult(for: command)
+        let combatResult = try await engine.getCombatResult(for: command)
 
         // Process the result to apply state changes
         try await engine.processActionResult(combatResult)
@@ -732,7 +732,7 @@ struct GameEngineCombatTests {
         // Process multiple combat turns
         for _ in 1...3 {
             let command = Command(verb: .attack)
-            _ = await engine.getCombatResult(for: command)
+            _ = try await engine.getCombatResult(for: command)
 
             // Combat state should persist
             #expect(await engine.isInCombat == true)

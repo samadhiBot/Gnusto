@@ -118,7 +118,7 @@ extension GameEngine {
     ///           state changes, and side effects
     /// - Throws: `ActionResponse.internalEngineError` if not currently in combat,
     ///           or other `ActionResponse` errors from combat processing
-    func getCombatResult(for command: Command) async -> ActionResult {
+    func getCombatResult(for command: Command) async throws -> ActionResult {
         guard let combatState else {
             assertionFailure("GameEngine.processCombatTurn invalid state")
             return .yield
@@ -128,7 +128,7 @@ extension GameEngine {
         let combatSystem = combatSystem(versus: combatState.enemyID)
 
         // Process the combat turn through the system
-        return await combatSystem.processCombatTurn(
+        return try await combatSystem.processCombatTurn(
             playerAction: getPlayerAction(for: command, in: combatState),
             in: ActionContext(command, self)
         )

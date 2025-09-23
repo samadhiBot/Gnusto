@@ -106,8 +106,7 @@ struct GnustoIDTests {
             TestID("🎮测试"),
         ]
 
-        let encoder = JSONEncoder()
-        encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
+        let encoder = JSONEncoder.sorted(.prettyPrinted)
         let decoder = JSONDecoder()
 
         for originalID in originalIDs {
@@ -122,7 +121,7 @@ struct GnustoIDTests {
     @Test("GnustoID JSON Representation")
     func testJSONRepresentation() throws {
         let id = TestID("testValue")
-        let encoder = JSONEncoder()
+        let encoder = JSONEncoder.sorted()
         let jsonData = try encoder.encode(id)
         let jsonString = String(data: jsonData, encoding: .utf8)
 
@@ -138,7 +137,7 @@ struct GnustoIDTests {
             TestID("third"),
         ]
 
-        let encoder = JSONEncoder()
+        let encoder = JSONEncoder.sorted()
         let decoder = JSONDecoder()
 
         let jsonData = try encoder.encode(originalIDs)
@@ -155,7 +154,7 @@ struct GnustoIDTests {
             "key2": "value2",
         ]
 
-        let encoder = JSONEncoder()
+        let encoder = JSONEncoder.sorted()
         let decoder = JSONDecoder()
 
         let jsonData = try encoder.encode(originalDict)
@@ -208,7 +207,7 @@ struct GnustoIDTests {
         #expect(id.rawValue == specialChars)
 
         // Test that special characters work with encoding/decoding
-        let encoder = JSONEncoder()
+        let encoder = JSONEncoder.sorted()
         let decoder = JSONDecoder()
         let jsonData = try encoder.encode(id)
         let decodedID = try decoder.decode(TestID.self, from: jsonData)
@@ -226,7 +225,7 @@ struct GnustoIDTests {
         #expect(id == id2)
 
         // Test encoding/decoding
-        let encoder = JSONEncoder()
+        let encoder = JSONEncoder.sorted()
         let decoder = JSONDecoder()
         let jsonData = try encoder.encode(id)
         let decodedID = try decoder.decode(TestID.self, from: jsonData)
@@ -318,7 +317,7 @@ struct GnustoIDTests {
         #expect(id1 < id2)
 
         // Test Codable
-        let encoder = JSONEncoder()
+        let encoder = JSONEncoder.sorted()
         let decoder = JSONDecoder()
         let jsonData = try encoder.encode(id)
         let decodedID = try decoder.decode(TestID.self, from: jsonData)

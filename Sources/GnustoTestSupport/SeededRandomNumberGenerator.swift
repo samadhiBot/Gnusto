@@ -25,4 +25,17 @@ public struct SeededRandomNumberGenerator: RandomNumberGenerator, Sendable {
         state = 6_364_136_223_846_793_005 &* state &+ 1
         return state
     }
+
+    /// Generates a random value in the range [0, upperBound) using deterministic modulo arithmetic.
+    ///
+    /// This method provides a deterministic implementation to ensure consistent behavior
+    /// across different platforms and Swift versions, particularly for the StandardMessenger's
+    /// oneOf() method which relies on this for selecting random responses.
+    ///
+    /// - Parameter upperBound: The exclusive upper bound for the random value.
+    /// - Returns: A pseudo-random UInt32 value in the range [0, upperBound).
+    public mutating func next(upperBound: UInt32) -> UInt32 {
+        let randomValue = next()
+        return UInt32(randomValue % UInt64(upperBound))
+    }
 }

@@ -147,7 +147,7 @@ struct SyntaxTokenTypeTests {
 
     @Test("All SyntaxTokenType cases are Codable")
     func testCodable() throws {
-        let encoder = JSONEncoder()
+        let encoder = JSONEncoder.sorted()
         let decoder = JSONDecoder()
 
         let testCases: [SyntaxTokenType] = [
@@ -171,7 +171,7 @@ struct SyntaxTokenTypeTests {
 
     @Test("Complex SyntaxTokenType cases encode and decode correctly")
     func testComplexCodable() throws {
-        let encoder = JSONEncoder()
+        let encoder = JSONEncoder.sorted()
         let decoder = JSONDecoder()
 
         let complexToken = SyntaxTokenType.specificVerb(.examine)

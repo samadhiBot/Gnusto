@@ -42,36 +42,22 @@ extension GameEngine {
                 )
             }
 
-            let fuseState: FuseState
+            var fuseState: FuseState
 
-            // Check if we have a modern encoded FuseState
-            if let encodedStateString = effect.parameters["--fuseState"]?.toString,
-                let encodedData = encodedStateString.data(using: .utf8),
-                let decodedState = try? JSONDecoder().decode(FuseState.self, from: encodedData)
-            {
-                // Use the decoded FuseState directly
-                fuseState = decodedState
+            // Extract FuseState from the strongly-typed payload
+            if let fuseStateFromPayload = effect.getPayload(as: FuseState.self) {
+                fuseState = fuseStateFromPayload
+                // If the FuseState has a placeholder turns value (1), use the definition's initialTurns
+                if fuseState.turns == 1 {
+                    fuseState.turns = definition.initialTurns
+                }
+            } else if let dictionaryPayload = effect.getPayload(as: [String: StateValue].self) {
+                // Handle legacy dictionary-based payloads
+                let actualTurns = definition.initialTurns
+                fuseState = try FuseState(turns: actualTurns, payload: dictionaryPayload)
             } else {
-                // Fall back to legacy dictionary-based approach
-                let initialTurns = effect.parameters["--turns"]?.toInt ?? definition.initialTurns
-
-                // Extract custom state (everything except "--turns" and "--fuseState" keys)
-                let customState = effect.parameters.filter {
-                    $0.key != "--turns" && $0.key != "--fuseState"
-                }
-
-                // Convert legacy dictionary to strongly-typed payload for backward compatibility
-                if customState.isEmpty {
-                    fuseState = FuseState(turns: initialTurns)
-                } else {
-                    // Try to create payload from dictionary
-                    do {
-                        fuseState = try FuseState(turns: initialTurns, payload: customState)
-                    } catch {
-                        // If encoding fails, create without payload
-                        fuseState = FuseState(turns: initialTurns)
-                    }
-                }
+                // Fallback to default state if no payload provided
+                fuseState = FuseState(turns: definition.initialTurns)
             }
 
             let addChange = StateChange.addActiveFuse(

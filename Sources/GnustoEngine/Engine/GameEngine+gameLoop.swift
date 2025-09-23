@@ -152,7 +152,7 @@ extension GameEngine {
 
             // When in combat mode, get and process the enemy response
             if isInCombat {
-                let combatResult = await getCombatResult(for: command)
+                let combatResult = try await getCombatResult(for: command)
                 try await processActionResult(combatResult)
             }
 
@@ -210,7 +210,7 @@ extension GameEngine {
 
             // Process the complete combat turn (player action + enemy response)
             try await processActionResult(
-                getCombatResult(for: command)
+                try await getCombatResult(for: command)
             )
 
         case .failure(let error):

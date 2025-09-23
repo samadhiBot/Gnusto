@@ -48,7 +48,7 @@ struct PlayerTests {
         originalPlayer.moves = 25
         originalPlayer.currentLocationID = "forestPath"
 
-        let encoder = JSONEncoder()
+        let encoder = JSONEncoder.sorted()
         let decoder = JSONDecoder()
 
         let jsonData = try encoder.encode(originalPlayer)

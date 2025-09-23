@@ -89,7 +89,7 @@ struct GameStateTests {
         let originalState = createBasicGameState()
 
         // Encode and decode
-        let data = try JSONEncoder().encode(originalState)
+        let data = try JSONEncoder.sorted().encode(originalState)
         let decodedState = try JSONDecoder().decode(GameState.self, from: data)
 
         // Verify equality

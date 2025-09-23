@@ -144,7 +144,7 @@ struct StateValueCodableTests {
         let stateValue = try StateValue.wrap(original)
 
         // Encode to JSON
-        let jsonData = try JSONEncoder().encode(stateValue)
+        let jsonData = try JSONEncoder.sorted().encode(stateValue)
         #expect(!jsonData.isEmpty)
 
         // Decode from JSON
@@ -166,7 +166,7 @@ struct StateValueCodableTests {
         )
 
         let stateValue1 = try StateValue.wrap(original)
-        let jsonData = try JSONEncoder().encode(stateValue1)
+        let jsonData = try JSONEncoder.sorted().encode(stateValue1)
         let stateValue2 = try JSONDecoder().decode(StateValue.self, from: jsonData)
         let extracted = stateValue2.toCodable(as: TestComplexData.self)
 

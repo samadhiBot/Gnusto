@@ -141,8 +141,7 @@ struct FuseIDTests {
             "💣定时器",
         ]
 
-        let encoder = JSONEncoder()
-        encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
+        let encoder = JSONEncoder.sorted(.prettyPrinted)
         let decoder = JSONDecoder()
 
         for originalID in originalIDs {
@@ -157,7 +156,7 @@ struct FuseIDTests {
     @Test("FuseID JSON Representation")
     func testJSONRepresentation() throws {
         let id: FuseID = "bombFuse"
-        let encoder = JSONEncoder()
+        let encoder = JSONEncoder.sorted()
         let jsonData = try encoder.encode(id)
         let jsonString = String(data: jsonData, encoding: .utf8)
 

@@ -9,7 +9,7 @@ extension GameEngine {
     /// - Parameter saveName: Optional name for the save file. Defaults to "quicksave".
     /// - Throws: FileManager or encoding errors if the save operation fails.
     public func saveGame(saveName: String = "quicksave") async throws -> URL {
-        let saveData = try JSONEncoder().encode(gameState)
+        let saveData = try JSONEncoder.sorted().encode(gameState)
         let saveURL = try filesystemHandler.saveFileURL(game: abbreviatedTitle, filename: saveName)
         try saveData.write(to: saveURL, options: [.atomic])
         return saveURL

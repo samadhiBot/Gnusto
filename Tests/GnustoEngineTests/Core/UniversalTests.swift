@@ -110,7 +110,7 @@ struct UniversalTests {
 
     @Test("Universal encodes and decodes correctly")
     func testCodable() throws {
-        let encoder = JSONEncoder()
+        let encoder = JSONEncoder.sorted()
         let decoder = JSONDecoder()
 
         for universalObject in Universal.allCases {
@@ -122,7 +122,7 @@ struct UniversalTests {
 
     @Test("Universal encodes to expected JSON string")
     func testEncodesToString() throws {
-        let encoder = JSONEncoder()
+        let encoder = JSONEncoder.sorted()
 
         let groundData = try encoder.encode(Universal.ground)
         let groundString = String(data: groundData, encoding: .utf8)

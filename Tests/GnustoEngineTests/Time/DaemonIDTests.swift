@@ -141,8 +141,7 @@ struct DaemonIDTests {
             "⚙️守护进程",
         ]
 
-        let encoder = JSONEncoder()
-        encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
+        let encoder = JSONEncoder.sorted(.prettyPrinted)
         let decoder = JSONDecoder()
 
         for originalID in originalIDs {
@@ -157,7 +156,7 @@ struct DaemonIDTests {
     @Test("DaemonID JSON Representation")
     func testJSONRepresentation() throws {
         let id: DaemonID = "heartbeat"
-        let encoder = JSONEncoder()
+        let encoder = JSONEncoder.sorted()
         let jsonData = try encoder.encode(id)
         let jsonString = String(data: jsonData, encoding: .utf8)
 

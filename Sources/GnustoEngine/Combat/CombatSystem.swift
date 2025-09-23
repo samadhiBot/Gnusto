@@ -90,7 +90,7 @@ public protocol CombatSystem: Sendable {
     func processCombatTurn(
         playerAction: PlayerAction,
         in context: ActionContext
-    ) async -> ActionResult
+    ) async throws -> ActionResult
 
     /// Calculates the outcome of a combat attack.
     ///

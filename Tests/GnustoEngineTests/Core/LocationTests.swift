@@ -165,8 +165,7 @@ struct LocationTests {
         // Add a short description for thorough testing by setting dynamic value
         originalLocation.properties[.shortDescription] = .string("A comfy room.")
 
-        let encoder = JSONEncoder()
-        encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
+        let encoder = JSONEncoder.sorted(.prettyPrinted)
         let decoder = JSONDecoder()
 
         let jsonData = try encoder.encode(originalLocation)
