@@ -66,21 +66,30 @@ let package = Package(
             name: "CloakOfDarkness",
             dependencies: ["GnustoEngine"],
             path: "Executables/CloakOfDarkness",
-            plugins: ["GnustoAutoWiringPlugin"]
+            plugins: [
+                "GnustoAutoWiringPlugin",
+                .plugin(name: "SwiftLintBuildToolPlugin", package: "SwiftLintPlugins")
+            ]
         ),
         .executableTarget(
             name: "FrobozzMagicDemoKit",
             dependencies: ["GnustoEngine"],
             path: "Executables/FrobozzMagicDemoKit",
             exclude: ["README.md", "Docs/"],
-            plugins: ["GnustoAutoWiringPlugin"]
+            plugins: [
+                "GnustoAutoWiringPlugin",
+                .plugin(name: "SwiftLintBuildToolPlugin", package: "SwiftLintPlugins")
+            ]
         ),
         .executableTarget(
             name: "Zork1",
             dependencies: ["GnustoEngine"],
             path: "Executables/Zork1",
             exclude: ["README.md"],
-            plugins: ["GnustoAutoWiringPlugin"]
+            plugins: [
+                "GnustoAutoWiringPlugin",
+                .plugin(name: "SwiftLintBuildToolPlugin", package: "SwiftLintPlugins")
+            ]
         ),
         .executableTarget(
             name: "GnustoAutoWiringTool",
@@ -89,7 +98,10 @@ let package = Package(
                 .product(name: "SwiftParser", package: "swift-syntax"),
                 .product(name: "SwiftSyntax", package: "swift-syntax"),
             ],
-            path: "Sources/GnustoAutoWiringTool"
+            path: "Sources/GnustoAutoWiringTool",
+            plugins: [
+                .plugin(name: "SwiftLintBuildToolPlugin", package: "SwiftLintPlugins")
+            ]
         ),
         .plugin(
             name: "GnustoAutoWiringPlugin",
@@ -100,6 +112,9 @@ let package = Package(
             name: "GnustoTestSupport",
             dependencies: [
                 "GnustoEngine",
+            ],
+            plugins: [
+                .plugin(name: "SwiftLintBuildToolPlugin", package: "SwiftLintPlugins")
             ]
         ),
         .testTarget(
