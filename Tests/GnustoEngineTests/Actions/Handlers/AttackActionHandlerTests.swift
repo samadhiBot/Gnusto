@@ -250,10 +250,7 @@ struct AttackActionHandlerTests {
             .in(.startRoom)
         )
 
-        let game = MinimalGame(
-            items: spider
-        )
-
+        let game = MinimalGame(items: spider)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // When

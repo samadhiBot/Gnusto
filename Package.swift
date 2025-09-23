@@ -68,7 +68,7 @@ let package = Package(
             path: "Executables/CloakOfDarkness",
             plugins: [
                 "GnustoAutoWiringPlugin",
-                .plugin(name: "SwiftLintBuildToolPlugin", package: "SwiftLintPlugins")
+                .plugin(name: "SwiftLintBuildToolPlugin", package: "SwiftLintPlugins"),
             ]
         ),
         .executableTarget(
@@ -78,7 +78,7 @@ let package = Package(
             exclude: ["README.md", "Docs/"],
             plugins: [
                 "GnustoAutoWiringPlugin",
-                .plugin(name: "SwiftLintBuildToolPlugin", package: "SwiftLintPlugins")
+                .plugin(name: "SwiftLintBuildToolPlugin", package: "SwiftLintPlugins"),
             ]
         ),
         .executableTarget(
@@ -88,7 +88,7 @@ let package = Package(
             exclude: ["README.md"],
             plugins: [
                 "GnustoAutoWiringPlugin",
-                .plugin(name: "SwiftLintBuildToolPlugin", package: "SwiftLintPlugins")
+                .plugin(name: "SwiftLintBuildToolPlugin", package: "SwiftLintPlugins"),
             ]
         ),
         .executableTarget(
@@ -98,7 +98,8 @@ let package = Package(
                 .product(name: "SwiftParser", package: "swift-syntax"),
                 .product(name: "SwiftSyntax", package: "swift-syntax"),
             ],
-            path: "Sources/GnustoAutoWiringTool"
+            path: "Sources/GnustoAutoWiringTool",
+            exclude: ["README.md"]
         ),
         .plugin(
             name: "GnustoAutoWiringPlugin",

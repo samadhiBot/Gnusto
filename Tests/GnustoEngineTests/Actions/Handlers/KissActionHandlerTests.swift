@@ -11,17 +11,7 @@ struct KissActionHandlerTests {
     @Test("KISS DIRECTOBJECT syntax works")
     func testKissDirectObjectSyntax() async throws {
         // Given
-        let princess = Item(
-            id: "princess",
-            .name("beautiful princess"),
-            .description("A beautiful princess."),
-            .characterSheet(.default),
-            .in(.startRoom)
-        )
-
-        let game = MinimalGame(
-            items: princess
-        )
+        let game = MinimalGame(items: Lab.princess)
 
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
@@ -398,33 +388,7 @@ struct KissActionHandlerTests {
     @Test("Kiss different character types")
     func testKissDifferentCharacterTypes() async throws {
         // Given
-        let merchant = Item(
-            id: "merchant",
-            .name("traveling merchant"),
-            .description("A traveling merchant."),
-            .characterSheet(.default),
-            .in(.startRoom)
-        )
-
-        let dragon = Item(
-            id: "dragon",
-            .name("fierce dragon"),
-            .description("A fierce dragon."),
-            .characterSheet(.init(isFighting: true)),
-            .in(.startRoom)
-        )
-
-        let fairy = Item(
-            id: "fairy",
-            .name("woodland fairy"),
-            .description("A woodland fairy."),
-            .characterSheet(.default),
-            .in(.startRoom)
-        )
-
-        let game = MinimalGame(
-            items: merchant, dragon, fairy
-        )
+        let game = MinimalGame(items: Lab.merchant, Lab.dragon, Lab.fairy)
 
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 

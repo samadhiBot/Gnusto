@@ -35,10 +35,7 @@ public struct StandardCombatSystem: CombatSystem {
     ///   - descriptions: Optional closure for custom combat event descriptions
     public init(
         versus enemyID: ItemID,
-        descriptions:
-            @escaping @Sendable (
-                CombatEvent, CombatMessenger
-            ) async -> String? = { _, _ in nil }
+        descriptions: @escaping @Sendable (CombatEvent, CombatMessenger) async -> String? = { _, _ in nil }
     ) {
         self.enemyID = enemyID
         self.description = descriptions
