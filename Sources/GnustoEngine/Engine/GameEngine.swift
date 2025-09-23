@@ -20,7 +20,7 @@ import Logging
 ///   or by using higher-level convenience mutation methods (e.g., in
 ///   `GameEngine+stateMutation.swift`).
 /// - Trigger output to the player (usually by returning an `ActionResult` with a message).
-public actor GameEngine: Sendable {
+public actor GameEngine {
     /// The full title of the game (e.g., "ZORK I: The Great Underground Empire").
     /// This is typically displayed when the game starts.
     nonisolated var title: String { gameBlueprint.title }
@@ -203,7 +203,7 @@ public actor GameEngine: Sendable {
             .enemyWakeUp: .enemyWakeUp,
             .enemyReturn: .enemyReturn,
             .statusEffectExpiry: .statusEffectExpiry,
-        ]) { blueprint, standard in blueprint }
+        ]) { blueprint, _ in blueprint }
 
         // Initialize the compute handlers directly from the blueprint
         self.itemComputers = blueprint.itemComputers

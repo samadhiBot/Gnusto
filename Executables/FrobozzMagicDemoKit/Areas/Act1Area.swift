@@ -263,7 +263,7 @@ struct Act1Area {
 
     /// Prevents leaving your house without food for Berzio.
     let yourCottageHandler = LocationEventHandler(for: .yourCottage) {
-        beforeTurn(.move) { context, command in
+        beforeTurn(.move) { context, _ in
             let basket = await context.item(.basket)
             let lemonade = await context.item(.lemonade)
             return switch await (basket.parent, lemonade.parent) {

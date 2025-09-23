@@ -56,7 +56,7 @@ public struct SideEffect: Sendable, Equatable {
     /// - Parameter type: The expected type of the payload.
     /// - Returns: The decoded payload, or `nil` if no payload exists or decoding fails.
     public func getPayload<T: Codable & Sendable>(as type: T.Type) -> T? {
-        return payload?.tryDecode(as: type)
+        payload?.tryDecode(as: type)
     }
 }
 
@@ -76,7 +76,7 @@ extension SideEffect {
         _ fuseID: FuseID,
         state: FuseState
     ) -> SideEffect {
-        return try! SideEffect(
+        try! SideEffect(
             type: .startFuse,
             targetID: .fuse(fuseID),
             payload: state
@@ -113,7 +113,7 @@ extension SideEffect {
     /// - Parameter fuseID: The `FuseID` of the fuse to stop.
     /// - Returns: A configured `SideEffect` for stopping the fuse.
     public static func stopFuse(_ fuseID: FuseID) -> SideEffect {
-        return SideEffect(
+        SideEffect(
             type: .stopFuse,
             targetID: .fuse(fuseID)
         )
@@ -129,7 +129,7 @@ extension SideEffect {
         _ daemonID: DaemonID,
         state: DaemonState
     ) -> SideEffect {
-        return try! SideEffect(
+        try! SideEffect(
             type: .runDaemon,
             targetID: .daemon(daemonID),
             payload: state
@@ -141,7 +141,7 @@ extension SideEffect {
     /// - Parameter daemonID: The `DaemonID` of the daemon to run.
     /// - Returns: A configured `SideEffect` for running the daemon.
     public static func runDaemon(_ daemonID: DaemonID) -> SideEffect {
-        return SideEffect(
+        SideEffect(
             type: .runDaemon,
             targetID: .daemon(daemonID)
         )
@@ -152,7 +152,7 @@ extension SideEffect {
     /// - Parameter daemonID: The `DaemonID` of the daemon to stop.
     /// - Returns: A configured `SideEffect` for stopping the daemon.
     public static func stopDaemon(_ daemonID: DaemonID) -> SideEffect {
-        return SideEffect(
+        SideEffect(
             type: .stopDaemon,
             targetID: .daemon(daemonID)
         )

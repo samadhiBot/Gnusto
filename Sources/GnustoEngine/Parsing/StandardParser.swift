@@ -213,8 +213,8 @@ public struct StandardParser: Parser {
         }
 
         // 7. Match Tokens Against All Potential Syntax Rules
-        var successfulParse: Command? = nil
-        var bestError: ParseError? = nil
+        var successfulParse: Command?
+        var bestError: ParseError?
 
         // Pre-calculate any preposition in the input once, since it's the same for all rules
         let inputPreposition = findInputPreposition(
@@ -501,8 +501,8 @@ public struct StandardParser: Parser {
         var tokenCursor = verbStartIndex + verbTokenCount
         var directObjectPhraseTokens = [String]()
         var indirectObjectPhraseTokens = [String]()
-        var matchedPreposition: Preposition? = nil
-        var matchedDirection: Direction? = nil
+        var matchedPreposition: Preposition?
+        var matchedDirection: Direction?
 
         for patternIndex in 1..<rule.pattern.count {
             let tokenType = rule.pattern[patternIndex]
@@ -965,7 +965,7 @@ public struct StandardParser: Parser {
             // If we can't extract a noun, use the last word in the phrase as the noun
             // This allows unknown nouns to be handled by the resolution phase
             let finalNoun = noun ?? phrase.last
-            guard let finalNoun = finalNoun else { return nil }
+            guard let finalNoun else { return nil }
 
             // If we used the fallback noun (phrase.last), don't include it as a modifier too
             let finalMods = noun != nil ? mods : mods.filter { $0 != finalNoun }

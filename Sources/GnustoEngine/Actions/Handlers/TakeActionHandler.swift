@@ -45,7 +45,7 @@ public struct TakeActionHandler: ActionHandler {
 
             let filteredItems = await accessibleItems.asyncFilter { item in
                 // Must be takable
-                return await item.isTakable
+                await item.isTakable
             }
             items = filteredItems
         } else {

@@ -72,7 +72,7 @@ struct Thief {
         .requiresTryTake,
         .omitDescription,
         .isContainer,
-        .capacity(1000),  // Large capacity for stolen treasures
+        .capacity(1_000),  // Large capacity for stolen treasures
         .in(.item(.thief))
     )
 }
@@ -93,7 +93,7 @@ extension Thief {
             )
         }
 
-        before(.give) { context, command in
+        before(.give) { _, command in
             // Get the item being given from the direct object
             guard case .item(let giftProxy) = command.directObject else {
                 return nil
@@ -109,7 +109,7 @@ extension Thief {
             ActionResult("Once you got him, what would you do with him?")
         }
 
-        before(.tell) { context, _ in
+        before(.tell) { _, _ in
             ActionResult("The thief is a strong, silent type.")
         }
 
@@ -148,7 +148,7 @@ extension Thief {
 
     /// Large bag handler with treasure integration
     static let largeBagHandler = ItemEventHandler(for: .largeBag) {
-        before(.examine) { context, command in
+        before(.examine) { context, _ in
             if await isThiefHoldingLargeBag(context.engine) {
                 return ActionResult(
                     """
@@ -171,7 +171,7 @@ extension Thief {
             }
         }
 
-        before(.take, .open) { context, command in
+        before(.take, .open) { context, _ in
             guard await isThiefHoldingLargeBag(context.engine) else { return nil }
             return ActionResult(
                 """
@@ -187,7 +187,7 @@ extension Thief {
     /// The `thiefDaemon` controls the thief's movement and tendency to steal.
     ///
     /// Based on Zork's `THIEF-VS-ADVENTURER` routine.
-    static let thiefDaemon = Daemon(frequency: 1) { engine, state in
+    static let thiefDaemon = Daemon(frequency: 1) { engine, _ in
         let playerLocation = await engine.player.location
         let thief = await engine.item(.thief)
         let thiefLargeBag = await engine.item(.largeBag)

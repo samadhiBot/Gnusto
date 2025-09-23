@@ -77,7 +77,7 @@ public struct DaemonState: Codable, Sendable, Equatable, Hashable {
     /// - Returns: The decoded payload of the specified type, or `nil` if no payload
     ///           exists or the type doesn't match.
     public func getPayload<T: Codable & Sendable>(as type: T.Type) -> T? {
-        return payload?.tryDecode(as: type)
+        payload?.tryDecode(as: type)
     }
 
     /// Checks if the payload contains data of the specified type.
@@ -85,7 +85,7 @@ public struct DaemonState: Codable, Sendable, Equatable, Hashable {
     /// - Parameter type: The type to check for.
     /// - Returns: `true` if the payload exists and can be decoded as the specified type.
     public func hasPayload<T: Codable & Sendable>(ofType type: T.Type) -> Bool {
-        return getPayload(as: type) != nil
+        getPayload(as: type) != nil
     }
 
     // MARK: - State Management Helpers
@@ -95,7 +95,7 @@ public struct DaemonState: Codable, Sendable, Equatable, Hashable {
     /// - Parameter currentTurn: The current game turn number.
     /// - Returns: A new DaemonState with incremented execution count and updated last execution turn.
     public func incrementingExecution(currentTurn: Int) -> DaemonState {
-        return DaemonState(
+        DaemonState(
             payload: self.payload,
             executionCount: self.executionCount + 1,
             lastExecutionTurn: currentTurn
@@ -108,7 +108,7 @@ public struct DaemonState: Codable, Sendable, Equatable, Hashable {
     /// - Returns: A new DaemonState with the updated payload.
     /// - Throws: An error if the payload cannot be encoded.
     public func updatingPayload<T: Codable & Sendable>(_ newPayload: T?) throws -> DaemonState {
-        return try DaemonState(
+        try DaemonState(
             payload: newPayload,
             executionCount: self.executionCount,
             lastExecutionTurn: self.lastExecutionTurn

@@ -1277,7 +1277,7 @@ public struct StandardCombatSystem: CombatSystem {
                         locationID: await context.player.location.id,
                         message: context.combatMsg.enemyWakes(enemy: enemy),
                         turns: context.engine.randomInt(in: 3...6)
-                    )
+                    ),
                 ]
             )
 
@@ -1323,7 +1323,7 @@ public struct StandardCombatSystem: CombatSystem {
                         to: await context.player.location.id,
                         message: context.combatMsg.enemyReturns(enemy: enemy),
                         turns: context.engine.randomInt(in: 2...4)
-                    )
+                    ),
                 ]
             )
 

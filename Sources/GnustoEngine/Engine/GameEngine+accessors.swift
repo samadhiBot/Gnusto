@@ -24,7 +24,7 @@ extension GameEngine {
     public func hasFlag(_ globalID: GlobalID) -> Bool {
         global(globalID)?.toBool == true
     }
-    
+
     /// Whether the player is dead.
     public var isPlayerDead: Bool {
         get async {

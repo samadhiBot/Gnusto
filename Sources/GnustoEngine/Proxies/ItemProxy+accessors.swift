@@ -162,7 +162,7 @@ extension ItemProxy {
     /// Corresponds to the ZIL `CAPACITY` property. Defaults to 1000 if not specified.
     public var capacity: Int {
         get async {
-            await property(.capacity)?.toInt ?? 1000
+            await property(.capacity)?.toInt ?? 1_000
         }
     }
 

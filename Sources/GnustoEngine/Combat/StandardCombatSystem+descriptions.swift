@@ -16,7 +16,7 @@ extension StandardCombatSystem {
         of event: CombatEvent,
         via messenger: CombatMessenger
     ) async -> String {
-        return switch event {
+        switch event {
         case let .enemyAttacks(enemy, playerWeapon, enemyWeapon):
             await messenger.enemyAttacks(
                 enemy: enemy,

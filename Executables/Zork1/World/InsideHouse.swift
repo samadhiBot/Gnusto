@@ -256,7 +256,7 @@ extension InsideHouse {
         .omitDescription,
         .requiresTryTake,
         .isSearchable,
-        .capacity(10000),
+        .capacity(10_000),
         .in(.livingRoom)
         // Note: Has action handler TROPHY-CASE-FCN
     )
@@ -324,7 +324,7 @@ extension InsideHouse {
     /// - TURN OFF: Extinguishes lamp (unless burned out)
     /// - EXAMINE: Shows lamp state (burned out, on, or off)
     static let lampHandler = ItemEventHandler(for: .lamp) {
-        before(.throw) { context, command in
+        before(.throw) { context, _ in
             let playerLocation = await context.player.location
             let brokenLamp = await context.item(.brokenLamp)
 
@@ -336,17 +336,17 @@ extension InsideHouse {
             )
         }
 
-        before(.lightSource) { context, command in
+        before(.lightSource) { context, _ in
             let isBurnedOut = await context.item.hasFlag(.isBurnedOut)
             return isBurnedOut ? ActionResult("A burned-out lamp won't light.") : nil
         }
 
-        before(.extinguish) { context, command in
+        before(.extinguish) { context, _ in
             let isBurnedOut = await context.item.hasFlag(.isBurnedOut)
             return isBurnedOut ? ActionResult("The lamp has already burned out.") : nil
         }
 
-        before(.examine) { context, command in
+        before(.examine) { context, _ in
             let isBurnedOut = await context.item.hasFlag(.isBurnedOut)
             let isOn = await context.item.hasFlag(.isOn)
 
@@ -364,7 +364,7 @@ extension InsideHouse {
     }
 
     static let waterHandler = ItemEventHandler(for: .water) {
-        before(.drink) { context, command in
+        before(.drink) { context, _ in
             guard await context.item(.bottle).isOpen else {
                 throw ActionResponse.feedback("You'll have to open the glass bottle first.")
             }
@@ -377,7 +377,7 @@ extension InsideHouse {
     }
 
     static let bottleHandler = ItemEventHandler(for: .bottle) {
-        before(.throw) { context, command in
+        before(.throw) { context, _ in
             let water = await context.item(.water)
             let hasWater = await water.parent == .item(context.item)
 
@@ -398,7 +398,7 @@ extension InsideHouse {
             }
         }
 
-        before(.attack) { context, command in
+        before(.attack) { context, _ in
             let water = await context.item(.water)
             let hasWater = await water.parent == .item(context.item)
 
@@ -419,7 +419,7 @@ extension InsideHouse {
             }
         }
 
-        before(.push) { context, command in
+        before(.push) { context, _ in
             let water = await context.item(.water)
             let hasWater = await water.parent == .item(context.item)
             let isOpen = await context.item.hasFlag(.isOpen)
@@ -446,7 +446,7 @@ extension InsideHouse {
     /// - LOOK UNDER: Temporary trap door revelation
     /// - CLIMB ON: Irregularity detection and magic carpet joke
     static let rugHandler = ItemEventHandler(for: .rug) {
-        before(.take) { context, command in
+        before(.take) { context, _ in
             let wasRugMoved = await context.engine.hasFlag(.rugMoved)
             let baseMessage = "The rug is too heavy to lift"
             return if wasRugMoved {
@@ -461,7 +461,7 @@ extension InsideHouse {
             }
         }
 
-        before(.move, .push) { context, command in
+        before(.move, .push) { context, _ in
             let wasRugMoved = await context.engine.hasFlag(.rugMoved)
             if wasRugMoved {
                 return ActionResult(
@@ -486,11 +486,11 @@ extension InsideHouse {
             }
         }
 
-        before(.take) { context, command in
+        before(.take) { _, _ in
             ActionResult("The rug is extremely heavy and cannot be carried.")
         }
 
-        before(.look) { context, command in
+        before(.look) { context, _ in
             let wasRugMoved = await context.engine.hasFlag(.rugMoved)
             let trapDoor = await context.item(.trapDoor)
             let trapDoorOpen = await trapDoor.hasFlag(.isOpen)
@@ -508,7 +508,7 @@ extension InsideHouse {
             }
         }
 
-        before(.climb) { context, command in
+        before(.climb) { context, _ in
             let wasRugMoved = await context.engine.hasFlag(.rugMoved)
             let trapDoor = await context.item(.trapDoor)
             let trapDoorOpen = await trapDoor.hasFlag(.isOpen)
@@ -534,7 +534,7 @@ extension InsideHouse {
     /// - **Cellar**: Prevents opening from below and has special behavior for closing.
     /// - **Raise**: Treats `RAISE` as an alias for `OPEN`.
     static let trapDoorHandler = ItemEventHandler(for: .trapDoor) {
-        before(.open, .pull) { context, command in
+        before(.open, .pull) { context, _ in
             let location = await context.player.location.id
             let isTrapDoorOpen = await context.item.hasFlag(.isOpen)
 
@@ -553,7 +553,7 @@ extension InsideHouse {
             }
         }
 
-        before(.close) { context, command in
+        before(.close) { context, _ in
             let location = await context.player.location.id
             let isTrapDoorOpen = await context.item.hasFlag(.isOpen)
 
@@ -578,7 +578,7 @@ extension InsideHouse {
     /// - Daemon activation: Checks current location and adjacent locations for monsters
     static let swordHandler = ItemEventHandler(for: .sword) {
         // Show glow message based on current glow level (like SWORD-FCN in ZIL)
-        before(.examine) { context, command in
+        before(.examine) { context, _ in
             switch await context.engine.global(.swordGlowLevel) ?? 0 {
             case 1:
                 ActionResult("Your sword is glowing with a faint blue glow.")
@@ -590,14 +590,14 @@ extension InsideHouse {
         }
 
         // Disable sword glow daemon when dropped
-        after(.drop) { context, command in
+        after(.drop) { _, _ in
             ActionResult(
                 .stopDaemon(.swordDaemon)
             )
         }
 
         // Enable sword glow daemon when taken (like SWORD-FCN in ZIL)
-        after(.take) { context, command in
+        after(.take) { _, _ in
             ActionResult(
                 .runDaemon(.swordDaemon)
             )

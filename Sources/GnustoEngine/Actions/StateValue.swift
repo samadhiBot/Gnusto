@@ -197,7 +197,7 @@ extension StateValue {
     /// - Parameter value: The value to wrap, which must conform to `Codable & Sendable`.
     /// - Throws: An error if the value cannot be JSON encoded.
     public static func wrap<T: Codable & Sendable>(_ value: T) throws -> StateValue {
-        return .codable(try AnyCodableSendable(value))
+        .codable(try AnyCodableSendable(value))
     }
 }
 

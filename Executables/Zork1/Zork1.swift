@@ -69,7 +69,7 @@ extension ItemProperty {
     ///
     /// In the Gnusto Engine translation it is only used to prevent item theft. For movement
     /// restriction the `.validLocations` property is set on the `.thief` item.
-    static let isSacred: ItemProperty = ItemProperty(
+    static let isSacred = ItemProperty(
         id: ItemPropertyID(rawValue: "isSacred"),
         rawValue: true
     )

@@ -3,7 +3,7 @@ import GnustoEngine
 // MARK: - Locations
 
 enum Underground {
-    static let cellar: Location = Location(
+    static let cellar = Location(
         id: .cellar,
         .name("Cellar"),
         .description(

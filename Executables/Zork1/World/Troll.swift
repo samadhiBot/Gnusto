@@ -85,7 +85,7 @@ enum Troll {
     // MARK: - Event Handlers
 
     static let trollHandler = ItemEventHandler(for: .troll) {
-        before(.tell) { context, command in
+        before(.tell) { _, _ in
             ActionResult("The troll isn't much of a conversationalist.")
         }
 
@@ -94,20 +94,20 @@ enum Troll {
         //            return ActionResult(description)
         //        }
 
-        before(.attack) { context, command in
+        before(.attack) { context, _ in
             // Wake the troll first if unconscious
-            return await wakeTroll(engine: context.engine)
+            await wakeTroll(engine: context.engine)
         }
 
         before(.give, .throw) { context, command in
-            return await handleTrollGiveOrThrow(
+            await handleTrollGiveOrThrow(
                 engine: context.engine,
                 command: command
             )
         }
 
-        before(.take, .move) { context, command in
-            return await ActionResult(
+        before(.take, .move) { context, _ in
+            await ActionResult(
                 """
                 The troll spits in your face, grunting "Better luck next time"
                 in a rather barbarous accent.
@@ -129,7 +129,7 @@ enum Troll {
             return nil
         }
 
-        before(.listen) { context, command in
+        before(.listen) { context, _ in
             if await context.item.isAwake {
                 return ActionResult(
                     """
@@ -141,7 +141,7 @@ enum Troll {
             return nil
         }
 
-        before(.ask, .tell) { context, command in
+        before(.ask, .tell) { context, _ in
             if await !context.item.isAwake {
                 return ActionResult("Unfortunately, the troll can't hear you.")
             }
@@ -166,7 +166,7 @@ enum Troll {
     }
 
     /// Handles the troll's periodic behavior (picking up axe, etc.)
-    static let trollDaemon = Daemon(frequency: 2) { engine, state in
+    static let trollDaemon = Daemon(frequency: 2) { engine, _ in
         let troll = await engine.item(.troll)
         let axe = await engine.item(.axe)
 
@@ -267,7 +267,7 @@ extension Troll {
             troll.setCharacterAttributes(
                 consciousness: .unconscious,
                 isFighting: false
-            )
+            ),
         ]
 
         // If troll had axe, drop it and restore weapon properties
@@ -304,7 +304,7 @@ extension Troll {
             troll.setCharacterAttributes(
                 consciousness: .unconscious,
                 isFighting: false
-            )
+            ),
         ]
 
         // Check if axe is available to pick up

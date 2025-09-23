@@ -29,7 +29,7 @@ extension GameEngine {
         guard FileManager.default.fileExists(atPath: saveURL.path) else {
             throw NSError(
                 domain: "GnustoEngine",
-                code: 2001,
+                code: 2_001,
                 userInfo: [NSLocalizedDescriptionKey: "Save file '\(saveName)' not found."]
             )
         }
@@ -72,7 +72,7 @@ extension GameEngine {
         guard FileManager.default.fileExists(atPath: saveURL.path) else {
             throw NSError(
                 domain: "GnustoEngine",
-                code: 2001,
+                code: 2_001,
                 userInfo: [NSLocalizedDescriptionKey: "Save file '\(saveName)' not found."]
             )
         }

@@ -256,7 +256,7 @@ enum Forest {
 
 extension Forest {
     static let forestHandler = ItemEventHandler(for: .forest) {
-        before(.listen) { context, command in
+        before(.listen) { _, _ in
             // For ZIL FOREST-F functionality:
             ActionResult("The pines and the hemlocks seem to be murmuring.")
         }
@@ -269,7 +269,7 @@ extension Forest {
                 """
                 You are in a clearing, with a forest surrounding you on all sides.
                 A path leads south.
-                """
+                """,
             ]
             if await !grate.hasFlag(.isInvisible) {
                 if await grate.isOpen {
@@ -300,7 +300,7 @@ extension Forest {
     }
 
     static let pileOfLeavesHandler = ItemEventHandler(for: .pileOfLeaves) {
-        before(.move) { context, command in
+        before(.move) { context, _ in
             let grate = await context.item(.grate)
 
             // Check if grate is invisible
@@ -328,7 +328,7 @@ extension Forest {
     }
 
     static let grateHandler = ItemEventHandler(for: .grate) {
-        before(.examine) { context, command in
+        before(.examine) { context, _ in
             if await context.item.hasFlag(.isInvisible) {
                 nil
             } else {
@@ -336,7 +336,7 @@ extension Forest {
             }
         }
 
-        before(.close) { context, command in
+        before(.close) { context, _ in
             if await context.item.hasFlag(.isOpen) {
                 ActionResult(
                     "The grating is closed.",
@@ -347,7 +347,7 @@ extension Forest {
             }
         }
 
-        before(.lock) { context, command in
+        before(.lock) { context, _ in
             let currentLocation = await context.player.location
             return if currentLocation.id == .gratingRoom {
                 ActionResult(

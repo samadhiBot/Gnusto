@@ -604,7 +604,7 @@ open class StandardMessenger: @unchecked Sendable {
     }
 
     open func examineYourself(healthRatio: Double = 1) -> String {
-        return switch true {
+        switch true {
         case healthRatio == 0:
             oneOf(
                 """

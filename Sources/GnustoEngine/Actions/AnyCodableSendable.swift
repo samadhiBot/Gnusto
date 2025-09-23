@@ -19,14 +19,14 @@ public struct AnyCodableSendable: Codable, Sendable, Hashable {
     /// - Parameter type: The type to decode as (must be `Codable & Sendable`).
     /// - Returns: The decoded value of the specified type, or `nil` if decoding fails.
     public func decode<T: Codable & Sendable>(as type: T.Type) throws -> T {
-        return try JSONDecoder().decode(type, from: data)
+        try JSONDecoder().decode(type, from: data)
     }
 
     /// Attempts to decode the wrapped value as the specified type, returning nil on failure.
     /// - Parameter type: The type to decode as (must be `Codable & Sendable`).
     /// - Returns: The decoded value of the specified type, or `nil` if decoding fails.
     public func tryDecode<T: Codable & Sendable>(as type: T.Type) -> T? {
-        return try? JSONDecoder().decode(type, from: data)
+        try? JSONDecoder().decode(type, from: data)
     }
 
     // MARK: - Codable

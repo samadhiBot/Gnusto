@@ -319,13 +319,13 @@ class GameDataCollector {
 
     private func isCombatSystemType(_ typeName: String) -> Bool {
         // Check if this is a CombatSystem type - could be direct instantiation or a known combat system type
-        return typeName.hasSuffix("CombatSystem")
+        typeName.hasSuffix("CombatSystem")
             || (typeName.contains("Combat") && typeName.contains("System"))
     }
 
     private func isCombatMessengerType(_ typeName: String) -> Bool {
         // Check if this is a CombatMessenger type - could be direct instantiation or a known combat messenger type
-        return typeName.hasSuffix("CombatMessenger")
+        typeName.hasSuffix("CombatMessenger")
             || (typeName.contains("Combat") && typeName.contains("Messenger"))
             || typeName == "CombatMessenger"
     }

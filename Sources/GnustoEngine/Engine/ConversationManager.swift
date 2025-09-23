@@ -16,7 +16,7 @@ import Foundation
 ///     noMessage: "What did you want to do then?"
 /// )
 /// ```
-public actor ConversationManager: Sendable {
+public actor ConversationManager {
     /// The currently pending question, if any
     private var pendingQuestion: PendingQuestion?
 
@@ -314,7 +314,7 @@ public actor ConversationManager: Sendable {
         // Find the appropriate handler for the command
         let handler = await engine.findActionHandler(for: command)
 
-        guard let handler = handler else {
+        guard let handler else {
             return ActionResult(
                 engine.messenger.verbUnknown(command.verbPhrase)
             )
@@ -349,7 +349,7 @@ extension ConversationManager {
         command: Command,
         context: ActionContext
     ) async -> ActionResult {
-        return await askYesNo(
+        await askYesNo(
             question: question,
             yesCommand: command,
             noMessage: context.msg.conversationNeverMind()
@@ -367,7 +367,7 @@ extension ConversationManager {
         clarifiedCommand: Command,
         context: ActionContext
     ) async -> ActionResult {
-        return await askYesNo(
+        await askYesNo(
             question: question,
             yesCommand: clarifiedCommand,
             noMessage: context.msg.conversationWhatNext(),

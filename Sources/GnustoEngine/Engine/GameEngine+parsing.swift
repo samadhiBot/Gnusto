@@ -191,7 +191,7 @@ extension GameEngine {
     func storeDisambiguationContext(
         originalInput: String?, noun: String, options: [String]
     ) {
-        guard let originalInput = originalInput else { return }
+        guard let originalInput else { return }
 
         // Try to extract the verb from the original input
         let words = originalInput.lowercased().split(separator: " ").map(String.init)

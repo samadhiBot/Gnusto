@@ -120,15 +120,11 @@ extension ExamineActionHandler {
             await messages.append(
                 describeSurface(item: targetItem)
             )
-        }
-
-        else if await targetItem.isContainer {
+        } else if await targetItem.isContainer {
             await messages.append(
                 describeContainer(item: targetItem)
             )
-        }
-
-        else if await targetItem.isDoor {
+        } else if await targetItem.isDoor {
             await messages.append(
                 describeDoor(item: targetItem)
             )

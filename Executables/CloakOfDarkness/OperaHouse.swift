@@ -125,12 +125,12 @@ struct OperaHouse {
 
         // Third: handle meta commands in dark
         beforeTurn(.meta) { _, _ in
-            return ActionResult.yield
+            ActionResult.yield
         }
 
         // Fourth: catch-all for other commands in dark
         beforeTurn { context, _ in
-            return ActionResult(
+            ActionResult(
                 "In the dark? You could easily disturb something!",
                 await context.engine.adjustGlobal(.barMessageDisturbances, by: 1)
             )

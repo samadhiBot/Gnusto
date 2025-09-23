@@ -321,7 +321,7 @@ public struct CombatState: Codable, Equatable, Sendable, Hashable {
         newPlayerWeapon: ItemID? = nil,
         newEnemyWeapon: ItemID? = nil
     ) -> CombatState {
-        return CombatState(
+        CombatState(
             enemyID: enemyID,
             roundCount: roundCount + 1,
             playerWeaponID: newPlayerWeapon ?? playerWeaponID,

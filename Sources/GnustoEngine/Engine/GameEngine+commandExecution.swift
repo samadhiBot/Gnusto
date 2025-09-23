@@ -39,7 +39,7 @@ extension GameEngine {
     /// - Returns: Whether the command should consume a turn.
     func execute(command: Command) async throws -> Bool {
         var actionHandled = false
-        var actionResponse: Error? = nil  // To store error from object handlers
+        var actionResponse: Error?  // To store error from object handlers
         var shouldConsumeTurn = true  // Default to consuming turn unless meta-command is used
 
         // Store the player's current location and lighting state before executing the command
@@ -97,7 +97,7 @@ extension GameEngine {
                         }
                         // If yielding, continue with normal processing
                     }
-                } catch let response {
+                } catch {
                     actionResponse = response
                     actionHandled = true  // Treat error as handled to prevent default handler
                     break  // Stop processing other objects if one throws an error
@@ -127,7 +127,7 @@ extension GameEngine {
                     }
                     // If yielding, continue with normal processing
                 }
-            } catch let response {
+            } catch {
                 actionResponse = response
                 actionHandled = true
             }

@@ -212,13 +212,13 @@ extension OutsideHouse {
 
 extension OutsideHouse {
     static let boardsHandler = ItemEventHandler(for: .boards) {
-        before(.take) { context, command in
+        before(.take) { _, _ in
             ActionResult("The boards are securely fastened.")
         }
     }
 
     static let kitchenWindowHandler = ItemEventHandler(for: .kitchenWindow) {
-        before(.open) { context, command in
+        before(.open) { context, _ in
             if await context.item.hasFlag(.isOpen) {
                 return ActionResult("Too late for that, the window is already open.")
             } else {
@@ -241,7 +241,7 @@ extension OutsideHouse {
     }
 
     static let mailboxHandler = ItemEventHandler(for: .mailbox) {
-        before(.take) { context, command in
+        before(.take) { _, _ in
             ActionResult("It is securely anchored.")
         }
     }
@@ -273,7 +273,7 @@ extension OutsideHouse {
         //            }
         //        }
 
-        before(.examine, .look) { context, command in
+        before(.examine, .look) { context, _ in
             let currentLocation = await context.player.location.id
             return
                 if [.eastOfHouse, .westOfHouse, .northOfHouse, .southOfHouse].contains(
@@ -291,7 +291,7 @@ extension OutsideHouse {
             }
         }
 
-        before(.open) { context, command in
+        before(.open) { context, _ in
             let currentLocation = await context.player.location.id
             let atHouseLocations: Set<LocationID> = [
                 .eastOfHouse, .westOfHouse, .northOfHouse, .southOfHouse,
@@ -317,7 +317,7 @@ extension OutsideHouse {
             }
         }
 
-        before(.burn) { context, command in
+        before(.burn) { context, _ in
             let currentLocation = await context.player.location.id
             let atHouseLocations: Set<LocationID> = [
                 .eastOfHouse, .westOfHouse, .northOfHouse, .southOfHouse,

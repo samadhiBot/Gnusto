@@ -27,7 +27,7 @@ public struct FuseState: Codable, Sendable, Equatable, Hashable {
     ///   - payload: Optional strongly-typed payload data for the fuse.
     /// - Throws: An error if the payload cannot be encoded to JSON.
     public init<T: Codable & Sendable>(turns: Int?, payload: T?) throws {
-        if let turns = turns {
+        if let turns {
             precondition(turns > 0, "Fuse state must have a positive turn count.")
         }
         self.turns = turns
@@ -39,7 +39,7 @@ public struct FuseState: Codable, Sendable, Equatable, Hashable {
     /// - Parameters:
     ///   - turns: The number of turns until the fuse triggers (must be > 0 if provided).
     public init(turns: Int?) {
-        if let turns = turns {
+        if let turns {
             precondition(turns > 0, "Fuse state must have a positive turn count.")
         }
         self.turns = turns
@@ -53,7 +53,7 @@ public struct FuseState: Codable, Sendable, Equatable, Hashable {
     ///   - turns: Number of turns until the fuse triggers (must be > 0 if provided).
     ///   - payload: The payload to use directly.
     internal init(turns: Int?, payload: AnyCodableSendable?) {
-        if let turns = turns {
+        if let turns {
             precondition(turns > 0, "Fuse state must have a positive turn count.")
         }
         self.turns = turns
@@ -68,7 +68,7 @@ public struct FuseState: Codable, Sendable, Equatable, Hashable {
     /// - Returns: The decoded payload of the specified type, or `nil` if no payload
     ///           exists or the type doesn't match.
     public func getPayload<T: Codable & Sendable>(as type: T.Type) -> T? {
-        return payload?.tryDecode(as: type)
+        payload?.tryDecode(as: type)
     }
 
     /// Checks if the payload contains data of the specified type.
@@ -76,7 +76,7 @@ public struct FuseState: Codable, Sendable, Equatable, Hashable {
     /// - Parameter type: The type to check for.
     /// - Returns: `true` if the payload exists and can be decoded as the specified type.
     public func hasPayload<T: Codable & Sendable>(ofType type: T.Type) -> Bool {
-        return getPayload(as: type) != nil
+        getPayload(as: type) != nil
     }
 }
 

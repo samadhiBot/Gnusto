@@ -80,7 +80,7 @@ public struct AskActionHandler: ActionHandler {
         in context: ActionContext
     ) async throws -> ActionResult {
         // Default response - games can override with ItemEventHandlers
-        return await ActionResult(
+        await ActionResult(
             context.msg.characterDoesNotSeemToKnow(
                 character.withDefiniteArticle,
                 topic: topic.withDefiniteArticle

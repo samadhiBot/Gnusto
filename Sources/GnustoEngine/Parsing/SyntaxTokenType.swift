@@ -127,6 +127,6 @@ extension SyntaxTokenType {
     /// - Parameter verbID: The specific verb ID that must be used
     /// - Returns: A syntax token that matches only the specified verb
     public static func verb(_ verbID: Verb) -> SyntaxTokenType {
-        return .specificVerb(verbID)
+        .specificVerb(verbID)
     }
 }

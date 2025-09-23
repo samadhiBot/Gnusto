@@ -57,7 +57,7 @@ extension PlayerProxy {
     ///   - health: The new health value.
     /// - Returns: A `StateChange` to set the health, or `nil` if it wouldn't change.
     public func setHealth(to health: Int) async -> StateChange? {
-        return await setCharacterAttributes(health: health)
+        await setCharacterAttributes(health: health)
     }
 
     /// Creates a `StateChange` to update multiple character sheet properties at once.

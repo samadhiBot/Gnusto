@@ -77,7 +77,7 @@ struct GnustoAutoWiringPlugin: BuildToolPlugin {
                 arguments: arguments,
                 inputFiles: swiftFiles.map(\.url),
                 outputFiles: [outputURL]
-            )
+            ),
         ]
     }
 }
@@ -154,7 +154,7 @@ struct GnustoAutoWiringPlugin: BuildToolPlugin {
                     arguments: arguments,
                     inputFiles: swiftFiles.map(\.url),
                     outputFiles: [outputURL]
-                )
+                ),
             ]
         }
     }
