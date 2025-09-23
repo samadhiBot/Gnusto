@@ -203,7 +203,6 @@ public actor GameEngine: Sendable {
             .enemyWakeUp: .enemyWakeUp,
             .enemyReturn: .enemyReturn,
             .statusEffectExpiry: .statusEffectExpiry,
-            .environmentalChange: .environmentalChange,
         ]) { blueprint, standard in blueprint }
 
         // Initialize the compute handlers directly from the blueprint

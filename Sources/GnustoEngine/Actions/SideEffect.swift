@@ -227,12 +227,12 @@ extension SideEffect {
     /// - Returns: A configured SideEffect for the status effect expiry fuse.
     public static func startStatusEffectExpiryFuse(
         for itemID: ItemID,
-        effectName: String,
+        effect: GeneralCondition,
         turns: Int = 5
     ) -> SideEffect {
         let payload = FuseState.StatusEffectPayload(
             itemID: itemID,
-            effectName: effectName
+            effect: effect
         )
         let fuseState = try! FuseState(turns: turns, payload: payload)
         return startFuse(.statusEffectExpiry, state: fuseState)
@@ -248,18 +248,7 @@ extension SideEffect {
     ///   - parameters: A dictionary of additional parameters for the change.
     ///   - turns: Number of turns until the change occurs. Defaults to 2.
     /// - Returns: A configured SideEffect for the environmental change fuse.
-    public static func startEnvironmentalChangeFuse(
-        changeType: String,
-        parameters: [String: String] = [:],
-        turns: Int = 2
-    ) throws -> SideEffect {
-        let payload = FuseState.EnvironmentalPayload(
-            changeType: changeType,
-            parameters: parameters
-        )
-        let fuseState = try! FuseState(turns: turns, payload: payload)
-        return startFuse(.environmentalChange, state: fuseState)
-    }
+
 }
 
 // MARK: - SideEffectType

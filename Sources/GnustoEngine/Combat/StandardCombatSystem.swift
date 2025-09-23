@@ -954,7 +954,6 @@ public struct StandardCombatSystem: CombatSystem {
 
         var newPlayerWeapon = currentState.playerWeaponID
         var newEnemyWeapon = currentState.enemyWeaponID
-        var additionalModifiers: [String: StateValue] = [:]
 
         // Analyze events for intensity and fatigue modifiers
         for event in turn.allEvents {
@@ -980,21 +979,21 @@ public struct StandardCombatSystem: CombatSystem {
             case .enemyDisarmed:
                 newEnemyWeapon = nil
                 intensityDelta += 0.25  // Increased from 0.20 - Disarmament is dramatic
-                additionalModifiers["enemyDisarmed"] = .bool(true)
+
                 enemyFatigueDelta += 0.05  // Disarming is exhausting
 
             case .playerDisarmed:
                 newPlayerWeapon = nil
                 intensityDelta += 0.25  // Increased from 0.20
-                additionalModifiers["playerDisarmed"] = .bool(true)
+
                 playerFatigueDelta += 0.05  // Disarming is exhausting
 
             case .enemyStaggers:
-                additionalModifiers["enemyStaggered"] = .bool(true)
+
                 enemyFatigueDelta += 0.05  // Increased from 0.03
 
             case .playerStaggers:
-                additionalModifiers["playerStaggered"] = .bool(true)
+
                 playerFatigueDelta += 0.05  // Increased from 0.03
 
             case .enemyMissed, .enemyBlocked:
@@ -1030,8 +1029,7 @@ public struct StandardCombatSystem: CombatSystem {
             playerFatigueDelta: playerFatigueDelta,
             enemyFatigueDelta: enemyFatigueDelta,
             newPlayerWeapon: newPlayerWeapon,
-            newEnemyWeapon: newEnemyWeapon,
-            additionalModifiers: additionalModifiers
+            newEnemyWeapon: newEnemyWeapon
         )
     }
 

@@ -102,25 +102,14 @@ extension FuseState {
     /// Contains the affected character and the specific effect to remove.
     public struct StatusEffectPayload: Codable, Sendable, Equatable, Hashable {
         public let itemID: ItemID
-        public let effectName: String
+        public let effect: GeneralCondition
 
-        public init(itemID: ItemID, effectName: String) {
+        public init(itemID: ItemID, effect: GeneralCondition) {
             self.itemID = itemID
-            self.effectName = effectName
+            self.effect = effect
         }
     }
 
-    /// A structured payload for environmental change fuses.
-    /// Contains information about what environmental change to trigger.
-    public struct EnvironmentalPayload: Codable, Sendable, Equatable, Hashable {
-        public let changeType: String
-        public let parameters: [String: String]
-
-        public init(changeType: String, parameters: [String: String] = [:]) {
-            self.changeType = changeType
-            self.parameters = parameters
-        }
-    }
 }
 
 // MARK: - Convenience Constructors
@@ -154,36 +143,18 @@ extension FuseState {
     /// - Parameters:
     ///   - turns: Number of turns until the fuse triggers (must be > 0 if provided).
     ///   - itemID: The ID of the affected character/item.
-    ///   - effectName: The name of the effect to remove.
+    ///   - effect: The status effect to remove.
     /// - Throws: An error if the payload cannot be encoded.
     public static func statusEffect(
         turns: Int?,
         itemID: ItemID,
-        effectName: String
+        effect: GeneralCondition
     ) throws -> FuseState {
         let payload = StatusEffectPayload(
             itemID: itemID,
-            effectName: effectName
+            effect: effect
         )
         return try FuseState(turns: turns, payload: payload)
     }
 
-    /// Creates a fuse state with environmental change payload data.
-    ///
-    /// - Parameters:
-    ///   - turns: Number of turns until the fuse triggers (must be > 0 if provided).
-    ///   - changeType: The type of environmental change.
-    ///   - parameters: Additional parameters for the change.
-    /// - Throws: An error if the payload cannot be encoded.
-    public static func environmental(
-        turns: Int?,
-        changeType: String,
-        parameters: [String: String] = [:]
-    ) throws -> FuseState {
-        let payload = EnvironmentalPayload(
-            changeType: changeType,
-            parameters: parameters
-        )
-        return try FuseState(turns: turns, payload: payload)
-    }
 }

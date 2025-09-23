@@ -165,7 +165,7 @@ extension Fuse {
             }
 
             let itemID = payload.itemID
-            let effectName = payload.effectName
+            let effect = payload.effect
 
             let character = await engine.item(itemID)
 
@@ -173,9 +173,9 @@ extension Fuse {
             let message: String?
             let stateChange: StateChange?
 
-            switch effectName.lowercased() {
+            switch effect {
             // General conditions
-            case "poisoned":
+            case .poisoned:
                 guard
                     await character.characterSheet.generalCondition == GeneralCondition.poisoned
                 else { return nil }
@@ -188,7 +188,7 @@ extension Fuse {
                 stateChange = await character.setCharacterAttributes(
                     generalCondition: GeneralCondition.normal)
 
-            case "cursed":
+            case .cursed:
                 guard await character.characterSheet.generalCondition == GeneralCondition.cursed
                 else { return nil }
                 message = await determineStatusExpiryMessage(
@@ -200,7 +200,7 @@ extension Fuse {
                 stateChange = await character.setCharacterAttributes(
                     generalCondition: GeneralCondition.normal)
 
-            case "blessed":
+            case .blessed:
                 guard
                     await character.characterSheet.generalCondition == GeneralCondition.blessed
                 else { return nil }
@@ -213,7 +213,7 @@ extension Fuse {
                 stateChange = await character.setCharacterAttributes(
                     generalCondition: GeneralCondition.normal)
 
-            case "charmed":
+            case .charmed:
                 guard
                     await character.characterSheet.generalCondition == GeneralCondition.charmed
                 else { return nil }
@@ -226,7 +226,7 @@ extension Fuse {
                 stateChange = await character.setCharacterAttributes(
                     generalCondition: GeneralCondition.normal)
 
-            case "terrified":
+            case .terrified:
                 guard
                     await character.characterSheet.generalCondition
                         == GeneralCondition.terrified
@@ -240,7 +240,7 @@ extension Fuse {
                 stateChange = await character.setCharacterAttributes(
                     generalCondition: GeneralCondition.normal)
 
-            case "drunk":
+            case .drunk:
                 guard await character.characterSheet.generalCondition == GeneralCondition.drunk
                 else { return nil }
                 message = await determineStatusExpiryMessage(
@@ -252,7 +252,7 @@ extension Fuse {
                 stateChange = await character.setCharacterAttributes(
                     generalCondition: GeneralCondition.normal)
 
-            case "diseased":
+            case .diseased:
                 guard
                     await character.characterSheet.generalCondition == GeneralCondition.diseased
                 else { return nil }
@@ -265,62 +265,12 @@ extension Fuse {
                 stateChange = await character.setCharacterAttributes(
                     generalCondition: GeneralCondition.normal)
 
-            // Combat conditions
-            case "offbalance", "off-balance":
-                guard
-                    await character.characterSheet.combatCondition == CombatCondition.offBalance
-                else { return nil }
-                message = await determineStatusExpiryMessage(
-                    for: character,
-                    engine: engine,
-                    recoveryMessage:
-                        "\(await character.withDefiniteArticle.capitalized) regains balance."
-                )
-                stateChange = await character.setCharacterAttributes(
-                    combatCondition: CombatCondition.normal)
-
-            case "uncertain":
-                guard
-                    await character.characterSheet.combatCondition == CombatCondition.uncertain
-                else { return nil }
-                message = await determineStatusExpiryMessage(
-                    for: character,
-                    engine: engine,
-                    recoveryMessage:
-                        "\(await character.withDefiniteArticle.capitalized) appears more confident."
-                )
-                stateChange = await character.setCharacterAttributes(
-                    combatCondition: CombatCondition.normal)
-
-            case "vulnerable":
-                guard
-                    await character.characterSheet.combatCondition == CombatCondition.vulnerable
-                else { return nil }
-                message = await determineStatusExpiryMessage(
-                    for: character,
-                    engine: engine,
-                    recoveryMessage:
-                        "\(await character.withDefiniteArticle.capitalized) recovers a defensive posture."
-                )
-                stateChange = await character.setCharacterAttributes(
-                    combatCondition: CombatCondition.normal)
-
-            case "disarmed":
-                guard await character.characterSheet.combatCondition == CombatCondition.disarmed
-                else { return nil }
-                message = await determineStatusExpiryMessage(
-                    for: character,
-                    engine: engine,
-                    recoveryMessage:
-                        "\(await character.withDefiniteArticle.capitalized) adapts to fighting without a weapon."
-                )
-                stateChange = await character.setCharacterAttributes(
-                    combatCondition: CombatCondition.normal)
-
-            default:
+            case .normal:
+                // Normal condition doesn't need to expire
                 engine.logger.warning(
-                    "Unknown effect name '\(effectName)' in statusEffectExpiry fuse")
+                    "Attempted to expire normal condition - this shouldn't happen")
                 return nil
+
             }
 
             return ActionResult(
@@ -336,22 +286,6 @@ extension Fuse {
     /// such as weather changes, lighting changes, or other atmospheric modifications.
     /// The specific environmental change and any associated data should be provided
     /// in the fuse state when activated.
-    ///
-    /// This is primarily a demonstration fuse that logs the environmental change.
-    /// Game developers should override or extend this for specific environmental effects.
-    static let environmentalChange = Fuse(
-        initialTurns: 2,
-        action: { engine, state in
-            if let payload = state.getPayload(as: FuseState.EnvironmentalPayload.self) {
-                engine.logger.info(
-                    "Environmental change triggered: \(payload.changeType) with parameters: \(payload.parameters)"
-                )
-            } else {
-                engine.logger.info("Environmental change triggered with no specific payload")
-            }
-            return nil
-        }
-    )
 
     /// Helper function to determine if a status expiry message should be shown to the player.
     ///

@@ -98,36 +98,20 @@ struct FuseStatePayloadTests {
     @Test("StatusEffectPayload creation and access")
     func testStatusEffectPayload() throws {
         let itemID = ItemID("player")
-        let effectName = "poisoned"
 
         let payload = FuseState.StatusEffectPayload(
             itemID: itemID,
-            effectName: effectName
+            effect: .poisoned
         )
 
         let fuseState = try FuseState(turns: 5, payload: payload)
 
         let retrievedPayload = fuseState.getPayload(as: FuseState.StatusEffectPayload.self)
         #expect(retrievedPayload?.itemID == itemID)
-        #expect(retrievedPayload?.effectName == effectName)
+        #expect(retrievedPayload?.effect == .poisoned)
     }
 
-    @Test("EnvironmentalPayload creation and access")
-    func testEnvironmentalPayload() throws {
-        let changeType = "weather"
-        let parameters = ["condition": "storm", "intensity": "severe"]
-
-        let payload = FuseState.EnvironmentalPayload(
-            changeType: changeType,
-            parameters: parameters
-        )
-
-        let fuseState = try FuseState(turns: 2, payload: payload)
-
-        let retrievedPayload = fuseState.getPayload(as: FuseState.EnvironmentalPayload.self)
-        #expect(retrievedPayload?.changeType == changeType)
-        #expect(retrievedPayload?.parameters == parameters)
-    }
+    // EnvironmentalPayload was removed - it was unused stringly-typed code
 
     // MARK: - Convenience Constructor Tests
 
@@ -153,42 +137,19 @@ struct FuseStatePayloadTests {
         let fuseState = try FuseState.statusEffect(
             turns: 6,
             itemID: "wizard",
-            effectName: "cursed"
+            effect: .cursed
         )
 
         #expect(fuseState.turns == 6)
 
         let payload = fuseState.getPayload(as: FuseState.StatusEffectPayload.self)
         #expect(payload?.itemID == ItemID("wizard"))
-        #expect(payload?.effectName == "cursed")
+        #expect(payload?.effect == .cursed)
     }
 
-    @Test("FuseState.environmental convenience constructor")
-    func testEnvironmentalConvenienceConstructor() throws {
-        let fuseState = try FuseState.environmental(
-            turns: 1,
-            changeType: "lighting",
-            parameters: ["brightness": "dim", "color": "red"]
-        )
+    // Environmental convenience constructor was removed - it was unused stringly-typed code
 
-        #expect(fuseState.turns == 1)
-
-        let payload = fuseState.getPayload(as: FuseState.EnvironmentalPayload.self)
-        #expect(payload?.changeType == "lighting")
-        #expect(payload?.parameters == ["brightness": "dim", "color": "red"])
-    }
-
-    @Test("Environmental constructor with empty parameters")
-    func testEnvironmentalConstructorEmptyParameters() throws {
-        let fuseState = try FuseState.environmental(
-            turns: 2,
-            changeType: "simple"
-        )
-
-        let payload = fuseState.getPayload(as: FuseState.EnvironmentalPayload.self)
-        #expect(payload?.changeType == "simple")
-        #expect(payload?.parameters.isEmpty == true)
-    }
+    // Environmental constructor with empty parameters was removed - it was unused stringly-typed code
 
     // MARK: - Codable Conformance Tests
 
@@ -251,7 +212,7 @@ struct FuseStatePayloadTests {
 
     @Test("FuseState equality with same payloads")
     func testFuseStateEqualityWithSamePayloads() throws {
-        let payload = FuseState.StatusEffectPayload(itemID: "player", effectName: "blessed")
+        let payload = FuseState.StatusEffectPayload(itemID: "player", effect: .blessed)
 
         let fuse1 = try FuseState(turns: 3, payload: payload)
         let fuse2 = try FuseState(turns: 3, payload: payload)
@@ -262,8 +223,8 @@ struct FuseStatePayloadTests {
 
     @Test("FuseState inequality with different payloads")
     func testFuseStateInequalityWithDifferentPayloads() throws {
-        let payload1 = FuseState.StatusEffectPayload(itemID: "player", effectName: "blessed")
-        let payload2 = FuseState.StatusEffectPayload(itemID: "player", effectName: "cursed")
+        let payload1 = FuseState.StatusEffectPayload(itemID: "player", effect: .blessed)
+        let payload2 = FuseState.StatusEffectPayload(itemID: "player", effect: .cursed)
 
         let fuse1 = try FuseState(turns: 3, payload: payload1)
         let fuse2 = try FuseState(turns: 3, payload: payload2)
