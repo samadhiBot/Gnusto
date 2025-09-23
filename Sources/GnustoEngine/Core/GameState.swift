@@ -326,8 +326,8 @@ extension GameState {
 
 enum GameStateError: Error {
     case globalTypeMismatch(GlobalID, actual: StateValue)
-    case itemPropertyTypeMismatch(ItemID, ItemPropertyID, actual: StateValue)
     case itemNotFound(ItemID)
-    case locationPropertyTypeMismatch(LocationID, LocationPropertyID, actual: StateValue)
+    case itemPropertyTypeMismatch(ItemID, ItemPropertyID, actual: StateValue)
     case locationNotFound(LocationID)
+    case locationPropertyTypeMismatch(LocationID, LocationPropertyID, actual: StateValue)
 }

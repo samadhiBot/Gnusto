@@ -1,0 +1,75 @@
+disabled_rules:
+  - inclusive_language # Please raise any issues in code reviews
+  - opening_brace # Conflicts with multiline if's
+  - todo # Allow `TODO` and `FIXME` comments
+
+analyzer_rules:
+  - capture_variable
+  - unused_import
+
+opt_in_rules:
+  - attributes
+  - closure_end_indentation
+  - closure_spacing
+  - collection_alignment
+  - contains_over_filter_count
+  - contains_over_filter_is_empty
+  - empty_count
+  - empty_string
+  - explicit_init
+  - fatal_error_message
+  - file_header
+  - file_name_no_space
+  - implicit_return
+  - literal_expression_end_indentation
+  - lower_acl_than_parent
+  - missing_docs
+  - multiline_literal_brackets
+  - multiline_parameters
+  - multiline_parameters_brackets
+  - number_separator
+  - operator_usage_whitespace
+  - optional_enum_case_matching
+  - redundant_type_annotation
+  - return_value_from_void_function
+  - shorthand_optional_binding
+  - sorted_enum_cases
+  - sorted_imports
+  - trailing_closure
+  - unneeded_parentheses_in_closure_argument
+  - untyped_error_in_catch
+  - vertical_parameter_alignment_on_call
+
+file_length:
+  warning: 600
+  error: 1000
+
+function_body_length:
+  warning: 100
+  error: 200
+
+identifier_name:
+  allowed_symbols:
+    - _
+  excluded:
+    - i
+    - x
+    - y
+    - z
+  max_length:
+    warning: 50
+  min_length:
+    warning: 2
+
+line_length: 120
+
+trailing_comma:
+  mandatory_comma: true
+
+type_body_length:
+  warning: 400
+  error: 600
+
+type_name:
+  excluded:
+    - ID

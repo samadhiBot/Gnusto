@@ -43,6 +43,7 @@ let package = Package(
         .package(url: "https://github.com/apple/swift-log", from: "1.6.4"),
         .package(url: "https://github.com/pointfreeco/swift-custom-dump", from: "1.3.3"),
         .package(url: "https://github.com/pointfreeco/xctest-dynamic-overlay", from: "1.6.1"),
+        .package(url: "https://github.com/simplydanny/swiftlintplugins", from: "0.61.0"),
         .package(url: "https://github.com/swiftlang/swift-markdown", branch: "main"),
         .package(url: "https://github.com/swiftlang/swift-syntax", "600.0.0"..."602.0.0"),
     ],
@@ -56,6 +57,9 @@ let package = Package(
             ],
             swiftSettings: [
                 .define("DEBUG", .when(configuration: .debug))
+            ],
+            plugins: [
+                .plugin(name: "SwiftLintBuildToolPlugin", package: "SwiftLintPlugins")
             ]
         ),
         .executableTarget(
