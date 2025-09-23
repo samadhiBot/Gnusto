@@ -51,10 +51,6 @@ extension GameEngine {
                 if fuseState.turns == nil {
                     fuseState.turns = definition.initialTurns
                 }
-            } else if let dictionaryPayload = effect.getPayload(as: [String: StateValue].self) {
-                // Handle legacy dictionary-based payloads
-                let actualTurns = definition.initialTurns
-                fuseState = try FuseState(turns: actualTurns, payload: dictionaryPayload)
             } else {
                 // Fallback to default state if no payload provided
                 fuseState = FuseState(turns: definition.initialTurns)
