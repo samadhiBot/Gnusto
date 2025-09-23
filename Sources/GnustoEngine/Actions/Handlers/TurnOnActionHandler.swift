@@ -51,5 +51,4 @@ public struct TurnOnActionHandler: ActionHandler {
             targetItem.setFlag(.isOn)
         )
     }
-
 }

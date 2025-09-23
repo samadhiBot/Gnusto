@@ -114,5 +114,4 @@ extension GameEngine {
             StateChange.clearGlobalState(id: globalID)
         }
     }
-
 }

@@ -109,7 +109,6 @@ extension FuseState {
             self.effect = effect
         }
     }
-
 }
 
 // MARK: - Convenience Constructors
@@ -156,5 +155,4 @@ extension FuseState {
         )
         return try FuseState(turns: turns, payload: payload)
     }
-
 }

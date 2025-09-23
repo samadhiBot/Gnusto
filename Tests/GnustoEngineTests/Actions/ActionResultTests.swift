@@ -338,5 +338,4 @@ struct ActionResultTests {
 
         #expect(change1 != change2)
     }
-
 }
