@@ -1,5 +1,7 @@
 import Foundation
 
+// swiftlint:disable file_length
+
 /// A unique identifier for a verb within the game's vocabulary.
 ///
 /// Verbs represent player actions in the interactive fiction engine. Each verb has a unique
@@ -692,7 +694,7 @@ extension Verb {
     )
 
     /// Abbreviation for "look" - look around or examine something visually.
-    public static let l = Verb(
+    public static let l = Verb(  // swiftlint:disable:this identifier_name
         id: "l",
         intents: .look, .examine
     )
@@ -1325,3 +1327,5 @@ extension Verb: CustomStringConvertible {
         rawValue
     }
 }
+
+// swiftlint:enable file_length

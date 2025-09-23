@@ -123,26 +123,7 @@ extension ProxyReference {
     }
 }
 
-// MARK: - Equatable conformance
-
-extension ProxyReference {
-    public static func == (lhs: ProxyReference, rhs: ProxyReference) -> Bool {
-        switch (lhs, rhs) {
-        case (.item(let lhsProxy), .item(let rhsProxy)):
-            lhsProxy.id == rhsProxy.id
-        case (.location(let lhsProxy), .location(let rhsProxy)):
-            lhsProxy.id == rhsProxy.id
-        case (.player, .player):
-            true
-        case (.universal(let lhsUniversal), .universal(let rhsUniversal)):
-            lhsUniversal == rhsUniversal
-        default:
-            false
-        }
-    }
-}
-
-// MARK: - Comparable
+// MARK: - Conformances
 
 extension ProxyReference: Comparable {
     public static func < (lhs: ProxyReference, rhs: ProxyReference) -> Bool {
@@ -159,8 +140,6 @@ extension ProxyReference: Comparable {
     }
 }
 
-// MARK: - CustomStringConvertible
-
 extension ProxyReference: CustomStringConvertible {
     public var description: String {
         switch self {
@@ -172,6 +151,23 @@ extension ProxyReference: CustomStringConvertible {
             ".player"
         case .universal(let universalObject):
             ".universal(.\(universalObject))"
+        }
+    }
+}
+
+extension ProxyReference: Equatable {
+    public static func == (lhs: ProxyReference, rhs: ProxyReference) -> Bool {
+        switch (lhs, rhs) {
+        case (.item(let lhsProxy), .item(let rhsProxy)):
+            lhsProxy.id == rhsProxy.id
+        case (.location(let lhsProxy), .location(let rhsProxy)):
+            lhsProxy.id == rhsProxy.id
+        case (.player, .player):
+            true
+        case (.universal(let lhsUniversal), .universal(let rhsUniversal)):
+            lhsUniversal == rhsUniversal
+        default:
+            false
         }
     }
 }

@@ -73,8 +73,8 @@ extension LocationProxy {
     /// - Parameter locationPropertyIDs: Flags to check, at least one must be `true`.
     /// - Returns: `true` if any of the specified flags are set, `false` if none are set.
     public func hasFlags(any locationPropertyIDs: LocationPropertyID...) async -> Bool {
-        for locationPropertyID in locationPropertyIDs {
-            if await hasFlag(locationPropertyID) { return true }
+        for locationPropertyID in locationPropertyIDs where await hasFlag(locationPropertyID) {
+            return true
         }
         return false
     }

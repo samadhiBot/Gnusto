@@ -1,5 +1,7 @@
 import Foundation
 
+// swiftlint:disable file_length
+
 // MARK: - Command Execution
 
 extension GameEngine {
@@ -37,7 +39,7 @@ extension GameEngine {
     ///
     /// - Parameter command: The `Command` object to execute.
     /// - Returns: Whether the command should consume a turn.
-    func execute(command: Command) async throws -> Bool {
+    func execute(command: Command) async throws -> Bool { // swiftlint:disable:this function_body_length
         var actionHandled = false
         var actionResponse: Error?  // To store error from object handlers
         var shouldConsumeTurn = true  // Default to consuming turn unless meta-command is used
@@ -98,7 +100,7 @@ extension GameEngine {
                         // If yielding, continue with normal processing
                     }
                 } catch {
-                    actionResponse = response
+                    actionResponse = error
                     actionHandled = true  // Treat error as handled to prevent default handler
                     break  // Stop processing other objects if one throws an error
                 }
@@ -128,7 +130,7 @@ extension GameEngine {
                     // If yielding, continue with normal processing
                 }
             } catch {
-                actionResponse = response
+                actionResponse = error
                 actionHandled = true
             }
         }
@@ -672,3 +674,5 @@ extension GameEngine {
         }
     }
 }
+
+// swiftlint:enable file_length

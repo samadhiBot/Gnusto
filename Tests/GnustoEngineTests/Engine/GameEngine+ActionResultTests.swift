@@ -93,7 +93,7 @@ struct GameEngineActionResultTests {
 
         // Create ActionResult with side effects using strongly-typed payload
         let fuseState = FuseState(turns: 5)
-        let sideEffects = [
+        let sideEffects = try [
             SideEffect.startFuse("testFuse", state: fuseState),
             SideEffect.runDaemon("testDaemon"),
         ]
@@ -152,7 +152,7 @@ struct GameEngineActionResultTests {
         ]
 
         let fuseState = FuseState(turns: 3)
-        let sideEffects = [
+        let sideEffects = try [
             SideEffect.startFuse("emergencyFuse", state: fuseState)
         ]
 
@@ -222,7 +222,7 @@ struct GameEngineActionResultTests {
 
         // Create ActionResult with invalid side effect (non-existent fuse)
         let fuseState = FuseState(turns: 3)
-        let invalidSideEffect = SideEffect.startFuse("nonExistentFuse", state: fuseState)
+        let invalidSideEffect = try SideEffect.startFuse("nonExistentFuse", state: fuseState)
 
         let actionResult = ActionResult(
             message: "This should fail on side effect",
@@ -280,7 +280,7 @@ struct GameEngineActionResultTests {
                 ]
 
                 let fuseState = FuseState(turns: 2)
-                let sideEffects = [
+                let sideEffects = try [
                     SideEffect.startFuse("activationFuse", state: fuseState)
                 ]
 
@@ -817,7 +817,7 @@ struct GameEngineActionResultTests {
         // Create ActionResult with typed payload fuse
         let payload = TestPayload(message: "typed data", value: 42)
         let fuseState = try FuseState(turns: 1, payload: payload)
-        let actionResult = ActionResult(
+        let actionResult = try ActionResult(
             message: "Fuse scheduled with typed payload!",
             effects: [
                 SideEffect.startFuse("testFuse", state: fuseState)
@@ -879,7 +879,7 @@ struct GameEngineActionResultTests {
             message: "The goblin returns!"
         )
 
-        let actionResult = ActionResult(
+        let actionResult = try ActionResult(
             message: "Enemy fuse scheduled!",
             effects: [
                 SideEffect.startFuse("enemyFuse", state: fuseState)

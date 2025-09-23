@@ -1,6 +1,8 @@
 import Foundation
 import Logging
 
+// swiftlint:disable file_length type_body_length
+
 /// Default implementation of turn-based melee combat system with D&D-style mechanics.
 ///
 /// This combat system provides:
@@ -9,7 +11,7 @@ import Logging
 /// - Character attribute-based combat modifiers
 /// - Dynamic enemy AI that responds to combat state
 /// - Rich narrative combat descriptions
-public struct StandardCombatSystem: CombatSystem { // swiftlint:disable:this type_body_length
+public struct StandardCombatSystem: CombatSystem {
     /// The identifier of the enemy this combat system applies to.
     public let enemyID: ItemID
 
@@ -121,11 +123,9 @@ public struct StandardCombatSystem: CombatSystem { // swiftlint:disable:this typ
         // Add combat state update to the result only if combat continues
         let combinedChanges: [StateChange]
         if let updatedCombatState {
-            logger.debug("⚔️ Combat continues with state: \(updatedCombatState)")
             let combatStateChange = await context.engine.setCombatState(to: updatedCombatState)
             combinedChanges = result.changes + [combatStateChange]
         } else {
-            logger.debug("⚔️ Combat ended - no state update")
             combinedChanges = result.changes
         }
 
@@ -139,7 +139,7 @@ public struct StandardCombatSystem: CombatSystem { // swiftlint:disable:this typ
 
     // MARK: - Enhanced Combat Calculations
 
-    /// Calculates the outcome of an attack between two combatants using enhanced action-packed mechanics.
+    /// Calculates the outcome of an attack between two combatants using action-packed mechanics.
     ///
     /// This method performs a complete attack resolution including:
     /// - Rolling a d20 for the attack with improved hit chances
@@ -150,7 +150,7 @@ public struct StandardCombatSystem: CombatSystem { // swiftlint:disable:this typ
     /// - Determining special combat events like disarming, staggering, and vulnerability
     /// - Escalating combat intensity over time
     ///
-    /// The enhanced system reduces complete misses and adds exciting special outcomes
+    /// The system reduces complete misses and adds exciting special outcomes
     /// like weapon disarming, temporary stuns, and tactical advantages.
     ///
     /// - Parameters:
@@ -160,7 +160,7 @@ public struct StandardCombatSystem: CombatSystem { // swiftlint:disable:this typ
     ///   - context: Action context for accessing game engine and random number generation
     /// - Returns: A CombatEvent describing the attack outcome and any damage dealt
     /// - Throws: Errors from attribute access or combat calculations
-    public func calculateAttackOutcome(
+    public func calculateAttackOutcome(  // swiftlint:disable:this function_body_length
         attacker: Combatant,
         defender: Combatant,
         weapon playerWeapon: ItemProxy?,
@@ -241,7 +241,7 @@ public struct StandardCombatSystem: CombatSystem { // swiftlint:disable:this typ
 
         logger.debug(
             """
-            \n🎲 \(attacker.description.capitalizedFirst.possessive) enhanced attack roll:
+            \n🎲 \(attacker.description.capitalizedFirst.possessive) attack roll:
             ------------------------------------
             attackRoll:      \(attackRoll)
             attackBonus:     \(attackBonus)
@@ -396,7 +396,7 @@ public struct StandardCombatSystem: CombatSystem { // swiftlint:disable:this typ
             }
         }
 
-        // Calculate enhanced base damage with intensity and fatigue modifiers
+        // Calculate base damage with intensity and fatigue modifiers
         let weaponDamage = await playerWeapon?.weaponDamage ?? 8  // Increased from 4
         let baseDamage = await engine.randomInt(in: 2...weaponDamage)  // Minimum 2 damage
         let attackerBonus = await attacker.characterSheet.damageBonus
@@ -471,7 +471,7 @@ public struct StandardCombatSystem: CombatSystem { // swiftlint:disable:this typ
 
         logger.debug(
             """
-            \n🎲 \(attacker.description.capitalizedFirst.possessive) enhanced damage roll:
+            \n🎲 \(attacker.description.capitalizedFirst.possessive) damage roll:
             ------------------------------------
             \(stats.joined(separator: .linebreak))
             prev health:  \(defenderHealth)
@@ -602,7 +602,7 @@ public struct StandardCombatSystem: CombatSystem { // swiftlint:disable:this typ
     ///   - context: Action context for dice rolls and game state access
     /// - Returns: A CombatEvent representing the enemy's action, or nil if no action taken
     /// - Throws: Errors from attribute access or combat calculations
-    public func determineEnemyAction(
+    public func determineEnemyAction(  // swiftlint:disable:this function_body_length
         against playerAction: PlayerAction,
         enemy: ItemProxy,
         in context: ActionContext
@@ -706,7 +706,7 @@ public struct StandardCombatSystem: CombatSystem { // swiftlint:disable:this typ
                 return .playerDodged(enemy: enemy, enemyWeapon: enemyWeapon)
             }
 
-            // Calculate enhanced damage with bonus for distracted player and intensity
+            // Calculate damage with bonus for distracted player and intensity
             var damage = await context.engine.randomInt(in: 3...12)  // Higher base damage when distracted
             damage += await enemy.characterSheet.damageBonus
             damage += 5 - Int(enemyFatigue * 2.0)  // Reduced bonus if enemy is fatigued
@@ -925,12 +925,7 @@ public struct StandardCombatSystem: CombatSystem { // swiftlint:disable:this typ
             }
         }
 
-        logger.debug(
-            "🔍 Combat state check: combatShouldEnd=\(combatShouldEnd), events=\(turn.allEvents.map { String(describing: $0) })"
-        )
-
         guard !combatShouldEnd else {
-            logger.debug("⚔️ Combat ending due to combat-ending events")
             return nil  // Combat ends
         }
 
@@ -947,7 +942,7 @@ public struct StandardCombatSystem: CombatSystem { // swiftlint:disable:this typ
                 context: context
             )
 
-        // Start with enhanced base values influenced by character attributes
+        // Start with base values influenced by character attributes
         var intensityDelta = 0.08 + baseIntensityModifier  // Increased from 0.05
         var playerFatigueDelta = 0.06 + baseFatigueModifiers.player  // Increased from 0.03
         var enemyFatigueDelta = 0.06 + baseFatigueModifiers.enemy  // Increased from 0.03
@@ -1110,18 +1105,15 @@ public struct StandardCombatSystem: CombatSystem { // swiftlint:disable:this typ
 
         // Higher bravery and lower wisdom lead to more intense combat
         intensityMod += Double(playerSheet.braveryModifier + enemySheet.braveryModifier) * 0.06
-        intensityMod -= Double(playerSheet.wisdomModifier + enemySheet.wisdomModifier) * 0.03  // Wisdom tempers intensity
+
+        // Wisdom tempers intensity
+        intensityMod -= Double(playerSheet.wisdomModifier + enemySheet.wisdomModifier) * 0.03
 
         // Low health combats are more desperate and intense
         let avgHealthPercent = (playerHealthPercent + enemyHealthPercent) / 2
         if avgHealthPercent < 60 {
             intensityMod += Double(60 - avgHealthPercent) * 0.005
         }
-
-        // Clamp modifiers to reasonable ranges
-        //        playerFatigueMod = max(-0.03, min(0.05, playerFatigueMod))
-        //        enemyFatigueMod = max(-0.03, min(0.05, enemyFatigueMod))
-        //        intensityMod = max(-0.02, min(0.04, intensityMod))
 
         return (
             fatigue: (player: playerFatigueMod, enemy: enemyFatigueMod), intensity: intensityMod
@@ -1231,7 +1223,7 @@ public struct StandardCombatSystem: CombatSystem { // swiftlint:disable:this typ
     ///   - context: Action context for accessing game engine
     /// - Returns: An array of state changes to apply to the game
     /// - Throws: Errors from state change creation or attribute access
-    func generateEventResult(
+    func generateEventResult(  // swiftlint:disable:this function_body_length
         for event: CombatEvent,
         in context: ActionContext
     ) async throws -> ActionResult {
@@ -1265,7 +1257,7 @@ public struct StandardCombatSystem: CombatSystem { // swiftlint:disable:this typ
             )
 
         case .enemyUnconscious(let enemy, _, _):
-            return await ActionResult(
+            return try await ActionResult(
                 message: description,
                 changes: [
                     enemy.setCharacterAttributes(consciousness: .unconscious),
@@ -1310,7 +1302,7 @@ public struct StandardCombatSystem: CombatSystem { // swiftlint:disable:this typ
 
         case .playerUnconscious(let enemy, _, let damage):
 
-            return await ActionResult(
+            return try await ActionResult(
                 message: description,
                 changes: [
                     context.player.takeDamage(damage),
@@ -1512,8 +1504,10 @@ public struct StandardCombatSystem: CombatSystem { // swiftlint:disable:this typ
 
     /// Computes damage adjustments as a flat bonus and a multiplier.
     ///
-    /// - Flat bonus reflects raw power and technique (strength, dexterity, level, morale, bravery, luck, health).
-    /// - Multiplier reflects tactical advantage and state (intimidation vs bravery, conditions, intensity, target health).
+    /// - Flat bonus reflects raw power and technique (strength, dexterity, level, morale,
+    ///   bravery, luck, health).
+    /// - Multiplier reflects tactical advantage and state (intimidation vs bravery, conditions,
+    ///   intensity, target health).
     func computeDamageAdjustment(
         attacker: Combatant,
         defender: Combatant,
@@ -1570,7 +1564,7 @@ public struct StandardCombatSystem: CombatSystem { // swiftlint:disable:this typ
     ///
     /// Factors include: natural roll, margin of hit, escalation, intensity, attacker and defender luck,
     /// and defender current health percent. The threshold is conservative so specials remain exciting.
-    func shouldTriggerSpecialEvent(
+    func shouldTriggerSpecialEvent(  // swiftlint:disable:this function_parameter_count
         attackRoll: Int,
         marginOfHit: Int,
         escalation: Double,
@@ -1601,3 +1595,5 @@ public struct StandardCombatSystem: CombatSystem { // swiftlint:disable:this typ
         return Double(roll) >= threshold
     }
 }
+
+// swiftlint:enable file_length type_body_length

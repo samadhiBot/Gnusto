@@ -12,7 +12,7 @@ extension StandardCombatSystem {
     ///   - messenger: The combat messenger responsible for generating the actual text
     /// - Returns: A string description of the combat event
     /// - Throws: Any error that occurs during message generation
-    public func defaultCombatDescription(
+    public func defaultCombatDescription(  // swiftlint:disable:this function_body_length
         of event: CombatEvent,
         via messenger: CombatMessenger
     ) async -> String {

@@ -591,14 +591,14 @@ extension InsideHouse {
 
         // Disable sword glow daemon when dropped
         after(.drop) { _, _ in
-            ActionResult(
+            try ActionResult(
                 .stopDaemon(.swordDaemon)
             )
         }
 
         // Enable sword glow daemon when taken (like SWORD-FCN in ZIL)
         after(.take) { _, _ in
-            ActionResult(
+            try ActionResult(
                 .runDaemon(.swordDaemon)
             )
         }

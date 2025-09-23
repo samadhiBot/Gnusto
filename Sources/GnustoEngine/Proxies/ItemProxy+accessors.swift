@@ -1,5 +1,7 @@
 import Foundation
 
+// swiftlint:disable file_length
+
 // MARK: - Convenience Accessors
 
 extension ItemProxy {
@@ -1341,3 +1343,5 @@ extension ItemProxy {
         return 0.2 + ((normalizedValue - 0.08) / 0.91) * 0.6
     }
 }
+
+// swiftlint:enable file_length

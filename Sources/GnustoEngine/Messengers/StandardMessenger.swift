@@ -1,5 +1,7 @@
 import Logging
 
+// swiftlint:disable file_length
+
 /// A class responsible for generating user-facing messages in the interactive fiction game.
 ///
 /// The `StandardMessenger` class provides methods for creating standardized text responses
@@ -11,7 +13,7 @@ import Logging
 ///
 /// `StandardMessenger` and its subclasses are forced to declare `@unchecked Sendable` because
 /// it is an open class.
-open class StandardMessenger: @unchecked Sendable {
+open class StandardMessenger: @unchecked Sendable {  // swiftlint:disable:this type_body_length
     /// Internal logger for engine messages, warnings, and errors.
     let logger = Logger(label: "com.samadhibot.Gnusto.StandardMessenger")
 
@@ -603,7 +605,10 @@ open class StandardMessenger: @unchecked Sendable {
         output("Would you like to RESTART, RESTORE a saved game, or QUIT?")
     }
 
-    open func examineYourself(healthRatio: Double = 1) -> String {
+    // swiftlint:disable:next function_body_length
+    open func examineYourself(
+        healthRatio: Double = 1
+    ) -> String {
         switch true {
         case healthRatio == 0:
             oneOf(
@@ -1448,9 +1453,18 @@ open class StandardMessenger: @unchecked Sendable {
         oneOf(
             "Darkness presses against you like a physical thing. You are effectively blind.",
             "The darkness here is absolute, consuming all light and hope of sight.",
-            "You stand in a depthless black where even your thoughts seem to whisper, careful not to make a sound.",
-            "This is the kind of dark that swallows shapes and edges, leaving only breath and heartbeat to prove you exist.",
-            "Light feels theoretical here--an idea someone once had, now forgotten by the room itself."
+            """
+            You stand in a depthless black where even your thoughts seem to whisper,
+            careful not to make a sound.
+            """,
+            """
+            This is the kind of dark that swallows shapes and edges,
+            leaving only breath and heartbeat to prove you exist.
+            """,
+            """
+            Light feels theoretical here--an idea someone once had,
+            now forgotten by the room itself.
+            """,
         )
     }
 
@@ -2492,3 +2506,5 @@ open class StandardMessenger: @unchecked Sendable {
         return capitalize ? gameOutput().capitalizedSentences : gameOutput()
     }
 }
+
+// swiftlint:enable file_length

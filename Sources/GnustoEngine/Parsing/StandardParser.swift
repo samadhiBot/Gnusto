@@ -1,6 +1,8 @@
 import Foundation
 import Logging
 
+// swiftlint:disable file_length type_body_length
+
 /// A standard, ZIL-inspired implementation of the `Parser` protocol, designed to
 /// interpret player input in a manner reminiscent of classic text-adventure games.
 ///
@@ -99,7 +101,7 @@ public struct StandardParser: Parser {
     ///     accessible, `.badGrammar` if the sentence structure didn't match any known rules,
     ///     or `.ambiguity` if the input could be interpreted in multiple ways that the
     ///     parser couldn't resolve on its own.
-    public func parse(
+    public func parse(  // swiftlint:disable:this function_body_length
         input: String,
         vocabulary: Vocabulary,
         engine: GameEngine
@@ -168,10 +170,13 @@ public struct StandardParser: Parser {
                 }
             }
 
-            // If we found any matches of the longest possible length starting at this position, use them and stop searching
+            // If we found any matches of the longest possible length starting at this position,
+            // use them and stop searching
             if longestMatchLength > 0 {
-                candidateVerbs = potentialMatchVerbs  // Assign the set of verbs found at the longest length
-                break  // Found the first (and longest) verb match group, stop outer loop
+                // Assign the set of verbs found at the longest length
+                candidateVerbs = potentialMatchVerbs
+                // Found the first (and longest) verb match group, stop outer loop
+                break
             }
         }
 
@@ -226,7 +231,7 @@ public struct StandardParser: Parser {
         // 7. Sort syntax rules by specificity score before matching
         // This ensures more specific rules (like .match(.verb, .on, .directObject))
         // are tried before generic rules (like .match(.knock))
-        var scoredRules: [(verb: Verb, rule: SyntaxRule, score: Int)] = []
+        var scoredRules = [ScoredRule]()
         for (verb, rule) in applicableSyntaxRules {
             // Create temporary commands for scoring - use dummy proxy reference for objects
             let dummyProxy = ProxyReference.universal(.ground)
@@ -249,7 +254,13 @@ public struct StandardParser: Parser {
                 synonyms: synonymsForThisVerb
             )
 
-            scoredRules.append((verb: verb, rule: rule, score: score))
+            scoredRules.append(
+                ScoredRule(
+                    verb: verb,
+                    rule: rule,
+                    score: score
+                )
+            )
         }
 
         // Sort by score (higher scores first)
@@ -488,7 +499,7 @@ public struct StandardParser: Parser {
     // MARK: - Syntax Matching Logic
 
     /// Attempts to match a sequence of tokens against a specific SyntaxRule.
-    private func matchRule(
+    private func matchRule(  // swiftlint:disable:this function_body_length function_parameter_count
         rule: SyntaxRule,
         tokens: [String],
         verbStartIndex: Int,
@@ -1114,7 +1125,7 @@ public struct StandardParser: Parser {
     // MARK: - Object Resolution Helpers
 
     /// Resolves a noun phrase (noun + modifiers) to a specific EntityReference within the game context.
-    func resolveObject(
+    func resolveObject(  // swiftlint:disable:this function_body_length
         noun: String,
         verb: Verb,
         modifiers: [String],
@@ -1313,7 +1324,8 @@ public struct StandardParser: Parser {
                 }
                 // TODO: Add check for location-specific requiredConditions if they become a concept.
                 // For now, if it's a location reference, it's valid if named.
-                if await engine.gameState.locations[locationProxy.id] != nil {  // Verify location actually exists in current game state
+                if await engine.gameState.locations[locationProxy.id] != nil {
+                    // Verify location actually exists in current game state
                     resolvedAndScopedProxies.append(.location(locationProxy))
                 }
 
@@ -1632,4 +1644,11 @@ extension StandardParser {
         /// Rule doesn't apply to this input (e.g., particle mismatch, wrong verb)
         case notApplicable
     }
+
+    struct ScoredRule {
+        let verb: Verb
+        let rule: SyntaxRule
+        let score: Int
+    }
 }
+// swiftlint:enable file_length type_body_length

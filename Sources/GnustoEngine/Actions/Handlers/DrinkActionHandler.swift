@@ -76,11 +76,9 @@ extension DrinkActionHandler {
     ) async throws -> String {
         // Find anything drinkable in the container
         var drinkableContents: ItemProxy?
-        for item in await container.contents {
-            if await item.hasFlag(.isDrinkable) {
-                drinkableContents = item
-                break
-            }
+        for item in await container.contents where await item.hasFlag(.isDrinkable) {
+            drinkableContents = item
+            break
         }
         guard let drinkableContents else {
             return await context.msg.nothingToDrinkIn(

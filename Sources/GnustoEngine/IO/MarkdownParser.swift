@@ -33,8 +33,10 @@ public struct MarkdownParser {
     ///
     /// - Parameters:
     ///   - columns: Maximum column width for text wrapping. If `nil`, text will not be wrapped.
-    ///   - preventOrphans: Whether to prevent single words from appearing alone on the last line of paragraphs.
-    ///   - makeSmartTypographicSubstitutions: Whether to convert straight quotes to curly quotes, double hyphens to em dashes, etc.
+    ///   - preventOrphans: Whether to prevent single words from appearing alone on the last
+    ///                     line of paragraphs.
+    ///   - makeSmartTypographicSubstitutions: Whether to convert straight quotes to curly quotes,
+    ///                                        double hyphens to em dashes, etc.
     public init(
         columns: Int? = nil,
         preventOrphans: Bool = true,

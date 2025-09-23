@@ -13,6 +13,9 @@ import Foundation
 /// can be handled in a consistent and type-safe manner. You will often encounter `StateValue`
 /// when defining or reacting to changes in your game's world.
 public enum StateValue: Codable, Sendable, Hashable {
+    /// Character moral and ethical alignment.
+    case alignment(Alignment)
+
     /// Represents a boolean value (e.g., for a flag like `isOpen` or `isLit`).
     case bool(Bool)
 
@@ -23,6 +26,9 @@ public enum StateValue: Codable, Sendable, Hashable {
     /// Use this for custom game-specific types that conform to `Codable & Sendable`.
     case codable(AnyCodableSendable)
 
+    /// Character combat condition (normal, off-balance, vulnerable, etc.).
+    case combatCondition(CombatCondition)
+
     /// Represents the current combat state, containing information about an active
     /// combat encounter including participants, turn order, and combat-specific state.
     case combatState(CombatState?)
@@ -30,14 +36,15 @@ public enum StateValue: Codable, Sendable, Hashable {
     /// Character consciousness level (awake, asleep, unconscious, etc.).
     case consciousness(ConsciousnessLevel)
 
-    /// Character combat condition (normal, off-balance, vulnerable, etc.).
-    case combatCondition(CombatCondition)
+    /// Represents an optional set of `EntityReference`s, often used for pronoun resolution
+    /// (e.g., what "it" or "them" currently refers to). `nil` can indicate no current reference.
+    case entityReferenceSet(Set<EntityReference>?)
+
+    /// Represents the exits from a location, mapping a `Direction` to `Exit` details.
+    case exits(Set<Exit>)
 
     /// Character general condition (normal, drunk, poisoned, etc.).
     case generalCondition(GeneralCondition)
-
-    /// Character moral and ethical alignment.
-    case alignment(Alignment)
 
     /// Represents an integer value (e.g., for a score, count, or size).
     case int(Int)
@@ -47,13 +54,6 @@ public enum StateValue: Codable, Sendable, Hashable {
 
     /// Represents a set of unique item identifiers (`Set<ItemID>`).
     case itemIDSet(Set<ItemID>)
-
-    /// Represents an optional set of `EntityReference`s, often used for pronoun resolution
-    /// (e.g., what "it" or "them" currently refers to). `nil` can indicate no current reference.
-    case entityReferenceSet(Set<EntityReference>?)
-
-    /// Represents the exits from a location, mapping a `Direction` to `Exit` details.
-    case exits(Set<Exit>)
 
     /// Represents a unique identifier for a location (`LocationID`).
     case locationID(LocationID)

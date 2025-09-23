@@ -101,7 +101,7 @@ struct GameEngineDisambiguationTests {
             options: ["the new book", "the old book"]
         )
 
-        let context = (
+        let context = GameEngine.LastDisambiguationContext(
             originalInput: "put book on table",
             verb: Verb(id: "put"),
             noun: "book"
@@ -151,7 +151,7 @@ struct GameEngineDisambiguationTests {
             options: ["the new book", "the old book"]
         )
 
-        let context = (
+        let context = GameEngine.LastDisambiguationContext(
             originalInput: "put book on table",
             verb: Verb(id: "put"),
             noun: "book"
@@ -191,7 +191,7 @@ struct GameEngineDisambiguationTests {
             options: ["the new book", "the old book"]
         )
 
-        let context = (
+        let context = GameEngine.LastDisambiguationContext(
             originalInput: "put book on table",
             verb: Verb(id: "put"),
             noun: "book"

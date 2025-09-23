@@ -292,10 +292,8 @@ public actor ConversationManager {
 
         // Check for case-insensitive match
         let lowercasedInput = trimmedInput.lowercased()
-        for (choice, command) in question.choices {
-            if choice.lowercased() == lowercasedInput {
-                return try await executeCommand(command, with: engine)
-            }
+        for (choice, command) in question.choices where choice.lowercased() == lowercasedInput {
+            return try await executeCommand(command, with: engine)
         }
 
         // No valid choice found

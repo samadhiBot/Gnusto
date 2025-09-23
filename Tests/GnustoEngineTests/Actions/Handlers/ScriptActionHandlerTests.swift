@@ -1,7 +1,8 @@
 import CustomDump
-import GnustoEngine
 import GnustoTestSupport
 import Testing
+
+@testable import GnustoEngine
 
 @Suite("ScriptActionHandler Tests")
 struct ScriptActionHandlerTests {

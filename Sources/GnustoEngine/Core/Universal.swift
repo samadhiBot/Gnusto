@@ -1,5 +1,7 @@
 import Foundation
 
+// swiftlint:disable sorted_enum_cases
+
 /// Represents universal concepts that are implicitly present in interactive fiction
 /// but don't need to be explicitly modeled as Item objects.
 ///
@@ -36,28 +38,22 @@ import Foundation
 public enum Universal: String, CaseIterable, Sendable, Codable {
     // MARK: - Ground and Earth
 
-    /// The ground, earth, or floor surface
-    case ground
+    /// Dirt or earth material
+    case dirt
 
     /// Earth, dirt, or soil
     case earth
 
-    /// Soil for digging or planting
-    case soil
-
-    /// Dirt or earth material
-    case dirt
-
     /// The floor surface
     case floor
 
+    /// The ground, earth, or floor surface
+    case ground
+
+    /// Soil for digging or planting
+    case soil
+
     // MARK: - Sky and Atmosphere
-
-    /// The sky or heavens above
-    case sky
-
-    /// The heavens or celestial sphere
-    case heavens
 
     /// Air or atmosphere
     case air
@@ -65,56 +61,62 @@ public enum Universal: String, CaseIterable, Sendable, Codable {
     /// Clouds in the sky
     case clouds
 
-    /// The sun
-    case sun
+    /// The heavens or celestial sphere
+    case heavens
 
     /// The moon
     case moon
 
+    /// The sky or heavens above
+    case sky
+
     /// Stars in the sky
     case stars
+
+    /// The sun
+    case sun
 
     // MARK: - Architectural Elements
 
     /// The ceiling above
     case ceiling
 
-    /// Walls around the location
-    case walls
+    /// The roof above
+    case roof
 
     /// A wall (singular)
     case wall
 
-    /// The roof above
-    case roof
+    /// Walls around the location
+    case walls
 
     // MARK: - Water Features
-
-    /// Water in general
-    case water
-
-    /// A river or stream
-    case river
-
-    /// A stream of water
-    case stream
 
     /// A lake or pond
     case lake
 
+    /// An ocean or sea
+    case ocean
+
     /// A pond of water
     case pond
 
-    /// An ocean or sea
-    case ocean
+    /// A river or stream
+    case river
 
     /// The sea
     case sea
 
+    /// A stream of water
+    case stream
+
+    /// Water in general
+    case water
+
     // MARK: - Natural Elements
 
-    /// Wind or breeze
-    case wind
+    /// Dust particles
+    case dust
 
     /// Fire or flames
     case fire
@@ -122,43 +124,43 @@ public enum Universal: String, CaseIterable, Sendable, Codable {
     /// Flames
     case flames
 
-    /// Smoke
-    case smoke
-
-    /// Dust particles
-    case dust
-
     /// Mud or muddy ground
     case mud
-
-    /// Sand
-    case sand
 
     /// Rock or stone
     case rock
 
+    /// Sand
+    case sand
+
+    /// Smoke
+    case smoke
+
     /// Stone material
     case stone
+
+    /// Wind or breeze
+    case wind
 
     // MARK: - Abstract Concepts
 
     /// Darkness or shadows
     case darkness
 
-    /// Shadows
-    case shadows
-
     /// Light in general
     case light
+
+    /// Noise
+    case noise
+
+    /// Shadows
+    case shadows
 
     /// Silence or quiet
     case silence
 
     /// Sound or noise
     case sound
-
-    /// Noise
-    case noise
 
     // MARK: - Properties
 
@@ -177,7 +179,29 @@ public enum Universal: String, CaseIterable, Sendable, Codable {
     }
 }
 
+// swiftlint:enable sorted_enum_cases
+
 extension Universal {
+    /// Checks if this universal matches or is related to another universal.
+    ///
+    /// This method determines whether two universals are conceptually related by checking
+    /// if the other universal is contained within this universal's set of related objects.
+    /// Related universals typically share similar properties, behaviors, or can be used
+    /// interchangeably in certain contexts.
+    ///
+    /// - Parameter other: The universal to compare against
+    /// - Returns: `true` if the universals are related, `false` otherwise
+    ///
+    /// ## Example Usage
+    ///
+    /// ```swift
+    /// let ground = Universal.ground
+    /// let floor = Universal.floor
+    /// let sky = Universal.sky
+    ///
+    /// print(ground.matches(floor)) // true - both are floor-like surfaces
+    /// print(ground.matches(sky))   // false - unrelated concepts
+    /// ```
     public func matches(_ other: Universal) -> Bool {
         self.relatedUniversals.contains(other)
     }

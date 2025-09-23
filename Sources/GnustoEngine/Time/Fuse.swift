@@ -148,25 +148,23 @@ extension Fuse {
     /// and combat conditions (offBalance, uncertain, vulnerable, etc.). The fuse will only
     /// trigger if the character still has the specified effect when the timer expires.
     /// Messages are displayed to the player if they are present to witness the recovery.
-    static let statusEffectExpiry = Fuse(initialTurns: 3) {
-        engine,
-        state in
+    static let statusEffectExpiry = Fuse(initialTurns: 3) { engine, state in
         // Specific character and effect must be provided in the payload
         guard let payload = state.getPayload(as: FuseState.StatusEffectPayload.self) else {
             engine.logger.warning(
                 ".statusEffectExpiry fuse called without required StatusEffectPayload")
             return nil
         }
-        
+
         let itemID = payload.itemID
         let effect = payload.effect
-        
+
         let character = await engine.item(itemID)
-        
+
         // Determine what type of effect we're dealing with and clear it
         let message: String?
         let stateChange: StateChange?
-        
+
         switch effect {
             // General conditions
         case .poisoned:
@@ -181,7 +179,7 @@ extension Fuse {
             )
             stateChange = await character.setCharacterAttributes(
                 generalCondition: GeneralCondition.normal)
-            
+
         case .cursed:
             guard await character.characterSheet.generalCondition == GeneralCondition.cursed
             else { return nil }
@@ -193,7 +191,7 @@ extension Fuse {
             )
             stateChange = await character.setCharacterAttributes(
                 generalCondition: GeneralCondition.normal)
-            
+
         case .blessed:
             guard
                 await character.characterSheet.generalCondition == GeneralCondition.blessed
@@ -206,7 +204,7 @@ extension Fuse {
             )
             stateChange = await character.setCharacterAttributes(
                 generalCondition: GeneralCondition.normal)
-            
+
         case .charmed:
             guard
                 await character.characterSheet.generalCondition == GeneralCondition.charmed
@@ -219,7 +217,7 @@ extension Fuse {
             )
             stateChange = await character.setCharacterAttributes(
                 generalCondition: GeneralCondition.normal)
-            
+
         case .terrified:
             guard
                 await character.characterSheet.generalCondition
@@ -235,7 +233,7 @@ extension Fuse {
             )
             stateChange = await character.setCharacterAttributes(
                 generalCondition: GeneralCondition.normal)
-            
+
         case .drunk:
             guard await character.characterSheet.generalCondition == GeneralCondition.drunk
             else { return nil }
@@ -247,7 +245,7 @@ extension Fuse {
             )
             stateChange = await character.setCharacterAttributes(
                 generalCondition: GeneralCondition.normal)
-            
+
         case .diseased:
             guard
                 await character.characterSheet.generalCondition == GeneralCondition.diseased
@@ -260,7 +258,7 @@ extension Fuse {
             )
             stateChange = await character.setCharacterAttributes(
                 generalCondition: GeneralCondition.normal)
-            
+
         case .normal:
             // Normal condition doesn't need to expire
             engine.logger.warning("Attempted to expire normal condition - this shouldn't happen")

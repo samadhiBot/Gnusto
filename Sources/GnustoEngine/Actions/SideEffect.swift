@@ -89,12 +89,12 @@ extension SideEffect {
     ///
     /// - Parameter fuseID: The `FuseID` of the fuse to start.
     /// - Returns: A configured `SideEffect` for starting the fuse.
-    public static func startFuse(_ fuseID: FuseID) -> SideEffect {
+    public static func startFuse(_ fuseID: FuseID) throws -> SideEffect {
         // We need to get the default turns from somewhere. Since we can't access the fuse definition
         // here, we'll create a simple FuseState with a reasonable default and let the engine
         // override with the actual definition's initialTurns if needed.
         let fuseState = FuseState(turns: nil)  // Engine will use definition's initialTurns
-        return startFuse(fuseID, state: fuseState)
+        return try startFuse(fuseID, state: fuseState)
     }
 
     /// Creates a new `SideEffect` instance with type `.startFuse` with custom turns and no payload.
@@ -103,16 +103,16 @@ extension SideEffect {
     ///   - fuseID: The `FuseID` of the fuse to start.
     ///   - turns: The number of turns until the fuse triggers.
     /// - Returns: A configured `SideEffect` for starting the fuse.
-    public static func startFuse(_ fuseID: FuseID, turns: Int) -> SideEffect {
+    public static func startFuse(_ fuseID: FuseID, turns: Int) throws -> SideEffect {
         let fuseState = FuseState(turns: turns)
-        return startFuse(fuseID, state: fuseState)
+        return try startFuse(fuseID, state: fuseState)
     }
 
     /// Creates a new `SideEffect` instance with type `.stopFuse`.
     ///
     /// - Parameter fuseID: The `FuseID` of the fuse to stop.
     /// - Returns: A configured `SideEffect` for stopping the fuse.
-    public static func stopFuse(_ fuseID: FuseID) -> SideEffect {
+    public static func stopFuse(_ fuseID: FuseID) throws -> SideEffect {
         SideEffect(
             type: .stopFuse,
             targetID: .fuse(fuseID)
@@ -140,7 +140,7 @@ extension SideEffect {
     ///
     /// - Parameter daemonID: The `DaemonID` of the daemon to run.
     /// - Returns: A configured `SideEffect` for running the daemon.
-    public static func runDaemon(_ daemonID: DaemonID) -> SideEffect {
+    public static func runDaemon(_ daemonID: DaemonID) throws -> SideEffect {
         SideEffect(
             type: .runDaemon,
             targetID: .daemon(daemonID)
@@ -151,7 +151,7 @@ extension SideEffect {
     ///
     /// - Parameter daemonID: The `DaemonID` of the daemon to stop.
     /// - Returns: A configured `SideEffect` for stopping the daemon.
-    public static func stopDaemon(_ daemonID: DaemonID) -> SideEffect {
+    public static func stopDaemon(_ daemonID: DaemonID) throws -> SideEffect {
         SideEffect(
             type: .stopDaemon,
             targetID: .daemon(daemonID)
@@ -178,14 +178,14 @@ extension SideEffect {
         locationID: LocationID,
         message: String,
         turns: Int = 3
-    ) -> SideEffect {
+    ) throws -> SideEffect {
         let payload = FuseState.EnemyLocationPayload(
             enemyID: enemyID,
             locationID: locationID,
             message: message
         )
         let fuseState = try FuseState(turns: turns, payload: payload)
-        return startFuse(.enemyWakeUp, state: fuseState)
+        return try startFuse(.enemyWakeUp, state: fuseState)
     }
 
     /// Starts an enemy return fuse with specific enemy and location IDs.
@@ -212,7 +212,7 @@ extension SideEffect {
             message: message
         )
         let fuseState = try FuseState(turns: turns, payload: payload)
-        return startFuse(.enemyReturn, state: fuseState)
+        return try startFuse(.enemyReturn, state: fuseState)
     }
 
     /// Starts a status effect expiry fuse with item and effect details.
@@ -235,7 +235,7 @@ extension SideEffect {
             effect: effect
         )
         let fuseState = try FuseState(turns: turns, payload: payload)
-        return startFuse(.statusEffectExpiry, state: fuseState)
+        return try startFuse(.statusEffectExpiry, state: fuseState)
     }
 
     /// Starts an environmental change fuse with custom parameters.

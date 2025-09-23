@@ -436,7 +436,7 @@ struct StandardCombatSystemUnitTests {
             in: attackContext(for: engine)
         )
 
-        let expected = await ActionResult(
+        let expected = try await ActionResult(
             message: """
                 Then the beast's strike connects with your jaw at exactly
                 the right angle to shut down your brain without breaking it.

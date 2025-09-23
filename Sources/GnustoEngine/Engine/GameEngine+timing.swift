@@ -29,9 +29,7 @@ extension GameEngine {
 
         // --- Process Fuses ---
         // Explicitly define the action type to match Fuse.action
-        typealias FuseActionType = @Sendable (GameEngine, FuseState) async throws -> ActionResult?
-        var expiredFuseIDsToExecute:
-            [(id: FuseID, action: FuseActionType, definition: Fuse, state: FuseState)] = []
+        var expiredFuseIDsToExecute = [FuseAction]()
 
         // Iterate over a copy of keys from gameState.activeFuses for safe modification
         let activeFuseIDsInState = Array(gameState.activeFuses.keys)
@@ -64,10 +62,13 @@ extension GameEngine {
                     continue
                 }
                 expiredFuseIDsToExecute.append(
-                    (
-                        id: fuseID, action: definition.action, definition: definition,
+                    FuseAction(
+                        id: fuseID,
+                        action: definition.action,
+                        definition: definition,
                         state: currentFuseState
-                    ))
+                    )
+                )
 
                 let removeChange = StateChange.removeActiveFuse(fuseID: fuseID)
                 try gameState.apply(removeChange)
@@ -144,5 +145,14 @@ extension GameEngine {
                 if shouldQuit || shouldRestart { return }
             }
         }
+    }
+}
+
+extension GameEngine {
+    struct FuseAction {
+        let id: FuseID
+        let action: @Sendable (GameEngine, FuseState) async throws -> ActionResult?
+        let definition: Fuse
+        let state: FuseState
     }
 }

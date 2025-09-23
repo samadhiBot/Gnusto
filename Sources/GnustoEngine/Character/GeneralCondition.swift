@@ -5,33 +5,6 @@ import Foundation
 /// These represent longer-term conditions that affect the character's capabilities
 /// beyond just combat effectiveness. They may persist across multiple encounters.
 public enum GeneralCondition: String, Codable, Sendable, Hashable, CaseIterable {
-    /// No special conditions affecting the character.
-    case normal
-
-    /// Impaired by alcohol consumption.
-    ///
-    /// Reduces coordination, judgment, and social inhibitions. May make the character
-    /// more talkative but less reliable in complex tasks.
-    case drunk
-
-    /// Affected by poison or toxins.
-    ///
-    /// May cause periodic damage, stat reduction, or other ongoing negative effects
-    /// until the poison is neutralized or runs its course.
-    case poisoned
-
-    /// Suffering from illness or disease.
-    ///
-    /// Long-term condition that may reduce various abilities and require treatment
-    /// or recovery time to overcome.
-    case diseased
-
-    /// Under a magical curse or hex.
-    ///
-    /// Supernatural affliction that may have various negative effects depending
-    /// on the specific curse. Usually requires magical means to remove.
-    case cursed
-
     /// Enhanced by magical blessing or divine favor.
     ///
     /// Provides temporary or permanent bonuses to various abilities. The opposite
@@ -43,6 +16,33 @@ public enum GeneralCondition: String, Codable, Sendable, Hashable, CaseIterable 
     /// The character's free will is compromised by magical influence, making them
     /// act according to the charm's directives rather than their own desires.
     case charmed
+
+    /// Under a magical curse or hex.
+    ///
+    /// Supernatural affliction that may have various negative effects depending
+    /// on the specific curse. Usually requires magical means to remove.
+    case cursed
+
+    /// Suffering from illness or disease.
+    ///
+    /// Long-term condition that may reduce various abilities and require treatment
+    /// or recovery time to overcome.
+    case diseased
+
+    /// Impaired by alcohol consumption.
+    ///
+    /// Reduces coordination, judgment, and social inhibitions. May make the character
+    /// more talkative but less reliable in complex tasks.
+    case drunk
+
+    /// No special conditions affecting the character.
+    case normal
+
+    /// Affected by poison or toxins.
+    ///
+    /// May cause periodic damage, stat reduction, or other ongoing negative effects
+    /// until the poison is neutralized or runs its course.
+    case poisoned
 
     /// Overcome by supernatural terror.
     ///

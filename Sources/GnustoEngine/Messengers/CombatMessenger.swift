@@ -1,5 +1,7 @@
 import Foundation
 
+// swiftlint:disable file_length function_body_length line_length type_body_length
+
 /// A messenger class that provides combat-related narrative text generation.
 ///
 /// `CombatMessenger` extends `StandardMessenger` to provide specialized messaging
@@ -3549,3 +3551,5 @@ open class CombatMessenger: StandardMessenger, @unchecked Sendable {
         }
     }
 }
+
+// swiftlint:enable file_length function_body_length line_length type_body_length

@@ -5,6 +5,12 @@ import Foundation
 /// These represent short-term states that can change during or between combats.
 /// Unlike consciousness levels, these are typically temporary tactical conditions.
 public enum CombatCondition: String, Codable, Sendable, Hashable, CaseIterable {
+    /// Weapon has been knocked away or taken.
+    ///
+    /// The character must either retrieve their weapon, find a new one,
+    /// or continue fighting with reduced effectiveness using improvised weapons or fists.
+    case disarmed
+
     /// Fighting normally with no special conditions.
     case normal
 
@@ -13,6 +19,12 @@ public enum CombatCondition: String, Codable, Sendable, Hashable, CaseIterable {
     /// Often results from powerful attacks, slippery terrain, or combat maneuvers.
     /// Reduces armor class and makes the character vulnerable to follow-up attacks.
     case offBalance
+
+    /// Given up fighting and ceased hostilities.
+    ///
+    /// The character will not initiate attacks and may flee or cooperate.
+    /// Combat may end or continue with the surrendered character as a non-combatant.
+    case surrendered
 
     /// Hesitant and uncertain about what to do next.
     ///
@@ -25,18 +37,6 @@ public enum CombatCondition: String, Codable, Sendable, Hashable, CaseIterable {
     /// The character is in a compromised position, perhaps caught off-guard
     /// or in an exposed location, making them easier to hit effectively.
     case vulnerable
-
-    /// Weapon has been knocked away or taken.
-    ///
-    /// The character must either retrieve their weapon, find a new one,
-    /// or continue fighting with reduced effectiveness using improvised weapons or fists.
-    case disarmed
-
-    /// Given up fighting and ceased hostilities.
-    ///
-    /// The character will not initiate attacks and may flee or cooperate.
-    /// Combat may end or continue with the surrendered character as a non-combatant.
-    case surrendered
 }
 
 // MARK: - Combat Condition Properties

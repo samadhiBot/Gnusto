@@ -27,13 +27,13 @@ extension Collection {
     ) async -> [Element] {
         var result = Array(self)
         guard count > 1 else { return result }
-        for i in 1..<result.count {
-            var j = i
-            while j > 0 {
-                let shouldSwap = await areInIncreasingOrder(result[j], result[j - 1])
+        for outer in 1..<result.count {
+            var inner = outer
+            while inner > 0 {
+                let shouldSwap = await areInIncreasingOrder(result[inner], result[inner - 1])
                 if shouldSwap {
-                    result.swapAt(j, j - 1)
-                    j -= 1
+                    result.swapAt(inner, inner - 1)
+                    inner -= 1
                 } else {
                     break
                 }

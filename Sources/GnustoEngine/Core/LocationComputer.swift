@@ -11,7 +11,7 @@
 ///         let weather = context.location.properties[.weather]?.stringValue ?? "clear"
 ///         return .string(timeOfDay == "night" ? "Dark woods loom." : "Sunlight filters through trees.")
 ///     }
-///     
+///
 ///     locationProperty(.isLit) { context in
 ///         let timeOfDay = await context.gameState.value(of: .timeOfDay) ?? "day"
 ///         return .bool(timeOfDay == "day")
@@ -46,7 +46,7 @@ public struct LocationComputer: Sendable {
     ///         let timeOfDay = await context.gameState.value(of: .timeOfDay) ?? "day"
     ///         return .string(timeOfDay == "night" ? "Dark woods loom." : "Sunlight filters through trees.")
     ///     }
-    ///     
+    ///
     ///     locationProperty(.isLit) { context in
     ///         let timeOfDay = await context.gameState.value(of: .timeOfDay) ?? "day"
     ///         return .bool(timeOfDay == "day")
@@ -55,7 +55,8 @@ public struct LocationComputer: Sendable {
     /// ```
     public init(
         for locationID: LocationID,
-        @LocationComputeMatcherBuilder _ matchers: @Sendable @escaping () async -> [LocationComputeMatcher]
+        @LocationComputeMatcherBuilder _ matchers:
+            @Sendable @escaping () async -> [LocationComputeMatcher]
     ) {
         self.compute = { context in
             let matcherList = await matchers()
@@ -83,7 +84,7 @@ public typealias LocationComputeMatcher = (LocationComputeContext) async -> Stat
 ///         let timeOfDay = await context.gameState.value(of: .timeOfDay) ?? "day"
 ///         return .string(timeOfDay == "night" ? "Dark woods loom." : "Sunlight filters through trees.")
 ///     }
-///     
+///
 ///     locationProperty(.isLit) { context in
 ///         let timeOfDay = await context.gameState.value(of: .timeOfDay) ?? "day"
 ///         return .bool(timeOfDay == "day")
@@ -92,7 +93,16 @@ public typealias LocationComputeMatcher = (LocationComputeContext) async -> Stat
 /// ```
 @resultBuilder
 public struct LocationComputeMatcherBuilder {
-    public static func buildBlock(_ matchers: LocationComputeMatcher...) -> [LocationComputeMatcher] {
+    /// Builds a block of location compute matchers into an array.
+    ///
+    /// This function is part of the result builder pattern and combines multiple
+    /// `LocationComputeMatcher` functions into a single array that can be processed
+    /// by the `LocationComputer`.
+    ///
+    /// - Parameter matchers: A variadic list of `LocationComputeMatcher` functions
+    /// - Returns: An array containing all the provided matchers
+    public static func buildBlock(_ matchers: LocationComputeMatcher...) -> [LocationComputeMatcher]
+    {
         Array(matchers)
     }
 }

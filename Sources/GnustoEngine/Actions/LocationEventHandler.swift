@@ -87,6 +87,13 @@ public struct LocationEventHandler: Sendable {
 /// `M-FLASH`) is analogous to `LocationEventHandler` in Gnusto. Some event types here
 /// directly map to those concepts, while others provide more general hooks.
 public enum LocationEvent: Sendable {
+    /// Triggered after the game engine has processed the player's command for the current turn,
+    /// while the player is in a location that has this event handler.
+    ///
+    /// The associated `Command` is the one the player entered.
+    /// This allows the location to react to the outcome of the turn or perform cleanup actions.
+    case afterTurn(Command)
+
     /// Triggered before the game engine processes the player's command for the current turn,
     /// while the player is in a location that has this event handler.
     ///
@@ -94,13 +101,6 @@ public enum LocationEvent: Sendable {
     /// Your handler can inspect this command and potentially return an `ActionResult` to
     /// preempt or alter the default command processing.
     case beforeTurn(Command)
-
-    /// Triggered after the game engine has processed the player's command for the current turn,
-    /// while the player is in a location that has this event handler.
-    ///
-    /// The associated `Command` is the one the player entered.
-    /// This allows the location to react to the outcome of the turn or perform cleanup actions.
-    case afterTurn(Command)
 
     /// Triggered when the player successfully enters the location that has this event handler.
     /// This typically occurs after any "look" action or movement that results in the player
@@ -132,6 +132,15 @@ public typealias LocationEventMatcher = (LocationEventContext) async throws -> A
 /// ```
 @resultBuilder
 public struct LocationEventMatcherBuilder {
+    /// Builds a block of location event matchers into an array.
+    ///
+    /// This is the core method of the `LocationEventMatcherBuilder` result builder that
+    /// combines multiple `LocationEventMatcher` functions into a single array for processing
+    /// by the location event handler.
+    ///
+    /// - Parameter matchers: A variadic list of `LocationEventMatcher` functions created by
+    ///   functions like `beforeTurn()`, `afterTurn()`, and `onEnter()`
+    /// - Returns: An array containing all the provided matchers
     public static func buildBlock(_ matchers: LocationEventMatcher...) -> [LocationEventMatcher] {
         Array(matchers)
     }

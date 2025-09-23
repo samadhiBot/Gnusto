@@ -40,10 +40,8 @@ extension Sequence {
         _ isIncluded: (Element) async -> Bool
     ) async -> [Element] {
         var results: [Element] = []
-        for element in self {
-            if await isIncluded(element) {
-                results.append(element)
-            }
+        for element in self where await isIncluded(element) {
+            results.append(element)
         }
         return results
     }
@@ -83,10 +81,8 @@ extension Sequence {
     public func asyncContains(
         where predicate: (Element) async -> Bool
     ) async -> Bool {
-        for element in self {
-            if await predicate(element) {
-                return true
-            }
+        for element in self where await predicate(element) {
+            return true
         }
         return false
     }
@@ -132,10 +128,8 @@ extension Sequence {
         _ isIncluded: (Element) async throws -> Bool
     ) async throws -> [Element] {
         var results: [Element] = []
-        for element in self {
-            if try await isIncluded(element) {
-                results.append(element)
-            }
+        for element in self where try await isIncluded(element) {
+            results.append(element)
         }
         return results
     }
@@ -175,10 +169,8 @@ extension Sequence {
     public func contains(
         where predicate: (Element) async throws -> Bool
     ) async throws -> Bool {
-        for element in self {
-            if try await predicate(element) {
-                return true
-            }
+        for element in self where try await predicate(element) {
+            return true
         }
         return false
     }

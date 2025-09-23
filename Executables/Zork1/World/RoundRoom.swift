@@ -181,11 +181,12 @@ extension RoundRoom {
     static let roundRoomHandler = LocationEventHandler(for: .roundRoom) {
         onEnter { context in
             if await !context.location.hasFlag(.isVisited) {
-                return ActionResult(
+                try ActionResult(
                     .runDaemon(.thiefDaemon)
                 )
+            } else {
+                nil
             }
-            return nil
         }
 
     }

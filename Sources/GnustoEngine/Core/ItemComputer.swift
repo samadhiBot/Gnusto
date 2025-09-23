@@ -11,7 +11,7 @@
 ///         let playerLevel = await context.gameState.value(of: .playerLevel) ?? 1
 ///         return .string(enchantment > playerLevel ? "Blazing sword!" : "Glowing blade")
 ///     }
-///     
+///
 ///     itemProperty(.weight) { context in
 ///         let enchantment = context.item.properties[.enchantmentLevel]?.intValue ?? 0
 ///         return .int(10 + enchantment) // Enchanted weapons are heavier
@@ -44,7 +44,7 @@ public struct ItemComputer: Sendable {
     ///         let enchantment = await context.item.enchantmentLevel
     ///         return .string(enchantment > 5 ? "Blazing sword!" : "Glowing blade")
     ///     }
-    ///     
+    ///
     ///     itemProperty(.weight, .size) { context in
     ///         let enchantment = await context.item.enchantmentLevel
     ///         return .int(10 + enchantment)
@@ -81,7 +81,7 @@ public typealias ItemComputeMatcher = (ItemComputeContext) async -> StateValue?
 ///         let enchantment = await context.item.enchantmentLevel
 ///         return .string(enchantment > 5 ? "Blazing sword!" : "Glowing blade")
 ///     }
-///     
+///
 ///     itemProperty(.weight, .size) { context in
 ///         let enchantment = await context.item.enchantmentLevel
 ///         return .int(10 + enchantment)
@@ -90,6 +90,13 @@ public typealias ItemComputeMatcher = (ItemComputeContext) async -> StateValue?
 /// ```
 @resultBuilder
 public struct ItemComputeMatcherBuilder {
+    /// Builds a block of item compute matchers into an array.
+    ///
+    /// This is the core building block of the result builder that combines multiple
+    /// `ItemComputeMatcher` functions into a single array for processing.
+    ///
+    /// - Parameter matchers: Variable number of matcher functions
+    /// - Returns: An array containing all the provided matchers
     public static func buildBlock(_ matchers: ItemComputeMatcher...) -> [ItemComputeMatcher] {
         Array(matchers)
     }

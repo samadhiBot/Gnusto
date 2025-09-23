@@ -90,7 +90,7 @@ struct FuseTests {
 
         // Schedule a fuse with typed payload
         let fuseState = try FuseState(turns: 3, payload: payload)
-        let result = ActionResult(
+        let result = try ActionResult(
             effects: [
                 .startFuse(
                     .statusEffectExpiry,
@@ -131,7 +131,7 @@ struct FuseTests {
         )
 
         let fuseState = try FuseState(turns: 3, payload: payload)
-        let result = ActionResult(
+        let result = try ActionResult(
             effects: [
                 .startFuse(.statusEffectExpiry, state: fuseState)
             ]
@@ -179,7 +179,7 @@ struct FuseTests {
         )
 
         // Schedule two fuses with different timing and payloads
-        let result = ActionResult(
+        let result = try ActionResult(
             effects: [
                 .startFuse(
                     .statusEffectExpiry,
@@ -237,7 +237,7 @@ struct FuseTests {
         )
 
         // Schedule all three fuses
-        let result = ActionResult(
+        let result = try ActionResult(
             effects: [
                 .startFuse(.enemyWakeUp, state: enemyLocationState),
                 .startFuse(.statusEffectExpiry, state: statusEffectState),
@@ -284,7 +284,7 @@ struct FuseTests {
             message: "The troll awakens!"
         )
 
-        let result = ActionResult(
+        let result = try ActionResult(
             effects: [
                 .startFuse(.enemyWakeUp, state: fuseState)
             ]
@@ -316,7 +316,7 @@ struct FuseTests {
 
         // Create fuse without payload
         let fuseState = FuseState(turns: 3)
-        let result = ActionResult(
+        let result = try ActionResult(
             effects: [
                 .startFuse(.statusEffectExpiry, state: fuseState)
             ]
@@ -390,7 +390,7 @@ struct FuseTests {
         )
 
         let fuseState = try FuseState(turns: 4, payload: complexPayload)
-        let result = ActionResult(
+        let result = try ActionResult(
             effects: [
                 .startFuse(.statusEffectExpiry, state: fuseState)
             ]

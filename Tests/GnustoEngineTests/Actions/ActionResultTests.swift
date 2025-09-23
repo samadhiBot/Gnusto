@@ -11,7 +11,7 @@ struct ActionResultTests {
 
     // - Simple Examples for Initialization Tests -
     let simpleChange = StateChange.setItemProperty(id: "lamp", property: .isOn, value: .bool(true))
-    let simpleEffect = SideEffect.startFuse("bomb", turns: 10)
+    let simpleEffect = try? SideEffect.startFuse("bomb", turns: 10)
 
     // - Examples for Merging/Applying Tests -
     // Note: These are now instance properties. `testResult` uses them,
@@ -113,9 +113,9 @@ struct ActionResultTests {
     }
 
     @Test("SideEffect Initialization - Full")
-    func testSideEffectInitializationFull() {
+    func testSideEffectInitializationFull() throws {
         let daemonState = DaemonState()
-        let effect = SideEffect.runDaemon("clock", state: daemonState)
+        let effect = try SideEffect.runDaemon("clock", state: daemonState)
 
         #expect(effect.type == .runDaemon)
         #expect(effect.targetID == .daemon("clock"))
@@ -123,8 +123,8 @@ struct ActionResultTests {
     }
 
     @Test("SideEffect Initialization - Defaults")
-    func testSideEffectInitializationWithDefaultParameters() {
-        let effect = SideEffect.stopDaemon("clock")
+    func testSideEffectInitializationWithDefaultParameters() throws {
+        let effect = try SideEffect.stopDaemon("clock")
 
         #expect(effect.type == .stopDaemon)
         #expect(effect.targetID == .daemon("clock"))
@@ -212,10 +212,7 @@ struct ActionResultTests {
     }
 
     // Corrected SideEffect initialization:
-    let sideEffect1 = SideEffect.startFuse(
-        "fuse",
-        turns: 5
-    )
+    let sideEffect1 = try? SideEffect.startFuse("fuse", turns: 5)
 
     @Test("ActionResult Initialization - Previous Structure Style")
     func testInitializationFromPreviousStyle() {

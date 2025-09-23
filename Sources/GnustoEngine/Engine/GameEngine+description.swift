@@ -35,7 +35,8 @@ extension GameEngine {
         let isFirstVisit = await !location.hasFlag(.isVisited)
         let isVerboseMode = hasFlag(.isVerboseMode)
 
-        // 4. For subsequent visits without forceFullDescription and not in verbose mode, just show the room name (brief mode)
+        // 4. For subsequent visits without forceFullDescription and not in verbose mode,
+        //    just show the room name (brief mode)
         if forceFullDescription || isFirstVisit || isVerboseMode {
             // Generate and print the full description
             await messages.append(
@@ -110,13 +111,11 @@ extension GameEngine {
 
         // Separate items with first descriptions from regular items
         // Only describe items that should be described (not those with .omitDescription)
-        for item in directItems.sorted() {
-            if await item.shouldDescribe {
-                if let firstDescription = await item.firstDescription {
-                    firstDescriptions.append(firstDescription)
-                } else {
-                    regularItems.append(item)
-                }
+        for item in directItems.sorted() where await item.shouldDescribe {
+            if let firstDescription = await item.firstDescription {
+                firstDescriptions.append(firstDescription)
+            } else {
+                regularItems.append(item)
             }
         }
 

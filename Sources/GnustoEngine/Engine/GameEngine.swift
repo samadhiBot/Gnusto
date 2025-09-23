@@ -152,7 +152,7 @@ public actor GameEngine {
     }
 
     /// Stores the last command that encountered disambiguation for retry with clarification
-    var lastDisambiguationContext: (originalInput: String, verb: Verb, noun: String)?
+    var lastDisambiguationContext: LastDisambiguationContext?
 
     /// Stores the last disambiguation options for matching against user responses
     var lastDisambiguationOptions: [String]?
@@ -216,5 +216,15 @@ public actor GameEngine {
         self.gameState = initialGameState
         self.messenger = gameBlueprint.messenger
         self.vocabulary = initialVocabulary
+    }
+}
+
+// MARK: - LastDisambiguationContext
+
+extension GameEngine {
+    struct LastDisambiguationContext {
+        let originalInput: String
+        let verb: Verb
+        let noun: String
     }
 }

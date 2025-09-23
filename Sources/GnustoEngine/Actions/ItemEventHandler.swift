@@ -84,14 +84,6 @@ public struct ItemEventHandler: Sendable {
 
 /// Represents the specific moments or triggers that can activate an `ItemEventHandler` for an item.
 public enum ItemEvent: Sendable {
-    /// Triggered before the game engine processes the player's command for the current turn,
-    /// specifically in the context of an item that has this event handler.
-    ///
-    /// The associated `Command` is the one the player has just entered.
-    /// Your handler can inspect this command and potentially return an `ActionResult` to
-    /// preempt or alter the default command processing for this item.
-    case beforeTurn(Command)
-
     /// Triggered after the game engine has processed the player's command for the current turn,
     /// specifically in the context of an item that has this event handler.
     ///
@@ -99,6 +91,13 @@ public enum ItemEvent: Sendable {
     /// This allows the item to react to the outcome of the turn or perform cleanup actions.
     case afterTurn(Command)
 
+    /// Triggered before the game engine processes the player's command for the current turn,
+    /// specifically in the context of an item that has this event handler.
+    ///
+    /// The associated `Command` is the one the player has just entered.
+    /// Your handler can inspect this command and potentially return an `ActionResult` to
+    /// preempt or alter the default command processing for this item.
+    case beforeTurn(Command)
 }
 
 // MARK: - Event Matching Result Builder
@@ -128,6 +127,14 @@ public typealias ItemEventMatcher = (ItemEventContext) async throws -> ActionRes
 /// ```
 @resultBuilder
 public struct ItemEventMatcherBuilder {
+    /// Builds an array of ItemEventMatcher from a sequence of matchers.
+    ///
+    /// This is the core building block method for the result builder that combines
+    /// multiple event matchers (created by `before()` and `after()` functions) into
+    /// a single array that can be processed by the ItemEventHandler.
+    ///
+    /// - Parameter matchers: A variadic list of ItemEventMatcher functions
+    /// - Returns: An array containing all the provided matchers
     public static func buildBlock(_ matchers: ItemEventMatcher...) -> [ItemEventMatcher] {
         Array(matchers)
     }

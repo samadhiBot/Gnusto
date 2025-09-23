@@ -1,5 +1,7 @@
 import Foundation
 
+// swiftlint:disable file_length
+
 /// Represents a property of an `Item`, providing both descriptive attributes and behavioral flags.
 ///
 /// `ItemProperty` serves as the foundation for defining item characteristics in the Gnusto engine.
@@ -122,7 +124,7 @@ extension ItemProperty {
     ///
     /// ## Usage
     /// ```swift
-    /// .description("A brass lamp with intricate Celtic knotwork etched into its surface. The wick appears well-maintained.")
+    /// .description("A brass lamp with intricate Celtic knotwork etched into its surface.")
     /// ```
     ///
     /// - Parameter description: The detailed examination text for this item.
@@ -142,7 +144,7 @@ extension ItemProperty {
     ///
     /// ## Usage
     /// ```swift
-    /// .firstDescription("A magnificent brass lamp sits majestically on the marble pedestal, its surface gleaming in the torchlight.")
+    /// .firstDescription("A magnificent brass lamp sits majestically on the marble pedestal.")
     /// ```
     ///
     /// - Parameter description: The initial encounter description for this item.
@@ -162,9 +164,9 @@ extension ItemProperty {
     ///
     /// ## Usage
     /// ```swift
-    /// .in("library"))  // Item is in the library locatin
-    /// .in(.player)               // Item is carried by the player
-    /// .in(.item("backpack"))     // Item is inside the backpack
+    /// .in(.library)          // Item is in the library location
+    /// .in(.player)           // Item is carried by the player
+    /// .in(.item(.backpack))  // Item is inside the backpack
     /// ```
     ///
     /// - Parameter parent: Where this item is currently located.
@@ -176,6 +178,18 @@ extension ItemProperty {
         )
     }
 
+    /// Convenience method for placing an item directly in a location.
+    ///
+    /// A shorthand for `.in(.location(locationID))` that simplifies the common case
+    /// of placing items in specific locations during initialization.
+    ///
+    /// ## Usage
+    /// ```swift
+    /// .in(.library)  // Item starts in the library location
+    /// ```
+    ///
+    /// - Parameter locationID: The location where this item should be placed.
+    /// - Returns: A .parentEntity property with the location as parent.
     public static func `in`(_ locationID: LocationID) -> ItemProperty {
         ItemProperty(
             id: .parentEntity,
@@ -253,7 +267,7 @@ extension ItemProperty {
     /// ## Usage
     /// ```swift
     /// .readText("Welcome to Zork! Your adventure begins now...")
-    /// .readText("The ancient runes seem to shift before your eyes, revealing: 'Speak friend and enter'")
+    /// .readText("The ancient runes seem to shift before your eyes, revealing...")
     /// ```
     ///
     /// - Parameter text: The readable content of this item.
@@ -273,7 +287,7 @@ extension ItemProperty {
     ///
     /// ## Usage
     /// ```swift
-    /// .readWhileHeldText("Holding the scroll closer to the light, you can make out faded marginalia: 'The password is XYZZY'")
+    /// .readWhileHeldText("Holding the scroll closer to the light, you can make out faded...")
     /// ```
     ///
     /// - Parameter text: The enhanced readable content available when holding this item.
@@ -701,7 +715,4 @@ extension ItemProperty {
 
 }
 
-// MARK: - Combat States
-
-/// Combat-related states that affect character behavior and capabilities during fights.
-/// These properties are primarily used with NPCs and actors in combat scenarios.
+// swiftlint:enable file_length

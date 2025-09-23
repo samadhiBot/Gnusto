@@ -12,6 +12,10 @@ public enum EntityID: Codable, Sendable, Hashable {
     /// unique `FuseID`.
     case fuse(FuseID)
 
+    /// Refers to global game state that isn't tied to a specific item, location, or character.
+    /// This can include things like global flags, counters, or pronoun references.
+    case global
+
     /// Refers to an item in the game world via its unique `ItemID`.
     case item(ItemID)
 
@@ -20,10 +24,6 @@ public enum EntityID: Codable, Sendable, Hashable {
 
     /// Refers to the player character.
     case player
-
-    /// Refers to global game state that isn't tied to a specific item, location, or character.
-    /// This can include things like global flags, counters, or pronoun references.
-    case global
 }
 
 extension EntityID {

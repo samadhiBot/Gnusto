@@ -9,17 +9,17 @@ import Foundation
 ///
 /// These are purely grammatical categories for language generation, not identity markers.
 public enum Classification: String, Codable, Sendable, Hashable, CaseIterable {
-    /// Masculine grammatical classification.
-    ///
-    /// Used for entities that should be referred to with masculine pronouns
-    /// ("he", "him", "his") in generated text.
-    case masculine
-
     /// Feminine grammatical classification.
     ///
     /// Used for entities that should be referred to with feminine pronouns
     /// ("she", "her", "hers") in generated text.
     case feminine
+
+    /// Masculine grammatical classification.
+    ///
+    /// Used for entities that should be referred to with masculine pronouns
+    /// ("he", "him", "his") in generated text.
+    case masculine
 
     /// Neuter grammatical classification.
     ///

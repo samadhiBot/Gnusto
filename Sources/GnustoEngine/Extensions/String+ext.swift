@@ -123,10 +123,8 @@ extension String {
 
         // Handle numbers that start with vowel sounds
         let vowelSoundPrefixes = ["8", "11", "18"]
-        for prefix in vowelSoundPrefixes {
-            if hasPrefix(prefix) {
-                return "an \(self)"
-            }
+        for prefix in vowelSoundPrefixes where hasPrefix(prefix) {
+            return "an \(self)"
         }
 
         // Handle vowels (including accented vowels)

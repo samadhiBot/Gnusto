@@ -10,23 +10,11 @@ public enum ConsciousnessLevel: String, Codable, Sendable, Hashable, CaseIterabl
     /// The character can take all normal actions and has full perception.
     case alert
 
-    /// Tired and less alert than usual.
-    ///
-    /// The character has reduced perception and initiative but can still act normally.
-    /// Common after exhaustion or late at night.
-    case drowsy
-
     /// Naturally sleeping but can be awakened.
     ///
     /// The character cannot take actions or perceive their surroundings while asleep,
     /// but loud noises or physical contact will wake them.
     case asleep
-
-    /// Knocked out or in a faint.
-    ///
-    /// The character cannot act or perceive anything. They may wake up naturally
-    /// after time or when healed/helped by others.
-    case unconscious
 
     /// Deep unconsciousness from severe trauma or magic.
     ///
@@ -39,6 +27,18 @@ public enum ConsciousnessLevel: String, Codable, Sendable, Hashable, CaseIterabl
     /// The character cannot act, perceive, or be awakened by normal means.
     /// May potentially be resurrected through powerful magic.
     case dead
+
+    /// Tired and less alert than usual.
+    ///
+    /// The character has reduced perception and initiative but can still act normally.
+    /// Common after exhaustion or late at night.
+    case drowsy
+
+    /// Knocked out or in a faint.
+    ///
+    /// The character cannot act or perceive anything. They may wake up naturally
+    /// after time or when healed/helped by others.
+    case unconscious
 }
 
 // MARK: - Consciousness Level Properties
