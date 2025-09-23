@@ -524,12 +524,6 @@ struct TurnOffActionHandlerTests {
         #expect(handler.requiresLight == false)
     }
 
-    @Test("Handler actions are correct")
-    func testActions() async throws {
-        let handler = TurnOffActionHandler()
-        #expect(handler.actions == [.lightSource])
-    }
-
     @Test("Handler syntax rules are correct")
     func testSyntaxRules() async throws {
         let handler = TurnOffActionHandler()

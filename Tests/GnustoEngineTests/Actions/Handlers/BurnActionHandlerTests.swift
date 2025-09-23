@@ -792,7 +792,6 @@ struct BurnActionHandlerTests {
         let handler = BurnActionHandler()
 
         #expect(handler.requiresLight == false)
-        #expect(handler.actions == [.lightSource])
         #expect(handler.synonyms.contains(.burn))
         #expect(handler.synonyms.contains(.ignite))
         #expect(handler.synonyms.contains(.light))

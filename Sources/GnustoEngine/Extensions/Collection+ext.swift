@@ -60,27 +60,6 @@ extension Collection {
     }
 }
 
-extension Collection where Element: Comparable {
-    /// Returns a sorted array of the collection's elements using their natural ordering.
-    ///
-    /// This is a convenience method for collections of `Comparable` elements that provides
-    /// async sorting using the default `<` comparison operator. Elements are sorted in
-    /// ascending order.
-    ///
-    /// ```swift
-    /// let numbers = [3, 1, 4, 1, 5]
-    /// let sortedNumbers = await numbers.asyncSorted()
-    /// // Result: [1, 1, 3, 4, 5]
-    /// ```
-    ///
-    /// - Returns: A new array containing the collection's elements sorted in ascending order.
-    /// - Complexity: O(n²) where n is the length of the collection, due to the insertion sort
-    ///   algorithm used.
-    func asyncSorted() async -> [Element] {
-        await asyncSorted(by: { $0 < $1 })
-    }
-}
-
 extension Collection where Element: Hashable {
     /// Returns `true` if this collection has any elements in common with the other collection.
     ///

@@ -421,8 +421,8 @@ struct TestLocationEventHandler {
 
 /// Test MessageProvider for testing custom message providers
 class TestMessenger: StandardMessenger, @unchecked Sendable {
-    override func anySomething(_ text: String) -> String {
-        "Custom: Cannot see any \(text) here."
+    override func anySuchThing() -> String {
+        "Custom: Cannot see any such thing in these parts."
     }
 }
 

@@ -5,15 +5,12 @@ import Foundation
 public struct TurnOnActionHandler: ActionHandler {
     // MARK: - Verb Definition Properties
 
-
     public let syntax: [SyntaxRule] = [
         .match(.verb, .directObject, .on),
         .match(.verb, .on, .directObject),
     ]
 
     public let synonyms: [Verb] = [.switch, .turn]
-
-    public let actions: [Intent] = [.lightSource]
 
     public let requiresLight: Bool = false
 

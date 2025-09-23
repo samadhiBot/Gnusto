@@ -214,10 +214,10 @@ class GameDataCollector {
                             extractPlayerLocationData(from: functionCall)
                         } else if functionName == "Fuse" {
                             extractFuseData(
-                                from: functionCall, propertyName: propertyName, isStatic: isStatic)
+                                propertyName: propertyName, isStatic: isStatic)
                         } else if functionName == "Daemon" {
                             extractDaemonData(
-                                from: functionCall, propertyName: propertyName, isStatic: isStatic)
+                                propertyName: propertyName, isStatic: isStatic)
                         }
                     }
                 }
@@ -493,7 +493,6 @@ class GameDataCollector {
     }
 
     private func extractFuseData(
-        from functionCall: FunctionCallExprSyntax,
         propertyName: String,
         isStatic: Bool
     ) {
@@ -510,7 +509,6 @@ class GameDataCollector {
     }
 
     private func extractDaemonData(
-        from functionCall: FunctionCallExprSyntax,
         propertyName: String,
         isStatic: Bool
     ) {

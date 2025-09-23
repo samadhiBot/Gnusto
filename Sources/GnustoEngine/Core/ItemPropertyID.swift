@@ -95,9 +95,6 @@ extension ItemPropertyID {
     /// Can be eaten (ZIL: EDIBLEBIT / `FOODBIT`).
     public static let isEdible = ItemPropertyID("isEdible")
 
-    /// Can be equipped (e.g., weapon, shield).
-    public static let isEquippable = ItemPropertyID("isEquippable")
-
     /// Can be consumed by fire, like wood, paper, etc. (ZIL: `BURNBIT`).
     public static let isFlammable = ItemPropertyID("isFlammable")
 
@@ -109,9 +106,6 @@ extension ItemPropertyID {
 
     /// Not normally seen, i.e.object is invisible (ZIL: `INVISIBLE`).
     public static let isInvisible = ItemPropertyID("isInvisible")
-
-    /// Can be used to lock/unlock.
-    public static let isKey = ItemPropertyID("isKey")
 
     /// Provides light when active/on (ZIL: `LIGHTBIT`).
     public static let isLightSource = ItemPropertyID("isLightSource")
@@ -160,9 +154,6 @@ extension ItemPropertyID {
 
     /// Is a vehicle (ZIL: `VEHBIT`).
     public static let isVehicle = ItemPropertyID("isVehicle")
-
-    /// Name starts with vowel, determines whether to use "an" (ZIL: `VOWELBIT`).
-    public static let startsWithVowel = ItemPropertyID("startsWithVowel")
 
     /// Is a weapon (ZIL: `WEAPONBIT`).
     public static let isWeapon = ItemPropertyID("isWeapon")

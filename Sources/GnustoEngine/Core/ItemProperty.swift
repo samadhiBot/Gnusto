@@ -452,9 +452,6 @@ extension ItemProperty {
     /// Allows weapons, armor, shields, and magical items to be equipped for enhanced
     /// combat effectiveness or special powers. Equipped items typically modify the
     /// player's capabilities or provide ongoing benefits.
-    public static var isEquippable: ItemProperty {
-        ItemProperty(id: .isEquippable, rawValue: true)
-    }
 
     /// The item can catch fire and be destroyed by flames (ZIL `BURNBIT`).
     ///
@@ -497,9 +494,6 @@ extension ItemProperty {
     /// Enables this item to operate locks when used with the "unlock" or "lock"
     /// commands. The key must match the `lockKey` property of the target item
     /// for the operation to succeed.
-    public static var isKey: ItemProperty {
-        ItemProperty(id: .isKey, rawValue: true)
-    }
 
     /// The item provides illumination when activated (ZIL `LIGHTBIT`).
     ///
@@ -704,9 +698,7 @@ extension ItemProperty {
     /// Helps the engine choose between "a" and "an" when generating text.
     /// Items starting with vowel sounds ("apple", "elegant dress") should have
     /// this flag to ensure proper grammatical article usage.
-    public static var startsWithVowel: ItemProperty {
-        ItemProperty(id: .startsWithVowel, rawValue: true)
-    }
+
 }
 
 // MARK: - Combat States

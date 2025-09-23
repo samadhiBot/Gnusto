@@ -14,8 +14,6 @@ public struct BurnActionHandler: ActionHandler {
         .match(.verb, .directObject, .with, .indirectObject),
     ]
 
-    public let actions: [Intent] = [.lightSource]
-
     public let synonyms: [Verb] = [.burn, .ignite, .light]
 
     public let requiresLight: Bool = false

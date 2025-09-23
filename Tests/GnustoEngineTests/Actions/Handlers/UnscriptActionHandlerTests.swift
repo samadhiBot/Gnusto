@@ -288,7 +288,6 @@ struct UnscriptActionHandlerTests {
     func testHandlerProperties() async throws {
         let handler = UnscriptActionHandler()
         #expect(handler.requiresLight == false)
-        // #expect(handler.actions.isEmpty)
         #expect(handler.synonyms.isEmpty)
     }
 

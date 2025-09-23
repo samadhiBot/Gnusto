@@ -556,7 +556,6 @@ struct ExtinguishActionHandlerTests {
     func testHandlerProperties() async throws {
         let handler = ExtinguishActionHandler()
         #expect(handler.requiresLight == true)
-        #expect(handler.actions == [.lightSource])
         #expect(handler.synonyms == [.extinguish, .douse])
     }
 

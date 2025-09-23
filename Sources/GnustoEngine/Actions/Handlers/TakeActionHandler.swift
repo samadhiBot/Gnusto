@@ -13,8 +13,6 @@ public struct TakeActionHandler: ActionHandler {
 
     public let synonyms: [Verb] = [.take, .get, .grab, .steal]
 
-    public let actions: [Intent] = [.take]
-
     public let requiresLight: Bool = true
 
     // MARK: - Action Processing Methods

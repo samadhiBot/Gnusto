@@ -121,10 +121,6 @@ open class StandardMessenger: @unchecked Sendable {
         )
     }
 
-    open func anySomething(_ text: String) -> String {
-        output("any \(text)", capitalize: false)
-    }
-
     open func anySuchThing() -> String {
         output("any such thing", capitalize: false)
     }
@@ -747,14 +743,6 @@ open class StandardMessenger: @unchecked Sendable {
         output("You \(command.verbPhrase) \(item).")
     }
 
-    open func failSound() -> String {
-        oneOf(
-            "Nothing happens.",
-            "The universe remains stubbornly unimpressed.",
-            "Reality fails to bend to your will."
-        )
-    }
-
     open func feelNothingUnusual(_ verb: Verb) -> String {
         oneOf(
             "You feel nothing unexpected.",
@@ -1148,15 +1136,6 @@ open class StandardMessenger: @unchecked Sendable {
 
     open func nothing() -> String {
         output("nothing", capitalize: false)
-    }
-
-    open func nothingHappens() -> String {
-        oneOf(
-            "Nothing happens.",
-            "The universe remains obstinately unchanged.",
-            "Your efforts produce no observable effect.",
-            "Reality continues its indifferent march."
-        )
     }
 
     open func nothingHereToDo(_ command: Command) -> String {
