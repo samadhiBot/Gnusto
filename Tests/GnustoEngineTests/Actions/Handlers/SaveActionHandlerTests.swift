@@ -257,7 +257,7 @@ struct SaveActionHandlerTests {
         )
 
         // When/Then: Should not throw
-        let _ = try await handler.process(context: ActionContext(command, engine))
+        _ = try await handler.process(context: ActionContext(command, engine))
     }
 
     @Test("Handler process returns correct result")

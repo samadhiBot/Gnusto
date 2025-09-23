@@ -418,7 +418,7 @@ public struct Vocabulary: Equatable, Sendable {
 
     /// Checks if a given word is a known pronoun.
     public func isPronoun(_ word: String) -> Bool {
-        return pronouns.contains(word.lowercased())
+        pronouns.contains(word.lowercased())
     }
 
     // MARK: - Default Universal Objects

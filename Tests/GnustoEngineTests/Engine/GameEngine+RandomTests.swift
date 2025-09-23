@@ -111,7 +111,7 @@ struct GameEngineRandomTests {
         var counts: [String: Int] = [:]
 
         // Generate many selections
-        for _ in 0..<1000 {
+        for _ in 0..<1_000 {
             guard let element = await engine.randomElement(in: collection) else {
                 Issue.record("Unexpectedly returned nil")
                 break

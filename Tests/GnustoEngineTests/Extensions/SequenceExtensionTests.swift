@@ -90,7 +90,7 @@ struct SequenceExtensionTests {
         let empty: [Int] = []
 
         let result = await empty.asyncFilter { _ in
-            return true
+            true
         }
 
         #expect(result.isEmpty)
@@ -101,7 +101,7 @@ struct SequenceExtensionTests {
         let numbers = [1, 2, 3, 4, 5]
 
         let result = await numbers.asyncFilter { _ in
-            return false
+            false
         }
 
         #expect(result.isEmpty)
@@ -112,7 +112,7 @@ struct SequenceExtensionTests {
         let numbers = [1, 2, 3, 4, 5]
 
         let result = await numbers.asyncFilter { _ in
-            return true
+            true
         }
 
         #expect(result == numbers)
@@ -165,7 +165,7 @@ struct SequenceExtensionTests {
         let empty: [Int] = []
 
         let result = await empty.asyncMap { number in
-            return number * 2
+            number * 2
         }
 
         #expect(result.isEmpty)
@@ -242,7 +242,7 @@ struct SequenceExtensionTests {
         let empty: [Int] = []
 
         let result = empty.contains { _ in
-            return true
+            true
         }
 
         #expect(result == false)
@@ -295,21 +295,21 @@ struct SequenceExtensionTests {
 
     @Test("All async methods work with large sequences")
     func testLargeSequencePerformance() async throws {
-        let largeArray = Array(1...1000)
+        let largeArray = Array(1...1_000)
 
         // Test asyncMap
         let mapped = await largeArray.asyncMap { $0 * 2 }
-        #expect(mapped.count == 1000)
+        #expect(mapped.count == 1_000)
         #expect(mapped.first == 2)
-        #expect(mapped.last == 2000)
+        #expect(mapped.last == 2_000)
 
         // Test asyncFilter
         let filtered = await largeArray.asyncFilter { $0 % 100 == 0 }
-        #expect(filtered == [100, 200, 300, 400, 500, 600, 700, 800, 900, 1000])
+        #expect(filtered == [100, 200, 300, 400, 500, 600, 700, 800, 900, 1_000])
 
         // Test asyncCompactMap
         let compactMapped = await largeArray.asyncCompactMap { $0 > 995 ? $0 : nil }
-        #expect(compactMapped == [996, 997, 998, 999, 1000])
+        #expect(compactMapped == [996, 997, 998, 999, 1_000])
 
         // Test contains
         let contains = largeArray.contains { $0 == 500 }

@@ -9,10 +9,6 @@ import Testing
 /// A test ID type that conforms to GnustoID for testing the protocol's default implementations.
 private struct TestID: GnustoID {
     let rawValue: String
-
-    init(rawValue: String) {
-        self.rawValue = rawValue
-    }
 }
 
 @Suite("GnustoID Protocol Tests")
@@ -179,7 +175,7 @@ struct GnustoIDTests {
         let results = await withTaskGroup(of: TestID.self) { group in
             for testID in testIDs {
                 group.addTask {
-                    return testID
+                    testID
                 }
             }
 
@@ -234,10 +230,10 @@ struct GnustoIDTests {
 
     @Test("GnustoID Very Long String")
     func testVeryLongString() throws {
-        let longString = String(repeating: "a", count: 10000)
+        let longString = String(repeating: "a", count: 10_000)
         let id = TestID(longString)
         #expect(id.rawValue == longString)
-        #expect(id.rawValue.count == 10000)
+        #expect(id.rawValue.count == 10_000)
     }
 
     @Test("GnustoID Whitespace Handling")
@@ -263,10 +259,10 @@ struct GnustoIDTests {
     @Test("GnustoID Large Collection Performance")
     func testLargeCollectionPerformance() throws {
         // Create a large set of TestIDs
-        let testIDs = (0..<1000).map { TestID("test\($0)") }
+        let testIDs = (0..<1_000).map { TestID("test\($0)") }
         let testSet = Set(testIDs)
 
-        #expect(testSet.count == 1000)
+        #expect(testSet.count == 1_000)
 
         // Test lookup performance
         let lookupID = TestID("test500")

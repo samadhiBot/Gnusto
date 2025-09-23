@@ -76,11 +76,11 @@ struct GameEngineActionResultTests {
 
     @Test("ActionResult with side effects")
     func testActionResultWithSideEffects() async throws {
-        let testFuse = Fuse(initialTurns: 5) { engine, fuseState in
+        let testFuse = Fuse(initialTurns: 5) { _, _ in
             ActionResult(message: "💣 Test fuse triggered!")
         }
 
-        let testDaemon = Daemon { engine, state in
+        let testDaemon = Daemon { _, _ in
             ActionResult(message: "🤖 Test daemon running")
         }
 
@@ -126,7 +126,7 @@ struct GameEngineActionResultTests {
             .in(.startRoom)
         )
 
-        let testFuse = Fuse(initialTurns: 3) { engine, fuseState in
+        let testFuse = Fuse(initialTurns: 3) { _, _ in
             ActionResult(message: "⏰ Emergency countdown started!")
         }
 
@@ -300,7 +300,7 @@ struct GameEngineActionResultTests {
             .in(.startRoom)
         )
 
-        let activationFuse = Fuse(initialTurns: 2) { engine, state in
+        let activationFuse = Fuse(initialTurns: 2) { _, _ in
             ActionResult(message: "🔥 The device overloads!")
         }
 
@@ -794,7 +794,7 @@ struct GameEngineActionResultTests {
 
     @Test("ActionResult with strongly-typed fuse payloads")
     func testActionResultWithStronglyTypedFusePayloads() async throws {
-        let testFuse = Fuse(initialTurns: 5) { engine, fuseState in
+        let testFuse = Fuse(initialTurns: 5) { _, fuseState in
             // Extract typed payload from fuse state
             if let payload = fuseState.getPayload(as: TestPayload.self) {
                 return ActionResult(message: "Fuse triggered with \(payload.message)!")
@@ -855,7 +855,7 @@ struct GameEngineActionResultTests {
 
     @Test("ActionResult with predefined payload types")
     func testActionResultWithPredefinedPayloadTypes() async throws {
-        let enemyFuse = Fuse(initialTurns: 2) { engine, fuseState in
+        let enemyFuse = Fuse(initialTurns: 2) { _, fuseState in
             if let payload = fuseState.getPayload(as: FuseState.EnemyLocationPayload.self) {
                 return ActionResult(
                     message:

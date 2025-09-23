@@ -319,7 +319,7 @@ struct StandardCombatSystemIntegrationTests {
         )
 
         // Look for critical hit indicators or high damage
-        let _ =
+        _ =
             output.lowercased().contains("critical") || output.lowercased().contains("devastating")
             || output.lowercased().contains("powerful")
 
@@ -676,7 +676,7 @@ struct StandardCombatSystemIntegrationTests {
             "dodge", "block", "parr", "miss",
         ]
 
-        let _ = specialEventTerms.contains { term in
+        _ = specialEventTerms.contains { term in
             output.lowercased().contains(term)
         }
 
@@ -770,7 +770,7 @@ struct StandardCombatSystemIntegrationTests {
 
         // Look for flee indicators
         let fleeTerms = ["flee", "flees", "retreat", "escap", "run"]
-        let _ = fleeTerms.contains { term in
+        _ = fleeTerms.contains { term in
             output.lowercased().contains(term)
         }
 
@@ -848,7 +848,7 @@ struct StandardCombatSystemIntegrationTests {
 
         // Look for surrender indicators
         let surrenderTerms = ["surrender", "yield", "submit", "give up"]
-        let _ = surrenderTerms.contains { term in
+        _ = surrenderTerms.contains { term in
             output.lowercased().contains(term)
         }
 
@@ -1056,7 +1056,7 @@ struct StandardCombatSystemIntegrationTests {
         )
 
         // Create custom combat system
-        let customSystem = StandardCombatSystem(versus: "dragon") { event, messenger in
+        let customSystem = StandardCombatSystem(versus: "dragon") { event, _ in
             switch event {
             case .enemyInjured:
                 return "The ancient dragon roars in fury as your blade finds its mark!"

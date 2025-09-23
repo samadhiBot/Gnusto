@@ -1,6 +1,6 @@
-import Testing
 import Foundation
 @testable import GnustoEngine
+import Testing
 
 @Suite("LocationID Tests")
 struct LocationIDTests {
@@ -68,7 +68,7 @@ struct LocationIDTests {
         let locationDict = [
             LocationID("kitchen"): "A cozy kitchen",
             LocationID("garden"): "A beautiful garden",
-            LocationID("library"): "A dusty library"
+            LocationID("library"): "A dusty library",
         ]
 
         #expect(locationDict[LocationID("kitchen")] == "A cozy kitchen")
@@ -83,7 +83,7 @@ struct LocationIDTests {
             "kitchen",
             "garden",
             "library",
-            "kitchen" // Duplicate should be ignored
+            "kitchen", // Duplicate should be ignored
         ]
 
         #expect(locationSet.count == 3)
@@ -184,7 +184,7 @@ struct LocationIDTests {
         let locations: [LocationID] = [
             "kitchen",
             "garden",
-            "library"
+            "library",
         ]
 
         #expect(locations.count == 3)
@@ -199,15 +199,15 @@ struct LocationIDTests {
     func testSendableCompliance() async throws {
         let locationIDs: [LocationID] = [
             "kitchen",
-            "garden", 
-            "library"
+            "garden",
+            "library",
         ]
 
         // Test that LocationID can be safely passed across actor boundaries
         let results = await withTaskGroup(of: LocationID.self) { group in
             for locationID in locationIDs {
                 group.addTask {
-                    return locationID
+                    locationID
                 }
             }
 
@@ -231,10 +231,10 @@ struct LocationIDTests {
     @Test("LocationID Large Collection Performance")
     func testLargeCollectionPerformance() throws {
         // Create a large set of LocationIDs
-        let locationIDs = (0..<1000).map { LocationID("location\($0)") }
+        let locationIDs = (0..<1_000).map { LocationID("location\($0)") }
         let locationSet = Set(locationIDs)
 
-        #expect(locationSet.count == 1000)
+        #expect(locationSet.count == 1_000)
 
         // Test lookup performance
         let lookupID: LocationID = "location500"
@@ -245,7 +245,7 @@ struct LocationIDTests {
 
     @Test("LocationID Very Long String")
     func testVeryLongString() throws {
-        let longString = String(repeating: "a", count: 10000)
+        let longString = String(repeating: "a", count: 10_000)
         let id = LocationID(longString)
         #expect(id.rawValue == longString)
     }
@@ -290,7 +290,7 @@ struct LocationIDTests {
             "kitchen",
             "attic",
             "garden",
-            "library"
+            "library",
         ]
         #expect(locations == expectedLocations)
     }
@@ -305,4 +305,4 @@ struct LocationIDTests {
         #expect(locationDescriptions.keys.contains("kitchen"))
         #expect(locationDescriptions.keys.contains("garden"))
     }
-} 
+}

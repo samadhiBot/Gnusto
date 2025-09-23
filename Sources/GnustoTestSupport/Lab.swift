@@ -265,7 +265,7 @@ extension Lab {
                     """
                     The troll says something, probably uncomplimentary, in
                     his guttural tongue.
-                    """
+                    """,
                 ]
             )
         ),

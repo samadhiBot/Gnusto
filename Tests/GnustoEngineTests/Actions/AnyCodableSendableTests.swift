@@ -135,7 +135,7 @@ struct AnyCodableSendableTests {
                 effectsVolume: 0.8
             ),
             difficulty: .nightmare,
-            scores: [100, 250, 500, 1000],
+            scores: [100, 250, 500, 1_000],
             metadata: ["version": "1.0", "platform": "iOS"]
         )
 
@@ -326,12 +326,12 @@ struct AnyCodableSendableTests {
 
     @Test("Large data handling")
     func testLargeDataHandling() throws {
-        let largeArray = Array(repeating: "test string", count: 10000)
+        let largeArray = Array(repeating: "test string", count: 10_000)
 
         let wrapper = try AnyCodableSendable(largeArray)
         let decoded = try wrapper.decode(as: [String].self)
 
-        #expect(decoded.count == 10000)
+        #expect(decoded.count == 10_000)
         #expect(decoded.allSatisfy { $0 == "test string" })
     }
 

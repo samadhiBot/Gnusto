@@ -75,8 +75,8 @@ extension SideEffect {
     public static func startFuse(
         _ fuseID: FuseID,
         state: FuseState
-    ) -> SideEffect {
-        try! SideEffect(
+    ) throws -> SideEffect {
+        try SideEffect(
             type: .startFuse,
             targetID: .fuse(fuseID),
             payload: state
@@ -128,8 +128,8 @@ extension SideEffect {
     public static func runDaemon(
         _ daemonID: DaemonID,
         state: DaemonState
-    ) -> SideEffect {
-        try! SideEffect(
+    ) throws -> SideEffect {
+        try SideEffect(
             type: .runDaemon,
             targetID: .daemon(daemonID),
             payload: state
@@ -184,7 +184,7 @@ extension SideEffect {
             locationID: locationID,
             message: message
         )
-        let fuseState = try! FuseState(turns: turns, payload: payload)
+        let fuseState = try FuseState(turns: turns, payload: payload)
         return startFuse(.enemyWakeUp, state: fuseState)
     }
 
@@ -205,13 +205,13 @@ extension SideEffect {
         to locationID: LocationID,
         message: String,
         turns: Int = 3
-    ) -> SideEffect {
+    ) throws -> SideEffect {
         let payload = FuseState.EnemyLocationPayload(
             enemyID: enemyID,
             locationID: locationID,
             message: message
         )
-        let fuseState = try! FuseState(turns: turns, payload: payload)
+        let fuseState = try FuseState(turns: turns, payload: payload)
         return startFuse(.enemyReturn, state: fuseState)
     }
 
@@ -229,12 +229,12 @@ extension SideEffect {
         for itemID: ItemID,
         effect: GeneralCondition,
         turns: Int = 5
-    ) -> SideEffect {
+    ) throws -> SideEffect {
         let payload = FuseState.StatusEffectPayload(
             itemID: itemID,
             effect: effect
         )
-        let fuseState = try! FuseState(turns: turns, payload: payload)
+        let fuseState = try FuseState(turns: turns, payload: payload)
         return startFuse(.statusEffectExpiry, state: fuseState)
     }
 
@@ -258,23 +258,23 @@ extension SideEffect {
 /// Each case represents a specific type of imperative action that the `GameEngine` can perform
 /// in response to game events or player commands.
 public enum SideEffectType: String, Codable, Sendable, Equatable {
-    /// Indicates that a timed event (a "fuse") should be started.
-    /// The `targetID` in the `SideEffect` should be the `EntityID.fuse(fuseID)` of the fuse.
-    /// The payload should contain a `FuseState` with timing and custom data.
-    case startFuse
-
-    /// Indicates that an active fuse should be stopped before it naturally concludes.
-    /// The `targetID` should be the `EntityID.fuse(fuseID)` of the fuse to stop.
-    /// No payload is required.
-    case stopFuse
-
     /// Indicates that a background game logic component (a "daemon") should be activated.
     /// The `targetID` should be the `EntityID.daemon(daemonID)` of the daemon to run.
     /// The payload may contain a `DaemonState` with initial execution data.
     case runDaemon
 
+    /// Indicates that a timed event (a "fuse") should be started.
+    /// The `targetID` in the `SideEffect` should be the `EntityID.fuse(fuseID)` of the fuse.
+    /// The payload should contain a `FuseState` with timing and custom data.
+    case startFuse
+
     /// Indicates that an active daemon should be deactivated.
     /// The `targetID` should be the `EntityID.daemon(daemonID)` of the daemon to stop.
     /// No payload is required.
     case stopDaemon
+
+    /// Indicates that an active fuse should be stopped before it naturally concludes.
+    /// The `targetID` should be the `EntityID.fuse(fuseID)` of the fuse to stop.
+    /// No payload is required.
+    case stopFuse
 }

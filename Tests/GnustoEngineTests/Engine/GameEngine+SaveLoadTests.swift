@@ -103,7 +103,7 @@ struct GameEngineSaveLoadTests {
             engine.player.updateScore(by: 25)
         )
         try await engine.apply(engine.player.move(to: "foyer"))
-        let _ = try await engine.saveGame(saveName: "testrestore")
+        _ = try await engine.saveGame(saveName: "testrestore")
 
         // Reset state to verify restoration
         try await engine.apply(

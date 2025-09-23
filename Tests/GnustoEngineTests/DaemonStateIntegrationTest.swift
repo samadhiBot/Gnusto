@@ -13,7 +13,7 @@ struct DaemonStateIntegrationTest {
             var message: String
         }
 
-        let statefulDaemon = Daemon(frequency: 2) { engine, state in
+        let statefulDaemon = Daemon(frequency: 2) { _, state in
             // Get current payload or create initial state
             var payload = state.getPayload(as: CounterPayload.self)
                           ?? CounterPayload(
@@ -105,9 +105,9 @@ struct DaemonStateIntegrationTest {
 
     @Test("Daemon state persists without payload updates")
     func testDaemonStatePersistenceWithoutPayload() async throws {
-        let simpleDaemon = Daemon(frequency: 1) { engine, state in
+        let simpleDaemon = Daemon(frequency: 1) { _, _ in
             // Return nil for state to keep it unchanged
-            return ActionResult(message: "Simple tick")
+            ActionResult(message: "Simple tick")
         }
 
         let game = MinimalGame(
@@ -172,7 +172,7 @@ struct DaemonStateIntegrationTest {
             var count: Int
         }
 
-        let daemon1 = Daemon(frequency: 1) { engine, state in
+        let daemon1 = Daemon(frequency: 1) { _, state in
             var payload = state.getPayload(as: DaemonPayload.self) ??
                           DaemonPayload(
                               name: "Alpha",
@@ -189,7 +189,7 @@ struct DaemonStateIntegrationTest {
             )
         }
 
-        let daemon2 = Daemon(frequency: 1) { engine, state in
+        let daemon2 = Daemon(frequency: 1) { _, state in
             var payload = state.getPayload(as: DaemonPayload.self) ??
                           DaemonPayload(
                               name: "Beta",

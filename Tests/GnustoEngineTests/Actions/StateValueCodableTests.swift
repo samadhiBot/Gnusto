@@ -95,7 +95,7 @@ struct StateValueCodableTests {
             timestamp: Date(),
             settings: TestGameSettings(difficulty: "Hard", musicVolume: 0.9, effectsVolume: 0.8),
             difficulty: .nightmare,
-            scores: [100, 250, 500, 1000],
+            scores: [100, 250, 500, 1_000],
             metadata: ["version": "1.0", "platform": "iOS"]
         )
 
@@ -333,16 +333,16 @@ struct StateValueCodableTests {
         }
 
         let original = LargeData(
-            largeArray: Array(repeating: "test string", count: 1000),
-            largeDictionary: Dictionary(uniqueKeysWithValues: (0..<1000).map { ("key\($0)", $0) })
+            largeArray: Array(repeating: "test string", count: 1_000),
+            largeDictionary: Dictionary(uniqueKeysWithValues: (0..<1_000).map { ("key\($0)", $0) })
         )
 
         let stateValue = try StateValue.wrap(original)
         let extracted = stateValue.toCodable(as: LargeData.self)
 
         #expect(extracted == original)
-        #expect(extracted?.largeArray.count == 1000)
-        #expect(extracted?.largeDictionary.count == 1000)
+        #expect(extracted?.largeArray.count == 1_000)
+        #expect(extracted?.largeDictionary.count == 1_000)
     }
 
     // MARK: - Type Safety Tests

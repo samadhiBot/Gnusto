@@ -19,20 +19,20 @@ struct GameEngineSideEffectsTests {
 
     private func createTestEngine() async -> (GameEngine, MockIOHandler) {
         // Test fuse action - return ActionResult with side effect to set flag
-        let testFuse = Fuse(initialTurns: 3) { engine, fuseState in
+        let testFuse = Fuse(initialTurns: 3) { _, _ in
             ActionResult(
                 message: "💥 The fuse exploded!",
                 effects: [
                     .startFuse(
                         "globalFlag",
                         turns: 1
-                    )
+                    ),
                 ]
             )
         }
 
         // Test daemon action - increment a counter using state changes
-        let testDaemon = Daemon { engine, state in
+        let testDaemon = Daemon { engine, _ in
             await ActionResult(
                 "🕰️ Daemon tick",
                 engine.adjustGlobal("daemonTicks", by: 1)
@@ -40,12 +40,12 @@ struct GameEngineSideEffectsTests {
         }
 
         // Another test fuse action - return state change via ActionResult
-        let anotherFuse = Fuse(initialTurns: 5) { engine, fuseState in
+        let anotherFuse = Fuse(initialTurns: 5) { _, _ in
             ActionResult("💌 Message delivered!")
         }
 
         // Another test daemon action - return state change via ActionResult
-        let anotherDaemon = Daemon { engine, state in
+        let anotherDaemon = Daemon { engine, _ in
             await ActionResult(
                 "🎻 Music is playing",
                 engine.setFlag("musicPlaying")

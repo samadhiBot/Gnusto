@@ -68,7 +68,7 @@ struct ItemProxyMovementTests {
             .north("library"),
             .east(blocked: "The wall is too thick"),
             .south("kitchen", via: "kitchenDoor"),
-            .west("garden")
+            .west("garden"),
         ])
     }
 
@@ -188,7 +188,7 @@ struct ItemProxyMovementTests {
         // Then: Should be able to pass through open doors and closed unlocked doors
         expectNoDifference(availableExits, [
             .north("hall1", via: "door1"),
-            .east("hall3", via: "door3")
+            .east("hall3", via: "door3"),
         ])
     }
 

@@ -95,7 +95,7 @@ struct FuseTests {
                 .startFuse(
                     .statusEffectExpiry,
                     state: fuseState
-                )
+                ),
             ]
         )
         try await engine.processActionResult(result)
@@ -184,7 +184,7 @@ struct FuseTests {
                 .startFuse(
                     .statusEffectExpiry,
                     state: try FuseState(turns: 1, payload: statusPayload)
-                )
+                ),
             ]
         )
         try await engine.processActionResult(result)
@@ -206,7 +206,7 @@ struct FuseTests {
 
         // After another turn, should be completely done
         gameState = await engine.gameState
-        #expect(gameState.activeFuses.count == 0)
+        #expect(gameState.activeFuses.isEmpty)
     }
 
     @Test("Convenience constructors create correct payloads")

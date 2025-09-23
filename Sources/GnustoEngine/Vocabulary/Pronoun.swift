@@ -47,7 +47,7 @@ extension Pronoun {
     /// - Parameter entities: The entity references to create a plural pronoun for
     /// - Returns: A `them` pronoun containing all provided entities
     public static func forEntities(_ entities: [EntityReference]) -> Pronoun {
-        return .them(entities)
+        .them(entities)
     }
 }
 

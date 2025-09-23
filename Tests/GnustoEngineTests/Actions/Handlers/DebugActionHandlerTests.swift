@@ -468,7 +468,7 @@ struct DebugActionHandlerTests {
         #expect(handler.syntax.count == 1)
 
         // Should have .match(.verb) syntax
-        let _ = handler.syntax[0]
+        _ = handler.syntax[0]
         // Note: We can't easily test the internal structure of SyntaxRule,
         // but we can verify the count and that syntax testing above works
     }

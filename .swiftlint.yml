@@ -2,6 +2,7 @@ disabled_rules:
   - inclusive_language # Please raise any issues in code reviews
   - opening_brace # Conflicts with multiline if's
   - todo # Allow `TODO` and `FIXME` comments
+  - cyclomatic_complexity # Consider re-enabling in the future
 
 analyzer_rules:
   - capture_variable

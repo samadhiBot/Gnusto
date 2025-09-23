@@ -40,7 +40,7 @@ struct UniversalTests {
     func testCaseIterable() {
         let allCases = Universal.allCases
 
-        #expect(allCases.count > 0)
+        #expect(!allCases.isEmpty)
         #expect(allCases.contains(.ground))
         #expect(allCases.contains(.sky))
         #expect(allCases.contains(.water))

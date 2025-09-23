@@ -464,7 +464,7 @@ struct StandardCombatSystemUnitTests {
                         You should have run when you could.
                         """,
                     turns: 3
-                )
+                ),
             ]
         )
 

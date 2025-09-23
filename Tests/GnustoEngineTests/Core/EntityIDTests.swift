@@ -339,7 +339,7 @@ struct EntityIDTests {
         let results = await withTaskGroup(of: EntityID.self) { group in
             for entityID in entityIDs {
                 group.addTask {
-                    return entityID
+                    entityID
                 }
             }
 

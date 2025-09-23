@@ -103,7 +103,7 @@ struct StateChangeCodableTests {
             timestamp: Date(),
             settings: TestGameSettings(difficulty: "Expert", musicVolume: 0.9, effectsVolume: 0.8),
             difficulty: .hard,
-            scores: [1000, 2500, 5000],
+            scores: [1_000, 2_500, 5_000],
             metadata: ["version": "2.0", "platform": "macOS"]
         )
 
@@ -214,7 +214,7 @@ struct StateChangeCodableTests {
             settings: TestGameSettings(
                 difficulty: "RoundTrip", musicVolume: 0.42, effectsVolume: 0.73),
             difficulty: .nightmare,
-            scores: [999, 1337, 2048],
+            scores: [999, 1_337, 2_048],
             metadata: ["test": "roundTrip", "encoding": "json"]
         )
 
@@ -245,7 +245,7 @@ struct StateChangeCodableTests {
         let changes = [
             StateChange.setGlobalCodable(id: "settings", value: wrapper),
             StateChange.setGlobalBool(id: "debugMode", value: true),
-            StateChange.setGlobalInt(id: "score", value: 1000),
+            StateChange.setGlobalInt(id: "score", value: 1_000),
             StateChange.setGlobalString(id: "playerName", value: "TestPlayer"),
             StateChange.setFlag(.isNoOp),
             StateChange.clearFlag(.isNoOp),

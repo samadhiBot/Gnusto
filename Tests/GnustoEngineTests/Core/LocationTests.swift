@@ -21,7 +21,7 @@ struct LocationTests {
     }
 
     func createCustomLocation() -> Location {
-        return Location(
+        Location(
             id: "livingRoom",
             .name("Living Room"),
             .description("A comfortably furnished living room. There are exits west and east."),

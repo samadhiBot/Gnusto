@@ -258,26 +258,29 @@ extension ItemProxy {
 
     /// Checks if this item meets all of the specified flag requirements.
     ///
-    /// This is a convenience method for checking complex flag requirements with AND, OR, and NOT logic.
+    /// This is a convenience method for checking complex flag requirements with AND, OR,
+    /// and NOT logic.
     ///
     /// - Parameters:
     ///   - anyPropertyIDs: Flags to check with OR logic - at least one must be `true`.
     ///   - allPropertyIDs: Flags to check with AND logic - all must be set to `true`.
     ///   - nonePropertyIDs: Flags to check with NOT logic - all must be `false` or unset.
-    /// - Returns: `true` if all conditions are met (all `allPropertyIDs` are true, none of `nonePropertyIDs` are true, and at least one of `anyPropertyIDs` is true if any are specified), `false` otherwise.
+    /// - Returns: `true` if all conditions are met (all `allPropertyIDs` are true,
+    ///            none of `nonePropertyIDs` are true, and at least one of `anyPropertyIDs`
+    ///            is true if any are specified), `false` otherwise.
     public func hasFlags(
         any anyPropertyIDs: ItemPropertyID...,
         all allPropertyIDs: ItemPropertyID...,
         none nonePropertyIDs: ItemPropertyID...
     ) async -> Bool {
-        for itemPropertyID in allPropertyIDs {
-            guard await hasFlag(itemPropertyID) else { return false }
+        for itemPropertyID in allPropertyIDs where await !hasFlag(itemPropertyID) {
+            return false
         }
-        for itemPropertyID in nonePropertyIDs {
-            if await hasFlag(itemPropertyID) { return false }
+        for itemPropertyID in nonePropertyIDs where await hasFlag(itemPropertyID) {
+            return false
         }
-        for itemPropertyID in anyPropertyIDs {
-            if await hasFlag(itemPropertyID) { return true }
+        for itemPropertyID in anyPropertyIDs where await hasFlag(itemPropertyID) {
+            return true
         }
         return anyPropertyIDs.isEmpty
     }

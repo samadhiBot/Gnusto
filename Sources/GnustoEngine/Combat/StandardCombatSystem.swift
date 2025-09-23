@@ -9,7 +9,7 @@ import Logging
 /// - Character attribute-based combat modifiers
 /// - Dynamic enemy AI that responds to combat state
 /// - Rich narrative combat descriptions
-public struct StandardCombatSystem: CombatSystem {
+public struct StandardCombatSystem: CombatSystem { // swiftlint:disable:this type_body_length
     /// The identifier of the enemy this combat system applies to.
     public let enemyID: ItemID
 

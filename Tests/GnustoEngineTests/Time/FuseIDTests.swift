@@ -194,7 +194,7 @@ struct FuseIDTests {
         let results = await withTaskGroup(of: FuseID.self) { group in
             for fuseID in fuseIDs {
                 group.addTask {
-                    return fuseID
+                    fuseID
                 }
             }
 
@@ -218,10 +218,10 @@ struct FuseIDTests {
     @Test("FuseID Large Collection Performance")
     func testLargeCollectionPerformance() throws {
         // Create a large set of FuseIDs
-        let fuseIDs = (0..<1000).map { FuseID("fuse\($0)") }
+        let fuseIDs = (0..<1_000).map { FuseID("fuse\($0)") }
         let fuseSet = Set(fuseIDs)
 
-        #expect(fuseSet.count == 1000)
+        #expect(fuseSet.count == 1_000)
 
         // Test lookup performance
         let lookupID: FuseID = "fuse500"
@@ -232,7 +232,7 @@ struct FuseIDTests {
 
     @Test("FuseID Very Long String")
     func testVeryLongString() throws {
-        let longString = String(repeating: "a", count: 10000)
+        let longString = String(repeating: "a", count: 10_000)
         let id = FuseID(longString)
         #expect(id.rawValue == longString)
     }

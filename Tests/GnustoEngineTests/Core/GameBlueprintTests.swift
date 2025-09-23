@@ -75,31 +75,28 @@ struct GameBlueprintTests {
 
         let fuses = [
             "testFuse": Fuse(
-                initialTurns: 5,
-                action: { _, _ in ActionResult("Fuse triggered!") }
-            )
+                initialTurns: 5
+            )                { _, _ in ActionResult("Fuse triggered!") },
         ]
 
         let daemons = [
-            DaemonID("testDaemon"): Daemon(
-                action: { _, _ in ActionResult("Daemon running!") }
-            )
+            DaemonID("testDaemon"): Daemon                { _, _ in ActionResult("Daemon running!") }
         ]
 
         let itemComputers = [
             ItemID("testSword"): ItemComputer(for: ItemID("testSword")) {
-                itemProperty(ItemPropertyID.description) { context in
-                    return .string("A dynamically computed description")
+                itemProperty(ItemPropertyID.description) { _ in
+                    .string("A dynamically computed description")
                 }
-            }
+            },
         ]
 
         let locationComputers = [
             LocationID("entrance"): LocationComputer(for: LocationID("entrance")) {
-                locationProperty(.description) { context in
-                    return .string("A dynamically computed location description")
+                locationProperty(.description) { _ in
+                    .string("A dynamically computed location description")
                 }
-            }
+            },
         ]
 
         let messenger = TestMessenger()
@@ -353,15 +350,15 @@ struct GameBlueprintTests {
         let blueprint = MinimalGameBlueprint()
 
         // All collections should be empty and non-nil
-        #expect(blueprint.items.count == 0)
-        #expect(blueprint.locations.count == 0)
-        #expect(blueprint.customActionHandlers.count == 0)
-        #expect(blueprint.itemEventHandlers.count == 0)
-        #expect(blueprint.locationEventHandlers.count == 0)
-        #expect(blueprint.fuses.count == 0)
-        #expect(blueprint.daemons.count == 0)
-        #expect(blueprint.itemComputers.count == 0)
-        #expect(blueprint.locationComputers.count == 0)
+        #expect(blueprint.items.isEmpty)
+        #expect(blueprint.locations.isEmpty)
+        #expect(blueprint.customActionHandlers.isEmpty)
+        #expect(blueprint.itemEventHandlers.isEmpty)
+        #expect(blueprint.locationEventHandlers.isEmpty)
+        #expect(blueprint.fuses.isEmpty)
+        #expect(blueprint.daemons.isEmpty)
+        #expect(blueprint.itemComputers.isEmpty)
+        #expect(blueprint.locationComputers.isEmpty)
     }
 
     @Test("GameBlueprint properties are accessible")
@@ -404,7 +401,7 @@ struct TestCustomActionHandler: ActionHandler {
 /// Test ItemEventHandler for testing item event handlers
 struct TestItemEventHandler {
     func createHandler() -> ItemEventHandler {
-        ItemEventHandler { engine, event in
+        ItemEventHandler { _, _ in
             ActionResult("Test item event handled")
         }
     }
@@ -413,7 +410,7 @@ struct TestItemEventHandler {
 /// Test LocationEventHandler for testing location event handlers
 struct TestLocationEventHandler {
     func createHandler() -> LocationEventHandler {
-        LocationEventHandler { engine, event in
+        LocationEventHandler { _, _ in
             ActionResult("Test location event handled")
         }
     }

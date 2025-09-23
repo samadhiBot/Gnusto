@@ -270,8 +270,8 @@ struct CircularDependencyIntegrationTests {
 
         // Computer that only handles weight, leaving other properties as static
         let partialComputer = ItemComputer(for: "testItem") {
-            itemProperty(.weight) { context in
-                return .int(42)
+            itemProperty(.weight) { _ in
+                .int(42)
             }
         }
 
