@@ -140,17 +140,6 @@ public struct MinimalGame: GameBlueprint {
 // MARK: - Default Component Generation
 
 extension MinimalGame {
-    /// Ensures the game has essential items, adding defaults if necessary.
-    //    private static func allItems(from items: [Item]) -> [Item] {
-    //        var allItems = items
-    //        if !allItems.contains(where: { $0.id == .startItem }) {
-    //            allItems.append(
-    //
-    //            )
-    //        }
-    //        return allItems
-    //    }
-
     /// Ensures the game has essential locations, adding defaults if necessary.
     private static func allLocations(from locations: [Location]) -> [Location] {
         var allLocations = locations

@@ -2,8 +2,15 @@ import GnustoEngine
 
 // MARK: - Locations
 
-/// A laboratory in which strange experiments are being conducted.
+/// A test laboratory containing various items and NPCs for testing interactive fiction mechanics.
+///
+/// The `Lab` provides a standardized testing environment with a single room containing
+/// a diverse collection of items and characters that cover most common IF scenarios.
 public enum Lab {
+    /// A well-lit laboratory room that serves as the primary testing location.
+    ///
+    /// This location is inherently lit and contains various test items and NPCs,
+    /// making it ideal for testing game mechanics without worrying about darkness.
     public static let laboratory = Location(
         id: .startRoom,
         .name("Laboratory"),
@@ -15,6 +22,11 @@ public enum Lab {
 // MARK: - Items
 
 extension Lab {
+    /// A bloody axe weapon carried by the troll.
+    ///
+    /// This item demonstrates weapon mechanics and the `requiresTryTake` flag,
+    /// making it more challenging to obtain. It has multiple synonyms and adjectives
+    /// for testing vocabulary parsing.
     public static let axe = Item(
         id: .axe,
         .name("bloody axe"),
@@ -28,6 +40,10 @@ extension Lab {
         .in(.item(.troll))
     )
 
+    /// A bunch of purple grapes for testing plural item handling.
+    ///
+    /// This item tests the plural flag functionality and provides a simple
+    /// takeable food item for testing consumption mechanics.
     public static let grapes = Item(
         id: "grapes",
         .name("grapes"),
@@ -37,6 +53,10 @@ extension Lab {
         .in(.startRoom)
     )
 
+    /// An iron sword weapon that starts in the player's inventory.
+    ///
+    /// This weapon provides a baseline for combat testing and demonstrates
+    /// items that begin in the player's possession.
     public static let ironSword = Item(
         id: "sword",
         .name("iron sword"),
@@ -46,6 +66,10 @@ extension Lab {
         .in(.player)
     )
 
+    /// A wooden match that can ignite itself or other items.
+    ///
+    /// This item tests the self-ignitable flag and fire mechanics,
+    /// starting in the player's inventory for immediate use.
     public static let matchStick = Item(
         id: "match",
         .name("wooden match"),
@@ -55,6 +79,10 @@ extension Lab {
         .in(.player)
     )
 
+    /// A simple pebble that serves as a basic test item.
+    ///
+    /// This unremarkable item provides a neutral test object for basic
+    /// item manipulation without special properties or complications.
     public static let pebble = Item(
         id: .startItem,
         .name("pebble"),
@@ -63,6 +91,10 @@ extension Lab {
         .isTakable
     )
 
+    /// A burning torch that provides light.
+    ///
+    /// This item tests light source mechanics, flammability, and burning states.
+    /// It starts in the player's inventory as an active light source.
     public static let torch = Item(
         id: "torch",
         .name("flaming torch"),
@@ -77,6 +109,11 @@ extension Lab {
 // MARK: - NPC's
 
 extension Lab {
+    /// A stern castle guard with moderate combat abilities.
+    ///
+    /// This NPC demonstrates character sheet mechanics, taunts system,
+    /// and represents a lawful neutral authority figure with combat capabilities.
+    /// The guard is drunk and drowsy, affecting their performance.
     public static let castleGuard = Item(
         id: "guard",
         .name("castle guard"),
@@ -113,6 +150,11 @@ extension Lab {
         .in(.startRoom)
     )
 
+    /// A powerful dragon representing the ultimate combat challenge.
+    ///
+    /// This NPC serves as a high-level boss enemy with maximum stats across
+    /// most categories. It demonstrates neutral evil alignment and represents
+    /// the most dangerous combat encounter in the test suite.
     public static let dragon = Item(
         id: "dragon",
         .name("terrible dragon"),
@@ -141,6 +183,11 @@ extension Lab {
         .in(.startRoom)
     )
 
+    /// A helpful woodland fairy with high magical abilities.
+    ///
+    /// This NPC represents a chaotic good character with exceptional dexterity,
+    /// luck, and stealth. The fairy demonstrates low physical strength but
+    /// high mental attributes, providing a contrast to combat-focused NPCs.
     public static let fairy = Item(
         id: "fairy",
         .name("woodland fairy"),
@@ -171,6 +218,11 @@ extension Lab {
         .in(.startRoom)
     )
 
+    /// A noble knight representing lawful good heroic archetype.
+    ///
+    /// This NPC demonstrates a well-balanced heroic character with high physical
+    /// and social stats. The knight has combat taunts and represents traditional
+    /// chivalric values in the game world.
     public static let knight = Item(
         id: "knight",
         .name("knight"),
@@ -203,6 +255,10 @@ extension Lab {
         .in(.startRoom)
     )
 
+    /// A traveling merchant with default character stats.
+    ///
+    /// This NPC provides a baseline character for testing trade mechanics
+    /// and demonstrates the use of default character sheet values.
     public static let merchant = Item(
         id: "merchant",
         .name("traveling merchant"),
@@ -211,6 +267,11 @@ extension Lab {
         .in(.startRoom)
     )
 
+    /// A beautiful princess with high social and mental attributes.
+    ///
+    /// This NPC represents a lawful neutral royal character with exceptional
+    /// charisma and luck. She demonstrates high intelligence and wisdom
+    /// while maintaining moderate physical capabilities.
     public static let princess = Item(
         id: "princess",
         .name("princess"),
@@ -231,6 +292,11 @@ extension Lab {
         .in(.startRoom)
     )
 
+    /// A fierce troll that blocks the player's path.
+    ///
+    /// This NPC serves as a classic IF obstacle with multiple synonyms and adjectives.
+    /// The troll carries an axe and has taunting behavior. It's transparent and
+    /// requires special handling to take, making it ideal for testing complex interactions.
     public static let troll = Item(
         id: .troll,
         .name("fierce troll"),
@@ -274,6 +340,11 @@ extension Lab {
         .in(.startRoom)
     )
 
+    /// Spandalf the wizard, a wise magical character.
+    ///
+    /// This NPC demonstrates the wise character sheet preset and provides
+    /// multiple synonyms for testing vocabulary recognition. The wizard
+    /// represents a classic IF mentor figure.
     public static let wizard = Item(
         id: "wizard",
         .name("Spandalf"),
@@ -286,6 +357,13 @@ extension Lab {
 }
 
 extension Item {
+    /// Returns a copy of this item with their fighting flag set to true.
+    ///
+    /// This computed property modifies the character sheet to indicate the NPC
+    /// is currently engaged in combat, which affects their behavior and responses.
+    ///
+    /// - Returns: A new `Item` instance with fighting status enabled, or the original
+    ///   item if it doesn't have a character sheet.
     public var fighting: Item {
         var fighter = self
         if case .characterSheet(var fightSheet) = fighter.properties[.characterSheet] {
@@ -300,11 +378,17 @@ extension Item {
 // MARK: - Common Test IDs
 
 extension ItemID {
+    /// The item ID for the bloody axe weapon.
     public static let axe: ItemID = "axe"
+
+    /// The item ID for the starting pebble item.
     public static let startItem: ItemID = "startItem"
+
+    /// The item ID for the fierce troll NPC.
     public static let troll: ItemID = "troll"
 }
 
 extension LocationID {
+    /// The location ID for the laboratory test room.
     public static let startRoom: LocationID = "startRoom"
 }

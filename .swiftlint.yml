@@ -1,8 +1,11 @@
 disabled_rules:
+  - cyclomatic_complexity # Consider re-enabling in the future
+  - file_length
+  - function_body_length
   - inclusive_language # Please raise any issues in code reviews
   - opening_brace # Conflicts with multiline if's
   - todo # Allow `TODO` and `FIXME` comments
-  - cyclomatic_complexity # Consider re-enabling in the future
+  - type_body_length
 
 analyzer_rules:
   - capture_variable
@@ -41,22 +44,9 @@ opt_in_rules:
   - untyped_error_in_catch
   - vertical_parameter_alignment_on_call
 
-file_length:
-  warning: 600
-  error: 1000
-
-function_body_length:
-  warning: 100
-  error: 200
-
 identifier_name:
   allowed_symbols:
     - _
-  excluded:
-    - i
-    - x
-    - y
-    - z
   max_length:
     warning: 50
   min_length:
@@ -66,10 +56,6 @@ line_length: 120
 
 trailing_comma:
   mandatory_comma: true
-
-type_body_length:
-  warning: 400
-  error: 600
 
 type_name:
   excluded:

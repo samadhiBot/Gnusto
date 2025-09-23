@@ -55,7 +55,7 @@ public final class MockIOHandler: IOHandler {
     public private(set) var recordedOutput: [OutputCall] = []
 
     /// All status line updates made during the test session.
-    public private(set) var recordedStatusLines: [(roomName: String, score: Int, turns: Int)] = []
+    public private(set) var recordedStatusLines: [RecordedStatusLine] = []
 
     /// Number of times the screen was cleared during testing.
     public private(set) var clearScreenCallCount: Int = 0
@@ -159,7 +159,13 @@ public final class MockIOHandler: IOHandler {
     }
 
     public func showStatusLine(roomName: String, score: Int, turns: Int) {
-        recordedStatusLines.append((roomName: roomName, score: score, turns: turns))
+        recordedStatusLines.append(
+            RecordedStatusLine(
+                roomName: roomName,
+                score: score,
+                turns: turns
+            )
+        )
     }
 
     public func clearScreen() {
@@ -295,5 +301,21 @@ public final class MockIOHandler: IOHandler {
             actualTranscript
             .trimmingCharacters(in: .whitespacesAndNewlines)
             .replacing(/\n{3,}/, with: String.paragraph)
+    }
+}
+
+extension MockIOHandler {
+    /// Represents a captured status line update during test execution.
+    ///
+    /// Status lines in interactive fiction games typically display contextual information
+    /// such as the current room, player score, and turn count. This structure captures
+    /// these updates for test verification.
+    public struct RecordedStatusLine {
+        /// The name of the current room or location.
+        let roomName: String
+        /// The player's current score.
+        let score: Int
+        /// The current turn number.
+        let turns: Int
     }
 }

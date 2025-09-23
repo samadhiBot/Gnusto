@@ -1,8 +1,6 @@
 import Foundation
 import Logging
 
-// swiftlint:disable file_length type_body_length
-
 /// A standard, ZIL-inspired implementation of the `Parser` protocol, designed to
 /// interpret player input in a manner reminiscent of classic text-adventure games.
 ///
@@ -386,8 +384,8 @@ public struct StandardParser: Parser {
         startIndex: Int,
         vocabulary: Vocabulary
     ) -> String? {
-        for i in startIndex..<tokens.count {
-            let currentToken = tokens[i]
+        for index in startIndex..<tokens.count {
+            let currentToken = tokens[index]
             if vocabulary.prepositions.contains(currentToken) {
                 // Found the first preposition after the verb phrase.
                 return currentToken
@@ -1651,4 +1649,3 @@ extension StandardParser {
         let score: Int
     }
 }
-// swiftlint:enable file_length type_body_length

@@ -50,7 +50,8 @@ public struct TestFilesystemHandler: FilesystemHandler {
     /// identified by a UUID to ensure complete isolation between test instances.
     /// The directory is created on-demand when first accessed by filesystem operations.
     ///
-    /// - Parameter baseDirectory: Optional custom base directory. If `nil`, uses system temporary directory with unique UUID suffix.
+    /// - Parameter baseDirectory: Optional custom base directory. If `nil`, uses system
+    ///                            temporary directory with unique UUID suffix.
     public init(baseDirectory: URL? = nil) {
         self.baseDirectory =
             baseDirectory

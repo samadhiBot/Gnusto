@@ -13,7 +13,7 @@ import Logging
 ///
 /// `StandardMessenger` and its subclasses are forced to declare `@unchecked Sendable` because
 /// it is an open class.
-open class StandardMessenger: @unchecked Sendable {  // swiftlint:disable:this type_body_length
+open class StandardMessenger: @unchecked Sendable {
     /// Internal logger for engine messages, warnings, and errors.
     let logger = Logger(label: "com.samadhibot.Gnusto.StandardMessenger")
 

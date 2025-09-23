@@ -315,67 +315,11 @@ extension InsideHouse {
             )
         }
     }
+}
 
-    /// Handles special lamp interactions based on the original ZIL `LANTERN` routine.
-    ///
-    /// This handler manages lamp behavior including:
-    /// - THROW: Smashes lamp and creates broken lamp
-    /// - TURN ON: Lights lamp (unless burned out)
-    /// - TURN OFF: Extinguishes lamp (unless burned out)
-    /// - EXAMINE: Shows lamp state (burned out, on, or off)
-    static let lampHandler = ItemEventHandler(for: .lamp) {
-        before(.throw) { context, _ in
-            let playerLocation = await context.player.location
-            let brokenLamp = await context.item(.brokenLamp)
+// MARK: - Handlers
 
-            return await ActionResult(
-                "The lamp has smashed into the floor, and the light has gone out.",
-                context.item.clearFlag(.isOn),
-                context.item.remove(),
-                brokenLamp.move(to: .location(playerLocation.id))
-            )
-        }
-
-        before(.lightSource) { context, _ in
-            let isBurnedOut = await context.item.hasFlag(.isBurnedOut)
-            return isBurnedOut ? ActionResult("A burned-out lamp won't light.") : nil
-        }
-
-        before(.extinguish) { context, _ in
-            let isBurnedOut = await context.item.hasFlag(.isBurnedOut)
-            return isBurnedOut ? ActionResult("The lamp has already burned out.") : nil
-        }
-
-        before(.examine) { context, _ in
-            let isBurnedOut = await context.item.hasFlag(.isBurnedOut)
-            let isOn = await context.item.hasFlag(.isOn)
-
-            let statusMessage =
-                if isBurnedOut {
-                    "has burned out."
-                } else if isOn {
-                    "is on."
-                } else {
-                    "is turned off."
-                }
-
-            return ActionResult("The lamp \(statusMessage)")
-        }
-    }
-
-    static let waterHandler = ItemEventHandler(for: .water) {
-        before(.drink) { context, _ in
-            guard await context.item(.bottle).isOpen else {
-                throw ActionResponse.feedback("You'll have to open the glass bottle first.")
-            }
-
-            return ActionResult(
-                "Thank you very much. I was rather thirsty (from all this talking, probably).",
-                context.item.remove()
-            )
-        }
-    }
-
+extension InsideHouse {
     static let bottleHandler = ItemEventHandler(for: .bottle) {
         before(.throw) { context, _ in
             let water = await context.item(.water)
@@ -434,9 +378,54 @@ extension InsideHouse {
             }
         }
     }
-}
 
-extension InsideHouse {
+    /// Handles special lamp interactions based on the original ZIL `LANTERN` routine.
+    ///
+    /// This handler manages lamp behavior including:
+    /// - THROW: Smashes lamp and creates broken lamp
+    /// - TURN ON: Lights lamp (unless burned out)
+    /// - TURN OFF: Extinguishes lamp (unless burned out)
+    /// - EXAMINE: Shows lamp state (burned out, on, or off)
+    static let lampHandler = ItemEventHandler(for: .lamp) {
+        before(.throw) { context, _ in
+            let playerLocation = await context.player.location
+            let brokenLamp = await context.item(.brokenLamp)
+
+            return await ActionResult(
+                "The lamp has smashed into the floor, and the light has gone out.",
+                context.item.clearFlag(.isOn),
+                context.item.remove(),
+                brokenLamp.move(to: .location(playerLocation.id))
+            )
+        }
+
+        before(.lightSource) { context, _ in
+            let isBurnedOut = await context.item.hasFlag(.isBurnedOut)
+            return isBurnedOut ? ActionResult("A burned-out lamp won't light.") : nil
+        }
+
+        before(.extinguish) { context, _ in
+            let isBurnedOut = await context.item.hasFlag(.isBurnedOut)
+            return isBurnedOut ? ActionResult("The lamp has already burned out.") : nil
+        }
+
+        before(.examine) { context, _ in
+            let isBurnedOut = await context.item.hasFlag(.isBurnedOut)
+            let isOn = await context.item.hasFlag(.isOn)
+
+            let statusMessage =
+                if isBurnedOut {
+                    "has burned out."
+                } else if isOn {
+                    "is on."
+                } else {
+                    "is turned off."
+                }
+
+            return ActionResult("The lamp \(statusMessage)")
+        }
+    }
+
     /// Handles special rug interactions based on the original ZIL `RUG-FCN`.
     ///
     /// This handler manages complex rug behavior including:
@@ -526,6 +515,40 @@ extension InsideHouse {
         }
     }
 
+    /// Handles sword glow functionality based on the ZIL `SWORD-FCN` and `I-SWORD` routines.
+    ///
+    /// This handler manages:
+    /// - TAKE: Enables the sword glow daemon when taken (equivalent to ENABLE <QUEUE I-SWORD -1>)
+    /// - EXAMINE: Shows appropriate glow messages based on current glow state
+    /// - Daemon activation: Checks current location and adjacent locations for monsters
+    static let swordHandler = ItemEventHandler(for: .sword) {
+        // Show glow message based on current glow level (like SWORD-FCN in ZIL)
+        before(.examine) { context, _ in
+            switch await context.engine.global(.swordGlowLevel) ?? 0 {
+            case 1:
+                ActionResult("Your sword is glowing with a faint blue glow.")
+            case 2:
+                ActionResult("Your sword is glowing very brightly.")
+            default:
+                ActionResult("It's just a sword.")
+            }
+        }
+
+        // Disable sword glow daemon when dropped
+        after(.drop) { _, _ in
+            try ActionResult(
+                .stopDaemon(.swordDaemon)
+            )
+        }
+
+        // Enable sword glow daemon when taken (like SWORD-FCN in ZIL)
+        after(.take) { _, _ in
+            try ActionResult(
+                .runDaemon(.swordDaemon)
+            )
+        }
+    }
+
     /// Handles trap door interactions based on the original ZIL `TRAP-DOOR-FCN`.
     ///
     /// This handler manages the trap door's behavior depending on the player's location
@@ -570,40 +593,23 @@ extension InsideHouse {
         }
     }
 
-    /// Handles sword glow functionality based on the ZIL `SWORD-FCN` and `I-SWORD` routines.
-    ///
-    /// This handler manages:
-    /// - TAKE: Enables the sword glow daemon when taken (equivalent to ENABLE <QUEUE I-SWORD -1>)
-    /// - EXAMINE: Shows appropriate glow messages based on current glow state
-    /// - Daemon activation: Checks current location and adjacent locations for monsters
-    static let swordHandler = ItemEventHandler(for: .sword) {
-        // Show glow message based on current glow level (like SWORD-FCN in ZIL)
-        before(.examine) { context, _ in
-            switch await context.engine.global(.swordGlowLevel) ?? 0 {
-            case 1:
-                ActionResult("Your sword is glowing with a faint blue glow.")
-            case 2:
-                ActionResult("Your sword is glowing very brightly.")
-            default:
-                ActionResult("It's just a sword.")
+    static let waterHandler = ItemEventHandler(for: .water) {
+        before(.drink) { context, _ in
+            guard await context.item(.bottle).isOpen else {
+                throw ActionResponse.feedback("You'll have to open the glass bottle first.")
             }
-        }
 
-        // Disable sword glow daemon when dropped
-        after(.drop) { _, _ in
-            try ActionResult(
-                .stopDaemon(.swordDaemon)
-            )
-        }
-
-        // Enable sword glow daemon when taken (like SWORD-FCN in ZIL)
-        after(.take) { _, _ in
-            try ActionResult(
-                .runDaemon(.swordDaemon)
+            return ActionResult(
+                "Thank you very much. I was rather thirsty (from all this talking, probably).",
+                context.item.remove()
             )
         }
     }
+}
 
+// MARK: - Daemons
+
+extension InsideHouse {
     /// Sword glow daemon based on the ZIL `I-SWORD` interrupt routine.
     ///
     /// This daemon runs every turn when enabled and updates the sword glow level based on

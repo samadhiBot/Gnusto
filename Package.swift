@@ -98,10 +98,7 @@ let package = Package(
                 .product(name: "SwiftParser", package: "swift-syntax"),
                 .product(name: "SwiftSyntax", package: "swift-syntax"),
             ],
-            path: "Sources/GnustoAutoWiringTool",
-            plugins: [
-                .plugin(name: "SwiftLintBuildToolPlugin", package: "SwiftLintPlugins")
-            ]
+            path: "Sources/GnustoAutoWiringTool"
         ),
         .plugin(
             name: "GnustoAutoWiringPlugin",

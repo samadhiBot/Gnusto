@@ -1,8 +1,6 @@
 import Foundation
 import Logging
 
-// swiftlint:disable file_length type_body_length
-
 /// Default implementation of turn-based melee combat system with D&D-style mechanics.
 ///
 /// This combat system provides:
@@ -1595,5 +1593,3 @@ public struct StandardCombatSystem: CombatSystem {
         return Double(roll) >= threshold
     }
 }
-
-// swiftlint:enable file_length type_body_length
