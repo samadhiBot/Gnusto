@@ -191,6 +191,40 @@ struct GameEngineRandomTests {
         }
     }
 
+    @Test("randomElement can produce deterministic values for testing")
+    func testRandomElementDeterministic() async throws {
+        let game = MinimalGame()
+
+        let (engine, _) = await GameEngine.test(blueprint: game)
+
+        var values = [String]()
+        let collection = ["apple", "banana", "cherry", "date"]
+
+        // Test multiple selections
+        for _ in 0..<12 {
+            if let element = await engine.randomElement(in: collection) {
+                values.append(element)
+            }
+        }
+
+        expectNoDifference(
+            values, [
+                "banana",
+                "banana",
+                "date",
+                "banana",
+                "apple",
+                "date",
+                "date",
+                "date",
+                "cherry",
+                "apple",
+                "banana",
+                "cherry",
+            ]
+        )
+    }
+
     // MARK: - Integration Tests
 
     @Test("all random methods work together consistently")
