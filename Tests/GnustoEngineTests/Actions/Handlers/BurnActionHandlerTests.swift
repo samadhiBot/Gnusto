@@ -718,21 +718,22 @@ struct BurnActionHandlerTests {
 
             > attack the troll
             Armed and hungry for violence, you strike with your flaming
-            torch as the creature can only dodge and weave against the
+            torch as the beast can only dodge and weave against the
             advantage of sharpened metal.
 
-            Your strike with your flaming torch grazes the grotesque
-            monster, drawing minimal blood. The light wound barely seems to
+            Your strike with your flaming torch grazes the creature,
+            drawing minimal blood. The light wound barely seems to
             register.
 
-            The monster's brutal retaliation breaks through your defenses
-            completely, rendering you vulnerable as an opened shell.
+            The angry beast's brutal retaliation breaks through your
+            defenses completely, rendering you vulnerable as an opened
+            shell.
 
             > burn the troll
             Your strike with your flaming torch grazes the creature,
             drawing minimal blood. The strike lands, but doesn't slow him.
 
-            The terrible monster's retaliatory strike comes fast but you're
+            The fearsome beast's retaliatory strike comes fast but you're
             faster, sidestepping the violence with practiced grace.
             """
         )

@@ -50,9 +50,12 @@ extension GameEngine {
     /// - Throws: `ActionResponse.internalEngineError` if the collection is empty.
     public func randomElement<T>(in collection: some Collection<T>) -> T? {
         guard collection.isNotEmpty else { return nil }
-        let randomValue = randomNumberGenerator.next()
-        let randomIndex = Int(randomValue % UInt64(collection.count))
-        return collection[collection.index(collection.startIndex, offsetBy: randomIndex)]
+        return collection[
+            collection.index(
+                collection.startIndex,
+                offsetBy: randomInt(in: 0...collection.count - 1)
+            )
+        ]
     }
 
     /// Rolls a 10-sided die and checks if it meets or exceeds the threshold.

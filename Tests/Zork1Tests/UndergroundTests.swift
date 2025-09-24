@@ -87,14 +87,14 @@ struct UndergroundTests {
             The troll laughs at your puny gesture.
 
             > hit the troll with the lantern
-            No more waiting as you attack with your lantern raised and the
-            pathetic troll responds with his axe, two weapons now committed
-            to drawing blood.
+            No more waiting as you attack with your light raised and the
+            troll responds with his ax, two weapons now committed to
+            drawing blood.
 
-            The brass lantern makes a poor weapon against the pathetic
-            troll's his axe! This might not end well.
+            The brass lantern makes a poor weapon against the troll's his
+            bloody ax! This might not end well.
 
-            The troll's retaliatory strike with his ax cuts toward you but
+            The troll's retaliatory strike with his axe cuts toward you but
             your body knows how to flow around death.
 
             > head west

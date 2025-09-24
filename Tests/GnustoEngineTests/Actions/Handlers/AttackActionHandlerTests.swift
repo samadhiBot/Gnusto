@@ -26,42 +26,42 @@ struct AttackActionHandlerTests {
             output,
             """
             > attack the troll
-            You attack barehanded against his axe in what might be suicide
+            You attack barehanded against his ax in what might be suicide
             but the violence is already chosen.
 
-            The monster has left himself wide open and completely
+            The angry beast has left himself wide open and completely
             vulnerable to your attack.
 
-            The fearsome beast's retaliatory strike with his axe cuts
-            toward you but your body knows how to flow around death.
+            The beast's retaliatory strike with his axe cuts toward you but
+            your body knows how to flow around death.
 
             > attack the troll
-            Your fist finds nothing but air! The creature watches with
+            Your fist finds nothing but air! The monster watches with
             amusement, his ax at the ready.
 
-            In the exchange, his ax slips through to mark you--a stinging
-            reminder that the angry beast still has teeth. The wound is
-            trivial against your battle fury.
+            In the exchange, his axe slips through to mark you--a stinging
+            reminder that the terrible creature still has teeth. The wound
+            is trivial against your battle fury.
 
             > attack the troll
-            The blow rocks the grotesque monster backward! He stumbles and
-            sways fighting desperately for balance.
+            The blow rocks the creature backward! He stumbles and sways
+            fighting desperately for balance.
 
-            The fearsome monster's retaliation with his axe sends you
-            stumbling like a drunk, with the world tilting at impossible
-            angles.
-
-            > attack the troll
-            Your blow bypasses his axe and lands true, the force driving
-            breath from the creature's lungs. The blow lands solidly,
-            drawing blood. He feels the sting but remains strong.
-
-            The monster's retaliation with his ax tears through your guard,
-            and in an instant you're completely exposed.
+            The beast's retaliation with his ax sends you stumbling like a
+            drunk, with the world tilting at impossible angles.
 
             > attack the troll
-            The brutal exchange ends with your killing blow! The terrible
-            monster goes limp and crashes down, utterly still.
+            Your blow bypasses his gruesome axe and lands true, the force
+            driving breath from the terrible creature's lungs. The blow
+            lands solidly, drawing blood. He feels the sting but remains
+            strong.
+
+            The creature's retaliation with his gruesome ax tears through
+            your guard, and in an instant you're completely exposed.
+
+            > attack the troll
+            The brutal exchange ends with your killing blow! The fearsome
+            beast goes limp and crashes down, utterly still.
             """
         )
     }
@@ -104,19 +104,20 @@ struct AttackActionHandlerTests {
             """
             > attack dragon with sword
             Armed and hungry for violence, you strike with your steel sword
-            as the wyrm can only dodge and weave against the advantage of
-            sharpened metal.
+            as the creature can only dodge and weave against the advantage
+            of sharpened metal.
 
             A disastrous miss--your steel sword cuts through empty air and
-            the terrible wyrm effortlessly evades your mistimed attack.
+            the wyrm effortlessly evades your mistimed attack.
 
-            The wyrm's brutal retaliation breaks through your defenses
-            completely, rendering you vulnerable as an opened shell.
+            The awesome creature's brutal retaliation breaks through your
+            defenses completely, rendering you vulnerable as an opened
+            shell.
 
             > attack dragon with sword
-            Your blow with your steel sword catches the wyrm cleanly,
-            tearing flesh and drawing crimson. The blow lands solidly,
-            drawing blood. It feels the sting but remains strong.
+            Your blow with your steel sword catches the fierce creature
+            cleanly, tearing flesh and drawing crimson. The blow lands
+            solidly, drawing blood. It feels the sting but remains strong.
 
             Then the wyrm recovers and strikes true. Your jaw takes the
             full force. Blood and fragments of teeth spray the air. First
@@ -124,8 +125,8 @@ struct AttackActionHandlerTests {
             red.
 
             > attack dragon with sword
-            Your strike with your steel sword grazes the fierce wyrm,
-            drawing minimal blood. The strike lands, but doesn't slow it.
+            Your strike with your steel sword grazes the wyrm, drawing
+            minimal blood. The strike lands, but doesn't slow it.
 
             The wyrm retaliates with raw force that rocks you hard, leaving
             you stumbling through space that won't hold still.
@@ -162,14 +163,15 @@ struct AttackActionHandlerTests {
             No weapons needed as you attack with pure violence while the
             warrior braces for the inevitable collision of flesh and bone.
 
-            You catch the angry warrior with minimal force, the blow almost
+            You catch the warrior with minimal force, the blow almost
             gentle. The light wound barely seems to register.
 
-            The warrior's brutal retaliation breaks through your defenses
-            completely, rendering you vulnerable as an opened shell.
+            The angry warrior's brutal retaliation breaks through your
+            defenses completely, rendering you vulnerable as an opened
+            shell.
 
             > fight the orc
-            You catch the warrior with minimal force, the blow almost
+            You catch the angry warrior with minimal force, the blow almost
             gentle. The light wound barely seems to register.
 
             In the exchange, the warrior lands clean. The world lurches as
@@ -181,8 +183,9 @@ struct AttackActionHandlerTests {
             The blow rocks the warrior backward! It stumbles and sways
             fighting desperately for balance.
 
-            The warrior's brutal retaliation breaks through your defenses
-            completely, rendering you vulnerable as an opened shell.
+            The mighty warrior's brutal retaliation breaks through your
+            defenses completely, rendering you vulnerable as an opened
+            shell.
             """
         )
     }
@@ -250,10 +253,7 @@ struct AttackActionHandlerTests {
             .in(.startRoom)
         )
 
-        let game = MinimalGame(
-            items: spider
-        )
-
+        let game = MinimalGame(items: spider)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // When
@@ -272,25 +272,24 @@ struct AttackActionHandlerTests {
             You catch the giant spider with minimal force, the blow almost
             gentle. The light wound barely seems to register.
 
+            The giant spider's counter-punch goes wide, rage making the
+            strike clumsy and predictable.
+
+            > kill the giant spider
+            You catch the giant spider with minimal force, the blow almost
+            gentle. The light wound barely seems to register.
+
+            The giant spider's retaliatory strike comes fast but you're
+            faster, sidestepping the violence with practiced grace.
+
+            > kill the giant spider
+            You land a punishing blow to the giant spider, and it grunts
+            from the force. You see the ripple of pain, but its body
+            absorbs it. It remains dangerous.
+
             In the tangle, the giant spider drives an elbow home--sudden
             pressure that blooms into dull pain. The wound is trivial
             against your battle fury.
-
-            > kill the giant spider
-            You catch the giant spider with minimal force, the blow almost
-            gentle. The strike lands, but doesn't slow it.
-
-            In the tangle, the giant spider drives an elbow home--sudden
-            pressure that blooms into dull pain. The strike lands but
-            doesn't slow you. Not yet.
-
-            > kill the giant spider
-            You catch the giant spider with minimal force, the blow almost
-            gentle. The sting adds to its growing catalog of pain.
-
-            In the scramble, the giant spider throws a desperate hook that
-            barely connects, all motion and no mass. The graze adds another
-            small discomfort to your growing list.
             """
         )
     }
@@ -484,12 +483,13 @@ struct AttackActionHandlerTests {
             """
             > attack the dragon
             No weapons needed as you attack with pure violence while the
-            wyrm braces for the inevitable collision of flesh and bone.
+            creature braces for the inevitable collision of flesh and bone.
 
-            The terrible wyrm catches your fist, stopping your attack cold.
+            The wyrm catches your fist, stopping your attack cold.
 
-            The creature's brutal retaliation breaks through your defenses
-            completely, rendering you vulnerable as an opened shell.
+            The awesome creature's brutal retaliation breaks through your
+            defenses completely, rendering you vulnerable as an opened
+            shell.
             """
         )
     }

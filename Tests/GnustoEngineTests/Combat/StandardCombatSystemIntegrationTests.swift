@@ -155,42 +155,43 @@ struct StandardCombatSystemIntegrationTests {
             """
             > attack the guard
             Armed and hungry for violence, you strike with your variable
-            sword as the bully can only dodge and weave against the
+            sword as the brute can only dodge and weave against the
             advantage of sharpened metal.
 
             A disastrous miss--your variable sword cuts through empty air
-            and the surly guard effortlessly evades your mistimed attack.
+            and the bully effortlessly evades your mistimed attack.
 
-            The guard's brutal retaliation breaks through your defenses
-            completely, rendering you vulnerable as an opened shell.
+            The bitter brute's brutal retaliation breaks through your
+            defenses completely, rendering you vulnerable as an opened
+            shell.
 
             > attack the guard
             Your blow with your variable sword catches the bully cleanly,
             tearing flesh and drawing crimson. The blow lands solidly,
             drawing blood. He feels the sting but remains strong.
 
-            In the tangle, the surly brute drives an elbow home--sudden
-            pressure that blooms into dull pain. The wound is trivial
-            against your battle fury.
-
-            > attack the guard
-            The bully has left himself wide open and completely vulnerable
-            to your attack.
-
-            In the tangle, the guard drives an elbow home--sudden pressure
+            In the tangle, the brute drives an elbow home--sudden pressure
             that blooms into dull pain. The wound is trivial against your
             battle fury.
 
             > attack the guard
-            The blow lands hard! The guard stumbles sideways, defenseless
-            and struggling to stay on his feet.
+            The guard has left himself wide open and completely vulnerable
+            to your attack.
 
-            The bully's brutal retaliation breaks through your defenses
+            In the tangle, the drunken guard drives an elbow home--sudden
+            pressure that blooms into dull pain. The wound is trivial
+            against your battle fury.
+
+            > attack the guard
+            The blow lands hard! The drunken brute stumbles sideways,
+            defenseless and struggling to stay on his feet.
+
+            The brute's brutal retaliation breaks through your defenses
             completely, rendering you vulnerable as an opened shell.
 
             > attack the guard
-            You strike true with your variable sword! The brute drops
-            without a sound, weaponless to the end.
+            You strike true with your variable sword! The drunken bully
+            drops without a sound, weaponless to the end.
             """
         )
 

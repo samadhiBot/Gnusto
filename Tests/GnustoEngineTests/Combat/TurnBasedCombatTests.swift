@@ -133,16 +133,16 @@ struct TurnBasedCombatTests {
             """
             > attack troll with lamp
             Armed and hungry for violence, you strike with your lamp as the
-            creature can only dodge and weave against the advantage of
+            beast can only dodge and weave against the advantage of
             sharpened metal.
 
             The lamp wasn't designed for combat, but you wield it against
             the beast regardless!
 
-            In the exchange, the beast lands clean. The world lurches as
-            your body absorbs punishment it won't soon forget. The blow
-            lands solidly, drawing blood. You feel the sting but remain
-            strong.
+            In the exchange, the grotesque monster lands clean. The world
+            lurches as your body absorbs punishment it won't soon forget.
+            The blow lands solidly, drawing blood. You feel the sting but
+            remain strong.
             """
         )
     }
@@ -166,7 +166,7 @@ struct TurnBasedCombatTests {
             .description("A small dagger."),
             .isTakable,
             .isWeapon,
-            .damage(2), // Low damage
+            .damage(2),  // Low damage
             .in(.player)
         )
 
@@ -196,19 +196,8 @@ struct TurnBasedCombatTests {
             The ogre evades your dagger with a fluid sidestep, managing to
             stay just out of reach.
 
-            The ogre's final retaliation breaks something essential inside
-            you and you feel yourself folding inward like paper in rain.
-
-            ****  You have died  ****
-
-            Death, that most permanent of inconveniences, has claimed you.
-            Yet in these tales, even death offers second chances.
-
-            You scored 0 out of a possible 10 points, in 0 moves.
-
-            Would you like to RESTART, RESTORE a saved game, or QUIT?
-
-            >
+            The ogre's counter-punch goes wide, rage making the strike
+            clumsy and predictable.
             """
         )
     }
@@ -228,7 +217,7 @@ struct TurnBasedCombatTests {
                     intelligence: 10,
                     wisdom: 8,
                     charisma: 8,
-                    alignment: .chaoticGood // Easier to pacify
+                    alignment: .chaoticGood  // Easier to pacify
                 )
             ),
             .in(.startRoom)

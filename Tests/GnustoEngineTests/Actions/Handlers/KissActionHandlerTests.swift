@@ -398,32 +398,8 @@ struct KissActionHandlerTests {
     @Test("Kiss different character types")
     func testKissDifferentCharacterTypes() async throws {
         // Given
-        let merchant = Item(
-            id: "merchant",
-            .name("traveling merchant"),
-            .description("A traveling merchant."),
-            .characterSheet(.default),
-            .in(.startRoom)
-        )
-
-        let dragon = Item(
-            id: "dragon",
-            .name("fierce dragon"),
-            .description("A fierce dragon."),
-            .characterSheet(.init(isFighting: true)),
-            .in(.startRoom)
-        )
-
-        let fairy = Item(
-            id: "fairy",
-            .name("woodland fairy"),
-            .description("A woodland fairy."),
-            .characterSheet(.default),
-            .in(.startRoom)
-        )
-
         let game = MinimalGame(
-            items: merchant, dragon, fairy
+            items: Lab.merchant, Lab.dragon.fighting, Lab.fairy
         )
 
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
@@ -444,25 +420,26 @@ struct KissActionHandlerTests {
             The moment for kissing the traveling merchant has neither
             arrived nor been invited.
 
-            In a moment of raw violence, the fierce dragon comes at you
+            In a moment of raw violence, the terrible dragon comes at you
             with nothing but fury! You raise your fists, knowing this will
             hurt regardless of who wins.
 
             > kiss dragon
-            That's an unusual combat strategy, and the fierce dragon seems
-            unlikely to reciprocate.
+            That's an unusual combat strategy, and the terrible dragon
+            seems unlikely to reciprocate.
 
-            In the exchange, the fierce dragon lands clean. The world
-            lurches as your body absorbs punishment it won't soon forget.
-            The blow lands solidly, drawing blood. You feel the sting but
-            remain strong.
+            In the tangle, the terrible dragon drives an elbow home--sudden
+            pressure that blooms into dull pain. The wound is trivial
+            against your battle fury.
 
             > kiss fairy
             The moment for kissing the woodland fairy has neither arrived
             nor been invited.
 
-            The fierce dragon responds with such ferocity that you falter,
-            your muscles locking as your brain recalculates the odds.
+            In the exchange, the terrible dragon lands clean. The world
+            lurches as your body absorbs punishment it won't soon forget.
+            The strike hurts, but your body absorbs it. You remain
+            dangerous.
             """
         )
 

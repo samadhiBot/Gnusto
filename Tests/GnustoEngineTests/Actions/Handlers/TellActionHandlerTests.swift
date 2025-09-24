@@ -547,9 +547,8 @@ struct TellActionHandlerTests {
             The subject of the steel sword cannot bridge the chasm between
             you and the fierce orc.
 
-            The fierce warrior's brutal retaliation breaks through your
-            defenses completely, rendering you vulnerable as an opened
-            shell.
+            The warrior's brutal retaliation breaks through your defenses
+            completely, rendering you vulnerable as an opened shell.
             """
         )
     }
