@@ -99,7 +99,7 @@ public struct StandardParser: Parser {
     ///     accessible, `.badGrammar` if the sentence structure didn't match any known rules,
     ///     or `.ambiguity` if the input could be interpreted in multiple ways that the
     ///     parser couldn't resolve on its own.
-    public func parse(  // swiftlint:disable:this function_body_length
+    public func parse(
         input: String,
         vocabulary: Vocabulary,
         engine: GameEngine
@@ -497,7 +497,7 @@ public struct StandardParser: Parser {
     // MARK: - Syntax Matching Logic
 
     /// Attempts to match a sequence of tokens against a specific SyntaxRule.
-    private func matchRule(  // swiftlint:disable:this function_body_length function_parameter_count
+    private func matchRule(  // swiftlint:disable:this function_parameter_count
         rule: SyntaxRule,
         tokens: [String],
         verbStartIndex: Int,
@@ -1123,7 +1123,7 @@ public struct StandardParser: Parser {
     // MARK: - Object Resolution Helpers
 
     /// Resolves a noun phrase (noun + modifiers) to a specific EntityReference within the game context.
-    func resolveObject(  // swiftlint:disable:this function_body_length
+    func resolveObject(
         noun: String,
         verb: Verb,
         modifiers: [String],

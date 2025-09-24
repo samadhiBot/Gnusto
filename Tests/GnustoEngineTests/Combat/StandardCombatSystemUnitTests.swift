@@ -156,7 +156,7 @@ struct StandardCombatSystemUnitTests {
                 enemy: troll,
                 message: """
                     The troll spits in your face, grunting "Better luck next time"
-                    in a rather barbarous accent.                    
+                    in a rather barbarous accent.
                     """
             )
         )

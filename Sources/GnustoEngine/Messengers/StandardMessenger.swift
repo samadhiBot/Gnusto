@@ -605,7 +605,6 @@ open class StandardMessenger: @unchecked Sendable {
         output("Would you like to RESTART, RESTORE a saved game, or QUIT?")
     }
 
-    // swiftlint:disable:next function_body_length
     open func examineYourself(
         healthRatio: Double = 1
     ) -> String {
@@ -2472,7 +2471,10 @@ open class StandardMessenger: @unchecked Sendable {
         capitalize: Bool = true,
         function: String = #function
     ) -> String {
-        let index = Int(randomNumberGenerator.next(upperBound: UInt32(responses.count)))
+        let index = Int.random(
+            in: 0..<responses.count,
+            using: &randomNumberGenerator
+        )
         return output(
             capitalize ? responses[index].capitalizedSentences : responses[index],
             logLevel,

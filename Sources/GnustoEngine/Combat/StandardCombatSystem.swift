@@ -155,7 +155,7 @@ public struct StandardCombatSystem: CombatSystem {
     ///   - context: Action context for accessing game engine and random number generation
     /// - Returns: A CombatEvent describing the attack outcome and any damage dealt
     /// - Throws: Errors from attribute access or combat calculations
-    public func calculateAttackOutcome(  // swiftlint:disable:this function_body_length
+    public func calculateAttackOutcome(
         attacker: Combatant,
         defender: Combatant,
         weapon playerWeapon: ItemProxy?,
@@ -597,7 +597,7 @@ public struct StandardCombatSystem: CombatSystem {
     ///   - context: Action context for dice rolls and game state access
     /// - Returns: A CombatEvent representing the enemy's action, or nil if no action taken
     /// - Throws: Errors from attribute access or combat calculations
-    public func determineEnemyAction(  // swiftlint:disable:this function_body_length
+    public func determineEnemyAction(
         against playerAction: PlayerAction,
         enemy: ItemProxy,
         in context: ActionContext
@@ -1218,7 +1218,7 @@ public struct StandardCombatSystem: CombatSystem {
     ///   - context: Action context for accessing game engine
     /// - Returns: An array of state changes to apply to the game
     /// - Throws: Errors from state change creation or attribute access
-    func generateEventResult(  // swiftlint:disable:this function_body_length
+    func generateEventResult(
         for event: CombatEvent,
         in context: ActionContext
     ) async throws -> ActionResult {
@@ -1296,7 +1296,6 @@ public struct StandardCombatSystem: CombatSystem {
             )
 
         case .playerUnconscious(let enemy, _, let damage):
-
             return try await ActionResult(
                 message: description,
                 changes: [

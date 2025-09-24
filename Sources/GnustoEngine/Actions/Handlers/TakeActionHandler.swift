@@ -23,7 +23,7 @@ public struct TakeActionHandler: ActionHandler {
     ///
     /// This action validates prerequisites and moves the specified item(s) to the player's inventory.
     /// Handles both single items and ALL commands with appropriate validation and messaging.
-    public func process(  // swiftlint:disable:this function_body_length
+    public func process(
         context: ActionContext
     ) async throws -> ActionResult {
         // Get items based on command type

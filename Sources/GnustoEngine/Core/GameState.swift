@@ -113,7 +113,7 @@ extension GameState {
     }
 
     /// Applies a `StateChange` to the game state, modifying the relevant property and recording the change.
-    private mutating func apply(  // swiftlint:disable:this function_body_length
+    private mutating func apply(
         change: StateChange
     ) throws {
         switch change {

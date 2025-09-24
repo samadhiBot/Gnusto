@@ -39,7 +39,7 @@ extension GameEngine {
     ///
     /// - Parameter command: The `Command` object to execute.
     /// - Returns: Whether the command should consume a turn.
-    func execute(command: Command) async throws -> Bool { // swiftlint:disable:this function_body_length
+    func execute(command: Command) async throws -> Bool {
         var actionHandled = false
         var actionResponse: Error?  // To store error from object handlers
         var shouldConsumeTurn = true  // Default to consuming turn unless meta-command is used
