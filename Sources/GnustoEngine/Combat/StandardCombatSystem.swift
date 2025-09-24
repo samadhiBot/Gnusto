@@ -234,7 +234,7 @@ public struct StandardCombatSystem: CombatSystem {
             default: "Hit!"
             }
 
-        logger.info(
+        logger.debug(
             """
             \n🎲 \(attacker.description.capitalizedFirst.possessive) attack roll:
             ------------------------------------
@@ -473,7 +473,7 @@ public struct StandardCombatSystem: CombatSystem {
             currentHealth: await defender.health
         )
 
-        logger.info(
+        logger.debug(
             """
             \n🎲 \(attacker.description.capitalizedFirst.possessive) damage roll:
             ------------------------------------

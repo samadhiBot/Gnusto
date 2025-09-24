@@ -145,43 +145,44 @@ struct Zork1TrollCombatTests {
             output,
             """
             > attack the troll with my sword
-            Your blood sings as your sword cuts toward the nasty troll who
-            barely gets his bloody ax into position before impact.
+            No more waiting as you attack with your sword raised and the
+            troll responds with his ax, two weapons now committed to
+            drawing blood.
 
-            The troll weaves past your ancient orcrist! Pure reflexes keep
-            him safe from your strike.
+            The nasty troll has left himself wide open and completely
+            vulnerable to your attack.
 
-            Suddenly the pathetic troll slips past your guard. His axe
-            opens a wound that will mark you, and your blood flows out
-            steady and sure. First blood to them. The wound is real but
-            manageable.
-
-            > attack the troll with my sword
-            Your orcrist clips the troll, leaving a shallow cut. The light
-            wound barely seems to register.
-
-            Then his bloody axe finds purchase in your flesh. The wound
-            opens clean, blood welling dark and constant. The strike hurts,
-            but your body absorbs it. You remain dangerous.
+            The troll's retaliatory strike with his bloody ax cuts toward
+            you but your body knows how to flow around death.
 
             > attack the troll with my sword
-            Your glamdring passes harmlessly past the pathetic troll, who
-            readies his axe for a counter.
+            Your strike with your elvish orcrist glances off his ax, still
+            managing to catch the troll lightly. The light wound barely
+            seems to register.
 
-            The troll finishes the battle, his bloody ax doing its work
-            with mechanical precision as the cold rushes in to replace
-            everything warm.
+            The troll strikes back with his axe so savagely that you
+            falter, uncertainty freezing your muscles for one crucial
+            heartbeat.
 
-            ****  You have died  ****
+            > attack the troll with my sword
+            Your strike with your antique blade beats aside his bloody axe,
+            tearing through clothing and skin alike. You see the ripple of
+            pain, but his body absorbs it. He remains dangerous.
 
-            Your story ends here, but death is merely an intermission in
-            the grand performance.
+            Suddenly the troll slips past your guard. His bloody ax opens a
+            wound that will mark you, and your blood flows out steady and
+            sure. The blow lands solidly, drawing blood. You feel the sting
+            but remain strong.
 
-            You scored 0 out of a possible 350 points, in 2 moves.
+            > attack the troll with my sword
+            You strike true with your glamdring! The troll drops without a
+            sound, weaponless to the end.
 
-            Would you like to RESTART, RESTORE a saved game, or QUIT?
+            > attack the troll with my sword
+            The troll stirs, quickly resuming a fighting stance.
 
-            >
+            > attack the troll with my sword
+            The troll stirs, quickly resuming a fighting stance.
             """
         )
     }

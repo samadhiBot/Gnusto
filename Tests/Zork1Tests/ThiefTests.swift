@@ -38,7 +38,7 @@ struct ThiefTests {
             "inventory",
             "examine the sceptre",
             "look at the man",
-            "look at me",
+            "talk to the man",
             "inventory"
         )
 
@@ -46,46 +46,40 @@ struct ThiefTests {
         expectNoDifference(
             output,
             """
-            > attack the troll
-            With nothing but rage you rush the fearsome beast as his
-            gruesome ax gleams cold and ready for the blood you're
-            offering.
+            > go east
+            --- Round Room ---
 
-            The angry beast's defenses crumble! He stands exposed, unable
-            to protect himself.
+            This is a circular stone room with passages in all directions.
+            Several of them have unfortunate endings.
 
-            The angry monster strikes back with his axe but you've already
-            moved, a ghost that steel cannot touch.
+            > inventory
+            You are carrying:
+            - A sceptre
+            - A sword
 
-            > attack the troll
-            Your blow bypasses his gruesome axe and lands true, the force
-            driving breath from the beast's lungs. The wound is real but
-            manageable.
+            > examine the sceptre
+            An ornamented sceptre, tapering to a sharp point, is here.
 
-            The grotesque monster whips his axe across in answer--steel
-            whispers against skin, leaving a thin signature of pain. The
-            cut registers dimly. Blood, but not enough to matter.
+            Someone carrying a large bag is casually leaning against one of
+            the walls here. He does not speak, but it is clear from his
+            aspect that the bag will be taken only over his dead body.
 
-            The troll says something, probably uncomplimentary, in his
-            guttural tongue.
+            > look at the man
+            The thief is a slippery character with beady eyes that flit
+            back and forth. He carries, along with an unmistakable
+            arrogance, a large bag over his shoulder and a vicious
+            stiletto, whose blade is aimed menacingly in your direction.
+            I'd watch out if I were you.
 
-            > attack the troll
-            You slip inside the reach of his bloody axe and drive your
-            knuckles hard into the angry monster's body. You see the ripple
-            of pain, but his body absorbs it. He remains dangerous.
+            > talk to the man
+            The thief is a strong, silent type.
 
-            The beast's counter with his axe misses completely, the weapon
-            whistling through empty space.
+            The thief just left, still carrying his large bag. You may not
+            have noticed that he robbed you blind first.
 
-            > attack the troll
-            You land the decisive hit! The fearsome beast wavers for a
-            heartbeat, then collapses into permanent silence.
-
-            > attack the troll
-            You throw yourself at the beast despite his nicked axe because
-            sometimes fury must answer steel even when flesh cannot win.
-
-            You're too late--the fierce troll is already deceased.
+            > inventory
+            You are carrying:
+            - A sword
             """
         )
 
@@ -105,7 +99,8 @@ struct ThiefTests {
         // When
         try await engine.execute(
             "look at the floor",
-            "examine thief"
+            "look at the ceiling",
+            "examine the man"
         )
 
         // Then
@@ -123,12 +118,20 @@ struct ThiefTests {
             The floor stubbornly remains ordinary despite your thorough
             examination.
 
-            > examine thief
-            You cannot reach any such thing from here.
+            > look at the ceiling
+            The ceiling stubbornly remains ordinary despite your thorough
+            examination.
 
             Someone carrying a large bag is casually leaning against one of
             the walls here. He does not speak, but it is clear from his
             aspect that the bag will be taken only over his dead body.
+
+            > examine the man
+            The thief is a slippery character with beady eyes that flit
+            back and forth. He carries, along with an unmistakable
+            arrogance, a large bag over his shoulder and a vicious
+            stiletto, whose blade is aimed menacingly in your direction.
+            I'd watch out if I were you.
             """
         )
     }
@@ -140,13 +143,16 @@ struct ThiefTests {
 
         try await engine.apply(
             engine.item(.sceptre).move(to: .player)
+
         )
 
         // When
         try await engine.execute(
             """
-            wait
-            give sceptre to thief
+            inventory
+            look at the floor
+            look at the ceiling
+            give the sceptre to the thief
             """
         )
 
@@ -161,11 +167,27 @@ struct ThiefTests {
             This is a circular stone room with passages in all directions.
             Several of them have unfortunate endings.
 
-            > wait
-            The universe's clock ticks inexorably forward.
+            > inventory
+            You are carrying:
+            - A sceptre
+            - A sword
 
-            > give sceptre to thief
-            You cannot reach any such thing from here.
+            > look at the floor
+            The floor stubbornly remains ordinary despite your thorough
+            examination.
+
+            > look at the ceiling
+            The ceiling stubbornly remains ordinary despite your thorough
+            examination.
+
+            Someone carrying a large bag is casually leaning against one of
+            the walls here. He does not speak, but it is clear from his
+            aspect that the bag will be taken only over his dead body.
+
+            > give the sceptre to the thief
+            The thief examines the sceptre with obvious delight and
+            carefully places it in his bag, giving you a grudging nod of
+            acknowledgment.
             """
         )
 
@@ -509,26 +531,30 @@ struct ThiefTests {
     @Test("Thief movement daemon can move thief around dungeon")
     func testThiefMovementDaemon() async throws {
         // Given
-        let (engine, mockIO) = try await setup()
+        let (engine, _) = try await setup()
+
+        var thiefLocations = [String]()
 
         // When - wait several turns to trigger movement daemon
-        for _ in 1...10 {
-            _ = await mockIO.flush()
+        for _ in 1...20 {
             try await engine.execute("wait")
+            let thiefLocation = await engine.item(.thief).parent.entity.description
+            if thiefLocations.last != thiefLocation {
+                thiefLocations.append(thiefLocation)
+            }
         }
 
-        // Then - thief might have moved (daemon runs every 3 turns)
-        let finalThiefLocation = await engine.item(.thief).parent
-
-        // Verify thief can potentially move (even if didn't this time due to randomness)
-        // At minimum, verify the thief still exists and is in a valid location
-        switch finalThiefLocation {
-        case .location(let locationProxy):
-            #expect(await locationProxy.name.isNotEmpty)  // Valid location
-        default:
-            // Thief should always be in a location
-            #expect(Bool(false), "Thief should be in a location")
-        }
+        // Then - thief will come and gone
+        expectNoDifference(
+            thiefLocations,
+            [
+                ".nowhere",
+                ".location(.roundRoom)",
+                ".nowhere",
+                ".location(.roundRoom)",
+                ".nowhere",
+            ]
+        )
     }
 
     @Test("Thief movement shows atmospheric messages")

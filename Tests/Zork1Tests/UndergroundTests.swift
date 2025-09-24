@@ -93,16 +93,16 @@ struct UndergroundTests {
             Attacking with the brass lantern? The pathetic troll grips his
             ax tighter, unimpressed by your improvised weaponry.
 
-            The riposte comes fast, his axe flicking out to trace a shallow
-            arc of red across your guard. The cut registers dimly. Blood,
-            but not enough to matter.
+            Then suddenly the troll disarms you with his axe in a
+            counter-move so smooth that it seems rehearsed, leaving you
+            weaponless.
 
             > head west
             The troll fends you off with a menacing gesture.
 
-            The troll turns your momentum against you, his axe catching
-            flesh in passing, painting a line of fire. The strike lands but
-            doesn't slow you. Not yet.
+            The troll whips his bloody axe across in answer--steel whispers
+            against skin, leaving a thin signature of pain. The wound is
+            trivial against your battle fury.
 
             > go south
             --- Cellar ---
