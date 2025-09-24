@@ -135,7 +135,20 @@ extension GameEngine {
     }
 
     func combatSystem(versus enemyID: ItemID) -> CombatSystem {
-        gameBlueprint.combatSystems[enemyID] ?? StandardCombatSystem(versus: enemyID)
+        // Check if there's a custom combat system first
+        if let customSystem = gameBlueprint.combatSystems[enemyID] {
+            return customSystem
+        }
+
+        // Use cached StandardCombatSystem or create a new one if needed
+        if let cachedSystem = standardCombatSystemCache[enemyID] {
+            return cachedSystem
+        }
+
+        // Create new StandardCombatSystem and cache it
+        let newSystem = StandardCombatSystem(versus: enemyID)
+        standardCombatSystemCache[enemyID] = newSystem
+        return newSystem
     }
 
     /// Returns the appropriate combat messenger for the given enemy.

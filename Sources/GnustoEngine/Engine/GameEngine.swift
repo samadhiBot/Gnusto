@@ -157,6 +157,11 @@ public actor GameEngine {
     /// Stores the last disambiguation options for matching against user responses
     var lastDisambiguationOptions: [String]?
 
+    /// Cache for dynamically created StandardCombatSystem instances to ensure consistency
+    /// across combat turns. This prevents creating new instances for each turn, which
+    /// could lead to different RNG call patterns and non-deterministic behavior.
+    var standardCombatSystemCache: [ItemID: StandardCombatSystem] = [:]
+
     /// Internal logger for engine messages, warnings, and errors.
     let logger = Logger(label: "com.samadhibot.Gnusto.GameEngine")
 
