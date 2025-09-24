@@ -34,7 +34,7 @@ struct FindActionHandlerTests {
             output,
             """
             > find book
-            Behold! It's right here!
+            It stands before you in all its mundane glory!
             """
         )
     }
@@ -65,7 +65,7 @@ struct FindActionHandlerTests {
             output,
             """
             > search for key
-            You have it already.
+            It rests securely in your possession.
             """
         )
     }
@@ -96,7 +96,7 @@ struct FindActionHandlerTests {
             output,
             """
             > locate coin
-            Behold! It's right here!
+            It stands before you in all its mundane glory!
             """
         )
     }
@@ -158,8 +158,8 @@ struct FindActionHandlerTests {
             output,
             """
             > find gem
-            You stand in a depthless black where even your thoughts seem to
-            whisper, careful not to make a sound.
+            The darkness here is absolute, consuming all light and hope of
+            sight.
             """
         )
     }
@@ -192,7 +192,7 @@ struct FindActionHandlerTests {
             output,
             """
             > find sword
-            You have it already.
+            It rests securely in your possession.
             """
         )
     }
@@ -222,7 +222,7 @@ struct FindActionHandlerTests {
             output,
             """
             > find table
-            Behold! It's right here!
+            It stands before you in all its mundane glory!
             """
         )
     }
@@ -262,7 +262,7 @@ struct FindActionHandlerTests {
             output,
             """
             > find ring
-            Behold! It's right here!
+            It stands before you in all its mundane glory!
             """
         )
     }
@@ -300,7 +300,7 @@ struct FindActionHandlerTests {
             output,
             """
             > find treasure
-            Any such thing remains frustratingly inaccessible.
+            Any such thing lurks beyond your reach.
             """
         )
     }
@@ -320,7 +320,7 @@ struct FindActionHandlerTests {
             output,
             """
             > find dragon
-            Any such thing remains frustratingly inaccessible.
+            Any such thing lurks beyond your reach.
             """
         )
     }
@@ -360,7 +360,7 @@ struct FindActionHandlerTests {
             output,
             """
             > find jewelry
-            Any such thing remains frustratingly inaccessible.
+            Any such thing lurks beyond your reach.
             """
         )
     }
@@ -398,7 +398,7 @@ struct FindActionHandlerTests {
             output1,
             """
             > find lamp
-            You have it already.
+            It rests securely in your possession.
             """
         )
 
@@ -411,7 +411,8 @@ struct FindActionHandlerTests {
             output2,
             """
             > find statue
-            It stands before you in all its mundane glory!
+            Your powers of observation are truly remarkable--it's right
+            here!
             """
         )
     }
@@ -450,7 +451,7 @@ struct FindActionHandlerTests {
             output,
             """
             > find paper
-            Behold! It's right here!
+            It stands before you in all its mundane glory!
             """
         )
     }
@@ -481,7 +482,7 @@ struct FindActionHandlerTests {
             output1,
             """
             > find crystal
-            Behold! It's right here!
+            It stands before you in all its mundane glory!
             """
         )
 
@@ -494,7 +495,8 @@ struct FindActionHandlerTests {
             output2,
             """
             > locate crystal
-            It stands before you in all its mundane glory!
+            Your powers of observation are truly remarkable--it's right
+            here!
             """
         )
     }

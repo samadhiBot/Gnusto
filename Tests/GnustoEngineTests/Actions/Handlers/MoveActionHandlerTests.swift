@@ -33,7 +33,8 @@ struct MoveActionHandlerTests {
             output,
             """
             > move box
-            The wooden box resists relocation with impressive stubbornness.
+            The wooden box remains firmly where it is, despite your
+            efforts.
             """
         )
 
@@ -66,8 +67,8 @@ struct MoveActionHandlerTests {
             output,
             """
             > shift stone
-            The large stone resists relocation with impressive
-            stubbornness.
+            The large stone remains firmly where it is, despite your
+            efforts.
             """
         )
     }
@@ -97,7 +98,7 @@ struct MoveActionHandlerTests {
             output,
             """
             > slide block
-            The ice block resists relocation with impressive stubbornness.
+            The ice block remains firmly where it is, despite your efforts.
             """
         )
     }
@@ -134,8 +135,7 @@ struct MoveActionHandlerTests {
             output,
             """
             > move chair to table
-            The journey from the wooden chair to the wooden table cannot be
-            made.
+            Moving the wooden chair to the wooden table proves impossible.
             """
         )
     }
@@ -157,7 +157,7 @@ struct MoveActionHandlerTests {
             output,
             """
             > move
-            You pace about with restless energy.
+            Nervous movement carries you nowhere in particular.
             """
         )
     }
@@ -177,7 +177,7 @@ struct MoveActionHandlerTests {
             output,
             """
             > move nonexistent
-            Any such thing lurks beyond your reach.
+            You cannot reach any such thing from here.
             """
         )
     }
@@ -214,7 +214,7 @@ struct MoveActionHandlerTests {
             output,
             """
             > move box
-            Any such thing lurks beyond your reach.
+            You cannot reach any such thing from here.
             """
         )
     }
@@ -234,7 +234,7 @@ struct MoveActionHandlerTests {
             output,
             """
             > move testRoom
-            Any such thing lurks beyond your reach.
+            You cannot reach any such thing from here.
             """
         )
     }
@@ -254,7 +254,7 @@ struct MoveActionHandlerTests {
             output,
             """
             > move me
-            You shift your position, accomplishing little.
+            You pace about with restless energy.
             """
         )
     }
@@ -293,8 +293,8 @@ struct MoveActionHandlerTests {
             output,
             """
             > move box
-            You stand in a depthless black where even your thoughts seem to
-            whisper, careful not to make a sound.
+            The darkness here is absolute, consuming all light and hope of
+            sight.
             """
         )
     }
@@ -333,7 +333,8 @@ struct MoveActionHandlerTests {
             output,
             """
             > move barrel
-            The oak barrel resists relocation with impressive stubbornness.
+            The oak barrel remains firmly where it is, despite your
+            efforts.
             """
         )
     }
@@ -378,8 +379,8 @@ struct MoveActionHandlerTests {
             A sharp steel sword.
 
             > move chest
-            The treasure chest resists relocation with impressive
-            stubbornness.
+            The treasure chest remains firmly where it is, despite your
+            efforts.
 
             > examine it
             A large treasure chest.
@@ -413,7 +414,8 @@ struct MoveActionHandlerTests {
             output,
             """
             > move book
-            The heavy book resists relocation with impressive stubbornness.
+            The heavy book remains firmly where it is, despite your
+            efforts.
             """
         )
 
@@ -457,7 +459,7 @@ struct MoveActionHandlerTests {
             output,
             """
             > move gem
-            The ruby gem resists relocation with impressive stubbornness.
+            The ruby gem remains firmly where it is, despite your efforts.
             """
         )
 
@@ -505,7 +507,8 @@ struct MoveActionHandlerTests {
             characterOutput,
             """
             > move wizard
-            The old wizard resists relocation with impressive stubbornness.
+            The old wizard remains firmly where it is, despite your
+            efforts.
             """
         )
 
@@ -517,7 +520,8 @@ struct MoveActionHandlerTests {
             deviceOutput,
             """
             > move device
-            Moving the mechanical device exceeds your current capabilities.
+            The mechanical device remains firmly where it is, despite your
+            efforts.
             """
         )
 

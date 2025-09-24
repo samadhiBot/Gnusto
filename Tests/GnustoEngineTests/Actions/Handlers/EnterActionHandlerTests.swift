@@ -242,7 +242,7 @@ struct EnterActionHandlerTests {
             output,
             """
             > enter
-            Several passages beckon. Which would you choose?
+            Multiple entrances present themselves. Which calls to you?
             """
         )
     }
@@ -359,7 +359,7 @@ struct EnterActionHandlerTests {
             output,
             """
             > enter
-            Several passages beckon. Which would you choose?
+            Multiple entrances present themselves. Which calls to you?
             """
         )
     }
@@ -399,7 +399,7 @@ struct EnterActionHandlerTests {
             output,
             """
             > enter door
-            Any such thing remains frustratingly inaccessible.
+            Any such thing lurks beyond your reach.
             """
         )
     }
@@ -429,7 +429,7 @@ struct EnterActionHandlerTests {
             output,
             """
             > enter rock
-            The universe denies your request to enter the large rock.
+            The large rock stubbornly resists your attempts to enter it.
             """
         )
     }
@@ -478,8 +478,8 @@ struct EnterActionHandlerTests {
             output,
             """
             > enter trapdoor
-            You stand in a depthless black where even your thoughts seem to
-            whisper, careful not to make a sound.
+            The darkness here is absolute, consuming all light and hope of
+            sight.
             """
         )
     }
@@ -688,8 +688,7 @@ struct EnterActionHandlerTests {
 
             You are in the town plaza.
 
-            You can see a shop door, a cave entrance, and a tower gate
-            here.
+            There are a shop door, a cave entrance, and a tower gate here.
 
             > enter entrance
             --- Cave ---
@@ -746,7 +745,7 @@ struct EnterActionHandlerTests {
             output,
             """
             > enter door
-            Any such thing remains frustratingly inaccessible.
+            Any such thing lurks beyond your reach.
             """
         )
     }

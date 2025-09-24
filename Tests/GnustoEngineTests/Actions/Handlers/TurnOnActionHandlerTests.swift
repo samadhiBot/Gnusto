@@ -36,7 +36,7 @@ struct TurnOnActionHandlerTests {
             output,
             """
             > turn on flashlight
-            With practiced efficiency, you turn on the silver flashlight.
+            You turn on the silver flashlight.
             """
         )
 
@@ -72,7 +72,7 @@ struct TurnOnActionHandlerTests {
             output,
             """
             > switch on lantern
-            With practiced efficiency, you switch on the camping lantern.
+            You switch on the camping lantern.
             """
         )
 
@@ -108,7 +108,7 @@ struct TurnOnActionHandlerTests {
             output,
             """
             > turn flashlight on
-            With practiced efficiency, you turn on the silver flashlight.
+            You turn on the silver flashlight.
             """
         )
 
@@ -153,7 +153,7 @@ struct TurnOnActionHandlerTests {
             output,
             """
             > turn on nonexistent
-            Any such thing remains frustratingly inaccessible.
+            Any such thing lurks beyond your reach.
             """
         )
     }
@@ -192,7 +192,7 @@ struct TurnOnActionHandlerTests {
             output,
             """
             > turn on lamp
-            Any such thing remains frustratingly inaccessible.
+            Any such thing lurks beyond your reach.
             """
         )
     }
@@ -222,7 +222,7 @@ struct TurnOnActionHandlerTests {
             output,
             """
             > turn on rock
-            That lacks the spark of mechanical life you seek to kindle.
+            It remains stubbornly inert despite your ministrations.
             """
         )
     }
@@ -260,7 +260,7 @@ struct TurnOnActionHandlerTests {
             output,
             """
             > turn on lamp
-            It hums with life already.
+            It's already on.
             """
         )
     }
@@ -302,7 +302,7 @@ struct TurnOnActionHandlerTests {
             output,
             """
             > turn on lamp
-            With practiced efficiency, you turn on the brass lamp.
+            You turn on the brass lamp.
 
             --- Dark Room ---
 
@@ -351,7 +351,7 @@ struct TurnOnActionHandlerTests {
             output,
             """
             > turn on lamp
-            Any such thing remains frustratingly inaccessible.
+            Any such thing lurks beyond your reach.
             """
         )
 
@@ -395,7 +395,7 @@ struct TurnOnActionHandlerTests {
             output,
             """
             > turn on radio
-            Any such thing remains frustratingly inaccessible.
+            Any such thing lurks beyond your reach.
             """
         )
     }
@@ -434,7 +434,7 @@ struct TurnOnActionHandlerTests {
             output,
             """
             > turn on lamp
-            With practiced efficiency, you turn on the brass lamp.
+            You turn on the brass lamp.
             """
         )
     }
@@ -479,7 +479,7 @@ struct TurnOnActionHandlerTests {
             output,
             """
             > turn on torch
-            With practiced efficiency, you turn on the silver torch.
+            You turn on the silver torch.
 
             --- Dark Room ---
 
@@ -488,10 +488,10 @@ struct TurnOnActionHandlerTests {
             > turn off torch
             The silver torch is now off.
 
-            Darkness rushes in like a living thing.
+            You are swallowed by impenetrable shadow.
 
-            Light feels theoretical here--an idea someone once had, now
-            forgotten by the room itself.
+            You stand in a depthless black where even your thoughts seem to
+            whisper, careful not to make a sound.
             """
         )
 
@@ -527,7 +527,7 @@ struct TurnOnActionHandlerTests {
             output,
             """
             > turn on radio
-            With practiced efficiency, you turn on the portable radio.
+            You turn on the portable radio.
             """
         )
 
@@ -566,7 +566,7 @@ struct TurnOnActionHandlerTests {
             output,
             """
             > turn on lamp
-            With practiced efficiency, you turn on the brass lamp.
+            You turn on the brass lamp.
 
             > examine it
             A shiny brass lamp.
@@ -611,7 +611,7 @@ struct TurnOnActionHandlerTests {
             output,
             """
             > turn on lamp
-            With practiced efficiency, you turn on the desk lamp.
+            You turn on the desk lamp.
             """
         )
     }

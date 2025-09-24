@@ -33,8 +33,7 @@ struct PushActionHandlerTests {
             output,
             """
             > push button
-            You lean into the red button, but it refuses to acknowledge
-            your efforts.
+            The red button meets your push with immovable resistance.
             """
         )
 
@@ -68,8 +67,8 @@ struct PushActionHandlerTests {
             output,
             """
             > push the guard
-            The surly guard maintains their position through dignity, not
-            your pushing.
+            Shoving the surly guard would cross lines better left
+            uncrossed.
             """
         )
 
@@ -95,8 +94,8 @@ struct PushActionHandlerTests {
             output,
             """
             > push the troll
-            The fierce troll maintains their position through dignity, not
-            your pushing.
+            Shoving the fierce troll would cross lines better left
+            uncrossed.
             """
         )
 
@@ -129,8 +128,7 @@ struct PushActionHandlerTests {
             output,
             """
             > press button
-            You lean into the red button, but it refuses to acknowledge
-            your efforts.
+            The red button meets your push with immovable resistance.
             """
         )
 
@@ -163,8 +161,7 @@ struct PushActionHandlerTests {
             output,
             """
             > depress switch
-            You lean into the light switch, but it refuses to acknowledge
-            your efforts.
+            The light switch meets your push with immovable resistance.
             """
         )
     }
@@ -194,8 +191,7 @@ struct PushActionHandlerTests {
             output,
             """
             > shove crate
-            You lean into the wooden crate, but it refuses to acknowledge
-            your efforts.
+            The wooden crate meets your push with immovable resistance.
             """
         )
     }
@@ -274,7 +270,7 @@ struct PushActionHandlerTests {
             output,
             """
             > press nonexistent
-            Any such thing remains frustratingly inaccessible.
+            Any such thing lurks beyond your reach.
             """
         )
     }
@@ -311,7 +307,7 @@ struct PushActionHandlerTests {
             output,
             """
             > push button
-            Any such thing remains frustratingly inaccessible.
+            Any such thing lurks beyond your reach.
             """
         )
     }
@@ -349,8 +345,8 @@ struct PushActionHandlerTests {
             output,
             """
             > push lever
-            You stand in a depthless black where even your thoughts seem to
-            whisper, careful not to make a sound.
+            The darkness here is absolute, consuming all light and hope of
+            sight.
             """
         )
     }
@@ -370,7 +366,7 @@ struct PushActionHandlerTests {
             output,
             """
             > press testRoom
-            Any such thing remains frustratingly inaccessible.
+            Any such thing lurks beyond your reach.
             """
         )
     }
@@ -390,7 +386,7 @@ struct PushActionHandlerTests {
             output,
             """
             > press me
-            You cannot press yourself, thankfully.
+            The logistics of pressing oneself prove insurmountable.
             """
         )
     }
@@ -422,8 +418,7 @@ struct PushActionHandlerTests {
             output,
             """
             > push switch
-            You lean into the light switch, but it refuses to acknowledge
-            your efforts.
+            The light switch meets your push with immovable resistance.
             """
         )
 
@@ -457,8 +452,8 @@ struct PushActionHandlerTests {
             output,
             """
             > push device
-            You lean into the electronic device, but it refuses to
-            acknowledge your efforts.
+            The electronic device meets your push with immovable
+            resistance.
             """
         )
     }
@@ -570,8 +565,7 @@ struct PushActionHandlerTests {
             output,
             """
             > push button
-            You lean into the emergency button, but it refuses to
-            acknowledge your efforts.
+            The emergency button meets your push with immovable resistance.
             """
         )
     }
@@ -631,11 +625,10 @@ struct PushActionHandlerTests {
             output,
             """
             > push lever
-            You lean into the wooden lever, but it refuses to acknowledge
-            your efforts.
+            The wooden lever meets your push with immovable resistance.
 
             > shove dial
-            The brass dial meets your push with immovable resistance.
+            Pushing the brass dial proves an exercise in futility.
             """
         )
 

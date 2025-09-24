@@ -198,7 +198,7 @@ struct MultipleObjectTests {
             output,
             """
             > put all in box
-            The coin and the gem finds a new home inside the box.
+            You carefully place the coin and the gem within the box.
             """
         )
 
@@ -241,7 +241,7 @@ struct MultipleObjectTests {
             output,
             """
             > put coin and gem in box
-            The coin and the gem finds a new home inside the box.
+            You carefully place the coin and the gem within the box.
             """
         )
 

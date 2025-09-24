@@ -190,7 +190,7 @@ struct FillActionHandlerTests {
             output,
             """
             > fill bucket
-            Any such thing remains frustratingly inaccessible.
+            Any such thing lurks beyond your reach.
             """
         )
     }
@@ -307,7 +307,7 @@ struct FillActionHandlerTests {
             output,
             """
             > fill bucket from well
-            Any such thing remains frustratingly inaccessible.
+            Any such thing lurks beyond your reach.
             """
         )
     }
@@ -348,8 +348,8 @@ struct FillActionHandlerTests {
             output,
             """
             > fill bucket
-            You stand in a depthless black where even your thoughts seem to
-            whisper, careful not to make a sound.
+            The darkness here is absolute, consuming all light and hope of
+            sight.
             """
         )
     }

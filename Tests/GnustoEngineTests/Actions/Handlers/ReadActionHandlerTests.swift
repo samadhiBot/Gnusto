@@ -98,7 +98,7 @@ struct ReadActionHandlerTests {
             output,
             """
             > read book
-            Any such thing remains frustratingly inaccessible.
+            Any such thing lurks beyond your reach.
             """
         )
     }
@@ -128,7 +128,7 @@ struct ReadActionHandlerTests {
             output,
             """
             > read rock
-            The universe denies your request to read the large rock.
+            The large rock stubbornly resists your attempts to read it.
             """
         )
     }
@@ -168,8 +168,8 @@ struct ReadActionHandlerTests {
             output,
             """
             > read book
-            You stand in a depthless black where even your thoughts seem to
-            whisper, careful not to make a sound.
+            The darkness here is absolute, consuming all light and hope of
+            sight.
             """
         )
     }
@@ -234,8 +234,8 @@ struct ReadActionHandlerTests {
             output,
             """
             > read card
-            The surface of the blank card remains unmarked by pen, quill,
-            or chisel.
+            The blank card bears no inscription, message, or literary
+            content whatsoever.
             """
         )
     }
@@ -267,8 +267,8 @@ struct ReadActionHandlerTests {
             output,
             """
             > read note
-            The surface of the empty note remains unmarked by pen, quill,
-            or chisel.
+            The empty note bears no inscription, message, or literary
+            content whatsoever.
             """
         )
     }

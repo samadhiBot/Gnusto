@@ -33,7 +33,7 @@ struct PullActionHandlerTests {
             output,
             """
             > pull rope
-            No amount of pulling will budge the thick rope.
+            The thick rope resists your tugging with stoic determination.
             """
         )
 
@@ -67,8 +67,7 @@ struct PullActionHandlerTests {
             output,
             """
             > pull guard
-            Yanking the surly guard about would strain both fabric and
-            friendship.
+            The surly guard is not a rope to be tugged at your convenience.
             """
         )
 
@@ -94,8 +93,8 @@ struct PullActionHandlerTests {
             output,
             """
             > pull troll
-            Yanking the fierce troll about would strain both fabric and
-            friendship.
+            The fierce troll is not a rope to be tugged at your
+            convenience.
             """
         )
 
@@ -157,7 +156,7 @@ struct PullActionHandlerTests {
             output,
             """
             > pull lever
-            Any such thing remains frustratingly inaccessible.
+            Any such thing lurks beyond your reach.
             """
         )
     }
@@ -195,8 +194,8 @@ struct PullActionHandlerTests {
             output,
             """
             > pull chain
-            You stand in a depthless black where even your thoughts seem to
-            whisper, careful not to make a sound.
+            The darkness here is absolute, consuming all light and hope of
+            sight.
             """
         )
     }
@@ -266,10 +265,10 @@ struct PullActionHandlerTests {
             output,
             """
             > pull first rope
-            No amount of pulling will budge the first rope.
+            The first rope resists your tugging with stoic determination.
 
             > pull second rope
-            The second rope resists your tugging with stoic determination.
+            You strain against the second rope to no avail.
             """
         )
 
@@ -314,7 +313,7 @@ struct PullActionHandlerTests {
             output,
             """
             > pull string
-            No amount of pulling will budge the pull string.
+            The pull string resists your tugging with stoic determination.
             """
         )
     }

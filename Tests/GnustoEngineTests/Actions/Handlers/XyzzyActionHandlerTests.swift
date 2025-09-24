@@ -23,7 +23,7 @@ struct XyzzyActionHandlerTests {
             output,
             """
             > xyzzy
-            The ancient magic fails to respond to your call.
+            A hollow voice says 'Fool.'
             """
         )
     }
@@ -56,7 +56,7 @@ struct XyzzyActionHandlerTests {
             output,
             """
             > xyzzy
-            The ancient magic fails to respond to your call.
+            A hollow voice says 'Fool.'
             """
         )
     }
@@ -103,7 +103,7 @@ struct XyzzyActionHandlerTests {
             output,
             """
             > xyzzy
-            The ancient magic fails to respond to your call.
+            A hollow voice says 'Fool.'
             """
         )
     }

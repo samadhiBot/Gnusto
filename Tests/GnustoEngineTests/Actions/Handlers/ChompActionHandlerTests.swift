@@ -72,10 +72,10 @@ struct ChompActionHandlerTests {
             Do you mean you want to eat the red apple?
 
             > yes
-            Acquired.
+            Taken.
 
-            Your appetite for the red apple must wait for better
-            circumstances.
+            The red apple remains tantalizingly out of reach of your
+            digestive ambitions.
             """
         )
 
@@ -169,7 +169,8 @@ struct ChompActionHandlerTests {
             output,
             """
             > chew
-            You chomp at the air like a creature possessed.
+            Your teeth clack together in a display of purposeless
+            aggression.
             """
         )
     }
@@ -209,7 +210,7 @@ struct ChompActionHandlerTests {
             output,
             """
             > chomp apple
-            Any such thing remains frustratingly inaccessible.
+            Any such thing lurks beyond your reach.
             """
         )
     }
@@ -248,8 +249,8 @@ struct ChompActionHandlerTests {
             output,
             """
             > chomp apple
-            You stand in a depthless black where even your thoughts seem to
-            whisper, careful not to make a sound.
+            The darkness here is absolute, consuming all light and hope of
+            sight.
             """
         )
     }
@@ -271,7 +272,8 @@ struct ChompActionHandlerTests {
             output,
             """
             > chomp
-            You chomp at the air like a creature possessed.
+            Your teeth clack together in a display of purposeless
+            aggression.
             """
         )
     }
@@ -337,8 +339,8 @@ struct ChompActionHandlerTests {
             output,
             """
             > chomp guard
-            The castle guard deserves better than to be treated like an
-            appetizer.
+            Your dental assault on the castle guard would likely end your
+            relationship, and possibly your teeth.
             """
         )
 
@@ -371,7 +373,7 @@ struct ChompActionHandlerTests {
             output,
             """
             > chomp rock
-            The smooth rock proves impervious to dental assault.
+            Your teeth are no match for the smooth rock.
             """
         )
 
@@ -412,7 +414,7 @@ struct ChompActionHandlerTests {
 
             A laboratory in which strange experiments are being conducted.
 
-            You can see a red apple here.
+            There is a red apple here.
             """
         )
 

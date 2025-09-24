@@ -148,7 +148,7 @@ struct NibbleActionHandlerTests {
             output,
             """
             > nibble cake
-            Any such thing remains frustratingly inaccessible.
+            Any such thing lurks beyond your reach.
             """
         )
 
@@ -170,8 +170,8 @@ struct NibbleActionHandlerTests {
             output,
             """
             > nibble rock
-            Your digestive system firmly vetoes the consumption of the gray
-            rock.
+            The gray rock falls well outside the realm of culinary
+            possibility.
             """
         )
 
@@ -215,8 +215,8 @@ struct NibbleActionHandlerTests {
             output,
             """
             > nibble bread
-            You stand in a depthless black where even your thoughts seem to
-            whisper, careful not to make a sound.
+            The darkness here is absolute, consuming all light and hope of
+            sight.
             """
         )
 
@@ -250,7 +250,8 @@ struct NibbleActionHandlerTests {
             Do you mean you want to eat the chocolate cookie?
 
             > yes
-            Now is not the time to consume the chocolate cookie.
+            Your appetite for the chocolate cookie must wait for better
+            circumstances.
             """
         )
 
@@ -466,10 +467,10 @@ struct NibbleActionHandlerTests {
             Do you mean you want to eat the red apple?
 
             > yes
-            Acquired.
+            Taken.
 
-            Your appetite for the red apple must wait for better
-            circumstances.
+            The red apple remains tantalizingly out of reach of your
+            digestive ambitions.
             """
         )
     }

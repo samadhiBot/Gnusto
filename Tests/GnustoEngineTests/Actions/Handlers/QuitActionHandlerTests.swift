@@ -29,7 +29,7 @@ struct QuitActionHandlerTests {
             > quit
             Your score is 0 (total of 10 points), in 0 moves. Do you wish
             to leave the game? (Y is affirmative): yes
-            Until we meet again in another tale...
+            Farewell, brave soul!
             """
         )
     }
@@ -54,7 +54,7 @@ struct QuitActionHandlerTests {
             > q
             Your score is 0 (total of 10 points), in 0 moves. Do you wish
             to leave the game? (Y is affirmative): y
-            Until we meet again in another tale...
+            Farewell, brave soul!
             """
         )
     }
@@ -92,7 +92,7 @@ struct QuitActionHandlerTests {
             > quit
             Your score is 0 (total of 10 points), in 0 moves. Do you wish
             to leave the game? (Y is affirmative): yes
-            Until we meet again in another tale...
+            Farewell, brave soul!
             """
         )
     }
@@ -117,7 +117,7 @@ struct QuitActionHandlerTests {
             > quit
             Your score is 0 (total of 10 points), in 0 moves. Do you wish
             to leave the game? (Y is affirmative): yes
-            Until we meet again in another tale...
+            Farewell, brave soul!
             """
         )
     }
@@ -144,7 +144,7 @@ struct QuitActionHandlerTests {
             > quit
             Your score is 0 (total of 10 points), in 0 moves. Do you wish
             to leave the game? (Y is affirmative): yes
-            Until we meet again in another tale...
+            Farewell, brave soul!
             """
         )
 
@@ -173,7 +173,7 @@ struct QuitActionHandlerTests {
             > quit
             Your score is 0 (total of 10 points), in 0 moves. Do you wish
             to leave the game? (Y is affirmative): y
-            Until we meet again in another tale...
+            Farewell, brave soul!
             """
         )
 
@@ -201,7 +201,7 @@ struct QuitActionHandlerTests {
             > quit
             Your score is 0 (total of 10 points), in 0 moves. Do you wish
             to leave the game? (Y is affirmative): no
-            Death postponed--onwards!
+            The adventure continues!
             """
         )
 
@@ -230,7 +230,7 @@ struct QuitActionHandlerTests {
             > quit
             Your score is 0 (total of 10 points), in 0 moves. Do you wish
             to leave the game? (Y is affirmative): n
-            Death postponed--onwards!
+            The adventure continues!
             """
         )
 
@@ -258,7 +258,8 @@ struct QuitActionHandlerTests {
             > quit
             Your score is 0 (total of 10 points), in 0 moves. Do you wish
             to leave the game? (Y is affirmative): maybe
-            That's neither yes nor no, so I'll err on the side of caution.
+            Your response defies binary interpretation. I'll take that as a
+            'no'.
             """
         )
 
@@ -286,7 +287,8 @@ struct QuitActionHandlerTests {
             > quit
             Your score is 0 (total of 10 points), in 0 moves. Do you wish
             to leave the game? (Y is affirmative): invalid
-            That's neither yes nor no, so I'll err on the side of caution.
+            Your response defies binary interpretation. I'll take that as a
+            'no'.
             """
         )
 
@@ -328,12 +330,12 @@ struct QuitActionHandlerTests {
             A laboratory in which strange experiments are being conducted.
 
             > inventory
-            You carry nothing but your own thoughts.
+            Your hands are as empty as your pockets.
 
             > quit
             Your score is 25 (total of 10 points), in 1 move. Do you wish
             to leave the game? (Y is affirmative): yes
-            Farewell, brave soul!
+            May your adventures elsewhere prove fruitful!
             """
         )
     }
@@ -359,7 +361,7 @@ struct QuitActionHandlerTests {
             > quit
             Your score is 0 (total of 10 points), in 0 moves. Do you wish
             to leave the game? (Y is affirmative): yes
-            Until we meet again in another tale...
+            Farewell, brave soul!
             """
         )
     }
@@ -381,7 +383,7 @@ struct QuitActionHandlerTests {
             > quit
             Your score is 0 (total of 10 points), in 0 moves. Do you wish
             to leave the game? (Y is affirmative):
-            Until we meet again in another tale...
+            Farewell, brave soul!
             """
         )
     }
@@ -406,7 +408,7 @@ struct QuitActionHandlerTests {
             > quit
             Your score is 0 (total of 10 points), in 0 moves. Do you wish
             to leave the game? (Y is affirmative): YES
-            Until we meet again in another tale...
+            Farewell, brave soul!
             """
         )
 
@@ -434,7 +436,7 @@ struct QuitActionHandlerTests {
             > quit
             Your score is 0 (total of 10 points), in 0 moves. Do you wish
             to leave the game? (Y is affirmative):   no
-            Death postponed--onwards!
+            The adventure continues!
             """
         )
 

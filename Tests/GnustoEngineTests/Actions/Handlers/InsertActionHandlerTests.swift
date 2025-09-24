@@ -43,7 +43,7 @@ struct InsertActionHandlerTests {
             output,
             """
             > insert coin in box
-            The gold coin finds a new home inside the wooden box.
+            You carefully place the gold coin within the wooden box.
             """
         )
 
@@ -89,7 +89,7 @@ struct InsertActionHandlerTests {
             output,
             """
             > insert gem inside pouch
-            The red gem finds a new home inside the leather pouch.
+            You carefully place the red gem within the leather pouch.
             """
         )
     }
@@ -129,7 +129,7 @@ struct InsertActionHandlerTests {
             output,
             """
             > insert key into chest
-            The brass key finds a new home inside the treasure chest.
+            You carefully place the brass key within the treasure chest.
             """
         )
     }
@@ -169,7 +169,7 @@ struct InsertActionHandlerTests {
             output,
             """
             > put book in bag
-            The old book finds a new home inside the travel bag.
+            You carefully place the old book within the travel bag.
             """
         )
     }
@@ -209,7 +209,8 @@ struct InsertActionHandlerTests {
             output,
             """
             > place scroll in satchel
-            The ancient scroll finds a new home inside the leather satchel.
+            You carefully place the ancient scroll within the leather
+            satchel.
             """
         )
     }
@@ -439,7 +440,7 @@ struct InsertActionHandlerTests {
             output,
             """
             > insert coin in box
-            Any such thing remains frustratingly inaccessible.
+            Any such thing lurks beyond your reach.
             """
         )
     }
@@ -472,8 +473,8 @@ struct InsertActionHandlerTests {
             output,
             """
             > insert bag in bag
-            The magic bag cannot contain itself--this isn't that kind of
-            story.
+            The universe politely but firmly prevents such recursive
+            madness.
             """
         )
     }
@@ -516,8 +517,8 @@ struct InsertActionHandlerTests {
             output,
             """
             > insert bag in box
-            You cannot fold space-time sufficiently to put the travel bag
-            in the small box.
+            The laws of physics sternly forbid putting the travel bag
+            inside its own contents.
             """
         )
     }
@@ -566,8 +567,8 @@ struct InsertActionHandlerTests {
             output,
             """
             > insert coin in box
-            You stand in a depthless black where even your thoughts seem to
-            whisper, careful not to make a sound.
+            The darkness here is absolute, consuming all light and hope of
+            sight.
             """
         )
     }
@@ -616,7 +617,7 @@ struct InsertActionHandlerTests {
             output,
             """
             > insert ring in box
-            The silver ring finds a new home inside the jewelry box.
+            You carefully place the silver ring within the jewelry box.
             """
         )
     }
@@ -664,8 +665,8 @@ struct InsertActionHandlerTests {
             output,
             """
             > insert gold coin and silver coin in purse
-            The gold coin and the silver coin finds a new home inside the
-            leather purse.
+            You carefully place the gold coin and the silver coin within
+            the leather purse.
             """
         )
 
@@ -719,8 +720,8 @@ struct InsertActionHandlerTests {
             output,
             """
             > insert all in satchel
-            The leather book and the ancient scroll finds a new home inside
-            the large satchel.
+            You carefully place the leather book and the ancient scroll
+            within the large satchel.
             """
         )
 
@@ -758,7 +759,8 @@ struct InsertActionHandlerTests {
             output,
             """
             > insert all in box
-            The empty box must remain empty, as you lack items to fill it.
+            Your possessions offer nothing suitable for placement in the
+            empty box.
             """
         )
     }
@@ -805,7 +807,7 @@ struct InsertActionHandlerTests {
             output,
             """
             > insert crystal in pouch
-            The magic crystal finds a new home inside the velvet pouch.
+            You carefully place the magic crystal within the velvet pouch.
             """
         )
     }
@@ -853,7 +855,7 @@ struct InsertActionHandlerTests {
             output,
             """
             > insert copper coin in wallet
-            The copper coin finds a new home inside the leather wallet.
+            You carefully place the copper coin within the leather wallet.
             """
         )
 
@@ -915,7 +917,7 @@ struct InsertActionHandlerTests {
             output1,
             """
             > insert red gem in box
-            The red gem finds a new home inside the gem box.
+            You carefully place the red gem within the gem box.
             """
         )
 
@@ -928,7 +930,7 @@ struct InsertActionHandlerTests {
             output2,
             """
             > put blue gem in box
-            You carefully place the blue gem within the gem box.
+            With practiced ease, you deposit the blue gem in the gem box.
             """
         )
 
@@ -941,7 +943,7 @@ struct InsertActionHandlerTests {
             output3,
             """
             > place green gem in box
-            With practiced ease, you deposit the green gem in the gem box.
+            The green gem finds a new home inside the gem box.
             """
         )
 

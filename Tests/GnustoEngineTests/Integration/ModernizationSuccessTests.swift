@@ -71,7 +71,7 @@ struct ModernizationSuccessTests {
             output,
             """
             > take modern item
-            Acquired.
+            Taken.
 
             > examine modern item
             An item for testing modern features.

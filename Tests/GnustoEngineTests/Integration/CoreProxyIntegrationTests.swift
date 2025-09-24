@@ -38,7 +38,7 @@ struct CoreProxyIntegrationTests {
             output,
             """
             > take test item
-            Acquired.
+            Taken.
 
             > examine test item
             A simple test item.
@@ -343,7 +343,7 @@ struct CoreProxyIntegrationTests {
             output,
             """
             > take heavy rock
-            The universe denies your request to take the heavy rock.
+            The heavy rock stubbornly resists your attempts to take it.
             """
         )
     }

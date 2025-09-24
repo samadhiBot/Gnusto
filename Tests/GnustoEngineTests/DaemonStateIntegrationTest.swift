@@ -56,10 +56,10 @@ struct DaemonStateIntegrationTest {
             output1,
             """
             > wait
-            Moments slip away like sand through fingers.
+            Time flows onward, indifferent to your concerns.
 
             > wait
-            Time flows onward, indifferent to your concerns.
+            The universe's clock ticks inexorably forward.
 
             🤖 Daemon tick #1
             """
@@ -84,10 +84,10 @@ struct DaemonStateIntegrationTest {
             output2,
             """
             > wait
-            The universe's clock ticks inexorably forward.
+            Moments slip away like sand through fingers.
 
             > wait
-            Moments slip away like sand through fingers.
+            The universe's clock ticks inexorably forward.
 
             🤖 Daemon tick #2
             """
@@ -131,7 +131,7 @@ struct DaemonStateIntegrationTest {
             output1,
             """
             > wait
-            Moments slip away like sand through fingers.
+            Time flows onward, indifferent to your concerns.
 
             Simple tick
             """
@@ -152,7 +152,7 @@ struct DaemonStateIntegrationTest {
             output2,
             """
             > wait
-            Time flows onward, indifferent to your concerns.
+            The universe's clock ticks inexorably forward.
 
             Simple tick
             """

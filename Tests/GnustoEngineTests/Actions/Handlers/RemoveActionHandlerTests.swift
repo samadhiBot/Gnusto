@@ -251,7 +251,7 @@ struct RemoveActionHandlerTests {
             output,
             """
             > remove nonexistent
-            Any such thing remains frustratingly inaccessible.
+            Any such thing lurks beyond your reach.
             """
         )
     }
@@ -288,7 +288,8 @@ struct RemoveActionHandlerTests {
             output,
             """
             > remove robe
-            The universe denies your request to remove the ceremonial robe.
+            The ceremonial robe stubbornly resists your attempts to remove
+            it.
             """
         )
     }

@@ -34,8 +34,8 @@ struct SqueezeActionHandlerTests {
             output,
             """
             > squeeze sponge
-            You squeeze the wet sponge with determination. Nothing of note
-            occurs.
+            You give the wet sponge a firm squeezing. It yields little and
+            reveals less.
             """
         )
 
@@ -69,8 +69,8 @@ struct SqueezeActionHandlerTests {
             output,
             """
             > compress bellows
-            You compress the leather bellows with determination. Nothing of
-            note occurs.
+            You give the leather bellows a firm compressing. It yields
+            little and reveals less.
             """
         )
     }
@@ -112,7 +112,7 @@ struct SqueezeActionHandlerTests {
             output,
             """
             > squeeze nonexistent
-            Any such thing lurks beyond your reach.
+            You cannot reach any such thing from here.
             """
         )
     }
@@ -150,7 +150,7 @@ struct SqueezeActionHandlerTests {
             output,
             """
             > squeeze pillow
-            Any such thing lurks beyond your reach.
+            You cannot reach any such thing from here.
             """
         )
     }
@@ -170,7 +170,7 @@ struct SqueezeActionHandlerTests {
             output,
             """
             > squeeze the ocean
-            That defies the fundamental laws of squeezing.
+            You cannot squeeze that, despite your best intentions.
             """
         )
     }
@@ -210,8 +210,8 @@ struct SqueezeActionHandlerTests {
             output,
             """
             > squeeze cushion
-            You stand in a depthless black where even your thoughts seem to
-            whisper, careful not to make a sound.
+            The darkness here is absolute, consuming all light and hope of
+            sight.
             """
         )
     }
@@ -244,8 +244,8 @@ struct SqueezeActionHandlerTests {
             output,
             """
             > squeeze the rubber ball
-            You squeeze the rubber ball with determination. Nothing of note
-            occurs.
+            You give the rubber ball a firm squeezing. It yields little and
+            reveals less.
             """
         )
 
@@ -279,8 +279,8 @@ struct SqueezeActionHandlerTests {
             output,
             """
             > squeeze the cat
-            The fluffy cat is unlikely to appreciate being squeezed right
-            now.
+            You reach toward the fluffy cat and pause. This is not the
+            moment for squeezing.
             """
         )
 
@@ -316,12 +316,12 @@ struct SqueezeActionHandlerTests {
             output,
             """
             > squeeze the necromancer
-            Squeezing the furious necromancer seems… ill-advised in the
-            current climate.
+            Aggression is one thing; squeezing the furious necromancer is
+            quite another.
 
-            The furious necromancer attacks with pure murderous intent! You
-            brace yourself for the impact, guard up, ready for the worst
-            kind of fight.
+            In a moment of raw violence, the furious necromancer comes at
+            you with nothing but fury! You raise your fists, knowing this
+            will hurt regardless of who wins.
             """
         )
 
@@ -344,7 +344,7 @@ struct SqueezeActionHandlerTests {
             output,
             """
             > squeeze myself
-            A reassuring self-squeeze bolsters your spirits.
+            You embrace yourself in a moment of self-comfort.
             """
         )
     }
@@ -386,12 +386,12 @@ struct SqueezeActionHandlerTests {
             output,
             """
             > squeeze red pillow
-            You squeeze the red pillow with determination. Nothing of note
-            occurs.
+            You give the red pillow a firm squeezing. It yields little and
+            reveals less.
 
             > squeeze blue pillow
-            You apply pressure to the blue pillow. The universe declines to
-            be impressed.
+            You squeeze the blue pillow. If it has secrets, they are not
+            released by squeezing.
             """
         )
 

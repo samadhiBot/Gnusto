@@ -406,7 +406,7 @@ struct PlayerProxyTests {
             output,
             """
             > take book
-            Acquired.
+            Taken.
             """
         )
     }

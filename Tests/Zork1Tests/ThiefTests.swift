@@ -72,8 +72,8 @@ struct ThiefTests {
             I'd watch out if I were you.
 
             > look at me
-            You are magnificently intact, without so much as a misplaced
-            hair to suggest adventure.
+            As good-looking as ever, which is to say, adequately
+            presentable.
 
             The thief just left, still carrying his large bag. You may not
             have noticed that he robbed you blind first.
@@ -115,8 +115,8 @@ struct ThiefTests {
             Several of them have unfortunate endings.
 
             > look at the floor
-            Your scrutiny of the floor yields no hidden depths or secret
-            purposes.
+            The floor reveals itself to be exactly what it appears--nothing
+            more, nothing less.
 
             Someone carrying a large bag is casually leaning against one of
             the walls here. He does not speak, but it is clear from his
@@ -161,7 +161,7 @@ struct ThiefTests {
             Several of them have unfortunate endings.
 
             > wait
-            Moments slip away like sand through fingers.
+            Time flows onward, indifferent to your concerns.
 
             Someone carrying a large bag is casually leaning against one of
             the walls here. He does not speak, but it is clear from his
@@ -211,7 +211,7 @@ struct ThiefTests {
             Several of them have unfortunate endings.
 
             > wait
-            Moments slip away like sand through fingers.
+            Time flows onward, indifferent to your concerns.
 
             Someone carrying a large bag is casually leaning against one of
             the walls here. He does not speak, but it is clear from his
@@ -259,55 +259,38 @@ struct ThiefTests {
             Several of them have unfortunate endings.
 
             > attack the thief
-            Any such thing lurks beyond your reach.
+            You cannot reach any such thing from here.
 
             Someone carrying a large bag is casually leaning against one of
             the walls here. He does not speak, but it is clear from his
             aspect that the bag will be taken only over his dead body.
 
             > stab the thief with my sword
-            You drive in hard with your blade while the thief pivots with
-            his stiletto ready, both of you past the point of retreat.
+            No more waiting as you attack with your sword raised and the
+            sneaky man responds with his vicious stiletto, two weapons now
+            committed to drawing blood.
 
-            A decisive blow from your elvish blade sends his stiletto
-            clattering away! The suspicious man stares at empty hands in
-            shock.
+            The shady thief evades your elvish blade with a fluid sidestep,
+            managing to stay just out of reach.
 
-            The person strikes back, his stiletto parting skin like paper.
-            A line of fire traces across your body, followed by the warm
-            rush of blood. First blood to them. The wound is real but
-            manageable.
+            Suddenly the suspicious-looking man slips past your guard. His
+            stiletto opens a wound that will mark you, and your blood flows
+            out steady and sure. The blow lands solidly, drawing blood. You
+            feel the sting but remain strong.
 
             > slay the thief
-            Perfect opportunity appears! The thief is off-balance and
-            defenseless, a sitting target for your next move.
+            The blow lands hard! The thief stumbles sideways, defenseless
+            and struggling to stay on his feet.
 
-            The sneaky thief strikes back, his stiletto parting skin like
-            paper. A line of fire traces across your body, followed by the
-            warm rush of blood. You grunt from the impact but maintain your
-            stance.
-
-            > stab the thief
-            Perfect opportunity appears! The robber is off-balance and
-            defenseless, a sitting target for your next move.
-
-            The thief neatly flips your elvish orcrist out of your hands,
-            and it drops to the floor.
-
-            > kill the thief
-            You aren't holding the sword.
-
-            Your fists against his vicious stiletto? Find a weapon first,
-            or find a grave soon after.
-
-            Finishing you off, the thief inserts his blade into your heart.
+            The thief, a pragmatist, dispatches you as a threat to his
+            livelihood.
 
             ****  You have died  ****
 
             Death, that most permanent of inconveniences, has claimed you.
             Yet in these tales, even death offers second chances.
 
-            You scored 0 out of a possible 350 points, in 5 moves.
+            You scored 0 out of a possible 350 points, in 3 moves.
 
             Would you like to RESTART, RESTORE a saved game, or QUIT?
 
@@ -336,7 +319,7 @@ struct ThiefTests {
             Several of them have unfortunate endings.
 
             > tell thief about treasure
-            You cannot reach any such thing from here.
+            Any such thing remains frustratingly inaccessible.
 
             Someone carrying a large bag is casually leaning against one of
             the walls here. He does not speak, but it is clear from his
@@ -365,7 +348,7 @@ struct ThiefTests {
             Several of them have unfortunate endings.
 
             > take thief
-            Any such thing remains frustratingly inaccessible.
+            Any such thing lurks beyond your reach.
 
             Someone carrying a large bag is casually leaning against one of
             the walls here. He does not speak, but it is clear from his
@@ -394,7 +377,7 @@ struct ThiefTests {
             Several of them have unfortunate endings.
 
             > examine stiletto
-            Any such thing remains frustratingly inaccessible.
+            Any such thing lurks beyond your reach.
 
             Someone carrying a large bag is casually leaning against one of
             the walls here. He does not speak, but it is clear from his
@@ -423,7 +406,7 @@ struct ThiefTests {
             Several of them have unfortunate endings.
 
             > look inside the bag
-            Any such thing remains frustratingly inaccessible.
+            Any such thing lurks beyond your reach.
 
             Someone carrying a large bag is casually leaning against one of
             the walls here. He does not speak, but it is clear from his
@@ -452,7 +435,7 @@ struct ThiefTests {
             Several of them have unfortunate endings.
 
             > take stiletto
-            Any such thing remains frustratingly inaccessible.
+            Any such thing lurks beyond your reach.
 
             Someone carrying a large bag is casually leaning against one of
             the walls here. He does not speak, but it is clear from his
@@ -521,15 +504,15 @@ struct ThiefTests {
             have noticed that he robbed you blind first.
 
             > dance with the thief
-            The thief accepts your hand, and together you share a brief,
-            graceful respite.
+            You and the thief move together in unexpected harmony, if only
+            for a moment.
 
             > kiss the thief
-            The moment for kissing the thief has neither arrived nor been
-            invited.
+            The thief has given no indication of welcoming such intimate
+            contact.
 
             > wait
-            Moments slip away like sand through fingers.
+            The universe's clock ticks inexorably forward.
 
             The thief, finding nothing of value, left disgusted.
             """
@@ -608,33 +591,42 @@ struct ThiefTests {
             Several of them have unfortunate endings.
 
             > attack the thief with my sword
-            Any such thing lurks beyond your reach.
+            You cannot reach any such thing from here.
 
             Someone carrying a large bag is casually leaning against one of
             the walls here. He does not speak, but it is clear from his
             aspect that the bag will be taken only over his dead body.
 
             > attack the thief with my sword
-            You drive in hard with your blade while the thief pivots with
-            his stiletto ready, both of you past the point of retreat.
+            No more waiting as you attack with your sword raised and the
+            sneaky man responds with his vicious stiletto, two weapons now
+            committed to drawing blood.
 
-            A decisive blow from your elvish blade sends his stiletto
-            clattering away! The suspicious man stares at empty hands in
-            shock.
+            The shady thief evades your elvish blade with a fluid sidestep,
+            managing to stay just out of reach.
 
-            The person strikes back, his stiletto parting skin like paper.
-            A line of fire traces across your body, followed by the warm
-            rush of blood. First blood to them. The wound is real but
-            manageable.
+            Suddenly the suspicious-looking man slips past your guard. His
+            stiletto opens a wound that will mark you, and your blood flows
+            out steady and sure. The blow lands solidly, drawing blood. You
+            feel the sting but remain strong.
 
             > attack the thief with my sword
-            Perfect opportunity appears! The thief is off-balance and
-            defenseless, a sitting target for your next move.
+            The blow lands hard! The thief stumbles sideways, defenseless
+            and struggling to stay on his feet.
 
-            The sneaky thief strikes back, his stiletto parting skin like
-            paper. A line of fire traces across your body, followed by the
-            warm rush of blood. You grunt from the impact but maintain your
-            stance.
+            The thief, a pragmatist, dispatches you as a threat to his
+            livelihood.
+
+            ****  You have died  ****
+
+            Death, that most permanent of inconveniences, has claimed you.
+            Yet in these tales, even death offers second chances.
+
+            You scored 0 out of a possible 350 points, in 3 moves.
+
+            Would you like to RESTART, RESTORE a saved game, or QUIT?
+
+            >
             """
         )
     }
@@ -751,23 +743,23 @@ struct ThiefTests {
             Several of them have unfortunate endings.
 
             > wait
-            Moments slip away like sand through fingers.
+            Time flows onward, indifferent to your concerns.
 
             Someone carrying a large bag is casually leaning against one of
             the walls here. He does not speak, but it is clear from his
             aspect that the bag will be taken only over his dead body.
 
             > wait
-            Time flows onward, indifferent to your concerns.
+            The universe's clock ticks inexorably forward.
 
             > wait
-            The universe's clock ticks inexorably forward.
+            Moments slip away like sand through fingers.
 
             The thief just left, still carrying his large bag. You may not
             have noticed that he robbed you blind first.
 
             > wait
-            Moments slip away like sand through fingers.
+            The universe's clock ticks inexorably forward.
             """
         )
 
@@ -805,55 +797,38 @@ struct ThiefTests {
             Several of them have unfortunate endings.
 
             > wait
-            Moments slip away like sand through fingers.
+            Time flows onward, indifferent to your concerns.
 
             Someone carrying a large bag is casually leaning against one of
             the walls here. He does not speak, but it is clear from his
             aspect that the bag will be taken only over his dead body.
 
             > attack the thief
-            You drive in hard with your blade while the thief pivots with
-            his stiletto ready, both of you past the point of retreat.
+            No more waiting as you attack with your sword raised and the
+            sneaky man responds with his vicious stiletto, two weapons now
+            committed to drawing blood.
 
-            A decisive blow from your elvish blade sends his stiletto
-            clattering away! The suspicious man stares at empty hands in
-            shock.
+            The shady thief evades your elvish blade with a fluid sidestep,
+            managing to stay just out of reach.
 
-            The person strikes back, his stiletto parting skin like paper.
-            A line of fire traces across your body, followed by the warm
-            rush of blood. First blood to them. The wound is real but
-            manageable.
+            Suddenly the suspicious-looking man slips past your guard. His
+            stiletto opens a wound that will mark you, and your blood flows
+            out steady and sure. The blow lands solidly, drawing blood. You
+            feel the sting but remain strong.
 
             > slay the thief
-            Perfect opportunity appears! The thief is off-balance and
-            defenseless, a sitting target for your next move.
+            The blow lands hard! The thief stumbles sideways, defenseless
+            and struggling to stay on his feet.
 
-            The sneaky thief strikes back, his stiletto parting skin like
-            paper. A line of fire traces across your body, followed by the
-            warm rush of blood. You grunt from the impact but maintain your
-            stance.
-
-            > stab the thief
-            Perfect opportunity appears! The robber is off-balance and
-            defenseless, a sitting target for your next move.
-
-            The thief neatly flips your elvish orcrist out of your hands,
-            and it drops to the floor.
-
-            > kill the thief
-            You aren't holding the sword.
-
-            Your fists against his vicious stiletto? Find a weapon first,
-            or find a grave soon after.
-
-            Finishing you off, the thief inserts his blade into your heart.
+            The thief, a pragmatist, dispatches you as a threat to his
+            livelihood.
 
             ****  You have died  ****
 
             Death, that most permanent of inconveniences, has claimed you.
             Yet in these tales, even death offers second chances.
 
-            You scored 0 out of a possible 350 points, in 5 moves.
+            You scored 0 out of a possible 350 points, in 3 moves.
 
             Would you like to RESTART, RESTORE a saved game, or QUIT?
 

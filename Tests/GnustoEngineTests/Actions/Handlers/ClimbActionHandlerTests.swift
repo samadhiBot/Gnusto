@@ -128,7 +128,7 @@ struct ClimbActionHandlerTests {
             output,
             """
             > climb tree
-            Any such thing remains frustratingly inaccessible.
+            Any such thing lurks beyond your reach.
             """
         )
     }
@@ -148,7 +148,7 @@ struct ClimbActionHandlerTests {
             output,
             """
             > climb me
-            You cannot climb yourself, thankfully.
+            The logistics of climbing oneself prove insurmountable.
             """
         )
     }
@@ -187,8 +187,8 @@ struct ClimbActionHandlerTests {
             output,
             """
             > climb tree
-            You stand in a depthless black where even your thoughts seem to
-            whisper, careful not to make a sound.
+            The darkness here is absolute, consuming all light and hope of
+            sight.
             """
         )
     }
@@ -254,7 +254,7 @@ struct ClimbActionHandlerTests {
             output,
             """
             > climb table
-            The universe denies your request to climb the heavy table.
+            The heavy table stubbornly resists your attempts to climb it.
             """
         )
 
@@ -324,8 +324,8 @@ struct ClimbActionHandlerTests {
             > climb stairs
             --- Upper Room ---
 
-            [INSERT ROOM DESCRIPTION HERE] You stand in a placeholder,
-            wondering what might have been.
+            This location is still under construction. The game developers
+            apologize for any inconvenience.
             """
         )
 

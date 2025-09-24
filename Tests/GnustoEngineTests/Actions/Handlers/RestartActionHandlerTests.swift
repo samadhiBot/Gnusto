@@ -128,7 +128,8 @@ struct RestartActionHandlerTests {
             > restart
             If you restart now you will lose any unsaved progress. Are you
             sure you want to restart? (Y is affirmative): maybe
-            That's neither yes nor no, so I'll err on the side of caution.
+            Your response defies binary interpretation. I'll take that as a
+            'no'.
             """
         )
     }

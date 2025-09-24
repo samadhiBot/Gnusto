@@ -231,7 +231,7 @@ struct LockActionHandlerTests {
             output,
             """
             > lock door with key
-            Any such thing remains frustratingly inaccessible.
+            Any such thing lurks beyond your reach.
             """
         )
     }
@@ -269,7 +269,7 @@ struct LockActionHandlerTests {
             output,
             """
             > lock rock with key
-            The universe denies your request to lock the large rock.
+            The large rock stubbornly resists your attempts to lock it.
             """
         )
     }
@@ -309,8 +309,8 @@ struct LockActionHandlerTests {
             output,
             """
             > lock door with key
-            The teeth of the wrong key find no purchase in the secure
-            door's mechanism.
+            The wrong key and the secure door were never meant to be
+            together.
             """
         )
     }
@@ -359,8 +359,8 @@ struct LockActionHandlerTests {
             output,
             """
             > lock door with key
-            You stand in a depthless black where even your thoughts seem to
-            whisper, careful not to make a sound.
+            The darkness here is absolute, consuming all light and hope of
+            sight.
             """
         )
     }
@@ -664,8 +664,8 @@ struct LockActionHandlerTests {
             output,
             """
             > lock door with stick
-            The teeth of the wooden stick find no purchase in the heavy
-            door's mechanism.
+            The wooden stick and the heavy door were never meant to be
+            together.
             """
         )
     }

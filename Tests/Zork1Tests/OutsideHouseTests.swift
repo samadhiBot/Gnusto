@@ -36,13 +36,13 @@ struct OutsideHouseTests {
             You are standing in an open field west of a white house, with a
             boarded front door.
 
-            You can see a small mailbox here.
+            There is a small mailbox here.
 
             > take the mailbox
             It is securely anchored.
 
             > open the mailbox
-            As the small mailbox opens, it reveals a leaflet within.
+            Opening the small mailbox brings a leaflet into the light.
 
             > read the leaflet
             (Taken)
@@ -57,14 +57,14 @@ struct OutsideHouseTests {
             The door is boarded and you can't remove the boards.
 
             > open door
-            You cannot open the door, much as you might wish otherwise.
+            The universe denies your request to open the door.
 
             > take boards
-            The universe denies your request to take the board.
+            You cannot take the board, much as you might wish otherwise.
 
             > look at the house
-            The white house reveals itself to be exactly what it
-            appears--nothing more, nothing less.
+            The white house stubbornly remains ordinary despite your
+            thorough examination.
 
             >
             May your adventures elsewhere prove fruitful!
@@ -96,11 +96,11 @@ struct OutsideHouseTests {
             smelling of hot peppers.
 
             > open sack
-            As the brown sack opens, it reveals a clove of garlic and a
-            lunch within.
+            Opening the brown sack brings a clove of garlic and a lunch
+            into the light.
 
             > inventory
-            You are unburdened by material possessions.
+            You carry nothing but your own thoughts.
 
             > take all
             You take the glass bottle and the brown sack.
@@ -111,7 +111,7 @@ struct OutsideHouseTests {
             - A brown sack
 
             >
-            Until we meet again in another tale...
+            May your adventures elsewhere prove fruitful!
             """
         )
     }
@@ -148,10 +148,10 @@ struct OutsideHouseTests {
             You are standing in an open field west of a white house, with a
             boarded front door.
 
-            You can see a small mailbox here.
+            There is a small mailbox here.
 
             > take the boards
-            The board stubbornly resists your attempts to take it.
+            You cannot take the board, much as you might wish otherwise.
 
             > north
             --- North of House ---
@@ -161,7 +161,7 @@ struct OutsideHouseTests {
             narrow path winds through the trees.
 
             > take the boards
-            You cannot take the board, much as you might wish otherwise.
+            The universe denies your request to take the board.
 
             > east
             --- Behind House ---
@@ -178,7 +178,8 @@ struct OutsideHouseTests {
             You can see what appears to be a kitchen.
 
             > take the window
-            The universe denies your request to take the kitchen window.
+            You cannot take the kitchen window, much as you might wish
+            otherwise.
 
             > south
             --- South of House ---
@@ -187,7 +188,7 @@ struct OutsideHouseTests {
             door here, and all the windows are boarded.
 
             > take the boards
-            The board stubbornly resists your attempts to take it.
+            You cannot take the board, much as you might wish otherwise.
 
             >
             May your adventures elsewhere prove fruitful!
@@ -231,16 +232,16 @@ struct OutsideHouseTests {
             the trophy case hangs an elvish sword of great antiquity.
 
             > take lamp
-            Taken.
+            Got it.
 
             > take sword
-            Got it.
+            Acquired.
 
             > examine lamp
             The lamp is turned off.
 
             > turn on lamp
-            With practiced efficiency, you turn on the brass lantern.
+            You successfully turn on the brass lantern.
 
             > inventory
             You are carrying:
@@ -259,7 +260,7 @@ struct OutsideHouseTests {
             nasty-looking knife.
 
             > take rope
-            Taken.
+            Got it.
 
             > take knife
             Got it.
@@ -272,7 +273,7 @@ struct OutsideHouseTests {
             - A sword
 
             >
-            May your adventures elsewhere prove fruitful!
+            Until we meet again in another tale...
             """
         )
     }
@@ -311,23 +312,23 @@ struct OutsideHouseTests {
             smelling of hot peppers.
 
             > take sack
-            Taken.
+            Got it.
 
             > examine sack
             The brown sack is closed.
 
             > open sack
-            Opening the brown sack brings a clove of garlic and a lunch
-            into the light.
+            The brown sack parts to disclose a clove of garlic and a lunch,
+            previously hidden from view.
 
             > examine sack
             The brown sack contains a clove of garlic and a lunch.
 
             > take lunch
-            Acquired.
+            Got it.
 
             > take garlic
-            Taken.
+            Got it.
 
             > take bottle
             Got it.
@@ -342,8 +343,8 @@ struct OutsideHouseTests {
             You'll have to open the glass bottle first.
 
             > open bottle
-            Opening the glass bottle brings a quantity of water into the
-            light.
+            The glass bottle parts to disclose a quantity of water,
+            previously hidden from view.
 
             > drink water
             Thank you very much. I was rather thirsty (from all this
@@ -360,7 +361,7 @@ struct OutsideHouseTests {
             - A brown sack
 
             >
-            May your adventures elsewhere prove fruitful!
+            Until we meet again in another tale...
             """
         )
     }

@@ -42,7 +42,7 @@ struct CutActionHandlerTests {
             output,
             """
             > cut rope
-            Your attempts at bisecting the thick rope prove fruitless.
+            The thick rope resists division with stubborn integrity.
             """
         )
 
@@ -84,7 +84,7 @@ struct CutActionHandlerTests {
             output,
             """
             > cut paper with scissors
-            Your attempts at bisecting the piece of paper prove fruitless.
+            The piece of paper resists division with stubborn integrity.
             """
         )
     }
@@ -123,7 +123,7 @@ struct CutActionHandlerTests {
             output,
             """
             > slice bread
-            Your attempts at bisecting the loaf of bread prove fruitless.
+            The loaf of bread resists division with stubborn integrity.
             """
         )
     }
@@ -162,7 +162,7 @@ struct CutActionHandlerTests {
             output,
             """
             > chop wood
-            Your attempts at bisecting the piece of wood prove fruitless.
+            The piece of wood resists division with stubborn integrity.
             """
         )
     }
@@ -221,7 +221,7 @@ struct CutActionHandlerTests {
             output,
             """
             > cut rope
-            Any such thing remains frustratingly inaccessible.
+            Any such thing lurks beyond your reach.
             """
         )
     }
@@ -259,8 +259,8 @@ struct CutActionHandlerTests {
             output,
             """
             > cut rope
-            You stand in a depthless black where even your thoughts seem to
-            whisper, careful not to make a sound.
+            The darkness here is absolute, consuming all light and hope of
+            sight.
             """
         )
     }
@@ -301,7 +301,7 @@ struct CutActionHandlerTests {
             output,
             """
             > cut the fabric with the sword
-            Your attempts at bisecting the piece of fabric prove fruitless.
+            The piece of fabric resists division with stubborn integrity.
             """
         )
 

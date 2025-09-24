@@ -35,8 +35,7 @@ struct DrinkActionHandlerTests {
             output,
             """
             > drink water
-            Circumstances conspire against drinking the glass of water at
-            present.
+            Now is not the moment for imbibing the glass of water.
             """
         )
 
@@ -71,8 +70,7 @@ struct DrinkActionHandlerTests {
             output,
             """
             > sip coffee
-            Circumstances conspire against drinking the cup of coffee at
-            present.
+            Now is not the moment for imbibing the cup of coffee.
             """
         )
     }
@@ -104,8 +102,7 @@ struct DrinkActionHandlerTests {
             output,
             """
             > imbibe potion
-            Circumstances conspire against drinking the magic potion at
-            present.
+            Now is not the moment for imbibing the magic potion.
             """
         )
     }
@@ -147,7 +144,7 @@ struct DrinkActionHandlerTests {
             output,
             """
             > drink nonexistent
-            Any such thing remains frustratingly inaccessible.
+            Any such thing lurks beyond your reach.
             """
         )
     }
@@ -179,8 +176,7 @@ struct DrinkActionHandlerTests {
             output,
             """
             > drink water
-            Circumstances conspire against drinking the glass of water at
-            present.
+            Now is not the moment for imbibing the glass of water.
             """
         )
     }
@@ -211,8 +207,7 @@ struct DrinkActionHandlerTests {
             output,
             """
             > drink rock
-            Your throat closes at the mere thought of drinking the large
-            rock.
+            The large rock was never meant to pass human lips.
             """
         )
     }
@@ -253,8 +248,8 @@ struct DrinkActionHandlerTests {
             output,
             """
             > drink water
-            You stand in a depthless black where even your thoughts seem to
-            whisper, careful not to make a sound.
+            The darkness here is absolute, consuming all light and hope of
+            sight.
             """
         )
     }
@@ -291,8 +286,7 @@ struct DrinkActionHandlerTests {
             output,
             """
             > drink juice
-            Circumstances conspire against drinking the orange juice at
-            present.
+            Now is not the moment for imbibing the orange juice.
             """
         )
     }
@@ -377,8 +371,7 @@ struct DrinkActionHandlerTests {
             output,
             """
             > drink bottle
-            Circumstances conspire against drinking the red wine at
-            present.
+            Now is not the moment for imbibing the red wine.
             """
         )
 
@@ -424,8 +417,7 @@ struct DrinkActionHandlerTests {
             output,
             """
             > drink bottle
-            Circumstances conspire against drinking the pure water at
-            present.
+            Now is not the moment for imbibing the pure water.
             """
         )
     }
@@ -458,8 +450,7 @@ struct DrinkActionHandlerTests {
             output,
             """
             > drink cup
-            Your hopes for liquid refreshment in the empty cup are sadly
-            misplaced.
+            The empty cup offers nothing to slake your thirst.
             """
         )
     }
@@ -504,14 +495,14 @@ struct DrinkActionHandlerTests {
             output,
             """
             > drink tea
-            Circumstances conspire against drinking the hot tea at present.
+            Now is not the moment for imbibing the hot tea.
 
             > take water
-            Taken.
+            Got it.
 
             > drink it
-            The cold water must wait for a more opportune moment of
-            consumption.
+            Circumstances conspire against drinking the cold water at
+            present.
             """
         )
     }
@@ -544,8 +535,7 @@ struct DrinkActionHandlerTests {
             output,
             """
             > drink smoothie
-            Circumstances conspire against drinking the fruit smoothie at
-            present.
+            Now is not the moment for imbibing the fruit smoothie.
             """
         )
     }

@@ -302,7 +302,7 @@ struct ThrowActionHandlerTests {
             output,
             """
             > throw nonexistent
-            Any such thing remains frustratingly inaccessible.
+            Any such thing lurks beyond your reach.
             """
         )
     }
@@ -333,7 +333,7 @@ struct ThrowActionHandlerTests {
             output,
             """
             > throw ball at nonexistent
-            Any such thing remains frustratingly inaccessible.
+            Any such thing lurks beyond your reach.
             """
         )
     }
@@ -378,7 +378,7 @@ struct ThrowActionHandlerTests {
             output,
             """
             > throw ball at target
-            Any such thing remains frustratingly inaccessible.
+            Any such thing lurks beyond your reach.
             """
         )
     }
@@ -418,8 +418,8 @@ struct ThrowActionHandlerTests {
             output,
             """
             > throw ball
-            You stand in a depthless black where even your thoughts seem to
-            whisper, careful not to make a sound.
+            The darkness here is absolute, consuming all light and hope of
+            sight.
             """
         )
     }
@@ -558,16 +558,17 @@ struct ThrowActionHandlerTests {
             You throw the red apple at the old wizard, but your aim falls
             short. The the red apple tumbles uselessly to the ground.
 
-            The old wizard attacks with pure murderous intent! You brace
-            yourself for the impact, guard up, ready for the worst kind of
-            fight.
+            In a moment of raw violence, the old wizard comes at you with
+            nothing but fury! You raise your fists, knowing this will hurt
+            regardless of who wins.
 
             > throw apple at wizard
             You aren't holding the red apple.
 
-            The counterblow comes wild and desperate, the old wizard
-            hammering through your guard to bruise rather than break. Pain
-            flickers and dies. Your body has more important work.
+            In the exchange, the old wizard lands clean. The world lurches
+            as your body absorbs punishment it won't soon forget. The blow
+            lands solidly, drawing blood. You feel the sting but remain
+            strong.
             """
         )
 

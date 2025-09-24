@@ -79,7 +79,7 @@ struct GameEnginePronounTests {
             output,
             """
             > take gold coin
-            Acquired.
+            Taken.
             """
         )
     }
@@ -166,10 +166,10 @@ struct GameEnginePronounTests {
             A shiny brass lamp.
 
             > take it
-            Acquired.
+            Taken.
 
             > turn it on
-            You turn on the brass lamp.
+            You successfully turn on the brass lamp.
             """
         )
 
@@ -275,7 +275,7 @@ struct GameEnginePronounTests {
             A coin.
 
             > take it
-            Acquired.
+            Taken.
             """
         )
 
@@ -338,14 +338,14 @@ struct GameEnginePronounTests {
             output,
             """
             > examine lamp
-            Your scrutiny of the lamp yields no hidden depths or secret
-            purposes.
+            The lamp reveals itself to be exactly what it appears--nothing
+            more, nothing less.
 
             > examine copper coin and silver coin
-            - Copper coin: The copper coin reveals itself to be exactly
-              what it appears--nothing more, nothing less.
-            - Silver coin: The silver coin stubbornly remains ordinary
-            despite your thorough examination.
+            - Copper coin: The copper coin stubbornly remains ordinary
+              despite your thorough examination.
+            - Silver coin: Your scrutiny of the silver coin yields no
+              hidden depths or secret purposes.
 
             > take them
             You take the copper coin and the silver coin.
@@ -681,7 +681,7 @@ struct GameEnginePronounTests {
             A brilliant red gem.
 
             > take it
-            Acquired.
+            Taken.
             """
         )
 
@@ -729,11 +729,10 @@ struct GameEnginePronounTests {
             An old leather-bound book.
 
             > take it
-            Acquired.
+            Taken.
 
             > read it
-            The ancient book bears no inscription, message, or literary
-            content whatsoever.
+            The ancient book offers no text for your eager eyes to decode.
             """
         )
 
@@ -794,11 +793,11 @@ struct GameEnginePronounTests {
             Which do you mean: the blue book or the red book?
 
             > the red book
-            Your scrutiny of the red book yields no hidden depths or secret
-            purposes.
+            The red book reveals itself to be exactly what it
+            appears--nothing more, nothing less.
 
             > take it
-            Taken.
+            Got it.
             """
         )
 
@@ -884,8 +883,8 @@ struct GameEnginePronounTests {
             > go east
             --- Room 2 ---
 
-            [INSERT ROOM DESCRIPTION HERE] You stand in a placeholder,
-            wondering what might have been.
+            This location is still under construction. The game developers
+            apologize for any inconvenience.
 
             > take it
             I don't know what 'it' refers to.
@@ -944,19 +943,19 @@ struct GameEnginePronounTests {
             A polished brass lamp.
 
             > take it
-            Acquired.
+            Taken.
 
             > examine copper coin and silver coin
-            - Copper coin: The copper coin reveals itself to be exactly
-              what it appears--nothing more, nothing less.
-            - Silver coin: The silver coin stubbornly remains ordinary
-            despite your thorough examination.
+            - Copper coin: The copper coin stubbornly remains ordinary
+              despite your thorough examination.
+            - Silver coin: Your scrutiny of the silver coin yields no
+              hidden depths or secret purposes.
 
             > take them
             You take the copper coin and the silver coin.
 
             > turn on lamp
-            With practiced efficiency, you turn on the brass lamp.
+            You successfully turn on the brass lamp.
 
             > examine it
             A polished brass lamp.

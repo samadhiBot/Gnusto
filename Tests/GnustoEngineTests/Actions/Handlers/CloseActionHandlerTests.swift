@@ -35,7 +35,7 @@ struct CloseActionHandlerTests {
             output,
             """
             > close chest
-            Shut tight.
+            Firmly closed.
             """
         )
 
@@ -71,7 +71,7 @@ struct CloseActionHandlerTests {
             output,
             """
             > shut door
-            Shut tight.
+            Firmly closed.
             """
         )
     }
@@ -132,7 +132,7 @@ struct CloseActionHandlerTests {
             output,
             """
             > close door
-            Any such thing remains frustratingly inaccessible.
+            Any such thing lurks beyond your reach.
             """
         )
     }
@@ -162,7 +162,7 @@ struct CloseActionHandlerTests {
             output,
             """
             > close rock
-            The universe denies your request to close the large rock.
+            The large rock stubbornly resists your attempts to close it.
             """
         )
     }
@@ -202,8 +202,8 @@ struct CloseActionHandlerTests {
             output,
             """
             > close chest
-            You stand in a depthless black where even your thoughts seem to
-            whisper, careful not to make a sound.
+            The darkness here is absolute, consuming all light and hope of
+            sight.
             """
         )
     }
@@ -237,7 +237,7 @@ struct CloseActionHandlerTests {
             output,
             """
             > close box
-            Shut tight.
+            Firmly closed.
             """
         )
 

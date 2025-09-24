@@ -61,10 +61,10 @@ struct CloakOfDarknessWalkthroughTests {
             This isn't the best place to leave a smart cloak lying around.
 
             > go south
-            The world vanishes into absolute blackness.
+            Darkness rushes in like a living thing.
 
-            The darkness here is absolute, consuming all light and hope of
-            sight.
+            This is the kind of dark that swallows shapes and edges,
+            leaving only breath and heartbeat to prove you exist.
 
             > walk north
             --- Foyer of the Opera House ---
@@ -87,8 +87,7 @@ struct CloakOfDarknessWalkthroughTests {
             You remove the velvet cloak.
 
             > hang it on the brass hook
-            You hang the velvet cloak on the small brass hook with careful
-            precision.
+            You successfully hang the velvet cloak on the small brass hook.
 
             > examine the hook
             It's just a small brass hook, with a cloak hanging on it.
@@ -162,10 +161,10 @@ struct CloakOfDarknessWalkthroughTests {
             seems to be getting worse.
 
             > go south
-            The world vanishes into absolute blackness.
+            Darkness rushes in like a living thing.
 
-            The darkness here is absolute, consuming all light and hope of
-            sight.
+            This is the kind of dark that swallows shapes and edges,
+            leaving only breath and heartbeat to prove you exist.
 
             > inventory
             You are carrying:
@@ -192,7 +191,7 @@ struct CloakOfDarknessWalkthroughTests {
             doorways south and west.
 
             > go east
-            The universe conspires against your movement that way.
+            You can't go that way.
 
             > go west
             --- Cloakroom ---
@@ -202,10 +201,11 @@ struct CloakOfDarknessWalkthroughTests {
             east.
 
             > take the brass hook
-            The universe denies your request to take the small brass hook.
+            You cannot take the small brass hook, much as you might wish
+            otherwise.
 
             > drop cloak
-            Dropped.
+            Relinquished.
 
             > e
             --- Foyer of the Opera House ---

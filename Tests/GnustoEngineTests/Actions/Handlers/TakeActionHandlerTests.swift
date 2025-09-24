@@ -34,7 +34,7 @@ struct TakeActionHandlerTests {
             output,
             """
             > take book
-            Acquired.
+            Taken.
             """
         )
 
@@ -69,7 +69,7 @@ struct TakeActionHandlerTests {
             output,
             """
             > get coin
-            Acquired.
+            Taken.
             """
         )
 
@@ -103,7 +103,7 @@ struct TakeActionHandlerTests {
             output,
             """
             > grab key
-            Acquired.
+            Taken.
             """
         )
 
@@ -137,7 +137,7 @@ struct TakeActionHandlerTests {
             output,
             """
             > steal gem
-            Acquired.
+            Taken.
             """
         )
 
@@ -171,7 +171,7 @@ struct TakeActionHandlerTests {
             output,
             """
             > pick up feather
-            Acquired.
+            Taken.
             """
         )
 
@@ -214,7 +214,7 @@ struct TakeActionHandlerTests {
             output,
             """
             > take ring from box
-            Acquired.
+            Taken.
             """
         )
 
@@ -303,7 +303,7 @@ struct TakeActionHandlerTests {
             output,
             """
             > take nonexistent
-            Any such thing remains frustratingly inaccessible.
+            Any such thing lurks beyond your reach.
             """
         )
     }
@@ -341,7 +341,7 @@ struct TakeActionHandlerTests {
             output,
             """
             > take book
-            Any such thing remains frustratingly inaccessible.
+            Any such thing lurks beyond your reach.
             """
         )
     }
@@ -372,7 +372,7 @@ struct TakeActionHandlerTests {
             output,
             """
             > take statue
-            The universe denies your request to take the stone statue.
+            The stone statue stubbornly resists your attempts to take it.
             """
         )
     }
@@ -403,7 +403,7 @@ struct TakeActionHandlerTests {
             output,
             """
             > take book
-            You need not acquire what you already possess.
+            That already resides among your possessions.
             """
         )
     }
@@ -443,7 +443,7 @@ struct TakeActionHandlerTests {
             output,
             """
             > take treasure
-            Any such thing remains frustratingly inaccessible.
+            Any such thing lurks beyond your reach.
             """
         )
     }
@@ -524,7 +524,7 @@ struct TakeActionHandlerTests {
             output,
             """
             > take coin
-            Acquired.
+            Taken.
             """
         )
     }
@@ -613,8 +613,8 @@ struct TakeActionHandlerTests {
             output,
             """
             > take book
-            You stand in a depthless black where even your thoughts seem to
-            whisper, careful not to make a sound.
+            The darkness here is absolute, consuming all light and hope of
+            sight.
             """
         )
     }
@@ -656,7 +656,7 @@ struct TakeActionHandlerTests {
             output,
             """
             > take vase
-            Acquired.
+            Taken.
             """
         )
 
@@ -699,7 +699,7 @@ struct TakeActionHandlerTests {
             output,
             """
             > take candle
-            Acquired.
+            Taken.
             """
         )
 
@@ -863,7 +863,7 @@ struct TakeActionHandlerTests {
             output,
             """
             > take book
-            Acquired.
+            Taken.
 
             > examine it
             A worn leather book.

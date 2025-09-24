@@ -23,7 +23,7 @@ struct BreatheActionHandlerTests {
             output,
             """
             > breathe
-            You fill your lungs with purpose.
+            You draw in a deep, contemplative breath.
             """
         )
     }
@@ -85,7 +85,7 @@ struct BreatheActionHandlerTests {
             output,
             """
             > breathe mist
-            Your ambition to breathe that must remain unfulfilled.
+            That defies the fundamental laws of breathing.
             """
         )
     }
@@ -115,7 +115,7 @@ struct BreatheActionHandlerTests {
             output,
             """
             > breathe with mask
-            I'm stumped by 'with mask' in this context.
+            The phrase 'with mask' eludes my comprehension.
             """
         )
     }
@@ -135,7 +135,7 @@ struct BreatheActionHandlerTests {
             output,
             """
             > breathe on air
-            You fill your lungs with purpose.
+            You draw in a deep, contemplative breath.
             """
         )
     }
@@ -165,7 +165,7 @@ struct BreatheActionHandlerTests {
             output,
             """
             > breathe
-            You fill your lungs with purpose.
+            You draw in a deep, contemplative breath.
             """
         )
     }
@@ -198,7 +198,7 @@ struct BreatheActionHandlerTests {
             output,
             """
             > breathe the air
-            You fill your lungs with purpose.
+            You draw in a deep, contemplative breath.
             """
         )
     }

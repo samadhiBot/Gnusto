@@ -2471,10 +2471,7 @@ open class StandardMessenger: @unchecked Sendable {
         capitalize: Bool = true,
         function: String = #function
     ) -> String {
-        let index = Int.random(
-            in: 0..<responses.count,
-            using: &randomNumberGenerator
-        )
+        let index = Int(randomNumberGenerator.next(upperBound: UInt32(responses.count)))
         return output(
             capitalize ? responses[index].capitalizedSentences : responses[index],
             logLevel,

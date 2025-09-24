@@ -40,10 +40,10 @@ struct ProxySystemIntegrationTests {
             output,
             """
             > take lamp
-            Acquired.
+            Taken.
 
             > turn on lamp
-            You turn on the brass lamp.
+            You successfully turn on the brass lamp.
 
             > examine lamp
             A shiny brass lamp.
@@ -177,13 +177,13 @@ struct ProxySystemIntegrationTests {
             output,
             """
             > take coin
-            Acquired.
+            Taken.
 
             > east
             --- Room Two ---
 
-            This location is still under construction. The game developers
-            apologize for any inconvenience.
+            Error 404: Room description not found. But you're definitely
+            somewhere.
 
             > inventory
             You are carrying:
@@ -288,31 +288,29 @@ struct ProxySystemIntegrationTests {
             A strange box with glowing runes. The mysterious box is closed.
 
             > open mysterious box
-            The mysterious box parts to disclose a crystal orb, previously
-            hidden from view.
+            As the mysterious box opens, it reveals a crystal orb within.
 
             > take crystal orb
-            Taken.
+            Got it.
 
             > put crystal orb in mysterious box
-            With practiced ease, you deposit the crystal orb in the
-            mysterious box.
+            The crystal orb finds a new home inside the mysterious box.
 
             > close mysterious box
-            Shut tight.
+            Closed.
 
             > take mysterious box
-            Taken.
+            Got it.
 
             > south
             You are swallowed by impenetrable shadow.
 
-            Light feels theoretical here--an idea someone once had, now
-            forgotten by the room itself.
+            You stand in a depthless black where even your thoughts seem to
+            whisper, careful not to make a sound.
 
             > look
-            Light feels theoretical here--an idea someone once had, now
-            forgotten by the room itself.
+            You stand in a depthless black where even your thoughts seem to
+            whisper, careful not to make a sound.
             """
         )
     }
@@ -440,8 +438,8 @@ struct ProxySystemIntegrationTests {
             output,
             """
             > open mechanical device
-            The mechanical device parts to disclose a bronze gear and a
-            silver gear, previously hidden from view.
+            As the mechanical device opens, it reveals a bronze gear and a
+            silver gear within.
 
             > examine mechanical device
             A complex mechanical device with gears and springs. In the
@@ -523,10 +521,10 @@ struct ProxySystemIntegrationTests {
             output,
             """
             > take magic wand
-            Acquired.
+            Taken.
 
             > turn on magic wand
-            You turn on the magic wand.
+            You successfully turn on the magic wand.
 
             > examine enchanted mirror
             A mirror that reflects magical auras.

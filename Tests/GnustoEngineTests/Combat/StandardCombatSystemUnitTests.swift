@@ -57,11 +57,12 @@ struct StandardCombatSystemUnitTests {
         expectNoDifference(
             result.message,
             """
-            You strike the beast with your iron sword, opening a wound
-            that bleeds steadily. The wound is real but manageable.
+            Your blow with your iron sword catches the beast cleanly,
+            tearing flesh and drawing crimson. The blow lands solidly, drawing blood. He
+            feels the sting but remains strong.
 
-            The counterstrike comes heavy. The beast's fist
-            finds ribs, and pain blooms like fire through your chest. First blood to them. The wound is real but manageable.
+            In the exchange, the grotesque monster lands clean. The world lurches
+            as your body absorbs punishment it won't soon forget. The blow lands solidly, drawing blood. You feel the sting but remain strong.
             """
         )
         expectNoDifference(result.changes.count, 3)
@@ -80,11 +81,12 @@ struct StandardCombatSystemUnitTests {
         expectNoDifference(
             result.message,
             """
-            You strike the beast with your iron sword, opening a wound
-            that bleeds steadily. The wound is real but manageable.
+            Your blow with your iron sword catches the beast cleanly,
+            tearing flesh and drawing crimson. The blow lands solidly, drawing blood. He
+            feels the sting but remains strong.
 
-            The counterstrike comes heavy. The beast's fist
-            finds ribs, and pain blooms like fire through your chest. First blood to them. The wound is real but manageable.
+            In the exchange, the grotesque monster lands clean. The world lurches
+            as your body absorbs punishment it won't soon forget. The blow lands solidly, drawing blood. You feel the sting but remain strong.
             """
         )
         expectNoDifference(result.changes.count, 3)
@@ -349,10 +351,11 @@ struct StandardCombatSystemUnitTests {
         expectNoDifference(
             result.message,
             """
-            You strike the fearsome beast with your iron sword, opening a wound
-            that bleeds steadily. The wound is real but manageable.
+            Your blow with your iron sword catches the fearsome beast cleanly,
+            tearing flesh and drawing crimson. The blow lands solidly, drawing blood. He
+            feels the sting but remains strong.
 
-            The monster strikes back hard but you duck away, the punch finding only the ghost of where you were.
+            The fearsome beast's retaliatory strike comes fast but you're faster, sidestepping the violence with practiced grace.
             """
         )
         #expect(
@@ -414,11 +417,11 @@ struct StandardCombatSystemUnitTests {
 
             A circular arena for testing combat.
 
-            You can see a fierce troll here.
+            There is a fierce troll here.
 
-            The fearsome beast comes at you unarmed but fearless! You level
-            your iron sword at his approach--will your weapon stop such
-            determination?
+            Despite having no weapon, the fearsome beast charges with
+            terrifying resolve! You grip your iron sword tighter, knowing
+            you'd better use this advantage.
             """
         )
 

@@ -179,7 +179,7 @@ struct LookInsideActionHandlerTests {
             output,
             """
             > look in container
-            Any such thing remains frustratingly inaccessible.
+            Any such thing lurks beyond your reach.
             """
         )
     }
@@ -218,8 +218,8 @@ struct LookInsideActionHandlerTests {
             output,
             """
             > look in box
-            You stand in a depthless black where even your thoughts seem to
-            whisper, careful not to make a sound.
+            The darkness here is absolute, consuming all light and hope of
+            sight.
             """
         )
     }
@@ -370,8 +370,8 @@ struct LookInsideActionHandlerTests {
             output,
             """
             > look inside statue
-            Within the marble statue lies nothing but unfulfilled
-            expectations.
+            The interior of the marble statue disappoints with its mundane
+            emptiness.
             """
         )
     }
@@ -401,8 +401,8 @@ struct LookInsideActionHandlerTests {
             output,
             """
             > look in rock
-            Within the small rock lies nothing but unfulfilled
-            expectations.
+            The interior of the small rock disappoints with its mundane
+            emptiness.
             """
         )
     }

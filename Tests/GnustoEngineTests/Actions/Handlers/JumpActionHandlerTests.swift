@@ -23,7 +23,7 @@ struct JumpActionHandlerTests {
             output,
             """
             > jump
-            You leap enthusiastically, achieving modest altitude.
+            You spring upward with temporary defiance of gravity.
             """
         )
     }
@@ -125,7 +125,7 @@ struct JumpActionHandlerTests {
             output,
             """
             > jump obstacle
-            Any such thing remains frustratingly inaccessible.
+            Any such thing lurks beyond your reach.
             """
         )
     }
@@ -155,7 +155,7 @@ struct JumpActionHandlerTests {
             output,
             """
             > jump
-            You leap enthusiastically, achieving modest altitude.
+            You spring upward with temporary defiance of gravity.
             """
         )
     }
@@ -180,8 +180,8 @@ struct JumpActionHandlerTests {
             output,
             """
             > jump troll
-            The fierce troll is not a trampoline for your acrobatic
-            ambitions.
+            Leaping upon the fierce troll would be an extraordinary breach
+            of personal space.
             """
         )
 

@@ -33,8 +33,8 @@ struct KickActionHandlerTests {
             output,
             """
             > kick rock
-            Kicking the large rock would injure your pride and possibly
-            your toes.
+            Your foot meets the large rock in an unequal contest. Your foot
+            loses.
             """
         )
 
@@ -96,7 +96,7 @@ struct KickActionHandlerTests {
             output,
             """
             > kick rock
-            Any such thing remains frustratingly inaccessible.
+            Any such thing lurks beyond your reach.
             """
         )
     }
@@ -134,8 +134,8 @@ struct KickActionHandlerTests {
             output,
             """
             > kick rock
-            You stand in a depthless black where even your thoughts seem to
-            whisper, careful not to make a sound.
+            The darkness here is absolute, consuming all light and hope of
+            sight.
             """
         )
     }
@@ -160,8 +160,8 @@ struct KickActionHandlerTests {
             output,
             """
             > kick troll
-            The fierce troll has done nothing to deserve such unprovoked
-            violence.
+            Kicking the fierce troll would irreparably damage your
+            relationship, among other things.
             """
         )
 
@@ -194,8 +194,8 @@ struct KickActionHandlerTests {
             output,
             """
             > kick box
-            Kicking the wooden box would injure your pride and possibly
-            your toes.
+            Your foot meets the wooden box in an unequal contest. Your foot
+            loses.
             """
         )
 
@@ -229,7 +229,7 @@ struct KickActionHandlerTests {
             output,
             """
             > kick pebble
-            The small pebble shifts slightly under your half-hearted kick.
+            You nudge the small pebble with your foot. The universe yawns.
             """
         )
     }
@@ -290,12 +290,12 @@ struct KickActionHandlerTests {
             output,
             """
             > kick table
-            Kicking the oak table would injure your pride and possibly your
-            toes.
+            Your foot meets the oak table in an unequal contest. Your foot
+            loses.
 
             > kick chair
-            Your foot meets the wooden chair in an unequal contest. Your
-            foot loses.
+            The wooden chair absorbs your kick with monumental
+            indifference.
             """
         )
 

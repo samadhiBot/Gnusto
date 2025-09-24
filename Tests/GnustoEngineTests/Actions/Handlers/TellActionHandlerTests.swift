@@ -34,8 +34,7 @@ struct TellActionHandlerTests {
             output,
             """
             > tell wizard
-            Your voice trails off, leaving the old wizard waiting
-            expectantly.
+            The old wizard awaits the subject of your discourse.
             """
         )
 
@@ -76,8 +75,8 @@ struct TellActionHandlerTests {
             output,
             """
             > tell sage about crystal
-            Your explanation of the magic crystal finds an attentive
-            audience in the wise sage.
+            The wise sage absorbs your words about the magic crystal with
+            thoughtful consideration.
             """
         )
 
@@ -118,8 +117,8 @@ struct TellActionHandlerTests {
             output,
             """
             > speak to guard about key
-            Your explanation of the silver key finds an attentive audience
-            in the palace guard.
+            The palace guard absorbs your words about the silver key with
+            thoughtful consideration.
             """
         )
     }
@@ -157,8 +156,8 @@ struct TellActionHandlerTests {
             output,
             """
             > talk to merchant about treasure
-            Your explanation of the ancient treasure finds an attentive
-            audience in the traveling merchant.
+            The traveling merchant absorbs your words about the ancient
+            treasure with thoughtful consideration.
             """
         )
     }
@@ -196,8 +195,8 @@ struct TellActionHandlerTests {
             output,
             """
             > say blessing to priest
-            Your explanation of the prayer blessing finds an attentive
-            audience in the village priest.
+            The village priest absorbs your words about the prayer blessing
+            with thoughtful consideration.
             """
         )
     }
@@ -235,8 +234,8 @@ struct TellActionHandlerTests {
             output,
             """
             > inform scholar about book
-            Your explanation of the ancient book finds an attentive
-            audience in the learned scholar.
+            The learned scholar absorbs your words about the ancient book
+            with thoughtful consideration.
             """
         )
     }
@@ -268,7 +267,7 @@ struct TellActionHandlerTests {
             output,
             """
             > tell about treasure
-            Who should receive this wisdom you're eager to share?
+            Your voice trails off, seeking an audience.
             """
         )
     }
@@ -288,7 +287,7 @@ struct TellActionHandlerTests {
             output,
             """
             > tell wizard about magic
-            You cannot reach any such thing from here.
+            Any such thing remains frustratingly inaccessible.
             """
         )
     }
@@ -326,7 +325,7 @@ struct TellActionHandlerTests {
             output,
             """
             > tell wizard about magic
-            You cannot reach any such thing from here.
+            Any such thing remains frustratingly inaccessible.
             """
         )
     }
@@ -356,7 +355,8 @@ struct TellActionHandlerTests {
             output,
             """
             > tell me about crystal
-            Your monologue on the magic crystal echoes in the silence.
+            You engage in a spirited internal dialogue about the magic
+            crystal.
             """
         )
     }
@@ -396,8 +396,8 @@ struct TellActionHandlerTests {
             output,
             """
             > tell wizard about magic
-            You stand in a depthless black where even your thoughts seem to
-            whisper, careful not to make a sound.
+            The darkness here is absolute, consuming all light and hope of
+            sight.
             """
         )
     }
@@ -430,8 +430,7 @@ struct TellActionHandlerTests {
             output,
             """
             > tell wizard
-            Your voice trails off, leaving the old wizard waiting
-            expectantly.
+            The old wizard awaits the subject of your discourse.
             """
         )
 
@@ -472,8 +471,8 @@ struct TellActionHandlerTests {
             output,
             """
             > tell sage about crystal
-            Your explanation of the magic crystal finds an attentive
-            audience in the wise sage.
+            The wise sage absorbs your words about the magic crystal with
+            thoughtful consideration.
             """
         )
     }
@@ -496,8 +495,7 @@ struct TellActionHandlerTests {
             output,
             """
             > tell troll
-            Your voice trails off, leaving the fierce troll waiting
-            expectantly.
+            The fierce troll awaits the subject of your discourse.
             """
         )
 
@@ -538,19 +536,20 @@ struct TellActionHandlerTests {
             output,
             """
             > tell the orc about my sword
-            The subject of the steel sword cannot bridge the chasm between
-            you and the fierce orc.
+            The fierce orc dismisses your words about the steel sword with
+            contemptuous silence.
 
-            The warrior attacks with pure murderous intent! You brace
-            yourself for the impact, guard up, ready for the worst kind of
-            fight.
+            In a moment of raw violence, the warrior comes at you with
+            nothing but fury! You raise your fists, knowing this will hurt
+            regardless of who wins.
 
             > tell the orc about my sword
             The subject of the steel sword cannot bridge the chasm between
             you and the fierce orc.
 
-            The warrior shatters your defense with bare hands, leaving you
-            wide open and unable to protect yourself.
+            Something shifts in the fierce warrior's posture. The
+            aggression dissipates like morning mist, replaced by wary
+            peace.
             """
         )
     }
@@ -580,8 +579,8 @@ struct TellActionHandlerTests {
             output,
             """
             > tell statue
-            Communication requires a listener, which the marble statue
-            decidedly is not.
+            Your words bounce off the marble statue without effect or
+            acknowledgment.
             """
         )
 
@@ -621,8 +620,8 @@ struct TellActionHandlerTests {
             output,
             """
             > tell mirror about secret
-            The silver mirror remains unmoved by your knowledge of the dark
-            secret, being unmovable by words in general.
+            Your eloquent exposition on the dark secret is wasted on the
+            silver mirror's inanimate indifference.
             """
         )
     }
@@ -653,8 +652,8 @@ struct TellActionHandlerTests {
             output,
             """
             > tell wizard about dragons
-            Your explanation of the dragons finds an attentive audience in
-            the old wizard.
+            The old wizard absorbs your words about the dragons with
+            thoughtful consideration.
             """
         )
     }

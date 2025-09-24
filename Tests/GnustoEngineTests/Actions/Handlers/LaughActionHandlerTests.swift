@@ -23,7 +23,7 @@ struct LaughActionHandlerTests {
             output,
             """
             > laugh
-            You laugh with genuine mirth.
+            Laughter bubbles up from somewhere deep within.
             """
         )
     }
@@ -55,7 +55,7 @@ struct LaughActionHandlerTests {
             output,
             """
             > laugh
-            You laugh with genuine mirth.
+            Laughter bubbles up from somewhere deep within.
             """
         )
     }

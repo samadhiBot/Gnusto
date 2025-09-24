@@ -145,66 +145,44 @@ struct Zork1TrollCombatTests {
             output,
             """
             > attack the troll with my sword
-            You drive in hard with your sword while the troll pivots with
-            his bloody ax ready, both of you past the point of retreat.
+            No more waiting as you attack with your sword raised and the
+            troll responds with his ax, two weapons now committed to
+            drawing blood.
 
-            The nasty troll ducks under your elvish blade! His agility
-            saves him from certain harm.
+            The nasty troll has left himself wide open and completely
+            vulnerable to your attack.
 
-            The troll strikes back, his ax parting skin like paper. A line
-            of fire traces across your body, followed by the warm rush of
-            blood. First blood to them. The wound is real but manageable.
-
-            > attack the troll with my sword
-            You manage to graze the troll with your orcrist despite his
-            axe, but barely break skin. He notes the minor damage and
-            dismisses it.
-
-            Then the troll breaks through with his bloody axe in a move
-            that leaves you defenseless, your body a map of unprotected
-            targets.
+            The troll's retaliatory strike with his bloody ax cuts toward
+            you but your body knows how to flow around death.
 
             > attack the troll with my sword
-            The troll pulls back from your ancient sword! Doubt replaces
-            his earlier confidence.
+            Your strike with your elvish orcrist glances off his ax, still
+            managing to catch the troll lightly. The light wound barely
+            seems to register.
 
-            The pathetic troll strikes back with his axe but misjudges
-            badly, steel meeting nothing but its own momentum.
-
-            > attack the troll with my sword
-            The nasty troll reels from your sword! He stagger drunkenly,
-            completely off-balance.
-
-            The nasty troll strikes back, his ax parting skin like paper. A
-            line of fire traces across your body, followed by the warm rush
-            of blood. You grunt from the impact but maintain your stance.
+            The troll strikes back with his axe so savagely that you
+            falter, uncertainty freezing your muscles for one crucial
+            heartbeat.
 
             > attack the troll with my sword
-            The troll pulls back from your ancient glamdring! Doubt
-            replaces his earlier confidence.
+            Your strike with your antique blade beats aside his bloody axe,
+            tearing through clothing and skin alike. You see the ripple of
+            pain, but his body absorbs it. He remains dangerous.
 
-            The nasty troll mistimes the attack completely! His bloody axe
-            slips free and bounces out of reach.
+            Suddenly the troll slips past your guard. His bloody ax opens a
+            wound that will mark you, and your blood flows out steady and
+            sure. The blow lands solidly, drawing blood. You feel the sting
+            but remain strong.
 
             > attack the troll with my sword
-            You drive your antique orcrist through the troll's guard,
-            slicing through skin and drawing a line of fire across his
-            body. The wound is real but manageable.
+            You strike true with your glamdring! The troll drops without a
+            sound, weaponless to the end.
 
-            The troll ends the exchange with his bloody axe buried deep,
-            and you understand with perfect clarity that you will not rise
-            again.
+            > attack the troll with my sword
+            The troll stirs, quickly resuming a fighting stance.
 
-            ****  You have died  ****
-
-            Death, that most permanent of inconveniences, has claimed you.
-            Yet in these tales, even death offers second chances.
-
-            You scored 0 out of a possible 350 points, in 5 moves.
-
-            Would you like to RESTART, RESTORE a saved game, or QUIT?
-
-            >
+            > attack the troll with my sword
+            The troll stirs, quickly resuming a fighting stance.
             """
         )
     }

@@ -310,7 +310,7 @@ struct TieActionHandlerTests {
             output,
             """
             > tie rope
-            Any such thing remains frustratingly inaccessible.
+            Any such thing lurks beyond your reach.
             """
         )
     }
@@ -354,7 +354,7 @@ struct TieActionHandlerTests {
             output,
             """
             > tie rope to post
-            Any such thing remains frustratingly inaccessible.
+            Any such thing lurks beyond your reach.
             """
         )
     }
@@ -393,8 +393,8 @@ struct TieActionHandlerTests {
             output,
             """
             > tie rope
-            You stand in a depthless black where even your thoughts seem to
-            whisper, careful not to make a sound.
+            The darkness here is absolute, consuming all light and hope of
+            sight.
             """
         )
     }
@@ -427,7 +427,8 @@ struct TieActionHandlerTests {
             output,
             """
             > tie wizard
-            The old wizard's freedom is not yours to restrict with rope.
+            Binding the old wizard would transform you from adventurer to
+            kidnapper.
             """
         )
 
@@ -455,7 +456,8 @@ struct TieActionHandlerTests {
             output,
             """
             > tie troll
-            The fierce troll's freedom is not yours to restrict with rope.
+            Binding the fierce troll would transform you from adventurer to
+            kidnapper.
             """
         )
 
@@ -542,12 +544,11 @@ struct TieActionHandlerTests {
             output,
             """
             > tie orc with rope
-            Your rope would need to overcome the angry orc's violent
-            objections first.
+            The angry orc would resist binding with extreme prejudice.
 
-            The warrior attacks with pure murderous intent! You brace
-            yourself for the impact, guard up, ready for the worst kind of
-            fight.
+            In a moment of raw violence, the warrior comes at you with
+            nothing but fury! You raise your fists, knowing this will hurt
+            regardless of who wins.
             """
         )
 
@@ -591,8 +592,8 @@ struct TieActionHandlerTests {
             output,
             """
             > tie up merchant with rope
-            The traveling merchant's freedom is not yours to restrict with
-            rope.
+            Binding the traveling merchant would transform you from
+            adventurer to kidnapper.
             """
         )
 
@@ -717,9 +718,9 @@ struct TieActionHandlerTests {
             > tie orc with orc
             You can't tie the angry orc with itself.
 
-            The warrior attacks with pure murderous intent! You brace
-            yourself for the impact, guard up, ready for the worst kind of
-            fight.
+            In a moment of raw violence, the warrior comes at you with
+            nothing but fury! You raise your fists, knowing this will hurt
+            regardless of who wins.
             """
         )
     }
@@ -757,7 +758,7 @@ struct TieActionHandlerTests {
             output,
             """
             > tie wizard
-            Any such thing remains frustratingly inaccessible.
+            Any such thing lurks beyond your reach.
             """
         )
     }
@@ -797,7 +798,7 @@ struct TieActionHandlerTests {
             output,
             """
             > tie troll
-            Any such thing remains frustratingly inaccessible.
+            Any such thing lurks beyond your reach.
             """
         )
     }
@@ -836,7 +837,8 @@ struct TieActionHandlerTests {
             output,
             """
             > tie wizard to guard
-            The castle guard's freedom is not yours to restrict with rope.
+            Binding the castle guard would transform you from adventurer to
+            kidnapper.
             """
         )
 

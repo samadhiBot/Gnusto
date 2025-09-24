@@ -23,7 +23,7 @@ struct YellActionHandlerTests {
             output,
             """
             > yell
-            You release a primal cry that would make your ancestors proud.
+            Your voice tears through the silence like a blade.
             """
         )
     }
@@ -55,7 +55,7 @@ struct YellActionHandlerTests {
             output,
             """
             > yell
-            You release a primal cry that would make your ancestors proud.
+            Your voice tears through the silence like a blade.
             """
         )
     }

@@ -198,7 +198,7 @@ struct PourActionHandlerTests {
             output,
             """
             > pour nonexistent on plant
-            Any such thing lurks beyond your reach.
+            You cannot reach any such thing from here.
             """
         )
     }
@@ -229,7 +229,7 @@ struct PourActionHandlerTests {
             output,
             """
             > pour water on nonexistent
-            Any such thing lurks beyond your reach.
+            You cannot reach any such thing from here.
             """
         )
     }
@@ -274,7 +274,7 @@ struct PourActionHandlerTests {
             output,
             """
             > pour water on plant
-            Any such thing lurks beyond your reach.
+            You cannot reach any such thing from here.
             """
         )
     }
@@ -319,7 +319,7 @@ struct PourActionHandlerTests {
             output,
             """
             > pour water on plant
-            Any such thing lurks beyond your reach.
+            You cannot reach any such thing from here.
             """
         )
     }
@@ -349,7 +349,7 @@ struct PourActionHandlerTests {
             output,
             """
             > pour testRoom on plant
-            Any such thing lurks beyond your reach.
+            You cannot reach any such thing from here.
             """
         )
     }
@@ -380,7 +380,7 @@ struct PourActionHandlerTests {
             output,
             """
             > pour water on testRoom
-            Any such thing lurks beyond your reach.
+            You cannot reach any such thing from here.
             """
         )
     }
@@ -410,7 +410,7 @@ struct PourActionHandlerTests {
             output,
             """
             > pour me on plant
-            Pouring requires a more liquid state of matter.
+            That lacks the necessary fluidity for pouring.
             """
         )
     }
@@ -488,8 +488,8 @@ struct PourActionHandlerTests {
             output,
             """
             > pour water on plant
-            You stand in a depthless black where even your thoughts seem to
-            whisper, careful not to make a sound.
+            The darkness here is absolute, consuming all light and hope of
+            sight.
             """
         )
     }
@@ -627,7 +627,7 @@ struct PourActionHandlerTests {
             output,
             """
             > pour water on water
-            The physics of self-pouring remain theoretical at best.
+            You cannot pour something onto itself without breaking reality.
             """
         )
     }

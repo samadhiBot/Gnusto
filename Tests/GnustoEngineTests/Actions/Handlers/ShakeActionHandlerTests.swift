@@ -34,8 +34,8 @@ struct ShakeActionHandlerTests {
             output,
             """
             > shake bottle
-            You give the empty bottle a vigorous shake. Nothing rattles,
-            breaks, or emerges.
+            Your agitation of the empty bottle produces no observable
+            effect.
             """
         )
 
@@ -60,7 +60,7 @@ struct ShakeActionHandlerTests {
             output,
             """
             > shake
-            You shake yourself like a wet dog, dignity be damned.
+            You give yourself a thorough rattling. It's oddly satisfying.
             """
         )
     }
@@ -97,7 +97,7 @@ struct ShakeActionHandlerTests {
             output,
             """
             > shake item
-            Any such thing lurks beyond your reach.
+            You cannot reach any such thing from here.
             """
         )
     }
@@ -135,8 +135,8 @@ struct ShakeActionHandlerTests {
             output,
             """
             > shake jar
-            You stand in a depthless black where even your thoughts seem to
-            whisper, careful not to make a sound.
+            The darkness here is absolute, consuming all light and hope of
+            sight.
             """
         )
     }
@@ -169,8 +169,8 @@ struct ShakeActionHandlerTests {
             output,
             """
             > shake the wizard
-            Rattling the old wizard like a maraca would be most
-            undignified.
+            Your urge to shake the old wizard must remain forever
+            unfulfilled.
             """
         )
     }
@@ -193,8 +193,8 @@ struct ShakeActionHandlerTests {
             output,
             """
             > shake the troll
-            Rattling the fierce troll like a maraca would be most
-            undignified.
+            Your urge to shake the fierce troll must remain forever
+            unfulfilled.
             """
         )
     }
@@ -214,8 +214,7 @@ struct ShakeActionHandlerTests {
             output,
             """
             > shake myself
-            A vigorous self-shake loosens your muscles if not your
-            troubles.
+            You shake yourself like a wet dog, dignity be damned.
             """
         )
     }

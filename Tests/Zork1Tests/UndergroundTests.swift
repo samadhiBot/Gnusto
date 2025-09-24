@@ -31,7 +31,7 @@ struct UndergroundTests {
             Your sword is glowing very brightly.
 
             >
-            May your adventures elsewhere prove fruitful!
+            Until we meet again in another tale...
             """
         )
     }
@@ -75,7 +75,7 @@ struct UndergroundTests {
             The troll fends you off with a menacing gesture.
 
             > go north
-            The universe conspires against your movement that way.
+            You can't go that way.
 
             > head west
             The troll fends you off with a menacing gesture.
@@ -87,21 +87,23 @@ struct UndergroundTests {
             The troll laughs at your puny gesture.
 
             > hit the troll with the lantern
-            You drive in hard with your light while the troll pivots with
-            his bloody ax ready, both of you past the point of retreat.
+            No more waiting as you attack with your lamp raised and the
+            troll responds with his ax, two weapons now committed to
+            drawing blood.
 
-            You brandish the brass lantern aggressively! The troll almost
-            laughs, readying his ax for real combat.
+            The brass lantern makes a poor weapon against the pathetic
+            troll's his ax! This might not end well.
 
-            The troll swings his axe in response but you weave away,
-            leaving the weapon to bite empty air.
+            The nasty troll's retaliation with his bloody ax tears through
+            your guard, and in an instant you're completely exposed.
 
             > head west
             The troll fends you off with a menacing gesture.
 
-            The riposte comes fast, his bloody ax flicking out to trace a
-            shallow arc of red across your guard. Pain flickers and dies.
-            Your body has more important work.
+            Suddenly the troll slips past your guard. His ax opens a wound
+            that will mark you, and your blood flows out steady and sure.
+            The blow lands solidly, drawing blood. You feel the sting but
+            remain strong.
 
             > go south
             --- Cellar ---
@@ -117,7 +119,7 @@ struct UndergroundTests {
             Your sword is no longer glowing.
 
             >
-            Farewell, brave soul!
+            May your adventures elsewhere prove fruitful!
             """
         )
     }

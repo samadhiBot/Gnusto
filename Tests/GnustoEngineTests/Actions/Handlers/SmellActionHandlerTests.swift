@@ -35,8 +35,8 @@ struct SmellActionHandlerTests {
             output,
             """
             > smell lamp
-            Your olfactory investigation of the brass lamp yields no
-            aromatic surprises.
+            The brass lamp smells exactly as you'd expect, which is to say,
+            not particularly noteworthy.
             """
         )
 
@@ -61,7 +61,7 @@ struct SmellActionHandlerTests {
             output,
             """
             > smell nonexistent
-            You cannot reach any such thing from here.
+            Any such thing remains frustratingly inaccessible.
             """
         )
     }
@@ -98,7 +98,7 @@ struct SmellActionHandlerTests {
             output,
             """
             > smell statue
-            You cannot reach any such thing from here.
+            Any such thing remains frustratingly inaccessible.
             """
         )
     }
@@ -118,7 +118,7 @@ struct SmellActionHandlerTests {
             output,
             """
             > smell the sky
-            The air carries only its usual secrets.
+            You detect no olfactory surprises.
             """
         )
     }
@@ -157,7 +157,7 @@ struct SmellActionHandlerTests {
             output,
             """
             > smell the dark room
-            The air carries only its usual secrets.
+            You detect no olfactory surprises.
             """
         )
     }
@@ -190,8 +190,7 @@ struct SmellActionHandlerTests {
             output,
             """
             > smell the wizard
-            Your olfactory curiosity about the old wizard must remain
-            unsatisfied.
+            The old wizard's personal aroma remains their private business.
             """
         )
 
@@ -230,9 +229,9 @@ struct SmellActionHandlerTests {
             You detect nothing unusual about the furious necromancer's
             scent.
 
-            The furious necromancer attacks with pure murderous intent! You
-            brace yourself for the impact, guard up, ready for the worst
-            kind of fight.
+            In a moment of raw violence, the furious necromancer comes at
+            you with nothing but fury! You raise your fists, knowing this
+            will hurt regardless of who wins.
             """
         )
 
@@ -255,7 +254,7 @@ struct SmellActionHandlerTests {
             output,
             """
             > sniff
-            You detect no olfactory surprises.
+            Nothing remarkable greets your nostrils.
             """
         )
     }
@@ -275,7 +274,7 @@ struct SmellActionHandlerTests {
             output,
             """
             > sniff myself
-            You smell of adventure, sweat, and determination--the usual.
+            Your personal aroma falls within acceptable parameters.
             """
         )
     }

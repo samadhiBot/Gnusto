@@ -30,10 +30,10 @@ struct FormattingTests {
             You are standing in an open field west of a white house, with a
             boarded front door.
 
-            You can see a small mailbox here.
+            There is a small mailbox here.
 
             >
-            Farewell, brave soul!
+            May your adventures elsewhere prove fruitful!
             """
         )
     }
@@ -67,7 +67,7 @@ struct FormattingTests {
             You are standing in an open field west of a white house, with a
             boarded front door.
 
-            You can see a small mailbox here.
+            There is a small mailbox here.
 
             > north
             --- North of House ---
@@ -83,7 +83,7 @@ struct FormattingTests {
             --- North of House ---
 
             >
-            Farewell, brave soul!
+            May your adventures elsewhere prove fruitful!
             """
         )
     }

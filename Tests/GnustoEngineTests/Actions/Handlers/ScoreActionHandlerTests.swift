@@ -79,10 +79,10 @@ struct ScoreActionHandlerTests {
             output,
             """
             > wait
-            Moments slip away like sand through fingers.
+            Time flows onward, indifferent to your concerns.
 
             > wait
-            Time flows onward, indifferent to your concerns.
+            The universe's clock ticks inexorably forward.
 
             > score
             Your score is 0 (total of 10 points), in 2 moves.

@@ -172,7 +172,7 @@ struct ExtinguishActionHandlerTests {
             output,
             """
             > extinguish candle
-            Any such thing remains frustratingly inaccessible.
+            Any such thing lurks beyond your reach.
             """
         )
     }
@@ -213,10 +213,10 @@ struct ExtinguishActionHandlerTests {
             > extinguish candle
             You extinguish the small candle.
 
-            The world vanishes into absolute blackness.
+            Darkness rushes in like a living thing.
 
-            The darkness here is absolute, consuming all light and hope of
-            sight.
+            This is the kind of dark that swallows shapes and edges,
+            leaving only breath and heartbeat to prove you exist.
             """
         )
     }
@@ -289,7 +289,7 @@ struct ExtinguishActionHandlerTests {
             output,
             """
             > extinguish torch
-            Your attempts to extinguish the wooden torch come to naught.
+            The wooden torch refuses to be extinguished.
             """
         )
 
@@ -363,7 +363,7 @@ struct ExtinguishActionHandlerTests {
             output,
             """
             > extinguish book
-            Your attempts to extinguish the leather book come to naught.
+            The leather book refuses to be extinguished.
             """
         )
 
@@ -539,10 +539,10 @@ struct ExtinguishActionHandlerTests {
             > extinguish candle
             You extinguish the small candle.
 
-            The world vanishes into absolute blackness.
+            Darkness rushes in like a living thing.
 
-            The darkness here is absolute, consuming all light and hope of
-            sight.
+            This is the kind of dark that swallows shapes and edges,
+            leaving only breath and heartbeat to prove you exist.
             """
         )
 
