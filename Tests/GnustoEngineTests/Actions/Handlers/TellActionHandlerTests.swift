@@ -539,17 +539,18 @@ struct TellActionHandlerTests {
             The fierce orc dismisses your words about the steel sword with
             contemptuous silence.
 
-            In a moment of raw violence, the warrior comes at you with
-            nothing but fury! You raise your fists, knowing this will hurt
-            regardless of who wins.
+            No weapons between you--just the warrior's aggression and your
+            desperation! You collide in a tangle of strikes and blocks.
 
             > tell the orc about my sword
             The subject of the steel sword cannot bridge the chasm between
             you and the fierce orc.
 
-            Something shifts in the fierce warrior's posture. The
-            aggression dissipates like morning mist, replaced by wary
-            peace.
+            The fight leaves the fierce warrior entirely. It stand passive
+            now, all hostility forgotten.
+
+            The warrior's vicious counter breaks your focus completely,
+            turning your advance into uncertain retreat.
             """
         )
     }

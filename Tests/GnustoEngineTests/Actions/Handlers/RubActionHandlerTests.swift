@@ -355,9 +355,9 @@ struct RubActionHandlerTests {
             > rub the necromancer
             That would be quite inappropriate.
 
-            In a moment of raw violence, the furious necromancer comes at
-            you with nothing but fury! You raise your fists, knowing this
-            will hurt regardless of who wins.
+            No weapons between you--just the furious necromancer's
+            aggression and your desperation! You collide in a tangle of
+            strikes and blocks.
             """
         )
 

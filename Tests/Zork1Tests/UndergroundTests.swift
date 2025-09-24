@@ -87,23 +87,22 @@ struct UndergroundTests {
             The troll laughs at your puny gesture.
 
             > hit the troll with the lantern
-            No more waiting as you attack with your lamp raised and the
-            troll responds with his ax, two weapons now committed to
-            drawing blood.
+            Your blood sings as your brass lantern cuts toward the troll
+            who barely gets his bloody ax into position before impact.
 
-            The brass lantern makes a poor weapon against the pathetic
-            troll's his ax! This might not end well.
+            Attacking with the brass lantern? The pathetic troll grips his
+            ax tighter, unimpressed by your improvised weaponry.
 
-            The nasty troll's retaliation with his bloody ax tears through
-            your guard, and in an instant you're completely exposed.
+            Then suddenly the troll disarms you with his axe in a
+            counter-move so smooth that it seems rehearsed, leaving you
+            weaponless.
 
             > head west
             The troll fends you off with a menacing gesture.
 
-            Suddenly the troll slips past your guard. His ax opens a wound
-            that will mark you, and your blood flows out steady and sure.
-            The blow lands solidly, drawing blood. You feel the sting but
-            remain strong.
+            The troll whips his bloody axe across in answer--steel whispers
+            against skin, leaving a thin signature of pain. The wound is
+            trivial against your battle fury.
 
             > go south
             --- Cellar ---

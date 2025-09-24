@@ -230,9 +230,8 @@ struct KissActionHandlerTests {
             That's an unusual combat strategy, and the angry troll seems
             unlikely to reciprocate.
 
-            In a moment of raw violence, the enemy comes at you with
-            nothing but fury! You raise your fists, knowing this will hurt
-            regardless of who wins.
+            No weapons between you--just the enemy's aggression and your
+            desperation! You collide in a tangle of strikes and blocks.
             """
         )
 
@@ -345,11 +344,11 @@ struct KissActionHandlerTests {
             output,
             """
             > kiss knight
-            Your romantic impulses toward the brave knight must remain
-            unexpressed.
+            The moment for kissing the brave knight has neither arrived nor
+            been invited.
 
             > kiss rose
-            The red rose remains unmoved by your romantic overtures.
+            Your lips and the red rose are destined never to meet.
             """
         )
 
@@ -428,18 +427,17 @@ struct KissActionHandlerTests {
             That's an unusual combat strategy, and the terrible dragon
             seems unlikely to reciprocate.
 
-            In the exchange, the terrible dragon lands clean. The world
-            lurches as your body absorbs punishment it won't soon forget.
-            The blow lands solidly, drawing blood. You feel the sting but
-            remain strong.
+            In the tangle, the terrible dragon drives an elbow home--sudden
+            pressure that blooms into dull pain. Pain flickers and dies.
+            Your body has more important work.
 
             > kiss fairy
             The moment for kissing the woodland fairy has neither arrived
             nor been invited.
 
-            The terrible dragon responds with such ferocity that you
-            falter, your muscles locking as your brain recalculates the
-            odds.
+            The terrible dragon's answer is swift and punishing--knuckles
+            meet flesh with the sound of meat hitting stone. You grunt from
+            the impact but maintain your stance.
             """
         )
 

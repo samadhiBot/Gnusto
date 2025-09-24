@@ -44,11 +44,10 @@ struct GameEngineCombatTests {
             goblin braces for the inevitable collision of flesh and bone.
 
             You catch the goblin with minimal force, the blow almost
-            gentle. The light wound barely seems to register.
+            gentle. It registers the wound with annoyance.
 
-            In the tangle, the goblin drives an elbow home--sudden pressure
-            that blooms into dull pain. The wound is trivial against your
-            battle fury.
+            The goblin's counter-punch goes wide, rage making the strike
+            clumsy and predictable.
             """
         )
 
@@ -97,12 +96,12 @@ struct GameEngineCombatTests {
             the orc can only dodge and weave against the advantage of
             sharpened metal.
 
-            The sword wasn't designed for combat, but you wield it against
-            the orc regardless!
+            You swing the sword at the orc with desperate creativity! It
+            prepare to defend against your improvised assault.
 
-            In the tangle, the orc drives an elbow home--sudden pressure
-            that blooms into dull pain. The wound is trivial against your
-            battle fury.
+            The orc crashes forward in response, the impact jarring but
+            glancing as you roll with it. Pain flickers and dies. Your body
+            has more important work.
             """
         )
 
@@ -200,9 +199,9 @@ struct GameEngineCombatTests {
 
             There is a fierce troll here.
 
-            Despite having no weapon, the fearsome beast charges with
-            terrifying resolve! You grip your battle axe tighter, knowing
-            you'd better use this advantage.
+            The fearsome beast abandons caution and lunges straight at you!
+            Your battle axe suddenly feels less reassuring as the distance
+            vanishes.
             """
         )
 
@@ -248,11 +247,10 @@ struct GameEngineCombatTests {
             and bone.
 
             You catch the skeleton warrior with minimal force, the blow
-            almost gentle. The light wound barely seems to register.
+            almost gentle. It registers the wound with annoyance.
 
-            In the tangle, the skeleton warrior drives an elbow
-            home--sudden pressure that blooms into dull pain. The wound is
-            trivial against your battle fury.
+            The skeleton warrior's counter-punch goes wide, rage making the
+            strike clumsy and predictable.
             """
         )
 
@@ -307,12 +305,13 @@ struct GameEngineCombatTests {
             as the shambling zombie can only dodge and weave against the
             advantage of sharpened metal.
 
-            The iron mace wasn't designed for combat, but you wield it
-            against the shambling zombie regardless!
+            You swing the iron mace at the shambling zombie with desperate
+            creativity! It prepare to defend against your improvised
+            assault.
 
-            In the tangle, the shambling zombie drives an elbow
-            home--sudden pressure that blooms into dull pain. The wound is
-            trivial against your battle fury.
+            The shambling zombie crashes forward in response, the impact
+            jarring but glancing as you roll with it. Pain flickers and
+            dies. Your body has more important work.
             """
         )
 
@@ -358,11 +357,10 @@ struct GameEngineCombatTests {
             goblin braces for the inevitable collision of flesh and bone.
 
             You catch the goblin with minimal force, the blow almost
-            gentle. The light wound barely seems to register.
+            gentle. It registers the wound with annoyance.
 
-            In the tangle, the goblin drives an elbow home--sudden pressure
-            that blooms into dull pain. The wound is trivial against your
-            battle fury.
+            The goblin's counter-punch goes wide, rage making the strike
+            clumsy and predictable.
             """
         )
     }
@@ -663,11 +661,10 @@ struct GameEngineCombatTests {
             bone.
 
             You catch the giant rat with minimal force, the blow almost
-            gentle. The light wound barely seems to register.
+            gentle. It registers the wound with annoyance.
 
-            In the tangle, the giant rat drives an elbow home--sudden
-            pressure that blooms into dull pain. The wound is trivial
-            against your battle fury.
+            The giant rat's counter-punch goes wide, rage making the strike
+            clumsy and predictable.
             """
         )
 
@@ -717,12 +714,13 @@ struct GameEngineCombatTests {
             as the fierce ogre can only dodge and weave against the
             advantage of sharpened metal.
 
-            The wooden club wasn't designed for combat, but you wield it
-            against the fierce ogre regardless!
+            You swing the wooden club at the fierce ogre with desperate
+            creativity! It prepare to defend against your improvised
+            assault.
 
-            In the tangle, the fierce ogre drives an elbow home--sudden
-            pressure that blooms into dull pain. The wound is trivial
-            against your battle fury.
+            The fierce ogre crashes forward in response, the impact jarring
+            but glancing as you roll with it. Pain flickers and dies. Your
+            body has more important work.
             """
         )
 
@@ -796,34 +794,31 @@ struct GameEngineCombatTests {
             as the dire wolf can only dodge and weave against the advantage
             of sharpened metal.
 
-            Your blow with your steel sword catches the dire wolf cleanly,
-            tearing flesh and drawing crimson. The blow lands solidly,
-            drawing blood. It feels the sting but remains strong.
+            Your strike with your steel sword grazes the dire wolf, drawing
+            minimal blood. It registers the wound with annoyance.
 
-            In the tangle, the dire wolf drives an elbow home--sudden
-            pressure that blooms into dull pain. The wound is trivial
-            against your battle fury.
+            The dire wolf's counter-punch goes wide, rage making the strike
+            clumsy and predictable.
 
             > kill the bear
             You're currently engaged with the dire wolf--focus!
 
-            Your blow with your steel sword catches the dire wolf cleanly,
-            tearing flesh and drawing crimson. You see the ripple of pain,
-            but its body absorbs it. It remains dangerous.
+            You strike the dire wolf with your steel sword, opening a wound
+            that bleeds steadily. The wound is real but manageable.
 
-            The dire wolf's lightning-fast counter strikes your wrist,
-            causing your steel sword to drop from shocked fingers.
+            The dire wolf swings in retaliation but you slip the attack,
+            flowing around the violence like water around stone.
 
             > kill the bear with the bow
             In case you hadn't noticed, the dire wolf is already trying to
             kill you!
 
-            The longbow wasn't designed for combat, but you wield it
-            against the dire wolf regardless!
+            You attack with the longbow! The dire wolf dodges, more puzzled
+            than threatened by your choice of weapon.
 
-            In the tangle, the dire wolf drives an elbow home--sudden
-            pressure that blooms into dull pain. The strike lands but
-            doesn't slow you. Not yet.
+            The dire wolf's answer is swift and punishing--knuckles meet
+            flesh with the sound of meat hitting stone. You absorb the hit,
+            feeling flesh tear but knowing you can endure.
             """
         )
     }

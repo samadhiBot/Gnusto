@@ -285,11 +285,10 @@ struct ShakeActionHandlerTests {
             output,
             """
             > shake small box
-            You give the small box a vigorous shake. Nothing rattles,
-            breaks, or emerges.
+            Your agitation of the small box produces no observable effect.
 
             > rattle large box
-            The large box tolerates your shaking with stoic indifference.
+            Your agitation of the large box produces no observable effect.
             """
         )
 

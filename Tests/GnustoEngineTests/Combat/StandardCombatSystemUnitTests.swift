@@ -57,12 +57,12 @@ struct StandardCombatSystemUnitTests {
         expectNoDifference(
             result.message,
             """
-            Your blow with your iron sword catches the beast cleanly,
-            tearing flesh and drawing crimson. The blow lands solidly, drawing blood. He
+            Your iron sword bites deep into the beast, inflicting damage
+            that shows immediately. The blow lands solidly, drawing blood. He
             feels the sting but remains strong.
 
-            In the exchange, the grotesque monster lands clean. The world lurches
-            as your body absorbs punishment it won't soon forget. The blow lands solidly, drawing blood. You feel the sting but remain strong.
+            The angry beast hammers back instantly--the blow lands solid,
+            driving air from lungs and thought from mind. The blow lands solidly, drawing blood. You feel the sting but remain strong.
             """
         )
         expectNoDifference(result.changes.count, 3)
@@ -81,12 +81,12 @@ struct StandardCombatSystemUnitTests {
         expectNoDifference(
             result.message,
             """
-            Your blow with your iron sword catches the beast cleanly,
-            tearing flesh and drawing crimson. The blow lands solidly, drawing blood. He
+            Your iron sword bites deep into the beast, inflicting damage
+            that shows immediately. The blow lands solidly, drawing blood. He
             feels the sting but remains strong.
 
-            In the exchange, the grotesque monster lands clean. The world lurches
-            as your body absorbs punishment it won't soon forget. The blow lands solidly, drawing blood. You feel the sting but remain strong.
+            The angry beast hammers back instantly--the blow lands solid,
+            driving air from lungs and thought from mind. The blow lands solidly, drawing blood. You feel the sting but remain strong.
             """
         )
         expectNoDifference(result.changes.count, 3)
@@ -352,10 +352,10 @@ struct StandardCombatSystemUnitTests {
             result.message,
             """
             Your blow with your iron sword catches the fearsome beast cleanly,
-            tearing flesh and drawing crimson. The blow lands solidly, drawing blood. He
-            feels the sting but remains strong.
+            tearing flesh and drawing crimson. He absorbs the hit, flesh suffering
+            but endurance holding.
 
-            The fearsome beast's retaliatory strike comes fast but you're faster, sidestepping the violence with practiced grace.
+            The terrible monster's counter whistles past as you weave aside, your body remembering how to avoid pain.
             """
         )
         #expect(
@@ -419,9 +419,9 @@ struct StandardCombatSystemUnitTests {
 
             There is a fierce troll here.
 
-            Despite having no weapon, the fearsome beast charges with
-            terrifying resolve! You grip your iron sword tighter, knowing
-            you'd better use this advantage.
+            The fearsome beast abandons caution and lunges straight at you!
+            Your iron sword suddenly feels less reassuring as the distance
+            vanishes.
             """
         )
 

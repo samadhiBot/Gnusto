@@ -249,25 +249,26 @@ struct TasteActionHandlerTests {
             Tasting the furious necromancer ranks among history's worst
             battle strategies.
 
-            In a moment of raw violence, the furious necromancer comes at
-            you with nothing but fury! You raise your fists, knowing this
-            will hurt regardless of who wins.
+            No weapons between you--just the furious necromancer's
+            aggression and your desperation! You collide in a tangle of
+            strikes and blocks.
 
             > taste the necromancer
             That's a level of intimacy the furious necromancer would answer
             with sharp steel.
 
-            In the tangle, the furious necromancer drives an elbow
-            home--sudden pressure that blooms into dull pain. The wound is
-            trivial against your battle fury.
+            In the exchange, the furious necromancer lands clean. The world
+            lurches as your body absorbs punishment it won't soon forget.
+            You absorb the hit, feeling flesh tear but knowing you can
+            endure.
 
             > lick the necromancer
             That's a level of intimacy the furious necromancer would answer
             with sharp steel.
 
-            In the tangle, the furious necromancer drives an elbow
-            home--sudden pressure that blooms into dull pain. The wound is
-            trivial against your battle fury.
+            The counterblow comes wild and desperate, the furious
+            necromancer hammering through your guard to bruise rather than
+            break. The strike lands but doesn't slow you. Not yet.
             """
         )
 

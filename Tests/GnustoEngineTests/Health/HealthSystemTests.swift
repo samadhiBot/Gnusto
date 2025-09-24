@@ -510,13 +510,11 @@ struct HealthSystemTests {
             the creature can only dodge and weave against the advantage of
             sharpened metal.
 
-            Your blow with your sword catches the creature cleanly, tearing
-            flesh and drawing crimson. The blow lands solidly, drawing
-            blood. It feels the sting but remains strong.
+            Your strike with your sword grazes the creature, drawing
+            minimal blood. It registers the wound with annoyance.
 
-            In the tangle, the creature drives an elbow home--sudden
-            pressure that blooms into dull pain. The wound is trivial
-            against your battle fury.
+            The creature's counter-punch goes wide, rage making the strike
+            clumsy and predictable.
             """
         )
 

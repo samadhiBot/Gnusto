@@ -213,10 +213,10 @@ struct GameEnginePronounTests {
             output,
             """
             > examine copper coin and silver coin
-            - Copper coin: Your scrutiny of the copper coin yields no
-              hidden depths or secret purposes.
-            - Silver coin: The silver coin reveals itself to be exactly
-            what it appears--nothing more, nothing less.
+            - Copper coin: The copper coin reveals itself to be exactly
+              what it appears--nothing more, nothing less.
+            - Silver coin: The silver coin stubbornly remains ordinary
+              despite your thorough examination.
 
             > take them
             You take the copper coin and the silver coin.
@@ -394,15 +394,15 @@ struct GameEnginePronounTests {
             output,
             """
             > examine test item
-            Your scrutiny of the test item yields no hidden depths or
-            secret purposes.
+            The test item reveals itself to be exactly what it
+            appears--nothing more, nothing less.
 
             > look
             --- Laboratory ---
 
             A laboratory in which strange experiments are being conducted.
 
-            There is a test item here.
+            Present in this location is a test item.
             """
         )
     }

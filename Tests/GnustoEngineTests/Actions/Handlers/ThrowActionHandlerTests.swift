@@ -565,10 +565,9 @@ struct ThrowActionHandlerTests {
             > throw apple at wizard
             You aren't holding the red apple.
 
-            In the exchange, the old wizard lands clean. The world lurches
-            as your body absorbs punishment it won't soon forget. The blow
-            lands solidly, drawing blood. You feel the sting but remain
-            strong.
+            In the tangle, the old wizard drives an elbow home--sudden
+            pressure that blooms into dull pain. Pain flickers and dies.
+            Your body has more important work.
             """
         )
 

@@ -717,24 +717,22 @@ struct BurnActionHandlerTests {
             That would be needlessly cruel.
 
             > attack the troll
-            Armed and hungry for violence, you strike with your flaming
-            torch as the fearsome beast can only dodge and weave against
-            the advantage of sharpened metal.
+            You drive forward with your flaming torch seeking its purpose
+            as the fearsome beast meets you barehanded, flesh against steel
+            in the oldest gamble.
 
-            Your strike with your flaming torch grazes the fearsome
-            creature, drawing minimal blood. The light wound barely seems
-            to register.
+            Your flaming torch swings wide, and the fearsome creature
+            avoids your poorly aimed strike with ease.
 
-            The angry beast's brutal retaliation breaks through your
-            defenses completely, rendering you vulnerable as an opened
-            shell.
+            The angry beast counters with a force that shatters your guard,
+            leaving you exposed to whatever violence comes next.
 
             > burn the troll
-            Your strike with your flaming torch grazes the creature,
-            drawing minimal blood. The strike lands, but doesn't slow him.
+            Your flaming torch inflicts a light wound on the creature, more
+            sting than damage. He registers the wound with annoyance.
 
-            The beast's retaliatory strike comes fast but you're faster,
-            sidestepping the violence with practiced grace.
+            The monster counters by grabbing your flaming torch with bare
+            hands, and wrenches it away with surprising strength.
             """
         )
 
