@@ -29,8 +29,8 @@ extension ItemProxy {
     public func alias(_ nameVariant: NameVariant? = nil) async -> String {
         let adjectives = await property(.adjectives)?.toStrings ?? []
         let synonyms = await property(.synonyms)?.toStrings ?? []
-        let adjective = await engine.randomElement(in: adjectives.sorted())
-        let synonym = await engine.randomElement(in: synonyms.sorted())
+        let adjective = await engine.randomElement(in: adjectives)
+        let synonym = await engine.randomElement(in: synonyms)
         let name = await name
         let aliasName =
             if let adjective, let synonym {

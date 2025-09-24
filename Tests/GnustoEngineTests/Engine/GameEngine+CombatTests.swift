@@ -641,7 +641,7 @@ struct GameEngineCombatTests {
             id: "rat",
             .name("giant rat"),
             .characterSheet(
-                .init(health: 10)
+                .init(health: 13)
             ),
             .in(.startRoom)
         )
@@ -667,8 +667,9 @@ struct GameEngineCombatTests {
             You land a light punch that it barely feels. It notes the minor
             damage and dismisses it.
 
-            The giant rat retaliates with violence but you're already
-            elsewhere when the blow arrives.
+            The counterblow comes wild and desperate, the giant rat
+            hammering through your guard to bruise rather than break. Pain
+            flickers and dies. Your body has more important work.
             """
         )
 

@@ -22,9 +22,13 @@ extension GameEngine {
     /// - Returns: A random element from the collection.
     /// - Throws: `ActionResponse.internalEngineError` if the collection is empty.
     public func randomElement<T: Comparable>(in collection: some Collection<T>) -> T? {
-        guard collection.isNotEmpty else { return nil }
-        let index = randomInt(in: 0...collection.count - 1)
-        return collection.sorted()[index]
+        switch collection.count {
+        case 0: return nil
+        case 1: return collection.first
+        default:
+            let index = randomInt(in: 0...collection.count - 1)
+            return collection.sorted()[index]
+        }
     }
 
     /// Generates a random integer within the specified range.
