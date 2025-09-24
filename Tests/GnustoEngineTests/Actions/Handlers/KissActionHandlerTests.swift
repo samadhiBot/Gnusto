@@ -428,18 +428,18 @@ struct KissActionHandlerTests {
             That's an unusual combat strategy, and the terrible dragon
             seems unlikely to reciprocate.
 
-            In the tangle, the terrible dragon drives an elbow home--sudden
-            pressure that blooms into dull pain. The wound is trivial
-            against your battle fury.
+            In the exchange, the terrible dragon lands clean. The world
+            lurches as your body absorbs punishment it won't soon forget.
+            The blow lands solidly, drawing blood. You feel the sting but
+            remain strong.
 
             > kiss fairy
             The moment for kissing the woodland fairy has neither arrived
             nor been invited.
 
-            In the exchange, the terrible dragon lands clean. The world
-            lurches as your body absorbs punishment it won't soon forget.
-            The strike hurts, but your body absorbs it. You remain
-            dangerous.
+            The terrible dragon responds with such ferocity that you
+            falter, your muscles locking as your brain recalculates the
+            odds.
             """
         )
 

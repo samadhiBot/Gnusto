@@ -155,11 +155,11 @@ struct StandardCombatSystemIntegrationTests {
             """
             > attack the guard
             Armed and hungry for violence, you strike with your variable
-            sword as the brute can only dodge and weave against the
+            sword as the drunken brute can only dodge and weave against the
             advantage of sharpened metal.
 
             A disastrous miss--your variable sword cuts through empty air
-            and the bully effortlessly evades your mistimed attack.
+            and the drunken bully effortlessly evades your mistimed attack.
 
             The bitter brute's brutal retaliation breaks through your
             defenses completely, rendering you vulnerable as an opened
@@ -183,15 +183,16 @@ struct StandardCombatSystemIntegrationTests {
             against your battle fury.
 
             > attack the guard
-            The blow lands hard! The drunken brute stumbles sideways,
-            defenseless and struggling to stay on his feet.
+            The blow lands hard! The brute stumbles sideways, defenseless
+            and struggling to stay on his feet.
 
-            The brute's brutal retaliation breaks through your defenses
-            completely, rendering you vulnerable as an opened shell.
+            The drunken brute's brutal retaliation breaks through your
+            defenses completely, rendering you vulnerable as an opened
+            shell.
 
             > attack the guard
-            You strike true with your variable sword! The drunken bully
-            drops without a sound, weaponless to the end.
+            You strike true with your variable sword! The bully drops
+            without a sound, weaponless to the end.
             """
         )
 
@@ -1113,7 +1114,8 @@ struct StandardCombatSystemIntegrationTests {
             """
             > attack corpse
             No weapons needed as you attack with pure violence while the
-            corpse braces for the inevitable collision of flesh and bone.
+            dead corpse braces for the inevitable collision of flesh and
+            bone.
 
             The dead bandit is beyond such concerns now, being dead.
             """

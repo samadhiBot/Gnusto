@@ -267,11 +267,11 @@ struct ThiefTests {
 
             > stab the thief with my sword
             No more waiting as you attack with your blade raised and the
-            thief responds with his vicious stiletto, two weapons now
-            committed to drawing blood.
+            thief responds with his stiletto, two weapons now committed to
+            drawing blood.
 
-            You hook his stiletto with your blade and wrench it free! The
-            man stumbles back, suddenly defenseless.
+            You hook his stiletto with your elvish blade and wrench it
+            free! The suspicious man stumbles back, suddenly defenseless.
 
             Suddenly the person slips past your guard. His stiletto opens a
             wound that will mark you, and your blood flows out steady and
@@ -282,14 +282,14 @@ struct ThiefTests {
             The thief has left himself wide open and completely vulnerable
             to your attack.
 
-            Suddenly the sneaky thief slips past your guard. His vicious
-            stiletto opens a wound that will mark you, and your blood flows
-            out steady and sure. The strike hurts, but your body absorbs
-            it. You remain dangerous.
+            Suddenly the sneaky thief slips past your guard. His stiletto
+            opens a wound that will mark you, and your blood flows out
+            steady and sure. The strike hurts, but your body absorbs it.
+            You remain dangerous.
 
             > stab the thief
-            The suspicious-looking robber has left himself wide open and
-            completely vulnerable to your attack.
+            The robber has left himself wide open and completely vulnerable
+            to your attack.
 
             A long, theatrical slash. You catch it on your elvish orcrist,
             but the thief twists his knife, and your blade goes flying.
@@ -297,7 +297,7 @@ struct ThiefTests {
             > kill the thief
             You aren't holding the sword.
 
-            Attacking the suspicious person bare-handed while he hold his
+            Attacking the person bare-handed while he hold his vicious
             stiletto? That would be suicidal.
 
             The thief, a pragmatist, dispatches you as a threat to his
@@ -617,11 +617,11 @@ struct ThiefTests {
 
             > attack the thief with my sword
             No more waiting as you attack with your blade raised and the
-            thief responds with his vicious stiletto, two weapons now
-            committed to drawing blood.
+            thief responds with his stiletto, two weapons now committed to
+            drawing blood.
 
-            You hook his stiletto with your blade and wrench it free! The
-            man stumbles back, suddenly defenseless.
+            You hook his stiletto with your elvish blade and wrench it
+            free! The suspicious man stumbles back, suddenly defenseless.
 
             Suddenly the person slips past your guard. His stiletto opens a
             wound that will mark you, and your blood flows out steady and
@@ -632,10 +632,10 @@ struct ThiefTests {
             The thief has left himself wide open and completely vulnerable
             to your attack.
 
-            Suddenly the sneaky thief slips past your guard. His vicious
-            stiletto opens a wound that will mark you, and your blood flows
-            out steady and sure. The strike hurts, but your body absorbs
-            it. You remain dangerous.
+            Suddenly the sneaky thief slips past your guard. His stiletto
+            opens a wound that will mark you, and your blood flows out
+            steady and sure. The strike hurts, but your body absorbs it.
+            You remain dangerous.
             """
         )
     }
@@ -814,11 +814,11 @@ struct ThiefTests {
 
             > attack the thief
             No more waiting as you attack with your blade raised and the
-            thief responds with his vicious stiletto, two weapons now
-            committed to drawing blood.
+            thief responds with his stiletto, two weapons now committed to
+            drawing blood.
 
-            You hook his stiletto with your blade and wrench it free! The
-            man stumbles back, suddenly defenseless.
+            You hook his stiletto with your elvish blade and wrench it
+            free! The suspicious man stumbles back, suddenly defenseless.
 
             Suddenly the person slips past your guard. His stiletto opens a
             wound that will mark you, and your blood flows out steady and
@@ -829,14 +829,14 @@ struct ThiefTests {
             The thief has left himself wide open and completely vulnerable
             to your attack.
 
-            Suddenly the sneaky thief slips past your guard. His vicious
-            stiletto opens a wound that will mark you, and your blood flows
-            out steady and sure. The strike hurts, but your body absorbs
-            it. You remain dangerous.
+            Suddenly the sneaky thief slips past your guard. His stiletto
+            opens a wound that will mark you, and your blood flows out
+            steady and sure. The strike hurts, but your body absorbs it.
+            You remain dangerous.
 
             > stab the thief
-            The suspicious-looking robber has left himself wide open and
-            completely vulnerable to your attack.
+            The robber has left himself wide open and completely vulnerable
+            to your attack.
 
             A long, theatrical slash. You catch it on your elvish orcrist,
             but the thief twists his knife, and your blade goes flying.
@@ -844,7 +844,7 @@ struct ThiefTests {
             > kill the thief
             You aren't holding the sword.
 
-            Attacking the suspicious person bare-handed while he hold his
+            Attacking the person bare-handed while he hold his vicious
             stiletto? That would be suicidal.
 
             The thief, a pragmatist, dispatches you as a threat to his

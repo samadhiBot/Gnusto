@@ -200,9 +200,9 @@ struct GameEngineCombatTests {
 
             There is a fierce troll here.
 
-            Despite having no weapon, the beast charges with terrifying
-            resolve! You grip your battle axe tighter, knowing you'd better
-            use this advantage.
+            Despite having no weapon, the fearsome beast charges with
+            terrifying resolve! You grip your battle axe tighter, knowing
+            you'd better use this advantage.
             """
         )
 

@@ -146,10 +146,10 @@ struct Zork1TrollCombatTests {
             """
             > attack the troll with my sword
             No more waiting as you attack with your sword raised and the
-            troll responds with his ax, two weapons now committed to
+            troll responds with his bloody ax, two weapons now committed to
             drawing blood.
 
-            The nasty troll evades your blade with a fluid sidestep,
+            The nasty troll evades your elvish blade with a fluid sidestep,
             managing to stay just out of reach.
 
             Suddenly the troll slips past your guard. His ax opens a wound
@@ -162,24 +162,24 @@ struct Zork1TrollCombatTests {
             managing to catch the troll lightly. The light wound barely
             seems to register.
 
-            The troll's retaliation with his axe tears through your guard,
-            and in an instant you're completely exposed.
+            The troll's retaliation with his bloody axe tears through your
+            guard, and in an instant you're completely exposed.
 
             > attack the troll with my sword
             Your ancient sword gives the troll serious pause! Unarmed, he
             suddenly questions this confrontation.
 
-            The pathetic troll's counter with his bloody axe misses
-            completely, the weapon whistling through empty space.
+            The pathetic troll's counter with his axe misses completely,
+            the weapon whistling through empty space.
 
             > attack the troll with my sword
             The blow lands hard! The nasty troll stumbles sideways,
             defenseless and struggling to stay on his feet.
 
-            Suddenly the nasty troll slips past your guard. His bloody ax
-            opens a wound that will mark you, and your blood flows out
-            steady and sure. The strike hurts, but your body absorbs it.
-            You remain dangerous.
+            Suddenly the nasty troll slips past your guard. His ax opens a
+            wound that will mark you, and your blood flows out steady and
+            sure. The strike hurts, but your body absorbs it. You remain
+            dangerous.
 
             > attack the troll with my sword
             Your ancient glamdring gives the troll serious pause! Unarmed,
@@ -189,13 +189,13 @@ struct Zork1TrollCombatTests {
             clatters away while you circle for advantage.
 
             > attack the troll with my sword
-            Your strike with your antique orcrist beats aside his ax,
-            tearing through clothing and skin alike. The blow lands
+            Your strike with your antique orcrist beats aside his bloody
+            ax, tearing through clothing and skin alike. The blow lands
             solidly, drawing blood. He feels the sting but remains strong.
 
-            The troll's counter drives his axe through something vital and
-            you feel yourself emptying onto the ground in warm, spreading
-            pools.
+            The troll's counter drives his bloody axe through something
+            vital and you feel yourself emptying onto the ground in warm,
+            spreading pools.
 
             ****  You have died  ****
 

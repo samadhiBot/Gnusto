@@ -88,11 +88,11 @@ struct UndergroundTests {
 
             > hit the troll with the lantern
             No more waiting as you attack with your light raised and the
-            troll responds with his ax, two weapons now committed to
+            troll responds with his bloody ax, two weapons now committed to
             drawing blood.
 
             The brass lantern makes a poor weapon against the troll's his
-            bloody ax! This might not end well.
+            ax! This might not end well.
 
             The troll's retaliatory strike with his axe cuts toward you but
             your body knows how to flow around death.
@@ -100,9 +100,9 @@ struct UndergroundTests {
             > head west
             The troll fends you off with a menacing gesture.
 
-            In the exchange, his ax slips through to mark you--a stinging
-            reminder that the troll still has teeth. The wound is trivial
-            against your battle fury.
+            In the exchange, his bloody ax slips through to mark you--a
+            stinging reminder that the troll still has teeth. The wound is
+            trivial against your battle fury.
 
             > go south
             --- Cellar ---

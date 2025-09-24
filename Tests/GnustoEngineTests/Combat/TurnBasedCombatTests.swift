@@ -133,8 +133,8 @@ struct TurnBasedCombatTests {
             """
             > attack troll with lamp
             Armed and hungry for violence, you strike with your lamp as the
-            beast can only dodge and weave against the advantage of
-            sharpened metal.
+            fearsome beast can only dodge and weave against the advantage
+            of sharpened metal.
 
             The lamp wasn't designed for combat, but you wield it against
             the beast regardless!
@@ -196,8 +196,19 @@ struct TurnBasedCombatTests {
             The ogre evades your dagger with a fluid sidestep, managing to
             stay just out of reach.
 
-            The ogre's counter-punch goes wide, rage making the strike
-            clumsy and predictable.
+            The ogre's final retaliation breaks something essential inside
+            you and you feel yourself folding inward like paper in rain.
+
+            ****  You have died  ****
+
+            Death, that most permanent of inconveniences, has claimed you.
+            Yet in these tales, even death offers second chances.
+
+            You scored 0 out of a possible 10 points, in 0 moves.
+
+            Would you like to RESTART, RESTORE a saved game, or QUIT?
+
+            >
             """
         )
     }

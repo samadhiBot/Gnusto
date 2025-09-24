@@ -61,7 +61,7 @@ struct StandardCombatSystemUnitTests {
             tearing flesh and drawing crimson. The blow lands solidly, drawing blood. He
             feels the sting but remains strong.
 
-            In the exchange, the terrible beast lands clean. The world lurches
+            In the exchange, the beast lands clean. The world lurches
             as your body absorbs punishment it won't soon forget. The blow lands solidly, drawing blood. You feel the sting but remain strong.
             """
         )
@@ -85,7 +85,7 @@ struct StandardCombatSystemUnitTests {
             tearing flesh and drawing crimson. The blow lands solidly, drawing blood. He
             feels the sting but remains strong.
 
-            In the exchange, the terrible beast lands clean. The world lurches
+            In the exchange, the beast lands clean. The world lurches
             as your body absorbs punishment it won't soon forget. The blow lands solidly, drawing blood. You feel the sting but remain strong.
             """
         )
@@ -348,7 +348,7 @@ struct StandardCombatSystemUnitTests {
         expectNoDifference(
             result.message,
             """
-            Your blow with your iron sword catches the beast cleanly,
+            Your blow with your iron sword catches the fearsome beast cleanly,
             tearing flesh and drawing crimson. The blow lands solidly, drawing blood. He
             feels the sting but remains strong.
 
@@ -416,9 +416,9 @@ struct StandardCombatSystemUnitTests {
 
             There is a fierce troll here.
 
-            Despite having no weapon, the beast charges with terrifying
-            resolve! You grip your iron sword tighter, knowing you'd better
-            use this advantage.
+            Despite having no weapon, the fearsome beast charges with
+            terrifying resolve! You grip your iron sword tighter, knowing
+            you'd better use this advantage.
             """
         )
 
