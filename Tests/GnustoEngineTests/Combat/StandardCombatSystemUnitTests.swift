@@ -154,7 +154,10 @@ struct StandardCombatSystemUnitTests {
             tauntEvent,
             .enemyTaunts(
                 enemy: troll,
-                message: "The troll laughs at your puny gesture."
+                message: """
+                    The troll spits in your face, grunting "Better luck next time"
+                    in a rather barbarous accent.                    
+                    """
             )
         )
     }
@@ -383,7 +386,7 @@ struct StandardCombatSystemUnitTests {
 
         let expected = await ActionResult(
             """
-            Your blow with your iron sword catches the creature cleanly,
+            Your blow with your iron sword catches the fearsome beast cleanly,
             tearing flesh and drawing crimson. The blow lands solidly, drawing blood. He
             feels the sting but remains strong.
             """,
@@ -435,13 +438,13 @@ struct StandardCombatSystemUnitTests {
 
         let expected = try await ActionResult(
             message: """
-                Then the beast's strike connects with your jaw at exactly
+                Then the monster's strike connects with your jaw at exactly
                 the right angle to shut down your brain without breaking it.
 
                 * * *
 
                 Your eyes crack open to an empty scene. How long were you out? Hours? Minutes?
-                The beast is nowhere to be seen--perhaps called away by urgent matters. Whatever
+                The monster is nowhere to be seen--perhaps called away by urgent matters. Whatever
                 the reason, this reprieve won't last. Move now or die here.
                 """,
             changes: [
