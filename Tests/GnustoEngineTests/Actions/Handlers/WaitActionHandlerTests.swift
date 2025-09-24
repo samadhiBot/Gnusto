@@ -23,7 +23,7 @@ struct WaitActionHandlerTests {
             output,
             """
             > wait
-            Time flows onward, indifferent to your concerns.
+            Moments slip away like sand through fingers.
             """
         )
     }
@@ -55,7 +55,7 @@ struct WaitActionHandlerTests {
             output,
             """
             > wait
-            Time flows onward, indifferent to your concerns.
+            Moments slip away like sand through fingers.
             """
         )
     }

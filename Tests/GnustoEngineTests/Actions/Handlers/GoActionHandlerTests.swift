@@ -370,7 +370,7 @@ struct GoActionHandlerTests {
             output,
             """
             > go
-            The compass awaits your decision.
+            Which direction calls to your wandering spirit?
             """
         )
     }
@@ -401,7 +401,7 @@ struct GoActionHandlerTests {
             output,
             """
             > north
-            That way lies only disappointment.
+            You can't go that way.
             """
         )
     }
@@ -806,10 +806,10 @@ struct GoActionHandlerTests {
             output,
             """
             > north
-            Darkness rushes in like a living thing.
+            The world vanishes into absolute blackness.
 
-            This is the kind of dark that swallows shapes and edges,
-            leaving only breath and heartbeat to prove you exist.
+            The darkness here is absolute, consuming all light and hope of
+            sight.
             """
         )
 

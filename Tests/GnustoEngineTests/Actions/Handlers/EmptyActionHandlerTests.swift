@@ -336,7 +336,7 @@ struct EmptyActionHandlerTests {
             output,
             """
             > empty box
-            Any such thing lurks beyond your reach.
+            Any such thing remains frustratingly inaccessible.
             """
         )
     }
@@ -447,8 +447,8 @@ struct EmptyActionHandlerTests {
             output,
             """
             > empty box
-            The darkness here is absolute, consuming all light and hope of
-            sight.
+            You stand in a depthless black where even your thoughts seem to
+            whisper, careful not to make a sound.
             """
         )
     }

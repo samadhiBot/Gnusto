@@ -79,7 +79,7 @@ struct GameEnginePronounTests {
             output,
             """
             > take gold coin
-            Taken.
+            Acquired.
             """
         )
     }
@@ -166,10 +166,10 @@ struct GameEnginePronounTests {
             A shiny brass lamp.
 
             > take it
-            Taken.
+            Acquired.
 
             > turn it on
-            You successfully turn on the brass lamp.
+            You turn on the brass lamp.
             """
         )
 
@@ -213,10 +213,10 @@ struct GameEnginePronounTests {
             output,
             """
             > examine copper coin and silver coin
-            - Copper coin: The copper coin reveals itself to be exactly
-              what it appears--nothing more, nothing less.
-            - Silver coin: The silver coin stubbornly remains ordinary
-              despite your thorough examination.
+            - Copper coin: Your scrutiny of the copper coin yields no
+              hidden depths or secret purposes.
+            - Silver coin: The silver coin reveals itself to be exactly
+            what it appears--nothing more, nothing less.
 
             > take them
             You take the copper coin and the silver coin.
@@ -275,7 +275,7 @@ struct GameEnginePronounTests {
             A coin.
 
             > take it
-            Taken.
+            Acquired.
             """
         )
 
@@ -338,14 +338,14 @@ struct GameEnginePronounTests {
             output,
             """
             > examine lamp
-            The lamp reveals itself to be exactly what it appears--nothing
-            more, nothing less.
+            Your scrutiny of the lamp yields no hidden depths or secret
+            purposes.
 
             > examine copper coin and silver coin
-            - Copper coin: The copper coin stubbornly remains ordinary
-              despite your thorough examination.
-            - Silver coin: Your scrutiny of the silver coin yields no
-              hidden depths or secret purposes.
+            - Copper coin: The copper coin reveals itself to be exactly
+              what it appears--nothing more, nothing less.
+            - Silver coin: The silver coin stubbornly remains ordinary
+            despite your thorough examination.
 
             > take them
             You take the copper coin and the silver coin.
@@ -394,15 +394,15 @@ struct GameEnginePronounTests {
             output,
             """
             > examine test item
-            The test item reveals itself to be exactly what it
-            appears--nothing more, nothing less.
+            Your scrutiny of the test item yields no hidden depths or
+            secret purposes.
 
             > look
             --- Laboratory ---
 
             A laboratory in which strange experiments are being conducted.
 
-            Present in this location is a test item.
+            There is a test item here.
             """
         )
     }
@@ -681,7 +681,7 @@ struct GameEnginePronounTests {
             A brilliant red gem.
 
             > take it
-            Taken.
+            Acquired.
             """
         )
 
@@ -729,10 +729,11 @@ struct GameEnginePronounTests {
             An old leather-bound book.
 
             > take it
-            Taken.
+            Acquired.
 
             > read it
-            The ancient book offers no text for your eager eyes to decode.
+            The ancient book bears no inscription, message, or literary
+            content whatsoever.
             """
         )
 
@@ -793,11 +794,11 @@ struct GameEnginePronounTests {
             Which do you mean: the blue book or the red book?
 
             > the red book
-            The red book reveals itself to be exactly what it
-            appears--nothing more, nothing less.
+            Your scrutiny of the red book yields no hidden depths or secret
+            purposes.
 
             > take it
-            Got it.
+            Taken.
             """
         )
 
@@ -883,8 +884,8 @@ struct GameEnginePronounTests {
             > go east
             --- Room 2 ---
 
-            This location is still under construction. The game developers
-            apologize for any inconvenience.
+            [INSERT ROOM DESCRIPTION HERE] You stand in a placeholder,
+            wondering what might have been.
 
             > take it
             I don't know what 'it' refers to.
@@ -943,19 +944,19 @@ struct GameEnginePronounTests {
             A polished brass lamp.
 
             > take it
-            Taken.
+            Acquired.
 
             > examine copper coin and silver coin
-            - Copper coin: The copper coin stubbornly remains ordinary
-              despite your thorough examination.
-            - Silver coin: Your scrutiny of the silver coin yields no
-              hidden depths or secret purposes.
+            - Copper coin: The copper coin reveals itself to be exactly
+              what it appears--nothing more, nothing less.
+            - Silver coin: The silver coin stubbornly remains ordinary
+            despite your thorough examination.
 
             > take them
             You take the copper coin and the silver coin.
 
             > turn on lamp
-            You successfully turn on the brass lamp.
+            With practiced efficiency, you turn on the brass lamp.
 
             > examine it
             A polished brass lamp.

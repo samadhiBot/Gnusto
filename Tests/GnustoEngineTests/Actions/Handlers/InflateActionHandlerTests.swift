@@ -211,7 +211,7 @@ struct InflateActionHandlerTests {
             output,
             """
             > inflate balloon
-            Any such thing lurks beyond your reach.
+            Any such thing remains frustratingly inaccessible.
             """
         )
     }
@@ -241,7 +241,7 @@ struct InflateActionHandlerTests {
             output,
             """
             > inflate rock
-            The large rock stubbornly resists your attempts to inflate it.
+            The universe denies your request to inflate the large rock.
             """
         )
     }
@@ -281,8 +281,8 @@ struct InflateActionHandlerTests {
             output,
             """
             > inflate balloon
-            The darkness here is absolute, consuming all light and hope of
-            sight.
+            You stand in a depthless black where even your thoughts seem to
+            whisper, careful not to make a sound.
             """
         )
     }

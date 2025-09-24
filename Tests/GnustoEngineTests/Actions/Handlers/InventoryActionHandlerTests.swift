@@ -23,7 +23,7 @@ struct InventoryActionHandlerTests {
             output,
             """
             > inventory
-            Your hands are as empty as your pockets.
+            You carry nothing but your own thoughts.
             """
         )
     }
@@ -43,7 +43,7 @@ struct InventoryActionHandlerTests {
             output,
             """
             > i
-            Your hands are as empty as your pockets.
+            You carry nothing but your own thoughts.
             """
         )
     }
@@ -65,7 +65,7 @@ struct InventoryActionHandlerTests {
             output,
             """
             > inventory
-            Your hands are as empty as your pockets.
+            You carry nothing but your own thoughts.
             """
         )
     }
@@ -214,7 +214,7 @@ struct InventoryActionHandlerTests {
             output,
             """
             > take key
-            Taken.
+            Acquired.
 
             > inventory
             You are carrying:

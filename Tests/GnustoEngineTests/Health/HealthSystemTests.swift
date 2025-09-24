@@ -138,16 +138,16 @@ struct HealthSystemTests {
             output,
             """
             > examine me
+            You are magnificently intact, without so much as a misplaced
+            hair to suggest adventure.
+
+            > examine me
             As good-looking as ever, which is to say, adequately
             presentable.
 
             > examine me
-            You examine yourself with satisfaction. Not a scratch. The
-            universe has failed to leave its mark.
-
-            > examine me
-            You are magnificently intact, without so much as a misplaced
-            hair to suggest adventure.
+            You are in pristine condition, as if freshly minted for
+            adventure.
             """
         )
     }
@@ -362,13 +362,13 @@ struct HealthSystemTests {
             output,
             """
             > examine me
-            Against all logic, you examine your deceased form. The
-            diagnosis is not encouraging.
+            You appear to be examining yourself from somewhere outside your
+            body, which is never a good sign. You are decidedly dead.
 
             ****  You have died  ****
 
-            Death, that most permanent of inconveniences, has claimed you.
-            Yet in these tales, even death offers second chances.
+            Your story ends here, but death is merely an intermission in
+            the grand performance.
 
             You scored 0 out of a possible 10 points, in 0 moves.
 
@@ -506,17 +506,16 @@ struct HealthSystemTests {
             output,
             """
             > attack creature
-            Armed and hungry for violence, you strike with your sword as
-            the creature can only dodge and weave against the advantage of
-            sharpened metal.
+            You press forward with your sword leading the way toward flesh
+            while the creature backs away, unarmed but still dangerous as
+            any cornered thing.
 
-            Your blow with your sword catches the creature cleanly, tearing
-            flesh and drawing crimson. The blow lands solidly, drawing
-            blood. It feels the sting but remains strong.
+            You strike the creature with your sword, opening a wound that
+            bleeds steadily. The wound is real but manageable.
 
-            In the tangle, the creature drives an elbow home--sudden
-            pressure that blooms into dull pain. The wound is trivial
-            against your battle fury.
+            The counterblow comes wild and desperate, the creature
+            hammering through your guard to bruise rather than break. Pain
+            flickers and dies. Your body has more important work.
             """
         )
 

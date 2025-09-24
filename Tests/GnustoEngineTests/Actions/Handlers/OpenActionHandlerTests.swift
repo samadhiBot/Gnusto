@@ -35,7 +35,7 @@ struct OpenActionHandlerTests {
             output,
             """
             > open chest
-            You open the wooden chest with a satisfying sense of purpose.
+            The wooden chest yields to your efforts and swings open.
             """
         )
 
@@ -99,7 +99,7 @@ struct OpenActionHandlerTests {
             output,
             """
             > open door
-            Any such thing lurks beyond your reach.
+            Any such thing remains frustratingly inaccessible.
             """
         )
     }
@@ -129,7 +129,7 @@ struct OpenActionHandlerTests {
             output,
             """
             > open rock
-            The large rock stubbornly resists your attempts to open it.
+            The universe denies your request to open the large rock.
             """
         )
     }
@@ -200,8 +200,8 @@ struct OpenActionHandlerTests {
             output,
             """
             > open chest
-            The darkness here is absolute, consuming all light and hope of
-            sight.
+            You stand in a depthless black where even your thoughts seem to
+            whisper, careful not to make a sound.
             """
         )
     }
@@ -235,7 +235,7 @@ struct OpenActionHandlerTests {
             output,
             """
             > open box
-            You open the cardboard box with a satisfying sense of purpose.
+            The cardboard box yields to your efforts and swings open.
             """
         )
 
@@ -310,7 +310,8 @@ struct OpenActionHandlerTests {
             output,
             """
             > open mailbox
-            As the small mailbox opens, it reveals a leaflet within.
+            The small mailbox parts to disclose a leaflet, previously
+            hidden from view.
             """
         )
 
@@ -345,7 +346,7 @@ struct OpenActionHandlerTests {
             output,
             """
             > open box
-            You open the empty box with a satisfying sense of purpose.
+            The empty box yields to your efforts and swings open.
             """
         )
     }
@@ -391,8 +392,8 @@ struct OpenActionHandlerTests {
             output,
             """
             > open trunk
-            As the old trunk opens, it reveals a leather book and a white
-            candle within.
+            The old trunk parts to disclose a leather book and a white
+            candle, previously hidden from view.
             """
         )
     }
@@ -448,7 +449,7 @@ struct OpenActionHandlerTests {
             output,
             """
             > open door
-            You open the wooden door with a satisfying sense of purpose.
+            The wooden door yields to your efforts and swings open.
             """
         )
     }

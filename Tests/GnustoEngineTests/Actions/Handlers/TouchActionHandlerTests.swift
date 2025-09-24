@@ -33,8 +33,8 @@ struct TouchActionHandlerTests {
             output,
             """
             > touch vase
-            The ceramic vase feels exactly as it looks--solidly real and
-            utterly ordinary.
+            Your tactile investigation of the ceramic vase yields no
+            surprises.
             """
         )
 
@@ -97,7 +97,7 @@ struct TouchActionHandlerTests {
             output,
             """
             > touch object
-            Any such thing remains frustratingly inaccessible.
+            You cannot reach any such thing from here.
             """
         )
     }
@@ -135,8 +135,8 @@ struct TouchActionHandlerTests {
             output,
             """
             > touch statue
-            The darkness here is absolute, consuming all light and hope of
-            sight.
+            You stand in a depthless black where even your thoughts seem to
+            whisper, careful not to make a sound.
             """
         )
     }
@@ -168,8 +168,8 @@ struct TouchActionHandlerTests {
             output,
             """
             > touch table
-            The wooden table feels exactly as it looks--solidly real and
-            utterly ordinary.
+            Your tactile investigation of the wooden table yields no
+            surprises.
             """
         )
 
@@ -204,8 +204,8 @@ struct TouchActionHandlerTests {
             output,
             """
             > touch coin
-            The gold coin feels exactly as it looks--solidly real and
-            utterly ordinary.
+            Your tactile investigation of the gold coin yields no
+            surprises.
             """
         )
 
@@ -249,8 +249,8 @@ struct TouchActionHandlerTests {
             output,
             """
             > touch gem
-            The sparkling gem feels exactly as it looks--solidly real and
-            utterly ordinary.
+            Your tactile investigation of the sparkling gem yields no
+            surprises.
             """
         )
 
@@ -324,8 +324,8 @@ struct TouchActionHandlerTests {
             output,
             """
             > touch wall
-            The stone wall feels exactly as it looks--solidly real and
-            utterly ordinary.
+            Your tactile investigation of the stone wall yields no
+            surprises.
 
             > feel door
             Your tactile investigation of the oak door yields no surprises.
@@ -366,8 +366,8 @@ struct TouchActionHandlerTests {
             output,
             """
             > touch orb
-            The glowing orb feels exactly as it looks--solidly real and
-            utterly ordinary.
+            Your tactile investigation of the glowing orb yields no
+            surprises.
             """
         )
 
@@ -402,7 +402,8 @@ struct TouchActionHandlerTests {
             output,
             """
             > touch wizard
-            The old wizard has not invited your touch.
+            Physical contact with the old wizard requires permission not
+            yet granted.
             """
         )
 
@@ -429,7 +430,8 @@ struct TouchActionHandlerTests {
             output,
             """
             > feel troll
-            The fierce troll has not invited your touch.
+            Physical contact with the fierce troll requires permission not
+            yet granted.
             """
         )
 
@@ -453,8 +455,7 @@ struct TouchActionHandlerTests {
             output,
             """
             > touch me
-            You confirm your continued corporeal existence with a
-            reassuring self-touch.
+            Your hand meets your body. You remain stubbornly solid.
             """
         )
     }
@@ -492,7 +493,7 @@ struct TouchActionHandlerTests {
             output,
             """
             > touch wizard
-            Any such thing remains frustratingly inaccessible.
+            You cannot reach any such thing from here.
             """
         )
     }
@@ -532,7 +533,7 @@ struct TouchActionHandlerTests {
             output,
             """
             > feel troll
-            Any such thing remains frustratingly inaccessible.
+            You cannot reach any such thing from here.
             """
         )
     }
@@ -571,8 +572,8 @@ struct TouchActionHandlerTests {
             output,
             """
             > touch wizard
-            The darkness here is absolute, consuming all light and hope of
-            sight.
+            You stand in a depthless black where even your thoughts seem to
+            whisper, careful not to make a sound.
             """
         )
     }
@@ -603,8 +604,8 @@ struct TouchActionHandlerTests {
             output,
             """
             > feel troll
-            The darkness here is absolute, consuming all light and hope of
-            sight.
+            You stand in a depthless black where even your thoughts seem to
+            whisper, careful not to make a sound.
             """
         )
     }
@@ -636,7 +637,8 @@ struct TouchActionHandlerTests {
             output,
             """
             > touch fairy
-            The tiny fairy has not invited your touch.
+            Physical contact with the tiny fairy requires permission not
+            yet granted.
             """
         )
 
@@ -682,15 +684,16 @@ struct TouchActionHandlerTests {
             output,
             """
             > touch wizard
-            The old wizard has not invited your touch.
+            Physical contact with the old wizard requires permission not
+            yet granted.
 
             > feel troll
             Physical contact with the fierce troll requires permission not
             yet granted.
 
             > touch statue
-            Your tactile investigation of the marble statue yields no
-            surprises.
+            The marble statue feels exactly as it looks--solidly real and
+            utterly ordinary.
             """
         )
 

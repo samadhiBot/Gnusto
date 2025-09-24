@@ -28,7 +28,8 @@ struct WaveActionHandlerTests {
             output,
             """
             > wave wand
-            You brandish the magic wand with theatrical enthusiasm.
+            The magic wand cuts through the air in your gesticulating
+            grasp.
             """
         )
     }
@@ -55,8 +56,8 @@ struct WaveActionHandlerTests {
             output,
             """
             > wave at wand
-            The magic wand remains unimpressed by your enthusiastic
-            gesticulation.
+            Your wave passes by the magic wand without acknowledgment or
+            effect.
             """
         )
     }
@@ -83,8 +84,8 @@ struct WaveActionHandlerTests {
             output,
             """
             > wave to wand
-            The magic wand remains unimpressed by your enthusiastic
-            gesticulation.
+            Your wave passes by the magic wand without acknowledgment or
+            effect.
             """
         )
     }
@@ -111,8 +112,8 @@ struct WaveActionHandlerTests {
             output,
             """
             > wave wand at troll
-            You flourish the magic wand in the general direction of the
-            fierce troll.
+            The magic wand describes elaborate patterns as you wave it at
+            the fierce troll.
             """
         )
     }
@@ -139,8 +140,8 @@ struct WaveActionHandlerTests {
             output,
             """
             > brandish at sword
-            The steel sword remains unimpressed by your enthusiastic
-            gesticulation.
+            Your wave passes by the steel sword without acknowledgment or
+            effect.
             """
         )
     }
@@ -159,7 +160,7 @@ struct WaveActionHandlerTests {
             output,
             """
             > wave
-            You wave your hands with theatrical flourish.
+            Your arms describe meaningless patterns in the air.
             """
         )
     }
@@ -176,7 +177,7 @@ struct WaveActionHandlerTests {
             output,
             """
             > wave at wand
-            Any such thing lurks beyond your reach.
+            Any such thing remains frustratingly inaccessible.
             """
         )
     }
@@ -210,7 +211,7 @@ struct WaveActionHandlerTests {
             output,
             """
             > wave at wand
-            Any such thing lurks beyond your reach.
+            Any such thing remains frustratingly inaccessible.
             """
         )
     }
@@ -245,8 +246,8 @@ struct WaveActionHandlerTests {
             output,
             """
             > wave at wand
-            The darkness here is absolute, consuming all light and hope of
-            sight.
+            You stand in a depthless black where even your thoughts seem to
+            whisper, careful not to make a sound.
             """
         )
     }
@@ -281,8 +282,8 @@ struct WaveActionHandlerTests {
             output,
             """
             > wave box at stone
-            You flourish the wooden box in the general direction of the
-            stone.
+            The wooden box describes elaborate patterns as you wave it at
+            the stone.
             """
         )
     }
@@ -316,8 +317,8 @@ struct WaveActionHandlerTests {
             output,
             """
             > wave wand at wizard
-            You flourish the magic wand in the general direction of the old
-            wizard.
+            The magic wand describes elaborate patterns as you wave it at
+            the old wizard.
             """
         )
     }
@@ -351,8 +352,8 @@ struct WaveActionHandlerTests {
             output,
             """
             > wave sword at dragon
-            You flourish the steel sword in the general direction of the
-            red dragon.
+            The steel sword describes elaborate patterns as you wave it at
+            the red dragon.
             """
         )
     }
@@ -389,12 +390,12 @@ struct WaveActionHandlerTests {
             output,
             """
             > wave at wand
-            The magic wand remains unimpressed by your enthusiastic
-            gesticulation.
+            Your wave passes by the magic wand without acknowledgment or
+            effect.
 
             > wave at sword
-            You wave at the steel sword, which maintains its steadfast
-            inanimacy.
+            The steel sword remains unimpressed by your enthusiastic
+            gesticulation.
             """
         )
     }

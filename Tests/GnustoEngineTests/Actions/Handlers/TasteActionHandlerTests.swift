@@ -33,8 +33,8 @@ struct TasteActionHandlerTests {
             output,
             """
             > taste apple
-            The moldy apple tastes remarkably like you'd expect the moldy
-            apple to taste.
+            The flavor of the moldy apple will not be making any culinary
+            history.
             """
         )
     }
@@ -56,7 +56,7 @@ struct TasteActionHandlerTests {
             output,
             """
             > taste
-            The flavor profile proves disappointingly ordinary.
+            You taste nothing worth noting.
             """
         )
     }
@@ -93,7 +93,7 @@ struct TasteActionHandlerTests {
             output,
             """
             > taste cake
-            Any such thing remains frustratingly inaccessible.
+            You cannot reach any such thing from here.
             """
         )
     }
@@ -131,7 +131,7 @@ struct TasteActionHandlerTests {
             output,
             """
             > taste bread
-            Any such thing remains frustratingly inaccessible.
+            You cannot reach any such thing from here.
             """
         )
     }
@@ -163,8 +163,8 @@ struct TasteActionHandlerTests {
             output,
             """
             > taste berry
-            The wild berry tastes remarkably like you'd expect the wild
-            berry to taste.
+            The flavor of the wild berry will not be making any culinary
+            history.
             """
         )
     }
@@ -199,14 +199,14 @@ struct TasteActionHandlerTests {
             output,
             """
             > taste the wizard
-            Tasting the old wizard would end your relationship and possibly
-            your freedom.
+            The old wizard is a person, not a delicacy to be sampled.
 
             > lick the wizard
             The old wizard is a person, not a delicacy to be sampled.
 
             > taste the wizard
-            The old wizard is a person, not a delicacy to be sampled.
+            Tasting the old wizard would end your relationship and possibly
+            your freedom.
             """
         )
 
@@ -246,28 +246,30 @@ struct TasteActionHandlerTests {
             output,
             """
             > lick the necromancer
-            Tasting the furious necromancer ranks among history's worst
-            battle strategies.
+            That's a level of intimacy the furious necromancer would answer
+            with sharp steel.
 
-            In a moment of raw violence, the furious necromancer comes at
-            you with nothing but fury! You raise your fists, knowing this
-            will hurt regardless of who wins.
+            The furious necromancer attacks with pure murderous intent! You
+            brace yourself for the impact, guard up, ready for the worst
+            kind of fight.
 
             > taste the necromancer
             That's a level of intimacy the furious necromancer would answer
             with sharp steel.
 
-            In the tangle, the furious necromancer drives an elbow
-            home--sudden pressure that blooms into dull pain. The wound is
-            trivial against your battle fury.
+            The counterblow comes wild and desperate, the furious
+            necromancer hammering through your guard to bruise rather than
+            break. Pain flickers and dies. Your body has more important
+            work.
 
             > lick the necromancer
-            That's a level of intimacy the furious necromancer would answer
-            with sharp steel.
+            Tasting the furious necromancer ranks among history's worst
+            battle strategies.
 
-            In the tangle, the furious necromancer drives an elbow
-            home--sudden pressure that blooms into dull pain. The wound is
-            trivial against your battle fury.
+            The counterblow comes wild and desperate, the furious
+            necromancer hammering through your guard to bruise rather than
+            break. Pain flickers and dies. Your body has more important
+            work.
             """
         )
 
@@ -294,13 +296,13 @@ struct TasteActionHandlerTests {
             output,
             """
             > taste myself
-            You sample your own flavor. The results are predictably salty.
-
-            > lick myself
             Your auto-gustatory exploration yields no surprising flavors.
 
             > lick myself
             You taste vaguely of determination and poor life choices.
+
+            > lick myself
+            You sample your own flavor. The results are predictably salty.
             """
         )
     }
@@ -344,16 +346,16 @@ struct TasteActionHandlerTests {
             output,
             """
             > taste the moldy orange
-            The moldy orange tastes remarkably like you'd expect the moldy
-            orange to taste.
+            The flavor of the moldy orange will not be making any culinary
+            history.
 
             > lick the orange
             The flavor of the moldy orange will not be making any culinary
             history.
 
             > taste moldy orange
-            The flavor of the moldy orange will not be making any culinary
-            history.
+            The moldy orange tastes remarkably like you'd expect the moldy
+            orange to taste.
             """
         )
     }
@@ -393,8 +395,8 @@ struct TasteActionHandlerTests {
             output,
             """
             > lick the cookie
-            The ancient cookie tastes remarkably like you'd expect the
-            ancient cookie to taste.
+            The flavor of the ancient cookie will not be making any
+            culinary history.
 
             > taste the milk
             The flavor of the glass of lumpy milk will not be making any
@@ -431,8 +433,8 @@ struct TasteActionHandlerTests {
             output,
             """
             > taste the slime
-            The bubbling slime tastes remarkably like you'd expect the
-            bubbling slime to taste.
+            The flavor of the bubbling slime will not be making any
+            culinary history.
 
             > lick the slime
             The flavor of the bubbling slime will not be making any
@@ -476,8 +478,8 @@ struct TasteActionHandlerTests {
             output,
             """
             > taste rock
-            The smooth rock tastes remarkably like you'd expect the smooth
-            rock to taste.
+            The flavor of the smooth rock will not be making any culinary
+            history.
 
             > lick coin
             The flavor of the copper coin will not be making any culinary
@@ -515,16 +517,16 @@ struct TasteActionHandlerTests {
             output,
             """
             > taste the slop
-            The bowl of slop tastes remarkably like you'd expect the bowl
-            of slop to taste.
+            The flavor of the bowl of slop will not be making any culinary
+            history.
 
             > taste the slop
             The flavor of the bowl of slop will not be making any culinary
             history.
 
             > lick the slop
-            The flavor of the bowl of slop will not be making any culinary
-            history.
+            The bowl of slop tastes remarkably like you'd expect the bowl
+            of slop to taste.
             """
         )
     }

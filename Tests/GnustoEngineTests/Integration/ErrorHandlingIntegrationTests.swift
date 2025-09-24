@@ -29,14 +29,14 @@ struct ErrorHandlingIntegrationTests {
         expectNoDifference(
             output,
             """
-            I beg your pardon?
+            Come again?
 
             > !@#$%
-            The universe awaits your command.
+            Come again?
 
             > verylongwordthatdoesnotexistanywhere
-            I lack the knowledge necessary to
-            verylongwordthatdoesnotexistanywhere anything.
+            'verylongwordthatdoesnotexistanywhere' doesn't appear in my
+            extensive vocabulary of actions.
             """
         )
     }
@@ -128,7 +128,7 @@ struct ErrorHandlingIntegrationTests {
             The wooden box is closed.
 
             > take heavy rock
-            The heavy rock stubbornly resists your attempts to take it.
+            The universe denies your request to take the heavy rock.
 
             > put heavy rock in wooden box
             The wooden box is closed.
@@ -295,16 +295,16 @@ struct ErrorHandlingIntegrationTests {
             output,
             """
             > look
+            You stand in a depthless black where even your thoughts seem to
+            whisper, careful not to make a sound.
+
+            > take hidden treasure
             The darkness here is absolute, consuming all light and hope of
             sight.
 
-            > take hidden treasure
-            This is the kind of dark that swallows shapes and edges,
-            leaving only breath and heartbeat to prove you exist.
-
             > examine hidden treasure
-            You stand in a depthless black where even your thoughts seem to
-            whisper, careful not to make a sound.
+            Light feels theoretical here--an idea someone once had, now
+            forgotten by the room itself.
             """
         )
     }
@@ -341,10 +341,10 @@ struct ErrorHandlingIntegrationTests {
             output,
             """
             > turn on broken machine
-            It remains stubbornly inert despite your ministrations.
+            That lacks the spark of mechanical life you seek to kindle.
 
             > turn off broken machine
-            No amount of fiddling will turn that off.
+            It lacks the necessary mechanism for deactivation.
             """
         )
     }
@@ -402,10 +402,10 @@ struct ErrorHandlingIntegrationTests {
             output,
             """
             > invalid command
-            The art of invalid-ing remains a mystery to me.
+            I lack the knowledge necessary to invalid anything.
 
             > take test item
-            Got it.
+            Taken.
 
             > go nowhere
             Which direction?
@@ -459,7 +459,7 @@ struct ErrorHandlingIntegrationTests {
             A laboratory in which strange experiments are being conducted.
 
             > look look look
-            Any such thing lurks beyond your reach.
+            Any such thing remains frustratingly inaccessible.
             """
         )
     }
@@ -505,10 +505,10 @@ struct ErrorHandlingIntegrationTests {
             output,
             """
             > take ethereal item
-            Taken.
+            Acquired.
 
             > take enormous item
-            Your hands are full and your pockets protest.
+            Your burden has reached its practical limit.
             """
         )
 
@@ -554,19 +554,19 @@ struct ErrorHandlingIntegrationTests {
             output,
             """
             > take test item
-            Taken.
+            Acquired.
 
             > drop test item
-            Relinquished.
+            Dropped.
 
             > take test item
-            Acquired.
+            Got it.
 
             > examine test item
             A test item.
 
             > drop test item
-            Relinquished.
+            Released.
             """
         )
 

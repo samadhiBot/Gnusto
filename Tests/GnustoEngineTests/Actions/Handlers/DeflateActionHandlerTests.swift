@@ -101,7 +101,7 @@ struct DeflateActionHandlerTests {
             output,
             """
             > deflate balloon
-            Any such thing lurks beyond your reach.
+            Any such thing remains frustratingly inaccessible.
             """
         )
     }
@@ -131,7 +131,7 @@ struct DeflateActionHandlerTests {
             output,
             """
             > deflate rock
-            The large rock stubbornly resists your attempts to deflate it.
+            The universe denies your request to deflate the large rock.
             """
         )
     }
@@ -172,8 +172,8 @@ struct DeflateActionHandlerTests {
             output,
             """
             > deflate balloon
-            The darkness here is absolute, consuming all light and hope of
-            sight.
+            You stand in a depthless black where even your thoughts seem to
+            whisper, careful not to make a sound.
             """
         )
     }

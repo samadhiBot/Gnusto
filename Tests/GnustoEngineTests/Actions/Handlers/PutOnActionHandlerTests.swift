@@ -42,7 +42,7 @@ struct PutOnActionHandlerTests {
             output,
             """
             > put book on table
-            The red book comes to rest upon the wooden table.
+            You successfully put the red book on the wooden table.
             """
         )
 
@@ -87,7 +87,7 @@ struct PutOnActionHandlerTests {
             output,
             """
             > place cup on desk
-            The coffee cup comes to rest upon the office desk.
+            You successfully place the coffee cup on the office desk.
             """
         )
     }
@@ -126,7 +126,7 @@ struct PutOnActionHandlerTests {
             output,
             """
             > set vase on shelf
-            The crystal vase comes to rest upon the wooden shelf.
+            You successfully set the crystal vase on the wooden shelf.
             """
         )
     }
@@ -165,7 +165,7 @@ struct PutOnActionHandlerTests {
             output,
             """
             > balance ball on post
-            The rubber ball comes to rest upon the fence post.
+            You successfully balance the rubber ball on the fence post.
             """
         )
     }
@@ -204,7 +204,7 @@ struct PutOnActionHandlerTests {
             output,
             """
             > hang coat on hook
-            The winter coat comes to rest upon the coat hook.
+            You successfully hang the winter coat on the coat hook.
             """
         )
     }
@@ -288,7 +288,7 @@ struct PutOnActionHandlerTests {
             output,
             """
             > put nonexistent on table
-            You cannot reach any such thing from here.
+            Any such thing lurks beyond your reach.
             """
         )
     }
@@ -319,7 +319,7 @@ struct PutOnActionHandlerTests {
             output,
             """
             > put book on nonexistent
-            Any such thing remains frustratingly inaccessible.
+            You cannot reach any such thing from here.
             """
         )
     }
@@ -404,7 +404,7 @@ struct PutOnActionHandlerTests {
             output,
             """
             > put book on table
-            Any such thing remains frustratingly inaccessible.
+            You cannot reach any such thing from here.
             """
         )
     }
@@ -435,7 +435,7 @@ struct PutOnActionHandlerTests {
             output,
             """
             > put testRoom on table
-            You cannot reach any such thing from here.
+            Any such thing lurks beyond your reach.
             """
         )
     }
@@ -466,7 +466,8 @@ struct PutOnActionHandlerTests {
             output,
             """
             > put me on table
-            You are not an object to be placed upon things.
+            That would require you to be both subject and object
+            simultaneously.
             """
         )
     }
@@ -497,7 +498,7 @@ struct PutOnActionHandlerTests {
             output,
             """
             > put book on testRoom
-            Any such thing remains frustratingly inaccessible.
+            You cannot reach any such thing from here.
             """
         )
     }
@@ -528,7 +529,7 @@ struct PutOnActionHandlerTests {
             output,
             """
             > put book on me
-            You cannot balance the red book there, physics be damned.
+            That surface rejects the red book with prejudice.
             """
         )
     }
@@ -560,8 +561,7 @@ struct PutOnActionHandlerTests {
             output,
             """
             > put table on table
-            The wooden table cannot rest upon itself--that way lies
-            madness.
+            You'd need to fold space to put the wooden table on itself.
             """
         )
     }
@@ -732,8 +732,8 @@ struct PutOnActionHandlerTests {
             output,
             """
             > put book on table
-            The darkness here is absolute, consuming all light and hope of
-            sight.
+            You stand in a depthless black where even your thoughts seem to
+            whisper, careful not to make a sound.
             """
         )
     }
@@ -781,7 +781,7 @@ struct PutOnActionHandlerTests {
             output,
             """
             > put coin on counter
-            The gold coin comes to rest upon the kitchen counter.
+            You successfully put the gold coin on the kitchen counter.
             """
         )
     }
@@ -831,7 +831,7 @@ struct PutOnActionHandlerTests {
             output,
             """
             > put key on shelf
-            The brass key comes to rest upon the wooden shelf.
+            You successfully put the brass key on the wooden shelf.
             """
         )
     }
@@ -883,7 +883,7 @@ struct PutOnActionHandlerTests {
             An old leather book.
 
             > put apple on plate
-            The red apple comes to rest upon the dinner plate.
+            You successfully put the red apple on the dinner plate.
 
             > examine it
             A crisp red apple.
@@ -935,7 +935,7 @@ struct PutOnActionHandlerTests {
             output,
             """
             > put pen on desk
-            The blue pen comes to rest upon the office desk.
+            You successfully put the blue pen on the office desk.
 
             > put pencil on desk
             You successfully put the yellow pencil on the office desk.
@@ -991,7 +991,7 @@ struct PutOnActionHandlerTests {
             output,
             """
             > put book on bookshelf
-            The new book comes to rest upon the wooden bookshelf.
+            You successfully put the new book on the wooden bookshelf.
             """
         )
 
@@ -1049,7 +1049,7 @@ struct PutOnActionHandlerTests {
             Which do you mean: the new book or the old book?
 
             > the new book
-            The new book comes to rest upon the wooden bookshelf.
+            You successfully put the new book on the wooden bookshelf.
             """
         )
 
@@ -1111,7 +1111,7 @@ struct PutOnActionHandlerTests {
             foodOutput,
             """
             > put sandwich on workbench
-            The sandwich comes to rest upon the wooden workbench.
+            You successfully put the sandwich on the wooden workbench.
             """
         )
 
@@ -1135,7 +1135,7 @@ struct PutOnActionHandlerTests {
             weaponOutput,
             """
             > put dagger on workbench
-            You successfully put the dagger on the wooden workbench.
+            The dagger comes to rest upon the wooden workbench.
             """
         )
     }
@@ -1189,7 +1189,7 @@ struct PutOnActionHandlerTests {
             altarOutput,
             """
             > put coin on altar
-            The gold coin comes to rest upon the stone altar.
+            You successfully put the gold coin on the stone altar.
             """
         )
 
@@ -1223,7 +1223,7 @@ struct PutOnActionHandlerTests {
             mantleOutput,
             """
             > put coin on mantle
-            You successfully put the gold coin on the fireplace mantle.
+            The gold coin comes to rest upon the fireplace mantle.
             """
         )
     }

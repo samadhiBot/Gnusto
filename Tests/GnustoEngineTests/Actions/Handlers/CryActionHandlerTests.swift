@@ -23,7 +23,7 @@ struct CryActionHandlerTests {
             output,
             """
             > cry
-            A moment of melancholy overtakes you.
+            You allow yourself a brief, cathartic sob.
             """
         )
     }
@@ -55,7 +55,7 @@ struct CryActionHandlerTests {
             output,
             """
             > cry
-            A moment of melancholy overtakes you.
+            You allow yourself a brief, cathartic sob.
             """
         )
     }

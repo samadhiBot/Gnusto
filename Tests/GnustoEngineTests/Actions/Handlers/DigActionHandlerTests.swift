@@ -32,7 +32,7 @@ struct DigActionHandlerTests {
             output,
             """
             > dig
-            The ground here resists your archaeological ambitions.
+            Digging here would yield nothing but frustration.
             """
         )
     }
@@ -59,7 +59,7 @@ struct DigActionHandlerTests {
             output,
             """
             > dig mound
-            The ground here resists your archaeological ambitions.
+            Digging here would yield nothing but frustration.
             """
         )
     }
@@ -86,7 +86,7 @@ struct DigActionHandlerTests {
             output,
             """
             > dig in the sand
-            The ground here resists your archaeological ambitions.
+            Digging here would yield nothing but frustration.
             """
         )
     }
@@ -122,7 +122,7 @@ struct DigActionHandlerTests {
             output,
             """
             > dig mound with shovel
-            The ground here resists your archaeological ambitions.
+            Digging here would yield nothing but frustration.
             """
         )
     }
@@ -151,7 +151,7 @@ struct DigActionHandlerTests {
             output,
             """
             > dig with shovel
-            The ground here resists your archaeological ambitions.
+            Digging here would yield nothing but frustration.
             """
         )
     }
@@ -180,7 +180,7 @@ struct DigActionHandlerTests {
             output,
             """
             > excavate with shovel
-            The ground here resists your archaeological ambitions.
+            Digging here would yield nothing but frustration.
             """
         )
     }
@@ -209,8 +209,8 @@ struct DigActionHandlerTests {
             output,
             """
             > dig
-            The darkness here is absolute, consuming all light and hope of
-            sight.
+            You stand in a depthless black where even your thoughts seem to
+            whisper, careful not to make a sound.
             """
         )
     }
@@ -244,7 +244,7 @@ struct DigActionHandlerTests {
             output,
             """
             > dig mound
-            Any such thing lurks beyond your reach.
+            Any such thing remains frustratingly inaccessible.
             """
         )
     }
@@ -308,7 +308,7 @@ struct DigActionHandlerTests {
             output,
             """
             > dig coin
-            The ground here resists your archaeological ambitions.
+            Digging here would yield nothing but frustration.
             """
         )
     }
@@ -337,7 +337,7 @@ struct DigActionHandlerTests {
             output,
             """
             > dig mound
-            The ground here resists your archaeological ambitions.
+            Digging here would yield nothing but frustration.
             """
         )
 
@@ -377,7 +377,7 @@ struct DigActionHandlerTests {
             output,
             """
             > dig mound
-            The ground here resists your archaeological ambitions.
+            Digging here would yield nothing but frustration.
             """
         )
 
@@ -417,7 +417,7 @@ struct DigActionHandlerTests {
             output,
             """
             > dig mound with shovel
-            The ground here resists your archaeological ambitions.
+            Digging here would yield nothing but frustration.
             """
         )
 
@@ -440,7 +440,7 @@ struct DigActionHandlerTests {
             output,
             """
             > dig ground
-            The ground here resists your archaeological ambitions.
+            Digging here would yield nothing but frustration.
             """
         )
     }
@@ -484,7 +484,7 @@ struct DigActionHandlerTests {
             output,
             """
             > dig ceiling
-            That defies the fundamental laws of digging.
+            Your ambition to dig that must remain unfulfilled.
             """
         )
     }
@@ -526,7 +526,7 @@ struct DigActionHandlerTests {
             output,
             """
             > dig mound with shovel
-            The ground here resists your archaeological ambitions.
+            Digging here would yield nothing but frustration.
 
             > examine it
             A small mound of dirt.
@@ -552,7 +552,7 @@ struct DigActionHandlerTests {
             output,
             """
             > dig
-            The ground here resists your archaeological ambitions.
+            Digging here would yield nothing but frustration.
             """
         )
     }
@@ -586,7 +586,7 @@ struct DigActionHandlerTests {
             output,
             """
             > dig the ground
-            The ground here resists your archaeological ambitions.
+            Digging here would yield nothing but frustration.
             """
         )
     }

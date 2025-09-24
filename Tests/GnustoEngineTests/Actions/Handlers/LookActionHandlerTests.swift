@@ -274,7 +274,7 @@ struct LookActionHandlerTests {
             output,
             """
             > look at nonexistent
-            Any such thing lurks beyond your reach.
+            Any such thing remains frustratingly inaccessible.
             """
         )
     }
@@ -311,7 +311,7 @@ struct LookActionHandlerTests {
             output,
             """
             > look at book
-            Any such thing lurks beyond your reach.
+            Any such thing remains frustratingly inaccessible.
             """
         )
     }
@@ -331,8 +331,8 @@ struct LookActionHandlerTests {
             output,
             """
             > look at me
-            As good-looking as ever, which is to say, adequately
-            presentable.
+            You are magnificently intact, without so much as a misplaced
+            hair to suggest adventure.
             """
         )
     }
@@ -365,8 +365,8 @@ struct LookActionHandlerTests {
             output,
             """
             > look
-            The darkness here is absolute, consuming all light and hope of
-            sight.
+            You stand in a depthless black where even your thoughts seem to
+            whisper, careful not to make a sound.
             """
         )
     }
@@ -430,7 +430,7 @@ struct LookActionHandlerTests {
 
             A laboratory in which strange experiments are being conducted.
 
-            There are a red book and a wooden table here.
+            You can see a red book and a wooden table here.
             """
         )
     }
@@ -481,7 +481,7 @@ struct LookActionHandlerTests {
 
             A laboratory in which strange experiments are being conducted.
 
-            There is an oak table here. On the oak table you can see a
+            You can see an oak table here. On the oak table you can see a
             leather book and a wax candle.
             """
         )
@@ -534,7 +534,7 @@ struct LookActionHandlerTests {
 
             A laboratory in which strange experiments are being conducted.
 
-            There is a wooden box here. In the wooden box you can see a
+            You can see a wooden box here. In the wooden box you can see a
             gold coin and a ruby gem.
             """
         )
@@ -580,8 +580,8 @@ struct LookActionHandlerTests {
 
             A laboratory in which strange experiments are being conducted.
 
-            There is a glass jar here. In the glass jar you can see a blue
-            marble.
+            You can see a glass jar here. In the glass jar you can see a
+            blue marble.
             """
         )
     }
@@ -625,7 +625,7 @@ struct LookActionHandlerTests {
 
             A laboratory in which strange experiments are being conducted.
 
-            There is a treasure chest here.
+            You can see a treasure chest here.
             """
         )
     }
@@ -668,8 +668,8 @@ struct LookActionHandlerTests {
             output,
             """
             > look
-            The darkness here is absolute, consuming all light and hope of
-            sight.
+            You stand in a depthless black where even your thoughts seem to
+            whisper, careful not to make a sound.
             """
         )
     }
@@ -763,8 +763,8 @@ struct LookActionHandlerTests {
 
             A laboratory in which strange experiments are being conducted.
 
-            There is a wooden table here. A mysterious book glows softly on
-            the table.
+            You can see a wooden table here. A mysterious book glows softly
+            on the table.
             """
         )
     }
@@ -809,8 +809,8 @@ struct LookActionHandlerTests {
 
             A laboratory in which strange experiments are being conducted.
 
-            There is a wooden table here. On the wooden table you can see a
-            mysterious book.
+            You can see a wooden table here. On the wooden table you can
+            see a mysterious book.
             """
         )
     }
@@ -928,7 +928,7 @@ struct LookActionHandlerTests {
 
             A laboratory in which strange experiments are being conducted.
 
-            There are a mahogany desk and a steel safe here. A mysterious
+            You can see a mahogany desk and a steel safe here. A mysterious
             crystal orb pulses with inner light on the desk. On the
             mahogany desk you also see an ancient map and a fountain pen. A
             gleaming gold bar catches your eye in the safe. In the steel
@@ -1022,8 +1022,8 @@ struct LookActionHandlerTests {
 
             A laboratory in which strange experiments are being conducted.
 
-            There is a wooden shelf here. On the wooden shelf you can see a
-            wooden crate, a glass jar, and a cardboard box.
+            You can see a wooden shelf here. On the wooden shelf you can
+            see a wooden crate, a glass jar, and a cardboard box.
             """
         )
     }
@@ -1114,7 +1114,7 @@ struct LookActionHandlerTests {
 
             A laboratory in which strange experiments are being conducted.
 
-            There are a round table and a work bench here. A wax candle
+            You can see a round table and a work bench here. A wax candle
             flickers softly on the table. On the round table you also see a
             parchment scroll. A steel hammer lies ready for use on the work
             bench. On the work bench you also see some iron nails and a
@@ -1179,7 +1179,7 @@ struct LookActionHandlerTests {
 
             A laboratory in which strange experiments are being conducted.
 
-            There are an empty box, an old broom, a clear jar, and a bare
+            You can see an empty box, an old broom, a clear jar, and a bare
             table here.
             """
         )

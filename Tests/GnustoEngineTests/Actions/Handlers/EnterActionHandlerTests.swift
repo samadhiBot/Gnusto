@@ -242,7 +242,7 @@ struct EnterActionHandlerTests {
             output,
             """
             > enter
-            Multiple entrances present themselves. Which calls to you?
+            Several passages beckon. Which would you choose?
             """
         )
     }
@@ -359,7 +359,7 @@ struct EnterActionHandlerTests {
             output,
             """
             > enter
-            Multiple entrances present themselves. Which calls to you?
+            Several passages beckon. Which would you choose?
             """
         )
     }
@@ -399,7 +399,7 @@ struct EnterActionHandlerTests {
             output,
             """
             > enter door
-            Any such thing lurks beyond your reach.
+            Any such thing remains frustratingly inaccessible.
             """
         )
     }
@@ -429,7 +429,7 @@ struct EnterActionHandlerTests {
             output,
             """
             > enter rock
-            The large rock stubbornly resists your attempts to enter it.
+            The universe denies your request to enter the large rock.
             """
         )
     }
@@ -478,8 +478,8 @@ struct EnterActionHandlerTests {
             output,
             """
             > enter trapdoor
-            The darkness here is absolute, consuming all light and hope of
-            sight.
+            You stand in a depthless black where even your thoughts seem to
+            whisper, careful not to make a sound.
             """
         )
     }
@@ -688,7 +688,8 @@ struct EnterActionHandlerTests {
 
             You are in the town plaza.
 
-            There are a shop door, a cave entrance, and a tower gate here.
+            You can see a shop door, a cave entrance, and a tower gate
+            here.
 
             > enter entrance
             --- Cave ---
@@ -745,7 +746,7 @@ struct EnterActionHandlerTests {
             output,
             """
             > enter door
-            Any such thing lurks beyond your reach.
+            Any such thing remains frustratingly inaccessible.
             """
         )
     }

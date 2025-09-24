@@ -33,8 +33,7 @@ struct ClimbOnActionHandlerTests {
             output,
             """
             > climb on table
-            The wooden table stubbornly resists your attempts to climb on
-            it.
+            The universe denies your request to climb on the wooden table.
             """
         )
 
@@ -67,8 +66,8 @@ struct ClimbOnActionHandlerTests {
             output,
             """
             > get on chair
-            The comfortable chair stubbornly resists your attempts to get
-            on it.
+            The universe denies your request to get on the comfortable
+            chair.
             """
         )
     }
@@ -98,7 +97,7 @@ struct ClimbOnActionHandlerTests {
             output,
             """
             > sit on bench
-            The stone bench stubbornly resists your attempts to sit on it.
+            The universe denies your request to sit on the stone bench.
             """
         )
     }
@@ -128,7 +127,7 @@ struct ClimbOnActionHandlerTests {
             output,
             """
             > mount horse
-            The white horse stubbornly resists your attempts to mount it.
+            The universe denies your request to mount the white horse.
             """
         )
     }
@@ -187,7 +186,7 @@ struct ClimbOnActionHandlerTests {
             output,
             """
             > climb on table
-            Any such thing lurks beyond your reach.
+            Any such thing remains frustratingly inaccessible.
             """
         )
     }
@@ -226,8 +225,8 @@ struct ClimbOnActionHandlerTests {
             output,
             """
             > climb on table
-            The darkness here is absolute, consuming all light and hope of
-            sight.
+            You stand in a depthless black where even your thoughts seem to
+            whisper, careful not to make a sound.
             """
         )
     }
@@ -263,8 +262,7 @@ struct ClimbOnActionHandlerTests {
             output,
             """
             > climb on stool
-            The wooden stool stubbornly resists your attempts to climb on
-            it.
+            The universe denies your request to climb on the wooden stool.
             """
         )
     }
@@ -301,7 +299,7 @@ struct ClimbOnActionHandlerTests {
             output1,
             """
             > climb on rock
-            The large rock stubbornly resists your attempts to climb on it.
+            The universe denies your request to climb on the large rock.
             """
         )
 
@@ -314,8 +312,7 @@ struct ClimbOnActionHandlerTests {
             output2,
             """
             > sit on tree
-            You cannot sit on the tall tree, much as you might wish
-            otherwise.
+            The tall tree stubbornly resists your attempts to sit on it.
             """
         )
     }
@@ -346,7 +343,7 @@ struct ClimbOnActionHandlerTests {
             output,
             """
             > climb on box
-            The small box stubbornly resists your attempts to climb on it.
+            The universe denies your request to climb on the small box.
             """
         )
 

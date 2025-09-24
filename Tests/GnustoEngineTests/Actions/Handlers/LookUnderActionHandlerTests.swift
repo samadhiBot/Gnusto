@@ -33,8 +33,8 @@ struct LookUnderActionHandlerTests {
             output,
             """
             > look under table
-            Beneath the wooden table lurks only disappointment and possibly
-            dust.
+            Your investigation under the wooden table reveals a profound
+            absence of interest.
             """
         )
 
@@ -67,8 +67,8 @@ struct LookUnderActionHandlerTests {
             output,
             """
             > look beneath rock
-            Beneath the large rock lurks only disappointment and possibly
-            dust.
+            Your investigation under the large rock reveals a profound
+            absence of interest.
             """
         )
     }
@@ -98,8 +98,8 @@ struct LookUnderActionHandlerTests {
             output,
             """
             > look below bridge
-            Beneath the stone bridge lurks only disappointment and possibly
-            dust.
+            Your investigation under the stone bridge reveals a profound
+            absence of interest.
             """
         )
     }
@@ -129,8 +129,8 @@ struct LookUnderActionHandlerTests {
             output,
             """
             > peek under bed
-            Beneath the old bed lurks only disappointment and possibly
-            dust.
+            Your investigation under the old bed reveals a profound absence
+            of interest.
             """
         )
     }
@@ -172,7 +172,7 @@ struct LookUnderActionHandlerTests {
             output,
             """
             > look under nonexistent
-            Any such thing lurks beyond your reach.
+            Any such thing remains frustratingly inaccessible.
             """
         )
     }
@@ -209,7 +209,7 @@ struct LookUnderActionHandlerTests {
             output,
             """
             > look under table
-            Any such thing lurks beyond your reach.
+            Any such thing remains frustratingly inaccessible.
             """
         )
     }
@@ -229,7 +229,7 @@ struct LookUnderActionHandlerTests {
             output,
             """
             > look under testRoom
-            Any such thing lurks beyond your reach.
+            Any such thing remains frustratingly inaccessible.
             """
         )
     }
@@ -249,7 +249,7 @@ struct LookUnderActionHandlerTests {
             output,
             """
             > look under me
-            The logistics of looking oneself prove insurmountable.
+            You cannot look under yourself, thankfully.
             """
         )
     }
@@ -288,8 +288,8 @@ struct LookUnderActionHandlerTests {
             output,
             """
             > look under table
-            The darkness here is absolute, consuming all light and hope of
-            sight.
+            You stand in a depthless black where even your thoughts seem to
+            whisper, careful not to make a sound.
             """
         )
     }
@@ -328,8 +328,8 @@ struct LookUnderActionHandlerTests {
             output,
             """
             > look under chest
-            Beneath the treasure chest lurks only disappointment and
-            possibly dust.
+            Your investigation under the treasure chest reveals a profound
+            absence of interest.
             """
         )
     }
@@ -374,8 +374,8 @@ struct LookUnderActionHandlerTests {
             An old leather book.
 
             > look under table
-            Beneath the wooden table lurks only disappointment and possibly
-            dust.
+            Your investigation under the wooden table reveals a profound
+            absence of interest.
 
             > examine it
             A sturdy wooden table.
@@ -409,8 +409,8 @@ struct LookUnderActionHandlerTests {
             output,
             """
             > look under box
-            Beneath the small box lurks only disappointment and possibly
-            dust.
+            Your investigation under the small box reveals a profound
+            absence of interest.
             """
         )
 
@@ -454,8 +454,8 @@ struct LookUnderActionHandlerTests {
             output,
             """
             > look under coin
-            Beneath the gold coin lurks only disappointment and possibly
-            dust.
+            Your investigation under the gold coin reveals a profound
+            absence of interest.
             """
         )
 
@@ -503,8 +503,8 @@ struct LookUnderActionHandlerTests {
             rugOutput,
             """
             > look under rug
-            Beneath the persian rug lurks only disappointment and possibly
-            dust.
+            Your investigation under the persian rug reveals a profound
+            absence of interest.
             """
         )
 
@@ -516,8 +516,8 @@ struct LookUnderActionHandlerTests {
             characterOutput,
             """
             > look under man
-            The space beneath the old man harbors no secrets worth
-            discovering.
+            Beneath the old man lurks only disappointment and possibly
+            dust.
             """
         )
 
@@ -529,8 +529,8 @@ struct LookUnderActionHandlerTests {
             deviceOutput,
             """
             > look under device
-            Your investigation under the strange device reveals a profound
-            absence of interest.
+            The space beneath the strange device harbors no secrets worth
+            discovering.
             """
         )
     }

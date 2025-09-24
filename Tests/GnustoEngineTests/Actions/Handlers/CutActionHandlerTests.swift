@@ -42,7 +42,7 @@ struct CutActionHandlerTests {
             output,
             """
             > cut rope
-            The thick rope resists division with stubborn integrity.
+            Your attempts at bisecting the thick rope prove fruitless.
             """
         )
 
@@ -84,7 +84,7 @@ struct CutActionHandlerTests {
             output,
             """
             > cut paper with scissors
-            The piece of paper resists division with stubborn integrity.
+            Your attempts at bisecting the piece of paper prove fruitless.
             """
         )
     }
@@ -123,7 +123,7 @@ struct CutActionHandlerTests {
             output,
             """
             > slice bread
-            The loaf of bread resists division with stubborn integrity.
+            Your attempts at bisecting the loaf of bread prove fruitless.
             """
         )
     }
@@ -162,7 +162,7 @@ struct CutActionHandlerTests {
             output,
             """
             > chop wood
-            The piece of wood resists division with stubborn integrity.
+            Your attempts at bisecting the piece of wood prove fruitless.
             """
         )
     }
@@ -221,7 +221,7 @@ struct CutActionHandlerTests {
             output,
             """
             > cut rope
-            Any such thing lurks beyond your reach.
+            Any such thing remains frustratingly inaccessible.
             """
         )
     }
@@ -259,8 +259,8 @@ struct CutActionHandlerTests {
             output,
             """
             > cut rope
-            The darkness here is absolute, consuming all light and hope of
-            sight.
+            You stand in a depthless black where even your thoughts seem to
+            whisper, careful not to make a sound.
             """
         )
     }
@@ -301,7 +301,7 @@ struct CutActionHandlerTests {
             output,
             """
             > cut the fabric with the sword
-            The piece of fabric resists division with stubborn integrity.
+            Your attempts at bisecting the piece of fabric prove fruitless.
             """
         )
 

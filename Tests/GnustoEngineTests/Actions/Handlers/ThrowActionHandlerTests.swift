@@ -302,7 +302,7 @@ struct ThrowActionHandlerTests {
             output,
             """
             > throw nonexistent
-            Any such thing lurks beyond your reach.
+            Any such thing remains frustratingly inaccessible.
             """
         )
     }
@@ -333,7 +333,7 @@ struct ThrowActionHandlerTests {
             output,
             """
             > throw ball at nonexistent
-            Any such thing lurks beyond your reach.
+            Any such thing remains frustratingly inaccessible.
             """
         )
     }
@@ -378,7 +378,7 @@ struct ThrowActionHandlerTests {
             output,
             """
             > throw ball at target
-            Any such thing lurks beyond your reach.
+            Any such thing remains frustratingly inaccessible.
             """
         )
     }
@@ -418,8 +418,8 @@ struct ThrowActionHandlerTests {
             output,
             """
             > throw ball
-            The darkness here is absolute, consuming all light and hope of
-            sight.
+            You stand in a depthless black where even your thoughts seem to
+            whisper, careful not to make a sound.
             """
         )
     }
@@ -558,16 +558,16 @@ struct ThrowActionHandlerTests {
             You throw the red apple at the old wizard, but your aim falls
             short. The the red apple tumbles uselessly to the ground.
 
-            In a moment of raw violence, the old wizard comes at you with
-            nothing but fury! You raise your fists, knowing this will hurt
-            regardless of who wins.
+            The old wizard attacks with pure murderous intent! You brace
+            yourself for the impact, guard up, ready for the worst kind of
+            fight.
 
             > throw apple at wizard
             You aren't holding the red apple.
 
-            In the tangle, the old wizard drives an elbow home--sudden
-            pressure that blooms into dull pain. The wound is trivial
-            against your battle fury.
+            The counterblow comes wild and desperate, the old wizard
+            hammering through your guard to bruise rather than break. Pain
+            flickers and dies. Your body has more important work.
             """
         )
 

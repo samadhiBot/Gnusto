@@ -68,7 +68,7 @@ struct GameEngineGameLoopTests {
             output,
             """
             >
-            Farewell, brave soul!
+            Until we meet again in another tale...
             """
         )
     }
@@ -89,8 +89,8 @@ struct GameEngineGameLoopTests {
             output,
             """
             > xyzzy nonexistent very complex invalid syntax
-            The phrase 'nonexistent very complex invalid syntax' eludes my
-            comprehension.
+            I'm stumped by 'nonexistent very complex invalid syntax' in
+            this context.
             """
         )
     }
@@ -210,7 +210,7 @@ struct GameEngineGameLoopTests {
             > quit
             Your score is 0 (total of 10 points), in 0 moves. Do you wish
             to leave the game? (Y is affirmative): y
-            Farewell, brave soul!
+            Until we meet again in another tale...
             """
         )
     }
@@ -245,10 +245,10 @@ struct GameEngineGameLoopTests {
 
             A laboratory in which strange experiments are being conducted.
 
-            There is a test item here.
+            You can see a test item here.
 
             > take test item
-            Got it.
+            Taken.
 
             > restart
             If you restart now you will lose any unsaved progress. Are you
@@ -284,7 +284,7 @@ struct GameEngineGameLoopTests {
             > quit
             Your score is 0 (total of 10 points), in 0 moves. Do you wish
             to leave the game? (Y is affirmative): y
-            Farewell, brave soul!
+            Until we meet again in another tale...
             """
         )
     }
@@ -309,7 +309,7 @@ struct GameEngineGameLoopTests {
             output,
             """
             > examine nonexistent very complex item with multiple words
-            The phrase 'with multiple words' eludes my comprehension.
+            I'm stumped by 'with multiple words' in this context.
             """
         )
     }
@@ -407,20 +407,20 @@ struct GameEngineGameLoopTests {
 
             A laboratory in which strange experiments are being conducted.
 
-            There is a gold coin here.
+            You can see a gold coin here.
 
             > look
             --- Laboratory ---
 
             A laboratory in which strange experiments are being conducted.
 
-            Present in this location is a gold coin.
+            There is a gold coin here.
 
             > examine coin
             A shiny gold coin.
 
             > take coin
-            Acquired.
+            Got it.
 
             > inventory
             You are carrying:
@@ -429,7 +429,7 @@ struct GameEngineGameLoopTests {
             > quit
             Your score is 0 (total of 10 points), in 3 moves. Do you wish
             to leave the game? (Y is affirmative): y
-            May your adventures elsewhere prove fruitful!
+            Until we meet again in another tale...
             """
         )
     }
@@ -465,7 +465,7 @@ struct GameEngineGameLoopTests {
             output,
             """
             > take test item
-            Taken.
+            Acquired.
             """
         )
     }

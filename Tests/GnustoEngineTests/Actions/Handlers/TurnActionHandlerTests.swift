@@ -33,8 +33,7 @@ struct TurnActionHandlerTests {
             output,
             """
             > turn dial
-            The brass dial remains fixed in its orientation, defying
-            rotation.
+            No amount of effort will turn the brass dial.
             """
         )
 
@@ -67,8 +66,7 @@ struct TurnActionHandlerTests {
             output,
             """
             > rotate wheel
-            The steering wheel remains fixed in its orientation, defying
-            rotation.
+            No amount of effort will turn the steering wheel.
             """
         )
     }
@@ -98,8 +96,7 @@ struct TurnActionHandlerTests {
             output,
             """
             > twist knob
-            The door knob remains fixed in its orientation, defying
-            rotation.
+            No amount of effort will turn the door knob.
             """
         )
     }
@@ -158,7 +155,7 @@ struct TurnActionHandlerTests {
             output,
             """
             > turn dial
-            Any such thing lurks beyond your reach.
+            Any such thing remains frustratingly inaccessible.
             """
         )
     }
@@ -196,8 +193,8 @@ struct TurnActionHandlerTests {
             output,
             """
             > turn handle
-            The darkness here is absolute, consuming all light and hope of
-            sight.
+            You stand in a depthless black where even your thoughts seem to
+            whisper, careful not to make a sound.
             """
         )
     }
@@ -230,7 +227,8 @@ struct TurnActionHandlerTests {
             output,
             """
             > turn guard
-            The palace guard is not a crank to be turned at your whim.
+            Rotating the palace guard would serve no purpose and strain
+            relations.
             """
         )
     }
@@ -261,8 +259,7 @@ struct TurnActionHandlerTests {
             output,
             """
             > turn cube
-            You rotate the puzzle cube experimentally. Nothing of
-            consequence occurs.
+            The puzzle cube turns in your hands, revealing nothing new.
             """
         )
     }
@@ -292,8 +289,7 @@ struct TurnActionHandlerTests {
             output,
             """
             > turn statue
-            The marble statue remains fixed in its orientation, defying
-            rotation.
+            No amount of effort will turn the marble statue.
             """
         )
     }
@@ -313,7 +309,7 @@ struct TurnActionHandlerTests {
             output,
             """
             > turn Test Room
-            Any such thing lurks beyond your reach.
+            Any such thing remains frustratingly inaccessible.
             """
         )
     }
@@ -379,11 +375,11 @@ struct TurnActionHandlerTests {
             output,
             """
             > turn first dial
-            The first dial remains fixed in its orientation, defying
-            rotation.
+            No amount of effort will turn the first dial.
 
             > rotate second dial
-            The second dial stubbornly maintains its current facing.
+            The second dial remains fixed in its orientation, defying
+            rotation.
             """
         )
 

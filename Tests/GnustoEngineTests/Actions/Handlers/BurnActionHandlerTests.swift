@@ -34,7 +34,7 @@ struct BurnActionHandlerTests {
             output,
             """
             > burn paper
-            The piece of paper stubbornly resists your attempts to burn it.
+            The universe denies your request to burn the piece of paper.
             """
         )
     }
@@ -104,7 +104,7 @@ struct BurnActionHandlerTests {
             output,
             """
             > ignite wood
-            The dry wood stubbornly resists your attempts to ignite it.
+            The universe denies your request to ignite the dry wood.
             """
         )
     }
@@ -135,7 +135,7 @@ struct BurnActionHandlerTests {
             output,
             """
             > light tinder
-            The dry tinder stubbornly resists your attempts to light it.
+            The universe denies your request to light the dry tinder.
             """
         )
     }
@@ -195,7 +195,7 @@ struct BurnActionHandlerTests {
             output,
             """
             > burn paper
-            Any such thing lurks beyond your reach.
+            Any such thing remains frustratingly inaccessible.
             """
         )
     }
@@ -234,7 +234,7 @@ struct BurnActionHandlerTests {
             output,
             """
             > burn paper
-            The piece of paper stubbornly resists your attempts to burn it.
+            The universe denies your request to burn the piece of paper.
             """
         )
     }
@@ -308,7 +308,7 @@ struct BurnActionHandlerTests {
             output,
             """
             > light flashlight
-            You light the electric flashlight.
+            With practiced efficiency, you light the electric flashlight.
             """
         )
 
@@ -350,7 +350,7 @@ struct BurnActionHandlerTests {
             output,
             """
             > light torch
-            The wooden torch already dances with flame.
+            The wooden torch is already burning merrily away.
             """
         )
     }
@@ -596,7 +596,7 @@ struct BurnActionHandlerTests {
             output,
             """
             > burn book
-            The leather book stubbornly resists your attempts to burn it.
+            The universe denies your request to burn the leather book.
             """
         )
     }
@@ -636,8 +636,8 @@ struct BurnActionHandlerTests {
             output,
             """
             > burn paper with match
-            The wooden match proves woefully inadequate as an implement of
-            combustion for the piece of paper.
+            Fire refuses to bridge the gap between the wooden match and the
+            piece of paper.
             """
         )
     }
@@ -711,30 +711,30 @@ struct BurnActionHandlerTests {
 
             A laboratory in which strange experiments are being conducted.
 
-            There is a fierce troll here.
+            You can see a fierce troll here.
 
             > burn the troll
             That would be needlessly cruel.
 
             > attack the troll
-            Armed and hungry for violence, you strike with your flaming
-            torch as the fearsome beast can only dodge and weave against
-            the advantage of sharpened metal.
+            You press forward with your flaming torch leading the way
+            toward flesh while the fearsome beast backs away, unarmed but
+            still dangerous as any cornered thing.
 
-            Your strike with your flaming torch grazes the fearsome
-            creature, drawing minimal blood. The light wound barely seems
-            to register.
+            You nick the fearsome creature with your flaming torch, the
+            weapon barely breaking skin. He notes the minor damage and
+            dismisses it.
 
-            The angry beast's brutal retaliation breaks through your
-            defenses completely, rendering you vulnerable as an opened
-            shell.
+            The angry beast shatters your defense with bare hands, leaving
+            you wide open and unable to protect yourself.
 
             > burn the troll
-            Your strike with your flaming torch grazes the creature,
-            drawing minimal blood. The strike lands, but doesn't slow him.
+            You nick the creature with your flaming torch, the weapon
+            barely breaking skin. He feels it connect, adding to the
+            bruises but not breaking rhythm.
 
-            The beast's retaliatory strike comes fast but you're faster,
-            sidestepping the violence with practiced grace.
+            The beast strikes back hard but you duck away, the punch
+            finding only the ghost of where you were.
             """
         )
 
@@ -777,8 +777,8 @@ struct BurnActionHandlerTests {
             output,
             """
             > burn guard with torch
-            The burning torch proves woefully inadequate as an implement of
-            combustion for the palace guard.
+            Fire refuses to bridge the gap between the burning torch and
+            the palace guard.
             """
         )
 
@@ -849,14 +849,15 @@ struct BurnActionHandlerTests {
             output,
             """
             > burn paper
-            The piece of paper stubbornly resists your attempts to burn it.
+            The universe denies your request to burn the piece of paper.
 
             > ignite paper
-            You cannot ignite the piece of paper, much as you might wish
-            otherwise.
+            The piece of paper stubbornly resists your attempts to ignite
+            it.
 
             > light paper
-            The universe denies your request to light the piece of paper.
+            You cannot light the piece of paper, much as you might wish
+            otherwise.
             """
         )
     }
@@ -887,7 +888,7 @@ struct BurnActionHandlerTests {
             output,
             """
             > burn paper with unicorn
-            Any such thing lurks beyond your reach.
+            Any such thing remains frustratingly inaccessible.
             """
         )
     }

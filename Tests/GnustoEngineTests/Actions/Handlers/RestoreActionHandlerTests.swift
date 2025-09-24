@@ -53,7 +53,7 @@ struct RestoreActionHandlerTests {
             Game saved.
 
             > take sword
-            Taken.
+            Acquired.
 
             > restore
             If you restore your saved game now you will lose any unsaved
@@ -112,7 +112,7 @@ struct RestoreActionHandlerTests {
             Game saved.
 
             > take sword
-            Taken.
+            Acquired.
 
             > load
             If you restore your saved game now you will lose any unsaved
@@ -194,8 +194,7 @@ struct RestoreActionHandlerTests {
             > restore
             If you restore your saved game now you will lose any unsaved
             progress. Are you sure you want to restore? (Y is affirmative): maybe
-            Your response defies binary interpretation. I'll take that as a
-            'no'.
+            That's neither yes nor no, so I'll err on the side of caution.
             """
         )
     }

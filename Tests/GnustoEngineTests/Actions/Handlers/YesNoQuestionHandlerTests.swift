@@ -23,7 +23,7 @@ struct YesNoQuestionHandlerTests {
             output,
             """
             > yes
-            Your affirmation lacks context. Yes to what, exactly?
+            Agreement requires a subject. What are you saying yes to?
             """
         )
 
@@ -153,10 +153,10 @@ struct YesNoQuestionHandlerTests {
             output,
             """
             > yes
-            Taken.
+            Acquired.
 
-            The red apple remains tantalizingly out of reach of your
-            digestive ambitions.
+            Your appetite for the red apple must wait for better
+            circumstances.
             """
         )
 
@@ -394,7 +394,7 @@ struct YesNoQuestionHandlerTests {
             output,
             """
             > yes
-            Taken.
+            Acquired.
             """
         )
 
@@ -485,7 +485,7 @@ struct YesNoQuestionHandlerTests {
             output,
             """
             > maybe
-            The art of maybe-ing remains a mystery to me.
+            I lack the knowledge necessary to maybe anything.
             """
         )
 
@@ -519,7 +519,7 @@ struct YesNoQuestionHandlerTests {
             output,
             """
             > yes thing
-            Your affirmation lacks context. Yes to what, exactly?
+            Agreement requires a subject. What are you saying yes to?
             """
         )
     }

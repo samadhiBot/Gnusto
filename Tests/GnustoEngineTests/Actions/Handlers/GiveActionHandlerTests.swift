@@ -269,7 +269,7 @@ struct GiveActionHandlerTests {
             output,
             """
             > give gem to collector
-            You search in vain for the precious gem among your belongings.
+            The precious gem is not among your current possessions.
             """
         )
     }
@@ -307,7 +307,7 @@ struct GiveActionHandlerTests {
             output,
             """
             > give apple to rock
-            You'll need someone animate to give to.
+            That action requires a living target, not an object.
             """
         )
     }
@@ -353,7 +353,7 @@ struct GiveActionHandlerTests {
             output,
             """
             > give ring to person
-            You cannot reach any such thing from here.
+            Any such thing lurks beyond your reach.
             """
         )
     }
@@ -401,8 +401,8 @@ struct GiveActionHandlerTests {
             output,
             """
             > give coin to stranger
-            The darkness here is absolute, consuming all light and hope of
-            sight.
+            You stand in a depthless black where even your thoughts seem to
+            whisper, careful not to make a sound.
             """
         )
     }
@@ -589,7 +589,7 @@ struct GiveActionHandlerTests {
             output,
             """
             > give all to sage
-            You carry nothing but your own thoughts.
+            You are unburdened by material possessions.
             """
         )
     }

@@ -41,8 +41,8 @@ struct AskActionHandlerTests {
             output,
             """
             > ask wizard about crystal
-            The old wizard meets your inquiry about the magic crystal with
-            genuine bewilderment.
+            The mention of the magic crystal draws only a blank stare from
+            the old wizard.
             """
         )
 
@@ -83,8 +83,8 @@ struct AskActionHandlerTests {
             output,
             """
             > question guard about sword
-            The castle guard meets your inquiry about the silver sword with
-            genuine bewilderment.
+            The mention of the silver sword draws only a blank stare from
+            the castle guard.
             """
         )
     }
@@ -211,7 +211,8 @@ struct AskActionHandlerTests {
             output,
             """
             > ask rock about crystal
-            The large rock lacks the capacity for conversation.
+            Questions require someone who can answer--the large rock
+            cannot.
             """
         )
     }
@@ -256,7 +257,7 @@ struct AskActionHandlerTests {
             output,
             """
             > ask wizard about crystal
-            Any such thing lurks beyond your reach.
+            Any such thing remains frustratingly inaccessible.
             """
         )
     }
@@ -303,8 +304,8 @@ struct AskActionHandlerTests {
             output,
             """
             > ask wizard about crystal
-            The darkness here is absolute, consuming all light and hope of
-            sight.
+            You stand in a depthless black where even your thoughts seem to
+            whisper, careful not to make a sound.
             """
         )
     }
@@ -348,8 +349,8 @@ struct AskActionHandlerTests {
             output,
             """
             > ask sage about scroll
-            The wise sage meets your inquiry about the ancient scroll with
-            genuine bewilderment.
+            The mention of the ancient scroll draws only a blank stare from
+            the wise sage.
             """
         )
     }
@@ -380,8 +381,8 @@ struct AskActionHandlerTests {
             output,
             """
             > ask oracle about me
-            The mystical oracle meets your inquiry about yourself with
-            genuine bewilderment.
+            The mention of yourself draws only a blank stare from the
+            mystical oracle.
             """
         )
     }
@@ -419,8 +420,8 @@ struct AskActionHandlerTests {
             output,
             """
             > ask librarian about library
-            The old librarian meets your inquiry about the Ancient Library
-            with genuine bewilderment.
+            The mention of the Ancient Library draws only a blank stare
+            from the old librarian.
             """
         )
     }
@@ -474,8 +475,8 @@ struct AskActionHandlerTests {
             phase2Output,
             """
             > the treasure
-            The old wizard meets your inquiry about the golden treasure
-            with genuine bewilderment.
+            The mention of the golden treasure draws only a blank stare
+            from the old wizard.
             """
         )
 
@@ -521,8 +522,8 @@ struct AskActionHandlerTests {
             output,
             """
             > ask oracle about crystal
-            The mystical oracle meets your inquiry about the magic crystal
-            with genuine bewilderment.
+            The mention of the magic crystal draws only a blank stare from
+            the mystical oracle.
             """
         )
 

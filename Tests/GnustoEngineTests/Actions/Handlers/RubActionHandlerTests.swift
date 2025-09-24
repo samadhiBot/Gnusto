@@ -35,8 +35,8 @@ struct RubActionHandlerTests {
             output,
             """
             > rub lamp
-            The brass lamp endures your rubbing without transformation or
-            complaint.
+            Your vigorous rubbing of the brass lamp produces neither genies
+            nor results.
             """
         )
 
@@ -77,8 +77,8 @@ struct RubActionHandlerTests {
             output,
             """
             > rub table with cloth
-            The wooden table endures your rubbing without transformation or
-            complaint.
+            Your vigorous rubbing of the wooden table produces neither
+            genies nor results.
             """
         )
 
@@ -112,8 +112,8 @@ struct RubActionHandlerTests {
             output,
             """
             > polish mirror
-            The silver mirror endures your rubbing without transformation
-            or complaint.
+            Your vigorous rubbing of the silver mirror produces neither
+            genies nor results.
             """
         )
     }
@@ -143,8 +143,8 @@ struct RubActionHandlerTests {
             output,
             """
             > clean window
-            The dirty window endures your rubbing without transformation or
-            complaint.
+            Your vigorous rubbing of the dirty window produces neither
+            genies nor results.
             """
         )
     }
@@ -186,7 +186,7 @@ struct RubActionHandlerTests {
             output,
             """
             > rub nonexistent
-            You cannot reach any such thing from here.
+            Any such thing lurks beyond your reach.
             """
         )
     }
@@ -223,7 +223,7 @@ struct RubActionHandlerTests {
             output,
             """
             > rub statue
-            You cannot reach any such thing from here.
+            Any such thing lurks beyond your reach.
             """
         )
     }
@@ -243,8 +243,7 @@ struct RubActionHandlerTests {
             output,
             """
             > rub me
-            You rub yourself vigorously, achieving little beyond mild
-            warmth.
+            Your self-massage provides minimal therapeutic value.
             """
         )
     }
@@ -283,8 +282,8 @@ struct RubActionHandlerTests {
             output,
             """
             > rub statue
-            The darkness here is absolute, consuming all light and hope of
-            sight.
+            You stand in a depthless black where even your thoughts seem to
+            whisper, careful not to make a sound.
             """
         )
     }
@@ -355,9 +354,9 @@ struct RubActionHandlerTests {
             > rub the necromancer
             That would be quite inappropriate.
 
-            In a moment of raw violence, the furious necromancer comes at
-            you with nothing but fury! You raise your fists, knowing this
-            will hurt regardless of who wins.
+            The furious necromancer attacks with pure murderous intent! You
+            brace yourself for the impact, guard up, ready for the worst
+            kind of fight.
             """
         )
 
@@ -390,8 +389,8 @@ struct RubActionHandlerTests {
             output,
             """
             > rub the wall
-            The stone wall endures your rubbing without transformation or
-            complaint.
+            Your vigorous rubbing of the stone wall produces neither genies
+            nor results.
             """
         )
 
@@ -433,8 +432,8 @@ struct RubActionHandlerTests {
             output,
             """
             > rub vase with rag
-            The ceramic vase endures your rubbing without transformation or
-            complaint.
+            Your vigorous rubbing of the ceramic vase produces neither
+            genies nor results.
             """
         )
 

@@ -145,62 +145,60 @@ struct Zork1TrollCombatTests {
             output,
             """
             > attack the troll with my sword
-            No more waiting as you attack with your sword raised and the
-            troll responds with his bloody ax, two weapons now committed to
-            drawing blood.
+            You drive in hard with your sword while the troll pivots with
+            his bloody ax ready, both of you past the point of retreat.
 
-            The nasty troll evades your elvish blade with a fluid sidestep,
-            managing to stay just out of reach.
+            The nasty troll ducks under your elvish blade! His agility
+            saves him from certain harm.
 
-            Suddenly the troll slips past your guard. His ax opens a wound
-            that will mark you, and your blood flows out steady and sure.
-            The blow lands solidly, drawing blood. You feel the sting but
-            remain strong.
+            The troll strikes back, his ax parting skin like paper. A line
+            of fire traces across your body, followed by the warm rush of
+            blood. First blood to them. The wound is real but manageable.
 
             > attack the troll with my sword
-            Your strike with your orcrist glances off his axe, still
-            managing to catch the troll lightly. The light wound barely
-            seems to register.
+            You manage to graze the troll with your orcrist despite his
+            axe, but barely break skin. He notes the minor damage and
+            dismisses it.
 
-            The troll's retaliation with his bloody axe tears through your
-            guard, and in an instant you're completely exposed.
-
-            > attack the troll with my sword
-            Your ancient sword gives the troll serious pause! Unarmed, he
-            suddenly questions this confrontation.
-
-            The pathetic troll's counter with his axe misses completely,
-            the weapon whistling through empty space.
+            Then the troll breaks through with his bloody axe in a move
+            that leaves you defenseless, your body a map of unprotected
+            targets.
 
             > attack the troll with my sword
-            The blow lands hard! The nasty troll stumbles sideways,
-            defenseless and struggling to stay on his feet.
+            The troll pulls back from your ancient sword! Doubt replaces
+            his earlier confidence.
 
-            Suddenly the nasty troll slips past your guard. His ax opens a
-            wound that will mark you, and your blood flows out steady and
-            sure. The strike hurts, but your body absorbs it. You remain
-            dangerous.
+            The pathetic troll strikes back with his axe but misjudges
+            badly, steel meeting nothing but its own momentum.
 
             > attack the troll with my sword
-            Your ancient glamdring gives the troll serious pause! Unarmed,
-            he suddenly questions this confrontation.
+            The nasty troll reels from your sword! He stagger drunkenly,
+            completely off-balance.
 
-            Overextending badly, the nasty troll fumbles his bloody axe! It
-            clatters away while you circle for advantage.
+            The nasty troll strikes back, his ax parting skin like paper. A
+            line of fire traces across your body, followed by the warm rush
+            of blood. You grunt from the impact but maintain your stance.
 
             > attack the troll with my sword
-            Your strike with your antique orcrist beats aside his bloody
-            ax, tearing through clothing and skin alike. The blow lands
-            solidly, drawing blood. He feels the sting but remains strong.
+            The troll pulls back from your ancient glamdring! Doubt
+            replaces his earlier confidence.
 
-            The troll's counter drives his bloody axe through something
-            vital and you feel yourself emptying onto the ground in warm,
-            spreading pools.
+            The nasty troll mistimes the attack completely! His bloody axe
+            slips free and bounces out of reach.
+
+            > attack the troll with my sword
+            You drive your antique orcrist through the troll's guard,
+            slicing through skin and drawing a line of fire across his
+            body. The wound is real but manageable.
+
+            The troll ends the exchange with his bloody axe buried deep,
+            and you understand with perfect clarity that you will not rise
+            again.
 
             ****  You have died  ****
 
-            The curtain falls on this particular act of your existence. But
-            all good stories deserve another telling...
+            Death, that most permanent of inconveniences, has claimed you.
+            Yet in these tales, even death offers second chances.
 
             You scored 0 out of a possible 350 points, in 5 moves.
 

@@ -38,7 +38,7 @@ struct ForestTests {
             You are standing in an open field west of a white house, with a
             boarded front door.
 
-            There is a small mailbox here.
+            You can see a small mailbox here.
 
             > north
             --- North of House ---
@@ -70,7 +70,7 @@ struct ForestTests {
             The forest is all around you, with trees in every direction.
 
             > examine grating
-            You cannot reach any such thing from here.
+            Any such thing lurks beyond your reach.
 
             > move leaves
             In disturbing the pile of leaves, a grating is revealed.
@@ -86,11 +86,11 @@ struct ForestTests {
             On the ground is a pile of leaves.
 
             > examine grating
-            Your scrutiny of the grating yields no hidden depths or secret
-            purposes.
+            The grating stubbornly remains ordinary despite your thorough
+            examination.
 
             >
-            May your adventures elsewhere prove fruitful!
+            Until we meet again in another tale...
             """
         )
     }

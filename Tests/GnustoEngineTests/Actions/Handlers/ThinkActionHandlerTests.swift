@@ -23,7 +23,7 @@ struct ThinkActionHandlerTests {
             output,
             """
             > think
-            Deep cogitation yields no immediate revelations.
+            The gears of contemplation grind slowly but surely.
             """
         )
     }
@@ -53,8 +53,8 @@ struct ThinkActionHandlerTests {
             output,
             """
             > think about puzzle
-            The ancient puzzle occupies your mental landscape for a
-            thoughtful moment.
+            Your thoughts circle around the ancient puzzle like moths
+            around flame.
             """
         )
 
@@ -87,8 +87,8 @@ struct ThinkActionHandlerTests {
             output,
             """
             > consider gem
-            The sparkling gem occupies your mental landscape for a
-            thoughtful moment.
+            Your thoughts circle around the sparkling gem like moths around
+            flame.
             """
         )
 
@@ -121,8 +121,8 @@ struct ThinkActionHandlerTests {
             output,
             """
             > ponder over riddle
-            The complex riddle occupies your mental landscape for a
-            thoughtful moment.
+            Your thoughts circle around the complex riddle like moths
+            around flame.
             """
         )
 
@@ -147,7 +147,7 @@ struct ThinkActionHandlerTests {
             output,
             """
             > think about nonexistent
-            You cannot reach any such thing from here.
+            Any such thing lurks beyond your reach.
             """
         )
     }
@@ -184,7 +184,7 @@ struct ThinkActionHandlerTests {
             output,
             """
             > think about object
-            You cannot reach any such thing from here.
+            Any such thing lurks beyond your reach.
             """
         )
     }
@@ -215,7 +215,7 @@ struct ThinkActionHandlerTests {
             output,
             """
             > think
-            Deep cogitation yields no immediate revelations.
+            The gears of contemplation grind slowly but surely.
             """
         )
     }
@@ -254,8 +254,8 @@ struct ThinkActionHandlerTests {
             output,
             """
             > think about stone
-            The smooth stone occupies your mental landscape for a
-            thoughtful moment.
+            Your thoughts circle around the smooth stone like moths around
+            flame.
             """
         )
     }
@@ -347,8 +347,8 @@ struct ThinkActionHandlerTests {
             output,
             """
             > think about box
-            The wooden box occupies your mental landscape for a thoughtful
-            moment.
+            Your thoughts circle around the wooden box like moths around
+            flame.
             """
         )
 
@@ -371,8 +371,8 @@ struct ThinkActionHandlerTests {
             output,
             """
             > think about myself
-            You turn your thoughts inward, finding the usual mixture of
-            hope and regret.
+            A moment of introspection reveals nothing you didn't already
+            suspect.
             """
         )
     }
@@ -392,7 +392,7 @@ struct ThinkActionHandlerTests {
             output,
             """
             > think about the test room
-            You cannot reach any such thing from here.
+            Any such thing lurks beyond your reach.
             """
         )
     }
@@ -412,8 +412,7 @@ struct ThinkActionHandlerTests {
             output,
             """
             > think about silence
-            The nature of the silence occupies your philosophical
-            attention.
+            You ponder the deeper meaning of the silence.
             """
         )
     }
@@ -433,7 +432,7 @@ struct ThinkActionHandlerTests {
             output,
             """
             > think
-            Deep cogitation yields no immediate revelations.
+            The gears of contemplation grind slowly but surely.
             """
         )
     }

@@ -47,15 +47,15 @@ struct StandardCombatSystemIntegrationTests {
             output,
             """
             > attack goblin with sword
-            Armed and hungry for violence, you strike with your steel sword
-            as the goblin warrior can only dodge and weave against the
-            advantage of sharpened metal.
+            You press forward with your steel sword leading the way toward
+            flesh while the goblin warrior backs away, unarmed but still
+            dangerous as any cornered thing.
 
-            Your steel sword gives the goblin warrior serious pause!
-            Unarmed, it suddenly questions this confrontation.
+            The goblin warrior pulls back from your steel sword! Doubt
+            replaces its earlier confidence.
 
-            The goblin warrior's counter-punch goes wide, rage making the
-            strike clumsy and predictable.
+            The goblin warrior retaliates with violence but you're already
+            elsewhere when the blow arrives.
             """
         )
 
@@ -111,12 +111,13 @@ struct StandardCombatSystemIntegrationTests {
             output,
             """
             > attack goblin with sword
-            Armed and hungry for violence, you strike with your legendary
-            sword as the weak goblin can only dodge and weave against the
-            advantage of sharpened metal.
+            You press forward with your legendary sword leading the way
+            toward flesh while the weak goblin backs away, unarmed but
+            still dangerous as any cornered thing.
 
-            You strike true with your legendary sword! The weak goblin
-            drops without a sound, weaponless to the end.
+            Your armed advantage proves decisive--your legendary sword ends
+            it! The weak goblin crumples, having fought barehanded and
+            lost.
             """
         )
 
@@ -154,45 +155,42 @@ struct StandardCombatSystemIntegrationTests {
             output,
             """
             > attack the guard
-            Armed and hungry for violence, you strike with your variable
-            sword as the drunken brute can only dodge and weave against the
-            advantage of sharpened metal.
+            You press forward with your variable sword leading the way
+            toward flesh while the drunken brute backs away, unarmed but
+            still dangerous as any cornered thing.
 
-            A disastrous miss--your variable sword cuts through empty air
-            and the drunken bully effortlessly evades your mistimed attack.
+            Your variable sword misses completely--the drunken bully wasn't
+            even near where you struck.
 
-            The bitter brute's brutal retaliation breaks through your
-            defenses completely, rendering you vulnerable as an opened
-            shell.
-
-            > attack the guard
-            Your blow with your variable sword catches the bully cleanly,
-            tearing flesh and drawing crimson. The blow lands solidly,
-            drawing blood. He feels the sting but remains strong.
-
-            In the tangle, the brute drives an elbow home--sudden pressure
-            that blooms into dull pain. The wound is trivial against your
-            battle fury.
+            The bitter brute shatters your defense with bare hands, leaving
+            you wide open and unable to protect yourself.
 
             > attack the guard
-            The guard has left himself wide open and completely vulnerable
-            to your attack.
+            You strike the bully with your variable sword, opening a wound
+            that bleeds steadily. The wound is real but manageable.
 
-            In the tangle, the drunken guard drives an elbow home--sudden
-            pressure that blooms into dull pain. The wound is trivial
-            against your battle fury.
-
-            > attack the guard
-            The blow lands hard! The brute stumbles sideways, defenseless
-            and struggling to stay on his feet.
-
-            The drunken brute's brutal retaliation breaks through your
-            defenses completely, rendering you vulnerable as an opened
-            shell.
+            The counterblow comes wild and desperate, the brute hammering
+            through your guard to bruise rather than break. Pain flickers
+            and dies. Your body has more important work.
 
             > attack the guard
-            You strike true with your variable sword! The bully drops
-            without a sound, weaponless to the end.
+            Perfect opportunity appears! The guard is off-balance and
+            defenseless, a sitting target for your next move.
+
+            The counterblow comes wild and desperate, the drunken guard
+            hammering through your guard to bruise rather than break. Pain
+            flickers and dies. Your body has more important work.
+
+            > attack the guard
+            The brute reels from your variable sword! He stagger drunkenly,
+            completely off-balance.
+
+            The drunken brute shatters your defense with bare hands,
+            leaving you wide open and unable to protect yourself.
+
+            > attack the guard
+            Your armed advantage proves decisive--your variable sword ends
+            it! The bully crumples, having fought barehanded and lost.
             """
         )
 
@@ -243,80 +241,79 @@ struct StandardCombatSystemIntegrationTests {
             output,
             """
             > attack enemy
-            Armed and hungry for violence, you strike with your sharp sword
-            as the test enemy can only dodge and weave against the
-            advantage of sharpened metal.
+            You press forward with your sharp sword leading the way toward
+            flesh while the test enemy backs away, unarmed but still
+            dangerous as any cornered thing.
 
-            Your sharp sword gives the test enemy serious pause! Unarmed,
-            it suddenly questions this confrontation.
+            The test enemy pulls back from your sharp sword! Doubt replaces
+            its earlier confidence.
 
-            The test enemy's counter-punch goes wide, rage making the
-            strike clumsy and predictable.
-
-            > attack enemy
-            Your blow with your sharp sword catches the test enemy cleanly,
-            tearing flesh and drawing crimson. The blow lands solidly,
-            drawing blood. It feels the sting but remains strong.
-
-            The test enemy's retaliatory strike comes fast but you're
-            faster, sidestepping the violence with practiced grace.
+            The test enemy retaliates with violence but you're already
+            elsewhere when the blow arrives.
 
             > attack enemy
-            Your blow with your sharp sword catches the test enemy cleanly,
-            tearing flesh and drawing crimson. You see the ripple of pain,
-            but its body absorbs it. It remains dangerous.
+            You strike the test enemy with your sharp sword, opening a
+            wound that bleeds steadily. The wound is real but manageable.
 
-            The test enemy responds with such ferocity that you falter,
-            your muscles locking as your brain recalculates the odds.
-
-            > attack enemy
-            Your blow with your sharp sword catches the test enemy cleanly,
-            opening flesh to the bone. The bleeding is immediate and
-            concerning. The serious wound changes its stance. Pain shows in
-            every movement.
-
-            In the tangle, the test enemy drives an elbow home--sudden
-            pressure that blooms into dull pain. The wound is trivial
-            against your battle fury.
+            The test enemy strikes back hard but you duck away, the punch
+            finding only the ghost of where you were.
 
             > attack enemy
-            You strike true with your sharp sword! The test enemy drops
-            without a sound, weaponless to the end.
+            You strike the test enemy with your sharp sword, opening a
+            wound that bleeds steadily. It grunts from the impact but
+            maintains stance.
+
+            The test enemy's brutal retaliation stops you short, the raw
+            violence of it shaking your confidence to its core.
 
             > attack enemy
-            Armed and hungry for violence, you strike with your sharp sword
-            as the test enemy can only dodge and weave against the
-            advantage of sharpened metal.
+            You strike the test enemy with your sharp sword, tearing
+            through skin and muscle. Blood wells immediately, dark and
+            thick. It clutches the wound, blood seeping between fingers.
+            The damage is real.
 
-            Death has already claimed the test enemy.
-
-            > attack enemy
-            Armed and hungry for violence, you strike with your sharp sword
-            as the test enemy can only dodge and weave against the
-            advantage of sharpened metal.
-
-            The test enemy is beyond such concerns now, being dead.
+            The counterblow comes wild and desperate, the test enemy
+            hammering through your guard to bruise rather than break. Pain
+            flickers and dies. Your body has more important work.
 
             > attack enemy
-            Armed and hungry for violence, you strike with your sharp sword
-            as the test enemy can only dodge and weave against the
-            advantage of sharpened metal.
-
-            The test enemy is beyond such concerns now, being dead.
+            Your armed advantage proves decisive--your sharp sword ends it!
+            The test enemy crumples, having fought barehanded and lost.
 
             > attack enemy
-            Armed and hungry for violence, you strike with your sharp sword
-            as the test enemy can only dodge and weave against the
-            advantage of sharpened metal.
+            You press forward with your sharp sword leading the way toward
+            flesh while the test enemy backs away, unarmed but still
+            dangerous as any cornered thing.
 
             You're too late--the test enemy is already deceased.
 
             > attack enemy
-            Armed and hungry for violence, you strike with your sharp sword
-            as the test enemy can only dodge and weave against the
-            advantage of sharpened metal.
+            You press forward with your sharp sword leading the way toward
+            flesh while the test enemy backs away, unarmed but still
+            dangerous as any cornered thing.
 
             The test enemy is beyond such concerns now, being dead.
+
+            > attack enemy
+            You press forward with your sharp sword leading the way toward
+            flesh while the test enemy backs away, unarmed but still
+            dangerous as any cornered thing.
+
+            Death has already claimed the test enemy.
+
+            > attack enemy
+            You press forward with your sharp sword leading the way toward
+            flesh while the test enemy backs away, unarmed but still
+            dangerous as any cornered thing.
+
+            You're too late--the test enemy is already deceased.
+
+            > attack enemy
+            You press forward with your sharp sword leading the way toward
+            flesh while the test enemy backs away, unarmed but still
+            dangerous as any cornered thing.
+
+            The test enemy is already dead.
             """
         )
 
@@ -432,47 +429,45 @@ struct StandardCombatSystemIntegrationTests {
             output,
             """
             > attack enemy
-            Armed and hungry for violence, you strike with your training
-            sword as the tough enemy can only dodge and weave against the
-            advantage of sharpened metal.
+            You press forward with your training sword leading the way
+            toward flesh while the tough enemy backs away, unarmed but
+            still dangerous as any cornered thing.
 
-            Your strike with your training sword grazes the tough enemy,
-            drawing minimal blood. The light wound barely seems to
-            register.
+            You nick the tough enemy with your training sword, the weapon
+            barely breaking skin. It notes the minor damage and dismisses
+            it.
 
-            The tough enemy's counter-punch goes wide, rage making the
-            strike clumsy and predictable.
-
-            > attack enemy
-            Your strike with your training sword grazes the tough enemy,
-            drawing minimal blood. The light wound barely seems to
-            register.
-
-            In the exchange, the tough enemy lands clean. The world lurches
-            as your body absorbs punishment it won't soon forget. The blow
-            lands solidly, drawing blood. You feel the sting but remain
-            strong.
+            The tough enemy retaliates with violence but you're already
+            elsewhere when the blow arrives.
 
             > attack enemy
-            Your blow with your training sword catches the tough enemy
-            cleanly, tearing flesh and drawing crimson. You see the ripple
-            of pain, but its body absorbs it. It remains dangerous.
+            You nick the tough enemy with your training sword, the weapon
+            barely breaking skin. It notes the minor damage and dismisses
+            it.
 
-            The tough enemy responds with such ferocity that you falter,
-            your muscles locking as your brain recalculates the odds.
+            The counterstrike comes heavy. The tough enemy's fist finds
+            ribs, and pain blooms like fire through your chest. First blood
+            to them. The wound is real but manageable.
 
             > attack enemy
-            The tough enemy has left itself wide open and completely
-            vulnerable to your attack.
+            You strike the tough enemy with your training sword, opening a
+            wound that bleeds steadily. It grunts from the impact but
+            maintains stance.
 
-            The tough enemy's final retaliation breaks something essential
-            inside you and you feel yourself folding inward like paper in
-            rain.
+            The tough enemy's brutal retaliation stops you short, the raw
+            violence of it shaking your confidence to its core.
+
+            > attack enemy
+            Perfect opportunity appears! The tough enemy is off-balance and
+            defenseless, a sitting target for your next move.
+
+            The tough enemy delivers death with bare hands, crushing you
+            windpipe with the indifference of stone.
 
             ****  You have died  ****
 
-            Death, that most permanent of inconveniences, has claimed you.
-            Yet in these tales, even death offers second chances.
+            Your story ends here, but death is merely an intermission in
+            the grand performance.
 
             You scored 0 out of a possible 10 points, in 3 moves.
 
@@ -616,60 +611,58 @@ struct StandardCombatSystemIntegrationTests {
             output,
             """
             > attack enemy
-            Armed and hungry for violence, you strike with your masterwork
-            sword as the skilled enemy can only dodge and weave against the
-            advantage of sharpened metal.
+            You press forward with your masterwork sword leading the way
+            toward flesh while the skilled enemy backs away, unarmed but
+            still dangerous as any cornered thing.
 
-            Your blow with your masterwork sword catches the skilled enemy
-            cleanly, opening flesh to the bone. The bleeding is immediate
-            and concerning. First blood draws a gasp. It touches the wound,
-            fingers coming away red.
+            You strike the skilled enemy with your masterwork sword,
+            tearing through skin and muscle. Blood wells immediately, dark
+            and thick. The shock of injury shows clearly. Its unmarked
+            flesh now torn and bleeding.
 
-            The skilled enemy's brutal retaliation breaks through your
-            defenses completely, rendering you vulnerable as an opened
-            shell.
-
-            > attack enemy
-            A disastrous miss--your masterwork sword cuts through empty air
-            and the skilled enemy effortlessly evades your mistimed attack.
-
-            In the exchange, the skilled enemy lands clean. The world
-            lurches as your body absorbs punishment it won't soon forget.
-            The blow lands solidly, drawing blood. You feel the sting but
-            remain strong.
+            The skilled enemy shatters your defense with bare hands,
+            leaving you wide open and unable to protect yourself.
 
             > attack enemy
-            Your masterwork sword gives the skilled enemy serious pause!
-            Unarmed, it suddenly questions this confrontation.
+            Your masterwork sword misses completely--the skilled enemy
+            wasn't even near where you struck.
 
-            The skilled enemy's retaliatory strike comes fast but you're
-            faster, sidestepping the violence with practiced grace.
-
-            > attack enemy
-            The blow lands hard! The skilled enemy stumbles sideways,
-            defenseless and struggling to stay on its feet.
-
-            The skilled enemy's brutal retaliation breaks through your
-            defenses completely, rendering you vulnerable as an opened
-            shell.
+            The counterstrike comes heavy. The skilled enemy's fist finds
+            ribs, and pain blooms like fire through your chest. First blood
+            to them. The wound is real but manageable.
 
             > attack enemy
-            The skilled enemy has left itself wide open and completely
-            vulnerable to your attack.
+            The skilled enemy pulls back from your masterwork sword! Doubt
+            replaces its earlier confidence.
 
-            The skilled enemy's retaliatory strike comes fast but you're
-            faster, sidestepping the violence with practiced grace.
-
-            > attack enemy
-            You strike true with your masterwork sword! The skilled enemy
-            drops without a sound, weaponless to the end.
+            The skilled enemy strikes back hard but you duck away, the
+            punch finding only the ghost of where you were.
 
             > attack enemy
-            Armed and hungry for violence, you strike with your masterwork
-            sword as the skilled enemy can only dodge and weave against the
-            advantage of sharpened metal.
+            The skilled enemy reels from your masterwork sword! It stagger
+            drunkenly, completely off-balance.
 
-            Death has already claimed the skilled enemy.
+            The skilled enemy shatters your defense with bare hands,
+            leaving you wide open and unable to protect yourself.
+
+            > attack enemy
+            Perfect opportunity appears! The skilled enemy is off-balance
+            and defenseless, a sitting target for your next move.
+
+            The skilled enemy strikes back hard but you duck away, the
+            punch finding only the ghost of where you were.
+
+            > attack enemy
+            Your armed advantage proves decisive--your masterwork sword
+            ends it! The skilled enemy crumples, having fought barehanded
+            and lost.
+
+            > attack enemy
+            You press forward with your masterwork sword leading the way
+            toward flesh while the skilled enemy backs away, unarmed but
+            still dangerous as any cornered thing.
+
+            You're too late--the skilled enemy is already deceased.
             """
         )
 
@@ -747,26 +740,26 @@ struct StandardCombatSystemIntegrationTests {
             output,
             """
             > attack bandit
-            No weapons needed as you attack with pure violence while the
-            cowardly bandit braces for the inevitable collision of flesh
-            and bone.
+            You close the distance fast with fists ready as the cowardly
+            bandit mirrors your stance, both of you committed to finding
+            out who breaks first.
 
-            The brutal exchange ends with your killing blow! The cowardly
-            bandit goes limp and crashes down, utterly still.
-
-            > attack bandit
-            No weapons needed as you attack with pure violence while the
-            cowardly bandit braces for the inevitable collision of flesh
-            and bone.
-
-            Death has already claimed the cowardly bandit.
+            You land the decisive hit! The cowardly bandit wavers for a
+            heartbeat, then collapses into permanent silence.
 
             > attack bandit
-            No weapons needed as you attack with pure violence while the
-            cowardly bandit braces for the inevitable collision of flesh
-            and bone.
+            You close the distance fast with fists ready as the cowardly
+            bandit mirrors your stance, both of you committed to finding
+            out who breaks first.
 
-            The cowardly bandit is beyond such concerns now, being dead.
+            You're too late--the cowardly bandit is already deceased.
+
+            > attack bandit
+            You close the distance fast with fists ready as the cowardly
+            bandit mirrors your stance, both of you committed to finding
+            out who breaks first.
+
+            The cowardly bandit is already dead.
             """
         )
 
@@ -832,19 +825,20 @@ struct StandardCombatSystemIntegrationTests {
             output,
             """
             > attack scholar
-            Armed and hungry for violence, you strike with your
-            intimidating sword as the scholar warrior can only dodge and
-            weave against the advantage of sharpened metal.
+            You press forward with your intimidating sword leading the way
+            toward flesh while the scholar warrior backs away, unarmed but
+            still dangerous as any cornered thing.
 
-            Your intimidating sword gives the scholar warrior serious
-            pause! Unarmed, it suddenly questions this confrontation.
+            The scholar warrior pulls back from your intimidating sword!
+            Doubt replaces its earlier confidence.
 
-            The scholar warrior's counter-punch goes wide, rage making the
-            strike clumsy and predictable.
+            The scholar warrior retaliates with violence but you're already
+            elsewhere when the blow arrives.
 
             > attack scholar
-            You strike true with your intimidating sword! The scholar
-            warrior drops without a sound, weaponless to the end.
+            Your armed advantage proves decisive--your intimidating sword
+            ends it! The scholar warrior crumples, having fought barehanded
+            and lost.
             """
         )
 
@@ -903,12 +897,11 @@ struct StandardCombatSystemIntegrationTests {
             output,
             """
             > talk to guard
-            The confused guard responds to your overture with hostile
-            silence.
+            Conversation with the confused guard has given way to darker
+            intentions.
 
-            Something shifts in the confused guard's posture. The
-            aggression dissipates like morning mist, replaced by wary
-            peace.
+            The confused guard steps back with open hands. Whatever fury
+            drove it has burned itself out.
             """
         )
 
@@ -955,12 +948,12 @@ struct StandardCombatSystemIntegrationTests {
             output,
             """
             > attack knight
-            Fighting the armored knight bare-handed seems inadvisable. Find
-            a proper weapon first.
+            The armored knight may be unarmed, but so are you. This won't
+            end well without a weapon.
 
-            In a moment of raw violence, the armored knight comes at you
-            with nothing but fury! You raise your fists, knowing this will
-            hurt regardless of who wins.
+            The armored knight attacks with pure murderous intent! You
+            brace yourself for the impact, guard up, ready for the worst
+            kind of fight.
             """
         )
 
@@ -1018,11 +1011,11 @@ struct StandardCombatSystemIntegrationTests {
             output,
             """
             > take sword
-            Got it.
+            Taken.
 
-            In the tangle, the fierce warrior drives an elbow home--sudden
-            pressure that blooms into dull pain. The wound is trivial
-            against your battle fury.
+            The counterblow comes wild and desperate, the fierce warrior
+            hammering through your guard to bruise rather than break. Pain
+            flickers and dies. Your body has more important work.
             """
         )
 
@@ -1113,11 +1106,11 @@ struct StandardCombatSystemIntegrationTests {
             output,
             """
             > attack corpse
-            No weapons needed as you attack with pure violence while the
-            dead corpse braces for the inevitable collision of flesh and
-            bone.
+            You close the distance fast with fists ready as the dead corpse
+            mirrors your stance, both of you committed to finding out who
+            breaks first.
 
-            The dead bandit is beyond such concerns now, being dead.
+            The dead bandit has already departed this mortal coil.
             """
         )
 
@@ -1158,11 +1151,11 @@ struct StandardCombatSystemIntegrationTests {
             output,
             """
             > attack bandit with nonexistent
-            You cannot reach any such thing from here.
+            Any such thing lurks beyond your reach.
 
-            In a moment of raw violence, the highway bandit comes at you
-            with nothing but fury! You raise your fists, knowing this will
-            hurt regardless of who wins.
+            The highway bandit attacks with pure murderous intent! You
+            brace yourself for the impact, guard up, ready for the worst
+            kind of fight.
             """
         )
 
@@ -1209,16 +1202,16 @@ struct StandardCombatSystemIntegrationTests {
             output,
             """
             > attack thug with book
-            Armed and hungry for violence, you strike with your heavy book
-            as the street thug can only dodge and weave against the
-            advantage of sharpened metal.
+            You press forward with your heavy book leading the way toward
+            flesh while the street thug backs away, unarmed but still
+            dangerous as any cornered thing.
 
-            The heavy book wasn't designed for combat, but you wield it
-            against the street thug regardless!
+            You attack with the heavy book! The street thug dodges, more
+            puzzled than threatened by your choice of weapon.
 
-            In the tangle, the street thug drives an elbow home--sudden
-            pressure that blooms into dull pain. The wound is trivial
-            against your battle fury.
+            The counterblow comes wild and desperate, the street thug
+            hammering through your guard to bruise rather than break. Pain
+            flickers and dies. Your body has more important work.
             """
         )
 

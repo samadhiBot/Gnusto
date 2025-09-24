@@ -226,7 +226,7 @@ struct UnlockActionHandlerTests {
             output,
             """
             > unlock door with key
-            Any such thing lurks beyond your reach.
+            Any such thing remains frustratingly inaccessible.
             """
         )
     }
@@ -346,8 +346,8 @@ struct UnlockActionHandlerTests {
             output,
             """
             > unlock strongbox with key
-            The copper key and the iron strongbox were never meant to be
-            together.
+            The teeth of the copper key find no purchase in the iron
+            strongbox's mechanism.
             """
         )
     }
@@ -397,8 +397,8 @@ struct UnlockActionHandlerTests {
             output,
             """
             > unlock chest with key
-            The darkness here is absolute, consuming all light and hope of
-            sight.
+            You stand in a depthless black where even your thoughts seem to
+            whisper, careful not to make a sound.
             """
         )
     }

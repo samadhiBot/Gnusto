@@ -23,7 +23,7 @@ struct SingActionHandlerTests {
             output,
             """
             > sing
-            You unleash a melodic assault upon the immediate vicinity.
+            Your voice rises in what you generously call song.
             """
         )
     }
@@ -53,8 +53,8 @@ struct SingActionHandlerTests {
             output,
             """
             > serenade the wooden box
-            Your serenade to the wooden box falls upon deaf... Well, absent
-            ears.
+            The wooden box remains unmoved by your musical offering,
+            lacking the capacity for appreciation.
             """
         )
     }
@@ -85,8 +85,8 @@ struct SingActionHandlerTests {
             output,
             """
             > sing to the old wizard
-            The old wizard endures your impromptu serenade with admirable
-            patience.
+            Your song draws a smile from the old wizard, though whether
+            from joy or pity remains unclear.
             """
         )
     }
@@ -141,7 +141,7 @@ struct SingActionHandlerTests {
             output,
             """
             > sing
-            You unleash a melodic assault upon the immediate vicinity.
+            Your voice rises in what you generously call song.
             """
         )
     }

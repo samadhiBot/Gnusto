@@ -63,7 +63,7 @@ struct KnockActionHandlerTests {
             output,
             """
             > tap table
-            You tap the wooden table.
+            With practiced efficiency, you tap the wooden table.
             """
         )
 
@@ -96,7 +96,7 @@ struct KnockActionHandlerTests {
             output,
             """
             > knock on door
-            You knock on the front door.
+            With practiced efficiency, you knock on the front door.
             """
         )
     }
@@ -126,7 +126,7 @@ struct KnockActionHandlerTests {
             output,
             """
             > rap on window
-            You rap on the glass window.
+            With practiced efficiency, you rap on the glass window.
             """
         )
     }
@@ -185,7 +185,7 @@ struct KnockActionHandlerTests {
             output,
             """
             > knock on door
-            Any such thing lurks beyond your reach.
+            Any such thing remains frustratingly inaccessible.
             """
         )
     }
@@ -224,8 +224,8 @@ struct KnockActionHandlerTests {
             output,
             """
             > knock on door
-            The darkness here is absolute, consuming all light and hope of
-            sight.
+            You stand in a depthless black where even your thoughts seem to
+            whisper, careful not to make a sound.
             """
         )
     }
@@ -258,7 +258,7 @@ struct KnockActionHandlerTests {
             output,
             """
             > knock on chest
-            You knock on the treasure chest.
+            With practiced efficiency, you knock on the treasure chest.
             """
         )
 
@@ -291,7 +291,7 @@ struct KnockActionHandlerTests {
             output,
             """
             > knock on wall
-            You knock on the stone wall.
+            With practiced efficiency, you knock on the stone wall.
             """
         )
     }
@@ -325,7 +325,7 @@ struct KnockActionHandlerTests {
             output,
             """
             > tap post
-            You tap the wooden post.
+            With practiced efficiency, you tap the wooden post.
             """
         )
     }
@@ -374,13 +374,13 @@ struct KnockActionHandlerTests {
             output,
             """
             > knock on door
-            You knock on the blue door.
+            With practiced efficiency, you knock on the blue door.
 
             > rap on box
-            You successfully rap on the wooden box.
+            You rap on the wooden box.
 
             > tap barrel
-            With practiced efficiency, you tap the oak barrel.
+            You successfully tap the oak barrel.
             """
         )
 
@@ -436,13 +436,13 @@ struct KnockActionHandlerTests {
             output,
             """
             > knock on red door
-            You knock on the red door.
+            With practiced efficiency, you knock on the red door.
 
             > rap on green door
-            You successfully rap on the green door.
+            You rap on the green door.
 
             > tap yellow door
-            With practiced efficiency, you tap the yellow door.
+            You successfully tap the yellow door.
             """
         )
     }
@@ -493,13 +493,13 @@ struct KnockActionHandlerTests {
             output,
             """
             > knock on the open door
-            You knock on the open door.
+            With practiced efficiency, you knock on the open door.
 
             > tap on the closed door
-            You successfully tap on the closed door.
+            You tap on the closed door.
 
             > rap on the locked door
-            With practiced efficiency, you rap on the locked door.
+            You successfully rap on the locked door.
             """
         )
     }

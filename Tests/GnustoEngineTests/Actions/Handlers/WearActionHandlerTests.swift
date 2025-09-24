@@ -35,7 +35,7 @@ struct WearActionHandlerTests {
             output,
             """
             > wear hat
-            You don the red hat with practiced ease.
+            The red hat settles into place upon your person.
             """
         )
 
@@ -71,7 +71,7 @@ struct WearActionHandlerTests {
             output,
             """
             > put on jacket
-            You don the leather jacket with practiced ease.
+            The leather jacket settles into place upon your person.
             """
         )
 
@@ -106,7 +106,7 @@ struct WearActionHandlerTests {
             output,
             """
             > don cloak
-            You don the dark cloak with practiced ease.
+            The dark cloak settles into place upon your person.
             """
         )
     }
@@ -147,7 +147,8 @@ struct WearActionHandlerTests {
             output,
             """
             > wear all
-            You don the wool gloves and the blue hat with practiced ease.
+            The wool gloves and the blue hat settles into place upon your
+            person.
             """
         )
 
@@ -237,7 +238,7 @@ struct WearActionHandlerTests {
             output,
             """
             > wear rock
-            The heavy rock stubbornly resists your attempts to wear it.
+            The universe denies your request to wear the heavy rock.
             """
         )
     }
@@ -315,8 +316,8 @@ struct WearActionHandlerTests {
             output,
             """
             > wear scarf
-            The darkness here is absolute, consuming all light and hope of
-            sight.
+            You stand in a depthless black where even your thoughts seem to
+            whisper, careful not to make a sound.
             """
         )
     }
@@ -355,7 +356,7 @@ struct WearActionHandlerTests {
             output,
             """
             > wear ring
-            You don the gold ring with practiced ease.
+            The gold ring settles into place upon your person.
             """
         )
     }
@@ -401,8 +402,8 @@ struct WearActionHandlerTests {
             output,
             """
             > wear shoes and socks
-            You don the running shoes and the cotton socks with practiced
-            ease.
+            The running shoes and the cotton socks settles into place upon
+            your person.
             """
         )
     }
@@ -459,7 +460,8 @@ struct WearActionHandlerTests {
             output,
             """
             > wear all
-            You don the white shirt and the silk tie with practiced ease.
+            The white shirt and the silk tie settles into place upon your
+            person.
             """
         )
     }
@@ -550,7 +552,7 @@ struct WearActionHandlerTests {
             output,
             """
             > wear all
-            You don the wool mittens with practiced ease.
+            The wool mittens settles into place upon your person.
             """
         )
     }

@@ -912,7 +912,7 @@ struct ItemEventHandlerTests {
             The bottle hits the far wall and shatters.
 
             > inventory
-            Your hands are as empty as your pockets.
+            You carry nothing but your own thoughts.
             """
         )
 

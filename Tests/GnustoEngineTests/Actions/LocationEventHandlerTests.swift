@@ -145,8 +145,8 @@ struct LocationEventHandlerTests {
             > look
             --- Starting Room ---
 
-            This location is still under construction. The game developers
-            apologize for any inconvenience.
+            [INSERT ROOM DESCRIPTION HERE] You stand in a placeholder,
+            wondering what might have been.
 
             > north
             --- Another Room ---
@@ -347,8 +347,8 @@ struct LocationEventHandlerTests {
             > look
             --- Starting Room ---
 
-            This location is still under construction. The game developers
-            apologize for any inconvenience.
+            [INSERT ROOM DESCRIPTION HERE] You stand in a placeholder,
+            wondering what might have been.
             """
         )
     }
@@ -550,7 +550,7 @@ struct LocationEventHandlerTests {
             A room for testing.
 
             > inventory
-            Your hands are as empty as your pockets.
+            You carry nothing but your own thoughts.
 
             > south
             --- Destination Room ---
@@ -563,7 +563,7 @@ struct LocationEventHandlerTests {
             Destination location.
 
             > inventory
-            You are unburdened by material possessions.
+            Your hands are as empty as your pockets.
 
             > north
             --- Test Room ---

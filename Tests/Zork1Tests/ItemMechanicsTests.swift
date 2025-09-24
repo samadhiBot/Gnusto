@@ -47,7 +47,7 @@ struct ItemMechanicsTests {
             The lamp is turned off.
 
             > turn on the lamp
-            You successfully turn on the brass lantern.
+            You turn on the brass lantern.
 
             > inventory
             You are carrying:
@@ -66,10 +66,10 @@ struct ItemMechanicsTests {
             nasty-looking knife.
 
             > take rope
-            Acquired.
+            Got it.
 
             > take knife
-            Got it.
+            Acquired.
 
             > inventory
             You are carrying:
@@ -79,7 +79,7 @@ struct ItemMechanicsTests {
             - A sword
 
             >
-            May your adventures elsewhere prove fruitful!
+            Farewell, brave soul!
             """
         )
     }
@@ -117,23 +117,23 @@ struct ItemMechanicsTests {
             smelling of hot peppers.
 
             > take sack
-            Got it.
+            Taken.
 
             > examine sack
             The brown sack is closed.
 
             > open sack
-            The brown sack parts to disclose a clove of garlic and a lunch,
-            previously hidden from view.
+            Opening the brown sack brings a clove of garlic and a lunch
+            into the light.
 
             > examine sack
             The brown sack contains a clove of garlic and a lunch.
 
             > get lunch
-            Got it.
+            Acquired.
 
             > take garlic from sack
-            Got it.
+            Taken.
 
             > take bottle
             Got it.
@@ -145,8 +145,8 @@ struct ItemMechanicsTests {
             You'll have to open the glass bottle first.
 
             > open bottle
-            The glass bottle parts to disclose a quantity of water,
-            previously hidden from view.
+            Opening the glass bottle brings a quantity of water into the
+            light.
 
             > drink water
             Thank you very much. I was rather thirsty (from all this
@@ -163,7 +163,7 @@ struct ItemMechanicsTests {
             - A brown sack
 
             >
-            Until we meet again in another tale...
+            May your adventures elsewhere prove fruitful!
             """
         )
     }
@@ -200,7 +200,7 @@ struct ItemMechanicsTests {
             the trophy case hangs an elvish sword of great antiquity.
 
             > take the lamp
-            Got it.
+            Taken.
 
             > examine it
             The lamp is turned off.
@@ -214,7 +214,7 @@ struct ItemMechanicsTests {
             It is pitch black. You are likely to be eaten by a grue.
 
             > light the lamp
-            With practiced efficiency, you light the brass lantern.
+            You successfully light the brass lantern.
 
             --- Attic ---
 
@@ -231,7 +231,7 @@ struct ItemMechanicsTests {
             It is pitch black. You are likely to be eaten by a grue.
 
             >
-            May your adventures elsewhere prove fruitful!
+            Until we meet again in another tale...
             """
         )
     }

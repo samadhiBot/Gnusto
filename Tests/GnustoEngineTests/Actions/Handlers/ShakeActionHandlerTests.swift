@@ -34,8 +34,8 @@ struct ShakeActionHandlerTests {
             output,
             """
             > shake bottle
-            Your agitation of the empty bottle produces no observable
-            effect.
+            You give the empty bottle a vigorous shake. Nothing rattles,
+            breaks, or emerges.
             """
         )
 
@@ -60,7 +60,7 @@ struct ShakeActionHandlerTests {
             output,
             """
             > shake
-            You give yourself a thorough rattling. It's oddly satisfying.
+            You shake yourself like a wet dog, dignity be damned.
             """
         )
     }
@@ -97,7 +97,7 @@ struct ShakeActionHandlerTests {
             output,
             """
             > shake item
-            You cannot reach any such thing from here.
+            Any such thing lurks beyond your reach.
             """
         )
     }
@@ -135,8 +135,8 @@ struct ShakeActionHandlerTests {
             output,
             """
             > shake jar
-            The darkness here is absolute, consuming all light and hope of
-            sight.
+            You stand in a depthless black where even your thoughts seem to
+            whisper, careful not to make a sound.
             """
         )
     }
@@ -169,8 +169,8 @@ struct ShakeActionHandlerTests {
             output,
             """
             > shake the wizard
-            Your urge to shake the old wizard must remain forever
-            unfulfilled.
+            Rattling the old wizard like a maraca would be most
+            undignified.
             """
         )
     }
@@ -193,8 +193,8 @@ struct ShakeActionHandlerTests {
             output,
             """
             > shake the troll
-            Your urge to shake the fierce troll must remain forever
-            unfulfilled.
+            Rattling the fierce troll like a maraca would be most
+            undignified.
             """
         )
     }
@@ -214,7 +214,8 @@ struct ShakeActionHandlerTests {
             output,
             """
             > shake myself
-            You shake yourself like a wet dog, dignity be damned.
+            A vigorous self-shake loosens your muscles if not your
+            troubles.
             """
         )
     }
@@ -285,10 +286,11 @@ struct ShakeActionHandlerTests {
             output,
             """
             > shake small box
-            Your agitation of the small box produces no observable effect.
+            You give the small box a vigorous shake. Nothing rattles,
+            breaks, or emerges.
 
             > rattle large box
-            Your agitation of the large box produces no observable effect.
+            The large box tolerates your shaking with stoic indifference.
             """
         )
 

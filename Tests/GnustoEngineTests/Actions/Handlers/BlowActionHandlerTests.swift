@@ -33,8 +33,7 @@ struct BlowActionHandlerTests {
             output,
             """
             > blow feather
-            Your breath plays across the fluffy feather to no discernible
-            effect.
+            Blowing on the fluffy feather accomplishes nothing of note.
             """
         )
 
@@ -76,7 +75,7 @@ struct BlowActionHandlerTests {
             output,
             """
             > blow feather
-            Any such thing lurks beyond your reach.
+            Any such thing remains frustratingly inaccessible.
             """
         )
     }
@@ -114,8 +113,8 @@ struct BlowActionHandlerTests {
             output,
             """
             > blow feather
-            The darkness here is absolute, consuming all light and hope of
-            sight.
+            You stand in a depthless black where even your thoughts seem to
+            whisper, careful not to make a sound.
             """
         )
     }
@@ -137,7 +136,7 @@ struct BlowActionHandlerTests {
             output,
             """
             > blow
-            You exhale dramatically into the void.
+            You blow air with great purpose but little effect.
             """
         )
     }

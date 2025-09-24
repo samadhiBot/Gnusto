@@ -146,11 +146,11 @@ struct VocabularyTests {
             output,
             """
             > take brass lamp
-            Taken.
+            Acquired.
 
             > examine lamp
-            The brass lamp stubbornly remains ordinary despite your
-            thorough examination.
+            The brass lamp reveals itself to be exactly what it
+            appears--nothing more, nothing less.
             """
         )
     }

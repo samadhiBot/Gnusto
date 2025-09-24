@@ -33,8 +33,8 @@ struct RaiseActionHandlerTests {
             output,
             """
             > raise box
-            You consider whether to raise the wooden box, then decide
-            against it.
+            Something makes you hesitate before you raise the wooden box.
+            Perhaps not.
             """
         )
 
@@ -67,8 +67,8 @@ struct RaiseActionHandlerTests {
             output,
             """
             > lift stone
-            You consider whether to lift the heavy stone, then decide
-            against it.
+            Something makes you hesitate before you lift the heavy stone.
+            Perhaps not.
             """
         )
     }
@@ -98,8 +98,8 @@ struct RaiseActionHandlerTests {
             output,
             """
             > hoist beam
-            You consider whether to hoist the steel beam, then decide
-            against it.
+            Something makes you hesitate before you hoist the steel beam.
+            Perhaps not.
             """
         )
     }
@@ -141,7 +141,7 @@ struct RaiseActionHandlerTests {
             output,
             """
             > raise nonexistent
-            Any such thing lurks beyond your reach.
+            Any such thing remains frustratingly inaccessible.
             """
         )
     }
@@ -178,7 +178,7 @@ struct RaiseActionHandlerTests {
             output,
             """
             > raise box
-            Any such thing lurks beyond your reach.
+            Any such thing remains frustratingly inaccessible.
             """
         )
     }
@@ -198,7 +198,7 @@ struct RaiseActionHandlerTests {
             output,
             """
             > raise testRoom
-            Any such thing lurks beyond your reach.
+            Any such thing remains frustratingly inaccessible.
             """
         )
     }
@@ -218,7 +218,7 @@ struct RaiseActionHandlerTests {
             output,
             """
             > raise me
-            The logistics of raising oneself prove insurmountable.
+            You cannot raise yourself, thankfully.
             """
         )
     }
@@ -257,8 +257,8 @@ struct RaiseActionHandlerTests {
             output,
             """
             > raise box
-            The darkness here is absolute, consuming all light and hope of
-            sight.
+            You stand in a depthless black where even your thoughts seem to
+            whisper, careful not to make a sound.
             """
         )
     }
@@ -297,8 +297,8 @@ struct RaiseActionHandlerTests {
             output,
             """
             > raise crate
-            You consider whether to raise the wooden crate, then decide
-            against it.
+            Something makes you hesitate before you raise the wooden crate.
+            Perhaps not.
             """
         )
     }
@@ -343,8 +343,8 @@ struct RaiseActionHandlerTests {
             An old leather book.
 
             > raise table
-            You consider whether to raise the heavy table, then decide
-            against it.
+            Something makes you hesitate before you raise the heavy table.
+            Perhaps not.
 
             > examine it
             A massive oak table.
@@ -378,8 +378,8 @@ struct RaiseActionHandlerTests {
             output,
             """
             > raise weight
-            You consider whether to raise the iron weight, then decide
-            against it.
+            Something makes you hesitate before you raise the iron weight.
+            Perhaps not.
             """
         )
 
@@ -421,8 +421,8 @@ struct RaiseActionHandlerTests {
             output,
             """
             > raise anvil
-            You consider whether to raise the iron anvil, then decide
-            against it.
+            Something makes you hesitate before you raise the iron anvil.
+            Perhaps not.
             """
         )
 
@@ -474,16 +474,15 @@ struct RaiseActionHandlerTests {
             output,
             """
             > raise chair
-            You consider whether to raise the wooden chair, then decide
-            against it.
+            Something makes you hesitate before you raise the wooden chair.
+            Perhaps not.
 
             > raise giant
-            You start to raise the sleeping giant but stop yourself at the
-            last moment.
+            You consider whether to raise the sleeping giant, then decide
+            against it.
 
             > raise machine
-            Something makes you hesitate before you raise the heavy
-            machine. Perhaps not.
+            On second thought, you decide not to raise the heavy machine.
             """
         )
     }
@@ -519,8 +518,8 @@ struct RaiseActionHandlerTests {
             featherOutput,
             """
             > raise feather
-            You consider whether to raise the small feather, then decide
-            against it.
+            Something makes you hesitate before you raise the small
+            feather. Perhaps not.
             """
         )
 
@@ -532,8 +531,8 @@ struct RaiseActionHandlerTests {
             boulderOutput,
             """
             > raise boulder
-            You start to raise the massive boulder but stop yourself at the
-            last moment.
+            You consider whether to raise the massive boulder, then decide
+            against it.
             """
         )
     }
@@ -567,16 +566,15 @@ struct RaiseActionHandlerTests {
             output,
             """
             > raise barrel
-            You consider whether to raise the oak barrel, then decide
-            against it.
+            Something makes you hesitate before you raise the oak barrel.
+            Perhaps not.
 
             > lift barrel
-            You start to lift the oak barrel but stop yourself at the last
-            moment.
+            You consider whether to lift the oak barrel, then decide
+            against it.
 
             > hoist barrel
-            Something makes you hesitate before you hoist the oak barrel.
-            Perhaps not.
+            On second thought, you decide not to hoist the oak barrel.
             """
         )
     }

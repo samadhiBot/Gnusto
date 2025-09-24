@@ -248,7 +248,7 @@ struct ExamineActionHandlerTests {
             output,
             """
             > examine nonexistent
-            Any such thing lurks beyond your reach.
+            Any such thing remains frustratingly inaccessible.
             """
         )
     }
@@ -285,7 +285,7 @@ struct ExamineActionHandlerTests {
             output,
             """
             > examine book
-            Any such thing lurks beyond your reach.
+            Any such thing remains frustratingly inaccessible.
             """
         )
     }
@@ -324,8 +324,8 @@ struct ExamineActionHandlerTests {
             output,
             """
             > examine book
-            The darkness here is absolute, consuming all light and hope of
-            sight.
+            You stand in a depthless black where even your thoughts seem to
+            whisper, careful not to make a sound.
             """
         )
     }
@@ -347,8 +347,8 @@ struct ExamineActionHandlerTests {
             output,
             """
             > examine me
-            As good-looking as ever, which is to say, adequately
-            presentable.
+            You are magnificently intact, without so much as a misplaced
+            hair to suggest adventure.
             """
         )
     }
@@ -654,7 +654,7 @@ struct ExamineActionHandlerTests {
             A worn leather book.
 
             > take it
-            Taken.
+            Acquired.
             """
         )
 

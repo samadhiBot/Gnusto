@@ -73,7 +73,7 @@ struct GameEngineActionResponseTests {
             output,
             """
             > take pebble
-            The pebble stubbornly resists your attempts to take it.
+            The universe denies your request to take the pebble.
             """
         )
     }
@@ -135,7 +135,7 @@ struct GameEngineActionResponseTests {
             output,
             """
             > take shield
-            Your burden has reached its practical limit.
+            You're juggling quite enough already.
             """
         )
     }
@@ -163,7 +163,7 @@ struct GameEngineActionResponseTests {
             output,
             """
             > drop my ankle bracelet
-            The ankle bracelet stubbornly resists your attempts to drop it.
+            The universe denies your request to drop the ankle bracelet.
             """
         )
     }
@@ -295,7 +295,7 @@ struct GameEngineActionResponseTests {
             output,
             """
             > open rock
-            The rock stubbornly resists your attempts to open it.
+            The universe denies your request to open the rock.
             """
         )
     }
@@ -321,7 +321,7 @@ struct GameEngineActionResponseTests {
             output,
             """
             > close book
-            The book stubbornly resists your attempts to close it.
+            The universe denies your request to close the book.
             """
         )
     }
@@ -379,7 +379,7 @@ struct GameEngineActionResponseTests {
             output,
             """
             > wear rock
-            The rock stubbornly resists your attempts to wear it.
+            The universe denies your request to wear the rock.
             """
         )
     }
@@ -409,8 +409,7 @@ struct GameEngineActionResponseTests {
             output,
             """
             > remove amulet
-            The cursed amulet stubbornly resists your attempts to remove
-            it.
+            The universe denies your request to remove the cursed amulet.
             """
         )
     }
@@ -486,7 +485,8 @@ struct GameEngineActionResponseTests {
             output,
             """
             > unlock chest with wrong key
-            The wrong key and the chest were never meant to be together.
+            The teeth of the wrong key find no purchase in the chest's
+            mechanism.
             """
         )
     }
@@ -523,8 +523,8 @@ struct GameEngineActionResponseTests {
             output,
             """
             > examine shadow
-            The darkness here is absolute, consuming all light and hope of
-            sight.
+            You stand in a depthless black where even your thoughts seem to
+            whisper, careful not to make a sound.
             """
         )
     }
@@ -683,7 +683,7 @@ struct GameEngineActionResponseTests {
             output,
             """
             > turn on lamp
-            It's already on.
+            It hums with life already.
             """
         )
     }
@@ -713,7 +713,7 @@ struct GameEngineActionResponseTests {
             output,
             """
             > turn off lamp
-            It's already off.
+            It rests in darkness already.
             """
         )
     }
@@ -739,7 +739,7 @@ struct GameEngineActionResponseTests {
             output,
             """
             > turn on rock
-            It remains stubbornly inert despite your ministrations.
+            That lacks the spark of mechanical life you seek to kindle.
             """
         )
     }
@@ -775,7 +775,7 @@ struct GameEngineActionResponseTests {
             output,
             """
             > take distant item
-            Any such thing lurks beyond your reach.
+            Any such thing remains frustratingly inaccessible.
             """
         )
     }
@@ -850,7 +850,8 @@ struct GameEngineActionResponseTests {
             output,
             """
             > eat rock
-            The rock falls well outside the realm of culinary possibility.
+            Your digestive system firmly vetoes the consumption of the
+            rock.
             """
         )
     }
@@ -870,7 +871,7 @@ struct GameEngineActionResponseTests {
             output,
             """
             > teleport
-            The art of teleport-ing remains a mystery to me.
+            I lack the knowledge necessary to teleport anything.
             """
         )
     }
@@ -908,7 +909,7 @@ struct GameEngineActionResponseTests {
             output,
             """
             > close box
-            Firmly closed.
+            Shut tight.
             """
         )
     }
@@ -988,8 +989,8 @@ struct GameEngineActionResponseTests {
             output,
             """
             > examine chest
-            The darkness here is absolute, consuming all light and hope of
-            sight.
+            You stand in a depthless black where even your thoughts seem to
+            whisper, careful not to make a sound.
             """
         )
     }

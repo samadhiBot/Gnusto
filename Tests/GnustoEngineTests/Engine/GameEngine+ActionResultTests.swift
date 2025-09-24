@@ -690,7 +690,7 @@ struct GameEngineActionResultTests {
             output,
             """
             > take gold coin
-            Taken.
+            Acquired.
             """
         )
 
@@ -733,10 +733,10 @@ struct GameEngineActionResultTests {
             output,
             """
             > take lamp
-            Taken.
+            Acquired.
 
             > turn on lamp
-            You successfully turn on the brass lamp.
+            You turn on the brass lamp.
             """
         )
 
@@ -846,7 +846,7 @@ struct GameEngineActionResultTests {
             finalOutput,
             """
             > wait
-            Time flows onward, indifferent to your concerns.
+            Moments slip away like sand through fingers.
 
             Fuse triggered with typed data!
             """
@@ -899,7 +899,7 @@ struct GameEngineActionResultTests {
             finalOutput,
             """
             > wait
-            Time flows onward, indifferent to your concerns.
+            Moments slip away like sand through fingers.
 
             Enemy goblin returns to cave!
             """

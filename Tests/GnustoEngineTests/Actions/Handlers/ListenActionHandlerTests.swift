@@ -23,8 +23,8 @@ struct ListenActionHandlerTests {
             output,
             """
             > listen
-            The world holds its breath as you listen, revealing nothing of
-            import.
+            You strain your ears but detect only the ordinary soundtrack of
+            existence.
             """
         )
     }
@@ -116,8 +116,8 @@ struct ListenActionHandlerTests {
             output,
             """
             > listen
-            The world holds its breath as you listen, revealing nothing of
-            import.
+            You strain your ears but detect only the ordinary soundtrack of
+            existence.
             """
         )
     }

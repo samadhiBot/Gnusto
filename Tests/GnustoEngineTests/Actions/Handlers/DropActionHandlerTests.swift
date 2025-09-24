@@ -34,7 +34,7 @@ struct DropActionHandlerTests {
             output,
             """
             > drop book
-            Dropped.
+            Released.
             """
         )
 
@@ -70,7 +70,7 @@ struct DropActionHandlerTests {
             output,
             """
             > discard paper
-            Dropped.
+            Released.
             """
         )
     }
@@ -199,7 +199,7 @@ struct DropActionHandlerTests {
             output,
             """
             > drop ring
-            The cursed ring stubbornly resists your attempts to drop it.
+            The universe denies your request to drop the cursed ring.
             """
         )
     }
@@ -238,8 +238,8 @@ struct DropActionHandlerTests {
             output,
             """
             > drop book
-            The darkness here is absolute, consuming all light and hope of
-            sight.
+            You stand in a depthless black where even your thoughts seem to
+            whisper, careful not to make a sound.
             """
         )
     }
@@ -272,7 +272,7 @@ struct DropActionHandlerTests {
             output,
             """
             > drop sword
-            Dropped.
+            Released.
             """
         )
 
@@ -352,7 +352,7 @@ struct DropActionHandlerTests {
             output,
             """
             > drop all
-            Your hands are as empty as your pockets.
+            You carry nothing but your own thoughts.
             """
         )
     }

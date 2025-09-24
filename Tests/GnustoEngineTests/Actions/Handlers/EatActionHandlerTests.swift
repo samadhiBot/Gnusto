@@ -35,8 +35,7 @@ struct EatActionHandlerTests {
             output,
             """
             > eat apple
-            Your appetite for the red apple must wait for better
-            circumstances.
+            Now is not the time to consume the red apple.
             """
         )
 
@@ -71,8 +70,7 @@ struct EatActionHandlerTests {
             output,
             """
             > consume bread
-            Your appetite for the piece of bread must wait for better
-            circumstances.
+            Now is not the time to consume the piece of bread.
             """
         )
     }
@@ -104,8 +102,7 @@ struct EatActionHandlerTests {
             output,
             """
             > devour cake
-            Your appetite for the chocolate cake must wait for better
-            circumstances.
+            Now is not the time to consume the chocolate cake.
             """
         )
     }
@@ -147,7 +144,7 @@ struct EatActionHandlerTests {
             output,
             """
             > eat nonexistent
-            Any such thing lurks beyond your reach.
+            Any such thing remains frustratingly inaccessible.
             """
         )
     }
@@ -179,10 +176,10 @@ struct EatActionHandlerTests {
             output,
             """
             > eat apple
-            Taken.
+            Acquired.
 
-            The red apple remains tantalizingly out of reach of your
-            digestive ambitions.
+            Your appetite for the red apple must wait for better
+            circumstances.
             """
         )
     }
@@ -213,8 +210,8 @@ struct EatActionHandlerTests {
             output,
             """
             > eat rock
-            The large rock falls well outside the realm of culinary
-            possibility.
+            Your digestive system firmly vetoes the consumption of the
+            large rock.
             """
         )
     }
@@ -255,8 +252,8 @@ struct EatActionHandlerTests {
             output,
             """
             > eat apple
-            The darkness here is absolute, consuming all light and hope of
-            sight.
+            You stand in a depthless black where even your thoughts seem to
+            whisper, careful not to make a sound.
             """
         )
     }
@@ -293,8 +290,7 @@ struct EatActionHandlerTests {
             output,
             """
             > eat orange
-            Your appetite for the juicy orange must wait for better
-            circumstances.
+            Now is not the time to consume the juicy orange.
             """
         )
     }
@@ -327,8 +323,7 @@ struct EatActionHandlerTests {
             output,
             """
             > eat cookie
-            Your appetite for the chocolate cookie must wait for better
-            circumstances.
+            Now is not the time to consume the chocolate cookie.
             """
         )
     }
@@ -371,14 +366,14 @@ struct EatActionHandlerTests {
             output,
             """
             > eat banana
-            Your appetite for the yellow banana must wait for better
-            circumstances.
+            Now is not the time to consume the yellow banana.
 
             > take apple
-            Got it.
+            Taken.
 
             > eat it
-            Now is not the time to consume the red apple.
+            The red apple remains tantalizingly out of reach of your
+            digestive ambitions.
             """
         )
     }
@@ -421,8 +416,7 @@ struct EatActionHandlerTests {
             output,
             """
             > eat box
-            Your appetite for the lunch box must wait for better
-            circumstances.
+            Now is not the time to consume the lunch box.
             """
         )
 
@@ -459,8 +453,7 @@ struct EatActionHandlerTests {
             output,
             """
             > eat soup
-            Your appetite for the hot soup must wait for better
-            circumstances.
+            Now is not the time to consume the hot soup.
             """
         )
     }

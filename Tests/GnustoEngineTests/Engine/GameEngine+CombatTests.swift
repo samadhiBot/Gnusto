@@ -40,15 +40,16 @@ struct GameEngineCombatTests {
             output,
             """
             > slay the goblin
-            No weapons needed as you attack with pure violence while the
-            goblin braces for the inevitable collision of flesh and bone.
+            You close the distance fast with fists ready as the goblin
+            mirrors your stance, both of you committed to finding out who
+            breaks first.
 
-            You catch the goblin with minimal force, the blow almost
-            gentle. The light wound barely seems to register.
+            You land a light punch that it barely feels. It notes the minor
+            damage and dismisses it.
 
-            In the tangle, the goblin drives an elbow home--sudden pressure
-            that blooms into dull pain. The wound is trivial against your
-            battle fury.
+            The counterblow comes wild and desperate, the goblin hammering
+            through your guard to bruise rather than break. Pain flickers
+            and dies. Your body has more important work.
             """
         )
 
@@ -93,16 +94,16 @@ struct GameEngineCombatTests {
             output,
             """
             > slay the orc with my sword
-            Armed and hungry for violence, you strike with your sword as
-            the orc can only dodge and weave against the advantage of
-            sharpened metal.
+            You press forward with your sword leading the way toward flesh
+            while the orc backs away, unarmed but still dangerous as any
+            cornered thing.
 
-            The sword wasn't designed for combat, but you wield it against
-            the orc regardless!
+            You attack with the sword! The orc dodges, more puzzled than
+            threatened by your choice of weapon.
 
-            In the tangle, the orc drives an elbow home--sudden pressure
-            that blooms into dull pain. The wound is trivial against your
-            battle fury.
+            The counterblow comes wild and desperate, the orc hammering
+            through your guard to bruise rather than break. Pain flickers
+            and dies. Your body has more important work.
             """
         )
 
@@ -147,11 +148,11 @@ struct GameEngineCombatTests {
 
             A laboratory in which strange experiments are being conducted.
 
-            There is a red dragon here.
+            You can see a red dragon here.
 
-            In a moment of raw violence, the red dragon comes at you with
-            nothing but fury! You raise your fists, knowing this will hurt
-            regardless of who wins.
+            The red dragon attacks with pure murderous intent! You brace
+            yourself for the impact, guard up, ready for the worst kind of
+            fight.
             """
         )
 
@@ -198,11 +199,11 @@ struct GameEngineCombatTests {
 
             A laboratory in which strange experiments are being conducted.
 
-            There is a fierce troll here.
+            You can see a fierce troll here.
 
-            Despite having no weapon, the fearsome beast charges with
-            terrifying resolve! You grip your battle axe tighter, knowing
-            you'd better use this advantage.
+            The fearsome beast comes at you unarmed but fearless! You level
+            your battle axe at his approach--will your weapon stop such
+            determination?
             """
         )
 
@@ -243,16 +244,16 @@ struct GameEngineCombatTests {
             output,
             """
             > attack the skeleton warrior
-            No weapons needed as you attack with pure violence while the
-            skeleton warrior braces for the inevitable collision of flesh
-            and bone.
+            You close the distance fast with fists ready as the skeleton
+            warrior mirrors your stance, both of you committed to finding
+            out who breaks first.
 
-            You catch the skeleton warrior with minimal force, the blow
-            almost gentle. The light wound barely seems to register.
+            You land a light punch that it barely feels. It notes the minor
+            damage and dismisses it.
 
-            In the tangle, the skeleton warrior drives an elbow
-            home--sudden pressure that blooms into dull pain. The wound is
-            trivial against your battle fury.
+            The counterblow comes wild and desperate, the skeleton warrior
+            hammering through your guard to bruise rather than break. Pain
+            flickers and dies. Your body has more important work.
             """
         )
 
@@ -303,16 +304,16 @@ struct GameEngineCombatTests {
             output,
             """
             > slay the shambling zombie
-            Armed and hungry for violence, you strike with your iron mace
-            as the shambling zombie can only dodge and weave against the
-            advantage of sharpened metal.
+            You press forward with your iron mace leading the way toward
+            flesh while the shambling zombie backs away, unarmed but still
+            dangerous as any cornered thing.
 
-            The iron mace wasn't designed for combat, but you wield it
-            against the shambling zombie regardless!
+            You attack with the iron mace! The shambling zombie dodges,
+            more puzzled than threatened by your choice of weapon.
 
-            In the tangle, the shambling zombie drives an elbow
-            home--sudden pressure that blooms into dull pain. The wound is
-            trivial against your battle fury.
+            The counterblow comes wild and desperate, the shambling zombie
+            hammering through your guard to bruise rather than break. Pain
+            flickers and dies. Your body has more important work.
             """
         )
 
@@ -354,15 +355,16 @@ struct GameEngineCombatTests {
             output,
             """
             > kill the goblin
-            No weapons needed as you attack with pure violence while the
-            goblin braces for the inevitable collision of flesh and bone.
+            You close the distance fast with fists ready as the goblin
+            mirrors your stance, both of you committed to finding out who
+            breaks first.
 
-            You catch the goblin with minimal force, the blow almost
-            gentle. The light wound barely seems to register.
+            You land a light punch that it barely feels. It notes the minor
+            damage and dismisses it.
 
-            In the tangle, the goblin drives an elbow home--sudden pressure
-            that blooms into dull pain. The wound is trivial against your
-            battle fury.
+            The counterblow comes wild and desperate, the goblin hammering
+            through your guard to bruise rather than break. Pain flickers
+            and dies. Your body has more important work.
             """
         )
     }
@@ -658,15 +660,15 @@ struct GameEngineCombatTests {
             output,
             """
             > kill the rat
-            No weapons needed as you attack with pure violence while the
-            giant rat braces for the inevitable collision of flesh and
-            bone.
+            You close the distance fast with fists ready as the giant rat
+            mirrors your stance, both of you committed to finding out who
+            breaks first.
 
-            You catch the giant rat with minimal force, the blow almost
-            gentle. The light wound barely seems to register.
+            You land a light punch that it barely feels. It notes the minor
+            damage and dismisses it.
 
-            The giant rat's counter-punch goes wide, rage making the strike
-            clumsy and predictable.
+            The giant rat retaliates with violence but you're already
+            elsewhere when the blow arrives.
             """
         )
 
@@ -712,16 +714,16 @@ struct GameEngineCombatTests {
             output,
             """
             > attack the ogre
-            Armed and hungry for violence, you strike with your wooden club
-            as the fierce ogre can only dodge and weave against the
-            advantage of sharpened metal.
+            You press forward with your wooden club leading the way toward
+            flesh while the fierce ogre backs away, unarmed but still
+            dangerous as any cornered thing.
 
-            The wooden club wasn't designed for combat, but you wield it
-            against the fierce ogre regardless!
+            You attack with the wooden club! The fierce ogre dodges, more
+            puzzled than threatened by your choice of weapon.
 
-            In the tangle, the fierce ogre drives an elbow home--sudden
-            pressure that blooms into dull pain. The wound is trivial
-            against your battle fury.
+            The counterblow comes wild and desperate, the fierce ogre
+            hammering through your guard to bruise rather than break. Pain
+            flickers and dies. Your body has more important work.
             """
         )
 
@@ -791,34 +793,33 @@ struct GameEngineCombatTests {
             output,
             """
             > slay the wolf with the sword
-            Armed and hungry for violence, you strike with your steel sword
-            as the dire wolf can only dodge and weave against the advantage
-            of sharpened metal.
+            You press forward with your steel sword leading the way toward
+            flesh while the dire wolf backs away, unarmed but still
+            dangerous as any cornered thing.
 
-            Your strike with your steel sword grazes the dire wolf, drawing
-            minimal blood. The light wound barely seems to register.
+            You nick the dire wolf with your steel sword, the weapon barely
+            breaking skin. It notes the minor damage and dismisses it.
 
-            The dire wolf's counter-punch goes wide, rage making the strike
-            clumsy and predictable.
+            The dire wolf retaliates with violence but you're already
+            elsewhere when the blow arrives.
 
             > kill the bear
-            You're currently engaged with the dire wolf--focus!
+            You and the dire wolf are already exchanging blows!
 
-            Your strike with your steel sword grazes the dire wolf, drawing
-            minimal blood. The light wound barely seems to register.
+            You nick the dire wolf with your steel sword, the weapon barely
+            breaking skin. It notes the minor damage and dismisses it.
 
-            The dire wolf's retaliatory strike comes fast but you're
-            faster, sidestepping the violence with practiced grace.
+            The dire wolf strikes back hard but you duck away, the punch
+            finding only the ghost of where you were.
 
             > kill the bear with the bow
-            In case you hadn't noticed, the dire wolf is already trying to
-            kill you!
+            You're already locked in combat with the dire wolf!
 
-            The longbow wasn't designed for combat, but you wield it
-            against the dire wolf regardless!
+            You attack with the longbow! The dire wolf dodges, more puzzled
+            than threatened by your choice of weapon.
 
-            The dire wolf's lightning-fast counter strikes your wrist,
-            causing your steel sword to drop from shocked fingers.
+            The dire wolf retaliates with expert technique, disarming you
+            barehanded and sending your steel sword clattering away.
             """
         )
     }

@@ -264,7 +264,7 @@ struct AllCommandTests {
             output,
             """
             > drop all
-            Your hands are as empty as your pockets.
+            You carry nothing but your own thoughts.
             """
         )
     }

@@ -53,12 +53,12 @@ struct TurnBasedCombatTests {
             output,
             """
             > attack goblin with sword
-            Armed and hungry for violence, you strike with your sword as
-            the goblin can only dodge and weave against the advantage of
-            sharpened metal.
+            You press forward with your sword leading the way toward flesh
+            while the goblin backs away, unarmed but still dangerous as any
+            cornered thing.
 
-            You strike true with your sword! The goblin drops without a
-            sound, weaponless to the end.
+            Your armed advantage proves decisive--your sword ends it! The
+            goblin crumples, having fought barehanded and lost.
             """
         )
     }
@@ -92,13 +92,14 @@ struct TurnBasedCombatTests {
             output,
             """
             > attack knight
-            No weapons needed as you attack with pure violence while the
-            knight braces for the inevitable collision of flesh and bone.
+            You close the distance fast with fists ready as the knight
+            mirrors your stance, both of you committed to finding out who
+            breaks first.
 
-            The knight catches your fist, stopping your attack cold.
+            The knight bobs and weaves, avoiding your strike entirely.
 
-            The knight's counter-punch goes wide, rage making the strike
-            clumsy and predictable.
+            The knight retaliates with violence but you're already
+            elsewhere when the blow arrives.
             """
         )
     }
@@ -132,17 +133,16 @@ struct TurnBasedCombatTests {
             output,
             """
             > attack troll with lamp
-            Armed and hungry for violence, you strike with your lamp as the
-            fearsome beast can only dodge and weave against the advantage
-            of sharpened metal.
+            You press forward with your lamp leading the way toward flesh
+            while the fearsome beast backs away, unarmed but still
+            dangerous as any cornered thing.
 
-            The lamp wasn't designed for combat, but you wield it against
-            the beast regardless!
+            You attack with the lamp! The beast dodges, more puzzled than
+            threatened by your choice of weapon.
 
-            In the exchange, the grotesque monster lands clean. The world
-            lurches as your body absorbs punishment it won't soon forget.
-            The blow lands solidly, drawing blood. You feel the sting but
-            remain strong.
+            The counterstrike comes heavy. The grotesque monster's fist
+            finds ribs, and pain blooms like fire through your chest. First
+            blood to them. The wound is real but manageable.
             """
         )
     }
@@ -189,20 +189,20 @@ struct TurnBasedCombatTests {
             output,
             """
             > attack ogre
-            Armed and hungry for violence, you strike with your dagger as
-            the ogre can only dodge and weave against the advantage of
-            sharpened metal.
+            You press forward with your dagger leading the way toward flesh
+            while the ogre backs away, unarmed but still dangerous as any
+            cornered thing.
 
-            The ogre evades your dagger with a fluid sidestep, managing to
-            stay just out of reach.
+            The ogre ducks under your dagger! Its agility saves it from
+            certain harm.
 
-            The ogre's final retaliation breaks something essential inside
-            you and you feel yourself folding inward like paper in rain.
+            The ogre delivers death with bare hands, crushing you windpipe
+            with the indifference of stone.
 
             ****  You have died  ****
 
-            Death, that most permanent of inconveniences, has claimed you.
-            Yet in these tales, even death offers second chances.
+            Your story ends here, but death is merely an intermission in
+            the grand performance.
 
             You scored 0 out of a possible 10 points, in 0 moves.
 
@@ -262,24 +262,25 @@ struct TurnBasedCombatTests {
             output,
             """
             > attack bandit
-            No weapons needed as you attack with pure violence while the
-            bandit braces for the inevitable collision of flesh and bone.
+            You close the distance fast with fists ready as the bandit
+            mirrors your stance, both of you committed to finding out who
+            breaks first.
 
-            You catch the bandit with minimal force, the blow almost
-            gentle. The light wound barely seems to register.
+            You land a light punch that it barely feels. It notes the minor
+            damage and dismisses it.
 
-            The bandit's counter-punch goes wide, rage making the strike
-            clumsy and predictable.
+            The bandit retaliates with violence but you're already
+            elsewhere when the blow arrives.
 
             > talk to bandit about peace
-            The subject of the peace cannot bridge the chasm between you
-            and the bandit.
+            The bandit dismisses your words about the peace with
+            contemptuous silence.
 
-            Something shifts in the bandit's posture. The aggression
-            dissipates like morning mist, replaced by wary peace.
+            The bandit steps back with open hands. Whatever fury drove it
+            has burned itself out.
 
-            Something shifts in the bandit's posture. The aggression
-            dissipates like morning mist, replaced by wary peace.
+            The bandit steps back with open hands. Whatever fury drove it
+            has burned itself out.
             """
         )
     }
@@ -310,7 +311,7 @@ struct TurnBasedCombatTests {
             output,
             """
             > attack statue
-            The statue is immune to your hostility.
+            Attacking the statue would accomplish nothing productive.
             """
         )
     }
@@ -341,10 +342,11 @@ struct TurnBasedCombatTests {
             output,
             """
             > attack zombie
-            No weapons needed as you attack with pure violence while the
-            zombie braces for the inevitable collision of flesh and bone.
+            You close the distance fast with fists ready as the zombie
+            mirrors your stance, both of you committed to finding out who
+            breaks first.
 
-            The zombie is beyond such concerns now, being dead.
+            The zombie has already departed this mortal coil.
             """
         )
     }
@@ -394,15 +396,15 @@ struct TurnBasedCombatTests {
             output,
             """
             > attack rat with sword
-            Armed and hungry for violence, you strike with your sword as
-            the rat can only dodge and weave against the advantage of
-            sharpened metal.
+            You press forward with your sword leading the way toward flesh
+            while the rat backs away, unarmed but still dangerous as any
+            cornered thing.
 
-            Your sword gives the rat serious pause! Unarmed, it suddenly
-            questions this confrontation.
+            The rat pulls back from your sword! Doubt replaces its earlier
+            confidence.
 
-            The rat's counter-punch goes wide, rage making the strike
-            clumsy and predictable.
+            The rat retaliates with violence but you're already elsewhere
+            when the blow arrives.
             """
         )
     }

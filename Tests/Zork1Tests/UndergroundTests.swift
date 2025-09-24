@@ -31,7 +31,7 @@ struct UndergroundTests {
             Your sword is glowing very brightly.
 
             >
-            Until we meet again in another tale...
+            May your adventures elsewhere prove fruitful!
             """
         )
     }
@@ -75,7 +75,7 @@ struct UndergroundTests {
             The troll fends you off with a menacing gesture.
 
             > go north
-            You can't go that way.
+            The universe conspires against your movement that way.
 
             > head west
             The troll fends you off with a menacing gesture.
@@ -87,22 +87,21 @@ struct UndergroundTests {
             The troll laughs at your puny gesture.
 
             > hit the troll with the lantern
-            No more waiting as you attack with your light raised and the
-            troll responds with his bloody ax, two weapons now committed to
-            drawing blood.
+            You drive in hard with your light while the troll pivots with
+            his bloody ax ready, both of you past the point of retreat.
 
-            The brass lantern makes a poor weapon against the troll's his
-            ax! This might not end well.
+            You brandish the brass lantern aggressively! The troll almost
+            laughs, readying his ax for real combat.
 
-            The troll's retaliatory strike with his axe cuts toward you but
-            your body knows how to flow around death.
+            The troll swings his axe in response but you weave away,
+            leaving the weapon to bite empty air.
 
             > head west
             The troll fends you off with a menacing gesture.
 
-            In the exchange, his bloody ax slips through to mark you--a
-            stinging reminder that the troll still has teeth. The wound is
-            trivial against your battle fury.
+            The riposte comes fast, his bloody ax flicking out to trace a
+            shallow arc of red across your guard. Pain flickers and dies.
+            Your body has more important work.
 
             > go south
             --- Cellar ---
@@ -118,7 +117,7 @@ struct UndergroundTests {
             Your sword is no longer glowing.
 
             >
-            May your adventures elsewhere prove fruitful!
+            Farewell, brave soul!
             """
         )
     }

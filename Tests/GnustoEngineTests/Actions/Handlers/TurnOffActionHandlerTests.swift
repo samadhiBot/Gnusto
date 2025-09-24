@@ -129,7 +129,7 @@ struct TurnOffActionHandlerTests {
             output,
             """
             > turn off lamp
-            Any such thing lurks beyond your reach.
+            Any such thing remains frustratingly inaccessible.
             """
         )
     }
@@ -168,7 +168,7 @@ struct TurnOffActionHandlerTests {
             output,
             """
             > turn off lamp
-            Any such thing lurks beyond your reach.
+            Any such thing remains frustratingly inaccessible.
             """
         )
     }
@@ -199,7 +199,7 @@ struct TurnOffActionHandlerTests {
             output,
             """
             > turn off book
-            It lacks the necessary mechanism for deactivation.
+            That refuses to acknowledge your attempts to silence it.
             """
         )
     }
@@ -231,7 +231,7 @@ struct TurnOffActionHandlerTests {
             output,
             """
             > turn off radio
-            It's already off.
+            It rests in darkness already.
             """
         )
     }
@@ -322,10 +322,10 @@ struct TurnOffActionHandlerTests {
             > turn off lantern
             The electric lantern is now off.
 
-            Darkness rushes in like a living thing.
+            The world vanishes into absolute blackness.
 
-            This is the kind of dark that swallows shapes and edges,
-            leaving only breath and heartbeat to prove you exist.
+            The darkness here is absolute, consuming all light and hope of
+            sight.
             """
         )
     }

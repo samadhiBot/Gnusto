@@ -23,8 +23,7 @@ struct DanceActionHandlerTests {
             output,
             """
             > dance
-            You execute a series of movements that could generously be
-            called dancing.
+            You dance with abandon, dignity be damned.
             """
         )
     }
@@ -54,7 +53,8 @@ struct DanceActionHandlerTests {
             output,
             """
             > dance with statue
-            The stone statue proves a disappointingly rigid dance partner.
+            You attempt a pas de deux with the stone statue, but it takes
+            two to tango.
             """
         )
     }
@@ -85,8 +85,8 @@ struct DanceActionHandlerTests {
             output,
             """
             > dance with partner
-            You and the dance partner move together in unexpected harmony,
-            if only for a moment.
+            The dance partner accepts your hand, and together you share a
+            brief, graceful respite.
             """
         )
     }
@@ -121,11 +121,11 @@ struct DanceActionHandlerTests {
 
             A laboratory in which strange experiments are being conducted.
 
-            There is a fierce troll here.
+            You can see a fierce troll here.
 
             > dance with troll
-            For a fleeting instant, you and the fierce troll find rhythm in
-            each other's movements.
+            You and the fierce troll move together in unexpected harmony,
+            if only for a moment.
             """
         )
     }
@@ -157,8 +157,7 @@ struct DanceActionHandlerTests {
             output,
             """
             > dance
-            You execute a series of movements that could generously be
-            called dancing.
+            You dance with abandon, dignity be damned.
             """
         )
     }
@@ -188,7 +187,8 @@ struct DanceActionHandlerTests {
             output,
             """
             > dance with chair
-            The wooden chair proves a disappointingly rigid dance partner.
+            You attempt a pas de deux with the wooden chair, but it takes
+            two to tango.
             """
         )
     }

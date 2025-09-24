@@ -292,7 +292,7 @@ struct GameEngineDisambiguationTests {
             Which do you mean: the new book or the old book?
 
             > the new book
-            The new book comes to rest upon the table.
+            You successfully put the new book on the table.
             """
         )
 

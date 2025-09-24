@@ -23,7 +23,7 @@ struct CurseActionHandlerTests {
             output,
             """
             > curse
-            You unleash a cascade of inventive profanity.
+            Words best left unrecorded escape your lips.
             """
         )
     }
@@ -55,7 +55,7 @@ struct CurseActionHandlerTests {
             output,
             """
             > curse
-            You unleash a cascade of inventive profanity.
+            Words best left unrecorded escape your lips.
             """
         )
     }

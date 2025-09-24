@@ -34,8 +34,8 @@ struct KissActionHandlerTests {
             output,
             """
             > kiss princess
-            The moment for kissing the beautiful princess has neither
-            arrived nor been invited.
+            Your romantic impulses toward the beautiful princess must
+            remain unexpressed.
             """
         )
 
@@ -98,7 +98,7 @@ struct KissActionHandlerTests {
             output,
             """
             > kiss princess
-            You cannot reach any such thing from here.
+            Any such thing lurks beyond your reach.
             """
         )
     }
@@ -138,8 +138,8 @@ struct KissActionHandlerTests {
             output,
             """
             > kiss stranger
-            The darkness here is absolute, consuming all light and hope of
-            sight.
+            You stand in a depthless black where even your thoughts seem to
+            whisper, careful not to make a sound.
             """
         )
     }
@@ -161,7 +161,8 @@ struct KissActionHandlerTests {
             output,
             """
             > kiss me
-            Your flexibility, while admirable, has limits.
+            Self-affection requires a level of contortion beyond your
+            abilities.
             """
         )
     }
@@ -192,8 +193,8 @@ struct KissActionHandlerTests {
             output,
             """
             > kiss friend
-            The moment for kissing the old friend has neither arrived nor
-            been invited.
+            Your romantic impulses toward the old friend must remain
+            unexpressed.
             """
         )
 
@@ -227,12 +228,12 @@ struct KissActionHandlerTests {
             output,
             """
             > kiss troll
-            That's an unusual combat strategy, and the angry troll seems
-            unlikely to reciprocate.
+            Romance and warfare make poor bedfellows, especially with the
+            angry troll.
 
-            In a moment of raw violence, the enemy comes at you with
-            nothing but fury! You raise your fists, knowing this will hurt
-            regardless of who wins.
+            The enemy attacks with pure murderous intent! You brace
+            yourself for the impact, guard up, ready for the worst kind of
+            fight.
             """
         )
 
@@ -265,7 +266,7 @@ struct KissActionHandlerTests {
             output,
             """
             > kiss statue
-            Your lips and the marble statue are destined never to meet.
+            You and the marble statue lack the necessary chemistry.
             """
         )
 
@@ -303,8 +304,8 @@ struct KissActionHandlerTests {
             output,
             """
             > kiss cat
-            The moment for kissing the fluffy cat has neither arrived nor
-            been invited.
+            Your romantic impulses toward the fluffy cat must remain
+            unexpressed.
             """
         )
     }
@@ -345,11 +346,11 @@ struct KissActionHandlerTests {
             output,
             """
             > kiss knight
-            The moment for kissing the brave knight has neither arrived nor
-            been invited.
+            Your romantic impulses toward the brave knight must remain
+            unexpressed.
 
             > kiss rose
-            Your lips and the red rose are destined never to meet.
+            The red rose remains unmoved by your romantic overtures.
             """
         )
 
@@ -386,7 +387,7 @@ struct KissActionHandlerTests {
             output,
             """
             > kiss locket
-            Your lips and the golden locket are destined never to meet.
+            You and the golden locket lack the necessary chemistry.
             """
         )
 
@@ -417,29 +418,27 @@ struct KissActionHandlerTests {
             output,
             """
             > kiss merchant
-            The moment for kissing the traveling merchant has neither
-            arrived nor been invited.
+            Your romantic impulses toward the traveling merchant must
+            remain unexpressed.
 
-            In a moment of raw violence, the terrible dragon comes at you
-            with nothing but fury! You raise your fists, knowing this will
-            hurt regardless of who wins.
+            The terrible dragon attacks with pure murderous intent! You
+            brace yourself for the impact, guard up, ready for the worst
+            kind of fight.
 
             > kiss dragon
-            That's an unusual combat strategy, and the terrible dragon
-            seems unlikely to reciprocate.
+            Your lips approaching the terrible dragon would likely meet
+            steel rather than flesh.
 
-            In the exchange, the terrible dragon lands clean. The world
-            lurches as your body absorbs punishment it won't soon forget.
-            The blow lands solidly, drawing blood. You feel the sting but
-            remain strong.
+            The counterstrike comes heavy. The terrible dragon's fist finds
+            ribs, and pain blooms like fire through your chest. First blood
+            to them. The wound is real but manageable.
 
             > kiss fairy
             The moment for kissing the woodland fairy has neither arrived
             nor been invited.
 
-            The terrible dragon responds with such ferocity that you
-            falter, your muscles locking as your brain recalculates the
-            odds.
+            The terrible dragon's brutal retaliation stops you short, the
+            raw violence of it shaking your confidence to its core.
             """
         )
 
@@ -487,11 +486,11 @@ struct KissActionHandlerTests {
             output,
             """
             > kiss mirror
-            Your lips and the magic mirror are destined never to meet.
+            You and the magic mirror lack the necessary chemistry.
 
             > kiss painting
-            Your lips and the beautiful painting are destined never to
-            meet.
+            The beautiful painting remains unmoved by your romantic
+            overtures.
             """
         )
     }
