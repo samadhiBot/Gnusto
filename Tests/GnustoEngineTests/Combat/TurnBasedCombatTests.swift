@@ -57,11 +57,8 @@ struct TurnBasedCombatTests {
             the goblin can only dodge and weave against the advantage of
             sharpened metal.
 
-            Facing your sword, the goblin falters! It takes an uncertain
-            step backward.
-
-            The goblin's counter-strike punches through air, missing by the
-            width of good instincts.
+            Your sword finds its mark at last! The goblin staggers once,
+            then falls forever silent.
             """
         )
     }
@@ -389,11 +386,8 @@ struct TurnBasedCombatTests {
             the rat can only dodge and weave against the advantage of
             sharpened metal.
 
-            Facing your sword, the rat falters! It takes an uncertain step
-            backward.
-
-            The rat's counter-strike punches through air, missing by the
-            width of good instincts.
+            Your sword finds its mark at last! The rat staggers once, then
+            falls forever silent.
             """
         )
     }

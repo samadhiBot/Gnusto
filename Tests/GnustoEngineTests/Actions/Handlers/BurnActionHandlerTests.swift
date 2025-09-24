@@ -731,8 +731,9 @@ struct BurnActionHandlerTests {
             Your flaming torch inflicts a light wound on the creature, more
             sting than damage. He registers the wound with annoyance.
 
-            The monster counters by grabbing your flaming torch with bare
-            hands, and wrenches it away with surprising strength.
+            The monster's answer is swift and punishing--knuckles meet
+            flesh with the sound of meat hitting stone. The blow lands
+            solidly, drawing blood. You feel the sting but remain strong.
             """
         )
 

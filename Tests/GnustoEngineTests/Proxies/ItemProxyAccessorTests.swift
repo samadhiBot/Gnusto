@@ -453,16 +453,16 @@ struct ItemProxyAccessorTests {
 
         // Test alias generation (should combine adjective + synonym)
         let alias1 = await sword.alias()
-        expectNoDifference(alias1, "sharp blade")
+        expectNoDifference(alias1, "sabre")
 
         let alias2 = await sword.alias(.withDefiniteArticle)
-        expectNoDifference(alias2, "the sharp blade")
+        expectNoDifference(alias2, "the weapon")
 
         let alias3 = await sword.alias(.withIndefiniteArticle)
-        expectNoDifference(alias3, "a weapon")
+        expectNoDifference(alias3, "a sharp blade")
 
         let alias4 = await sword.alias(.withPossessiveAdjective)
-        expectNoDifference(alias4, "your sabre")
+        expectNoDifference(alias4, "your weapon")
     }
 
     @Test("ItemProxy alias without synonyms")

@@ -46,39 +46,46 @@ struct ThiefTests {
         expectNoDifference(
             output,
             """
-            > go east
-            --- Round Room ---
+            > attack the troll
+            With nothing but rage you rush the fearsome beast as his
+            gruesome ax gleams cold and ready for the blood you're
+            offering.
 
-            This is a circular stone room with passages in all directions.
-            Several of them have unfortunate endings.
+            The angry beast's defenses crumble! He stands exposed, unable
+            to protect himself.
 
-            > inventory
-            You are carrying:
-            - A sceptre
-            - A sword
+            The angry monster strikes back with his axe but you've already
+            moved, a ghost that steel cannot touch.
 
-            > examine the sceptre
-            An ornamented sceptre, tapering to a sharp point, is here.
+            > attack the troll
+            Your blow bypasses his gruesome axe and lands true, the force
+            driving breath from the beast's lungs. The wound is real but
+            manageable.
 
-            Someone carrying a large bag is casually leaning against one of
-            the walls here. He does not speak, but it is clear from his
-            aspect that the bag will be taken only over his dead body.
+            The grotesque monster whips his axe across in answer--steel
+            whispers against skin, leaving a thin signature of pain. The
+            cut registers dimly. Blood, but not enough to matter.
 
-            > look at the man
-            The thief is a slippery character with beady eyes that flit
-            back and forth. He carries, along with an unmistakable
-            arrogance, a large bag over his shoulder and a vicious
-            stiletto, whose blade is aimed menacingly in your direction.
-            I'd watch out if I were you.
+            The troll says something, probably uncomplimentary, in his
+            guttural tongue.
 
-            > look at me
-            You examine yourself with satisfaction. Not a scratch. The
-            universe has failed to leave its mark.
+            > attack the troll
+            You slip inside the reach of his bloody axe and drive your
+            knuckles hard into the angry monster's body. You see the ripple
+            of pain, but his body absorbs it. He remains dangerous.
 
-            > inventory
-            You are carrying:
-            - A sceptre
-            - A sword
+            The beast's counter with his axe misses completely, the weapon
+            whistling through empty space.
+
+            > attack the troll
+            You land the decisive hit! The fearsome beast wavers for a
+            heartbeat, then collapses into permanent silence.
+
+            > attack the troll
+            You throw yourself at the beast despite his nicked axe because
+            sometimes fury must answer steel even when flesh cannot win.
+
+            You're too late--the fierce troll is already deceased.
             """
         )
 
@@ -112,19 +119,11 @@ struct ThiefTests {
             This is a circular stone room with passages in all directions.
             Several of them have unfortunate endings.
 
-            > wait
-            The universe's clock ticks inexorably forward.
+            > look at the floor
+            The floor stubbornly remains ordinary despite your thorough
+            examination.
 
-            > attack the thief
-            You cannot reach any such thing from here.
-
-            > slay the thief
-            Any such thing remains frustratingly inaccessible.
-
-            > stab the thief
-            Any such thing remains frustratingly inaccessible.
-
-            > kill the thief
+            > examine thief
             You cannot reach any such thing from here.
 
             Someone carrying a large bag is casually leaning against one of
@@ -286,8 +285,19 @@ struct ThiefTests {
             The suspicious man weaves past your glamdring! Pure reflexes
             keep him safe from your strike.
 
-            The thief neatly flips your glamdring out of your hands, and it
-            drops to the floor.
+            The thief, a pragmatist, dispatches you as a threat to his
+            livelihood.
+
+            ****  You have died  ****
+
+            The curtain falls on this particular act of your existence. But
+            all good stories deserve another telling...
+
+            You scored 0 out of a possible 350 points, in 6 moves.
+
+            Would you like to RESTART, RESTORE a saved game, or QUIT?
+
+            >
             """
         )
     }

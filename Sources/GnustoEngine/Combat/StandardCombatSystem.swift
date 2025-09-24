@@ -234,7 +234,7 @@ public struct StandardCombatSystem: CombatSystem {
             default: "Hit!"
             }
 
-        logger.debug(
+        logger.info(
             """
             \n🎲 \(attacker.description.capitalizedFirst.possessive) attack roll:
             ------------------------------------
@@ -319,12 +319,13 @@ public struct StandardCombatSystem: CombatSystem {
             }
         }
 
-        // Check for special combat events before damage calculation
+        // Store special event for potential use alongside damage
+        var specialEvent: CombatEvent?
         if triggerSpecialEvent {
             let eventType = await engine.randomInt(in: 1...6)
 
             switch eventType {
-            case 1:  // Disarm
+            case 1:  // Disarm - dramatic, no damage
                 if case .enemy(let enemy) = defender, let playerWeapon, let enemyWeapon {
                     return .enemyDisarmed(
                         enemy: enemy,
@@ -343,37 +344,37 @@ public struct StandardCombatSystem: CombatSystem {
                         wasFumble: false
                     )
                 }
-            case 2:  // Stagger
+            case 2:  // Stagger - status effect, allow damage
                 if case .enemy(let enemy) = defender {
-                    return .enemyStaggers(
+                    specialEvent = .enemyStaggers(
                         enemy: enemy, playerWeapon: playerWeapon, enemyWeapon: nil)
                 }
                 if case .enemy(let enemy) = attacker {
-                    return .playerStaggers(enemy: enemy, enemyWeapon: enemyWeapon)
+                    specialEvent = .playerStaggers(enemy: enemy, enemyWeapon: enemyWeapon)
                 }
-            case 3:  // Hesitate
+            case 3:  // Hesitate - status effect, allow damage
                 if case .enemy(let enemy) = defender {
-                    return .enemyHesitates(
+                    specialEvent = .enemyHesitates(
                         enemy: enemy,
                         playerWeapon: playerWeapon,
                         enemyWeapon: nil
                     )
                 }
                 if case .enemy(let enemy) = attacker {
-                    return .playerHesitates(enemy: enemy, enemyWeapon: enemyWeapon)
+                    specialEvent = .playerHesitates(enemy: enemy, enemyWeapon: enemyWeapon)
                 }
-            case 4:  // Vulnerable
+            case 4:  // Vulnerable - status effect, allow damage
                 if case .enemy(let enemy) = defender {
-                    return .enemyVulnerable(
+                    specialEvent = .enemyVulnerable(
                         enemy: enemy,
                         playerWeapon: playerWeapon,
                         enemyWeapon: nil
                     )
                 }
                 if case .enemy(let enemy) = attacker {
-                    return .playerVulnerable(enemy: enemy, enemyWeapon: enemyWeapon)
+                    specialEvent = .playerVulnerable(enemy: enemy, enemyWeapon: enemyWeapon)
                 }
-            case 5:  // Unconscious (rare, only on very damaged opponents)
+            case 5:  // Unconscious - dramatic, no damage
                 let defenderHealth = await defender.health
                 let defenderMaxHealth = await defender.characterSheet.maxHealth
                 let defenderHealthPercent = (defenderHealth * 100) / defenderMaxHealth
@@ -389,6 +390,14 @@ public struct StandardCombatSystem: CombatSystem {
             default:
                 break  // Fall through to damage calculation
             }
+        }
+
+        // If we have a special event that allows damage, we'll combine them
+        // Most special events now happen IN ADDITION to damage, not instead of it
+
+        // Return special event first if it exists and precludes damage
+        if let specialEvent {
+            return specialEvent
         }
 
         // Calculate base damage with intensity and fatigue modifiers
@@ -464,7 +473,7 @@ public struct StandardCombatSystem: CombatSystem {
             currentHealth: await defender.health
         )
 
-        logger.debug(
+        logger.info(
             """
             \n🎲 \(attacker.description.capitalizedFirst.possessive) damage roll:
             ------------------------------------
@@ -1453,6 +1462,9 @@ public struct StandardCombatSystem: CombatSystem {
         // Slight benefit when properly armed (without inspecting weapon style)
         if weapon != nil { modifier += 1 }
 
+        // Combat condition effects on offense
+        modifier += sheet.combatCondition.attackModifier
+
         // Intensity can sharpen focus a bit
         modifier += Int(intensity * 2.0)  // 0..2
 
@@ -1569,21 +1581,21 @@ public struct StandardCombatSystem: CombatSystem {
     ) async -> Bool {
         if attackRoll == 20 { return true }
 
-        // Base threshold starts high, lowered by favorable context
-        var threshold: Double = 20.0
-        threshold -= escalation * 8.0  // 0..8 easier with escalation
-        threshold -= intensity * 4.0  // 0..4 easier with intensity
-        threshold -= Double(max(0, marginOfHit)) * 0.8  // strong hits more likely
+        // Base threshold starts very high to keep special events RARE
+        var threshold: Double = 25.0
+        threshold -= escalation * 3.0  // 0..3 easier with escalation (reduced from 8.0)
+        threshold -= intensity * 1.5  // 0..1.5 easier with intensity (reduced from 4.0)
+        threshold -= Double(max(0, marginOfHit)) * 0.3  // strong hits slightly more likely (reduced from 0.8)
 
-        // Luck influences
-        if let attacker { threshold -= Double(attacker.luckModifier) * 0.6 }
-        if let defender { threshold += Double(defender.luckModifier) * 0.4 }
+        // Luck influences (much reduced)
+        if let attacker { threshold -= Double(attacker.luckModifier) * 0.2 }
+        if let defender { threshold += Double(defender.luckModifier) * 0.1 }
 
         // Very low defender health makes dramatic outcomes more likely
-        if let defender, defender.healthPercent <= 25 { threshold -= 2.0 }
+        if let defender, defender.healthPercent <= 15 { threshold -= 1.5 }  // Only at very low health
 
-        // Clamp threshold to sane bounds
-        threshold = max(8.0, min(20.0, threshold))
+        // Clamp threshold to maintain rarity - most special events require 18+ on d20
+        threshold = max(15.0, min(25.0, threshold))
 
         let roll = await engine.randomInt(in: 1...20)
         return Double(roll) >= threshold

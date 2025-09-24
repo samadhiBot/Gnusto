@@ -387,8 +387,8 @@ struct StandardCombatSystemUnitTests {
         let expected = await ActionResult(
             """
             Your blow with your iron sword catches the fearsome beast cleanly,
-            tearing flesh and drawing crimson. The blow lands solidly, drawing blood. He
-            feels the sting but remains strong.
+            tearing flesh and drawing crimson. He absorbs the hit, flesh suffering
+            but endurance holding.
             """,
             troll.setCharacterAttributes(health: 43)
         )
@@ -438,8 +438,8 @@ struct StandardCombatSystemUnitTests {
 
         let expected = try await ActionResult(
             message: """
-                Then the monster's strike connects with your jaw at exactly
-                the right angle to shut down your brain without breaking it.
+                The monster retaliates with precision, bare knuckles finding the spot
+                where consciousness lives and evicting it.
 
                 * * *
 
@@ -457,14 +457,13 @@ struct StandardCombatSystemUnitTests {
                     enemyID: .troll,
                     to: .startRoom,
                     message: """
-                        Disaster. The terrible monster reappears just as \
-                        you're examining your surroundings--clearly
-                        the wrong priority. He takes in your recovered
-                        state with what reads as dark amusement. \
-                        You should have run when you could.
+                        The worst possible timing: the creature comes back to find you still present,
+                        apparently fascinated by your surroundings rather than your survival.
+                        He doesn't hesitate--violence resumes immediately.
+                        You had your chance to leave.
                         """,
-                    turns: 3
-                ),
+                    turns: 2
+                )
             ]
         )
 
@@ -627,42 +626,191 @@ struct StandardCombatSystemUnitTests {
 
     // MARK: - shouldTriggerSpecialEvent Tests
 
-    @Test("shouldTriggerSpecialEvent with high escalation")
-    func testShouldTriggerSpecialEventHighEscalation() async throws {
+    @Test("shouldTriggerSpecialEvent with natural 20 always triggers")
+    func testShouldTriggerSpecialEventNatural20() async throws {
         let (engine, _) = await createTestGame()
         let combatSystem = StandardCombatSystem(versus: "troll")
 
         let shouldTrigger = await combatSystem.shouldTriggerSpecialEvent(
-            attackRoll: 18,
-            marginOfHit: 10,
-            escalation: 3.0,
-            intensity: 2.0,
-            attacker: CharacterSheet(strength: 18),
-            defender: CharacterSheet(constitution: 12),
+            attackRoll: 20,
+            marginOfHit: 1,
+            escalation: 0.1,
+            intensity: 0.1,
+            attacker: CharacterSheet(strength: 10),
+            defender: CharacterSheet(constitution: 10),
             engine: engine
         )
 
-        // High escalation and good roll should potentially trigger special event
-        #expect(shouldTrigger == true || shouldTrigger == false)  // Valid boolean result
+        #expect(shouldTrigger == true)
     }
 
-    @Test("shouldTriggerSpecialEvent with low values")
-    func testShouldTriggerSpecialEventLowValues() async throws {
+    @Test("shouldTriggerSpecialEvent is rare with low values")
+    func testShouldTriggerSpecialEventRarity() async throws {
         let (engine, _) = await createTestGame()
         let combatSystem = StandardCombatSystem(versus: "troll")
 
-        let shouldTrigger = await combatSystem.shouldTriggerSpecialEvent(
-            attackRoll: 5,
-            marginOfHit: 1,
-            escalation: 0.5,
-            intensity: 0.5,
-            attacker: CharacterSheet(strength: 10),
-            defender: CharacterSheet(constitution: 15),
-            engine: engine
+        // Test multiple times to ensure special events are truly rare
+        var triggerCount = 0
+        let testIterations = 50
+
+        for _ in 0..<testIterations {
+            let shouldTrigger = await combatSystem.shouldTriggerSpecialEvent(
+                attackRoll: 15,  // Good roll but not crit
+                marginOfHit: 3,
+                escalation: 0.5,
+                intensity: 0.5,
+                attacker: CharacterSheet(strength: 12),
+                defender: CharacterSheet(constitution: 12),
+                engine: engine
+            )
+            if shouldTrigger {
+                triggerCount += 1
+            }
+        }
+
+        // Special events should be RARE - expect less than 30% trigger rate
+        let triggerRate = Double(triggerCount) / Double(testIterations)
+        #expect(triggerRate < 0.3, "Special events should be rare, got \(triggerRate) trigger rate")
+    }
+
+    @Test("shouldTriggerSpecialEvent increases with escalation")
+    func testShouldTriggerSpecialEventEscalation() async throws {
+        let (engine, _) = await createTestGame()
+        let combatSystem = StandardCombatSystem(versus: "troll")
+
+        var lowEscalationTriggers = 0
+        var highEscalationTriggers = 0
+        let testIterations = 30
+
+        for _ in 0..<testIterations {
+            // Low escalation test
+            let lowTrigger = await combatSystem.shouldTriggerSpecialEvent(
+                attackRoll: 16,
+                marginOfHit: 5,
+                escalation: 0.2,
+                intensity: 0.8,
+                attacker: CharacterSheet(strength: 14),
+                defender: CharacterSheet(constitution: 12),
+                engine: engine
+            )
+            if lowTrigger { lowEscalationTriggers += 1 }
+
+            // High escalation test
+            let highTrigger = await combatSystem.shouldTriggerSpecialEvent(
+                attackRoll: 16,
+                marginOfHit: 5,
+                escalation: 2.5,
+                intensity: 0.8,
+                attacker: CharacterSheet(strength: 14),
+                defender: CharacterSheet(constitution: 12),
+                engine: engine
+            )
+            if highTrigger { highEscalationTriggers += 1 }
+        }
+
+        // High escalation should trigger more often than low escalation
+        #expect(
+            highEscalationTriggers >= lowEscalationTriggers,
+            "High escalation should trigger more special events than low escalation")
+    }
+
+    @Test("Combat conditions affect subsequent attacks")
+    func testCombatConditionsAffectAttacks() async throws {
+        // Given: A combat scenario with staggered enemy
+        let staggeredTroll = Item(
+            id: "staggeredTroll",
+            .name("staggered troll"),
+            .characterSheet(
+                CharacterSheet(
+                    strength: 16,
+                    constitution: 14,
+                    combatCondition: .offBalance  // -2 AC, -1 attack
+                )
+            ),
+            .in("combatRoom")
         )
 
-        // Low values should be less likely to trigger special events
-        #expect(shouldTrigger == true || shouldTrigger == false)  // Valid boolean result
+        let vulnerableTroll = Item(
+            id: "vulnerableTroll",
+            .name("vulnerable troll"),
+            .characterSheet(
+                CharacterSheet(
+                    strength: 16,
+                    constitution: 14,
+                    combatCondition: .vulnerable  // -3 AC, no attack penalty
+                )
+            ),
+            .in("combatRoom")
+        )
+
+        let normalTroll = Item(
+            id: "normalTroll",
+            .name("normal troll"),
+            .characterSheet(
+                CharacterSheet(
+                    strength: 16,
+                    constitution: 14,
+                    combatCondition: .normal  // No penalties
+                )
+            ),
+            .in("combatRoom")
+        )
+
+        let player = Player(
+            in: "combatRoom",
+            characterSheet: CharacterSheet(strength: 14, dexterity: 12)
+        )
+
+        let testRoom = Location(
+            id: "combatRoom",
+            .name("Combat Room"),
+            .inherentlyLit
+        )
+
+        let game = MinimalGame(
+            player: player,
+            locations: testRoom,
+            items: staggeredTroll, vulnerableTroll, normalTroll
+        )
+
+        let (engine, _) = await GameEngine.test(blueprint: game)
+        let combatSystem = StandardCombatSystem(versus: "staggeredTroll")
+
+        // When: Computing offense modifiers for each enemy
+        let staggeredProxy = await engine.item("staggeredTroll")
+        let vulnerableProxy = await engine.item("vulnerableTroll")
+        let normalProxy = await engine.item("normalTroll")
+
+        let staggeredOffense = await combatSystem.computeOffenseModifier(
+            for: .enemy(staggeredProxy),
+            weapon: nil,
+            intensity: 0.5
+        )
+
+        let vulnerableOffense = await combatSystem.computeOffenseModifier(
+            for: .enemy(vulnerableProxy),
+            weapon: nil,
+            intensity: 0.5
+        )
+
+        let normalOffense = await combatSystem.computeOffenseModifier(
+            for: .enemy(normalProxy),
+            weapon: nil,
+            intensity: 0.5
+        )
+
+        // Then: Combat conditions should affect combat effectiveness
+        #expect(staggeredOffense < normalOffense, "Staggered enemy should have reduced offense")
+        #expect(vulnerableOffense == normalOffense, "Vulnerable doesn't affect offense")
+
+        // Defense adjustments don't include combat condition modifiers (they're in effectiveArmorClass)
+        // but we can verify the effectiveArmorClass includes the penalties
+        let staggeredAC = await staggeredProxy.characterSheet.effectiveArmorClass
+        let vulnerableAC = await vulnerableProxy.characterSheet.effectiveArmorClass
+        let normalAC = await normalProxy.characterSheet.effectiveArmorClass
+
+        #expect(staggeredAC == normalAC - 2, "Staggered enemy should have -2 AC")
+        #expect(vulnerableAC == normalAC - 3, "Vulnerable enemy should have -3 AC")
     }
 
     // MARK: - defaultCombatDescription Tests

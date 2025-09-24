@@ -59,3 +59,11 @@ public struct AnyCodableSendable: Codable, Sendable, Hashable {
         lhs.data == rhs.data && lhs.typeName == rhs.typeName
     }
 }
+
+// MARK: - Conformances
+
+extension AnyCodableSendable: CustomStringConvertible {
+    public var description: String {
+        String(data: data, encoding: .utf8) ?? "<unreadable data>"
+    }
+}

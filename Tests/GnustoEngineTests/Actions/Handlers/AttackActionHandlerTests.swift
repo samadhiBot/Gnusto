@@ -49,29 +49,22 @@ struct AttackActionHandlerTests {
             guttural tongue.
 
             > attack the troll
-            Uncertainty grips the monster! Your savage determination makes
-            him question this combat.
+            You slip inside the reach of his bloody axe and drive your
+            knuckles hard into the angry monster's body. You see the ripple
+            of pain, but his body absorbs it. He remains dangerous.
 
-            The beast strikes back with his ax but misjudges badly, steel
-            meeting nothing but its own momentum.
-
-            > attack the troll
-            Your relentless assault gives the fearsome beast pause! He
-            steps back, reconsidering the wisdom of this fight.
-
-            The monster counters with his ax with such violence that you
-            flinch, in a moment of weakness he immediately exploits.
+            The beast's counter with his axe misses completely, the weapon
+            whistling through empty space.
 
             > attack the troll
-            You catch the monster even as he wields his rusty ax, your fist
-            connecting with solid force. He grunts from the impact but
-            maintains stance.
+            You land the decisive hit! The fearsome beast wavers for a
+            heartbeat, then collapses into permanent silence.
 
-            The counter comes swift. The fearsome monster drives his ax
-            past your defenses, opening meat that parts like overripe
-            fruit. You stumble, watching your blood spill out. The wound
-            steals your momentum. You stagger, trying to comprehend the
-            damage.
+            > attack the troll
+            You throw yourself at the beast despite his nicked axe because
+            sometimes fury must answer steel even when flesh cannot win.
+
+            You're too late--the fierce troll is already deceased.
             """
         )
     }
@@ -134,13 +127,13 @@ struct AttackActionHandlerTests {
             > attack dragon with sword
             You aren't holding the steel sword.
 
-            Your steel sword finds the terrible creature exposed, carving a
-            solid wound that draws a grunt of pain. The wound is real but
+            Your steel sword finds the fierce wyrm exposed, carving a solid
+            wound that draws a grunt of pain. The wound is real but
             manageable.
 
-            The counterblow drives deep. The wyrm buries knuckles in your
-            ribs, and breath becomes agony. First blood draws a gasp. You
-            touch the wound, fingers coming away red.
+            Then the wyrm's strike hammers home with the sound of a mallet
+            on meat. Something structural fails inside you. First blood
+            draws a gasp. You touch the wound, fingers coming away red.
             """
         )
     }
@@ -178,32 +171,24 @@ struct AttackActionHandlerTests {
             Your punch connects lightly, leaving perhaps a small bruise. It
             registers the wound with annoyance.
 
-            The angry warrior counters with a force that shatters your
-            guard, leaving you exposed to whatever violence comes next.
+            Then the angry warrior's strike hammers home with the sound of
+            a mallet on meat. Something structural fails inside you. First
+            blood draws a gasp. You touch the wound, fingers coming away
+            red.
 
             > fight the orc
-            You land a punishing blow to the warrior, and it grunts from
-            the force. It absorbs the hit, flesh suffering but endurance
-            holding.
+            Your strike sends the warrior stumbling sideways! It sways
+            precariously, barely maintaining its footing.
 
-            The counterstrike comes heavy. The warrior's fist finds ribs,
-            and pain blooms like fire through your chest. First blood to
-            them. The wound is real but manageable.
-
-            > fight the orc
-            Your strike grazes the mighty warrior, more push than punch. It
-            feels it connect, adding to the bruises but not breaking
-            rhythm.
-
-            The warrior counters with lethal force, bare fists finding the
-            places where life connects to body and severing each thread.
+            The warrior finishes you with nothing but flesh and bone,
+            proving that the oldest weapons still kill just as dead.
 
             ****  You have died  ****
 
-            Death, that most permanent of inconveniences, has claimed you.
-            Yet in these tales, even death offers second chances.
+            The curtain falls on this particular act of your existence. But
+            all good stories deserve another telling...
 
-            You scored 0 out of a possible 10 points, in 2 moves.
+            You scored 0 out of a possible 10 points, in 1 moves.
 
             Would you like to RESTART, RESTORE a saved game, or QUIT?
 
@@ -611,18 +596,18 @@ struct AttackActionHandlerTests {
             barely breaking skin. It notes the minor damage and dismisses
             it.
 
-            In the exchange, the evil monster lands clean. The world
-            lurches as your body absorbs punishment it won't soon forget.
-            You absorb the hit, feeling flesh tear but knowing you can
-            endure.
+            In the tangle, the evil monster drives an elbow home--sudden
+            pressure that blooms into dull pain. The cut registers dimly.
+            Blood, but not enough to matter.
 
             > attack the monster with my dagger
             Your sharp dagger swings wide, and the evil monster avoids your
             poorly aimed strike with ease.
 
-            The evil monster's counter connects true, and suddenly the act
-            of standing requires all your concentration while the world
-            spins.
+            The evil monster pivots and strikes true--impact ripples
+            through muscle and bone, stealing balance and breath together.
+            You absorb the hit, feeling flesh tear but knowing you can
+            endure.
             """
         )
     }
@@ -735,18 +720,18 @@ struct AttackActionHandlerTests {
             barely breaking skin. It notes the minor damage and dismisses
             it.
 
-            In the exchange, the evil monster lands clean. The world
-            lurches as your body absorbs punishment it won't soon forget.
-            You absorb the hit, feeling flesh tear but knowing you can
-            endure.
+            In the tangle, the evil monster drives an elbow home--sudden
+            pressure that blooms into dull pain. The cut registers dimly.
+            Blood, but not enough to matter.
 
             > stab the monster
             Your sharp dagger swings wide, and the evil monster avoids your
             poorly aimed strike with ease.
 
-            The evil monster's counter connects true, and suddenly the act
-            of standing requires all your concentration while the world
-            spins.
+            The evil monster pivots and strikes true--impact ripples
+            through muscle and bone, stealing balance and breath together.
+            You absorb the hit, feeling flesh tear but knowing you can
+            endure.
             """
         )
     }

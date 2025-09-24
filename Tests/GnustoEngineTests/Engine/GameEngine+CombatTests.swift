@@ -260,8 +260,8 @@ struct GameEngineCombatTests {
             enemyID: "skeleton",
             roundCount: 1,
             playerWeaponID: nil,
-            combatIntensity: 0.33999999999999997,
-            playerFatigue: 0.18,
+            combatIntensity: 0.23,
+            playerFatigue: 0.14,
             enemyFatigue: 0.18
         )
         expectNoDifference(combatState, expectedSkeleton)

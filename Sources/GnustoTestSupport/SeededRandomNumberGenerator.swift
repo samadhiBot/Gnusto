@@ -1,6 +1,7 @@
 import Foundation
 
-/// A thread-safe seeded random number generator that implements a linear congruential generator (LCG) algorithm.
+/// A thread-safe seeded random number generator that implements a linear congruential generator
+/// (LCG) algorithm.
 ///
 /// This generator produces deterministic pseudo-random sequences based on an initial seed value,
 /// making it useful for reproducible random number generation in testing and simulations.
@@ -69,7 +70,7 @@ public struct SeededRandomNumberGenerator: RandomNumberGenerator, Sendable {
     ///
     /// - Returns: A pseudo-random UInt64 value
     public func next() -> UInt64 {
-        return stateContainer.withLock { state in
+        stateContainer.withLock { state in
             state = 6_364_136_223_846_793_005 &* state &+ 1
             return state
         }
