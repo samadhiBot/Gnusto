@@ -22,6 +22,53 @@ struct GameEngineRandomTests {
         }
     }
 
+    @Test("randomDouble can produce deterministic values for testing")
+    func testRandomDoubleDeterministic() async throws {
+        let game = MinimalGame()
+        let (engine, _) = await GameEngine.test(blueprint: game)
+
+        var values = [Double]()
+
+        for _ in 0..<25 {
+            let value = await engine.randomDouble()
+            values.append(value)
+        }
+
+        expectNoDifference(
+            values, [
+                0.8350297165326732,
+                0.6651743565360789,
+                0.33749983916303106,
+                0.04045289403475072,
+                0.3062399736298653,
+                0.3781552213687195,
+                0.2728560420208541,
+                0.5956885600965335,
+                0.14110790513557925,
+                0.10104497572235316,
+                0.1355074094972546,
+                0.8610598104646948,
+                0.9616321872854634,
+                0.5213575019048059,
+                0.8807643188239724,
+                0.06178615631326678,
+                0.11200620628122726,
+                0.0038094609012869762,
+                0.5939165213727684,
+                0.6374286009446507,
+                0.6472069572862997,
+                0.6222853597225991,
+                0.8783525360038851,
+                0.30749223707537776,
+                0.7789377230019316,
+            ]
+        )
+        expectNoDifference(
+            values.reduce(0, +) / 25,
+            0.4670716988447969
+        )
+    }
+
     // MARK: - Random Percentage Tests
 
     @Test("randomPercentage returns value in correct range")
