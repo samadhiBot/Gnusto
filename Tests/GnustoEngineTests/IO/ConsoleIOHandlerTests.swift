@@ -19,7 +19,7 @@ struct ConsoleIOHandlerTests {
 
     @Test("ConsoleIOHandler initialization works correctly")
     func testInitialization() {
-        let _ = ConsoleIOHandler()
+        _ = ConsoleIOHandler()
 
         // Should initialize without issues
         #expect(Bool(true))  // Handler initialized successfully
@@ -45,7 +45,7 @@ struct ConsoleIOHandlerTests {
 
         // Test with a very long room name that should be truncated
         let longRoomName = "This is an extremely long room name that should definitely be truncated"
-        handler.showStatusLine(roomName: longRoomName, score: 999, turns: 1000)
+        handler.showStatusLine(roomName: longRoomName, score: 999, turns: 1_000)
 
         // If we get here without crashing, the truncation logic worked
         #expect(Bool(true))
@@ -75,7 +75,7 @@ struct ConsoleIOHandlerTests {
     func testStatusLineFormattingLargeValues() {
         let handler = ConsoleIOHandler()
 
-        handler.showStatusLine(roomName: "Test Room", score: 999999, turns: 999999)
+        handler.showStatusLine(roomName: "Test Room", score: 999_999, turns: 999_999)
 
         // Should handle large values gracefully
         #expect(Bool(true))

@@ -51,8 +51,8 @@ struct ProxySystemIntegrationTests {
         )
 
         // And: ItemProxy should reflect all changes
-        let lampProxy = try await engine.item("lamp")
-        #expect(try await lampProxy.parent == .player)
+        let lampProxy = await engine.item("lamp")
+        #expect(await lampProxy.parent == .player)
         #expect(await lampProxy.hasFlag(ItemPropertyID.isOn) == true)
         #expect(await lampProxy.hasFlag(ItemPropertyID.isTouched) == true)
     }
@@ -103,20 +103,20 @@ struct ProxySystemIntegrationTests {
         )
 
         // Then: LocationProxy should correctly calculate lighting
-        let darkRoomProxy = try await engine.location("darkRoom")
-        let brightRoomProxy = try await engine.location("brightRoom")
+        let darkRoomProxy = await engine.location("darkRoom")
+        let brightRoomProxy = await engine.location("brightRoom")
 
         // Dark room should be lit when player has torch
         _ = await engine.player.move(to: "darkRoom")
         try await engine.execute("turn on torch")
-        #expect(try await darkRoomProxy.isLit == true)
+        #expect(await darkRoomProxy.isLit == true)
 
         // Bright room should always be lit
-        #expect(try await brightRoomProxy.isLit == true)
+        #expect(await brightRoomProxy.isLit == true)
 
         // Dark room should be dark when player has no light
         try await engine.execute("turn off torch")
-        #expect(try await darkRoomProxy.isLit == false)
+        #expect(await darkRoomProxy.isLit == false)
     }
 
     @Test("PlayerProxy integrates with movement and inventory changes")
@@ -165,10 +165,10 @@ struct ProxySystemIntegrationTests {
 
         // Then: PlayerProxy should reflect all changes
         let playerProxy = await engine.player
-        let playerLocation = try await playerProxy.location
+        let playerLocation = await playerProxy.location
         #expect(playerLocation.id == LocationID("room2"))
 
-        let playerItems = try await playerProxy.inventory
+        let playerItems = await playerProxy.inventory
         #expect(playerItems.count == 1)
         #expect(playerItems.first?.id == ItemID("coin"))
 
@@ -190,25 +190,6 @@ struct ProxySystemIntegrationTests {
             - A gold coin
             """
         )
-    }
-
-    // MARK: - Proxy Error Handling Integration
-
-    @Test("Proxy system handles invalid references gracefully")
-    func testProxyErrorHandlingIntegration() async throws {
-        // Given
-        let game = MinimalGame()
-
-        let (engine, _) = await GameEngine.test(blueprint: game)
-
-        // When/Then: Attempting to access non-existent entities should throw
-        await #expect(throws: Error.self) {
-            try await engine.item("nonexistent")
-        }
-
-        await #expect(throws: Error.self) {
-            try await engine.location("nonexistent")
-        }
     }
 
     // MARK: - Complex Multi-Proxy Scenarios
@@ -277,26 +258,26 @@ struct ProxySystemIntegrationTests {
         )
 
         // Then: All proxies should reflect the correct state
-        let boxProxy = try await engine.item("mysteriousBox")
-        let orbProxy = try await engine.item("crystalOrb")
-        let vaultProxy = try await engine.location("darkVault")
+        let boxProxy = await engine.item("mysteriousBox")
+        let orbProxy = await engine.item("crystalOrb")
+        let vaultProxy = await engine.location("darkVault")
         let playerProxy = await engine.player
 
         // Box should be in player's inventory and closed
-        #expect(try await boxProxy.parent == .player)
+        #expect(await boxProxy.parent == .player)
         #expect(await boxProxy.hasFlag(ItemPropertyID.isOpen) == false)
 
         // Orb should be inside the box
-        let orbParent = try await orbProxy.parent
+        let orbParent = await orbProxy.parent
         if case .item(let parentItem) = orbParent {
             #expect(parentItem.id == ItemID("mysteriousBox"))
         }
 
         // Vault should be dark (orb is contained)
-        #expect(try await vaultProxy.isLit == false)
+        #expect(await vaultProxy.isLit == false)
 
         // Player should be in the vault
-        let playerLocation = try await playerProxy.location
+        let playerLocation = await playerProxy.location
         #expect(playerLocation.id == LocationID("darkVault"))
 
         let output = await mockIO.flush()
@@ -360,13 +341,13 @@ struct ProxySystemIntegrationTests {
 
         // Then: All items should be properly moved to player
         for i in 1...5 {
-            let itemProxy = try await engine.item(ItemID("item\(i)"))
-            #expect(try await itemProxy.parent == .player)
+            let itemProxy = await engine.item(ItemID("item\(i)"))
+            #expect(await itemProxy.parent == .player)
             #expect(await itemProxy.hasFlag(ItemPropertyID.isTouched) == true)
         }
 
         let playerProxy = await engine.player
-        let playerItems = try await playerProxy.inventory
+        let playerItems = await playerProxy.inventory
         #expect(playerItems.count == 5)
 
         let output = await mockIO.flush()
@@ -437,10 +418,10 @@ struct ProxySystemIntegrationTests {
         )
 
         // Then: Proxy computed properties should reflect current state
-        let deviceProxy = try await engine.item("mechanicalDevice")
+        let deviceProxy = await engine.item("mechanicalDevice")
 
         // Should have 2 items inside
-        let contents = try await deviceProxy.contents
+        let contents = await deviceProxy.contents
         #expect(contents.count == 2)
 
         // Should show correct capacity usage (1 + 2 = 3 out of 3)
@@ -512,25 +493,25 @@ struct ProxySystemIntegrationTests {
         )
 
         // Then: All proxies should show consistent state
-        let wandProxy = try await engine.item("magicWand")
-        let mirrorProxy = try await engine.item("enchantedMirror")
-        let shopProxy = try await engine.location("magicShop")
+        let wandProxy = await engine.item("magicWand")
+        let mirrorProxy = await engine.item("enchantedMirror")
+        let shopProxy = await engine.location("magicShop")
         let playerProxy = await engine.player
 
         // Wand should be with player and on
-        #expect(try await wandProxy.parent == .player)
+        #expect(await wandProxy.parent == .player)
         #expect(await wandProxy.hasFlag(ItemPropertyID.isOn) == true)
 
         // Player should have the wand
-        let playerItems = try await playerProxy.inventory
+        let playerItems = await playerProxy.inventory
         #expect(playerItems.contains { $0.id == ItemID("magicWand") })
 
         // Shop should still contain the mirror
-        let shopItems = try await shopProxy.items
+        let shopItems = await shopProxy.items
         #expect(shopItems.contains { $0.id == ItemID("enchantedMirror") })
 
         // All proxies should be accessible and functional
-        let mirrorLocation = try await mirrorProxy.parent
+        let mirrorLocation = await mirrorProxy.parent
         if case .location(let loc) = mirrorLocation {
             #expect(loc.id == LocationID("magicShop"))
         }

@@ -39,7 +39,7 @@ public struct SmellActionHandler: ActionHandler {
             )
         }
 
-        return try await ActionResult(
+        return await ActionResult(
             item.response(
                 object: { context.msg.smellObject(context.verb, item: $0) },
                 character: { context.msg.smellCharacter(context.verb, character: $0) },

@@ -51,8 +51,9 @@ struct StandardCombatSystemIntegrationTests {
             as the goblin warrior can only dodge and weave against the
             advantage of sharpened metal.
 
-            Your steel sword gives the goblin warrior serious pause!
-            Unarmed, it suddenly questions this confrontation.
+            Your blow with your steel sword catches the goblin warrior
+            cleanly, tearing flesh and drawing crimson. It absorbs the hit,
+            flesh suffering but endurance holding.
 
             The goblin warrior's counter-punch goes wide, rage making the
             strike clumsy and predictable.
@@ -65,8 +66,8 @@ struct StandardCombatSystemIntegrationTests {
         #expect(combatState?.enemyID == "goblin")
 
         // Goblin should still be fighting
-        let finalGoblin = try await engine.item("goblin")
-        #expect(try await finalGoblin.isFighting == true)
+        let finalGoblin = await engine.item("goblin")
+        #expect(await finalGoblin.isFighting == true)
     }
 
     @Test("Combat ends when enemy dies")
@@ -103,7 +104,7 @@ struct StandardCombatSystemIntegrationTests {
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // When: Player attacks with powerful weapon
-        try await engine.execute("attack goblin with sword")
+        try await engine.execute("attack goblin with sword", times: 2)
 
         // Then: Goblin should die and combat should end
         let output = await mockIO.flush()
@@ -115,8 +116,15 @@ struct StandardCombatSystemIntegrationTests {
             sword as the weak goblin can only dodge and weave against the
             advantage of sharpened metal.
 
-            You strike true with your legendary sword! The weak goblin
-            drops without a sound, weaponless to the end.
+            Your legendary sword finds its mark at last! The weak goblin
+            staggers once, then falls forever silent.
+
+            > attack goblin with sword
+            You press forward with your legendary sword leading the way
+            toward flesh while the weak goblin backs away, unarmed but
+            still dangerous as any cornered thing.
+
+            Death has already claimed the weak goblin.
             """
         )
 
@@ -125,8 +133,8 @@ struct StandardCombatSystemIntegrationTests {
         #expect(combatState == nil)
 
         // Goblin should be dead
-        let finalGoblin = try await engine.item("goblin")
-        #expect(try await finalGoblin.isDead)
+        let finalGoblin = await engine.item("goblin")
+        #expect(await finalGoblin.isDead)
     }
 
     @Test("Damage categories are properly calculated")
@@ -138,7 +146,7 @@ struct StandardCombatSystemIntegrationTests {
             .isWeapon,
             .isTakable,
             .value(1),
-            .damage(4),
+            .damage(25),
             .in(.player)
         )
 
@@ -154,49 +162,50 @@ struct StandardCombatSystemIntegrationTests {
             output,
             """
             > attack the guard
-            Armed and hungry for violence, you strike with your variable
-            sword as the bully can only dodge and weave against the
-            advantage of sharpened metal.
+            You drive forward with your variable sword seeking its purpose
+            as the drunken brute meets you barehanded, flesh against steel
+            in the oldest gamble.
 
+            Your variable sword swings wide, and the drunken bully avoids
+            your poorly aimed strike with ease.
+
+            The bitter brute counters with a force that shatters your
+            guard, leaving you exposed to whatever violence comes next.
+
+            > attack the guard
+            Your variable sword inflicts a light wound on the bully, more
+            sting than damage. He registers the wound with annoyance.
+
+            The guard answers with raw violence, a clubbing strike that
+            finds you but lacks the angle to truly hurt. The wound is
+            trivial against your battle fury.
+
+            > attack the guard
+            Your variable sword finds the surly brute exposed, carving a
+            solid wound that draws a grunt of pain. He grunts from the
+            impact but maintains stance.
+
+            The counterblow comes wild and desperate, the guard hammering
+            through your guard to bruise rather than break. The strike
+            lands but doesn't slow you. Not yet.
+
+            > attack the guard
             A disastrous miss--your variable sword cuts through empty air
-            and the surly guard effortlessly evades your mistimed attack.
+            and the brute effortlessly evades your mistimed attack.
 
-            The guard's brutal retaliation breaks through your defenses
-            completely, rendering you vulnerable as an opened shell.
-
-            > attack the guard
-            Your blow with your variable sword catches the bully cleanly,
-            tearing flesh and drawing crimson. The blow lands solidly,
-            drawing blood. He feels the sting but remains strong.
-
-            In the tangle, the surly brute drives an elbow home--sudden
-            pressure that blooms into dull pain. The wound is trivial
-            against your battle fury.
+            The brute surges back instantly, fist cracking against your
+            ribs--more warning than wound. The wound is light but
+            unwelcome, your body protesting the accumulation.
 
             > attack the guard
-            The bully has left himself wide open and completely vulnerable
-            to your attack.
-
-            In the tangle, the guard drives an elbow home--sudden pressure
-            that blooms into dull pain. The wound is trivial against your
-            battle fury.
-
-            > attack the guard
-            The blow lands hard! The guard stumbles sideways, defenseless
-            and struggling to stay on his feet.
-
-            The bully's brutal retaliation breaks through your defenses
-            completely, rendering you vulnerable as an opened shell.
-
-            > attack the guard
-            You strike true with your variable sword! The brute drops
-            without a sound, weaponless to the end.
+            Your variable sword finds its mark at last! The brute staggers
+            once, then falls forever silent.
             """
         )
 
         // Enemy has been slain
-        let finalEnemy = try await engine.item("guard")
-        #expect(try await finalEnemy.isDead)
+        let finalEnemy = await engine.item("guard")
+        #expect(await finalEnemy.isDead)
     }
 
     @Test("Critical hits deal increased damage")
@@ -245,87 +254,83 @@ struct StandardCombatSystemIntegrationTests {
             as the test enemy can only dodge and weave against the
             advantage of sharpened metal.
 
-            Your sharp sword gives the test enemy serious pause! Unarmed,
-            it suddenly questions this confrontation.
+            Your blow with your sharp sword catches the test enemy cleanly,
+            tearing flesh and drawing crimson. It absorbs the hit, flesh
+            suffering but endurance holding.
 
             The test enemy's counter-punch goes wide, rage making the
             strike clumsy and predictable.
 
             > attack enemy
-            Your blow with your sharp sword catches the test enemy cleanly,
-            tearing flesh and drawing crimson. The blow lands solidly,
-            drawing blood. It feels the sting but remains strong.
+            You strike the test enemy with your sharp sword, tearing
+            through skin and muscle. Blood wells immediately, dark and
+            thick. From confident to cautious in one blow. Blood runs
+            freely down its body.
 
-            The test enemy's retaliatory strike comes fast but you're
-            faster, sidestepping the violence with practiced grace.
-
-            > attack enemy
-            Your blow with your sharp sword catches the test enemy cleanly,
-            tearing flesh and drawing crimson. You see the ripple of pain,
-            but its body absorbs it. It remains dangerous.
-
-            The test enemy responds with such ferocity that you falter,
-            your muscles locking as your brain recalculates the odds.
+            The test enemy swings in retaliation but you slip the attack,
+            flowing around the violence like water around stone.
 
             > attack enemy
-            Your blow with your sharp sword catches the test enemy cleanly,
-            opening flesh to the bone. The bleeding is immediate and
-            concerning. The serious wound changes its stance. Pain shows in
-            every movement.
-
-            In the tangle, the test enemy drives an elbow home--sudden
-            pressure that blooms into dull pain. The wound is trivial
-            against your battle fury.
+            Your armed advantage proves decisive--your sharp sword ends it!
+            The test enemy crumples, having fought barehanded and lost.
 
             > attack enemy
-            You strike true with your sharp sword! The test enemy drops
-            without a sound, weaponless to the end.
+            Your sharp sword cuts through air toward the test enemy who has
+            no steel to answer yours, only the speed of desperation.
+
+            The test enemy is beyond such concerns now, being dead.
 
             > attack enemy
-            Armed and hungry for violence, you strike with your sharp sword
-            as the test enemy can only dodge and weave against the
-            advantage of sharpened metal.
+            You drive forward with your sharp sword seeking its purpose as
+            the test enemy meets you barehanded, flesh against steel in the
+            oldest gamble.
 
             Death has already claimed the test enemy.
 
             > attack enemy
-            Armed and hungry for violence, you strike with your sharp sword
-            as the test enemy can only dodge and weave against the
-            advantage of sharpened metal.
+            Your sharp sword cuts through air toward the test enemy who has
+            no steel to answer yours, only the speed of desperation.
 
             The test enemy is beyond such concerns now, being dead.
 
             > attack enemy
-            Armed and hungry for violence, you strike with your sharp sword
-            as the test enemy can only dodge and weave against the
-            advantage of sharpened metal.
+            You drive forward with your sharp sword seeking its purpose as
+            the test enemy meets you barehanded, flesh against steel in the
+            oldest gamble.
 
             The test enemy is beyond such concerns now, being dead.
 
             > attack enemy
-            Armed and hungry for violence, you strike with your sharp sword
-            as the test enemy can only dodge and weave against the
-            advantage of sharpened metal.
+            You drive forward with your sharp sword seeking its purpose as
+            the test enemy meets you barehanded, flesh against steel in the
+            oldest gamble.
 
             You're too late--the test enemy is already deceased.
 
             > attack enemy
+            You press forward with your sharp sword leading the way toward
+            flesh while the test enemy backs away, unarmed but still
+            dangerous as any cornered thing.
+
+            The test enemy is beyond such concerns now, being dead.
+
+            > attack enemy
             Armed and hungry for violence, you strike with your sharp sword
             as the test enemy can only dodge and weave against the
             advantage of sharpened metal.
 
-            The test enemy is beyond such concerns now, being dead.
+            The test enemy is already dead.
             """
         )
 
         // Look for critical hit indicators or high damage
-        let _ =
+        _ =
             output.lowercased().contains("critical") || output.lowercased().contains("devastating")
             || output.lowercased().contains("powerful")
 
         // At minimum, enemy should have taken damage
-        let finalEnemy = try await engine.item("enemy")
-        let finalHealth = try await finalEnemy.health
+        let finalEnemy = await engine.item("enemy")
+        let finalHealth = await finalEnemy.health
         #expect(finalHealth < 100)
     }
 
@@ -435,44 +440,32 @@ struct StandardCombatSystemIntegrationTests {
             advantage of sharpened metal.
 
             Your strike with your training sword grazes the tough enemy,
-            drawing minimal blood. The light wound barely seems to
-            register.
+            drawing minimal blood. It registers the wound with annoyance.
 
             The tough enemy's counter-punch goes wide, rage making the
             strike clumsy and predictable.
 
             > attack enemy
-            Your strike with your training sword grazes the tough enemy,
-            drawing minimal blood. The light wound barely seems to
-            register.
+            You strike the tough enemy with your training sword, opening a
+            wound that bleeds steadily. The wound is real but manageable.
 
             In the exchange, the tough enemy lands clean. The world lurches
-            as your body absorbs punishment it won't soon forget. The blow
-            lands solidly, drawing blood. You feel the sting but remain
-            strong.
+            as your body absorbs punishment it won't soon forget. You
+            absorb the hit, feeling flesh tear but knowing you can endure.
 
             > attack enemy
-            Your blow with your training sword catches the tough enemy
-            cleanly, tearing flesh and drawing crimson. You see the ripple
-            of pain, but its body absorbs it. It remains dangerous.
+            Your training sword swings wide, and the tough enemy avoids
+            your poorly aimed strike with ease.
 
-            The tough enemy responds with such ferocity that you falter,
-            your muscles locking as your brain recalculates the odds.
-
-            > attack enemy
-            The tough enemy has left itself wide open and completely
-            vulnerable to your attack.
-
-            The tough enemy's final retaliation breaks something essential
-            inside you and you feel yourself folding inward like paper in
-            rain.
+            The tough enemy finishes you with nothing but flesh and bone,
+            proving that the oldest weapons still kill just as dead.
 
             ****  You have died  ****
 
             Death, that most permanent of inconveniences, has claimed you.
             Yet in these tales, even death offers second chances.
 
-            You scored 0 out of a possible 10 points, in 3 moves.
+            You scored 0 out of a possible 10 points, in 2 moves.
 
             Would you like to RESTART, RESTORE a saved game, or QUIT?
 
@@ -560,8 +553,8 @@ struct StandardCombatSystemIntegrationTests {
             #expect(finalState.playerFatigue > 0.05)  // Meaningful fatigue accumulation
         } else {
             // If combat ended, verify it was due to escalation, not immediate death
-            let finalEnemy = try await engine.item("warrior")
-            let finalEnemyHealth = try await finalEnemy.health
+            let finalEnemy = await engine.item("warrior")
+            let finalEnemyHealth = await finalEnemy.health
             let playerHealth = await engine.player.health
 
             // Either someone died from accumulated damage or combat mechanics worked
@@ -614,60 +607,57 @@ struct StandardCombatSystemIntegrationTests {
             output,
             """
             > attack enemy
-            Armed and hungry for violence, you strike with your masterwork
-            sword as the skilled enemy can only dodge and weave against the
-            advantage of sharpened metal.
+            Your masterwork sword cuts through air toward the skilled enemy
+            who has no steel to answer yours, only the speed of
+            desperation.
 
-            Your blow with your masterwork sword catches the skilled enemy
-            cleanly, opening flesh to the bone. The bleeding is immediate
-            and concerning. First blood draws a gasp. It touches the wound,
-            fingers coming away red.
-
-            The skilled enemy's brutal retaliation breaks through your
-            defenses completely, rendering you vulnerable as an opened
-            shell.
-
-            > attack enemy
-            A disastrous miss--your masterwork sword cuts through empty air
-            and the skilled enemy effortlessly evades your mistimed attack.
+            Your masterwork sword bites deep into the skilled enemy,
+            inflicting damage that shows immediately. The blow lands
+            solidly, drawing blood. It feels the sting but remains strong.
 
             In the exchange, the skilled enemy lands clean. The world
             lurches as your body absorbs punishment it won't soon forget.
-            The blow lands solidly, drawing blood. You feel the sting but
-            remain strong.
-
-            > attack enemy
-            Your masterwork sword gives the skilled enemy serious pause!
-            Unarmed, it suddenly questions this confrontation.
-
-            The skilled enemy's retaliatory strike comes fast but you're
-            faster, sidestepping the violence with practiced grace.
-
-            > attack enemy
-            The blow lands hard! The skilled enemy stumbles sideways,
-            defenseless and struggling to stay on its feet.
-
-            The skilled enemy's brutal retaliation breaks through your
-            defenses completely, rendering you vulnerable as an opened
-            shell.
-
-            > attack enemy
-            The skilled enemy has left itself wide open and completely
-            vulnerable to your attack.
-
-            The skilled enemy's retaliatory strike comes fast but you're
-            faster, sidestepping the violence with practiced grace.
+            You absorb the hit, feeling flesh tear but knowing you can
+            endure.
 
             > attack enemy
             You strike true with your masterwork sword! The skilled enemy
             drops without a sound, weaponless to the end.
 
             > attack enemy
-            Armed and hungry for violence, you strike with your masterwork
-            sword as the skilled enemy can only dodge and weave against the
-            advantage of sharpened metal.
+            Your masterwork sword cuts through air toward the skilled enemy
+            who has no steel to answer yours, only the speed of
+            desperation.
+
+            You're too late--the skilled enemy is already deceased.
+
+            > attack enemy
+            You drive forward with your masterwork sword seeking its
+            purpose as the skilled enemy meets you barehanded, flesh
+            against steel in the oldest gamble.
+
+            You're too late--the skilled enemy is already deceased.
+
+            > attack enemy
+            You press forward with your masterwork sword leading the way
+            toward flesh while the skilled enemy backs away, unarmed but
+            still dangerous as any cornered thing.
 
             Death has already claimed the skilled enemy.
+
+            > attack enemy
+            You drive forward with your masterwork sword seeking its
+            purpose as the skilled enemy meets you barehanded, flesh
+            against steel in the oldest gamble.
+
+            The skilled enemy is beyond such concerns now, being dead.
+
+            > attack enemy
+            You drive forward with your masterwork sword seeking its
+            purpose as the skilled enemy meets you barehanded, flesh
+            against steel in the oldest gamble.
+
+            The skilled enemy has already departed this mortal coil.
             """
         )
 
@@ -676,7 +666,7 @@ struct StandardCombatSystemIntegrationTests {
             "dodge", "block", "parr", "miss",
         ]
 
-        let _ = specialEventTerms.contains { term in
+        _ = specialEventTerms.contains { term in
             output.lowercased().contains(term)
         }
 
@@ -684,8 +674,8 @@ struct StandardCombatSystemIntegrationTests {
         #expect(output.contains("attack enemy"))
 
         // Enemy should have taken damage
-        let finalEnemy = try await engine.item("enemy")
-        let finalHealth = try await finalEnemy.health
+        let finalEnemy = await engine.item("enemy")
+        let finalHealth = await finalEnemy.health
         #expect(finalHealth < 60)
     }
 
@@ -731,8 +721,8 @@ struct StandardCombatSystemIntegrationTests {
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // Severely wound the bandit to trigger flee behavior
-        let banditProxy = try await engine.item("bandit")
-        if let damageChange = try await banditProxy.takeDamage(15) {
+        let banditProxy = await engine.item("bandit")
+        if let damageChange = await banditProxy.takeDamage(15) {
             try await engine.apply(damageChange)
         }
 
@@ -749,20 +739,20 @@ struct StandardCombatSystemIntegrationTests {
             cowardly bandit braces for the inevitable collision of flesh
             and bone.
 
-            The brutal exchange ends with your killing blow! The cowardly
-            bandit goes limp and crashes down, utterly still.
+            The last blow is yours! The cowardly bandit staggers back, eyes
+            going vacant, before falling motionless.
 
             > attack bandit
-            No weapons needed as you attack with pure violence while the
-            cowardly bandit braces for the inevitable collision of flesh
-            and bone.
+            You close the distance fast with fists ready as the cowardly
+            bandit mirrors your stance, both of you committed to finding
+            out who breaks first.
 
             Death has already claimed the cowardly bandit.
 
             > attack bandit
-            No weapons needed as you attack with pure violence while the
-            cowardly bandit braces for the inevitable collision of flesh
-            and bone.
+            You close the distance fast with fists ready as the cowardly
+            bandit mirrors your stance, both of you committed to finding
+            out who breaks first.
 
             The cowardly bandit is beyond such concerns now, being dead.
             """
@@ -770,7 +760,7 @@ struct StandardCombatSystemIntegrationTests {
 
         // Look for flee indicators
         let fleeTerms = ["flee", "flees", "retreat", "escap", "run"]
-        let _ = fleeTerms.contains { term in
+        _ = fleeTerms.contains { term in
             output.lowercased().contains(term)
         }
 
@@ -816,8 +806,8 @@ struct StandardCombatSystemIntegrationTests {
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // Wound the scholar to make surrender more likely
-        let scholarProxy = try await engine.item("scholar")
-        if let damageChange = try await scholarProxy.takeDamage(12) {
+        let scholarProxy = await engine.item("scholar")
+        if let damageChange = await scholarProxy.takeDamage(12) {
             try await engine.apply(damageChange)
         }
 
@@ -834,21 +824,21 @@ struct StandardCombatSystemIntegrationTests {
             intimidating sword as the scholar warrior can only dodge and
             weave against the advantage of sharpened metal.
 
-            Your intimidating sword gives the scholar warrior serious
-            pause! Unarmed, it suddenly questions this confrontation.
-
-            The scholar warrior's counter-punch goes wide, rage making the
-            strike clumsy and predictable.
+            Your intimidating sword finds its mark at last! The scholar
+            warrior staggers once, then falls forever silent.
 
             > attack scholar
-            You strike true with your intimidating sword! The scholar
-            warrior drops without a sound, weaponless to the end.
+            You press forward with your intimidating sword leading the way
+            toward flesh while the scholar warrior backs away, unarmed but
+            still dangerous as any cornered thing.
+
+            Death has already claimed the scholar warrior.
             """
         )
 
         // Look for surrender indicators
         let surrenderTerms = ["surrender", "yield", "submit", "give up"]
-        let _ = surrenderTerms.contains { term in
+        _ = surrenderTerms.contains { term in
             output.lowercased().contains(term)
         }
 
@@ -904,9 +894,8 @@ struct StandardCombatSystemIntegrationTests {
             The confused guard responds to your overture with hostile
             silence.
 
-            Something shifts in the confused guard's posture. The
-            aggression dissipates like morning mist, replaced by wary
-            peace.
+            The fight leaves the confused guard entirely. It stand passive
+            now, all hostility forgotten.
             """
         )
 
@@ -914,8 +903,8 @@ struct StandardCombatSystemIntegrationTests {
         #expect(output.contains("talk") || output.contains("guard"))
 
         // Guard state should be affected
-        let finalGuard = try await engine.item("guard")
-        let guardHealth = try await finalGuard.health
+        let finalGuard = await engine.item("guard")
+        let guardHealth = await finalGuard.health
         #expect(guardHealth <= 30)  // Health may have changed from combat
     }
 
@@ -956,9 +945,9 @@ struct StandardCombatSystemIntegrationTests {
             Fighting the armored knight bare-handed seems inadvisable. Find
             a proper weapon first.
 
-            In a moment of raw violence, the armored knight comes at you
-            with nothing but fury! You raise your fists, knowing this will
-            hurt regardless of who wins.
+            No weapons between you--just the armored knight's aggression
+            and your desperation! You collide in a tangle of strikes and
+            blocks.
             """
         )
 
@@ -1018,8 +1007,8 @@ struct StandardCombatSystemIntegrationTests {
             > take sword
             Got it.
 
-            In the tangle, the fierce warrior drives an elbow home--sudden
-            pressure that blooms into dull pain. The wound is trivial
+            The fierce warrior surges back instantly, fist cracking against
+            your ribs--more warning than wound. The wound is trivial
             against your battle fury.
             """
         )
@@ -1031,8 +1020,8 @@ struct StandardCombatSystemIntegrationTests {
         #expect(output.contains("warrior"))
 
         // Player should have taken the sword
-        let finalSword = try await engine.item("sword")
-        let swordParent = try await finalSword.parent
+        let finalSword = await engine.item("sword")
+        let swordParent = await finalSword.parent
         #expect(swordParent == .player)
     }
 
@@ -1056,7 +1045,7 @@ struct StandardCombatSystemIntegrationTests {
         )
 
         // Create custom combat system
-        let customSystem = StandardCombatSystem(versus: "dragon") { event, messenger in
+        let customSystem = StandardCombatSystem(versus: "dragon") { event, _ in
             switch event {
             case .enemyInjured:
                 return "The ancient dragon roars in fury as your blade finds its mark!"
@@ -1111,8 +1100,8 @@ struct StandardCombatSystemIntegrationTests {
             output,
             """
             > attack corpse
-            No weapons needed as you attack with pure violence while the
-            corpse braces for the inevitable collision of flesh and bone.
+            Barehanded, you commit to the assault as the corpse accepts the
+            challenge with equal violence promised.
 
             The dead bandit is beyond such concerns now, being dead.
             """
@@ -1210,12 +1199,13 @@ struct StandardCombatSystemIntegrationTests {
             as the street thug can only dodge and weave against the
             advantage of sharpened metal.
 
-            The heavy book wasn't designed for combat, but you wield it
-            against the street thug regardless!
+            You swing the heavy book at the street thug with desperate
+            creativity! It prepare to defend against your improvised
+            assault.
 
-            In the tangle, the street thug drives an elbow home--sudden
-            pressure that blooms into dull pain. The wound is trivial
-            against your battle fury.
+            The street thug crashes forward in response, the impact jarring
+            but glancing as you roll with it. Pain flickers and dies. Your
+            body has more important work.
             """
         )
 

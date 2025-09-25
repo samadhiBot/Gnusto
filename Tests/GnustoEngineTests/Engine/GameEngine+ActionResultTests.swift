@@ -69,18 +69,18 @@ struct GameEngineActionResultTests {
         expectNoDifference(output, "Lamp activated with multiple changes!")
 
         // And: State changes should be applied
-        let finalLamp = try await engine.item("lamp")
+        let finalLamp = await engine.item("lamp")
         #expect(await finalLamp.hasFlag(.isOn) == true)
         #expect(await finalLamp.hasFlag(.isTouched) == true)
     }
 
     @Test("ActionResult with side effects")
     func testActionResultWithSideEffects() async throws {
-        let testFuse = Fuse(initialTurns: 5) { engine, fuseState in
+        let testFuse = Fuse(initialTurns: 5) { _, _ in
             ActionResult(message: "💣 Test fuse triggered!")
         }
 
-        let testDaemon = Daemon { engine in
+        let testDaemon = Daemon { _, _ in
             ActionResult(message: "🤖 Test daemon running")
         }
 
@@ -91,9 +91,10 @@ struct GameEngineActionResultTests {
 
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        // Create ActionResult with side effects
-        let sideEffects = [
-            SideEffect.startFuse("testFuse"),
+        // Create ActionResult with side effects using strongly-typed payload
+        let fuseState = FuseState(turns: 5)
+        let sideEffects = try [
+            SideEffect.startFuse("testFuse", state: fuseState),
             SideEffect.runDaemon("testDaemon"),
         ]
 
@@ -112,7 +113,7 @@ struct GameEngineActionResultTests {
         // And: Side effects should be processed
         let finalState = await engine.gameState
         #expect(finalState.activeFuses["testFuse"]?.turns == 5)
-        #expect(finalState.activeDaemons.contains("testDaemon"))
+        #expect(finalState.activeDaemons["testDaemon"] != nil)
     }
 
     @Test("ActionResult with message, changes, and effects")
@@ -125,7 +126,7 @@ struct GameEngineActionResultTests {
             .in(.startRoom)
         )
 
-        let testFuse = Fuse(initialTurns: 3) { engine, fuseState in
+        let testFuse = Fuse(initialTurns: 3) { _, _ in
             ActionResult(message: "⏰ Emergency countdown started!")
         }
 
@@ -150,8 +151,9 @@ struct GameEngineActionResultTests {
             ),
         ]
 
-        let sideEffects = [
-            SideEffect.startFuse("emergencyFuse")
+        let fuseState = FuseState(turns: 3)
+        let sideEffects = try [
+            SideEffect.startFuse("emergencyFuse", state: fuseState)
         ]
 
         let actionResult = ActionResult(
@@ -168,18 +170,14 @@ struct GameEngineActionResultTests {
         expectNoDifference(output, "Control panel activated! Emergency systems online.")
 
         // State changes applied
-        let finalPanel = try await engine.item("panel")
+        let finalPanel = await engine.item("panel")
         #expect(await finalPanel.hasFlag(.isOn) == true)
         #expect(await finalPanel.hasFlag(.isTouched) == true)
 
         // Side effects processed
         let finalState = await engine.gameState
-        #expect(
-            finalState.activeFuses["emergencyFuse"] == FuseState(
-                turns: 3,
-                state: [:]
-            )
-        )
+        #expect(finalState.activeFuses["emergencyFuse"]?.turns == 3)
+        #expect(finalState.activeFuses["emergencyFuse"]?.payload == nil)
     }
 
     // MARK: - Error Handling Tests
@@ -223,7 +221,8 @@ struct GameEngineActionResultTests {
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         // Create ActionResult with invalid side effect (non-existent fuse)
-        let invalidSideEffect = SideEffect.startFuse("nonExistentFuse")
+        let fuseState = FuseState(turns: 3)
+        let invalidSideEffect = try SideEffect.startFuse("nonExistentFuse", state: fuseState)
 
         let actionResult = ActionResult(
             message: "This should fail on side effect",
@@ -280,8 +279,9 @@ struct GameEngineActionResultTests {
                     ),
                 ]
 
-                let sideEffects = [
-                    SideEffect.startFuse("activationFuse")
+                let fuseState = FuseState(turns: 2)
+                let sideEffects = try [
+                    SideEffect.startFuse("activationFuse", state: fuseState)
                 ]
 
                 return ActionResult(
@@ -300,7 +300,7 @@ struct GameEngineActionResultTests {
             .in(.startRoom)
         )
 
-        let activationFuse = Fuse(initialTurns: 2) { engine, state in
+        let activationFuse = Fuse(initialTurns: 2) { _, _ in
             ActionResult(message: "🔥 The device overloads!")
         }
 
@@ -326,13 +326,13 @@ struct GameEngineActionResultTests {
         )
 
         // State changes applied
-        let finalDevice = try await engine.item("device")
+        let finalDevice = await engine.item("device")
         #expect(await finalDevice.hasFlag(.isOn) == true)
         #expect(await finalDevice.hasFlag(.isTouched) == true)
 
         // Side effects processed
         let finalState = await engine.gameState
-        #expect(finalState.activeFuses["activationFuse"] == FuseState(turns: 1))
+        #expect(finalState.activeFuses["activationFuse"]?.turns == 1)
     }
 
     @Test("ActionResult processing preserves change order")
@@ -380,8 +380,8 @@ struct GameEngineActionResultTests {
         let output = await mockIO.flush()
         expectNoDifference(output, "Counter incremented three times.")
 
-        let finalCounter = try await engine.item("counter")
-        #expect(try await finalCounter.property(.testCounter) == .int(3))
+        let finalCounter = await engine.item("counter")
+        #expect(await finalCounter.property(.testCounter) == .int(3))
 
         // And: Change history should preserve order
         let history = await engine.changeHistory
@@ -556,7 +556,7 @@ struct GameEngineActionResultTests {
 
         // And: All changes should be applied
         for i in 1...20 {
-            let item = try await engine.item(ItemID("item\(i)"))
+            let item = await engine.item(ItemID("item\(i)"))
             #expect(await item.hasFlag(.isTouched) == true)
         }
 
@@ -640,7 +640,7 @@ struct GameEngineActionResultTests {
         let output = await mockIO.flush()
         expectNoDifference(output, "Device fully activated.")
 
-        let finalDevice = try await engine.item("device")
+        let finalDevice = await engine.item("device")
         #expect(await finalDevice.hasFlag(.isOn) == true)
         #expect(await engine.hasFlag("deviceActivated") == true)
 
@@ -695,8 +695,8 @@ struct GameEngineActionResultTests {
         )
 
         // And: State should be updated
-        let finalCoin = try await engine.item("coin")
-        #expect(try await finalCoin.parent == .player)
+        let finalCoin = await engine.item("coin")
+        #expect(await finalCoin.parent == .player)
 
         // And: Pronouns should be updated
         let pronoun = await engine.gameState.pronoun
@@ -741,8 +741,8 @@ struct GameEngineActionResultTests {
         )
 
         // And: Final state should reflect both actions
-        let finalLamp = try await engine.item("lamp")
-        #expect(try await finalLamp.parent == .player)
+        let finalLamp = await engine.item("lamp")
+        #expect(await finalLamp.parent == .player)
         #expect(await finalLamp.hasFlag(.isOn) == true)
         #expect(await finalLamp.hasFlag(.isTouched) == true)
     }
@@ -788,6 +788,122 @@ struct GameEngineActionResultTests {
         try await engine.processActionResult(specialCharResult)
         let output = await mockIO.flush()
         expectNoDifference(output, "Special chars: é, ñ, 中文, emoji 🎮, quotes \"'`")
+    }
+
+    // MARK: - Typed Payload Tests
+
+    @Test("ActionResult with strongly-typed fuse payloads")
+    func testActionResultWithStronglyTypedFusePayloads() async throws {
+        let testFuse = Fuse(initialTurns: 5) { _, fuseState in
+            // Extract typed payload from fuse state
+            if let payload = fuseState.getPayload(as: TestPayload.self) {
+                return ActionResult(message: "Fuse triggered with \(payload.message)!")
+            } else {
+                return ActionResult(message: "Fuse triggered with no payload.")
+            }
+        }
+
+        struct TestPayload: Codable, Sendable, Equatable {
+            let message: String
+            let value: Int
+        }
+
+        let game = MinimalGame(
+            fuses: ["testFuse": testFuse]
+        )
+
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // Create ActionResult with typed payload fuse
+        let payload = TestPayload(message: "typed data", value: 42)
+        let fuseState = try FuseState(turns: 1, payload: payload)
+        let actionResult = try ActionResult(
+            message: "Fuse scheduled with typed payload!",
+            effects: [
+                SideEffect.startFuse("testFuse", state: fuseState)
+            ]
+        )
+
+        try await engine.processActionResult(actionResult)
+
+        let output = await mockIO.flush()
+        expectNoDifference(output, "Fuse scheduled with typed payload!")
+
+        // Verify fuse was scheduled with correct payload
+        let gameState = await engine.gameState
+        let scheduledFuse = gameState.activeFuses["testFuse"]
+        #expect(scheduledFuse?.turns == 1)
+
+        let retrievedPayload = scheduledFuse?.getPayload(as: TestPayload.self)
+        #expect(retrievedPayload?.message == "typed data")
+        #expect(retrievedPayload?.value == 42)
+
+        // Trigger the fuse by advancing time
+        try await engine.execute("wait")
+
+        let finalOutput = await mockIO.flush()
+        expectNoDifference(
+            finalOutput,
+            """
+            > wait
+            Time flows onward, indifferent to your concerns.
+
+            Fuse triggered with typed data!
+            """
+        )
+    }
+
+    @Test("ActionResult with predefined payload types")
+    func testActionResultWithPredefinedPayloadTypes() async throws {
+        let enemyFuse = Fuse(initialTurns: 2) { _, fuseState in
+            if let payload = fuseState.getPayload(as: FuseState.EnemyLocationPayload.self) {
+                return ActionResult(
+                    message:
+                        "Enemy \(payload.enemyID.rawValue) returns to \(payload.locationID.rawValue)!"
+                )
+            }
+            return ActionResult(message: "Enemy fuse triggered.")
+        }
+
+        let game = MinimalGame(
+            fuses: ["enemyFuse": enemyFuse]
+        )
+
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // Use predefined payload type
+        let fuseState = try FuseState.enemyLocation(
+            turns: 1,
+            enemyID: ItemID("goblin"),
+            locationID: LocationID("cave"),
+            message: "The goblin returns!"
+        )
+
+        let actionResult = try ActionResult(
+            message: "Enemy fuse scheduled!",
+            effects: [
+                SideEffect.startFuse("enemyFuse", state: fuseState)
+            ]
+        )
+
+        try await engine.processActionResult(actionResult)
+
+        let output = await mockIO.flush()
+        expectNoDifference(output, "Enemy fuse scheduled!")
+
+        // Trigger the fuse
+        try await engine.execute("wait")
+
+        let finalOutput = await mockIO.flush()
+        expectNoDifference(
+            finalOutput,
+            """
+            > wait
+            Time flows onward, indifferent to your concerns.
+
+            Enemy goblin returns to cave!
+            """
+        )
     }
 }
 

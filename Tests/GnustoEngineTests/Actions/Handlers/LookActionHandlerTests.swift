@@ -81,7 +81,7 @@ struct LookActionHandlerTests {
             """
         )
 
-        let finalState = try await engine.item("book")
+        let finalState = await engine.item("book")
         #expect(await finalState.hasFlag(.isTouched) == true)
     }
 

@@ -7,10 +7,10 @@ public enum Combatant: Sendable {
 
     /// The combatant's character sheet containing all attributes and combat properties.
     public var characterSheet: CharacterSheet {
-        get async throws {
+        get async {
             switch self {
             case .enemy(let item):
-                try await item.characterSheet
+                await item.characterSheet
             case .player(let player):
                 await player.characterSheet
             }
@@ -19,26 +19,26 @@ public enum Combatant: Sendable {
 
     /// Current health points.
     public var health: Int {
-        get async throws {
-            try await characterSheet.health
+        get async {
+            await characterSheet.health
         }
     }
 
     /// Maximum health points.
     public var maxHealth: Int {
-        get async throws {
-            try await characterSheet.maxHealth
+        get async {
+            await characterSheet.maxHealth
         }
     }
 
     /// The combatant's preferred weapon, if any.
     public var preferredWeapon: ItemProxy? {
-        get async throws {
+        get async {
             switch self {
             case .enemy(let item):
-                try await item.preferredWeapon
+                await item.preferredWeapon
             case .player(let player):
-                try await player.preferredWeapon
+                await player.preferredWeapon
             }
         }
     }

@@ -31,6 +31,4 @@ extension FuseID {
     /// Fuse for temporary status effects wearing off.
     public static let statusEffectExpiry: FuseID = "statusEffectExpiry"
 
-    /// Fuse for delayed environmental changes.
-    public static let environmentalChange: FuseID = "environmentalChange"
 }

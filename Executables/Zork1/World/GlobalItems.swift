@@ -173,15 +173,6 @@ enum GlobalItems {
         // Note: Has action handler HOT-BELL-F, parent not specified
     )
 
-    static let kitchenWindow = Item(
-        id: .kitchenWindow,
-        .name("kitchen window"),
-        .synonyms("window"),
-        .adjectives("kitchen", "small"),
-        .omitDescription
-        // Note: Has action handler KITCHEN-WINDOW-F
-    )
-
     static let ladder = Item(
         id: .ladder,
         .name("wooden ladder"),

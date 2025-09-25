@@ -48,7 +48,7 @@ All game state modifications must use the `StateChange` system. Action handlers 
 public func process(context: ActionContext) async throws -> ActionResult {
     // Process inbound command, validate correctness...
 
-    return try await ActionResult(
+    return await ActionResult(
         message,
         item.setFlag(.isTouched),
         item.clearFlag(.isInflated)
@@ -130,7 +130,7 @@ public func process(context: ActionContext) async throws -> ActionResult {
         throw ActionResponse.itemNotAccessible(targetItemID)
     }
 
-    let targetItem = try await context.engine.item(targetItemID)
+    let targetItem = await context.item(targetItemID)
 
     return await ActionResult(
         context.msg.blowOn(item: targetItem.withDefiniteArticle),
@@ -147,7 +147,7 @@ public func process(context: ActionContext) async throws -> ActionResult {
         throw await ActionResponse.feedback(context.msg.askWhom())
     }
 
-    let character = try await context.engine.item(characterID)
+    let character = await context.item(characterID)
 
     guard await character.isCharacter else {
         throw await ActionResponse.feedback(
@@ -176,7 +176,7 @@ public func process(context: ActionContext) async throws -> ActionResult {
         throw await ActionResponse.feedback(context.msg.doWhat(context.command.verb))
     }
 
-    let targetItem = try await context.engine.item(targetItemID)
+    let targetItem = await context.item(targetItemID)
 
     guard await context.engine.playerCanReach(targetItemID) else {
         throw ActionResponse.itemNotAccessible(targetItemID)
@@ -211,7 +211,7 @@ public func process(context: ActionContext) async throws -> ActionResult {
     }
 
     // Object specified - targeted action
-    let targetItem = try await context.engine.item(targetItemID)
+    let targetItem = await context.item(targetItemID)
 
     guard await context.engine.playerCanReach(targetItemID) else {
         throw ActionResponse.itemNotAccessible(targetItemID)
@@ -253,7 +253,7 @@ public struct ExamineActionHandler: ActionHandler {
             switch directObjectRef {
             case .item(let itemID):
                 // Handle regular items through proxy system
-                let item = try await context.engine.item(itemID)
+                let item = await context.item(itemID)
 
             case .universal(let universal):
                 // Handle universals like .sky, .ground, .walls
@@ -273,21 +273,21 @@ public struct ExamineActionHandler: ActionHandler {
 
 ```swift
 // Digging handler that works with ground/earth universals
-UniversalObject.diggableUniversals.contains(universal)
+Universal.diggableUniversals.contains(universal)
 
 // Movement handler that only works with architectural features
-UniversalObject.architecturalUniversals.contains(universal)
+Universal.architecturalUniversals.contains(universal)
 ```
 
 ### Universal Object Categories
 
 Universal objects are pre-categorized for convenience:
 
-- `UniversalObject.diggableUniversals`: ground, earth, soil, dirt, mud, sand
-- `UniversalObject.waterUniversals`: water, river, stream, lake, pond, ocean, sea
-- `UniversalObject.architecturalUniversals`: floor, walls, wall, ceiling, roof
-- `UniversalObject.outdoorUniversals`: sky, sun, moon, stars, clouds, etc.
-- `UniversalObject.indoorUniversals`: ceiling, walls, floor, etc.
+- `Universal.diggableUniversals`: ground, earth, soil, dirt, mud, sand
+- `Universal.waterUniversals`: water, river, stream, lake, pond, ocean, sea
+- `Universal.architecturalUniversals`: floor, walls, wall, ceiling, roof
+- `Universal.outdoorUniversals`: sky, sun, moon, stars, clouds, etc.
+- `Universal.indoorUniversals`: ceiling, walls, floor, etc.
 
 This system ensures players get reasonable responses to common interactions without requiring game developers to create explicit items for every possible universal concept.
 
@@ -390,8 +390,8 @@ func testTakeMovesItem() async throws {
 
     try await engine.execute("take lamp")
 
-    let finalState = try await engine.item("lamp")
-    #expect(try await finalState.playerIsHolding)
+    let finalState = await engine.item("lamp")
+    #expect(await finalState.playerIsHolding)
 }
 ```
 
@@ -445,7 +445,7 @@ func testSomething() async throws {
         Taken.
         """)
 
-    let finalState = try await engine.item("testItem")
+    let finalState = await engine.item("testItem")
     #expect(await finalState.parent == .player)
 }
 ```
@@ -577,7 +577,7 @@ For item-specific behavior, use ItemEventHandlers with the proxy system:
 let lampHandler = ItemEventHandler(for: .magicLamp) {
     before(.examine) { context, command in
         // Custom examine behavior for magic lamp with proxy access
-        let lamp = try await context.engine.item(.magicLamp)
+        let lamp = await context.item(.magicLamp)
         let glowLevel = await lamp.property("glowLevel", type: Int.self) ?? 0
 
         let message = glowLevel > 0 ?

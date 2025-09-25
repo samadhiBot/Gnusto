@@ -56,7 +56,7 @@ struct EntityReferenceTests {
         }
     }
 
-    @Test("EntityReference.universal can be created with UniversalObject")
+    @Test("EntityReference.universal can be created with Universal")
     func testUniversalCase() throws {
         let universalRef = EntityReference.universal(.ground)
 
@@ -189,7 +189,7 @@ struct EntityReferenceTests {
 
     @Test("All EntityReference cases are Codable")
     func testCodable() throws {
-        let encoder = JSONEncoder()
+        let encoder = JSONEncoder.sorted()
         let decoder = JSONDecoder()
 
         let testItem = Item(
@@ -221,7 +221,7 @@ struct EntityReferenceTests {
 
     @Test("Complex EntityReference cases encode and decode correctly")
     func testComplexCodable() throws {
-        let encoder = JSONEncoder()
+        let encoder = JSONEncoder.sorted()
         let decoder = JSONDecoder()
 
         let complexItem = Item(

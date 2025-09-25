@@ -780,5 +780,4 @@ struct CodeGenerator {
             }
         }
     }
-
 }

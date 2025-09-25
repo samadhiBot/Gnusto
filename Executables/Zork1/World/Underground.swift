@@ -3,7 +3,7 @@ import GnustoEngine
 // MARK: - Locations
 
 enum Underground {
-    static let cellar: Location = Location(
+    static let cellar = Location(
         id: .cellar,
         .name("Cellar"),
         .description(
@@ -228,13 +228,13 @@ extension Underground {
     /// an easy return. This is controlled by a custom flag.
     static let cellarHandler = LocationEventHandler(for: .cellar) {
         onEnter { context in
-            let isTrapDoorOpen = try await context.engine.item(.trapDoor).isOpen
+            let isTrapDoorOpen = await context.item(.trapDoor).isOpen
             let isTrapDoorBarred = await context.engine.hasFlag(.trapDoorBarred)
 
             if isTrapDoorOpen, !isTrapDoorBarred {
-                return try await ActionResult(
+                return await ActionResult(
                     "The trap door crashes shut, and you hear someone barring it.",
-                    context.engine.item(.trapDoor).clearFlag(.isOpen),
+                    context.item(.trapDoor).clearFlag(.isOpen),
                     context.engine.setFlag(.trapDoorBarred)
                 )
             }

@@ -169,8 +169,7 @@ struct EntityIDTests {
             .global,
         ]
 
-        let encoder = JSONEncoder()
-        encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
+        let encoder = JSONEncoder.sorted(.prettyPrinted)
         let decoder = JSONDecoder()
 
         for originalEntityID in originalEntityIDs {
@@ -340,7 +339,7 @@ struct EntityIDTests {
         let results = await withTaskGroup(of: EntityID.self) { group in
             for entityID in entityIDs {
                 group.addTask {
-                    return entityID
+                    entityID
                 }
             }
 

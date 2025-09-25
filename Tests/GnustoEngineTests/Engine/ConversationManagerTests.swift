@@ -47,7 +47,7 @@ struct ConversationManagerTests {
 
         let (engine, _) = await GameEngine.test(blueprint: game)
 
-        let appleProxy = try await engine.item("apple")
+        let appleProxy = await engine.item("apple")
         let eatCommand = Command(
             verb: .eat,
             directObject: .item(appleProxy),

@@ -58,7 +58,7 @@ struct ThinkActionHandlerTests {
             """
         )
 
-        let finalState = try await engine.item("puzzle")
+        let finalState = await engine.item("puzzle")
         #expect(await finalState.hasFlag(.isTouched) == true)
     }
 
@@ -92,7 +92,7 @@ struct ThinkActionHandlerTests {
             """
         )
 
-        let finalState = try await engine.item("gem")
+        let finalState = await engine.item("gem")
         #expect(await finalState.hasFlag(.isTouched) == true)
     }
 
@@ -126,7 +126,7 @@ struct ThinkActionHandlerTests {
             """
         )
 
-        let finalState = try await engine.item("riddle")
+        let finalState = await engine.item("riddle")
         #expect(await finalState.hasFlag(.isTouched) == true)
     }
 
@@ -292,7 +292,7 @@ struct ThinkActionHandlerTests {
             """
         )
 
-        let finalState = try await engine.item("wizard")
+        let finalState = await engine.item("wizard")
         #expect(await finalState.hasFlag(.isTouched) == true)
     }
 
@@ -318,7 +318,7 @@ struct ThinkActionHandlerTests {
             """
         )
 
-        let finalState = try await engine.item("troll")
+        let finalState = await engine.item("troll")
         #expect(await finalState.hasFlag(.isTouched) == true)
     }
 
@@ -352,7 +352,7 @@ struct ThinkActionHandlerTests {
             """
         )
 
-        let finalState = try await engine.item("box")
+        let finalState = await engine.item("box")
         #expect(await finalState.hasFlag(.isTouched) == true)
     }
 

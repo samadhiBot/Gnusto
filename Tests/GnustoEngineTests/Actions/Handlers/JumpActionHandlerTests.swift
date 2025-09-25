@@ -57,7 +57,7 @@ struct JumpActionHandlerTests {
             """
         )
 
-        let finalState = try await engine.item("log")
+        let finalState = await engine.item("log")
         #expect(await finalState.hasFlag(.isTouched) == true)
     }
 
@@ -185,7 +185,7 @@ struct JumpActionHandlerTests {
             """
         )
 
-        let finalState = try await engine.item("troll")
+        let finalState = await engine.item("troll")
         #expect(await finalState.hasFlag(.isTouched) == true)
     }
 
@@ -218,7 +218,7 @@ struct JumpActionHandlerTests {
             """
         )
 
-        let finalState = try await engine.item("boulder")
+        let finalState = await engine.item("boulder")
         #expect(await finalState.hasFlag(.isTouched) == true)
     }
 
@@ -242,7 +242,7 @@ struct JumpActionHandlerTests {
         try await engine.execute("jump fence")
 
         // Then
-        let finalState = try await engine.item("fence")
+        let finalState = await engine.item("fence")
         #expect(await finalState.hasFlag(.isTouched) == true)
     }
 
@@ -275,7 +275,7 @@ struct JumpActionHandlerTests {
             """
         )
 
-        let finalState = try await engine.item("puddle")
+        let finalState = await engine.item("puddle")
         #expect(await finalState.hasFlag(.isTouched) == true)
     }
 

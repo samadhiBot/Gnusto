@@ -45,8 +45,8 @@ struct PourActionHandlerTests {
             """
         )
 
-        let finalBottle = try await engine.item("bottle")
-        let finalPlant = try await engine.item("plant")
+        let finalBottle = await engine.item("bottle")
+        let finalPlant = await engine.item("plant")
         #expect(await finalBottle.hasFlag(.isTouched) == true)
         #expect(await finalPlant.hasFlag(.isTouched) == true)
     }
@@ -522,8 +522,8 @@ struct PourActionHandlerTests {
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // Verify initial state
-        let initialOil = try await engine.item("oil")
-        let initialLamp = try await engine.item("lamp")
+        let initialOil = await engine.item("oil")
+        let initialLamp = await engine.item("lamp")
         #expect(await initialOil.hasFlag(.isTouched) == false)
         #expect(await initialLamp.hasFlag(.isTouched) == false)
 
@@ -531,8 +531,8 @@ struct PourActionHandlerTests {
         try await engine.execute("pour oil on lamp")
 
         // Then
-        let finalOil = try await engine.item("oil")
-        let finalLamp = try await engine.item("lamp")
+        let finalOil = await engine.item("oil")
+        let finalLamp = await engine.item("lamp")
         #expect(await finalOil.hasFlag(.isTouched) == true)
         #expect(await finalLamp.hasFlag(.isTouched) == true)
 

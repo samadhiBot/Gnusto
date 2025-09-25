@@ -59,7 +59,7 @@ public struct InsertActionHandler: ActionHandler {
         for itemToInsert in itemsToInsert {
             do {
                 // Check if player is holding this item
-                guard try await itemToInsert.playerIsHolding else {
+                guard await itemToInsert.playerIsHolding else {
                     throw ActionResponse.itemNotHeld(itemToInsert)
                 }
 
@@ -78,14 +78,14 @@ public struct InsertActionHandler: ActionHandler {
                 }
 
                 // Recursive check: is the target container inside the item we are inserting?
-                var currentParent = try await container.parent
+                var currentParent = await container.parent
                 var isCircular = false
                 while case .item(let parentProxy) = currentParent {
                     if parentProxy == itemToInsert {
                         isCircular = true
                         break
                     }
-                    currentParent = try await parentProxy.parent
+                    currentParent = await parentProxy.parent
                 }
 
                 if isCircular {
@@ -119,7 +119,7 @@ public struct InsertActionHandler: ActionHandler {
                 itemStateChanges.append(moveChange)
 
                 // Mark item touched
-                if let touchedChange = try await itemToInsert.setFlag(.isTouched) {
+                if let touchedChange = await itemToInsert.setFlag(.isTouched) {
                     itemStateChanges.append(touchedChange)
                 }
 
@@ -135,7 +135,7 @@ public struct InsertActionHandler: ActionHandler {
 
         // Mark container touched if any items were inserted
         if insertedItems.isNotEmpty {
-            try await allStateChanges.append(
+            await allStateChanges.append(
                 container.setFlag(.isTouched)
             )
         }
@@ -143,14 +143,13 @@ public struct InsertActionHandler: ActionHandler {
         // Generate appropriate message
         let message =
             if insertedItems.isEmpty {
-                context.command.isAllCommand
-                    ? context.msg.youHaveNothingToPutIn(
-                        await container.withDefiniteArticle
-                    ) : context.msg.doWhat(context.command)
+                context.command.isAllCommand ?
+                    await context.msg.youHaveNothingToPutIn(container.withDefiniteArticle) :
+                    context.msg.doWhat(context.command)
             } else {
-                context.msg.youPutItemInContainer(
-                    await insertedItems.listWithDefiniteArticles() ?? "",
-                    container: await container.withDefiniteArticle
+                await context.msg.youPutItemInContainer(
+                    insertedItems.listWithDefiniteArticles() ?? "",
+                    container: container.withDefiniteArticle
                 )
             }
 

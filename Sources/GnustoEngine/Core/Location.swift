@@ -58,7 +58,7 @@ public struct Location: Codable, Identifiable, Hashable, Sendable {
         )
     }
 
-    public func proxy(_ engine: GameEngine) async throws -> LocationProxy {
-        try await engine.location(id)
+    public func proxy(_ engine: GameEngine) async -> LocationProxy {
+        await engine.location(id)
     }
 }

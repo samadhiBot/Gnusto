@@ -10,65 +10,149 @@ import Foundation
 public struct FuseState: Codable, Sendable, Equatable, Hashable {
     /// The number of game turns remaining until this fuse triggers.
     /// This value is decremented each turn by the game engine's timing system.
-    public var turns: Int
+    /// If nil, the engine will use the fuse definition's initialTurns.
+    public var turns: Int?
 
-    /// Custom state data associated with this fuse instance.
-    /// This dictionary can store any context-specific information needed when the fuse triggers.
-    /// Common use cases include entity IDs, location references, or fuse-specific parameters.
-    public var dictionary: [String: StateValue]
+    /// Type-safe codable payload containing custom state data for this fuse instance.
+    /// This can store any `Codable & Sendable` type, providing compile-time type safety
+    /// and eliminating the need for string-based key lookups.
+    public var payload: AnyCodableSendable?
 
-    /// Initializes a new fuse state.
+    // MARK: - Initializers
+
+    /// Initializes a new fuse state with a type-safe payload.
     ///
     /// - Parameters:
-    ///   - turns: The number of turns until the fuse triggers (must be > 0).
-    ///   - state: Optional custom state data for the fuse. Defaults to empty.
-    public init(turns: Int, state: [String: StateValue] = [:]) {
-        precondition(turns > 0, "Fuse state must have a positive turn count.")
+    ///   - turns: The number of turns until the fuse triggers (must be > 0 if provided).
+    ///   - payload: Optional strongly-typed payload data for the fuse.
+    /// - Throws: An error if the payload cannot be encoded to JSON.
+    public init<T: Codable & Sendable>(turns: Int?, payload: T?) throws {
+        if let turns {
+            precondition(turns > 0, "Fuse state must have a positive turn count.")
+        }
         self.turns = turns
-        self.dictionary = state
+        self.payload = try payload.map(AnyCodableSendable.init)
     }
 
-    // MARK: - Convenience Access Methods
-
-    /// Retrieves a string value from the fuse's state data.
+    /// Initializes a new fuse state with no payload data.
     ///
-    /// - Parameter key: The key to look up in the state dictionary.
-    /// - Returns: The string value if found and convertible, otherwise `nil`.
-    public func getString(_ key: String) -> String? {
-        return dictionary[key]?.toString
+    /// - Parameters:
+    ///   - turns: The number of turns until the fuse triggers (must be > 0 if provided).
+    public init(turns: Int?) {
+        if let turns {
+            precondition(turns > 0, "Fuse state must have a positive turn count.")
+        }
+        self.turns = turns
+        self.payload = nil
     }
 
-    /// Retrieves an integer value from the fuse's state data.
+    /// Internal initializer that takes a payload directly without re-encoding.
+    /// Used by the engine for operations like fuse repetition.
     ///
-    /// - Parameter key: The key to look up in the state dictionary.
-    /// - Returns: The integer value if found and convertible, otherwise `nil`.
-    public func getInt(_ key: String) -> Int? {
-        return dictionary[key]?.toInt
+    /// - Parameters:
+    ///   - turns: Number of turns until the fuse triggers (must be > 0 if provided).
+    ///   - payload: The payload to use directly.
+    internal init(turns: Int?, payload: AnyCodableSendable?) {
+        if let turns {
+            precondition(turns > 0, "Fuse state must have a positive turn count.")
+        }
+        self.turns = turns
+        self.payload = payload
     }
 
-    /// Retrieves a boolean value from the fuse's state data.
+    // MARK: - Type-Safe Payload Access
+
+    /// Retrieves the payload as the specified type.
     ///
-    /// - Parameter key: The key to look up in the state dictionary.
-    /// - Returns: The boolean value if found and convertible, otherwise `nil`.
-    public func getBool(_ key: String) -> Bool? {
-        return dictionary[key]?.toBool
+    /// - Parameter type: The type to decode the payload as.
+    /// - Returns: The decoded payload of the specified type, or `nil` if no payload
+    ///           exists or the type doesn't match.
+    public func getPayload<T: Codable & Sendable>(as type: T.Type) -> T? {
+        payload?.tryDecode(as: type)
     }
 
-    /// Retrieves an ItemID from the fuse's state data.
+    /// Checks if the payload contains data of the specified type.
     ///
-    /// - Parameter key: The key to look up in the state dictionary.
-    /// - Returns: The ItemID if found and the value is a valid string, otherwise `nil`.
-    public func getItemID(_ key: String) -> ItemID? {
-        guard let stringValue = getString(key) else { return nil }
-        return ItemID(rawValue: stringValue)
+    /// - Parameter type: The type to check for.
+    /// - Returns: `true` if the payload exists and can be decoded as the specified type.
+    public func hasPayload<T: Codable & Sendable>(ofType type: T.Type) -> Bool {
+        getPayload(as: type) != nil
+    }
+}
+
+// MARK: - Common Payload Types
+
+extension FuseState {
+
+    /// A structured payload for fuses that need to reference an enemy and location.
+    /// This is commonly used by enemy-related fuses like wakeup and return behaviors.
+    public struct EnemyLocationPayload: Codable, Sendable, Equatable, Hashable {
+        public let enemyID: ItemID
+        public let locationID: LocationID
+        public let message: String
+
+        public init(enemyID: ItemID, locationID: LocationID, message: String) {
+            self.enemyID = enemyID
+            self.locationID = locationID
+            self.message = message
+        }
     }
 
-    /// Retrieves a LocationID from the fuse's state data.
+    /// A structured payload for status effect expiry fuses.
+    /// Contains the affected character and the specific effect to remove.
+    public struct StatusEffectPayload: Codable, Sendable, Equatable, Hashable {
+        public let itemID: ItemID
+        public let effect: GeneralCondition
+
+        public init(itemID: ItemID, effect: GeneralCondition) {
+            self.itemID = itemID
+            self.effect = effect
+        }
+    }
+}
+
+// MARK: - Convenience Constructors
+
+extension FuseState {
+
+    /// Creates a fuse state with enemy/location payload data.
     ///
-    /// - Parameter key: The key to look up in the state dictionary.
-    /// - Returns: The LocationID if found and the value is a valid string, otherwise `nil`.
-    public func getLocationID(_ key: String) -> LocationID? {
-        guard let stringValue = getString(key) else { return nil }
-        return LocationID(rawValue: stringValue)
+    /// - Parameters:
+    ///   - turns: Number of turns until the fuse triggers (must be > 0 if provided).
+    ///   - enemyID: The ID of the enemy item.
+    ///   - locationID: The location ID for context.
+    ///   - message: The message to display when triggered.
+    /// - Throws: An error if the payload cannot be encoded.
+    public static func enemyLocation(
+        turns: Int?,
+        enemyID: ItemID,
+        locationID: LocationID,
+        message: String
+    ) throws -> FuseState {
+        let payload = EnemyLocationPayload(
+            enemyID: enemyID,
+            locationID: locationID,
+            message: message
+        )
+        return try FuseState(turns: turns, payload: payload)
+    }
+
+    /// Creates a fuse state with status effect payload data.
+    ///
+    /// - Parameters:
+    ///   - turns: Number of turns until the fuse triggers (must be > 0 if provided).
+    ///   - itemID: The ID of the affected character/item.
+    ///   - effect: The status effect to remove.
+    /// - Throws: An error if the payload cannot be encoded.
+    public static func statusEffect(
+        turns: Int?,
+        itemID: ItemID,
+        effect: GeneralCondition
+    ) throws -> FuseState {
+        let payload = StatusEffectPayload(
+            itemID: itemID,
+            effect: effect
+        )
+        return try FuseState(turns: turns, payload: payload)
     }
 }

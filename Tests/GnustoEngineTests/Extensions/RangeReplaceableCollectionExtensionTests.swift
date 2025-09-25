@@ -147,13 +147,13 @@ struct RangeReplaceableCollectionExtensionTests {
         var numbers: [Int] = []
 
         // Append 1000 elements, alternating between valid and nil values
-        for i in 1...1000 {
+        for i in 1...1_000 {
             let value: Int? = i % 2 == 0 ? i : nil
             numbers.append(value)
         }
 
         // Should only contain even numbers from 2 to 1000
-        let expectedNumbers = Array(stride(from: 2, through: 1000, by: 2))
+        let expectedNumbers = Array(stride(from: 2, through: 1_000, by: 2))
         #expect(numbers == expectedNumbers)
         #expect(numbers.count == 500)
     }

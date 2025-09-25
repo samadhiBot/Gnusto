@@ -39,7 +39,7 @@ struct InflateActionHandlerTests {
             """
         )
 
-        let finalState = try await engine.item("balloon")
+        let finalState = await engine.item("balloon")
         #expect(await finalState.hasFlag(.isTouched))
         #expect(await finalState.hasFlag(.isInflated))
     }
@@ -311,7 +311,7 @@ struct InflateActionHandlerTests {
         try await engine.execute("inflate vest")
 
         // Then: Verify state changes
-        let finalState = try await engine.item("lifeVest")
+        let finalState = await engine.item("lifeVest")
         #expect(await finalState.hasFlag(.isTouched))
         #expect(await finalState.hasFlag(.isInflated))
         #expect(await finalState.hasFlag(.isInflatable))  // Still inflatable
@@ -360,7 +360,7 @@ struct InflateActionHandlerTests {
         )
 
         // Should still touch the item
-        let finalState = try await engine.item("balloon")
+        let finalState = await engine.item("balloon")
         #expect(await finalState.hasFlag(.isTouched))
         #expect(await finalState.hasFlag(.isInflated))
     }
@@ -396,9 +396,9 @@ struct InflateActionHandlerTests {
             """
         )
 
-        let finalState = try await engine.item("balloon")
+        let finalState = await engine.item("balloon")
         #expect(await finalState.hasFlag(.isInflated))
-        #expect(try await finalState.playerIsHolding)  // Still held by player
+        #expect(await finalState.playerIsHolding)  // Still held by player
     }
 
     @Test("Inflate multiple different items")
@@ -453,8 +453,8 @@ struct InflateActionHandlerTests {
         )
 
         // Verify both items are inflated
-        let balloonState = try await engine.item("balloon")
-        let raftState = try await engine.item("raft")
+        let balloonState = await engine.item("balloon")
+        let raftState = await engine.item("raft")
         #expect(await balloonState.hasFlag(.isInflated))
         #expect(await raftState.hasFlag(.isInflated))
     }
@@ -481,7 +481,7 @@ struct InflateActionHandlerTests {
         try await engine.execute("inflate tube")
 
         // Then: Verify state changes
-        let finalState = try await engine.item("tube")
+        let finalState = await engine.item("tube")
         #expect(await finalState.hasFlag(.isTouched))
         #expect(await finalState.hasFlag(.isInflated))
 
@@ -556,8 +556,8 @@ struct InflateActionHandlerTests {
         )
 
         // Verify both balloons are inflated
-        let balloon1State = try await engine.item("balloon1")
-        let balloon2State = try await engine.item("balloon2")
+        let balloon1State = await engine.item("balloon1")
+        let balloon2State = await engine.item("balloon2")
         #expect(await balloon1State.hasFlag(.isInflated))
         #expect(await balloon2State.hasFlag(.isInflated))
     }

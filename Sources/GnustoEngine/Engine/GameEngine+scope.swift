@@ -15,97 +15,81 @@ extension GameEngine {
     ///   Inventory items are always reachable regardless of this setting.
     /// - Returns: A set of proxies for items reachable by the player.
     func itemsReachableByPlayer(requiresLight: Bool = true) async -> Set<ItemProxy> {
-        do {
-            let player = await player
-            let currentLocation = try await player.location
+        let player = await player
+        let currentLocation = await player.location
 
-            // Check if the current location is lit - this is critical for reachability
-            let isLit = try await currentLocation.isLit
+        // Check if the current location is lit - this is critical for reachability
+        let isLit = await currentLocation.isLit
 
-            var reachableItems = Set<ItemProxy>()
-            var processedContainers = Set<ItemProxy>()
+        var reachableItems = Set<ItemProxy>()
+        var processedContainers = Set<ItemProxy>()
 
-            // 1. Add inventory items (always reachable regardless of lighting)
-            let inventoryItems = try await player.inventory
-            reachableItems.formUnion(inventoryItems)
+        // 1. Add inventory items (always reachable regardless of lighting)
+        let inventoryItems = await player.inventory
+        reachableItems.formUnion(inventoryItems)
 
-            // 2. Add items in current location only if lit (or if light is not required)
-            if isLit || !requiresLight {
-                // Add items directly in the location
-                let locationItems = try await currentLocation.items
-                reachableItems.formUnion(locationItems)
+        // 2. Add items in current location only if lit (or if light is not required)
+        if isLit || !requiresLight {
+            // Add items directly in the location
+            let locationItems = await currentLocation.items
+            reachableItems.formUnion(locationItems)
 
-                // Add local globals for the current location
-                let localGlobals = try await currentLocation.localGlobals
-                for globalItemID in localGlobals {
-                    do {
-                        let globalItem = try await item(globalItemID)
-                        let isInvisible = await globalItem.hasFlag(.isInvisible)
-                        if !isInvisible {
-                            reachableItems.insert(globalItem)
-                        }
-                    } catch {
-                        // Skip items that don't exist
-                        continue
-                    }
+            // Add local globals for the current location
+            let localGlobals = await currentLocation.localGlobals
+            for globalItemID in localGlobals {
+                let globalItem = item(globalItemID)
+                let isInvisible = await globalItem.hasFlag(.isInvisible)
+                if !isInvisible {
+                    reachableItems.insert(globalItem)
                 }
             }
-
-            // 3. Process containers and surfaces recursively
-            var itemsToCheck = reachableItems
-
-            while itemsToCheck.isNotEmpty {
-                let currentItem = itemsToCheck.removeFirst()
-
-                do {
-                    // Check if it's an accessible container
-                    let isContainer = await currentItem.isContainer
-                    if isContainer && !processedContainers.contains(currentItem) {
-                        processedContainers.insert(currentItem)
-
-                        let isOpen = await currentItem.hasFlag(.isOpen)
-                        let isTransparent = await currentItem.hasFlag(.isTransparent)
-
-                        if isOpen || isTransparent {
-                            let itemsInside = try await currentItem.contents
-                            let newlyReachable = Set(itemsInside).subtracting(reachableItems)
-                            reachableItems.formUnion(newlyReachable)
-                            itemsToCheck.formUnion(newlyReachable)
-                        }
-                    }
-
-                    // Check if it's a non-container (items in non-containers are visible by default)
-                    else if !(await currentItem.isContainer)
-                        && !processedContainers.contains(currentItem)
-                    {
-                        processedContainers.insert(currentItem)
-
-                        let itemsInside = try await currentItem.contents
-                        let newlyReachable = Set(itemsInside).subtracting(reachableItems)
-                        reachableItems.formUnion(newlyReachable)
-                        itemsToCheck.formUnion(newlyReachable)
-                    }
-
-                    // Check if it's a surface
-                    let isSurface = await currentItem.isSurface
-                    if isSurface {
-                        let itemsOnSurface = try await currentItem.contents
-                        let newlyReachable = Set(itemsOnSurface).subtracting(reachableItems)
-                        reachableItems.formUnion(newlyReachable)
-                        itemsToCheck.formUnion(newlyReachable)
-                    }
-                } catch {
-                    // Skip items that can't be retrieved
-                    continue
-                }
-            }
-
-            return reachableItems
-
-        } catch {
-            logger.warning("GameEngine.itemsReachableByPlayer: \(error)")
-            return []
         }
+
+        // 3. Process containers and surfaces recursively
+        var itemsToCheck = reachableItems
+
+        while itemsToCheck.isNotEmpty {
+            let currentItem = itemsToCheck.removeFirst()
+
+            // Check if it's an accessible container
+            let isContainer = await currentItem.isContainer
+            if isContainer && !processedContainers.contains(currentItem) {
+                processedContainers.insert(currentItem)
+
+                let isOpen = await currentItem.hasFlag(.isOpen)
+                let isTransparent = await currentItem.hasFlag(.isTransparent)
+
+                if isOpen || isTransparent {
+                    let itemsInside = await currentItem.contents
+                    let newlyReachable = Set(itemsInside).subtracting(reachableItems)
+                    reachableItems.formUnion(newlyReachable)
+                    itemsToCheck.formUnion(newlyReachable)
+                }
+            }
+
+            // Check if it's a non-container (items in non-containers are visible by default)
+            else if !(await currentItem.isContainer)
+                        && !processedContainers.contains(currentItem)
+            {
+                processedContainers.insert(currentItem)
+
+                let itemsInside = await currentItem.contents
+                let newlyReachable = Set(itemsInside).subtracting(reachableItems)
+                reachableItems.formUnion(newlyReachable)
+                itemsToCheck.formUnion(newlyReachable)
+            }
+
+            // Check if it's a surface
+            let isSurface = await currentItem.isSurface
+            if isSurface {
+                let itemsOnSurface = await currentItem.contents
+                let newlyReachable = Set(itemsOnSurface).subtracting(reachableItems)
+                reachableItems.formUnion(newlyReachable)
+                itemsToCheck.formUnion(newlyReachable)
+            }
+        }
+
+        return reachableItems
     }
 
     /// Determines all items currently reachable by the player, requiring light.

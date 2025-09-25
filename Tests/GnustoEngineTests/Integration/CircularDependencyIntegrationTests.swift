@@ -57,10 +57,9 @@ struct CircularDependencyIntegrationTests {
     static let lampComputer = ItemComputer(for: "lamp") {
         itemProperty(.brightness) { context in
             // This creates a circular dependency: lamp.brightness → mirror.reflectionLevel → lamp.brightness
-            let mirror = try await context.engine.item("mirror")
-            let reflectionLevel =
-                try await mirror.property(.reflectionLevel) ?? .int(0)
-            let baseValue = context.item.properties[.brightness]?.toInt ?? 50
+            let mirror = await context.item("mirror")
+            let reflectionLevel = await mirror.property(.reflectionLevel) ?? 0
+            let baseValue = await context.item.property(.brightness)?.toInt ?? 50
             return .int(baseValue + (reflectionLevel.toInt ?? 0))
         }
     }
@@ -69,8 +68,8 @@ struct CircularDependencyIntegrationTests {
     static let mirrorComputer = ItemComputer(for: "mirror") {
         itemProperty(.reflectionLevel) { context in
             // This completes the circular dependency: mirror.reflectionLevel → lamp.brightness → mirror.reflectionLevel
-            let lamp = try await context.engine.item("lamp")
-            let brightness = try await lamp.property(.brightness) ?? .int(0)
+            let lamp = await context.item("lamp")
+            let brightness = await lamp.property(.brightness) ?? .int(0)
             return .int((brightness.toInt ?? 0) / 2)
         }
     }
@@ -79,8 +78,8 @@ struct CircularDependencyIntegrationTests {
     static let caveComputer = LocationComputer(for: "crystalCave") {
         locationProperty(LocationPropertyID.ambientLight) { context in
             // This could create a three-way circular dependency if lamp depends on cave
-            let lamp = try await context.engine.item("lamp")
-            let brightness = try await lamp.property(.brightness) ?? .int(0)
+            let lamp = await context.item("lamp")
+            let brightness = await lamp.property(.brightness) ?? .int(0)
             return .int((brightness.toInt ?? 0) * 2)
         }
     }
@@ -88,9 +87,9 @@ struct CircularDependencyIntegrationTests {
     /// Lamp computer that depends on location (creates item → location → item cycle)
     static let lampLocationDependentComputer = ItemComputer(for: "lamp") {
         itemProperty(.brightness) { context in
-            let location = try await context.engine.location("crystalCave")
+            let location = await context.location("crystalCave")
             let ambientLight =
-                try await location.property(LocationPropertyID.ambientLight) ?? .int(0)
+                await location.property(LocationPropertyID.ambientLight) ?? .int(0)
             return .int(50 + (ambientLight.toInt ?? 0))
         }
     }
@@ -131,19 +130,19 @@ struct CircularDependencyIntegrationTests {
         // Accessing lamp.brightness should trigger the circular dependency detection
         // and gracefully fall back to static values (nil in this case)
         // lamp.brightness → mirror.reflectionLevel → lamp.brightness (fallback to nil)
-        let lampProxy = try await engine.item("lamp")
+        let lampProxy = await engine.item("lamp")
 
         // Should not throw an error, but successfully compute using fallback values
         // lamp.brightness calls mirror.reflectionLevel, which calls lamp.brightness (circular!)
         // Inner lamp.brightness short-circuits to nil, so mirror.reflectionLevel = 0 / 2 = 0
         // Then lamp.brightness = 50 + 0 = 50
-        let brightness = try await lampProxy.property(.brightness)
+        let brightness = await lampProxy.property(.brightness)
         #expect(brightness?.toInt == 50, "Should gracefully compute using fallback values")
 
         // Mirror should now compute successfully using the computed lamp brightness
         // mirror.reflectionLevel = 50 / 2 = 25
-        let mirrorProxy = try await engine.item("mirror")
-        let reflectionLevel = try await mirrorProxy.property(.reflectionLevel)
+        let mirrorProxy = await engine.item("mirror")
+        let reflectionLevel = await mirrorProxy.property(.reflectionLevel)
         #expect(reflectionLevel?.toInt == 25, "Should gracefully compute using computed brightness")
     }
 
@@ -155,13 +154,13 @@ struct CircularDependencyIntegrationTests {
         // Accessing mirror.reflectionLevel should trigger circular dependency detection
         // and gracefully fall back to static values
         // mirror.reflectionLevel → lamp.brightness → mirror.reflectionLevel (fallback to nil)
-        let mirrorProxy = try await engine.item("mirror")
+        let mirrorProxy = await engine.item("mirror")
 
         // Should not throw an error, but successfully compute using fallback values
         // mirror.reflectionLevel calls lamp.brightness, which calls mirror.reflectionLevel (circular!)
         // Inner mirror.reflectionLevel short-circuits to nil, so lamp.brightness = 50 + 0 = 50
         // Then mirror.reflectionLevel = 50 / 2 = 25
-        let reflectionLevel = try await mirrorProxy.property(.reflectionLevel)
+        let reflectionLevel = await mirrorProxy.property(.reflectionLevel)
         #expect(reflectionLevel?.toInt == 25, "Should gracefully compute using fallback values")
 
         // Lamp should also compute successfully when accessed fresh
@@ -169,8 +168,8 @@ struct CircularDependencyIntegrationTests {
         // lamp.brightness → mirror.reflectionLevel → lamp.brightness (circular!)
         // Inner lamp.brightness returns nil, so mirror.reflectionLevel = 0/2 = 0
         // Final lamp.brightness = 50 + 0 = 50
-        let lampProxy = try await engine.item("lamp")
-        let brightness = try await lampProxy.property(.brightness)
+        let lampProxy = await engine.item("lamp")
+        let brightness = await lampProxy.property(.brightness)
         #expect(
             brightness?.toInt == 50, "Should gracefully compute with predictable fallback behavior")
     }
@@ -182,19 +181,19 @@ struct CircularDependencyIntegrationTests {
 
         // Accessing lamp.brightness should trigger circular dependency detection:
         // lamp.brightness → crystalCave.ambientLight → lamp.brightness (fallback to nil)
-        let lampProxy = try await engine.item("lamp")
+        let lampProxy = await engine.item("lamp")
 
         // Should not throw an error, but successfully compute using fallback values
         // When lamp.brightness tries to compute, it calls ambientLight, which calls brightness back (circular!)
         // The inner brightness call returns nil (fallback), so ambientLight = 0*2 = 0
         // Then lamp.brightness = 50 + 0 = 50
-        let brightness = try await lampProxy.property(.brightness)
+        let brightness = await lampProxy.property(.brightness)
         #expect(brightness?.toInt == 50, "Should gracefully compute using fallback values")
 
         // When we access ambientLight directly, it computes based on the now-computed brightness
         // ambientLight = brightness*2 = 50*2 = 100
-        let caveProxy = try await engine.location("crystalCave")
-        let ambientLight = try await caveProxy.property(LocationPropertyID.ambientLight)
+        let caveProxy = await engine.location("crystalCave")
+        let ambientLight = await caveProxy.property(LocationPropertyID.ambientLight)
         #expect(
             ambientLight?.toInt == 100, "Should gracefully compute using current brightness value")
     }
@@ -218,8 +217,8 @@ struct CircularDependencyIntegrationTests {
         // Mirror depends on lamp, but lamp doesn't depend on mirror (no cycle)
         let safeMirrorComputer = ItemComputer(for: "safeMirror") {
             itemProperty(.reflectionLevel) { context in
-                let lamp = try await context.engine.item("staticLamp")
-                let brightness = try await lamp.property(.brightness) ?? .int(0)
+                let lamp = await context.item("staticLamp")
+                let brightness = await lamp.property(.brightness) ?? .int(0)
                 return .int((brightness.toInt ?? 0) / 3)
             }
         }
@@ -234,8 +233,8 @@ struct CircularDependencyIntegrationTests {
         let (engine, _) = await GameEngine.test(blueprint: safeGame)
 
         // This should work without throwing
-        let mirrorProxy = try await engine.item("dependentMirror")
-        let reflectionLevel = try await mirrorProxy.property(.reflectionLevel)
+        let mirrorProxy = await engine.item("dependentMirror")
+        let reflectionLevel = await mirrorProxy.property(.reflectionLevel)
 
         #expect(reflectionLevel?.toInt == 25)  // 75 / 3 = 25
     }
@@ -245,14 +244,14 @@ struct CircularDependencyIntegrationTests {
         let game = createCircularItemGame()
         let (engine, _) = await GameEngine.test(blueprint: game)
 
-        let lampProxy = try await engine.item("lamp")
+        let lampProxy = await engine.item("lamp")
 
         // First attempt should gracefully compute using fallback values
-        let brightness1 = try await lampProxy.property(.brightness)
+        let brightness1 = await lampProxy.property(.brightness)
         #expect(brightness1?.toInt == 50, "Should gracefully compute using fallback values")
 
         // Computation tracker should be reset, so we can try again and get the same result
-        let brightness2 = try await lampProxy.property(.brightness)
+        let brightness2 = await lampProxy.property(.brightness)
         #expect(brightness2?.toInt == 50, "Should gracefully compute consistently")
 
         // Note: With the new TaskLocal-based tracking system, computation state
@@ -271,8 +270,8 @@ struct CircularDependencyIntegrationTests {
 
         // Computer that only handles weight, leaving other properties as static
         let partialComputer = ItemComputer(for: "testItem") {
-            itemProperty(.weight) { context in
-                return .int(42)
+            itemProperty(.weight) { _ in
+                .int(42)
             }
         }
 
@@ -284,17 +283,17 @@ struct CircularDependencyIntegrationTests {
         )
 
         let (engine, _) = await GameEngine.test(blueprint: game)
-        let itemProxy = try await engine.item("complexItem")
+        let itemProxy = await engine.item("complexItem")
 
         // Static properties should work normally
-        let description = try await itemProxy.property(.description)
+        let description = await itemProxy.property(.description)
         #expect(description?.toString == "Static description")
 
-        let brightness = try await itemProxy.property(.brightness)
+        let brightness = await itemProxy.property(.brightness)
         #expect(brightness?.toInt == 100)
 
         // Computed property should work
-        let weight = try await itemProxy.property(.weight)
+        let weight = await itemProxy.property(.weight)
         #expect(weight?.toInt == 42)
     }
 }

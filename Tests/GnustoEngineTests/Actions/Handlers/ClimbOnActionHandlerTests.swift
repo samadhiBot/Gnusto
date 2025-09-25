@@ -38,7 +38,7 @@ struct ClimbOnActionHandlerTests {
             """
         )
 
-        let finalState = try await engine.item("table")
+        let finalState = await engine.item("table")
         #expect(await finalState.hasFlag(.isTouched) == true)
     }
 
@@ -254,7 +254,7 @@ struct ClimbOnActionHandlerTests {
         try await engine.execute("climb on stool")
 
         // Then: Verify state change
-        let finalState = try await engine.item("stool")
+        let finalState = await engine.item("stool")
         #expect(await finalState.hasFlag(.isTouched) == true)
 
         // Verify message
@@ -350,7 +350,7 @@ struct ClimbOnActionHandlerTests {
             """
         )
 
-        let finalState = try await engine.item("box")
+        let finalState = await engine.item("box")
         #expect(await finalState.hasFlag(.isTouched) == true)
     }
 

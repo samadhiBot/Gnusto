@@ -214,10 +214,10 @@ class GameDataCollector {
                             extractPlayerLocationData(from: functionCall)
                         } else if functionName == "Fuse" {
                             extractFuseData(
-                                from: functionCall, propertyName: propertyName, isStatic: isStatic)
+                                propertyName: propertyName, isStatic: isStatic)
                         } else if functionName == "Daemon" {
                             extractDaemonData(
-                                from: functionCall, propertyName: propertyName, isStatic: isStatic)
+                                propertyName: propertyName, isStatic: isStatic)
                         }
                     }
                 }
@@ -319,13 +319,13 @@ class GameDataCollector {
 
     private func isCombatSystemType(_ typeName: String) -> Bool {
         // Check if this is a CombatSystem type - could be direct instantiation or a known combat system type
-        return typeName.hasSuffix("CombatSystem")
+        typeName.hasSuffix("CombatSystem")
             || (typeName.contains("Combat") && typeName.contains("System"))
     }
 
     private func isCombatMessengerType(_ typeName: String) -> Bool {
         // Check if this is a CombatMessenger type - could be direct instantiation or a known combat messenger type
-        return typeName.hasSuffix("CombatMessenger")
+        typeName.hasSuffix("CombatMessenger")
             || (typeName.contains("Combat") && typeName.contains("Messenger"))
             || typeName == "CombatMessenger"
     }
@@ -493,7 +493,6 @@ class GameDataCollector {
     }
 
     private func extractFuseData(
-        from functionCall: FunctionCallExprSyntax,
         propertyName: String,
         isStatic: Bool
     ) {
@@ -510,7 +509,6 @@ class GameDataCollector {
     }
 
     private func extractDaemonData(
-        from functionCall: FunctionCallExprSyntax,
         propertyName: String,
         isStatic: Bool
     ) {

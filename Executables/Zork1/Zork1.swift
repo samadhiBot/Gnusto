@@ -32,11 +32,35 @@ public struct Zork1: GameBlueprint {
         rng: RandomNumberGenerator & Sendable = SystemRandomNumberGenerator()
     ) {
         self.randomNumberGenerator = rng
-        self.messenger = ZorkMessageProvider(randomNumberGenerator: rng)
+        self.messenger = ZorkMessenger(randomNumberGenerator: rng)
     }
 
     // Note: All game content registration (items, locations, handlers, etc.)
     // is automatically handled by GnustoAutoWiringPlugin
+}
+
+// MARK: - SwordBrightness
+
+enum SwordBrightness: Codable, CustomStringConvertible, Sendable {
+    case glowingBrightly
+    case glowingFaintly
+    case notGlowing
+
+    var description: String {
+        switch self {
+        case .glowingBrightly: "Your sword is glowing very brightly."
+        case .glowingFaintly: "Your sword is glowing with a faint blue glow."
+        case .notGlowing: "Your sword is no longer glowing."
+        }
+    }
+}
+
+// MARK: - Custom IDs and Properties
+
+extension Item {
+    var isMonster: Bool {
+        [.bat, .cyclops, .ghosts, .thief, .troll].contains(id)
+    }
 }
 
 extension ItemProperty {
@@ -45,12 +69,13 @@ extension ItemProperty {
     ///
     /// In the Gnusto Engine translation it is only used to prevent item theft. For movement
     /// restriction the `.validLocations` property is set on the `.thief` item.
-    static let isSacred: ItemProperty = ItemProperty(
+    static let isSacred = ItemProperty(
         id: ItemPropertyID(rawValue: "isSacred"),
         rawValue: true
     )
 }
 
 extension ItemPropertyID {
+    static let isBurnedOut = ItemPropertyID("isBurnedOut")
     static let isSacred = ItemPropertyID(rawValue: "isSacred")
 }

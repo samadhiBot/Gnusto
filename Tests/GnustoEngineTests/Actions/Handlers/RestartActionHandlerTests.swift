@@ -1,7 +1,8 @@
 import CustomDump
-import GnustoEngine
 import GnustoTestSupport
 import Testing
+
+@testable import GnustoEngine
 
 @Suite("RestartActionHandler Tests")
 struct RestartActionHandlerTests {
@@ -30,8 +31,8 @@ struct RestartActionHandlerTests {
         _ = await mockIO.flush()  // Clear output buffer
 
         // Verify sword is in inventory before restart
-        let swordBeforeRestart = try await engine.item("sword")
-        #expect(try await swordBeforeRestart.playerIsHolding)
+        let swordBeforeRestart = await engine.item("sword")
+        #expect(await swordBeforeRestart.playerIsHolding)
 
         // Set up mock to respond "y" to restart confirmation
         await mockIO.enqueueInput("y")
@@ -77,8 +78,8 @@ struct RestartActionHandlerTests {
         _ = await mockIO.flush()  // Clear output buffer
 
         // Verify sword is in inventory before restart attempt
-        let swordBefore = try await engine.item("sword")
-        #expect(try await swordBefore.playerIsHolding)
+        let swordBefore = await engine.item("sword")
+        #expect(await swordBefore.playerIsHolding)
 
         // Set up mock to respond "n" to restart confirmation
         await mockIO.enqueueInput("n")
@@ -103,8 +104,8 @@ struct RestartActionHandlerTests {
         #expect(shouldRestart == false)
 
         // Verify game state was not reset
-        let swordAfter = try await engine.item("sword")
-        #expect(try await swordAfter.playerIsHolding)
+        let swordAfter = await engine.item("sword")
+        #expect(await swordAfter.playerIsHolding)
     }
 
     @Test("RESTART handles invalid responses")

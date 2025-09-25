@@ -5,14 +5,8 @@ import Foundation
 /// Each case defines a category of word or phrase the parser looks for when trying to match
 /// player input against a known grammatical structure.
 public enum SyntaxTokenType: Sendable, Equatable, Codable {
-    /// Expects the main verb of the command (e.g., "TAKE", "GO", "LOOK").
-    /// This is typically the first significant token matched by the parser.
-    case verb
-
-    /// Expects a specific verb word (e.g., "CHARGE" in "CHARGE UP CAR").
-    /// This allows syntax rules to be specific to particular verb synonyms.
-    /// The associated `Verb` value is the specific verb that must be used.
-    case specificVerb(Verb)
+    /// Expects a word indicating a direction of movement (e.g., "NORTH", "UP", "WEST").
+    case direction  // Matches a known direction word (e.g., "north", "n")
 
     /// Expects a noun phrase that will be identified as the direct object of the
     /// verb (e.g., the "APPLE" in "TAKE APPLE") _or_ the object of a preposition
@@ -31,13 +25,19 @@ public enum SyntaxTokenType: Sendable, Equatable, Codable {
     /// of the verb. Allows multiple objects.
     case indirectObjects
 
-    /// Expects a word indicating a direction of movement (e.g., "NORTH", "UP", "WEST").
-    case direction  // Matches a known direction word (e.g., "north", "n")
-
     /// Expects a specific particle word that is part of a phrasal verb or special command
     /// syntax (e.g., the "ON" in "TURN LIGHT ON", or "ABOUT" in "THINK ABOUT TOPIC").
     /// The associated `String` value is the exact particle word expected.
     case particle(String)  // Matches a specific particle word (e.g., "on", "off")
+
+    /// Expects a specific verb word (e.g., "CHARGE" in "CHARGE UP CAR").
+    /// This allows syntax rules to be specific to particular verb synonyms.
+    /// The associated `Verb` value is the specific verb that must be used.
+    case specificVerb(Verb)
+
+    /// Expects the main verb of the command (e.g., "TAKE", "GO", "LOOK").
+    /// This is typically the first significant token matched by the parser.
+    case verb
 }
 
 // MARK: - Conformances
@@ -127,6 +127,6 @@ extension SyntaxTokenType {
     /// - Parameter verbID: The specific verb ID that must be used
     /// - Returns: A syntax token that matches only the specified verb
     public static func verb(_ verbID: Verb) -> SyntaxTokenType {
-        return .specificVerb(verbID)
+        .specificVerb(verbID)
     }
 }

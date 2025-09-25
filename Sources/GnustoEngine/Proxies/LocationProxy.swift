@@ -45,9 +45,7 @@ public struct LocationProxy: Sendable, Identifiable {
     ///
     /// - Parameter propertyID: The identifier of the property to retrieve.
     /// - Returns: The property value as a `StateValue`, or `nil` if the property is not set.
-    /// - Throws: `ActionResponse.circularDependency` if a computation cycle is detected.
-    /// - Throws: An error if there's an issue accessing the computed value.
-    public func property(_ propertyID: LocationPropertyID) async throws -> StateValue? {
+    public func property(_ propertyID: LocationPropertyID) async -> StateValue? {
         // Create a unique computation key
         let computationKey = PropertyComputationTracker.key(for: id, property: propertyID)
 
@@ -63,9 +61,9 @@ public struct LocationProxy: Sendable, Identifiable {
         }
 
         // Compute with tracking
-        return try await PropertyComputationTracker.withTracking(computationKey) {
+        return await PropertyComputationTracker.withTracking(computationKey) {
             guard
-                let computedValue = try await computer.compute(
+                let computedValue = await computer.compute(
                     LocationComputeContext(
                         propertyID: propertyID,
                         location: location,
@@ -84,19 +82,31 @@ public struct LocationProxy: Sendable, Identifiable {
 // MARK: - Convenience Extensions
 
 extension GameEngine {
-    /// Creates a `LocationProxy` for the specified location.
+    /// Creates an `LocationProxy` for the `Location` with the specified ID.
+    ///
+    /// If the location is not found in the game state, this method will trigger an assertion failure
+    /// in debug builds and return a placeholder `LocationProxy` with an empty location. This allows
+    /// the game to continue running in release builds while alerting developers to missing location
+    /// references during development.
     ///
     /// - Parameter locationID: The unique identifier of the location.
-    /// - Returns: A `LocationProxy` instance for dynamic property access.
-    public func location(_ locationID: LocationID) async throws -> LocationProxy {
+    /// - Returns: An `LocationProxy` instance for dynamic property access.
+    public func location(_ locationID: LocationID) -> LocationProxy {
         guard let location = gameState.locations[locationID] else {
-            throw ActionResponse.unknownLocation(locationID)
+            assertionFailure("GameEngine.location(\(locationID)): Location not found")
+            return LocationProxy(location: Location(id: locationID), engine: self)
         }
         return LocationProxy(location: location, engine: self)
     }
 }
 
 // MARK: - Conformances
+
+extension LocationProxy: Comparable {
+    public static func < (lhs: LocationProxy, rhs: LocationProxy) -> Bool {
+        lhs.id < rhs.id
+    }
+}
 
 extension LocationProxy: CustomDumpStringConvertible {
     public var customDumpDescription: String {
@@ -106,14 +116,21 @@ extension LocationProxy: CustomDumpStringConvertible {
     }
 }
 
-extension LocationProxy: Equatable {
-    public static func == (lhs: LocationProxy, rhs: LocationProxy) -> Bool {
-        lhs.location == rhs.location
-    }
-}
-
 extension LocationProxy: Hashable {
     public func hash(into hasher: inout Hasher) {
         hasher.combine(id)
+    }
+
+    public static func == (lhs: LocationProxy, rhs: LocationProxy) -> Bool {
+        lhs.id == rhs.id
+    }
+
+    /// A convenience comparator that enables comparisons like `player.location == .forest`.
+    ///
+    /// - Parameters:
+    ///   - proxy: A `LocationProxy` to compare.
+    ///   - id: A `LocationID` to compare.
+    public static func == (proxy: LocationProxy, id: LocationID) -> Bool {
+        proxy.id == id
     }
 }

@@ -14,9 +14,12 @@ public struct CombatTurn: Sendable {
     /// Creates a combat turn with the specified events.
     ///
     /// - Parameters:
-    ///   - playerEvent: The player's action for this turn. Defaults to `nil` if the player takes no action.
-    ///   - enemyEvent: The enemy's reaction or counter-action for this turn. Defaults to `nil` if the enemy takes no action.
-    ///   - additionalEvents: Any supplementary events that occur during this turn, such as status effects or environmental changes. Defaults to an empty array.
+    ///   - playerEvent: The player's action for this turn. Defaults to `nil` if the player
+    ///                  takes no action.
+    ///   - enemyEvent: The enemy's reaction or counter-action for this turn. Defaults to `nil`
+    ///                 if the enemy takes no action.
+    ///   - additionalEvents: Any supplementary events that occur during this turn, such as status
+    ///                       effects or environmental changes. Defaults to an empty array.
     public init(
         playerEvent: CombatEvent? = nil,
         enemyEvent: CombatEvent? = nil,

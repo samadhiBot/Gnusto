@@ -47,7 +47,7 @@ struct GameStateApplyTests {
             items: [testItem, containerItem],
             player: Player(in: .startRoom),
             activeFuses: ["testFuse": FuseState(turns: 5)],
-            activeDaemons: ["testDaemon"],
+            activeDaemons: ["testDaemon": DaemonState()],
             globalState: [
                 "testFlag": .bool(true),
                 "testCounter": .int(42),
@@ -529,11 +529,11 @@ struct GameStateApplyTests {
     func testApplyValidAddActiveDaemonChange() throws {
         var state = createTestGameState()
 
-        let change = StateChange.addActiveDaemon(daemonID: "newDaemon")
+        let change = StateChange.addActiveDaemon(daemonID: "newDaemon", daemonState: DaemonState())
 
         try state.apply(change)
 
-        #expect(state.activeDaemons.contains("newDaemon"))
+        #expect(state.activeDaemons["newDaemon"] != nil)
         #expect(state.changeHistory.count == 1)
         #expect(state.changeHistory.first == change)
     }
@@ -546,43 +546,9 @@ struct GameStateApplyTests {
 
         try state.apply(change)
 
-        #expect(!state.activeDaemons.contains("testDaemon"))
+        #expect(state.activeDaemons["testDaemon"] == nil)
         #expect(state.changeHistory.count == 1)
         #expect(state.changeHistory.first == change)
-    }
-
-    // MARK: - Error Handling Tests
-
-    @Test("Apply change to non-existent item")
-    func testApplyChangeToNonExistentItem() throws {
-        var state = createTestGameState()
-
-        let change = StateChange.setItemName(
-            id: "nonExistentItem",
-            name: "new name"
-        )
-
-        #expect(throws: ActionResponse.self) {
-            try state.apply(change)
-        }
-
-        #expect(state.changeHistory.count == 0)
-    }
-
-    @Test("Apply change to non-existent location")
-    func testApplyChangeToNonExistentLocation() throws {
-        var state = createTestGameState()
-
-        let change = StateChange.setLocationName(
-            id: "nonExistentLocation",
-            name: "new name"
-        )
-
-        #expect(throws: ActionResponse.self) {
-            try state.apply(change)
-        }
-
-        #expect(state.changeHistory.count == 0)
     }
 
     // MARK: - Combat State Tests

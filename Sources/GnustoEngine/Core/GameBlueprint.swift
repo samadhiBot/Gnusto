@@ -268,54 +268,67 @@ public protocol GameBlueprint: Sendable {
 // MARK: - Default implementations
 
 extension GameBlueprint {
+    /// Default implementation provides an empty array of locations.
     public var locations: [Location] {
         []
     }
 
+    /// Default implementation provides no custom action handlers.
     public var customActionHandlers: [ActionHandler] {
         []
     }
 
+    /// Default implementation provides no item event handlers.
     public var itemEventHandlers: [ItemID: ItemEventHandler] {
         [:]
     }
 
+    /// Default implementation provides no location event handlers.
     public var locationEventHandlers: [LocationID: LocationEventHandler] {
         [:]
     }
 
+    /// Default implementation provides no custom combat systems.
     public var combatSystems: [ItemID: any CombatSystem] {
         [:]
     }
 
+    /// Default implementation provides no character-specific combat messengers.
     public var combatMessengers: [ItemID: CombatMessenger] {
         [:]
     }
 
+    /// Default implementation creates a standard combat messenger with the blueprint's RNG.
     public var defaultCombatMessenger: CombatMessenger {
         CombatMessenger(randomNumberGenerator: randomNumberGenerator)
     }
 
+    /// Default implementation provides no timed fuses.
     public var fuses: [FuseID: Fuse] {
         [:]
     }
 
+    /// Default implementation provides no background daemons.
     public var daemons: [DaemonID: Daemon] {
         [:]
     }
 
+    /// Default implementation provides no custom item computers.
     public var itemComputers: [ItemID: ItemComputer] {
         [:]
     }
 
+    /// Default implementation provides no custom location computers.
     public var locationComputers: [LocationID: LocationComputer] {
         [:]
     }
 
+    /// Default implementation uses the system's random number generator.
     public var randomNumberGenerator: any RandomNumberGenerator & Sendable {
         SystemRandomNumberGenerator()
     }
 
+    /// Default implementation creates a standard messenger with default English text.
     public var messenger: StandardMessenger {
         StandardMessenger()
     }

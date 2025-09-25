@@ -20,7 +20,7 @@ import Logging
 ///   or by using higher-level convenience mutation methods (e.g., in
 ///   `GameEngine+stateMutation.swift`).
 /// - Trigger output to the player (usually by returning an `ActionResult` with a message).
-public actor GameEngine: Sendable {
+public actor GameEngine {
     /// The full title of the game (e.g., "ZORK I: The Great Underground Empire").
     /// This is typically displayed when the game starts.
     nonisolated var title: String { gameBlueprint.title }
@@ -152,10 +152,15 @@ public actor GameEngine: Sendable {
     }
 
     /// Stores the last command that encountered disambiguation for retry with clarification
-    var lastDisambiguationContext: (originalInput: String, verb: Verb, noun: String)?
+    var lastDisambiguationContext: LastDisambiguationContext?
 
     /// Stores the last disambiguation options for matching against user responses
     var lastDisambiguationOptions: [String]?
+
+    /// Cache for dynamically created StandardCombatSystem instances to ensure consistency
+    /// across combat turns. This prevents creating new instances for each turn, which
+    /// could lead to different RNG call patterns and non-deterministic behavior.
+    var standardCombatSystemCache: [ItemID: StandardCombatSystem] = [:]
 
     /// Internal logger for engine messages, warnings, and errors.
     let logger = Logger(label: "com.samadhibot.Gnusto.GameEngine")
@@ -163,12 +168,12 @@ public actor GameEngine: Sendable {
     /// Internal flag to control the main game loop's continuation.
     /// Game developers can call `requestQuit()` to set this flag to `true`,
     /// causing the game to end after the current turn completes.
-    public internal(set) var shouldQuit: Bool = false
+    var shouldQuit: Bool = false
 
     /// Internal flag to control game restart.
     /// Game developers can call `requestRestart()` to set this flag to `true`,
     /// causing the game to restart after the current turn completes.
-    public internal(set) var shouldRestart: Bool = false
+    var shouldRestart: Bool = false
 
     /// Blueprint data for game restart and computed properties
     let gameBlueprint: GameBlueprint
@@ -182,11 +187,6 @@ public actor GameEngine: Sendable {
     ///
     /// - Parameters:
     ///   - blueprint: The `GameBlueprint` containing all game definitions, custom handlers, and hooks.
-    ///   - vocabulary: Optional. The `Vocabulary` for the game. If `nil`, it's auto-generated from items.
-    ///   - pronoun: Optional. Initial pronoun reference.
-    ///   - activeFuses: Optional. Initially active fuses and their remaining turns.
-    ///   - activeDaemons: Optional. Initially active daemons.
-    ///   - globalState: Optional. Initial game-specific global key-value data.
     ///   - parser: The `Parser` instance to be used for understanding player input.
     ///   - ioHandler: The `IOHandler` instance for interacting with the player (text input/output).
     ///   - filesystemHandler: The `FilesystemHandler` for save files and transcripts (defaults to production handler).
@@ -208,8 +208,7 @@ public actor GameEngine: Sendable {
             .enemyWakeUp: .enemyWakeUp,
             .enemyReturn: .enemyReturn,
             .statusEffectExpiry: .statusEffectExpiry,
-            .environmentalChange: .environmentalChange,
-        ]) { blueprint, standard in blueprint }
+        ]) { blueprint, _ in blueprint }
 
         // Initialize the compute handlers directly from the blueprint
         self.itemComputers = blueprint.itemComputers
@@ -222,5 +221,15 @@ public actor GameEngine: Sendable {
         self.gameState = initialGameState
         self.messenger = gameBlueprint.messenger
         self.vocabulary = initialVocabulary
+    }
+}
+
+// MARK: - LastDisambiguationContext
+
+extension GameEngine {
+    struct LastDisambiguationContext {
+        let originalInput: String
+        let verb: Verb
+        let noun: String
     }
 }

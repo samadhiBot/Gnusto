@@ -1,13 +1,26 @@
 import Foundation
 
+// swiftlint:disable sorted_enum_cases
+
 /// Categorizes a character's overall health state for narrative purposes.
 public enum HealthCondition {
-    case healthy  // 80-100%
-    case bruised  // 60-79%
-    case wounded  // 40-59%
-    case badlyWounded  // 20-39%
-    case critical  // 1-19%
-    case dead  // 0%
+    /// Character is in excellent health with minimal or no injuries (80-100% health).
+    case healthy
+
+    /// Character has minor injuries but remains functional (60-79% health).
+    case bruised
+
+    /// Character has sustained moderate injuries that impair performance (40-59% health).
+    case wounded
+
+    /// Character has severe injuries requiring immediate attention (20-39% health).
+    case badlyWounded
+
+    /// Character is in critical condition and near death (1-19% health).
+    case critical
+
+    /// Character has died (0% health).
+    case dead
 
     init(at healthPercent: Int) {
         switch healthPercent {
@@ -20,3 +33,5 @@ public enum HealthCondition {
         }
     }
 }
+
+// swiftlint:enable sorted_enum_cases

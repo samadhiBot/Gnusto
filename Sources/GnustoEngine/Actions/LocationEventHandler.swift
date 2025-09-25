@@ -35,7 +35,7 @@ public struct LocationEventHandler: Sendable {
     /// Initializes a `LocationEventHandler` with a result builder that provides declarative
     /// event matching.
     ///
-    /// This is the recommended modern approach that eliminates the need for nested `event.match`
+    /// This is the recommended approach that eliminates the need for nested `event.match`
     /// closures.
     ///
     /// - Parameters:
@@ -67,7 +67,7 @@ public struct LocationEventHandler: Sendable {
             @Sendable @escaping () async throws -> [LocationEventMatcher]
     ) {
         self.handle = { engine, event in
-            let location = try await engine.location(locationID)
+            let location = await engine.location(locationID)
             let context = LocationEventContext(event: event, location: location, engine: engine)
 
             let matcherList = try await matchers()
@@ -87,6 +87,13 @@ public struct LocationEventHandler: Sendable {
 /// `M-FLASH`) is analogous to `LocationEventHandler` in Gnusto. Some event types here
 /// directly map to those concepts, while others provide more general hooks.
 public enum LocationEvent: Sendable {
+    /// Triggered after the game engine has processed the player's command for the current turn,
+    /// while the player is in a location that has this event handler.
+    ///
+    /// The associated `Command` is the one the player entered.
+    /// This allows the location to react to the outcome of the turn or perform cleanup actions.
+    case afterTurn(Command)
+
     /// Triggered before the game engine processes the player's command for the current turn,
     /// while the player is in a location that has this event handler.
     ///
@@ -94,13 +101,6 @@ public enum LocationEvent: Sendable {
     /// Your handler can inspect this command and potentially return an `ActionResult` to
     /// preempt or alter the default command processing.
     case beforeTurn(Command)
-
-    /// Triggered after the game engine has processed the player's command for the current turn,
-    /// while the player is in a location that has this event handler.
-    ///
-    /// The associated `Command` is the one the player entered.
-    /// This allows the location to react to the outcome of the turn or perform cleanup actions.
-    case afterTurn(Command)
 
     /// Triggered when the player successfully enters the location that has this event handler.
     /// This typically occurs after any "look" action or movement that results in the player
@@ -132,6 +132,15 @@ public typealias LocationEventMatcher = (LocationEventContext) async throws -> A
 /// ```
 @resultBuilder
 public struct LocationEventMatcherBuilder {
+    /// Builds a block of location event matchers into an array.
+    ///
+    /// This is the core method of the `LocationEventMatcherBuilder` result builder that
+    /// combines multiple `LocationEventMatcher` functions into a single array for processing
+    /// by the location event handler.
+    ///
+    /// - Parameter matchers: A variadic list of `LocationEventMatcher` functions created by
+    ///   functions like `beforeTurn()`, `afterTurn()`, and `onEnter()`
+    /// - Returns: An array containing all the provided matchers
     public static func buildBlock(_ matchers: LocationEventMatcher...) -> [LocationEventMatcher] {
         Array(matchers)
     }
@@ -148,7 +157,7 @@ public struct LocationEventMatcherBuilder {
                                                │
                                                ▼
  ┌─────────────────────────────────────────────────────────────────┐
- │ 1. beforeEnter() - Called BEFORE action processing              │
+ │ 1. beforeTurn() - Called BEFORE action processing              │
  │    • Can intercept and override normal command processing       │
  │    • If returns ActionResult, command processing stops          │
  │    • Example: Block movement in dark rooms                      │
@@ -164,7 +173,7 @@ public struct LocationEventMatcherBuilder {
                                                │
                                                ▼
  ┌─────────────────────────────────────────────────────────────────┐
- │ 3. afterEnter() - Called AFTER action completed                 │
+ │ 3. afterTurn() - Called AFTER action completed                 │
  │    • Cannot prevent the action (already happened)               │
  │    • Can add follow-up effects or ambient responses             │
  │    • Example: "You hear rustling in the bushes."                │
@@ -179,7 +188,7 @@ public struct LocationEventMatcherBuilder {
  └─────────────────────────────────────────────────────────────────┘
 
  Note: onEnter() only fires for location changes, not every turn.
-       beforeEnter() and afterEnter() fire every turn while in the location.
+       beforeTurn() and afterTurn() fire every turn while in the location.
 */
 
 /// Creates a location event matcher for **beforeTurn** events with any of the specified intents.
@@ -188,9 +197,6 @@ public struct LocationEventMatcherBuilder {
 /// **Purpose**: Can intercept and potentially override normal command processing.
 /// **Can Block Actions**: Yes - if it returns an `ActionResult`, further command processing stops.
 ///
-/// **Important**: Despite the name "beforeEnter", this handles `beforeTurn` events that fire
-/// every turn while the player is in this location, not just when entering.
-///
 /// - Parameters:
 ///   - intents: The command intents to match against (e.g., `.move`, `.take`, `.examine`)
 ///   - result: The closure to execute if any intent matches, receiving the context and command
@@ -198,7 +204,7 @@ public struct LocationEventMatcherBuilder {
 ///
 /// Example:
 /// ```swift
-/// beforeEnter(.move) { context, command in
+/// beforeTurn(.move) { context, command in
 ///     if !await context.location.isLit {
 ///         ActionResult("Blundering around in the dark isn't a good idea!")
 ///     } else {
@@ -206,7 +212,7 @@ public struct LocationEventMatcherBuilder {
 ///     }
 /// }
 /// ```
-public func beforeEnter(
+public func beforeTurn(
     _ intents: Intent...,
     result: @escaping (LocationEventContext, Command) async throws -> ActionResult?
 ) -> LocationEventMatcher {
@@ -227,9 +233,6 @@ public func beforeEnter(
 /// **Purpose**: React to what just happened or perform cleanup/ambient actions.
 /// **Can Block Actions**: No - the main action already happened, this is just for follow-up effects.
 ///
-/// **Important**: Despite the name "afterEnter", this handles `afterTurn` events that fire
-/// every turn while the player is in this location, not just when entering.
-///
 /// - Parameters:
 ///   - intents: The command intents to match against (e.g., `.move`, `.take`, `.examine`).
 ///              If no intents specified, matches all commands.
@@ -238,17 +241,17 @@ public func beforeEnter(
 ///
 /// Example:
 /// ```swift
-/// afterEnter { context, command in
+/// afterTurn { context, command in
 ///     // Ambient sounds after any action in this forest location
 ///     ActionResult("You hear rustling in the distant bushes.")
 /// }
 ///
-/// afterEnter(.take) { context, command in
+/// afterTurn(.take) { context, command in
 ///     // Specific reaction to taking items in this location
 ///     ActionResult("The shopkeeper eyes you suspiciously.")
 /// }
 /// ```
-public func afterEnter(
+public func afterTurn(
     _ intents: Intent...,
     result: @escaping (LocationEventContext, Command) async throws -> ActionResult?
 ) -> LocationEventMatcher {
@@ -284,7 +287,7 @@ public func afterEnter(
 ///         return ActionResult(
 ///             "The trap door crashes shut, and you hear someone barring it!",
 ///             context.engine.setFlag(.cellarTrapTriggered),
-///             context.engine.item(.trapDoor).clearFlag(.isOpen)
+///             context.item(.trapDoor).clearFlag(.isOpen)
 ///         )
 ///     }
 ///     return nil

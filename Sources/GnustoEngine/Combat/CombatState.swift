@@ -31,8 +31,7 @@ import Foundation
 /// let combatState = CombatState(
 ///     enemyID: .troll,
 ///     roundCount: 0,
-///     playerWeaponID: .sword,
-///     combatModifiers: ["playerBerserk": true]
+///     playerWeaponID: .sword
 /// )
 /// ```
 public struct CombatState: Codable, Equatable, Sendable, Hashable {
@@ -148,32 +147,6 @@ public struct CombatState: Codable, Equatable, Sendable, Hashable {
 
     // MARK: - Combat Modifiers
 
-    /// A dictionary of combat-specific state values and temporary modifiers.
-    ///
-    /// This flexible storage system allows combat encounters to track temporary conditions,
-    /// special effects, and situational modifiers that affect combat behavior. Examples include:
-    ///
-    /// - **Status Effects**: `"poisoned"`, `"blessed"`, `"cursed"`, `"stunned"`
-    /// - **Tactical States**: `"playerDefending"`, `"enemyFlanked"`, `"highGround"`
-    /// - **Temporary Bonuses**: `"weaponEnchanted"`, `"berserkerRage"`, `"magicalShield"`
-    /// - **Environmental**: `"fightingInDarkness"`, `"slipperyGround"`, `"narrowSpace"`
-    ///
-    /// Combat systems can read and modify these values to implement complex combat mechanics
-    /// while maintaining state across rounds.
-    ///
-    /// ## Usage Examples
-    /// ```swift
-    /// // Check for a status effect
-    /// if case .bool(true) = combatModifiers["poisoned"] {
-    ///     // Apply poison damage
-    /// }
-    ///
-    /// // Set a temporary bonus
-    /// var modifiers = combatModifiers
-    /// modifiers["criticalHitBonus"] = .int(2)
-    /// ```
-    public let combatModifiers: [String: StateValue]
-
     // MARK: - Initialization
 
     /// Creates a new combat state for an encounter with the specified enemy.
@@ -192,8 +165,6 @@ public struct CombatState: Codable, Equatable, Sendable, Hashable {
     ///   - playerFatigue: The player's initial fatigue level. Defaults to 0.0 (fresh).
     ///   - enemyFatigue: The enemy's initial fatigue level. Defaults to 0.0 (fresh).
     ///   - enemyWeaponID: The enemy's starting weapon, or `nil` for unarmed. Defaults to `nil`.
-    ///   - combatModifiers: Any initial combat modifiers or status effects to apply.
-    ///     Defaults to an empty dictionary.
     ///
     /// ## Usage Examples
     /// ```swift
@@ -215,8 +186,7 @@ public struct CombatState: Codable, Equatable, Sendable, Hashable {
     ///     playerWeaponID: .dragonslayerSword,
     ///     combatIntensity: 0.8,
     ///     playerFatigue: 0.4,
-    ///     enemyFatigue: 0.6,
-    ///     combatModifiers: ["dragonsFear": .bool(true)]
+    ///     enemyFatigue: 0.6
     /// )
     /// ```
     public init(
@@ -226,8 +196,7 @@ public struct CombatState: Codable, Equatable, Sendable, Hashable {
         combatIntensity: Double = 0.1,
         playerFatigue: Double = 0.0,
         enemyFatigue: Double = 0.0,
-        enemyWeaponID: ItemID? = nil,
-        combatModifiers: [String: StateValue] = [:]
+        enemyWeaponID: ItemID? = nil
     ) {
         self.enemyID = enemyID
         self.roundCount = roundCount
@@ -236,7 +205,6 @@ public struct CombatState: Codable, Equatable, Sendable, Hashable {
         self.playerFatigue = max(0.0, min(1.0, playerFatigue))
         self.enemyFatigue = max(0.0, min(1.0, enemyFatigue))
         self.enemyWeaponID = enemyWeaponID
-        self.combatModifiers = combatModifiers
     }
 
     // MARK: - Proxy Accessors
@@ -252,15 +220,15 @@ public struct CombatState: Codable, Equatable, Sendable, Hashable {
     ///
     /// ## Usage
     /// ```swift
-    /// let enemy = try await combatState.enemy(with: engine)
-    /// let enemyHealth = try await enemy.health
+    /// let enemy = await combatState.enemy(with: engine)
+    /// let enemyHealth = await enemy.health
     /// let enemyName = enemy.withDefiniteArticle
     /// ```
     ///
     /// - Important: Always use this method rather than directly accessing items by ID
     ///   to ensure proper proxy behavior and computed value resolution.
-    func enemy(with engine: GameEngine) async throws -> ItemProxy {
-        try await Item(id: enemyID).proxy(engine)
+    func enemy(with engine: GameEngine) async -> ItemProxy {
+        await Item(id: enemyID).proxy(engine)
     }
 
     /// Retrieves the player's weapon as an `ItemProxy`, if one is being used.
@@ -274,7 +242,7 @@ public struct CombatState: Codable, Equatable, Sendable, Hashable {
     ///
     /// ## Usage
     /// ```swift
-    /// let weapon = try await combatState.playerWeapon(with: engine)
+    /// let weapon = await combatState.playerWeapon(with: engine)
     /// if let weapon {
     ///     let damage = await weapon.weaponAttributes.damage
     ///     let weaponName = weapon.withIndefiniteArticle
@@ -285,9 +253,9 @@ public struct CombatState: Codable, Equatable, Sendable, Hashable {
     ///
     /// - Note: This method only returns `nil` if `playerWeaponID` is `nil`. If a weapon
     ///   ID is stored but the weapon cannot be found, this method will throw an error.
-    func playerWeapon(with engine: GameEngine) async throws -> ItemProxy? {
+    func playerWeapon(with engine: GameEngine) async -> ItemProxy? {
         guard let playerWeaponID else { return nil }
-        return try await Item(id: playerWeaponID).proxy(engine)
+        return await Item(id: playerWeaponID).proxy(engine)
     }
 
     /// Retrieves the enemy's weapon as an `ItemProxy`, if one is being used.
@@ -301,7 +269,7 @@ public struct CombatState: Codable, Equatable, Sendable, Hashable {
     ///
     /// ## Usage
     /// ```swift
-    /// let enemyWeapon = try await combatState.enemyWeapon(with: engine)
+    /// let enemyWeapon = await combatState.enemyWeapon(with: engine)
     /// if let enemyWeapon {
     ///     let damage = await enemyWeapon.weaponAttributes.damage
     ///     let weaponType = enemyWeapon.weaponType
@@ -309,9 +277,9 @@ public struct CombatState: Codable, Equatable, Sendable, Hashable {
     ///     // Enemy uses natural weapons (claws, fists, etc.)
     /// }
     /// ```
-    func enemyWeapon(with engine: GameEngine) async throws -> ItemProxy? {
+    func enemyWeapon(with engine: GameEngine) async -> ItemProxy? {
         guard let enemyWeaponID else { return nil }
-        return try await Item(id: enemyWeaponID).proxy(engine)
+        return await Item(id: enemyWeaponID).proxy(engine)
     }
 
     // MARK: - Combat Progression Methods
@@ -327,7 +295,6 @@ public struct CombatState: Codable, Equatable, Sendable, Hashable {
     ///   - enemyFatigueDelta: Change in enemy fatigue (-1.0 to +1.0). Defaults to +0.03.
     ///   - newPlayerWeapon: New player weapon if changed, otherwise keeps current.
     ///   - newEnemyWeapon: New enemy weapon if changed, otherwise keeps current.
-    ///   - additionalModifiers: New combat modifiers to merge with existing ones.
     /// - Returns: A new `CombatState` representing the next round
     ///
     /// ## Usage
@@ -344,8 +311,7 @@ public struct CombatState: Codable, Equatable, Sendable, Hashable {
     ///
     /// // Disarmament event
     /// let disarmedRound = currentState.nextRound(
-    ///     newEnemyWeapon: nil,
-    ///     additionalModifiers: ["enemyDisarmed": .bool(true)]
+    ///     newEnemyWeapon: nil
     /// )
     /// ```
     func nextRound(
@@ -353,23 +319,16 @@ public struct CombatState: Codable, Equatable, Sendable, Hashable {
         playerFatigueDelta: Double = 0.03,
         enemyFatigueDelta: Double = 0.03,
         newPlayerWeapon: ItemID? = nil,
-        newEnemyWeapon: ItemID? = nil,
-        additionalModifiers: [String: StateValue] = [:]
+        newEnemyWeapon: ItemID? = nil
     ) -> CombatState {
-        var mergedModifiers = combatModifiers
-        for (key, value) in additionalModifiers {
-            mergedModifiers[key] = value
-        }
-
-        return CombatState(
+        CombatState(
             enemyID: enemyID,
             roundCount: roundCount + 1,
             playerWeaponID: newPlayerWeapon ?? playerWeaponID,
             combatIntensity: combatIntensity + intensityDelta,
             playerFatigue: playerFatigue + playerFatigueDelta,
             enemyFatigue: enemyFatigue + enemyFatigueDelta,
-            enemyWeaponID: newEnemyWeapon ?? enemyWeaponID,
-            combatModifiers: mergedModifiers
+            enemyWeaponID: newEnemyWeapon ?? enemyWeaponID
         )
     }
 

@@ -1,6 +1,12 @@
 import GnustoEngine
 
+/// A game world representing the classic tutorial game "Cloak of Darkness".
+///
+/// This struct contains all the locations, items, and event handlers that make up
+/// the simple adventure game where the player must navigate an opera house,
+/// hang up their cloak, and read a message in the bar.
 struct OperaHouse {
+
     // MARK: - Foyer of the Opera House
 
     let foyer = Location(
@@ -98,15 +104,15 @@ struct OperaHouse {
 
     let barHandler = LocationEventHandler(for: .bar) {
         // First: if location is lit, yield to normal processing
-        beforeEnter { context, command in
-            if try await context.location.isLit {
+        beforeTurn { context, _ in
+            if await context.location.isLit {
                 return ActionResult.yield
             }
             return nil  // not handled, try next matcher
         }
 
         // Second: handle north movement in dark
-        beforeEnter(.move) { context, command in
+        beforeTurn(.move) { context, command in
             if command.direction == .north {
                 return ActionResult.yield
             } else {
@@ -118,13 +124,13 @@ struct OperaHouse {
         }
 
         // Third: handle meta commands in dark
-        beforeEnter(.meta) { context, command in
-            return ActionResult.yield
+        beforeTurn(.meta) { _, _ in
+            ActionResult.yield
         }
 
         // Fourth: catch-all for other commands in dark
-        beforeEnter { context, command in
-            return ActionResult(
+        beforeTurn { context, _ in
+            ActionResult(
                 "In the dark? You could easily disturb something!",
                 await context.engine.adjustGlobal(.barMessageDisturbances, by: 1)
             )
@@ -134,8 +140,8 @@ struct OperaHouse {
     // MARK: - Item event handlers
 
     let cloakHandler = ItemEventHandler(for: .cloak) {
-        before(.drop, .insert) { context, command in
-            guard try await context.engine.player.location.id == .cloakroom else {
+        before(.drop, .insert) { context, _ in
+            guard await context.player.location == .cloakroom else {
                 throw ActionResponse.feedback(
                     "This isn't the best place to leave a smart cloak lying around."
                 )
@@ -144,23 +150,23 @@ struct OperaHouse {
         }
 
         after { context, command in
-            guard try await context.engine.player.location.id == .cloakroom else {
+            guard await context.player.location == .cloakroom else {
                 return nil
             }
 
             if command.hasIntent(.drop, .insert) {
                 var changes = [
-                    try await context.engine.location(.bar).setFlag(.isLit)
+                    await context.location(.bar).setFlag(.isLit)
                 ]
-                if await context.engine.player.score < 1 {
-                    changes.append(await context.engine.player.updateScore(by: 1))
+                if await context.player.score < 1 {
+                    changes.append(await context.player.updateScore(by: 1))
                 }
                 return ActionResult(changes: changes)
             }
 
             if command.hasIntent(.take) {
                 return ActionResult(
-                    try await context.engine.location(.bar).clearFlag(.isLit)
+                    await context.location(.bar).clearFlag(.isLit)
                 )
             }
 
@@ -169,9 +175,9 @@ struct OperaHouse {
     }
 
     let hookHandler = ItemEventHandler(for: .hook) {
-        before(.examine) { context, command in
+        before(.examine) { context, _ in
             let hookDetail =
-                if try await context.item.isHolding(.cloak) {
+                if await context.item.isHolding(.cloak) {
                     "with a cloak hanging on it"
                 } else {
                     "screwed to the wall"
@@ -181,35 +187,38 @@ struct OperaHouse {
     }
 
     let messageHandler = ItemEventHandler(for: .message) {
-        before(.examine, .read) { context, command in
-            guard try await context.engine.player.location.id == .bar else {
-                return nil
+        before(.examine, .read) { context, _ in
+            guard await context.player.location == .bar else {
+                return .yield
             }
 
-            let bar = try await context.engine.location(.bar)
+            let bar = await context.location(.bar)
             guard await bar.hasFlag(.isLit) else {
                 throw ActionResponse.feedback("It's too dark to do that.")
             }
 
             let disturbedCount = await context.engine.global(.barMessageDisturbances)?.toInt ?? 0
-            await context.engine.requestQuit()
-            if disturbedCount < 2 {
-                return ActionResult(
+
+            return if disturbedCount < 2 {
+                await ActionResult(
                     """
                     The message, neatly marked in the sawdust, reads...
 
                     "You win."
                     """,
-                    await context.engine.player.updateScore(by: 1)
+                    context.player.updateScore(by: 1),
+                    .requestGameQuit
                 )
             } else {
-                throw ActionResponse.feedback(
+                ActionResult(
                     """
                     The message has been carelessly trampled, making it
                     difficult to read. You can just distinguish the words...
 
                     "You lose."
-                    """)
+                    """,
+                    .requestGameQuit
+                )
             }
         }
     }

@@ -105,7 +105,7 @@ struct GameEngineGameLoopTests {
         )
 
         // Set shouldQuit before processing
-        await engine.requestQuit()
+        try await engine.apply(.requestGameQuit)
         #expect(await engine.shouldQuit == true)
 
         try await engine.processTurn()
@@ -125,7 +125,7 @@ struct GameEngineGameLoopTests {
         )
 
         // Set shouldRestart before processing
-        await engine.requestRestart()
+        try await engine.apply(.requestGameRestart)
         #expect(await engine.shouldRestart == true)
 
         try await engine.processTurn()
@@ -162,7 +162,7 @@ struct GameEngineGameLoopTests {
 
         #expect(await engine.shouldQuit == false)
 
-        await engine.requestQuit()
+        try await engine.apply(.requestGameQuit)
 
         #expect(await engine.shouldQuit == true)
     }
@@ -177,7 +177,7 @@ struct GameEngineGameLoopTests {
 
         #expect(await engine.shouldRestart == false)
 
-        await engine.requestRestart()
+        try await engine.apply(.requestGameRestart)
 
         #expect(await engine.shouldRestart == true)
     }
@@ -453,11 +453,11 @@ struct GameEngineGameLoopTests {
         try await engine.processTurn()
 
         // Verify the item is now held
-        let item = try await engine.item("testItem")
-        #expect(try await item.parent == .player)
+        let item = await engine.item("testItem")
+        #expect(await item.parent == .player)
 
         // Verify player location is still correct
-        let playerLocation = try await engine.player.location
+        let playerLocation = await engine.player.location
         #expect(playerLocation.id == .startRoom)
 
         let output = await mockIO.flush()

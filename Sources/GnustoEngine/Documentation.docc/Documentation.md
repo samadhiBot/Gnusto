@@ -4,339 +4,238 @@
 
 ![Gnusto Interactive Fiction Engine](gnusto-heading.png)
 
-Welcome to the Gnusto Interactive Fiction Engine! Gnusto is a powerful and flexible Swift-based framework designed to help you create rich, dynamic text adventure games. Inspired by the classic Infocom masterpieces, Gnusto provides a modern toolkit that simplifies the development of interactive narratives, allowing you to focus on storytelling and world-building.
+### Welcome to the Gnusto Interactive Fiction Engine!
 
-Whether you're a seasoned interactive fiction author or new to the genre, Gnusto offers an approachable yet robust platform for bringing your interactive stories to life.
+Gnusto is a flexible and powerful framework for writing interactive fiction games. Drawing inspiration from the Infocom classics of the 1980s, it provides a modern toolkit that makes building rich, dynamic text adventures easy and enjoyable—allowing you to focus on storytelling and world-building rather than engine mechanics.
 
-## Core Concepts for Game Creators
+Gnusto is written in cross-platform Swift, allowing you to deploy your games on Mac, Linux, Windows, iOS and Android. The framework emphasizes ergonomics and developer experience, providing type safety without boilerplate code. Built with extensibility in mind, you can customize and extend Gnusto to fit your creative vision.
 
-At its heart, creating a game with Gnusto involves defining your game world, its inhabitants, and the rules that govern their interactions.
+At its core, Gnusto uses a state change pipeline that ensures safe state management, eliminating many of the bugs that can plague interactive fiction engines. Whether you're creating your first text adventure or building a complex, multi-layered world, Gnusto provides the foundation you need while staying out of your way.
 
-### Defining Your World: Locations and Items
 
-The foundation of your game is built from ``Location``s and ``Item``s.
+## Building Your First Game
 
-### Locations: Crafting Your Spaces
+Creating a game with Gnusto begins with two main concepts: ``Location`` and ``Item``.
 
-A ``Location`` represents a distinct place or room that the player can visit. You define a location with a unique ID, a name, a textual description that sets the scene for the player, and exits that connect it to other locations. The engine's proxy system provides access to both static properties (defined at creation) and dynamic computed properties (calculated at runtime).
+### Location: Places in Your World
 
-Here's a simple definition for a cloakroom:
-
-```swift
-import GnustoEngine
-
-enum OperaHouse {
-    static let cloakroom = Location(
-        id: .cloakroom,
-        .name("Cloakroom"),
-        .description("""
-            The walls of this small room were clearly once lined with hooks,
-            though now only one remains. The exit is a door to the east.
-            """
-        ),
-        .exits(
-            .east(.foyer)
-        ),
-        .inherentlyLit
-    )
-}
-```
-
-In this example:
-
-- ``Location/id``: Each location needs a unique ``LocationID`` (here, `"cloakroom"`).
-- ``LocationProperty/name(_:)``: This is often used as the heading when describing the location.
-- ``LocationProperty/description(_:)``: The text paints a picture of the location for the player.
-- ``LocationProperty/exits(_:)``: A dictionary mapping a ``Direction`` to an ``Exit``, defining how the player can move between locations. The ``Exit`` specifies the ``Exit/destinationID`` ``LocationID``.
-- ``LocationProperty/inherentlyLit``: This ``LocationProperty`` indicates the room is lit by default, without needing a light source.
-
-#### Items: Populating Your World
-
-An ``Item`` is any object, character, or other entity that the player can interact with. Like locations, items have an ID, a name, a description, and various properties that define their behavior and state. Items can represent simple objects, complex devices, NPCs with character sheets, or even abstract concepts through the proxy system.
-
-Let's add a cloak that the player is wearing, and a brass hook in the cloakroom to hang it on:
+A ``Location`` represents any place the player can visit—a room, forest clearing, or spaceship bridge. Here's a simple example:
 
 ```swift
-import GnustoEngine
-
-extension OperaHouse {
-    static let hook = Item(
-        id: .hook,
-        .adjectives("small", "brass"),
-        .in(.cloakroom),
-        .omitDescription,
-        .isSurface,
-        .name("small brass hook"),
-        .synonyms("peg"),
-    )
-
-    static let cloak = Item(
-        id: .cloak,
-        .name("velvet cloak"),
-        .description("""
-            A handsome cloak, of velvet trimmed with satin, and slightly
-            spattered with raindrops. Its blackness is so deep that it
-            almost seems to suck light from the room.
-            """
-        ),
-        .adjectives("handsome", "dark", "black", "velvet", "satin"),
-        .in(.player),
-        .isTakable,
-        .isWearable,
-        .isWorn,
-    )
-}
+let westOfHouse = Location(
+    id: .westOfHouse,
+    .name("West of House"),
+    .description(
+        "You are standing in an open field west of a white house, with a boarded front door."
+    ),
+    .exits(
+        .north(.northOfHouse),
+        .south(.southOfHouse),
+        .east(blocked: "The door is boarded and you can't remove the boards.")
+    ),
+    .inherentlyLit
+)
 ```
 
-Key ``ItemProperty``s here include:
+### Item: Objects and Characters
 
-- ``ItemProperty/name(_:)``, ``ItemProperty/description(_:)``, ``ItemProperty/adjectives(_:)``, ``ItemProperty/synonyms(_:)``: Help describe the item and how the player can refer to it.
-- ``ItemProperty/in(_:)``: Specifies the item's initial ``ParentEntity``, which can be a location, a container item, or the player.
-- Flags are boolean properties like ``ItemProperty/isTakable`` (can the player pick it up?), ``ItemProperty/isWearable`` (can the player wear it?), or ``ItemProperty/omitDescription`` (is it just part of the background?).
+An ``Item`` can be anything the player interacts with—objects, characters, even abstract concepts:
 
-### Making it Interactive: Actions and Responses
-
-Player commands (like "take cloak", "attack troll", or "ask wizard about magic") are processed by Gnusto's ``Parser``, which translates them into structured ``Command`` objects. These commands are then handled by the appropriate ``ActionHandler``.
-
-Gnusto provides 80+ built-in action handlers covering everything from basic movement and object manipulation to complex combat, conversation, and puzzle-solving interactions. You can customize behavior by providing your own handlers or by attaching event handlers directly to items or locations.
-
-For example, examining the `hook` might give a dynamic description depending on whether the `cloak` is on it. This logic could be placed in an ``ItemEventHandler`` associated with the hook, or handled through the proxy system's computed properties for more complex scenarios involving combat state, character interactions, or environmental conditions.
-
-### The GameEngine and GameState
-
-The ``GameEngine`` is the central orchestrator of your game. It manages the main game loop, processes player input, updates the ``GameState``, handles combat and character systems, manages conversations, and interacts with the ``IOHandler`` to communicate with the player through the centralized ``Messenger`` system.
-
-The ``GameState`` is the single source of truth for everything dynamic in your game world: the player's current location, the properties and locations of all items, character sheets and combat states, active conversations, timers, game flags, and more. As a game developer, you'll interact with the `GameState` safely through the proxy system and methods provided by the ``GameEngine``.
-
-## Getting Started
-
-Creating a game with Gnusto generally follows these steps:
-
-1.  **Design Your World:** Sketch out your map, puzzles, items, and story.
-2.  **Define Core Entities:** Create your ``Location``s and ``Item``s using their respective initializers and properties, often organized into logical area groups (enums or structs).
-3.  **Implement Custom Logic:** Add ``ItemEventHandler``s, ``LocationEventHandler``s, or custom ``ActionHandler``s for unique interactions and puzzle mechanics.
-4.  **Set up a `GameBlueprint`:** This brings together your areas, vocabulary, and initial game settings.
-5.  **Initialize and Run:** Create a ``GameEngine`` instance with your ``GameBlueprint`` and an ``IOHandler`` (like ``ConsoleIOHandler``), then start the game loop.
+```swift
+let cloak = Item(
+    id: .cloak,
+    .name("velvet cloak"),
+    .description(
+        """
+        A handsome cloak, of velvet trimmed with satin, and slightly
+        spattered with raindrops. Its blackness is so deep that it
+        almost seems to suck light from the room.
+        """
+    ),
+    .adjectives("handsome", "dark", "black", "velvet", "satin"),
+    .in(.player),
+    .isTakable,
+    .isWearable,
+    .isWorn,
+)
+```
 
 ## Key Features
 
-Gnusto is built with game creators in mind, offering features that simplify development:
+- **Natural Language**: Smart parser understands synonyms, adjectives, and complex commands
+- **Rich Interactions**: 80+ built-in action handlers for commands like "take," "examine," "attack"
+- **Dynamic Content**: Use event handlers to create living, responsive worlds
+- **Advanced Systems**: Built-in combat, character sheets, conversations, and timed events
+- **Extensible**: Add custom behaviors without fighting the engine
+- **Cross-Platform**: Develop on Mac, Linux or Windows; deploy on Mac, iOS, Linux, Windows, Android and WebAssembly
+- **Automatic Setup**: The `GnustoAutoWiringPlugin` eliminates boilerplate
 
-- **Automatic Boilerplate Generation:** The GnustoAutoWiringPlugin eliminates the need to manually create ID constants and wire up game components.
-- **Proxy-Based State Management:** Safe, concurrent access to game state with automatic computation of dynamic properties and validation of state changes.
-- **Dynamic Content:** Create living worlds with state-driven descriptions and behaviors using ``ItemEventHandler``s, ``LocationEventHandler``s, and computed properties.
-- **Rich Action System:** 80+ built-in action handlers covering everything from basic interactions to complex combat, conversations, and puzzle mechanics.
-- **Combat & Character Systems:** Full RPG-style combat with character sheets, health/consciousness tracking, combat states, and automated combat resolution.
-- **Conversation System:** Rich dialogue mechanics with NPCs, topic tracking, and dynamic conversation flow.
-- **Smart `Parser`:** Gnusto's parser understands natural language, supporting synonyms, adjectives, complex sentence structures, and conversational contexts.
-- **Localization Ready:** Centralized ``Messenger`` system enables easy translation and customization of all player-facing text.
-- **Comprehensive State Management:** Easily track and modify game progress, character states, combat conditions, conversations, and timed events through the safe proxy system.
-- **Extensible Architecture:** The engine is designed for modularity. Add custom behaviors, new actions, or entire new systems without fighting the core framework.
+## Getting Started
 
-## New Major Systems
-
-### Proxy-Based State Management
-
-Gnusto uses a sophisticated proxy system that provides safe, concurrent access to game state while enabling both static and computed properties. Instead of accessing game objects directly, you work with proxy objects that automatically handle state computation and validation.
-
-```swift
-// Access items and locations through proxies
-let swordProxy = try await engine.item(.sword)
-let roomProxy = try await engine.location(.throneRoom)
-
-// Proxies provide access to both static and computed properties
-let damage = await swordProxy.damage  // Could be static or computed
-let isLit = await roomProxy.isLit     // Automatically computed based on light sources
-let description = await swordProxy.description  // Dynamic based on current state
-```
-
-The proxy system ensures that:
-- All state access is thread-safe and respects Swift 6 concurrency
-- Computed properties are automatically calculated when accessed
-- State changes flow through proper validation pipelines
-- Both static (compile-time) and dynamic (runtime) properties work seamlessly
-
-### Combat System
-
-Gnusto includes a comprehensive combat system that handles turn-based combat with multiple participants, weapon systems, and complex combat conditions.
-
-```swift
-// Characters automatically get combat capabilities
-let troll = Item(
-    id: .troll,
-    .name("nasty troll"),
-    .isCharacter,
-    .characterSheet(
-        health: 25,
-        maxHealth: 25,
-        attackPower: 8,
-        defenseRating: 3
-    ),
-    .in(.trollBridge)
-)
-
-// Combat is initiated through standard action handlers
-// "attack troll with sword" -> AttackActionHandler -> CombatSystem
-```
-
-The combat system features:
-- **Turn-based combat** with initiative ordering
-- **Weapon and armor systems** with different damage types
-- **Combat conditions** (bleeding, stunned, weakened, etc.)
-- **Automatic combat resolution** with detailed narration
-- **Integration with character consciousness** and health systems
-- **Flexible weapon definitions** supporting various combat scenarios
-
-### Character System
-
-Characters in Gnusto are represented by comprehensive character sheets that track health, consciousness, combat abilities, and other vital statistics.
-
-```swift
-// Characters have detailed stat tracking
-let wizard = Item(
-    id: .wizard,
-    .name("ancient wizard"),
-    .isCharacter,
-    .characterSheet(
-        health: 15,
-        maxHealth: 15,
-        consciousnessLevel: .awake,
-        classification: .friendly,
-        attackPower: 5,
-        defenseRating: 7
-    )
-)
-```
-
-Character features include:
-- **Health and consciousness tracking** (awake, unconscious, dying, dead)
-- **Character classifications** (friendly, neutral, hostile, ally)
-- **Combat statistics** (attack power, defense, armor class)
-- **Condition management** (poisoned, blessed, cursed, etc.)
-- **Dynamic state computation** through the proxy system
-- **Integration with conversation and combat systems**
-
-### Conversation System
-
-Rich dialogue mechanics enable complex interactions with NPCs, supporting topic-based conversations, dynamic responses, and conversational context tracking.
-
-```swift
-// NPCs can engage in detailed conversations
-// "ask wizard about magic" -> AskActionHandler -> ConversationSystem
-// "tell guard about treasure" -> TellActionHandler -> ConversationSystem
-
-// Conversations can branch based on game state, character relationships, and previous interactions
-```
-
-The conversation system provides:
-- **Topic-based dialogue** with dynamic topic discovery
-- **Context-aware responses** based on game state and character relationships
-- **Multi-turn conversations** with conversation state tracking
-- **Integration with quest and story systems**
-- **Flexible response patterns** supporting both scripted and procedural dialogue
-
-### Messenger System
-
-The centralized Messenger system handles all player-facing text, enabling easy localization and consistent tone across your entire game.
-
-```swift
-// All player messages go through the messenger
-return ActionResult(
-    engine.messenger.taken(),  // "Taken."
-    await engine.setFlag(.isTouched, on: item)
-)
-
-// Custom games can override messages for their specific tone
-class MyGameMessenger: MessageProvider {
-    override func taken() -> String {
-        output("You've successfully acquired the item!")
-    }
-}
-```
-
-Messenger benefits:
-- **Centralized text management** for all player-facing messages
-- **Easy localization** - translate in one place, works everywhere
-- **Consistent tone** across all game interactions
-- **Customizable messaging** - override defaults to match your game's style
-- **Rich message formatting** with automatic article handling ("a sword" vs "the sword")
-
-## Automatic ID Generation and Game Setup
-
-**The GnustoAutoWiringPlugin eliminates boilerplate!** One of Gnusto's most powerful features is the included build tool plugin that automatically discovers your game patterns and generates all the necessary ID constants and game setup code for you.
-
-### What the Plugin Does for You
-
-When you include the GnustoAutoWiringPlugin in your game project, it automatically:
-
-- **Generates ID Extensions**: Scans patterns like `Location(id: .foyer, ...)` and creates `static let foyer = LocationID("foyer")`
-- **Discovers Event Handlers**: Finds your ``ItemEventHandler`` and ``LocationEventHandler`` definitions and wires them up automatically
-- **Sets Up Time Registry**: Discovers ``Fuse`` and ``Daemon`` instances and registers them
-- **Aggregates Game Content**: Collects all your items and locations from multiple area files and provides them to your `GameBlueprint`
-- **Handles Custom Actions**: Discovers custom ``ActionHandler`` implementations and integrates them
-
-This means you can focus on writing your game content without worrying about the connection logic!
-
-### Including the Plugin in Your Game
-
-To use the GnustoAutoWiringPlugin in your own game project, add it to your `Package.swift`:
-
-```swift
-// swift-tools-version: 6.1
-import PackageDescription
-
-let package = Package(
-    name: "MyGame",
+1. **Add Gnusto to your project** and include the `GnustoAutoWiringPlugin`
+    ```swift
+    // Package.swift
     dependencies: [
-        .package(url: "https://github.com/samadhiBot/Gnusto", from: "1.0.0"),
+        .package(url: "https://github.com/samadhiBot/Gnusto", from: "0.1.0"),
     ],
     targets: [
         .executableTarget(
             name: "MyGame",
             dependencies: ["GnustoEngine"],
-            plugins: ["GnustoAutoWiringPlugin"]  // ← Add this line
+            plugins: ["GnustoAutoWiringPlugin"]
         ),
     ]
-)
+    ```
+2. **Organize your content** into logical groups that make sense to you
+    ```
+    CloakOfDarkness/                  Zork1/
+    ├── CloakOfDarkness.swift         ├── main.swift
+    ├── main.swift                    ├── World
+    └── OperaHouse.swift              │   ├── Forest.swift
+                                      │   ├── OutsideHouse.swift
+                                      │   ├── ...
+                                      │   ├── Thief.swift
+                                      │   ├── Troll.swift
+                                      │   └── Underground.swift
+                                      ├── Zork1.swift
+                                      └── ZorkMessenger.swift
+    ```
+3. **Define your world** with ``Location`` and ``Item`` objects
+    ```swift
+    struct OperaHouse {
+        let cloakroom = Location(
+            id: .cloakroom,
+            .name("Cloakroom"),
+            .description(
+                """
+                The walls of this small room were clearly once lined with hooks,
+                though now only one remains. The exit is a door to the east.
+                """
+            ),
+            .exits(.east(.foyer)),
+            .inherentlyLit
+        )
+
+        let hook = Item(
+            id: .hook,
+            .adjectives("small", "brass"),
+            .in(.cloakroom),
+            .omitDescription,
+            .isSurface,
+            .name("small brass hook"),
+            .synonyms("peg"),
+        )
+    }
+    ```
+4. **Add dynamic behavior** using ``ItemEventHandler`` and ``LocationEventHandler``, ``Daemon`` and ``Fuse``
+    ```swift
+    extension Troll {
+        static let trollHandler = ItemEventHandler(for: .troll) {
+            before(.tell) { context, command in
+                ActionResult("The troll isn't much of a conversationalist.")
+            }
+        }
+    }
+    ```
+5. **Customize default responses** by overriding standard messaging
+    ```swift
+    class ZorkMessenger: StandardMessenger {
+        override func roomIsDark() -> String {
+            output("It is pitch black. You are likely to be eaten by a grue.")
+        }
+    }
+    ```
+6. **Create a** ``GameBlueprint`` to bring everything together
+    ```swift
+    struct CloakOfDarkness: GameBlueprint {
+        let title = "Cloak of Darkness"
+        let abbreviatedTitle = "Cloak"
+        let introduction = """
+            A basic IF demonstration.
+
+            Hurrying through the rainswept November night, you're glad to see the
+            bright lights of the Opera House. It's surprising that there aren't more
+            people about but, hey, what do you expect in a cheap demo game...?
+            """
+        let release = "0.0.3"
+        let maximumScore = 2
+        let player = Player(in: .foyer)
+    }
+    ```
+7. **Run your game** with ``GameEngine``
+    ```swift
+    import GnustoEngine
+
+    let engine = await GameEngine(
+        blueprint: CloakOfDarkness(),
+        parser: StandardParser(),
+        ioHandler: ConsoleIOHandler()
+    )
+
+    await engine.run()
+    ```
+
+
+## Learning by Example
+
+The easiest way to understand Gnusto is by looking at working examples:
+
+- **[Cloak of Darkness](https://github.com/samadhiBot/Gnusto/blob/main/Executables/CloakOfDarkness)**:
+    A minimalist interactive fiction game created by Roger Firth in 1999. It is regarded as the "Hello, world!" of interactive fiction, and is used as a reference implementation to compare features and capabilities across IF systems.
+
+- **[Zork 1: The Great Underground Empire](https://github.com/samadhiBot/Gnusto/blob/main/Executables/Zork1)**:
+    A pioneering text adventure game released by Infocom in 1980, based on the original MIT mainframe game developed in the late 1970s. It is widely recognized as one of the most influential works of interactive fiction, notable for its sophisticated parser, rich puzzles, and imaginative setting. This comprehensive recreation is still in progress, but already features combat, characters, and complex interactions.
+
+Start with _Cloak of Darkness_ to see how a whole game fits together, then explore _Zork 1_ to study the more advanced patterns.
+
+## How to Run the Example Games
+
+To run the example games in a terminal, first clone the Gnusto repository and `cd` into the project folder, then `swift run` either `CloakOfDarkness` or `Zork1`.
+
+```zsh
+git clone https://github.com/samadhiBot/Gnusto.git
+cd Gnusto
+
+# Run Cloak of Darkness
+swift run CloakOfDarkness 
+
+# Run Zork
+swift run Zork1
 ```
 
-That's it! The plugin will automatically scan your Swift files during build and generate all the necessary boilerplate code.
+Xcode users can select `CloakOfDarkness` or `Zork1` as the active scheme, Run the scheme, and play the game in the Xcode console.
 
-### Manual Setup Alternative
+For VS Code users, the Debug Console does not support interactive keyboard input, and the Swift debug adapter does not support rerouting to a different terminal. For now, the best option is to run the commands above in the integrated terminal.
 
-If you prefer complete control or want to understand what's happening under the hood, you can skip the plugin and handle ID generation and game setup manually. Simply don't include the plugin in your `Package.swift`, and then:
+## Topics
 
-1. **Create your own ID extensions**:
+### Game Development Guides
+- <doc:GameStructure>
+- <doc:GnustoAutoWiringPlugin>
+- <doc:Combat>
 
-   ```swift
-   extension LocationID {
-       static let foyer = LocationID("foyer")
-       static let cloakroom = LocationID("cloakroom")
-       // ... etc
-   }
-   ```
+### Core Types
+- ``GameBlueprint``
+- ``Item``
+- ``ItemProxy``
+- ``Location``
+- ``LocationProxy``
 
-2. **Manually wire up your GameBlueprint**:
-   ```swift
-   extension MyGameBlueprint {
-       var items: [Item] { [MyArea.cloak, MyArea.hook, /* ... */] }
-       var locations: [Location] { [MyArea.foyer, MyArea.cloakroom, /* ... */] }
-       var itemEventHandlers: [ItemID: ItemEventHandler] {
-           [.cloak: MyArea.cloakHandler, /* ... */]
-       }
-       // ... etc
-   }
-   ```
+### Advanced Systems
+- ``ItemEventHandler``
+- ``ItemComputer``
+- ``LocationEventHandler``
+- ``LocationComputer``
 
-The choice is yours--use the plugin for convenience, or go manual for complete control.
+### Default Systems
+- ``StandardMessenger``
+- ``StandardCombatSystem``
 
-## Where to Go Next
+### Engine Development Guides
+- <doc:ActionHandlerGuide>
 
-- Explore the _Cloak of Darkness_ example game (`Executables/CloakOfDarkness`) for a playable demonstration of Gnusto's capabilities.
-- Study the _Zork 1_ implementation (`Executables/Zork1`) for a comprehensive example of combat, characters, and complex world interactions.
-- Dive deeper into specific components like ``Item``, ``Location``, ``GameEngine``, ``ActionHandler``s, and the new systems by exploring their detailed documentation.
-- Check out the [Action Handler Development Guide](ActionHandlerGuide) for creating custom interactions.
-- See [Dynamic Properties](DynamicAttributes) for advanced state management patterns.
-- Consult the rest of the documentation for more information on project structure and engine-level concepts.
+### Main Types
+- ``GameEngine``
+- ``ActionHandler``
 
-Happy creating!
+Ready to start building? Check out the [Cloak of Darkness](https://github.com/samadhiBot/Gnusto/blob/main/Executables/CloakOfDarkness) source code to see these concepts in action!

@@ -39,7 +39,7 @@ struct DrinkActionHandlerTests {
             """
         )
 
-        let finalState = try await engine.item("water")
+        let finalState = await engine.item("water")
         #expect(await finalState.hasFlag(.isTouched) == true)
     }
 
@@ -278,7 +278,7 @@ struct DrinkActionHandlerTests {
         try await engine.execute("drink juice")
 
         // Then
-        let finalState = try await engine.item("juice")
+        let finalState = await engine.item("juice")
         #expect(await finalState.hasFlag(.isTouched) == true)
 
         let output = await mockIO.flush()
@@ -309,7 +309,7 @@ struct DrinkActionHandlerTests {
             }
             return ActionResult(
                 "The elixir tastes magical and you feel your strength returning.",
-                try await elixir.proxy(engine).remove()
+                await elixir.proxy(engine).remove()
             )
         }
 
@@ -376,8 +376,8 @@ struct DrinkActionHandlerTests {
         )
 
         // Wine should be consumed, bottle should remain
-        let finalBottle = try await engine.item("bottle")
-        #expect(try await finalBottle.playerIsHolding)
+        let finalBottle = await engine.item("bottle")
+        #expect(await finalBottle.playerIsHolding)
     }
 
     @Test("Drink from closed container fails")

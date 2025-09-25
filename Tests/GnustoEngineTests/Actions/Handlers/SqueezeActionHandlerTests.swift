@@ -39,7 +39,7 @@ struct SqueezeActionHandlerTests {
             """
         )
 
-        let finalState = try await engine.item("sponge")
+        let finalState = await engine.item("sponge")
         #expect(await finalState.hasFlag(.isTouched) == true)
     }
 
@@ -249,7 +249,7 @@ struct SqueezeActionHandlerTests {
             """
         )
 
-        let finalState = try await engine.item("ball")
+        let finalState = await engine.item("ball")
         #expect(await finalState.hasFlag(.isTouched) == true)
     }
 
@@ -284,7 +284,7 @@ struct SqueezeActionHandlerTests {
             """
         )
 
-        let finalState = try await engine.item("cat")
+        let finalState = await engine.item("cat")
         #expect(await finalState.hasFlag(.isTouched) == true)
     }
 
@@ -319,13 +319,13 @@ struct SqueezeActionHandlerTests {
             Aggression is one thing; squeezing the furious necromancer is
             quite another.
 
-            In a moment of raw violence, the furious necromancer comes at
-            you with nothing but fury! You raise your fists, knowing this
-            will hurt regardless of who wins.
+            No weapons between you--just the furious necromancer's
+            aggression and your desperation! You collide in a tangle of
+            strikes and blocks.
             """
         )
 
-        let finalState = try await engine.item("necromancer")
+        let finalState = await engine.item("necromancer")
         #expect(await finalState.hasFlag(.isTouched) == true)
     }
 
@@ -395,7 +395,7 @@ struct SqueezeActionHandlerTests {
             """
         )
 
-        let finalPillow2 = try await engine.item("pillow2")
+        let finalPillow2 = await engine.item("pillow2")
         #expect(await finalPillow2.hasFlag(.isTouched) == true)
     }
 

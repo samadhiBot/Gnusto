@@ -38,7 +38,7 @@ struct TellActionHandlerTests {
             """
         )
 
-        let finalState = try await engine.item("wizard")
+        let finalState = await engine.item("wizard")
         #expect(await finalState.hasFlag(.isTouched) == true)
     }
 
@@ -80,7 +80,7 @@ struct TellActionHandlerTests {
             """
         )
 
-        let finalState = try await engine.item("sage")
+        let finalState = await engine.item("sage")
         #expect(await finalState.hasFlag(.isTouched) == true)
     }
 
@@ -434,7 +434,7 @@ struct TellActionHandlerTests {
             """
         )
 
-        let finalState = try await engine.item("wizard")
+        let finalState = await engine.item("wizard")
         #expect(await finalState.hasFlag(.isTouched) == true)
     }
 
@@ -499,7 +499,7 @@ struct TellActionHandlerTests {
             """
         )
 
-        let finalState = try await engine.item("troll")
+        let finalState = await engine.item("troll")
         #expect(await finalState.hasFlag(.isTouched) == true)
     }
 
@@ -539,17 +539,18 @@ struct TellActionHandlerTests {
             The fierce orc dismisses your words about the steel sword with
             contemptuous silence.
 
-            In a moment of raw violence, the warrior comes at you with
-            nothing but fury! You raise your fists, knowing this will hurt
-            regardless of who wins.
+            No weapons between you--just the warrior's aggression and your
+            desperation! You collide in a tangle of strikes and blocks.
 
             > tell the orc about my sword
             The subject of the steel sword cannot bridge the chasm between
             you and the fierce orc.
 
-            The fierce warrior's brutal retaliation breaks through your
-            defenses completely, rendering you vulnerable as an opened
-            shell.
+            The fight leaves the fierce warrior entirely. It stand passive
+            now, all hostility forgotten.
+
+            The warrior's vicious counter breaks your focus completely,
+            turning your advance into uncertain retreat.
             """
         )
     }
@@ -584,7 +585,7 @@ struct TellActionHandlerTests {
             """
         )
 
-        let finalState = try await engine.item("statue")
+        let finalState = await engine.item("statue")
         #expect(await finalState.hasFlag(.isTouched) == true)
     }
 

@@ -54,7 +54,14 @@ public struct ScriptActionHandler: ActionHandler {
 }
 
 extension URL {
-    public var gnustoPath: String {
+    /// Returns a user-friendly path representation for Gnusto app files.
+    ///
+    /// This computed property extracts the portion of the file path that comes after
+    /// "/Gnusto/" and presents it as a tilde-prefixed path for display purposes.
+    ///
+    /// - Returns: A string representing the path in the format "~/Gnusto/..."
+    ///   If no "/Gnusto/" component is found, returns "~/Gnusto/" with an empty suffix.
+    var gnustoPath: String {
         let path = path().split(separator: "/Gnusto/").last ?? ""
         return "~/Gnusto/\(path)"
     }

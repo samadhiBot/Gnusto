@@ -19,10 +19,10 @@ struct ItemProxyStateChangesTests {
         )
         let game = MinimalGame(items: testItem)
         let (engine, _) = await GameEngine.test(blueprint: game)
-        let proxy = try await engine.item("testItem")
+        let proxy = await engine.item("testItem")
 
         // When
-        let change = try await proxy.setFlag(.isTouched)
+        let change = await proxy.setFlag(.isTouched)
 
         // Then
         #expect(change != nil)
@@ -52,10 +52,10 @@ struct ItemProxyStateChangesTests {
         )
         let game = MinimalGame(items: testItem)
         let (engine, _) = await GameEngine.test(blueprint: game)
-        let proxy = try await engine.item("testItem")
+        let proxy = await engine.item("testItem")
 
         // When
-        let change = try await proxy.setFlag(.isTouched)
+        let change = await proxy.setFlag(.isTouched)
 
         // Then
         #expect(change == nil)
@@ -72,10 +72,10 @@ struct ItemProxyStateChangesTests {
         )
         let game = MinimalGame(items: testItem)
         let (engine, _) = await GameEngine.test(blueprint: game)
-        let proxy = try await engine.item("testItem")
+        let proxy = await engine.item("testItem")
 
         // When
-        let change = try await proxy.clearFlag(.isTouched)
+        let change = await proxy.clearFlag(.isTouched)
 
         // Then
         #expect(change != nil)
@@ -104,10 +104,10 @@ struct ItemProxyStateChangesTests {
         )
         let game = MinimalGame(items: testItem)
         let (engine, _) = await GameEngine.test(blueprint: game)
-        let proxy = try await engine.item("testItem")
+        let proxy = await engine.item("testItem")
 
         // When
-        let change = try await proxy.clearFlag(.isTouched)
+        let change = await proxy.clearFlag(.isTouched)
 
         // Then
         #expect(change == nil)
@@ -125,7 +125,7 @@ struct ItemProxyStateChangesTests {
         )
         let game = MinimalGame(items: testItem)
         let (engine, _) = await GameEngine.test(blueprint: game)
-        let proxy = try await engine.item("testItem")
+        let proxy = await engine.item("testItem")
 
         // When
         let change = proxy.move(to: .player)
@@ -149,7 +149,7 @@ struct ItemProxyStateChangesTests {
         )
         let game = MinimalGame(items: testItem)
         let (engine, _) = await GameEngine.test(blueprint: game)
-        let proxy = try await engine.item("testItem")
+        let proxy = await engine.item("testItem")
 
         // When
         let change = proxy.remove()
@@ -175,10 +175,10 @@ struct ItemProxyStateChangesTests {
         )
         let game = MinimalGame(items: testItem)
         let (engine, _) = await GameEngine.test(blueprint: game)
-        let proxy = try await engine.item("testItem")
+        let proxy = await engine.item("testItem")
 
         // When
-        let change = try await proxy.setProperty(.testCounter, to: .int(42))
+        let change = await proxy.setProperty(.testCounter, to: .int(42))
 
         // Then
         #expect(change != nil)
@@ -208,10 +208,10 @@ struct ItemProxyStateChangesTests {
         )
         let game = MinimalGame(items: testItem)
         let (engine, _) = await GameEngine.test(blueprint: game)
-        let proxy = try await engine.item("testItem")
+        let proxy = await engine.item("testItem")
 
         // When
-        let change = try await proxy.setProperty(.testCounter, to: .int(42))
+        let change = await proxy.setProperty(.testCounter, to: .int(42))
 
         // Then
         #expect(change == nil)
@@ -227,10 +227,10 @@ struct ItemProxyStateChangesTests {
         )
         let game = MinimalGame(items: testItem)
         let (engine, _) = await GameEngine.test(blueprint: game)
-        let proxy = try await engine.item("testItem")
+        let proxy = await engine.item("testItem")
 
         // When
-        let change = try await proxy.setProperty(.testFlag, to: true)
+        let change = await proxy.setProperty(.testFlag, to: true)
 
         // Then
         #expect(change != nil)
@@ -259,10 +259,10 @@ struct ItemProxyStateChangesTests {
         )
         let game = MinimalGame(items: testItem)
         let (engine, _) = await GameEngine.test(blueprint: game)
-        let proxy = try await engine.item("testItem")
+        let proxy = await engine.item("testItem")
 
         // When
-        let change = try await proxy.setProperty(.testCounter, to: 100)
+        let change = await proxy.setProperty(.testCounter, to: 100)
 
         // Then
         #expect(change != nil)
@@ -291,10 +291,10 @@ struct ItemProxyStateChangesTests {
         )
         let game = MinimalGame(items: testItem)
         let (engine, _) = await GameEngine.test(blueprint: game)
-        let proxy = try await engine.item("testItem")
+        let proxy = await engine.item("testItem")
 
         // When
-        let change = try await proxy.setProperty(.testText, to: "Hello World")
+        let change = await proxy.setProperty(.testText, to: "Hello World")
 
         // Then
         #expect(change != nil)
@@ -325,10 +325,10 @@ struct ItemProxyStateChangesTests {
         )
         let game = MinimalGame(items: testItem)
         let (engine, _) = await GameEngine.test(blueprint: game)
-        let proxy = try await engine.item("testItem")
+        let proxy = await engine.item("testItem")
 
         // When
-        let change = try await proxy.setDescription(to: "A newly described item.")
+        let change = await proxy.setDescription(to: "A newly described item.")
 
         // Then
         #expect(change != nil)
@@ -358,10 +358,10 @@ struct ItemProxyStateChangesTests {
         )
         let game = MinimalGame(items: testItem)
         let (engine, _) = await GameEngine.test(blueprint: game)
-        let proxy = try await engine.item("testItem")
+        let proxy = await engine.item("testItem")
 
         // When
-        let change = try await proxy.setDescription(to: "A newly described item.")
+        let change = await proxy.setDescription(to: "A newly described item.")
 
         // Then
         #expect(change == nil)
@@ -379,10 +379,10 @@ struct ItemProxyStateChangesTests {
         )
         let game = MinimalGame(items: testItem)
         let (engine, _) = await GameEngine.test(blueprint: game)
-        let proxy = try await engine.item("testItem")
+        let proxy = await engine.item("testItem")
 
         // When/Then: Set a new flag
-        let setChange = try await proxy.setFlag(.isTouched)
+        let setChange = await proxy.setFlag(.isTouched)
         #expect(setChange != nil)
         if let setChange {
             if case .setItemProperty(let id, let property, let value) = setChange {
@@ -398,7 +398,7 @@ struct ItemProxyStateChangesTests {
         try await engine.apply(setChange!)
 
         // Clear the flag
-        let clearChange = try await proxy.clearFlag(.isTouched)
+        let clearChange = await proxy.clearFlag(.isTouched)
         #expect(clearChange != nil)
         if let clearChange {
             if case .setItemProperty(let id, let property, let value) = clearChange {
@@ -421,10 +421,10 @@ struct ItemProxyStateChangesTests {
         )
         let game = MinimalGame(items: testItem)
         let (engine, _) = await GameEngine.test(blueprint: game)
-        let proxy = try await engine.item("testItem")
+        let proxy = await engine.item("testItem")
 
         // When/Then: Set various property types
-        let boolChange = try await proxy.setProperty(.testFlag, to: true)
+        let boolChange = await proxy.setProperty(.testFlag, to: true)
         #expect(boolChange != nil)
         if let boolChange {
             if case .setItemProperty(let id, let property, let value) = boolChange {
@@ -437,7 +437,7 @@ struct ItemProxyStateChangesTests {
         }
 
         // Set int property
-        let intChange = try await proxy.setProperty(.testCounter, to: 42)
+        let intChange = await proxy.setProperty(.testCounter, to: 42)
         #expect(intChange != nil)
         if let intChange {
             if case .setItemProperty(let id, let property, let value) = intChange {
@@ -450,7 +450,7 @@ struct ItemProxyStateChangesTests {
         }
 
         // Set string property
-        let stringChange = try await proxy.setProperty(.testText, to: "test value")
+        let stringChange = await proxy.setProperty(.testText, to: "test value")
         #expect(stringChange != nil)
         if let stringChange {
             if case .setItemProperty(let id, let property, let value) = stringChange {
@@ -475,20 +475,20 @@ struct ItemProxyStateChangesTests {
         )
         let game = MinimalGame(items: testItem)
         let (engine, _) = await GameEngine.test(blueprint: game)
-        let proxy = try await engine.item("testItem")
+        let proxy = await engine.item("testItem")
 
         // When: Apply multiple changes
-        let change1 = try await proxy.setProperty(.testCounter, to: 1)
-        let change2 = try await proxy.setProperty(.testCounter, to: 2)
-        let change3 = try await proxy.setProperty(.testCounter, to: 3)
+        let change1 = await proxy.setProperty(.testCounter, to: 1)
+        let change2 = await proxy.setProperty(.testCounter, to: 2)
+        let change3 = await proxy.setProperty(.testCounter, to: 3)
 
         try await engine.apply(change1!)
         try await engine.apply(change2!)
         try await engine.apply(change3!)
 
         // Then: Final value should be from the last change
-        let finalItem = try await engine.item("testItem")
-        #expect(try await finalItem.property(.testCounter) == .int(3))
+        let finalItem = await engine.item("testItem")
+        #expect(await finalItem.property(.testCounter) == .int(3))
 
         // And: Change history should preserve order
         let history = await engine.changeHistory

@@ -1,6 +1,6 @@
-import Testing
 import Foundation
 @testable import GnustoEngine
+import Testing
 
 @Suite("ItemID Tests")
 struct ItemIDTests {
@@ -68,7 +68,7 @@ struct ItemIDTests {
         let itemDict = [
             ItemID("lantern"): "A brass lantern",
             ItemID("knife"): "A rusty knife",
-            ItemID("coin"): "A silver coin"
+            ItemID("coin"): "A silver coin",
         ]
 
         #expect(itemDict[ItemID("lantern")] == "A brass lantern")
@@ -83,7 +83,7 @@ struct ItemIDTests {
             "lantern",
             "knife",
             "coin",
-            "lantern" // Duplicate should be ignored
+            "lantern", // Duplicate should be ignored
         ]
 
         #expect(itemSet.count == 3)
@@ -139,8 +139,7 @@ struct ItemIDTests {
             "🗝️魔法钥匙",
         ]
 
-        let encoder = JSONEncoder()
-        encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
+        let encoder = JSONEncoder.sorted(.prettyPrinted)
         let decoder = JSONDecoder()
 
         for originalID in originalIDs {
@@ -155,7 +154,7 @@ struct ItemIDTests {
     @Test("ItemID JSON Representation")
     func testJSONRepresentation() throws {
         let id: ItemID = "brassLantern"
-        let encoder = JSONEncoder()
+        let encoder = JSONEncoder.sorted()
         let jsonData = try encoder.encode(id)
         let jsonString = String(data: jsonData, encoding: .utf8)
 
@@ -193,14 +192,14 @@ struct ItemIDTests {
         let itemIDs: [ItemID] = [
             "lantern",
             "knife",
-            "coin"
+            "coin",
         ]
 
         // Test that ItemID can be safely passed across actor boundaries
         let results = await withTaskGroup(of: ItemID.self) { group in
             for itemID in itemIDs {
                 group.addTask {
-                    return itemID
+                    itemID
                 }
             }
 
@@ -224,10 +223,10 @@ struct ItemIDTests {
     @Test("ItemID Large Collection Performance")
     func testLargeCollectionPerformance() throws {
         // Create a large set of ItemIDs
-        let itemIDs = (0..<1000).map { ItemID("item\($0)") }
+        let itemIDs = (0..<1_000).map { ItemID("item\($0)") }
         let itemSet = Set(itemIDs)
 
-        #expect(itemSet.count == 1000)
+        #expect(itemSet.count == 1_000)
 
         // Test lookup performance
         let lookupID: ItemID = "item500"
@@ -238,7 +237,7 @@ struct ItemIDTests {
 
     @Test("ItemID Very Long String")
     func testVeryLongString() throws {
-        let longString = String(repeating: "a", count: 10000)
+        let longString = String(repeating: "a", count: 10_000)
         let id = ItemID(longString)
         #expect(id.rawValue == longString)
     }
@@ -260,4 +259,4 @@ struct ItemIDTests {
         #expect(id2 != id3)
         #expect(id3 != id4)
     }
-} 
+}

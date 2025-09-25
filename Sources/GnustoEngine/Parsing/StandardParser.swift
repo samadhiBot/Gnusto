@@ -83,7 +83,7 @@ public struct StandardParser: Parser {
     ///                 (verbs, nouns, adjectives, prepositions, noise words, directions)
     ///                 and verb syntax rules. This is the primary source of grammatical
     ///                 and lexical knowledge for the parser.
-    ///   - gameState: The current `GameState`, providing essential context for resolving
+    ///   - engine: The game engine providing essential context for resolving
     ///                object references (e.g., player inventory, item locations, current
     ///                pronoun meanings, items visible or accessible to the player).
     /// - Returns: A `Result` which is either:
@@ -168,10 +168,13 @@ public struct StandardParser: Parser {
                 }
             }
 
-            // If we found any matches of the longest possible length starting at this position, use them and stop searching
+            // If we found any matches of the longest possible length starting at this position,
+            // use them and stop searching
             if longestMatchLength > 0 {
-                candidateVerbs = potentialMatchVerbs  // Assign the set of verbs found at the longest length
-                break  // Found the first (and longest) verb match group, stop outer loop
+                // Assign the set of verbs found at the longest length
+                candidateVerbs = potentialMatchVerbs
+                // Found the first (and longest) verb match group, stop outer loop
+                break
             }
         }
 
@@ -213,8 +216,8 @@ public struct StandardParser: Parser {
         }
 
         // 7. Match Tokens Against All Potential Syntax Rules
-        var successfulParse: Command? = nil
-        var bestError: ParseError? = nil
+        var successfulParse: Command?
+        var bestError: ParseError?
 
         // Pre-calculate any preposition in the input once, since it's the same for all rules
         let inputPreposition = findInputPreposition(
@@ -226,7 +229,7 @@ public struct StandardParser: Parser {
         // 7. Sort syntax rules by specificity score before matching
         // This ensures more specific rules (like .match(.verb, .on, .directObject))
         // are tried before generic rules (like .match(.knock))
-        var scoredRules: [(verb: Verb, rule: SyntaxRule, score: Int)] = []
+        var scoredRules = [ScoredRule]()
         for (verb, rule) in applicableSyntaxRules {
             // Create temporary commands for scoring - use dummy proxy reference for objects
             let dummyProxy = ProxyReference.universal(.ground)
@@ -249,7 +252,13 @@ public struct StandardParser: Parser {
                 synonyms: synonymsForThisVerb
             )
 
-            scoredRules.append((verb: verb, rule: rule, score: score))
+            scoredRules.append(
+                ScoredRule(
+                    verb: verb,
+                    rule: rule,
+                    score: score
+                )
+            )
         }
 
         // Sort by score (higher scores first)
@@ -375,8 +384,8 @@ public struct StandardParser: Parser {
         startIndex: Int,
         vocabulary: Vocabulary
     ) -> String? {
-        for i in startIndex..<tokens.count {
-            let currentToken = tokens[i]
+        for index in startIndex..<tokens.count {
+            let currentToken = tokens[index]
             if vocabulary.prepositions.contains(currentToken) {
                 // Found the first preposition after the verb phrase.
                 return currentToken
@@ -488,7 +497,7 @@ public struct StandardParser: Parser {
     // MARK: - Syntax Matching Logic
 
     /// Attempts to match a sequence of tokens against a specific SyntaxRule.
-    private func matchRule(
+    private func matchRule(  // swiftlint:disable:this function_parameter_count
         rule: SyntaxRule,
         tokens: [String],
         verbStartIndex: Int,
@@ -501,8 +510,8 @@ public struct StandardParser: Parser {
         var tokenCursor = verbStartIndex + verbTokenCount
         var directObjectPhraseTokens = [String]()
         var indirectObjectPhraseTokens = [String]()
-        var matchedPreposition: Preposition? = nil
-        var matchedDirection: Direction? = nil
+        var matchedPreposition: Preposition?
+        var matchedDirection: Direction?
 
         for patternIndex in 1..<rule.pattern.count {
             let tokenType = rule.pattern[patternIndex]
@@ -965,7 +974,7 @@ public struct StandardParser: Parser {
             // If we can't extract a noun, use the last word in the phrase as the noun
             // This allows unknown nouns to be handled by the resolution phase
             let finalNoun = noun ?? phrase.last
-            guard let finalNoun = finalNoun else { return nil }
+            guard let finalNoun else { return nil }
 
             // If we used the fallback noun (phrase.last), don't include it as a modifier too
             let finalMods = noun != nil ? mods : mods.filter { $0 != finalNoun }
@@ -1219,7 +1228,7 @@ public struct StandardParser: Parser {
                     for itemID in itemIDs {
                         // Only consider this alternative if the item is specifically identified by this modifier
                         // and also has the current noun as part of its name/synonyms
-                        guard let itemProxy = try? await engine.item(itemID) else { continue }
+                        let itemProxy = await engine.item(itemID)
 
                         let itemNameWords = Set(
                             await itemProxy.name.lowercased().split(separator: " ").map(String.init)
@@ -1242,24 +1251,26 @@ public struct StandardParser: Parser {
         // Check for items using the main noun
         if let itemIDs = vocabulary.items[lowercasedNoun] {
             for itemID in itemIDs {
-                if let item = try? await engine.item(itemID) {
-                    potentialEntities.append(.item(item))
-                }
+                let item = await engine.item(itemID)
+                potentialEntities.append(
+                    .item(item)
+                )
             }
         }
 
         // Check for locations
         if let locationID = vocabulary.locationNames[lowercasedNoun] {
-            if let location = try? await engine.location(locationID) {
-                potentialEntities.append(.location(location))
-            }
+            let location = await engine.location(locationID)
+            potentialEntities.append(
+                .location(location)
+            )
         }
 
         // If no entities found in vocabulary, check for universal objects as fallback
         if potentialEntities.isEmpty {
             // Check if the noun matches any universal objects
             if let universalObjects = vocabulary.universals[lowercasedNoun],
-               let closestMatch = universalObjects.closestMatch(to: lowercasedNoun)
+                let closestMatch = universalObjects.closestMatch(to: lowercasedNoun)
             {
                 return .success(.universal(closestMatch))
             }
@@ -1311,7 +1322,8 @@ public struct StandardParser: Parser {
                 }
                 // TODO: Add check for location-specific requiredConditions if they become a concept.
                 // For now, if it's a location reference, it's valid if named.
-                if await engine.gameState.locations[locationProxy.id] != nil {  // Verify location actually exists in current game state
+                if await engine.gameState.locations[locationProxy.id] != nil {
+                    // Verify location actually exists in current game state
                     resolvedAndScopedProxies.append(.location(locationProxy))
                 }
 
@@ -1339,7 +1351,7 @@ public struct StandardParser: Parser {
                 // Look through all items to see if any have this full phrase as a synonym
                 for (_, itemIDs) in vocabulary.items {
                     for itemID in itemIDs {
-                        guard let item = try? await engine.item(itemID) else { continue }
+                        let item = await engine.item(itemID)
 
                         // Check if the full phrase matches the item's name or any synonym
                         let itemNameLowercase = await item.name.lowercased()
@@ -1348,9 +1360,10 @@ public struct StandardParser: Parser {
                         if itemNameLowercase == fullPhrase || itemSynonyms.contains(fullPhrase) {
                             // This exact phrase refers to a specific item, but it's not accessible
                             // Return an unresolved reference to trigger "Any such thing lurks beyond your reach."
-                            if let proxy = try? await engine.item(ItemID(fullPhrase)) {
-                                return .success(.item(proxy))
-                            }
+                            let proxy = await engine.item(ItemID(fullPhrase))
+                            return .success(
+                                .item(proxy)
+                            )
                         }
                     }
                 }
@@ -1403,7 +1416,7 @@ public struct StandardParser: Parser {
                 ) { group in
                     for item in itemEntities {
                         group.addTask {
-                            (item, try await item.playerIsHolding)
+                            (item, await item.playerIsHolding)
                         }
                     }
                     var results: [(ItemProxy, Bool)] = []
@@ -1520,48 +1533,6 @@ public struct StandardParser: Parser {
         )
     }
 
-    /// Helper method to check if an item is accessible to the player.
-    private func checkItemAccessibility(
-        of parent: ParentProxy,
-        at currentLocationID: LocationID
-    ) async throws -> Bool {
-        switch parent {
-        case .item(let item):
-            try await checkContainerAccessibility(item, at: currentLocationID)
-        case .location(let location):
-            location.id == currentLocationID
-        case .nowhere:
-            false
-        case .player:
-            true
-        }
-    }
-
-    /// Helper method to check if a container is accessible and its contents are visible
-    private func checkContainerAccessibility(
-        _ container: ItemProxy,
-        at currentLocationID: LocationID
-    ) async throws -> Bool {
-        // Get dynamic parent of container
-        let containerParent = try await container.parent
-
-        // Check if container is accessible
-        let containerAccessible = try await checkItemAccessibility(
-            of: containerParent,
-            at: currentLocationID
-        )
-
-        guard containerAccessible else { return false }
-
-        // True if parent container is a surface
-        if await container.isSurface { return true }
-
-        // True if parent container contents are visible (open, transparent, or surface)
-        if await container.contentsAreVisible { return true }
-
-        return false
-    }
-
     /// Filters a set of candidate ItemIDs based on a list of required modifiers (adjectives).
     func filterCandidates(
         item: ItemProxy,
@@ -1670,5 +1641,11 @@ extension StandardParser {
         case failure(ParseError)
         /// Rule doesn't apply to this input (e.g., particle mismatch, wrong verb)
         case notApplicable
+    }
+
+    struct ScoredRule {
+        let verb: Verb
+        let rule: SyntaxRule
+        let score: Int
     }
 }

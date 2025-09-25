@@ -142,7 +142,7 @@ struct StandardParserTests {
             engine: engine
         )
         let command = try result.get()
-        let lampProxy = try await lamp.proxy(engine)
+        let lampProxy = await lamp.proxy(engine)
         #expect(command.verb == .take)
         #expect(command.directObject == .item(lampProxy))
         #expect(command.indirectObject == nil)
@@ -182,7 +182,7 @@ struct StandardParserTests {
             engine: engine
         )
         let command = try result.get()
-        let lamp1Proxy = try await lamp1.proxy(engine)
+        let lamp1Proxy = await lamp1.proxy(engine)
 
         expectNoDifference(
             command,
@@ -227,8 +227,8 @@ struct StandardParserTests {
             engine: engine
         )
         let command = try result.get()
-        let keyProxy = try await key.proxy(engine)
-        let boxProxy = try await box.proxy(engine)
+        let keyProxy = await key.proxy(engine)
+        let boxProxy = await box.proxy(engine)
         #expect(command.verb == .put)
         #expect(command.directObject == .item(keyProxy))
         #expect(command.indirectObject == .item(boxProxy))

@@ -12,9 +12,9 @@ extension ItemProxy {
     ///   - propertyID: The `PropertyID` of the flag to clear.
     /// - Returns: A `StateChange` to set the flag to `false`, or `nil` if the flag is not currently
     ///            `true`.
-    public func clearFlag(_ propertyID: ItemPropertyID) async throws -> StateChange? {
-        if try await property(propertyID)?.toBool == true {
-            try await setProperty(propertyID, to: false)
+    public func clearFlag(_ propertyID: ItemPropertyID) async -> StateChange? {
+        if await property(propertyID)?.toBool == true {
+            await setProperty(propertyID, to: false)
         } else {
             nil
         }
@@ -79,8 +79,8 @@ extension ItemProxy {
     public func setProperty(
         _ propertyID: ItemPropertyID,
         to value: StateValue
-    ) async throws -> StateChange? {
-        let currentValue = try await property(propertyID)
+    ) async -> StateChange? {
+        let currentValue = await property(propertyID)
         guard currentValue != value else { return nil }
 
         return StateChange.setItemProperty(id: id, property: propertyID, value: value)
@@ -95,11 +95,11 @@ extension ItemProxy {
     ///   - propertyID: The `PropertyID` of the flag to set.
     /// - Returns: A `StateChange` to set the flag to `true`, or `nil` if the flag is already
     ///            `true`.
-    public func setFlag(_ propertyID: ItemPropertyID) async throws -> StateChange? {
-        if try await property(propertyID)?.toBool == true {
+    public func setFlag(_ propertyID: ItemPropertyID) async -> StateChange? {
+        if await property(propertyID)?.toBool == true {
             nil
         } else {
-            try await setProperty(propertyID, to: true)
+            await setProperty(propertyID, to: true)
         }
     }
 }
@@ -115,8 +115,8 @@ extension ItemProxy {
     /// - Parameters:
     ///   - description: The new description text.
     /// - Returns: A `StateChange` to set the description, or `nil` if it wouldn't change.
-    public func setDescription(to description: String) async throws -> StateChange? {
-        try await setProperty(.description, to: .string(description))
+    public func setDescription(to description: String) async -> StateChange? {
+        await setProperty(.description, to: .string(description))
     }
 
     /// Creates a `StateChange` to set a boolean flag property on an item.
@@ -131,8 +131,8 @@ extension ItemProxy {
     public func setProperty(
         _ flag: ItemPropertyID,
         to value: Bool
-    ) async throws -> StateChange? {
-        try await setProperty(flag, to: .bool(value))
+    ) async -> StateChange? {
+        await setProperty(flag, to: .bool(value))
     }
 
     /// Creates a `StateChange` to set an integer property on an item.
@@ -146,8 +146,8 @@ extension ItemProxy {
     public func setProperty(
         _ propertyID: ItemPropertyID,
         to value: Int
-    ) async throws -> StateChange? {
-        try await setProperty(propertyID, to: .int(value))
+    ) async -> StateChange? {
+        await setProperty(propertyID, to: .int(value))
     }
 
     /// Creates a `StateChange` to set a string property on an item.
@@ -161,8 +161,8 @@ extension ItemProxy {
     public func setProperty(
         _ propertyID: ItemPropertyID,
         to value: String
-    ) async throws -> StateChange? {
-        try await setProperty(propertyID, to: .string(value))
+    ) async -> StateChange? {
+        await setProperty(propertyID, to: .string(value))
     }
 }
 
@@ -174,7 +174,7 @@ extension ItemProxy {
     /// This method allows you to update any combination of character sheet properties
     /// in a single operation. Only non-nil parameters will be applied to the character sheet.
     /// If the item is not a character (doesn't have a character sheet), this method
-    /// throws an error.
+    /// an error.
     ///
     /// - Parameters:
     ///   - strength: The character's physical strength attribute.
@@ -233,8 +233,8 @@ extension ItemProxy {
         weaponWeaknesses: [ItemID: Int] = [:],
         weaponResistances: [ItemID: Int] = [:],
         taunts: [String] = []
-    ) async throws -> StateChange? {
-        var characterSheet = try await characterSheet
+    ) async -> StateChange? {
+        var characterSheet = await characterSheet
         if let strength {
             characterSheet.strength = strength
         }
@@ -304,7 +304,7 @@ extension ItemProxy {
         if let isFighting {
             characterSheet.isFighting = isFighting
         }
-        return try await setProperty(
+        return await setProperty(
             .characterSheet,
             to: .characterSheet(characterSheet)
         )
@@ -321,10 +321,10 @@ extension ItemProxy {
     /// - Parameters:
     ///   - amount: The amount of damage to inflict (positive integer).
     /// - Returns: A `StateChange` to reduce health, or `nil` if it wouldn't change.
-    public func takeDamage(_ amount: Int) async throws -> StateChange? {
-        var characterSheet = try await characterSheet
+    public func takeDamage(_ amount: Int) async -> StateChange? {
+        var characterSheet = await characterSheet
         characterSheet.health = max(0, characterSheet.health - amount)
-        return try await setProperty(
+        return await setProperty(
             .characterSheet,
             to: .characterSheet(characterSheet)
         )
@@ -337,13 +337,13 @@ extension ItemProxy {
     /// - Parameters:
     ///   - amount: The amount of healing to apply (positive integer).
     /// - Returns: A `StateChange` to increase health, or `nil` if it wouldn't change.
-    public func heal(_ amount: Int) async throws -> StateChange? {
-        var characterSheet = try await characterSheet
+    public func heal(_ amount: Int) async -> StateChange? {
+        var characterSheet = await characterSheet
         characterSheet.health = min(
             characterSheet.maxHealth,
             characterSheet.health + amount
         )
-        return try await setProperty(
+        return await setProperty(
             .characterSheet,
             to: .characterSheet(characterSheet)
         )
@@ -357,10 +357,10 @@ extension ItemProxy {
     /// - Parameters:
     ///   - health: The new health value.
     /// - Returns: A `StateChange` to set the health, or `nil` if it wouldn't change.
-    public func setHealth(to health: Int) async throws -> StateChange? {
-        var characterSheet = try await characterSheet
+    public func setHealth(to health: Int) async -> StateChange? {
+        var characterSheet = await characterSheet
         characterSheet.health = health
-        return try await setProperty(
+        return await setProperty(
             .characterSheet,
             to: .characterSheet(characterSheet)
         )

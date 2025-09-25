@@ -69,7 +69,7 @@ ALL game state mutations must flow through `StateChange` objects via the engine:
 ```swift
 // ✅ RIGHT - Use state change builders
 //
-return try await ActionResult(
+return await ActionResult(
     await context.msg.inflateSuccess(raft.withDefiniteArticle),
     raft.setFlag(.isTouched),
     raft.setFlag(.isInflated)
@@ -137,7 +137,7 @@ func testSomething() async throws {
         """
     )
 
-    let finalState = try await engine.item("testItem")
+    let finalState = await engine.item("testItem")
     #expect(finalState?.parent == .player)
 }
 ```
@@ -152,7 +152,7 @@ func testSomething() async throws {
 
 Diff legend:
   - lines are actual output from the game engine
-  + lines are the output expected by the test 
+  + lines are the output expected by the test
 
 You are blind to the difference between the following two lines. The first uses a curly apostrophe, and the second uses a straight apostrophe. If there is a failing test with an apostrophe or quote, and you cannot see the difference, leave the test for me and I will fix it.
 
@@ -278,12 +278,12 @@ let darkRoom = Location(
 
 ```swift
 // Check item state
-let item = try await engine.item("itemID")
+let item = await engine.item("itemID")
 #expect(item.parent == .player)
 #expect(await item.hasFlag(.isOn) == true)
 
 // Check location lighting
-let isLit = try await engine.player.location.isLit
+let isLit = await engine.player.location.isLit
 #expect(isLit == true)
 
 // Check global state

@@ -70,11 +70,11 @@ struct ConjunctionCommandTests {
         try await engine.execute("drop sword and lantern")
 
         // Assert: Both items should be dropped
-        let swordItem = try await engine.item("sword")
-        let lanternItem = try await engine.item("lantern")
+        let swordItem = await engine.item("sword")
+        let lanternItem = await engine.item("lantern")
 
-        #expect(try await swordItem.parent == .location(engine.location(.startRoom)))
-        #expect(try await lanternItem.parent == .location(engine.location(.startRoom)))
+        #expect(await swordItem.parent == .location(engine.location(.startRoom)))
+        #expect(await lanternItem.parent == .location(engine.location(.startRoom)))
 
         // Assert: Appropriate message
         let output = await mockIO.flush()
@@ -95,13 +95,13 @@ struct ConjunctionCommandTests {
         try await engine.execute("drop sword, lantern and book")
 
         // Assert: All three items should be dropped
-        let swordItem = try await engine.item("sword")
-        let lanternItem = try await engine.item("lantern")
-        let bookItem = try await engine.item("book")
+        let swordItem = await engine.item("sword")
+        let lanternItem = await engine.item("lantern")
+        let bookItem = await engine.item("book")
 
-        #expect(try await swordItem.parent == .location(engine.location(.startRoom)))
-        #expect(try await lanternItem.parent == .location(engine.location(.startRoom)))
-        #expect(try await bookItem.parent == .location(engine.location(.startRoom)))
+        #expect(await swordItem.parent == .location(engine.location(.startRoom)))
+        #expect(await lanternItem.parent == .location(engine.location(.startRoom)))
+        #expect(await bookItem.parent == .location(engine.location(.startRoom)))
 
         // Assert: Appropriate message
         let output = await mockIO.flush()
@@ -125,11 +125,11 @@ struct ConjunctionCommandTests {
         try await engine.execute("take coin and gem")
 
         // Assert: Both items should be taken
-        let coinItem = try await engine.item("coin")
-        let gemItem = try await engine.item(.startItem)
+        let coinItem = await engine.item("coin")
+        let gemItem = await engine.item(.startItem)
 
-        #expect(try await coinItem.playerIsHolding)
-        #expect(try await gemItem.playerIsHolding)
+        #expect(await coinItem.playerIsHolding)
+        #expect(await gemItem.playerIsHolding)
 
         // Assert: Appropriate message
         let output = await mockIO.flush()
@@ -219,11 +219,11 @@ struct ConjunctionCommandTests {
         try await engine.execute("drop sword and statue")
 
         // Assert: Should drop the sword but handle the statue appropriately
-        let swordItem = try await engine.item("sword")
-        let statueItem = try await engine.item("statue")
+        let swordItem = await engine.item("sword")
+        let statueItem = await engine.item("statue")
 
-        #expect(try await swordItem.parent == .location(engine.location(.startRoom)))
-        #expect(try await statueItem.parent == .location(engine.location(.startRoom)))  // Should remain in location
+        #expect(await swordItem.parent == .location(engine.location(.startRoom)))
+        #expect(await statueItem.parent == .location(engine.location(.startRoom)))  // Should remain in location
 
         // Check output for appropriate error or success message
         let output = await mockIO.flush()
@@ -252,10 +252,10 @@ struct ConjunctionCommandTests {
         try await engine.execute("drop sword and lantern")
 
         // Assert: Should successfully execute with multiple objects
-        let swordItem = try await engine.item("sword")
-        let lanternItem = try await engine.item("lantern")
-        #expect(try await swordItem.parent == .location(engine.location(.startRoom)))
-        #expect(try await lanternItem.parent == .location(engine.location(.startRoom)))
+        let swordItem = await engine.item("sword")
+        let lanternItem = await engine.item("lantern")
+        #expect(await swordItem.parent == .location(engine.location(.startRoom)))
+        #expect(await lanternItem.parent == .location(engine.location(.startRoom)))
 
         let output = await mockIO.flush()
         expectNoDifference(
@@ -282,12 +282,12 @@ struct ConjunctionCommandTests {
         try await engine.execute("take coin, gem and book")
 
         // Assert: Should successfully execute with multiple objects
-        let coinItem = try await engine.item("coin")
-        let gemItem = try await engine.item(.startItem)
-        let bookItem = try await engine.item("book")
-        #expect(try await coinItem.playerIsHolding)
-        #expect(try await gemItem.playerIsHolding)
-        #expect(try await bookItem.playerIsHolding)
+        let coinItem = await engine.item("coin")
+        let gemItem = await engine.item(.startItem)
+        let bookItem = await engine.item("book")
+        #expect(await coinItem.playerIsHolding)
+        #expect(await gemItem.playerIsHolding)
+        #expect(await bookItem.playerIsHolding)
 
         let output = await mockIO.flush()
         expectNoDifference(

@@ -28,16 +28,19 @@ struct ItemProxyAccessorTests {
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         // When/Then
-        let bookProxy = try await engine.item("book")
+        let bookProxy = await engine.item("book")
         let name = await bookProxy.name
         #expect(name == "leather book")
 
         let description = await bookProxy.description
         #expect(description == "A worn leather-bound tome.")
 
-        let coinProxy = try await engine.item("coin")
+        let coinProxy = await engine.item("coin")
         let coinDescription = await coinProxy.description
-        #expect(coinDescription == "The gold coin reveals itself to be exactly what it appears--nothing more, nothing less.")
+        #expect(
+            coinDescription
+                == "The gold coin reveals itself to be exactly what it appears--nothing more, nothing less."
+        )
     }
 
     @Test("ItemProxy flag checking methods")
@@ -58,7 +61,7 @@ struct ItemProxyAccessorTests {
         )
 
         let (engine, _) = await GameEngine.test(blueprint: game)
-        let proxy = try await engine.item("container")
+        let proxy = await engine.item("container")
 
         // When/Then - Test single flag checking
         #expect(await proxy.hasFlag(.isContainer) == true)
@@ -137,7 +140,7 @@ struct ItemProxyAccessorTests {
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         // When/Then
-        let containerProxy = try await engine.item("container")
+        let containerProxy = await engine.item("container")
         #expect(await containerProxy.isContainer == true)
         #expect(await containerProxy.isOpenable == true)
         #expect(await containerProxy.isOpen == true)
@@ -146,22 +149,22 @@ struct ItemProxyAccessorTests {
         #expect(await containerProxy.isNotEmpty == false)
         #expect(await containerProxy.isVisible == true)
 
-        let weaponProxy = try await engine.item("sword")
+        let weaponProxy = await engine.item("sword")
         #expect(await weaponProxy.isWeapon == true)
         #expect(await weaponProxy.isContainer == false)
 
-        let characterProxy = try await engine.item("guard")
-        #expect(try await characterProxy.isCharacter == true)
-        #expect((try? await characterProxy.isFighting) == false)
+        let characterProxy = await engine.item("guard")
+        #expect(await characterProxy.isCharacter == true)
+        #expect(await characterProxy.isFighting == false)
 
-        let fightingProxy = try await engine.item("monster")
-        #expect(try await fightingProxy.isCharacter == true)
-        #expect((try? await fightingProxy.isFighting) == true)
+        let fightingProxy = await engine.item("monster")
+        #expect(await fightingProxy.isCharacter == true)
+        #expect(await fightingProxy.isFighting == true)
 
-        let surfaceProxy = try await engine.item("table")
+        let surfaceProxy = await engine.item("table")
         #expect(await surfaceProxy.isSurface == true)
 
-        let lampProxy = try await engine.item("lamp")
+        let lampProxy = await engine.item("lamp")
         #expect(await lampProxy.isProvidingLight == true)
     }
 
@@ -200,13 +203,13 @@ struct ItemProxyAccessorTests {
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         // When/Then
-        let containerProxy = try await engine.item("container")
+        let containerProxy = await engine.item("container")
         #expect(await containerProxy.capacity == 5)
         #expect(await containerProxy.currentLoad == 1)  // coin has size 1
         #expect(await containerProxy.canHold("coin") == true)  // can hold another coin
         #expect(await containerProxy.canHold("boulder") == false)  // boulder is size 10
 
-        let contents = try await containerProxy.contents
+        let contents = await containerProxy.contents
         #expect(contents.count == 1)
         #expect(contents[0].id == "coin")
 
@@ -253,28 +256,28 @@ struct ItemProxyAccessorTests {
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         // When/Then
-        let roomItemProxy = try await engine.item("roomItem")
-        let roomItemParent = try await roomItemProxy.parent
+        let roomItemProxy = await engine.item("roomItem")
+        let roomItemParent = await roomItemProxy.parent
         if case .location(let locationProxy) = roomItemParent {
             #expect(locationProxy.id == .startRoom)
         } else {
             #expect(Bool(false), "Expected location parent")
         }
-        #expect(try await roomItemProxy.playerIsHolding == false)
-        #expect(try await roomItemProxy.playerCanCarry == true)
+        #expect(await roomItemProxy.playerIsHolding == false)
+        #expect(await roomItemProxy.playerCanCarry == true)
 
-        let containerItemProxy = try await engine.item("containerItem")
-        let containerItemParent = try await containerItemProxy.parent
+        let containerItemProxy = await engine.item("containerItem")
+        let containerItemParent = await containerItemProxy.parent
         if case .item(let itemProxy) = containerItemParent {
             #expect(itemProxy.id == "container")
         } else {
             #expect(Bool(false), "Expected item parent")
         }
 
-        let playerItemProxy = try await engine.item("playerItem")
-        let playerItemParent = try await playerItemProxy.parent
+        let playerItemProxy = await engine.item("playerItem")
+        let playerItemParent = await playerItemProxy.parent
         #expect(playerItemParent == .player)
-        #expect(try await playerItemProxy.playerIsHolding == true)
+        #expect(await playerItemProxy.playerIsHolding == true)
     }
 
     @Test("ItemProxy article methods")
@@ -313,19 +316,19 @@ struct ItemProxyAccessorTests {
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         // When/Then
-        let bookProxy = try await engine.item("book")
+        let bookProxy = await engine.item("book")
         #expect(await bookProxy.withDefiniteArticle == "the leather book")
         #expect(await bookProxy.withIndefiniteArticle == "a leather book")
 
-        let coinsProxy = try await engine.item("coins")
+        let coinsProxy = await engine.item("coins")
         #expect(await coinsProxy.withDefiniteArticle == "the gold coins")
         #expect(await coinsProxy.withIndefiniteArticle == "some gold coins")
 
-        let waterProxy = try await engine.item("water")
+        let waterProxy = await engine.item("water")
         #expect(await waterProxy.withDefiniteArticle == "water")
         #expect(await waterProxy.withIndefiniteArticle == "water")
 
-        let appleProxy = try await engine.item("apple")
+        let appleProxy = await engine.item("apple")
         #expect(await appleProxy.withDefiniteArticle == "the apple")
         #expect(await appleProxy.withIndefiniteArticle == "an apple")
     }
@@ -362,24 +365,24 @@ struct ItemProxyAccessorTests {
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         // When/Then
-        let objectProxy = try await engine.item("book")
-        let objectResponse = try await objectProxy.response(
+        let objectProxy = await engine.item("book")
+        let objectResponse = await objectProxy.response(
             object: { "object: \($0)" },
             character: { "character: \($0)" },
             enemy: { "enemy: \($0)" }
         )
         #expect(objectResponse == "object: the leather book")
 
-        let characterProxy = try await engine.item("guard")
-        let characterResponse = try await characterProxy.response(
+        let characterProxy = await engine.item("guard")
+        let characterResponse = await characterProxy.response(
             object: { "object: \($0)" },
             character: { "character: \($0)" },
             enemy: { "enemy: \($0)" }
         )
         #expect(characterResponse == "character: the town guard")
 
-        let enemyProxy = try await engine.item("monster")
-        let enemyResponse = try await enemyProxy.response(
+        let enemyProxy = await engine.item("monster")
+        let enemyResponse = await enemyProxy.response(
             object: { "object: \($0)" },
             character: { "character: \($0)" },
             enemy: { "enemy: \($0)" }
@@ -403,7 +406,7 @@ struct ItemProxyAccessorTests {
         )
 
         let (engine, _) = await GameEngine.test(blueprint: game)
-        let sword = try await engine.item("sword")
+        let sword = await engine.item("sword")
 
         let adjectives = await sword.adjectives
         expectNoDifference(adjectives, ["gleaming", "sharp", "shining", "steel"])
@@ -412,17 +415,17 @@ struct ItemProxyAccessorTests {
         expectNoDifference(synonyms, ["blade", "sabre", "weapon"])
 
         // Test alias generation (should combine adjective + synonym)
-        let alias1 = try await sword.alias()
-        expectNoDifference(alias1, "sabre")
+        let alias1 = await sword.alias()
+        expectNoDifference(alias1, "sharp blade")
 
-        let alias2 = try await sword.alias(.withDefiniteArticle)
-        expectNoDifference(alias2, "the steel sabre")
+        let alias2 = await sword.alias(.withDefiniteArticle)
+        expectNoDifference(alias2, "the sharp blade")
 
-        let alias3 = try await sword.alias(.withIndefiniteArticle)
-        expectNoDifference(alias3, "a sabre")
+        let alias3 = await sword.alias(.withIndefiniteArticle)
+        expectNoDifference(alias3, "a weapon")
 
-        let alias4 = try await sword.alias(.withPossessiveAdjective)
-        expectNoDifference(alias4, "your weapon")
+        let alias4 = await sword.alias(.withPossessiveAdjective)
+        expectNoDifference(alias4, "your sabre")
     }
 
     @Test("ItemProxy alias without adjectives")
@@ -440,7 +443,7 @@ struct ItemProxyAccessorTests {
         )
 
         let (engine, _) = await GameEngine.test(blueprint: game)
-        let sword = try await engine.item("sword")
+        let sword = await engine.item("sword")
 
         let adjectives = await sword.adjectives
         expectNoDifference(adjectives, ["sharp"])
@@ -449,16 +452,16 @@ struct ItemProxyAccessorTests {
         expectNoDifference(synonyms, ["blade", "sabre", "weapon"])
 
         // Test alias generation (should combine adjective + synonym)
-        let alias1 = try await sword.alias()
+        let alias1 = await sword.alias()
         expectNoDifference(alias1, "sabre")
 
-        let alias2 = try await sword.alias(.withDefiniteArticle)
-        expectNoDifference(alias2, "the sharp sabre")
+        let alias2 = await sword.alias(.withDefiniteArticle)
+        expectNoDifference(alias2, "the weapon")
 
-        let alias3 = try await sword.alias(.withIndefiniteArticle)
-        expectNoDifference(alias3, "a sabre")
+        let alias3 = await sword.alias(.withIndefiniteArticle)
+        expectNoDifference(alias3, "a sharp blade")
 
-        let alias4 = try await sword.alias(.withPossessiveAdjective)
+        let alias4 = await sword.alias(.withPossessiveAdjective)
         expectNoDifference(alias4, "your weapon")
     }
 
@@ -477,7 +480,7 @@ struct ItemProxyAccessorTests {
         )
 
         let (engine, _) = await GameEngine.test(blueprint: game)
-        let sword = try await engine.item("sword")
+        let sword = await engine.item("sword")
 
         let adjectives = await sword.adjectives
         expectNoDifference(adjectives, ["gleaming", "sharp", "shining", "steel"])
@@ -486,16 +489,16 @@ struct ItemProxyAccessorTests {
         #expect(synonyms.isEmpty)
 
         // Test alias generation (should combine adjective + synonym)
-        let alias1 = try await sword.alias()
+        let alias1 = await sword.alias()
         expectNoDifference(alias1, "sharp sword")
 
-        let alias2 = try await sword.alias(.withDefiniteArticle)
+        let alias2 = await sword.alias(.withDefiniteArticle)
         expectNoDifference(alias2, "the sharp sword")
 
-        let alias3 = try await sword.alias(.withIndefiniteArticle)
+        let alias3 = await sword.alias(.withIndefiniteArticle)
         expectNoDifference(alias3, "a sharp sword")
 
-        let alias4 = try await sword.alias(.withPossessiveAdjective)
+        let alias4 = await sword.alias(.withPossessiveAdjective)
         expectNoDifference(alias4, "your sharp sword")
     }
 
@@ -527,17 +530,17 @@ struct ItemProxyAccessorTests {
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         // When/Then - Test explicit values
-        let artifactProxy = try await engine.item("artifact")
+        let artifactProxy = await engine.item("artifact")
         #expect(await artifactProxy.size == 5)
-        #expect(try await artifactProxy.health == 75)
-        #expect(try await artifactProxy.strength == 15)
+        #expect(await artifactProxy.health == 75)
+        #expect(await artifactProxy.strength == 15)
         #expect(await artifactProxy.value == 100)
 
         // Test default values
-        let basicProxy = try await engine.item("basic")
+        let basicProxy = await engine.item("basic")
         #expect(await basicProxy.size == 1)  // Default size
-        #expect(try await basicProxy.health == 50)  // Default health
-        #expect(try await basicProxy.strength == 10)  // Default strength
+        #expect(await basicProxy.health == 50)  // Default health
+        #expect(await basicProxy.strength == 10)  // Default strength
         #expect(await basicProxy.value == 0)  // Default value
     }
 
@@ -579,20 +582,20 @@ struct ItemProxyAccessorTests {
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         // When/Then
-        let visibleProxy = try await engine.item("visible")
+        let visibleProxy = await engine.item("visible")
         #expect(await visibleProxy.isVisible == true)
         #expect(await visibleProxy.shouldDescribe == true)
         #expect(await visibleProxy.isTouched == false)
 
-        let invisibleProxy = try await engine.item("invisible")
+        let invisibleProxy = await engine.item("invisible")
         #expect(await invisibleProxy.isVisible == false)
         #expect(await invisibleProxy.shouldDescribe == false)
 
-        let omitProxy = try await engine.item("omit")
+        let omitProxy = await engine.item("omit")
         #expect(await omitProxy.shouldDescribe == false)
         #expect(await omitProxy.isIncludableInAllCommands == false)  // Not includable due to omitDescription
 
-        let touchedProxy = try await engine.item("touched")
+        let touchedProxy = await engine.item("touched")
         #expect(await touchedProxy.isTouched == true)
     }
 
@@ -620,10 +623,10 @@ struct ItemProxyAccessorTests {
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         // When/Then
-        let doorProxy = try await engine.item("door")
+        let doorProxy = await engine.item("door")
         #expect(await doorProxy.isDoor == true)
 
-        let bookProxy = try await engine.item("book")
+        let bookProxy = await engine.item("book")
         #expect(await bookProxy.isDoor == false)
     }
 
@@ -668,22 +671,20 @@ struct ItemProxyAccessorTests {
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         // When/Then
-        let guardProxy = try await engine.item("guard")
-        #expect(try await guardProxy.isAlive == true)
-        #expect(try await guardProxy.isDead == false)
-        #expect(try await guardProxy.isHostileEnemy == false)
+        let guardProxy = await engine.item("guard")
+        #expect(await guardProxy.isAlive == true)
+        #expect(await guardProxy.isDead == false)
+        #expect(await guardProxy.isHostileEnemy == false)
 
-        let skeletonProxy = try await engine.item("skeleton")
-        #expect(try await skeletonProxy.isAlive == false)
-        #expect(try await skeletonProxy.isDead == true)
+        let skeletonProxy = await engine.item("skeleton")
+        #expect(await skeletonProxy.isAlive == false)
+        #expect(await skeletonProxy.isDead == true)
 
-        let orcProxy = try await engine.item("orc")
-        #expect(try await orcProxy.isHostileEnemy == true)
+        let orcProxy = await engine.item("orc")
+        #expect(await orcProxy.isHostileEnemy == true)
 
-        let rockProxy = try await engine.item("rock")
-        await #expect(throws: ItemError.self) {
-            _ = try await rockProxy.isAlive
-        }
+        let rockProxy = await engine.item("rock")
+        #expect(await rockProxy.isAlive == false)
     }
 
     @Test("ItemProxy text content properties")
@@ -720,13 +721,13 @@ struct ItemProxyAccessorTests {
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         // When/Then
-        let bookProxy = try await engine.item("book")
+        let bookProxy = await engine.item("book")
         #expect(await bookProxy.readText == "Ancient secrets are revealed within.")
         #expect(await bookProxy.readWhileHeldText == "The text glows when held closely.")
         #expect(await bookProxy.shortDescription == "A tome")
         #expect(await bookProxy.firstDescription == "You notice an untouched book.")
 
-        let rockProxy = try await engine.item("rock")
+        let rockProxy = await engine.item("rock")
         let readText = await rockProxy.readText
         let readWhileHeldText = await rockProxy.readWhileHeldText
         expectNoDifference(
@@ -738,7 +739,7 @@ struct ItemProxyAccessorTests {
             "The smooth rock keeps its mysteries, if any, well hidden from your grasp."
         )
 
-        let scrollProxy = try await engine.item("scroll")
+        let scrollProxy = await engine.item("scroll")
         #expect(await scrollProxy.firstDescription == "An ancient scroll lies here.")
         try await engine.apply(
             scrollProxy.setFlag(.isTouched)
@@ -818,23 +819,23 @@ struct ItemProxyAccessorTests {
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         // When/Then
-        let chestProxy = try await engine.item("chest")
+        let chestProxy = await engine.item("chest")
         #expect(await chestProxy.contentsAreVisible == true)  // Open container
-        let chestVisibleItems = try await chestProxy.visibleItems
+        let chestVisibleItems = await chestProxy.visibleItems
         #expect(chestVisibleItems.count == 1)  // Only gem, not hidden item
         #expect(chestVisibleItems[0].id == "gem")
 
-        let boxProxy = try await engine.item("box")
+        let boxProxy = await engine.item("box")
         #expect(await boxProxy.contentsAreVisible == false)  // Closed container
 
-        let jarProxy = try await engine.item("jar")
+        let jarProxy = await engine.item("jar")
         #expect(await jarProxy.contentsAreVisible == true)  // Transparent container
 
-        let tableProxy = try await engine.item("table")
+        let tableProxy = await engine.item("table")
         #expect(await tableProxy.contentsAreVisible == true)  // Surface
 
         // Test allContents method
-        let chestAllContents = try await chestProxy.allContents
+        let chestAllContents = await chestProxy.allContents
         #expect(chestAllContents.count == 2)  // Both gem and hidden item
     }
 
@@ -869,17 +870,17 @@ struct ItemProxyAccessorTests {
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         // When/Then
-        let bagProxy = try await engine.item("bag")
-        let coinProxy = try await engine.item("coin")
-        let keyProxy = try await engine.item("key")
+        let bagProxy = await engine.item("bag")
+        let coinProxy = await engine.item("coin")
+        let keyProxy = await engine.item("key")
 
-        #expect(try await bagProxy.isHolding(coinProxy.id) == true)
-        #expect(try await bagProxy.isHolding(keyProxy.id) == false)
+        #expect(await bagProxy.isHolding(coinProxy.id) == true)
+        #expect(await bagProxy.isHolding(keyProxy.id) == false)
 
         #expect(await coinProxy.playerCanReach == true)  // In bag held by player
         #expect(await keyProxy.playerCanReach == true)  // In same room
-        #expect(try await keyProxy.shouldTakeFirst == true)  // Takable but not held
-        #expect(try await bagProxy.shouldTakeFirst == false)  // Already held
+        #expect(await keyProxy.shouldTakeFirst == true)  // Takable but not held
+        #expect(await bagProxy.shouldTakeFirst == false)  // Already held
     }
 
     @Test("ItemProxy possessive and article methods")
@@ -896,7 +897,7 @@ struct ItemProxyAccessorTests {
         )
 
         let (engine, _) = await GameEngine.test(blueprint: game)
-        let proxy = try await engine.item("sword")
+        let proxy = await engine.item("sword")
 
         // When/Then
         let possessive = await proxy.withPossessiveAdjective
@@ -931,9 +932,9 @@ struct ItemProxyAccessorTests {
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         // When
-        let bookProxy = try await engine.item("book")
-        let coinProxy = try await engine.item("coin")
-        let gemProxy = try await engine.item("gem")
+        let bookProxy = await engine.item("book")
+        let coinProxy = await engine.item("coin")
+        let gemProxy = await engine.item("gem")
         let itemArray = [bookProxy, coinProxy, gemProxy]
 
         // Then
@@ -1029,13 +1030,13 @@ struct ItemProxyAccessorTests {
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         // When
-        let chestProxy = try await engine.item("chest")
-        let boxProxy = try await engine.item("box")
-        let jarProxy = try await engine.item("jar")
+        let chestProxy = await engine.item("chest")
+        let boxProxy = await engine.item("box")
+        let jarProxy = await engine.item("jar")
         let containerArray = [chestProxy, boxProxy, jarProxy]
 
         // Then - Test allContents (includes everything recursively)
-        let allContents = try await containerArray.allContents
+        let allContents = await containerArray.allContents
         #expect(allContents.count == 6)  // gem, coin, beetle, pouch, ring, secret
         let allContentIDs = allContents.map(\.id).sorted()
         #expect(allContentIDs == ["beetle", "coin", "gem", "pouch", "ring", "secret"])
@@ -1093,11 +1094,11 @@ struct ItemProxyAccessorTests {
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         // When
-        let copperProxy = try await engine.item("copper")
-        let diamondProxy = try await engine.item("diamond")
-        let silverProxy = try await engine.item("silver")
-        let rockProxy = try await engine.item("rock")
-        let specialProxy = try await engine.item("special")
+        let copperProxy = await engine.item("copper")
+        let diamondProxy = await engine.item("diamond")
+        let silverProxy = await engine.item("silver")
+        let rockProxy = await engine.item("rock")
+        let specialProxy = await engine.item("special")
 
         let itemArray = [diamondProxy, copperProxy, silverProxy, rockProxy, specialProxy]
 

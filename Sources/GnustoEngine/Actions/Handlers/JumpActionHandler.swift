@@ -32,7 +32,7 @@ public struct JumpActionHandler: ActionHandler {
             )
         }
 
-        return try await ActionResult(
+        return await ActionResult(
             item.response(
                 object: context.msg.jumpObject,
                 character: context.msg.jumpCharacter,

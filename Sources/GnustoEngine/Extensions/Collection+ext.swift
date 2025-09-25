@@ -27,13 +27,13 @@ extension Collection {
     ) async -> [Element] {
         var result = Array(self)
         guard count > 1 else { return result }
-        for i in 1..<result.count {
-            var j = i
-            while j > 0 {
-                let shouldSwap = await areInIncreasingOrder(result[j], result[j - 1])
+        for outer in 1..<result.count {
+            var inner = outer
+            while inner > 0 {
+                let shouldSwap = await areInIncreasingOrder(result[inner], result[inner - 1])
                 if shouldSwap {
-                    result.swapAt(j, j - 1)
-                    j -= 1
+                    result.swapAt(inner, inner - 1)
+                    inner -= 1
                 } else {
                     break
                 }
@@ -57,27 +57,6 @@ extension Collection {
     /// - Complexity: O(1)
     public var isNotEmpty: Bool {
         !isEmpty
-    }
-}
-
-extension Collection where Element: Comparable {
-    /// Returns a sorted array of the collection's elements using their natural ordering.
-    ///
-    /// This is a convenience method for collections of `Comparable` elements that provides
-    /// async sorting using the default `<` comparison operator. Elements are sorted in
-    /// ascending order.
-    ///
-    /// ```swift
-    /// let numbers = [3, 1, 4, 1, 5]
-    /// let sortedNumbers = await numbers.asyncSorted()
-    /// // Result: [1, 1, 3, 4, 5]
-    /// ```
-    ///
-    /// - Returns: A new array containing the collection's elements sorted in ascending order.
-    /// - Complexity: O(n²) where n is the length of the collection, due to the insertion sort
-    ///   algorithm used.
-    func asyncSorted() async -> [Element] {
-        await asyncSorted(by: { $0 < $1 })
     }
 }
 

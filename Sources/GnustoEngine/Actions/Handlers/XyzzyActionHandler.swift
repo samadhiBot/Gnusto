@@ -21,7 +21,7 @@ public struct XyzzyActionHandler: ActionHandler {
     /// This classic adventure game easter egg provides a nostalgic response to players
     /// who remember the original Adventure/Colossal Cave game.
     public func process(context: ActionContext) async throws -> ActionResult {
-        return ActionResult(
+        ActionResult(
             context.msg.xyzzyResponse()
         )
     }

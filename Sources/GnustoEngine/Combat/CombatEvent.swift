@@ -6,7 +6,10 @@ import Logging
 /// Each event captures both what happened mechanically (damage, status changes)
 /// and provides context for generating appropriate narrative messages.
 public enum CombatEvent: Equatable, Sendable {
-    // MARK: - Combat Initiation
+    /// Combat is interrupted by external event.
+    case combatInterrupted(
+        reason: String
+    )
 
     /// An enemy attacks the player.
     case enemyAttacks(
@@ -15,55 +18,8 @@ public enum CombatEvent: Equatable, Sendable {
         enemyWeapon: ItemProxy?
     )
 
-    /// The player attacks an enemy.
-    case playerAttacks(
-        enemy: ItemProxy,
-        playerWeapon: ItemProxy?,
-        enemyWeapon: ItemProxy?
-    )
-
-    // MARK: - Player Attack Outcomes
-
-    /// Player kills the enemy outright.
-    case enemySlain(
-        enemy: ItemProxy,
-        playerWeapon: ItemProxy?,
-        enemyWeapon: ItemProxy?,
-        damage: Int
-    )
-
-    /// Player knocks enemy unconscious.
-    case enemyUnconscious(
-        enemy: ItemProxy,
-        playerWeapon: ItemProxy?,
-        enemyWeapon: ItemProxy?
-    )
-
-    /// Enemy drop their weapon, either disarmed by the player, or by fumbling on a critical miss
-    /// and dropping their weapon.
-    case enemyDisarmed(
-        enemy: ItemProxy,
-        playerWeapon: ItemProxy?,
-        enemyWeapon: ItemProxy,
-        wasFumble: Bool
-    )
-
-    /// Player's attack causes enemy to stagger, reducing their combat effectiveness.
-    case enemyStaggers(
-        enemy: ItemProxy,
-        playerWeapon: ItemProxy?,
-        enemyWeapon: ItemProxy?
-    )
-
-    /// Player's attack causes enemy to hesitate, creating an opening for follow-up actions.
-    case enemyHesitates(
-        enemy: ItemProxy,
-        playerWeapon: ItemProxy?,
-        enemyWeapon: ItemProxy?
-    )
-
-    /// Player's attack leaves enemy vulnerable to subsequent attacks.
-    case enemyVulnerable(
+    /// Player's attack is blocked, dodged, or made ineffective by armor.
+    case enemyBlocked(
         enemy: ItemProxy,
         playerWeapon: ItemProxy?,
         enemyWeapon: ItemProxy?
@@ -77,12 +33,44 @@ public enum CombatEvent: Equatable, Sendable {
         damage: Int
     )
 
+    /// Enemy drop their weapon, either disarmed by the player, or by fumbling on a critical miss
+    /// and dropping their weapon.
+    case enemyDisarmed(
+        enemy: ItemProxy,
+        playerWeapon: ItemProxy?,
+        enemyWeapon: ItemProxy,
+        wasFumble: Bool
+    )
+
+    /// Enemy flees from combat.
+    case enemyFlees(
+        enemy: ItemProxy,
+        enemyWeapon: ItemProxy?,
+        direction: Direction?,
+        destination: LocationID?
+    )
+
     /// Player deals significant damage to enemy.
     case enemyGravelyInjured(
         enemy: ItemProxy,
         playerWeapon: ItemProxy?,
         enemyWeapon: ItemProxy?,
         damage: Int
+    )
+
+    /// Player barely damages enemy.
+    case enemyGrazed(
+        enemy: ItemProxy,
+        playerWeapon: ItemProxy?,
+        enemyWeapon: ItemProxy?,
+        damage: Int
+    )
+
+    /// Player's attack causes enemy to hesitate, creating an opening for follow-up actions.
+    case enemyHesitates(
+        enemy: ItemProxy,
+        playerWeapon: ItemProxy?,
+        enemyWeapon: ItemProxy?
     )
 
     /// Player deals moderate damage to enemy.
@@ -101,14 +89,6 @@ public enum CombatEvent: Equatable, Sendable {
         damage: Int
     )
 
-    /// Player barely damages enemy.
-    case enemyGrazed(
-        enemy: ItemProxy,
-        playerWeapon: ItemProxy?,
-        enemyWeapon: ItemProxy?,
-        damage: Int
-    )
-
     /// Player's attack is a critical miss.
     case enemyMissed(
         enemy: ItemProxy,
@@ -116,24 +96,81 @@ public enum CombatEvent: Equatable, Sendable {
         enemyWeapon: ItemProxy?
     )
 
-    /// Player's attack is blocked, dodged, or made ineffective by armor.
-    case enemyBlocked(
+    /// Enemy is pacified and stops fighting.
+    case enemyPacified(
+        enemy: ItemProxy,
+        enemyWeapon: ItemProxy?
+    )
+
+    /// Player kills the enemy outright.
+    case enemySlain(
+        enemy: ItemProxy,
+        playerWeapon: ItemProxy?,
+        enemyWeapon: ItemProxy?,
+        damage: Int
+    )
+
+    /// Enemy performs a special ability or action.
+    case enemySpecialAction(
+        enemy: ItemProxy,
+        enemyWeapon: ItemProxy?,
+        message: String
+    )
+
+    /// Player's attack causes enemy to stagger, reducing their combat effectiveness.
+    case enemyStaggers(
         enemy: ItemProxy,
         playerWeapon: ItemProxy?,
         enemyWeapon: ItemProxy?
     )
 
-    // MARK: - Enemy Attack Outcomes
-
-    /// Enemy kills the player.
-    case playerSlain(
+    /// Enemy surrenders.
+    case enemySurrenders(
         enemy: ItemProxy,
-        enemyWeapon: ItemProxy?,
-        damage: Int
+        enemyWeapon: ItemProxy?
     )
 
-    /// Enemy knocks player unconscious.
-    case playerUnconscious(
+    /// Enemy taunts or intimidates instead of attacking.
+    case enemyTaunts(
+        enemy: ItemProxy,
+        message: String
+    )
+
+    /// Player knocks enemy unconscious.
+    case enemyUnconscious(
+        enemy: ItemProxy,
+        playerWeapon: ItemProxy?,
+        enemyWeapon: ItemProxy?
+    )
+
+    /// Player's attack leaves enemy vulnerable to subsequent attacks.
+    case enemyVulnerable(
+        enemy: ItemProxy,
+        playerWeapon: ItemProxy?,
+        enemyWeapon: ItemProxy?
+    )
+
+    /// Error processing combat event outcome.
+    case error(
+        message: String
+    )
+
+    /// Player attempts to attack with non-weapon item.
+    case nonWeaponAttack(
+        enemy: ItemProxy,
+        enemyWeapon: ItemProxy?,
+        item: ItemProxy
+    )
+
+    /// The player attacks an enemy.
+    case playerAttacks(
+        enemy: ItemProxy,
+        playerWeapon: ItemProxy?,
+        enemyWeapon: ItemProxy?
+    )
+
+    /// Enemy deals critical damage to player.
+    case playerCriticallyWounded(
         enemy: ItemProxy,
         enemyWeapon: ItemProxy?,
         damage: Int
@@ -148,29 +185,17 @@ public enum CombatEvent: Equatable, Sendable {
         wasFumble: Bool
     )
 
-    /// Enemy's attack causes player to stagger, reducing their combat effectiveness.
-    case playerStaggers(
-        enemy: ItemProxy,
-        enemyWeapon: ItemProxy?
-    )
-
-    /// Enemy's attack causes player to hesitate, creating an opening for follow-up actions.
-    case playerHesitates(
-        enemy: ItemProxy,
-        enemyWeapon: ItemProxy?
-    )
-
-    /// Enemy's attack leaves player vulnerable to subsequent attacks.
-    case playerVulnerable(
-        enemy: ItemProxy,
-        enemyWeapon: ItemProxy?
-    )
-
-    /// Enemy deals critical damage to player.
-    case playerCriticallyWounded(
+    /// Player is distracted by non-combat action, allowing enemy free attack.
+    case playerDistracted(
         enemy: ItemProxy,
         enemyWeapon: ItemProxy?,
-        damage: Int
+        command: Command
+    )
+
+    /// Enemy's attack is blocked, dodged, or made ineffective by armor.
+    case playerDodged(
+        enemy: ItemProxy,
+        enemyWeapon: ItemProxy?
     )
 
     /// Enemy deals significant damage to player.
@@ -178,6 +203,19 @@ public enum CombatEvent: Equatable, Sendable {
         enemy: ItemProxy,
         enemyWeapon: ItemProxy?,
         damage: Int
+    )
+
+    /// Enemy barely damages player.
+    case playerGrazed(
+        enemy: ItemProxy,
+        enemyWeapon: ItemProxy?,
+        damage: Int
+    )
+
+    /// Enemy's attack causes player to hesitate, creating an opening for follow-up actions.
+    case playerHesitates(
+        enemy: ItemProxy,
+        enemyWeapon: ItemProxy?
     )
 
     /// Enemy deals moderate damage to player.
@@ -194,58 +232,42 @@ public enum CombatEvent: Equatable, Sendable {
         damage: Int
     )
 
-    /// Enemy barely damages player.
-    case playerGrazed(
-        enemy: ItemProxy,
-        enemyWeapon: ItemProxy?,
-        damage: Int
-    )
-
     /// Enemy's attack is a critical miss.
     case playerMissed(
         enemy: ItemProxy,
         enemyWeapon: ItemProxy?
     )
 
-    /// Enemy's attack is blocked, dodged, or made ineffective by armor.
-    case playerDodged(
-        enemy: ItemProxy,
-        enemyWeapon: ItemProxy?
-    )
-
-    // MARK: - Special Outcomes
-
-    /// Enemy flees from combat.
-    case enemyFlees(
+    /// Enemy kills the player.
+    case playerSlain(
         enemy: ItemProxy,
         enemyWeapon: ItemProxy?,
-        direction: Direction?,
-        destination: LocationID?
+        damage: Int
     )
 
-    /// Enemy is pacified and stops fighting.
-    case enemyPacified(
+    /// Enemy's attack causes player to stagger, reducing their combat effectiveness.
+    case playerStaggers(
         enemy: ItemProxy,
         enemyWeapon: ItemProxy?
     )
 
-    /// Enemy surrenders.
-    case enemySurrenders(
-        enemy: ItemProxy,
-        enemyWeapon: ItemProxy?
-    )
-
-    /// Enemy taunts or intimidates instead of attacking.
-    case enemyTaunts(
-        enemy: ItemProxy,
-        message: String
-    )
-
-    /// Enemy performs a special ability or action.
-    case enemySpecialAction(
+    /// Enemy knocks player unconscious.
+    case playerUnconscious(
         enemy: ItemProxy,
         enemyWeapon: ItemProxy?,
-        message: String
+        damage: Int
+    )
+
+    /// Enemy's attack leaves player vulnerable to subsequent attacks.
+    case playerVulnerable(
+        enemy: ItemProxy,
+        enemyWeapon: ItemProxy?
+    )
+
+    /// Stalemate - neither side can harm the other.
+    case stalemate(
+        enemy: ItemProxy,
+        enemyWeapon: ItemProxy?
     )
 
     /// Player attempts to attack without required weapon.
@@ -254,31 +276,6 @@ public enum CombatEvent: Equatable, Sendable {
         enemyWeapon: ItemProxy?
     )
 
-    /// Player attempts to attack with non-weapon item.
-    case nonWeaponAttack(
-        enemy: ItemProxy,
-        enemyWeapon: ItemProxy?,
-        item: ItemProxy
-    )
-
-    /// Player is distracted by non-combat action, allowing enemy free attack.
-    case playerDistracted(
-        enemy: ItemProxy,
-        enemyWeapon: ItemProxy?,
-        command: Command
-    )
-
-    /// Combat is interrupted by external event.
-    case combatInterrupted(reason: String)
-
-    /// Stalemate - neither side can harm the other.
-    case stalemate(
-        enemy: ItemProxy,
-        enemyWeapon: ItemProxy?
-    )
-
-    /// Error processing combat event outcome.
-    case error(message: String)
 }
 
 // MARK: - Damage Categories
@@ -286,13 +283,26 @@ public enum CombatEvent: Equatable, Sendable {
 extension CombatEvent {
     /// Categorizes damage amounts for narrative purposes.
     public enum DamageCategory {
-        case fatal  // 100+ or kills
-        case critical  // 50-99
-        case grave  // 30-49
-        case moderate  // 15-29
-        case light  // 5-14
-        case scratch  // 1-4
-        case none  // 0
+        /// Damage that kills or incapacitates the target (100+ damage or fatal blow).
+        case fatal
+
+        /// Severe damage that significantly impairs combat ability (50-99 damage).
+        case critical
+
+        /// Serious damage that notably affects performance (30-49 damage).
+        case grave
+
+        /// Noticeable damage with moderate impact (15-29 damage).
+        case moderate
+
+        /// Minor damage with limited effect (5-14 damage).
+        case light
+
+        /// Superficial damage with minimal impact (1-4 damage).
+        case scratch
+
+        /// No damage dealt (0 damage).
+        case none
 
         /// Creates a damage category from a numeric value.
         public init(damage: Int, currentHealth: Int) {

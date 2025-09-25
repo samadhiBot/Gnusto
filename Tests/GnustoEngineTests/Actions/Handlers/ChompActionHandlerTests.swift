@@ -80,8 +80,8 @@ struct ChompActionHandlerTests {
         )
 
         // Apple should remain
-        let finalState = try await engine.item("apple")
-        #expect(try await finalState.parent == .player)
+        let finalState = await engine.item("apple")
+        #expect(await finalState.parent == .player)
     }
 
     @Test("CHOMP disambiguation - NO response just takes a bite")
@@ -118,8 +118,8 @@ struct ChompActionHandlerTests {
         )
 
         // Apple should still be in the room
-        let finalState = try await engine.item("apple").parent
-        let startRoom = try await engine.location(.startRoom)
+        let finalState = await engine.item("apple").parent
+        let startRoom = await engine.location(.startRoom)
         #expect(finalState == .location(startRoom))
     }
 
@@ -344,7 +344,7 @@ struct ChompActionHandlerTests {
             """
         )
 
-        let finalState = try await engine.item("castleGuard")
+        let finalState = await engine.item("castleGuard")
         #expect(await finalState.hasFlag(.isTouched) == true)
     }
 
@@ -377,7 +377,7 @@ struct ChompActionHandlerTests {
             """
         )
 
-        let finalState = try await engine.item("rock")
+        let finalState = await engine.item("rock")
         #expect(await finalState.hasFlag(.isTouched) == true)
     }
 

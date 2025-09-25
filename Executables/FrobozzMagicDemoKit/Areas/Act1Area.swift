@@ -263,26 +263,40 @@ struct Act1Area {
 
     /// Prevents leaving your house without food for Berzio.
     let yourCottageHandler = LocationEventHandler(for: .yourCottage) {
-        beforeEnter(.move) { context, command in
-            let basket = try await context.engine.item(.basket)
-            let lemonade = try await context.engine.item(.lemonade)
-            return switch try await (basket.parent, lemonade.parent) {
+        beforeTurn(.move) { context, _ in
+            let basket = await context.item(.basket)
+            let lemonade = await context.item(.lemonade)
+            return switch await (basket.parent, lemonade.parent) {
             case (.player, .player):
                 nil
             case (.player, _):
                 ActionResult(
                     """
-                    You're halfway out the door when you remember the glass jug of blackberry lemonade sitting inside. Berzio does get terribly absorbed in his work--sometimes for days at a time--and the lemonade is just as important as the food. Your neighbors have always included something to drink with their weekly offerings. After all, even brilliant thaumaturges need proper hydration.
+                    You're halfway out the door when you remember the glass jug of blackberry
+                    lemonade sitting inside. Berzio does get terribly absorbed in his work--
+                    sometimes for days at a time--and the lemonade is just as important as
+                    the food. Your neighbors have always included something to drink with
+                    their weekly offerings. After all, even brilliant thaumaturges need
+                    proper hydration.
                     """)
             case (_, .player):
                 ActionResult(
                     """
-                    You pause at your doorstep, the jug of blackberry lemonade in hand. What else did you need to bring? Oh right. The warm sourdough boule, fresh butter, and cherry preserves are still waiting inside--carefully prepared for your weekly visit to Berzio. It's a tradition that goes back generations in your family, and you'd hate to break it now. Grandmother always said the magic that keeps the neighborhood so pleasant depends on these small kindnesses.
+                    You pause at your doorstep, the jug of blackberry lemonade in hand. What else
+                    did you need to bring? Oh right. The warm sourdough boule, fresh butter, and
+                    cherry preserves are still waiting inside--carefully prepared for your weekly
+                    visit to Berzio. It's a tradition that goes back generations in your family,
+                    and you'd hate to break it now. Grandmother always said the magic that keeps
+                    the neighborhood so pleasant depends on these small kindnesses.
                     """)
             default:
                 ActionResult(
                     """
-                    You pause at your doorstep, empty-handed. The warm sourdough boule, fresh butter, and cherry preserves are still waiting inside--carefully prepared for your weekly visit to Berzio. It's a tradition that goes back generations in your family, and you'd hate to break it now. Grandmother always said the magic that keeps the neighborhood so pleasant depends on these small kindnesses.
+                    You pause at your doorstep, empty-handed. The warm sourdough boule, fresh
+                    butter, and cherry preserves are still waiting inside--carefully prepared
+                    for your weekly visit to Berzio. It's a tradition that goes back generations
+                    in your family, and you'd hate to break it now. Grandmother always said the
+                    magic that keeps the neighborhood so pleasant depends on these small kindnesses.
                     """)
             }
         }
@@ -307,11 +321,11 @@ struct Act1Area {
     let berziosGateHandler = LocationEventHandler(for: .berziosGate) {
         onEnter { context in
             // This is where Gnusto escapes!
-            guard await context.engine.global(.gnustoEscaped) != true else {
+            guard await !context.engine.hasFlag(.gnustoEscaped) else {
                 return nil
             }
 
-            let gnusto = try await context.engine.item(.gnustoDog)
+            let gnusto = await context.item(.gnustoDog)
 
             // Move Gnusto from nowhere to the gate area
             return ActionResult(

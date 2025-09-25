@@ -47,7 +47,7 @@ struct LookInsideActionHandlerTests {
             """
         )
 
-        let finalState = try await engine.item("box")
+        let finalState = await engine.item("box")
         #expect(await finalState.hasFlag(.isTouched) == true)
     }
 
@@ -430,7 +430,7 @@ struct LookInsideActionHandlerTests {
         try await engine.execute("look inside drawer")
 
         // Then
-        let finalState = try await engine.item("drawer")
+        let finalState = await engine.item("drawer")
         #expect(await finalState.hasFlag(.isTouched) == true)
     }
 

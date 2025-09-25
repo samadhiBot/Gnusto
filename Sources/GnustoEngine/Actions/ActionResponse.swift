@@ -18,6 +18,11 @@ public enum ActionResponse: Error, Equatable, Sendable {
     /// Action failed because the verb required something absent in the command.
     case cannotDoYourself(ActionContext)
 
+    /// Action failed because a circular dependency was detected in property computation.
+    /// This occurs when item properties depend on each other in a way that would cause
+    /// infinite recursion during computation.
+    case circularDependency(String)
+
     /// Action failed because the target container (e.g., a box, chest) is closed.
     case containerIsClosed(ItemProxy)
 
@@ -56,11 +61,6 @@ public enum ActionResponse: Error, Equatable, Sendable {
     /// This might occur if a dynamic property validation handler rejected a new value.
     /// The `String` provides details, often for debugging.
     case invalidValue(String)
-
-    /// Action failed because a circular dependency was detected in property computation.
-    /// This occurs when item properties depend on each other in a way that would cause
-    /// infinite recursion during computation.
-    case circularDependency(String)
 
     /// Action failed because the target item, though it may exist, is not currently reachable
     /// or perceivable by the player (e.g., it's in another room, in a closed container, or in darkness).

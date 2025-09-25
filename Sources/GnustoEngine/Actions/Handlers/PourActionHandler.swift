@@ -24,22 +24,25 @@ public struct PourActionHandler: ActionHandler {
     /// Handles pouring attempts with different types of liquids and targets.
     /// Provides appropriate responses following ZIL traditions.
     ///
-    /// - Parameter command: The command being processed.
-    /// - Parameter engine: The game context.engine.
+    /// - Parameter context: The action context containing the command and game state.
     /// - Returns: An `ActionResult` with appropriate pouring message and state changes.
     public func process(context: ActionContext) async throws -> ActionResult {
         // Pour requires a direct object (what to pour)
-        guard let source = try await context.itemDirectObject(
-            failureMessage: context.msg.pourFail()
-        ) else {
+        guard
+            let source = try await context.itemDirectObject(
+                failureMessage: context.msg.pourFail()
+            )
+        else {
             throw ActionResponse.doWhat(context)
         }
 
         // Pour requires an indirect object (what to pour on)
-        guard let targetItem = try await context.itemIndirectObject(
-            playerMessage: context.msg.pourItemOnSelf(source.withDefiniteArticle),
-            failureMessage: context.msg.pourTargetFail()
-        ) else {
+        guard
+            let targetItem = try await context.itemIndirectObject(
+                playerMessage: context.msg.pourItemOnSelf(source.withDefiniteArticle),
+                failureMessage: context.msg.pourTargetFail()
+            )
+        else {
             throw ActionResponse.feedback(
                 await context.msg.pourItemOnWhat(source.withDefiniteArticle)
             )
@@ -57,8 +60,8 @@ public struct PourActionHandler: ActionHandler {
                 source.withDefiniteArticle,
                 target: targetItem.withDefiniteArticle
             ),
-            try await source.setFlag(.isTouched),
-            try await targetItem.setFlag(.isTouched)
+            await source.setFlag(.isTouched),
+            await targetItem.setFlag(.isTouched)
         )
     }
 }

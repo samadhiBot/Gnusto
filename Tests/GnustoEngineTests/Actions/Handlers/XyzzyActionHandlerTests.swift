@@ -81,7 +81,7 @@ struct XyzzyActionHandlerTests {
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // Record initial state
-        let initialLamp = try await engine.item("lamp")
+        let initialLamp = await engine.item("lamp")
         let initialScore = await engine.player.score
         let initialTurnCount = await engine.player.moves
 
@@ -89,11 +89,11 @@ struct XyzzyActionHandlerTests {
         try await engine.execute("xyzzy")
 
         // Then: State should be unchanged
-        let finalLamp = try await engine.item("lamp")
+        let finalLamp = await engine.item("lamp")
         let finalScore = await engine.player.score
         let finalTurnCount = await engine.player.moves
 
-        #expect(try await finalLamp.parent == initialLamp.parent)
+        #expect(await finalLamp.parent == initialLamp.parent)
         #expect(await finalLamp.hasFlag(.isTouched) == initialLamp.hasFlag(.isTouched))
         #expect(finalScore == initialScore)
         #expect(finalTurnCount == initialTurnCount + 1)

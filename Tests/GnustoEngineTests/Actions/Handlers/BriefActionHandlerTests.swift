@@ -39,7 +39,7 @@ struct BriefActionHandlerTests {
 
         // Ensure we start in verbose mode
         try await engine.apply(
-            engine.setGlobal(.isVerboseMode, to: true)
+            engine.setFlag(.isVerboseMode)
         )
 
         // When
@@ -70,7 +70,7 @@ struct BriefActionHandlerTests {
 
         // Start with verbose mode enabled
         try await engine.apply(
-            engine.setGlobal(.isVerboseMode, to: true)
+            engine.setFlag(.isVerboseMode)
         )
         let isVerboseBeforeBrief = await engine.hasFlag(.isVerboseMode)
         #expect(isVerboseBeforeBrief == true)

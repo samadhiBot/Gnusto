@@ -39,7 +39,7 @@ public struct BreatheActionHandler: ActionHandler {
 
         // Can breathe on other items
         if context.hasPreposition(.on) {
-            return try await ActionResult(
+            return await ActionResult(
                 context.msg.breatheOnResponse(targetItem.withDefiniteArticle),
                 targetItem.setFlag(.isTouched)
             )

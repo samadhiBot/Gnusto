@@ -88,8 +88,8 @@ struct LockActionHandlerTests {
             """
         )
 
-        let finalChestState = try await engine.item("chest")
-        let finalKeyState = try await engine.item("key")
+        let finalChestState = await engine.item("chest")
+        let finalKeyState = await engine.item("key")
         #expect(await finalChestState.hasFlag(.isLocked))
         #expect(await finalChestState.hasFlag(.isTouched))
         #expect(await finalKeyState.hasFlag(.isTouched))
@@ -398,8 +398,8 @@ struct LockActionHandlerTests {
         try await engine.execute("lock safe with combination")
 
         // Then: Verify state changes
-        let finalSafeState = try await engine.item("safe")
-        let finalCombinationState = try await engine.item("combination")
+        let finalSafeState = await engine.item("safe")
+        let finalCombinationState = await engine.item("combination")
         #expect(await finalSafeState.hasFlag(.isLocked))
         #expect(await finalSafeState.hasFlag(.isTouched))
         #expect(await finalCombinationState.hasFlag(.isTouched))
@@ -456,7 +456,7 @@ struct LockActionHandlerTests {
         )
 
         // Item should remain locked but not touched again
-        let finalDoorState = try await engine.item("door")
+        let finalDoorState = await engine.item("door")
         #expect(await finalDoorState.hasFlag(.isLocked))
     }
 
@@ -491,8 +491,8 @@ struct LockActionHandlerTests {
         try await engine.execute("lock box with key")
 
         // Then: Verify state changes
-        let finalBoxState = try await engine.item("box")
-        let finalKeyState = try await engine.item("tinyKey")
+        let finalBoxState = await engine.item("box")
+        let finalKeyState = await engine.item("tinyKey")
         #expect(await finalBoxState.hasFlag(.isLocked))
         #expect(await finalBoxState.hasFlag(.isTouched))
         #expect(await finalKeyState.hasFlag(.isTouched))
@@ -579,8 +579,8 @@ struct LockActionHandlerTests {
         )
 
         // Verify both items are locked
-        let doorState = try await engine.item("door")
-        let chestState = try await engine.item("chest")
+        let doorState = await engine.item("door")
+        let chestState = await engine.item("chest")
         #expect(await doorState.hasFlag(.isLocked))
         #expect(await chestState.hasFlag(.isLocked))
     }
@@ -625,7 +625,7 @@ struct LockActionHandlerTests {
             """
         )
 
-        let finalBoxState = try await engine.item("magicBox")
+        let finalBoxState = await engine.item("magicBox")
         #expect(await finalBoxState.hasFlag(.isLocked))
     }
 

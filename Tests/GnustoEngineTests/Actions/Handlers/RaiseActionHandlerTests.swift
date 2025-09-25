@@ -38,7 +38,7 @@ struct RaiseActionHandlerTests {
             """
         )
 
-        let finalState = try await engine.item("box")
+        let finalState = await engine.item("box")
         #expect(await finalState.hasFlag(.isTouched) == true)
     }
 
@@ -282,14 +282,14 @@ struct RaiseActionHandlerTests {
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // Verify crate is not touched initially
-        let initialState = try await engine.item("crate")
+        let initialState = await engine.item("crate")
         #expect(await initialState.hasFlag(.isTouched) == false)
 
         // When
         try await engine.execute("raise crate")
 
         // Then
-        let finalState = try await engine.item("crate")
+        let finalState = await engine.item("crate")
         #expect(await finalState.hasFlag(.isTouched) == true)
 
         let output = await mockIO.flush()
@@ -383,7 +383,7 @@ struct RaiseActionHandlerTests {
             """
         )
 
-        let finalState = try await engine.item("weight")
+        let finalState = await engine.item("weight")
         #expect(await finalState.hasFlag(.isTouched) == true)
     }
 
@@ -426,7 +426,7 @@ struct RaiseActionHandlerTests {
             """
         )
 
-        let finalState = try await engine.item("anvil")
+        let finalState = await engine.item("anvil")
         #expect(await finalState.hasFlag(.isTouched) == true)
     }
 

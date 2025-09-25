@@ -207,5 +207,4 @@ struct DanceActionHandlerTests {
         let handler = DanceActionHandler()
         #expect(handler.requiresLight == false)
     }
-
 }

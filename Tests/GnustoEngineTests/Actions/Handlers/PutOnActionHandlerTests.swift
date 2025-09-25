@@ -46,9 +46,9 @@ struct PutOnActionHandlerTests {
             """
         )
 
-        let finalBook = try await engine.item("book")
-        let finalTable = try await engine.item("table")
-        #expect(try await finalBook.parent == .item(table.proxy(engine)))
+        let finalBook = await engine.item("book")
+        let finalTable = await engine.item("table")
+        #expect(await finalBook.parent == .item(table.proxy(engine)))
         #expect(await finalBook.hasFlag(.isTouched) == true)
         #expect(await finalTable.hasFlag(.isTouched) == true)
     }
@@ -766,15 +766,15 @@ struct PutOnActionHandlerTests {
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // Verify initial state
-        let initialCoin = try await engine.item("coin")
-        #expect(try await initialCoin.playerIsHolding)
+        let initialCoin = await engine.item("coin")
+        #expect(await initialCoin.playerIsHolding)
 
         // When
         try await engine.execute("put coin on counter")
 
         // Then
-        let finalCoin = try await engine.item("coin")
-        #expect(try await finalCoin.parent == .item(counter.proxy(engine)))
+        let finalCoin = await engine.item("coin")
+        #expect(await finalCoin.parent == .item(counter.proxy(engine)))
 
         let output = await mockIO.flush()
         expectNoDifference(
@@ -812,8 +812,8 @@ struct PutOnActionHandlerTests {
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // Verify initial state
-        let initialKey = try await engine.item("key")
-        let initialShelf = try await engine.item("shelf")
+        let initialKey = await engine.item("key")
+        let initialShelf = await engine.item("shelf")
         #expect(await initialKey.hasFlag(.isTouched) == false)
         #expect(await initialShelf.hasFlag(.isTouched) == false)
 
@@ -821,8 +821,8 @@ struct PutOnActionHandlerTests {
         try await engine.execute("put key on shelf")
 
         // Then
-        let finalKey = try await engine.item("key")
-        let finalShelf = try await engine.item("shelf")
+        let finalKey = await engine.item("key")
+        let finalShelf = await engine.item("shelf")
         #expect(await finalKey.hasFlag(.isTouched) == true)
         #expect(await finalShelf.hasFlag(.isTouched) == true)
 
@@ -943,10 +943,10 @@ struct PutOnActionHandlerTests {
         )
 
         // Then - Both items should be on the desk
-        let finalPen = try await engine.item("pen")
-        let finalPencil = try await engine.item("pencil")
-        #expect(try await finalPen.parent == .item(desk.proxy(engine)))
-        #expect(try await finalPencil.parent == .item(desk.proxy(engine)))
+        let finalPen = await engine.item("pen")
+        let finalPencil = await engine.item("pencil")
+        #expect(await finalPen.parent == .item(desk.proxy(engine)))
+        #expect(await finalPencil.parent == .item(desk.proxy(engine)))
     }
 
     @Test("Put item on surface that has other items")
@@ -995,10 +995,10 @@ struct PutOnActionHandlerTests {
             """
         )
 
-        let finalNewBook = try await engine.item("newBook")
-        let finalOldBook = try await engine.item("oldBook")
-        #expect(try await finalNewBook.parent == .item(bookshelf.proxy(engine)))
-        #expect(try await finalOldBook.parent == .item(bookshelf.proxy(engine)))
+        let finalNewBook = await engine.item("newBook")
+        let finalOldBook = await engine.item("oldBook")
+        #expect(await finalNewBook.parent == .item(bookshelf.proxy(engine)))
+        #expect(await finalOldBook.parent == .item(bookshelf.proxy(engine)))
     }
 
     @Test("Put ambiguous item on surface that has other items")
@@ -1053,10 +1053,10 @@ struct PutOnActionHandlerTests {
             """
         )
 
-        let finalNewBook = try await engine.item("newBook")
-        let finalOldBook = try await engine.item("oldBook")
-        #expect(try await finalNewBook.parent == .item(bookshelf.proxy(engine)))
-        #expect(try await finalOldBook.parent == .player)
+        let finalNewBook = await engine.item("newBook")
+        let finalOldBook = await engine.item("oldBook")
+        #expect(await finalNewBook.parent == .item(bookshelf.proxy(engine)))
+        #expect(await finalOldBook.parent == .player)
     }
 
     @Test("Put different types of items on surfaces")

@@ -1,5 +1,7 @@
 import Foundation
 
+// swiftlint:disable file_length
+
 // MARK: - Convenience Accessors
 
 extension ItemProxy {
@@ -7,7 +9,7 @@ extension ItemProxy {
     /// Corresponds to the ZIL `ADJECTIVE` property.
     public var adjectives: [String] {
         get async {
-            (try? await property(.adjectives)?.toStrings)?.sorted() ?? []
+            await property(.adjectives)?.toStrings?.sorted() ?? []
         }
     }
 
@@ -24,11 +26,11 @@ extension ItemProxy {
     /// - Returns: A string in the format "{adjective} {synonym}" or the item's name if
     ///   adjectives or synonyms are unavailable.
     /// - Throws: Rethrows any errors from accessing the item's properties.
-    public func alias(_ nameVariant: NameVariant? = nil) async throws -> String {
-        let adjectives = try await property(.adjectives)?.toStrings ?? []
-        let synonyms = try await property(.synonyms)?.toStrings ?? []
-        let adjective = await engine.randomElement(in: adjectives.sorted())
-        let synonym = await engine.randomElement(in: synonyms.sorted())
+    public func alias(_ nameVariant: NameVariant? = nil) async -> String {
+        let adjectives = await property(.adjectives)?.toStrings ?? []
+        let synonyms = await property(.synonyms)?.toStrings ?? []
+        let adjective = await engine.randomElement(in: adjectives)
+        let synonym = await engine.randomElement(in: synonyms)
         let name = await name
         let aliasName =
             if let adjective, let synonym {
@@ -50,7 +52,7 @@ extension ItemProxy {
                 aliasName.withIndefiniteArticle
             case .withPossessiveAdjective(for: let other):
                 if let other {
-                    "\(try await other.classification.possessiveAdjective) \(aliasName)"
+                    "\(await other.classification.possessiveAdjective) \(aliasName)"
                 } else {
                     engine.messenger.your(aliasName)
                 }
@@ -63,12 +65,12 @@ extension ItemProxy {
     ///
     /// This includes items inside containers, and items inside containers within those containers, etc.
     public var allContents: [ItemProxy] {
-        get async throws {
+        get async {
             var allItems = [ItemProxy]()
-            let directContents = try await contents
+            let directContents = await contents
             for item in directContents {
                 allItems.append(item)
-                try await allItems.append(contentsOf: item.allContents)
+                await allItems.append(contentsOf: item.allContents)
             }
             return allItems
         }
@@ -91,16 +93,16 @@ extension ItemProxy {
     /// - Throws: An error if exit evaluation fails.
     public func availableExits(
         behavior: Exit.MovementBehavior = .normal
-    ) async throws -> [Exit] {
-        guard let currentLocation = try await location else { return [] }
+    ) async -> [Exit] {
+        guard let currentLocation = await location else { return [] }
 
-        return try await currentLocation.exits.asyncFilter { exit in
+        return await currentLocation.exits.asyncFilter { exit in
             // Exits without destinations are permanently blocked
             guard let destinationID = exit.destinationID else {
                 return behavior == .any
             }
             // Check if NPC is restricted to specific locations
-            if let validLocations = try await property(.validLocations)?.toLocationIDs {
+            if let validLocations = await property(.validLocations)?.toLocationIDs {
                 guard validLocations.contains(destinationID) else {
                     return false  // Destination not in valid locations
                 }
@@ -112,7 +114,7 @@ extension ItemProxy {
                 return behavior == .any || exit.blockedMessage == nil
             }
             // Handle exits with doors based on movement behavior
-            let door = try await engine.item(doorID)
+            let door = await engine.item(doorID)
             switch behavior {
             case .any:  // Can pass through any exit regardless of door state
                 return true
@@ -126,7 +128,7 @@ extension ItemProxy {
                 // Can pass through doors if open, or if locked and we have the right key
                 if await door.isOpen { return true }
                 if await door.hasFlag(.isLocked),
-                    let lockKey = try await door.property(.lockKey)?.toItemID
+                    let lockKey = await door.property(.lockKey)?.toItemID
                 {
                     return keys.contains(lockKey)
                 }
@@ -147,7 +149,7 @@ extension ItemProxy {
     public func canHold(_ otherItemID: ItemID) async -> Bool {
         let currentLoad = await self.currentLoad
         let capacity = await self.capacity
-        let otherItemSize = (try? await engine.item(otherItemID).size) ?? 1
+        let otherItemSize = await engine.item(otherItemID).size
 
         return capacity < 0 || (currentLoad + otherItemSize <= capacity)
     }
@@ -162,7 +164,7 @@ extension ItemProxy {
     /// Corresponds to the ZIL `CAPACITY` property. Defaults to 1000 if not specified.
     public var capacity: Int {
         get async {
-            (try? await property(.capacity)?.toInt) ?? 1000
+            await property(.capacity)?.toInt ?? 1_000
         }
     }
 
@@ -171,10 +173,10 @@ extension ItemProxy {
     /// This does not include items inside containers within this container.
     /// Use `allContents` to get all items recursively.
     public var contents: [ItemProxy] {
-        get async throws {
-            try await engine.gameState.items.values.asyncCompactMap { item -> ItemProxy? in
-                let proxy = try await engine.item(item.id)
-                guard try await proxy.parent.entity == .item(self.id) else { return nil }
+        get async {
+            await engine.gameState.items.values.asyncCompactMap { item -> ItemProxy? in
+                let proxy = await engine.item(item.id)
+                guard await proxy.parent.entity == .item(self.id) else { return nil }
                 return proxy
             }
             .sorted()
@@ -208,13 +210,8 @@ extension ItemProxy {
     public var currentLoad: Int {
         get async {
             var load = 0
-            do {
-                for item in try await self.contents {
-                    load += await item.size
-                }
-            } catch {
-                // If we can't get contents, assume empty
-                load = 0
+            for item in await self.contents {
+                load += await item.size
             }
             return load
         }
@@ -227,7 +224,7 @@ extension ItemProxy {
     /// player examines the item.
     public var description: String {
         get async {
-            if let description = try? await property(.description)?.toString {
+            if let description = await property(.description)?.toString {
                 description
             } else {
                 engine.messenger.nothingSpecialAbout(await withDefiniteArticle)
@@ -244,7 +241,7 @@ extension ItemProxy {
         get async {
             guard
                 await !isTouched,
-                let firstDescription = try? await property(.firstDescription)?.toString,
+                let firstDescription = await property(.firstDescription)?.toString,
                 firstDescription.isNotEmpty
             else {
                 return nil
@@ -255,39 +252,37 @@ extension ItemProxy {
 
     /// Checks if a specific boolean property (flag) is set to `true` on this item.
     ///
-    /// - Parameter id: The `ItemPropertyID` of the flag to check.
+    /// - Parameter itemPropertyID: The `ItemPropertyID` of the flag to check.
     /// - Returns: `true` if the flag is set to `true`, `false` otherwise.
     public func hasFlag(_ itemPropertyID: ItemPropertyID) async -> Bool {
-        do {
-            return try await property(itemPropertyID)?.toBool == true
-        } catch {
-            assertionFailure("ItemProxy: Failed to check flag \(itemPropertyID): \(error)")
-            return false
-        }
+        await property(itemPropertyID)?.toBool == true
     }
 
     /// Checks if this item meets all of the specified flag requirements.
     ///
-    /// This is a convenience method for checking complex flag requirements with AND, OR, and NOT logic.
+    /// This is a convenience method for checking complex flag requirements with AND, OR,
+    /// and NOT logic.
     ///
     /// - Parameters:
     ///   - anyPropertyIDs: Flags to check with OR logic - at least one must be `true`.
     ///   - allPropertyIDs: Flags to check with AND logic - all must be set to `true`.
     ///   - nonePropertyIDs: Flags to check with NOT logic - all must be `false` or unset.
-    /// - Returns: `true` if all conditions are met (all `allPropertyIDs` are true, none of `nonePropertyIDs` are true, and at least one of `anyPropertyIDs` is true if any are specified), `false` otherwise.
+    /// - Returns: `true` if all conditions are met (all `allPropertyIDs` are true,
+    ///            none of `nonePropertyIDs` are true, and at least one of `anyPropertyIDs`
+    ///            is true if any are specified), `false` otherwise.
     public func hasFlags(
         any anyPropertyIDs: ItemPropertyID...,
         all allPropertyIDs: ItemPropertyID...,
         none nonePropertyIDs: ItemPropertyID...
     ) async -> Bool {
-        for itemPropertyID in allPropertyIDs {
-            guard await hasFlag(itemPropertyID) else { return false }
+        for itemPropertyID in allPropertyIDs where await !hasFlag(itemPropertyID) {
+            return false
         }
-        for itemPropertyID in nonePropertyIDs {
-            if await hasFlag(itemPropertyID) { return false }
+        for itemPropertyID in nonePropertyIDs where await hasFlag(itemPropertyID) {
+            return false
         }
-        for itemPropertyID in anyPropertyIDs {
-            if await hasFlag(itemPropertyID) { return true }
+        for itemPropertyID in anyPropertyIDs where await hasFlag(itemPropertyID) {
+            return true
         }
         return anyPropertyIDs.isEmpty
     }
@@ -303,12 +298,12 @@ extension ItemProxy {
     /// that are in the player's location will return `false` unless the container
     /// itself is being checked.
     public var hasSameLocationAsPlayer: Bool {
-        get async throws {
-            if try await playerIsHolding {
+        get async {
+            if await playerIsHolding {
                 return true
             }
-            let playerLocation = try await engine.player.location
-            let itemLocation = try await location
+            let playerLocation = await engine.player.location
+            let itemLocation = await location
             return itemLocation == playerLocation
         }
     }
@@ -326,8 +321,8 @@ extension ItemProxy {
     /// - Parameter locationID: The ID of the location to check accessibility for.
     /// - Returns: `true` if the item is allowed in the location, `false` if restricted.
     /// - Throws: Re-throws any errors from accessing the item's properties.
-    public func isAllowed(in locationID: LocationID) async throws -> Bool {
-        guard let restrictedLocations = try await property(.validLocations)?.toLocationIDs else {
+    public func isAllowed(in locationID: LocationID) async -> Bool {
+        guard let restrictedLocations = await property(.validLocations)?.toLocationIDs else {
             return true  // No restrictions
         }
         return restrictedLocations.contains(locationID)
@@ -360,7 +355,7 @@ extension ItemProxy {
     /// for non-containers or if there's an error accessing contents.
     public var isEmpty: Bool {
         get async {
-            (try? await contents.isEmpty) ?? true
+            await contents.isEmpty
         }
     }
 
@@ -369,10 +364,10 @@ extension ItemProxy {
     /// This method determines whether the given item is contained within this
     /// container or any of its sub-containers.
     ///
-    /// - Parameter item: The `Item` identifier to check for containment.
+    /// - Parameter itemID: The `Item` identifier to check for containment.
     /// - Returns: `true` if this container is holding the item, `false` otherwise.
-    public func isHolding(_ itemID: ItemID) async throws -> Bool {
-        try await allContents.contains { $0.id == itemID }
+    public func isHolding(_ itemID: ItemID) async -> Bool {
+        await allContents.contains { $0.id == itemID }
     }
 
     /// Whether this item can be included in ALL commands.
@@ -485,7 +480,7 @@ extension ItemProxy {
             if await hasFlags(any: .isWeapon, .isBurning, .isTool) {
                 return true
             }
-            return (try? await property(.damage)?.toInt) != nil
+            return await property(.damage)?.toInt != nil
         }
     }
 
@@ -503,8 +498,8 @@ extension ItemProxy {
     ///
     /// Corresponds to the ZIL `LOC` function which recursively finds an object's location.
     public var location: LocationProxy? {
-        get async throws {
-            var currentParent = try await parent
+        get async {
+            var currentParent = await parent
 
             // Traverse up the containment chain until we find a location or reach the end
             while true {
@@ -513,10 +508,10 @@ extension ItemProxy {
                     return locationProxy
                 case .item(let itemProxy):
                     // Continue searching up the chain through this item's parent
-                    currentParent = try await itemProxy.parent
+                    currentParent = await itemProxy.parent
                 case .player:
                     // Player is in a location, so get the player's location
-                    return try await engine.player.location
+                    return await engine.player.location
                 case .nowhere:
                     return nil
                 }
@@ -534,7 +529,7 @@ extension ItemProxy {
     /// Corresponds to the ZIL `DESC` property. Falls back to the item's ID if no name is set.
     public var name: String {
         get async {
-            (try? await property(.name)?.toString) ?? id.rawValue
+            await property(.name)?.toString ?? id.rawValue
         }
     }
 
@@ -551,11 +546,11 @@ extension ItemProxy {
     ///
     /// Corresponds to the ZIL `IN` property.
     public var parent: ParentProxy {
-        get async throws {
-            guard let parentEntity = try await property(.parentEntity)?.toParentEntity else {
+        get async {
+            guard let parentEntity = await property(.parentEntity)?.toParentEntity else {
                 return .nowhere
             }
-            return try await engine.parent(from: parentEntity)
+            return await engine.parent(from: parentEntity)
         }
     }
 
@@ -569,8 +564,8 @@ extension ItemProxy {
     /// - Returns: `true` if the player can carry this item, `false` if it would exceed capacity
     /// - Throws: Re-throws any errors from accessing player or item properties
     public var playerCanCarry: Bool {
-        get async throws {
-            try await engine.player.canCarry(id)
+        get async {
+            await engine.player.canCarry(id)
         }
     }
 
@@ -600,8 +595,8 @@ extension ItemProxy {
     /// - Returns: `true` if the player is directly holding this item, `false` otherwise
     /// - Throws: Re-throws any errors from accessing the item's parent property
     public var playerIsHolding: Bool {
-        get async throws {
-            try await parent == .player
+        get async {
+            await parent == .player
         }
     }
 
@@ -622,8 +617,8 @@ extension ItemProxy {
     /// - Throws: Re-throws any errors from `availableExits(behavior:)`.
     public func randomExit(
         behavior: Exit.MovementBehavior = .normal
-    ) async throws -> Exit? {
-        let availableExits = try await availableExits(behavior: behavior)
+    ) async -> Exit? {
+        let availableExits = await availableExits(behavior: behavior)
         return await engine.randomElement(in: availableExits)
     }
 
@@ -637,7 +632,7 @@ extension ItemProxy {
     /// Items like books, letters, signs, and inscriptions typically have custom read text.
     public var readText: String? {
         get async {
-            if let readText = try? await property(.readText)?.toString {
+            if let readText = await property(.readText)?.toString {
                 readText
             } else {
                 engine.messenger.nothingWrittenOn(await withDefiniteArticle)
@@ -657,7 +652,7 @@ extension ItemProxy {
     /// nothing special about the item.
     public var readWhileHeldText: String? {
         get async {
-            if let readWhileHeldText = try? await property(.readWhileHeldText)?.toString {
+            if let readWhileHeldText = await property(.readWhileHeldText)?.toString {
                 readWhileHeldText
             } else {
                 engine.messenger.holdingRevealsNothingSpecial(await withDefiniteArticle)
@@ -670,11 +665,11 @@ extension ItemProxy {
     /// Similar values cluster around 0.4-0.6 to avoid artificial extremes. Worthless (0-0.2) and
     /// priceless (0.8-1.0) are reserved for genuine outliers with significant value differences.
     public var relativeValue: Double {
-        get async throws {
+        get async {
             var allValues: [Int] = []
             let gameState = await engine.gameState
             for item in gameState.items.values {
-                try await allValues.append(
+                await allValues.append(
                     item.proxy(engine).value
                 )
             }
@@ -707,11 +702,11 @@ extension ItemProxy {
     /// Calculates this item's weapon damage relative to all other items in the game.
     /// Returns a value from 0.0 to 1.0 based on smart distribution analysis, filtering out extreme outliers.
     public var relativeWeaponDamage: Double {
-        get async throws {
+        get async {
             var allValues: [Int] = []
             let gameState = await engine.gameState
             for item in gameState.items.values {
-                try await allValues.append(
+                await allValues.append(
                     item.proxy(engine).weaponDamage
                 )
             }
@@ -750,8 +745,8 @@ extension ItemProxy {
     /// - `.high`: Items in the 60-80% range (0.6-0.8)
     /// - `.priceless`: Items in the top 20% of values (0.8-1.0)
     public var relativeValueCategory: Item.RoughValue {
-        get async throws {
-            let ratio = try await relativeValue
+        get async {
+            let ratio = await relativeValue
             switch ratio {
             case 0..<0.2:
                 return .worthless
@@ -770,8 +765,8 @@ extension ItemProxy {
     /// Converts the relative weapon damage to a categorical assessment.
     /// Returns low/medium/high based on the relative weapon damage percentile.
     public var relativeWeaponDamageCategory: Item.RoughValue {
-        get async throws {
-            let ratio = try await relativeWeaponDamage
+        get async {
+            let ratio = await relativeWeaponDamage
             switch ratio {
             case 0..<0.2:
                 return .worthless
@@ -801,9 +796,9 @@ extension ItemProxy {
         object: (String) -> String,
         character: (String) -> String,
         enemy: ((String) -> String)? = nil
-    ) async throws -> String {
-        if try await isCharacter {
-            if let enemy, (try? await isHostileEnemy) == true {
+    ) async -> String {
+        if await isCharacter {
+            if let enemy, await isHostileEnemy == true {
                 await enemy(withDefiniteArticle)
             } else {
                 await character(withDefiniteArticle)
@@ -826,9 +821,9 @@ extension ItemProxy {
     /// - `.high`: Items with above-average value/damage (65-90% range)
     /// - `.priceless`: Items with exceptional value/damage (90-100% range)
     public var roughValue: Item.RoughValue {
-        get async throws {
-            let valueRatio = try await relativeValue
-            let damageRatio = try await relativeWeaponDamage
+        get async {
+            let valueRatio = await relativeValue
+            let damageRatio = await relativeWeaponDamage
             let maxRatio = max(valueRatio, damageRatio)
 
             // Convert ratio to rough categorization
@@ -854,7 +849,7 @@ extension ItemProxy {
     /// article if no short description is set.
     public var shortDescription: String? {
         get async {
-            if let shortDescription = try? await property(.shortDescription)?.toString {
+            if let shortDescription = await property(.shortDescription)?.toString {
                 shortDescription
             } else {
                 "\(await withIndefiniteArticle.capitalizedFirst)."
@@ -878,8 +873,8 @@ extension ItemProxy {
     /// Returns `true` if the item is takable but not currently held by the player.
     /// Some actions may automatically take an item first if this property is `true`.
     public var shouldTakeFirst: Bool {
-        get async throws {
-            let itemParent = try await parent
+        get async {
+            let itemParent = await parent
             let isTakable = await isTakable
 
             return itemParent != .player && isTakable
@@ -896,7 +891,7 @@ extension ItemProxy {
     /// Corresponds to the ZIL `SIZE` property. Defaults to 1 if not specified.
     public var size: Int {
         get async {
-            (try? await property(.size)?.toInt) ?? 1
+            await property(.size)?.toInt ?? 1
         }
     }
 
@@ -909,7 +904,7 @@ extension ItemProxy {
     /// Corresponds to the ZIL `SYNONYM` property. Returns an empty set if no synonyms are defined.
     public var synonyms: [String] {
         get async {
-            (try? await property(.synonyms)?.toStrings)?.sorted() ?? []
+            await property(.synonyms)?.toStrings?.sorted() ?? []
         }
     }
 
@@ -923,7 +918,7 @@ extension ItemProxy {
     /// Corresponds to the ZIL `VALUE` property. Defaults to 0 if not specified.
     public var value: Int {
         get async {
-            (try? await property(.value)?.toInt) ?? 0
+            await property(.value)?.toInt ?? 0
         }
     }
 
@@ -932,15 +927,15 @@ extension ItemProxy {
     /// This method is used when you need to know which items can be seen in a container,
     /// regardless of whether there is adequate light.
     public var visibleItems: [ItemProxy] {
-        get async throws {
+        get async {
             var allItems = [ItemProxy]()
-            let directContents = try await contents
+            let directContents = await contents
             for item in directContents {
                 if await item.hasFlags(any: .isInvisible, .omitDescription) { continue }
                 allItems.append(item)
                 if await item.hasFlags(any: .isOpen, .isTransparent) {
                     allItems.append(
-                        contentsOf: try await item.visibleItems
+                        contentsOf: await item.visibleItems
                     )
                 }
             }
@@ -962,7 +957,7 @@ extension ItemProxy {
     /// damage an item inflicts when used to attack.
     public var weaponDamage: Int {
         get async {
-            if let damage = try? await property(.damage)?.toInt {
+            if let damage = await property(.damage)?.toInt {
                 damage
             } else if await hasFlags(all: .isWeapon, .isBurning) {
                 12
@@ -1013,8 +1008,8 @@ extension ItemProxy {
     /// - Returns: The item name with the appropriate possessive adjective prepended
     /// - Throws: Re-throws any errors from accessing the other item's gender property
     /// - Example: If `other` has masculine gender, returns "his sword" for a sword item
-    public func withPossessiveAdjective(for other: ItemProxy) async throws -> String {
-        try await "\(other.classification.possessiveAdjective) \(name)"
+    public func withPossessiveAdjective(for other: ItemProxy) async -> String {
+        await "\(other.classification.possessiveAdjective) \(name)"
     }
 
     /// The item's name with an appropriate indefinite article ("a" or "an") prepended.
@@ -1052,15 +1047,15 @@ extension Array where Element == ItemProxy {
     /// - Returns: Array of all contained items, flattened from the containment hierarchy
     /// - Throws: Re-throws any errors from accessing item contents
     public var allContents: [ItemProxy] {
-        get async throws {
+        get async {
             var allContents: [ItemProxy] = []
 
             for item in self {
-                let itemContents = try await item.contents
+                let itemContents = await item.contents
                 allContents.append(contentsOf: itemContents)
 
                 // Recursively get contents of the contents
-                let nestedContents = try await itemContents.allContents
+                let nestedContents = await itemContents.allContents
                 allContents.append(contentsOf: nestedContents)
             }
 
@@ -1136,8 +1131,8 @@ extension Array where Element == ItemProxy {
     public var sortedByTempValue: [ItemProxy] {
         get async {
             await asyncSorted {
-                let lValue = try? await $0.property(.tmpValue)?.toInt
-                let rValue = try? await $1.property(.tmpValue)?.toInt
+                let lValue = await $0.property(.tmpValue)?.toInt
+                let rValue = await $1.property(.tmpValue)?.toInt
                 return lValue ?? 0 > rValue ?? 0
             }
         }
@@ -1157,8 +1152,8 @@ extension Array where Element == ItemProxy {
     public var sortedByValue: [ItemProxy] {
         get async {
             await asyncSorted {
-                let lValue = try? await $0.property(.value)?.toInt
-                let rValue = try? await $1.property(.value)?.toInt
+                let lValue = await $0.property(.value)?.toInt
+                let rValue = await $1.property(.value)?.toInt
                 return lValue ?? 0 > rValue ?? 0
             }
         }
@@ -1205,17 +1200,12 @@ extension Array where Element == ItemProxy {
             for item in self {
                 guard await item.contentsAreVisible else { continue }
 
-                do {
-                    let itemContents = try await item.contents.asyncFilter { await $0.isVisible }
-                    allVisibleContents.append(contentsOf: itemContents)
+                let itemContents = await item.contents.asyncFilter { await $0.isVisible }
+                allVisibleContents.append(contentsOf: itemContents)
 
-                    // Recursively get visible contents of the contents
-                    let nestedVisibleContents = await itemContents.visibleContents
-                    allVisibleContents.append(contentsOf: nestedVisibleContents)
-                } catch {
-                    // If we can't get contents, skip this item
-                    continue
-                }
+                // Recursively get visible contents of the contents
+                let nestedVisibleContents = await itemContents.visibleContents
+                allVisibleContents.append(contentsOf: nestedVisibleContents)
             }
 
             return allVisibleContents
@@ -1353,3 +1343,5 @@ extension ItemProxy {
         return 0.2 + ((normalizedValue - 0.08) / 0.91) * 0.6
     }
 }
+
+// swiftlint:enable file_length

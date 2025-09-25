@@ -47,8 +47,8 @@ public struct UnlockActionHandler: ActionHandler {
         }
 
         // Check whether item requires a key (manual unlock)
-        guard case .itemID(let lockKeyID) = try await lockedItem.property(.lockKey) else {
-            return try await ActionResult(
+        guard case .itemID(let lockKeyID) = await lockedItem.property(.lockKey) else {
+            return await ActionResult(
                 context.msg.itemIsNowUnlocked(lockedItem.withDefiniteArticle),
                 lockedItem.clearFlag(.isLocked),
                 lockedItem.setFlag(.isTouched)
@@ -66,7 +66,7 @@ public struct UnlockActionHandler: ActionHandler {
         }
 
         // Check if player is holding the key
-        guard try await key.playerIsHolding else {
+        guard await key.playerIsHolding else {
             throw ActionResponse.itemNotHeld(key)
         }
 
@@ -81,7 +81,7 @@ public struct UnlockActionHandler: ActionHandler {
         }
 
         // Unlock the locked item with the key
-        return try await ActionResult(
+        return await ActionResult(
             context.msg.itemIsNowUnlocked(lockedItem.withDefiniteArticle),
             lockedItem.clearFlag(.isLocked),
             lockedItem.setFlag(.isTouched),

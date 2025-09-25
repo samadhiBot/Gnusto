@@ -36,21 +36,21 @@ public struct LockActionHandler: ActionHandler {
 
         // Check if already locked
         if await lockItem.hasFlag(.isLocked) {
-            return ActionResult(
-                await context.msg.alreadyDone(context.command, item: lockItem.withDefiniteArticle)
+            return await ActionResult(
+                context.msg.alreadyDone(context.command, item: lockItem.withDefiniteArticle)
             )
         }
 
         // Handle key validation (if indirect object provided)
         if let keyItem = try await context.itemIndirectObject() {
             // Check if player is holding the key
-            guard try await keyItem.playerIsHolding else {
+            guard await keyItem.playerIsHolding else {
                 throw ActionResponse.itemNotHeld(keyItem)
             }
 
             // Check if it's the correct key
             guard
-                let lockKeyValue = try await lockItem.property(.lockKey),
+                let lockKeyValue = await lockItem.property(.lockKey),
                 case .itemID(let lockKey) = lockKeyValue,
                 lockKey == keyItem.id
             else {
@@ -63,7 +63,7 @@ public struct LockActionHandler: ActionHandler {
             }
 
             // Lock with key
-            return try await ActionResult(
+            return await ActionResult(
                 context.msg.lockSuccess(lockItem.withDefiniteArticle),
                 lockItem.setFlag(.isLocked),
                 lockItem.setFlag(.isTouched),
@@ -71,7 +71,7 @@ public struct LockActionHandler: ActionHandler {
             )
         } else {
             // No key specified - check if item requires a key
-            if try await lockItem.property(.lockKey) != nil {
+            if await lockItem.property(.lockKey) != nil {
                 throw await ActionResponse.feedback(
                     context.msg.doWithWhat(
                         context.command,
@@ -80,7 +80,7 @@ public struct LockActionHandler: ActionHandler {
                 )
             } else {
                 // Item doesn't require a key (manual lock)
-                return try await ActionResult(
+                return await ActionResult(
                     context.msg.lockSuccess(lockItem.withDefiniteArticle),
                     lockItem.setFlag(.isLocked),
                     lockItem.setFlag(.isTouched)

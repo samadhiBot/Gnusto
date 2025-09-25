@@ -1,19 +1,34 @@
 import Foundation
 
+// swiftlint:disable line_length
+
+/// A messenger class that provides combat-related narrative text generation.
+///
+/// `CombatMessenger` extends `StandardMessenger` to provide specialized messaging
+/// for combat scenarios in a text-based game. It generates dynamic, contextual
+/// descriptions for various combat situations including attacks, outcomes, and
+/// status effects.
+///
+/// The class uses weapon state and combat context to generate appropriate narrative
+/// text that varies based on whether participants are armed or unarmed, creating
+/// immersive combat descriptions.
+///
+/// `StandardMessenger`, `CombatMessenger` and its subclasses are forced to declare
+/// `@unchecked Sendable` because they are open classes.
 open class CombatMessenger: StandardMessenger, @unchecked Sendable {
 
-    // MARK:--Opening Attacks
+    // MARK: - Opening Attacks
 
     /// An enemy attacks the player.
     open func enemyAttacks(
         enemy: ItemProxy,
         playerWeapon: ItemProxy?,
         enemyWeapon: ItemProxy?
-    ) async throws -> String {
-        let enemyRef = try await enemy.classification
-        let itsWeapon = try await enemyWeapon?.alias(.withPossessiveAdjective(for: enemy))
-        let theEnemy = try await enemy.alias(.withDefiniteArticle)
-        let yourWeapon = try await playerWeapon?.alias(.withPossessiveAdjective)
+    ) async -> String {
+        let enemyRef = await enemy.classification
+        let itsWeapon = await enemyWeapon?.alias(.withPossessiveAdjective(for: enemy))
+        let theEnemy = await enemy.alias(.withDefiniteArticle)
+        let yourWeapon = await playerWeapon?.alias(.withPossessiveAdjective)
 
         return switch (yourWeapon, itsWeapon) {
         case (.some(let yourWeapon), .some(let itsWeapon)):
@@ -125,11 +140,11 @@ open class CombatMessenger: StandardMessenger, @unchecked Sendable {
         enemy: ItemProxy,
         playerWeapon: ItemProxy?,
         enemyWeapon: ItemProxy?
-    ) async throws -> String {
-        let enemyRef = try await enemy.classification
-        let itsWeapon = try await enemyWeapon?.alias(.withPossessiveAdjective(for: enemy))
-        let theEnemy = try await enemy.alias(.withDefiniteArticle)
-        let yourWeapon = try await playerWeapon?.alias(.withPossessiveAdjective)
+    ) async -> String {
+        let enemyRef = await enemy.classification
+        let itsWeapon = await enemyWeapon?.alias(.withPossessiveAdjective(for: enemy))
+        let theEnemy = await enemy.alias(.withDefiniteArticle)
+        let yourWeapon = await playerWeapon?.alias(.withPossessiveAdjective)
 
         return switch (yourWeapon, itsWeapon) {
         case (.some(let yourWeapon), .some(let itsWeapon)):
@@ -171,7 +186,7 @@ open class CombatMessenger: StandardMessenger, @unchecked Sendable {
         }
     }
 
-    // MARK:--Player Attack Outcomes
+    // MARK: - Player Attack Outcomes
 
     /// Player kills the enemy outright.
     open func enemySlain(
@@ -179,11 +194,11 @@ open class CombatMessenger: StandardMessenger, @unchecked Sendable {
         playerWeapon: ItemProxy?,
         enemyWeapon: ItemProxy?,
         damage: Int
-    ) async throws -> String {
-        let enemyRef = try await enemy.classification
-        let itsWeapon = try await enemyWeapon?.alias(.withPossessiveAdjective(for: enemy))
-        let theEnemy = try await enemy.alias(.withDefiniteArticle)
-        let yourWeapon = try await playerWeapon?.alias(.withPossessiveAdjective)
+    ) async -> String {
+        let enemyRef = await enemy.classification
+        let itsWeapon = await enemyWeapon?.alias(.withPossessiveAdjective(for: enemy))
+        let theEnemy = await enemy.alias(.withDefiniteArticle)
+        let yourWeapon = await playerWeapon?.alias(.withPossessiveAdjective)
 
         return switch (yourWeapon, itsWeapon) {
         case (.some(let yourWeapon), .some(let itsWeapon)):
@@ -293,11 +308,11 @@ open class CombatMessenger: StandardMessenger, @unchecked Sendable {
         enemy: ItemProxy,
         playerWeapon: ItemProxy?,
         enemyWeapon: ItemProxy?
-    ) async throws -> String {
-        let enemyRef = try await enemy.classification
-        let itsWeapon = try await enemyWeapon?.alias(.withPossessiveAdjective(for: enemy))
-        let theEnemy = try await enemy.alias(.withDefiniteArticle)
-        let yourWeapon = try await playerWeapon?.alias(.withPossessiveAdjective)
+    ) async -> String {
+        let enemyRef = await enemy.classification
+        let itsWeapon = await enemyWeapon?.alias(.withPossessiveAdjective(for: enemy))
+        let theEnemy = await enemy.alias(.withDefiniteArticle)
+        let yourWeapon = await playerWeapon?.alias(.withPossessiveAdjective)
 
         return switch (yourWeapon, itsWeapon) {
         case (.some(let yourWeapon), .some(let itsWeapon)):
@@ -407,11 +422,11 @@ open class CombatMessenger: StandardMessenger, @unchecked Sendable {
         playerWeapon: ItemProxy?,
         enemyWeapon: ItemProxy,
         wasFumble: Bool
-    ) async throws -> String {
-        let theEnemy = try await enemy.alias(.withDefiniteArticle)
-        let enemyRef = try await enemy.classification
-        let itsWeapon = try await enemyWeapon.withPossessiveAdjective(for: enemy)
-        let yourWeapon = try await playerWeapon?.alias(.withPossessiveAdjective)
+    ) async -> String {
+        let theEnemy = await enemy.alias(.withDefiniteArticle)
+        let enemyRef = await enemy.classification
+        let itsWeapon = await enemyWeapon.withPossessiveAdjective(for: enemy)
+        let yourWeapon = await playerWeapon?.alias(.withPossessiveAdjective)
 
         return switch (yourWeapon, wasFumble) {
         case (.some(let yourWeapon), true):
@@ -519,11 +534,11 @@ open class CombatMessenger: StandardMessenger, @unchecked Sendable {
         enemy: ItemProxy,
         playerWeapon: ItemProxy?,
         enemyWeapon: ItemProxy?
-    ) async throws -> String {
-        let enemyRef = try await enemy.classification
-        let itsWeapon = try await enemyWeapon?.alias(.withPossessiveAdjective(for: enemy))
-        let theEnemy = try await enemy.alias(.withDefiniteArticle)
-        let yourWeapon = try await playerWeapon?.alias(.withPossessiveAdjective)
+    ) async -> String {
+        let enemyRef = await enemy.classification
+        let itsWeapon = await enemyWeapon?.alias(.withPossessiveAdjective(for: enemy))
+        let theEnemy = await enemy.alias(.withDefiniteArticle)
+        let yourWeapon = await playerWeapon?.alias(.withPossessiveAdjective)
 
         return switch (yourWeapon, itsWeapon) {
         case (.some(let yourWeapon), .some(let itsWeapon)):
@@ -640,11 +655,11 @@ open class CombatMessenger: StandardMessenger, @unchecked Sendable {
         enemy: ItemProxy,
         playerWeapon: ItemProxy?,
         enemyWeapon: ItemProxy?
-    ) async throws -> String {
-        let enemyRef = try await enemy.classification
-        let itsWeapon = try await enemyWeapon?.alias(.withPossessiveAdjective(for: enemy))
-        let theEnemy = try await enemy.alias(.withDefiniteArticle)
-        let yourWeapon = try await playerWeapon?.alias(.withPossessiveAdjective)
+    ) async -> String {
+        let enemyRef = await enemy.classification
+        let itsWeapon = await enemyWeapon?.alias(.withPossessiveAdjective(for: enemy))
+        let theEnemy = await enemy.alias(.withDefiniteArticle)
+        let yourWeapon = await playerWeapon?.alias(.withPossessiveAdjective)
 
         return switch (yourWeapon, itsWeapon) {
         case (.some(let yourWeapon), .some(let itsWeapon)):
@@ -755,10 +770,10 @@ open class CombatMessenger: StandardMessenger, @unchecked Sendable {
         enemy: ItemProxy,
         playerWeapon: ItemProxy?,
         enemyWeapon: ItemProxy?
-    ) async throws -> String {
-        let theEnemy = try await enemy.alias(.withDefiniteArticle)
-        let enemyRef = try await enemy.classification
-        let itsWeapon = try await enemyWeapon?.alias(.withPossessiveAdjective(for: enemy))
+    ) async -> String {
+        let theEnemy = await enemy.alias(.withDefiniteArticle)
+        let enemyRef = await enemy.classification
+        let itsWeapon = await enemyWeapon?.alias(.withPossessiveAdjective(for: enemy))
 
         return switch itsWeapon {
         case .some(let itsWeapon):
@@ -820,12 +835,12 @@ open class CombatMessenger: StandardMessenger, @unchecked Sendable {
         playerWeapon: ItemProxy?,
         enemyWeapon: ItemProxy?,
         damage: Int
-    ) async throws -> String {
-        let enemyHealth = try await enemy.characterSheet.healthCondition
-        let enemyRef = try await enemy.classification
-        let itsWeapon = try await enemyWeapon?.alias(.withPossessiveAdjective(for: enemy))
-        let theEnemy = try await enemy.alias(.withDefiniteArticle)
-        let yourWeapon = try await playerWeapon?.alias(.withPossessiveAdjective)
+    ) async -> String {
+        let enemyHealth = await enemy.characterSheet.healthCondition
+        let enemyRef = await enemy.classification
+        let itsWeapon = await enemyWeapon?.alias(.withPossessiveAdjective(for: enemy))
+        let theEnemy = await enemy.alias(.withDefiniteArticle)
+        let yourWeapon = await playerWeapon?.alias(.withPossessiveAdjective)
 
         // Assess the enemy's overall condition after critical damage
         let conditionReport =
@@ -1061,12 +1076,12 @@ open class CombatMessenger: StandardMessenger, @unchecked Sendable {
         playerWeapon: ItemProxy?,
         enemyWeapon: ItemProxy?,
         damage: Int
-    ) async throws -> String {
-        let enemyHealth = try await enemy.characterSheet.healthCondition
-        let enemyRef = try await enemy.classification
-        let itsWeapon = try await enemyWeapon?.alias(.withPossessiveAdjective(for: enemy))
-        let theEnemy = try await enemy.alias(.withDefiniteArticle)
-        let yourWeapon = try await playerWeapon?.alias(.withPossessiveAdjective)
+    ) async -> String {
+        let enemyHealth = await enemy.characterSheet.healthCondition
+        let enemyRef = await enemy.classification
+        let itsWeapon = await enemyWeapon?.alias(.withPossessiveAdjective(for: enemy))
+        let theEnemy = await enemy.alias(.withDefiniteArticle)
+        let yourWeapon = await playerWeapon?.alias(.withPossessiveAdjective)
 
         // Assess the enemy's overall condition after grave damage
         let conditionReport =
@@ -1263,12 +1278,12 @@ open class CombatMessenger: StandardMessenger, @unchecked Sendable {
         playerWeapon: ItemProxy?,
         enemyWeapon: ItemProxy?,
         damage: Int
-    ) async throws -> String {
-        let enemyHealth = try await enemy.characterSheet.healthCondition
-        let enemyRef = try await enemy.classification
-        let itsWeapon = try await enemyWeapon?.alias(.withPossessiveAdjective(for: enemy))
-        let theEnemy = try await enemy.alias(.withDefiniteArticle)
-        let yourWeapon = try await playerWeapon?.alias(.withPossessiveAdjective)
+    ) async -> String {
+        let enemyHealth = await enemy.characterSheet.healthCondition
+        let enemyRef = await enemy.classification
+        let itsWeapon = await enemyWeapon?.alias(.withPossessiveAdjective(for: enemy))
+        let theEnemy = await enemy.alias(.withDefiniteArticle)
+        let yourWeapon = await playerWeapon?.alias(.withPossessiveAdjective)
 
         // Assess the enemy's overall condition
         let conditionReport =
@@ -1458,12 +1473,12 @@ open class CombatMessenger: StandardMessenger, @unchecked Sendable {
         playerWeapon: ItemProxy?,
         enemyWeapon: ItemProxy?,
         damage: Int
-    ) async throws -> String {
-        let enemyHealth = try await enemy.characterSheet.healthCondition
-        let enemyRef = try await enemy.classification
-        let itsWeapon = try await enemyWeapon?.alias(.withPossessiveAdjective(for: enemy))
-        let theEnemy = try await enemy.alias(.withDefiniteArticle)
-        let yourWeapon = try await playerWeapon?.alias(.withPossessiveAdjective)
+    ) async -> String {
+        let enemyHealth = await enemy.characterSheet.healthCondition
+        let enemyRef = await enemy.classification
+        let itsWeapon = await enemyWeapon?.alias(.withPossessiveAdjective(for: enemy))
+        let theEnemy = await enemy.alias(.withDefiniteArticle)
+        let yourWeapon = await playerWeapon?.alias(.withPossessiveAdjective)
 
         // Assess the enemy's overall condition
         let conditionReport =
@@ -1627,12 +1642,12 @@ open class CombatMessenger: StandardMessenger, @unchecked Sendable {
         playerWeapon: ItemProxy?,
         enemyWeapon: ItemProxy?,
         damage: Int
-    ) async throws -> String {
-        let theEnemy = try await enemy.alias(.withDefiniteArticle)
-        let enemyRef = try await enemy.classification
-        let itsWeapon = try await enemyWeapon?.alias(.withPossessiveAdjective(for: enemy))
-        let yourWeapon = try await playerWeapon?.alias(.withPossessiveAdjective)
-        let enemyHealth = try await enemy.characterSheet.healthCondition
+    ) async -> String {
+        let theEnemy = await enemy.alias(.withDefiniteArticle)
+        let enemyRef = await enemy.classification
+        let itsWeapon = await enemyWeapon?.alias(.withPossessiveAdjective(for: enemy))
+        let yourWeapon = await playerWeapon?.alias(.withPossessiveAdjective)
+        let enemyHealth = await enemy.characterSheet.healthCondition
 
         // Assess the enemy's overall condition after a graze
         let conditionReport =
@@ -1813,11 +1828,11 @@ open class CombatMessenger: StandardMessenger, @unchecked Sendable {
         enemy: ItemProxy,
         playerWeapon: ItemProxy?,
         enemyWeapon: ItemProxy?
-    ) async throws -> String {
-        let theEnemy = try await enemy.alias(.withDefiniteArticle)
-        let enemyRef = try await enemy.classification
-        let itsWeapon = try await enemyWeapon?.alias(.withPossessiveAdjective(for: enemy))
-        let yourWeapon = try await playerWeapon?.alias(.withPossessiveAdjective)
+    ) async -> String {
+        let theEnemy = await enemy.alias(.withDefiniteArticle)
+        let enemyRef = await enemy.classification
+        let itsWeapon = await enemyWeapon?.alias(.withPossessiveAdjective(for: enemy))
+        let yourWeapon = await playerWeapon?.alias(.withPossessiveAdjective)
 
         return switch (yourWeapon, itsWeapon) {
         case (.some(let yourWeapon), .some(let itsWeapon)):
@@ -1927,11 +1942,11 @@ open class CombatMessenger: StandardMessenger, @unchecked Sendable {
         enemy: ItemProxy,
         playerWeapon: ItemProxy?,
         enemyWeapon: ItemProxy?
-    ) async throws -> String {
-        let theEnemy = try await enemy.alias(.withDefiniteArticle)
-        let enemyRef = try await enemy.classification
-        let itsWeapon = try await enemyWeapon?.alias(.withPossessiveAdjective(for: enemy))
-        let yourWeapon = try await playerWeapon?.alias(.withPossessiveAdjective)
+    ) async -> String {
+        let theEnemy = await enemy.alias(.withDefiniteArticle)
+        let enemyRef = await enemy.classification
+        let itsWeapon = await enemyWeapon?.alias(.withPossessiveAdjective(for: enemy))
+        let yourWeapon = await playerWeapon?.alias(.withPossessiveAdjective)
 
         return switch (yourWeapon, itsWeapon) {
         case (.some(let yourWeapon), .some(let itsWeapon)):
@@ -2031,16 +2046,16 @@ open class CombatMessenger: StandardMessenger, @unchecked Sendable {
         }
     }
 
-    // MARK:--Enemy Attack Outcomes
+    // MARK: - Enemy Attack Outcomes
 
     /// Enemy kills the player.
     open func playerSlain(
         enemy: ItemProxy,
         enemyWeapon: ItemProxy?,
         damage: Int
-    ) async throws -> String {
-        let theEnemy = try await enemy.alias(.withDefiniteArticle)
-        let itsWeapon = try await enemyWeapon?.alias(.withPossessiveAdjective(for: enemy))
+    ) async -> String {
+        let theEnemy = await enemy.alias(.withDefiniteArticle)
+        let itsWeapon = await enemyWeapon?.alias(.withPossessiveAdjective(for: enemy))
 
         return switch itsWeapon {
         case .some(let itsWeapon):
@@ -2100,10 +2115,10 @@ open class CombatMessenger: StandardMessenger, @unchecked Sendable {
         enemy: ItemProxy,
         enemyWeapon: ItemProxy?,
         damage: Int
-    ) async throws -> String {
-        let enemyRef = try await enemy.classification
-        let itsWeapon = try await enemyWeapon?.alias(.withPossessiveAdjective(for: enemy))
-        let theEnemy = try await enemy.alias(.withDefiniteArticle)
+    ) async -> String {
+        let enemyRef = await enemy.classification
+        let itsWeapon = await enemyWeapon?.alias(.withPossessiveAdjective(for: enemy))
+        let theEnemy = await enemy.alias(.withDefiniteArticle)
 
         let combatEvent =
             switch itsWeapon {
@@ -2207,11 +2222,11 @@ open class CombatMessenger: StandardMessenger, @unchecked Sendable {
         playerWeapon: ItemProxy,
         enemyWeapon: ItemProxy?,
         wasFumble: Bool
-    ) async throws -> String {
-        let theEnemy = try await enemy.alias(.withDefiniteArticle)
-        let enemyRef = try await enemy.classification
+    ) async -> String {
+        let theEnemy = await enemy.alias(.withDefiniteArticle)
+        let enemyRef = await enemy.classification
         let yourWeapon = await playerWeapon.withPossessiveAdjective
-        let itsWeapon = try await enemyWeapon?.alias(.withPossessiveAdjective(for: enemy))
+        let itsWeapon = await enemyWeapon?.alias(.withPossessiveAdjective(for: enemy))
 
         return switch (itsWeapon, wasFumble) {
         case (.some(let itsWeapon), true):
@@ -2320,9 +2335,9 @@ open class CombatMessenger: StandardMessenger, @unchecked Sendable {
     open func playerStaggers(
         enemy: ItemProxy,
         enemyWeapon: ItemProxy?
-    ) async throws -> String {
-        let theEnemy = try await enemy.alias(.withDefiniteArticle)
-        let itsWeapon = try await enemyWeapon?.alias(.withPossessiveAdjective(for: enemy))
+    ) async -> String {
+        let theEnemy = await enemy.alias(.withDefiniteArticle)
+        let itsWeapon = await enemyWeapon?.alias(.withPossessiveAdjective(for: enemy))
 
         return switch itsWeapon {
         case .some(let itsWeapon):
@@ -2380,10 +2395,10 @@ open class CombatMessenger: StandardMessenger, @unchecked Sendable {
     open func playerHesitates(
         enemy: ItemProxy,
         enemyWeapon: ItemProxy?
-    ) async throws -> String {
-        let theEnemy = try await enemy.alias(.withDefiniteArticle)
-        let enemyRef = try await enemy.classification
-        let itsWeapon = try await enemyWeapon?.alias(.withPossessiveAdjective(for: enemy))
+    ) async -> String {
+        let theEnemy = await enemy.alias(.withDefiniteArticle)
+        let enemyRef = await enemy.classification
+        let itsWeapon = await enemyWeapon?.alias(.withPossessiveAdjective(for: enemy))
 
         return switch itsWeapon {
         case .some(let itsWeapon):
@@ -2441,9 +2456,9 @@ open class CombatMessenger: StandardMessenger, @unchecked Sendable {
     open func playerVulnerable(
         enemy: ItemProxy,
         enemyWeapon: ItemProxy?
-    ) async throws -> String {
-        let theEnemy = try await enemy.alias(.withDefiniteArticle)
-        let itsWeapon = try await enemyWeapon?.alias(.withPossessiveAdjective(for: enemy))
+    ) async -> String {
+        let theEnemy = await enemy.alias(.withDefiniteArticle)
+        let itsWeapon = await enemyWeapon?.alias(.withPossessiveAdjective(for: enemy))
 
         return switch itsWeapon {
         case .some(let itsWeapon):
@@ -2502,9 +2517,9 @@ open class CombatMessenger: StandardMessenger, @unchecked Sendable {
         enemy: ItemProxy,
         enemyWeapon: ItemProxy?,
         damage: Int
-    ) async throws -> String {
-        let theEnemy = try await enemy.alias(.withDefiniteArticle)
-        let itsWeapon = try await enemyWeapon?.alias(.withPossessiveAdjective(for: enemy))
+    ) async -> String {
+        let theEnemy = await enemy.alias(.withDefiniteArticle)
+        let itsWeapon = await enemyWeapon?.alias(.withPossessiveAdjective(for: enemy))
         let playerHealth = await enemy.engine.player.characterSheet.healthCondition
 
         // Assess the player's overall condition after critical damage
@@ -2616,9 +2631,9 @@ open class CombatMessenger: StandardMessenger, @unchecked Sendable {
         enemy: ItemProxy,
         enemyWeapon: ItemProxy?,
         damage: Int
-    ) async throws -> String {
-        let theEnemy = try await enemy.alias(.withDefiniteArticle)
-        let itsWeapon = try await enemyWeapon?.alias(.withPossessiveAdjective(for: enemy))
+    ) async -> String {
+        let theEnemy = await enemy.alias(.withDefiniteArticle)
+        let itsWeapon = await enemyWeapon?.alias(.withPossessiveAdjective(for: enemy))
         let playerHealth = await enemy.engine.player.characterSheet.healthCondition
 
         // Assess the player's overall condition after grave damage
@@ -2719,9 +2734,9 @@ open class CombatMessenger: StandardMessenger, @unchecked Sendable {
         enemy: ItemProxy,
         enemyWeapon: ItemProxy?,
         damage: Int
-    ) async throws -> String {
-        let theEnemy = try await enemy.alias(.withDefiniteArticle)
-        let itsWeapon = try await enemyWeapon?.alias(.withPossessiveAdjective(for: enemy))
+    ) async -> String {
+        let theEnemy = await enemy.alias(.withDefiniteArticle)
+        let itsWeapon = await enemyWeapon?.alias(.withPossessiveAdjective(for: enemy))
         let playerHealth = await enemy.engine.player.characterSheet.healthCondition
 
         // Assess the player's overall condition
@@ -2821,9 +2836,9 @@ open class CombatMessenger: StandardMessenger, @unchecked Sendable {
         enemy: ItemProxy,
         enemyWeapon: ItemProxy?,
         damage: Int
-    ) async throws -> String {
-        let theEnemy = try await enemy.alias(.withDefiniteArticle)
-        let itsWeapon = try await enemyWeapon?.alias(.withPossessiveAdjective(for: enemy))
+    ) async -> String {
+        let theEnemy = await enemy.alias(.withDefiniteArticle)
+        let itsWeapon = await enemyWeapon?.alias(.withPossessiveAdjective(for: enemy))
         let playerHealth = await enemy.engine.player.characterSheet.healthCondition
 
         // Assess the player's overall condition
@@ -2894,9 +2909,9 @@ open class CombatMessenger: StandardMessenger, @unchecked Sendable {
         enemy: ItemProxy,
         enemyWeapon: ItemProxy?,
         damage: Int
-    ) async throws -> String {
-        let theEnemy = try await enemy.alias(.withDefiniteArticle)
-        let itsWeapon = try await enemyWeapon?.alias(.withPossessiveAdjective(for: enemy))
+    ) async -> String {
+        let theEnemy = await enemy.alias(.withDefiniteArticle)
+        let itsWeapon = await enemyWeapon?.alias(.withPossessiveAdjective(for: enemy))
         let playerHealth = await enemy.engine.player.characterSheet.healthCondition
 
         // Assess the player's overall condition after a graze
@@ -2965,10 +2980,10 @@ open class CombatMessenger: StandardMessenger, @unchecked Sendable {
     open func playerMissed(
         enemy: ItemProxy,
         enemyWeapon: ItemProxy?
-    ) async throws -> String {
-        let theEnemy = try await enemy.alias(.withDefiniteArticle)
-        let enemyRef = try await enemy.classification
-        let itsWeapon = try await enemyWeapon?.alias(.withPossessiveAdjective(for: enemy))
+    ) async -> String {
+        let theEnemy = await enemy.alias(.withDefiniteArticle)
+        let enemyRef = await enemy.classification
+        let itsWeapon = await enemyWeapon?.alias(.withPossessiveAdjective(for: enemy))
 
         return switch itsWeapon {
         case .some(let itsWeapon):
@@ -2996,9 +3011,9 @@ open class CombatMessenger: StandardMessenger, @unchecked Sendable {
     open func playerDodged(
         enemy: ItemProxy,
         enemyWeapon: ItemProxy?
-    ) async throws -> String {
-        let theEnemy = try await enemy.alias(.withDefiniteArticle)
-        let itsWeapon = try await enemyWeapon?.alias(.withPossessiveAdjective(for: enemy))
+    ) async -> String {
+        let theEnemy = await enemy.alias(.withDefiniteArticle)
+        let itsWeapon = await enemyWeapon?.alias(.withPossessiveAdjective(for: enemy))
 
         return switch itsWeapon {
         case .some(let itsWeapon):
@@ -3022,7 +3037,7 @@ open class CombatMessenger: StandardMessenger, @unchecked Sendable {
         }
     }
 
-    // MARK:--Special Outcomes
+    // MARK: - Special Outcomes
 
     /// Enemy flees from combat.
     open func enemyFlees(
@@ -3030,10 +3045,10 @@ open class CombatMessenger: StandardMessenger, @unchecked Sendable {
         enemyWeapon: ItemProxy?,
         direction: Direction?,
         destination: LocationID?
-    ) async throws -> String {
-        let theEnemy = try await enemy.alias(.withDefiniteArticle)
-        let enemyRef = try await enemy.classification
-        let itsWeapon = try await enemyWeapon?.alias(.withPossessiveAdjective(for: enemy))
+    ) async -> String {
+        let theEnemy = await enemy.alias(.withDefiniteArticle)
+        let enemyRef = await enemy.classification
+        let itsWeapon = await enemyWeapon?.alias(.withPossessiveAdjective(for: enemy))
         let inSomeDirection = somethingDisappears(toward: direction)
 
         return switch itsWeapon {
@@ -3095,10 +3110,10 @@ open class CombatMessenger: StandardMessenger, @unchecked Sendable {
     open func enemyPacified(
         enemy: ItemProxy,
         enemyWeapon: ItemProxy?
-    ) async throws -> String {
-        let theEnemy = try await enemy.alias(.withDefiniteArticle)
-        let enemyRef = try await enemy.classification
-        let itsWeapon = try await enemyWeapon?.alias(.withPossessiveAdjective(for: enemy))
+    ) async -> String {
+        let theEnemy = await enemy.alias(.withDefiniteArticle)
+        let enemyRef = await enemy.classification
+        let itsWeapon = await enemyWeapon?.alias(.withPossessiveAdjective(for: enemy))
 
         return switch itsWeapon {
         case .some(let itsWeapon):
@@ -3153,9 +3168,9 @@ open class CombatMessenger: StandardMessenger, @unchecked Sendable {
     }
 
     /// Enemy returns after knocking player unconscious and leaving them for dead.
-    open func enemyReturns(enemy: ItemProxy) async throws -> String {
-        let theEnemy = try await enemy.alias(.withDefiniteArticle)
-        let enemyRef = try await enemy.classification
+    open func enemyReturns(enemy: ItemProxy) async -> String {
+        let theEnemy = await enemy.alias(.withDefiniteArticle)
+        let enemyRef = await enemy.classification
 
         return oneOf(
             """
@@ -3195,10 +3210,10 @@ open class CombatMessenger: StandardMessenger, @unchecked Sendable {
     open func enemySurrenders(
         enemy: ItemProxy,
         enemyWeapon: ItemProxy?
-    ) async throws -> String {
-        let theEnemy = try await enemy.alias(.withDefiniteArticle)
-        let enemyRef = try await enemy.classification
-        let itsWeapon = try await enemyWeapon?.alias(.withPossessiveAdjective(for: enemy))
+    ) async -> String {
+        let theEnemy = await enemy.alias(.withDefiniteArticle)
+        let enemyRef = await enemy.classification
+        let itsWeapon = await enemyWeapon?.alias(.withPossessiveAdjective(for: enemy))
 
         return switch itsWeapon {
         case .some(let itsWeapon):
@@ -3221,7 +3236,7 @@ open class CombatMessenger: StandardMessenger, @unchecked Sendable {
                 and assumes a posture of complete defeat and surrender.
                 """,
                 """
-                \(theEnemy) throws \(itsWeapon) far away! \(enemyRef.subjectPronoun)
+                \(theEnemy) \(itsWeapon) far away! \(enemyRef.subjectPronoun)
                 cower low, displaying absolute submission to your victory.
                 """
             )
@@ -3257,7 +3272,7 @@ open class CombatMessenger: StandardMessenger, @unchecked Sendable {
         enemy: ItemProxy,
         enemyWeapon: ItemProxy?,
         message: String
-    ) async throws -> String {
+    ) async -> String {
         output(message)
     }
 
@@ -3265,14 +3280,14 @@ open class CombatMessenger: StandardMessenger, @unchecked Sendable {
     open func enemyTaunts(
         enemy: ItemProxy,
         message: String
-    ) async throws -> String {
+    ) async -> String {
         output(message)
     }
 
     /// Enemy wakes after being knocked unconscious for some time.
-    open func enemyWakes(enemy: ItemProxy) async throws -> String {
-        let theEnemy = try await enemy.alias(.withDefiniteArticle)
-        let enemyRef = try await enemy.classification
+    open func enemyWakes(enemy: ItemProxy) async -> String {
+        let theEnemy = await enemy.alias(.withDefiniteArticle)
+        let enemyRef = await enemy.classification
 
         return oneOf(
             """
@@ -3313,10 +3328,10 @@ open class CombatMessenger: StandardMessenger, @unchecked Sendable {
     open func unarmedAttackDenied(
         enemy: ItemProxy,
         enemyWeapon: ItemProxy?
-    ) async throws -> String {
-        let theEnemy = try await enemy.alias(.withDefiniteArticle)
-        let enemyRef = try await enemy.classification
-        let itsWeapon = try await enemyWeapon?.alias(.withPossessiveAdjective(for: enemy))
+    ) async -> String {
+        let theEnemy = await enemy.alias(.withDefiniteArticle)
+        let enemyRef = await enemy.classification
+        let itsWeapon = await enemyWeapon?.alias(.withPossessiveAdjective(for: enemy))
 
         return switch itsWeapon {
         case .some(let itsWeapon):
@@ -3375,10 +3390,10 @@ open class CombatMessenger: StandardMessenger, @unchecked Sendable {
         enemy: ItemProxy,
         enemyWeapon: ItemProxy?,
         item: ItemProxy
-    ) async throws -> String {
-        let enemyRef = try await enemy.classification
-        let itsWeapon = try await enemyWeapon?.alias(.withPossessiveAdjective(for: enemy))
-        let theEnemy = try await enemy.alias(.withDefiniteArticle)
+    ) async -> String {
+        let enemyRef = await enemy.classification
+        let itsWeapon = await enemyWeapon?.alias(.withPossessiveAdjective(for: enemy))
+        let theEnemy = await enemy.alias(.withDefiniteArticle)
         let theItem = await item.withDefiniteArticle
 
         return switch itsWeapon {
@@ -3440,10 +3455,10 @@ open class CombatMessenger: StandardMessenger, @unchecked Sendable {
         enemy: ItemProxy,
         enemyWeapon: ItemProxy?,
         command: Command
-    ) async throws -> String {
-        let enemyRef = try await enemy.classification
-        let itsWeapon = try await enemyWeapon?.alias(.withPossessiveAdjective(for: enemy))
-        let theEnemy = try await enemy.alias(.withDefiniteArticle)
+    ) async -> String {
+        let enemyRef = await enemy.classification
+        let itsWeapon = await enemyWeapon?.alias(.withPossessiveAdjective(for: enemy))
+        let theEnemy = await enemy.alias(.withDefiniteArticle)
 
         return switch itsWeapon {
         case .some(let itsWeapon):
@@ -3471,7 +3486,7 @@ open class CombatMessenger: StandardMessenger, @unchecked Sendable {
     /// Combat is interrupted by external event.
     open func combatInterrupted(
         reason: String
-    ) async throws -> String {
+    ) async -> String {
         output(reason)
     }
 
@@ -3479,10 +3494,10 @@ open class CombatMessenger: StandardMessenger, @unchecked Sendable {
     open func stalemate(
         enemy: ItemProxy,
         enemyWeapon: ItemProxy?
-    ) async throws -> String {
-        let theEnemy = try await enemy.alias(.withDefiniteArticle)
-        let enemyRef = try await enemy.classification
-        let itsWeapon = try await enemyWeapon?.alias(.withPossessiveAdjective(for: enemy))
+    ) async -> String {
+        let theEnemy = await enemy.alias(.withDefiniteArticle)
+        let enemyRef = await enemy.classification
+        let itsWeapon = await enemyWeapon?.alias(.withPossessiveAdjective(for: enemy))
 
         return switch itsWeapon {
         case .some(let itsWeapon):
@@ -3536,3 +3551,5 @@ open class CombatMessenger: StandardMessenger, @unchecked Sendable {
         }
     }
 }
+
+// swiftlint:enable line_length

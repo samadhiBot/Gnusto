@@ -12,8 +12,6 @@ public struct NibbleActionHandler: ActionHandler {
 
     public let synonyms: [Verb] = [.nibble, .bite]
 
-    public let actions: [Intent] = [.eat]
-
     public let requiresLight: Bool = true
 
     // MARK: - Action Processing Methods

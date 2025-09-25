@@ -39,13 +39,13 @@ struct AllCommandTests {
         try await engine.execute("take all")
 
         // Assert: All items should be taken
-        let finalKeyState = try await engine.item(.startItem)
-        let finalCoinState = try await engine.item("coin")
-        let finalLampState = try await engine.item("lamp")
+        let finalKeyState = await engine.item(.startItem)
+        let finalCoinState = await engine.item("coin")
+        let finalLampState = await engine.item("lamp")
 
-        #expect(try await finalKeyState.playerIsHolding)
-        #expect(try await finalCoinState.playerIsHolding)
-        #expect(try await finalLampState.playerIsHolding)
+        #expect(await finalKeyState.playerIsHolding)
+        #expect(await finalCoinState.playerIsHolding)
+        #expect(await finalLampState.playerIsHolding)
 
         // Assert: Appropriate message
         let output = await mockIO.flush()
@@ -117,13 +117,13 @@ struct AllCommandTests {
         try await engine.execute("take all")
 
         // Assert: Only takable items are taken
-        let finalKeyState = try await engine.item(.startItem)
-        let finalCoinState = try await engine.item("coin")
-        let finalWallState = try await engine.item("wall")
+        let finalKeyState = await engine.item(.startItem)
+        let finalCoinState = await engine.item("coin")
+        let finalWallState = await engine.item("wall")
 
-        #expect(try await finalKeyState.playerIsHolding)
-        #expect(try await finalCoinState.playerIsHolding)
-        #expect(try await finalWallState.parent == .location(engine.location(.startRoom)))  // Wall stays
+        #expect(await finalKeyState.playerIsHolding)
+        #expect(await finalCoinState.playerIsHolding)
+        #expect(await finalWallState.parent == .location(engine.location(.startRoom)))  // Wall stays
 
         // Assert: Appropriate message
         let output = await mockIO.flush()
@@ -169,13 +169,13 @@ struct AllCommandTests {
         try await engine.execute("take all")
 
         // Assert: Only items within capacity are taken
-        let finalKeyState = try await engine.item(.startItem)
-        let finalCoinState = try await engine.item("coin")
-        let finalBoulderState = try await engine.item("boulder")
+        let finalKeyState = await engine.item(.startItem)
+        let finalCoinState = await engine.item("coin")
+        let finalBoulderState = await engine.item("boulder")
 
-        #expect(try await finalKeyState.playerIsHolding)
-        #expect(try await finalCoinState.playerIsHolding)
-        #expect(try await finalBoulderState.parent == .location(engine.location(.startRoom)))
+        #expect(await finalKeyState.playerIsHolding)
+        #expect(await finalCoinState.playerIsHolding)
+        #expect(await finalBoulderState.parent == .location(engine.location(.startRoom)))
 
         // Assert: Appropriate message
         let output = await mockIO.flush()
@@ -220,13 +220,13 @@ struct AllCommandTests {
         try await engine.execute("drop all")
 
         // Assert: All items should be dropped
-        let finalCoinState = try await engine.item("coin")
-        let finalLampState = try await engine.item("lamp")
-        let finalKeyState = try await engine.item(.startItem)
+        let finalCoinState = await engine.item("coin")
+        let finalLampState = await engine.item("lamp")
+        let finalKeyState = await engine.item(.startItem)
 
-        #expect(try await finalKeyState.parent == .location(engine.location(.startRoom)))
-        #expect(try await finalCoinState.parent == .location(engine.location(.startRoom)))
-        #expect(try await finalLampState.parent == .location(engine.location(.startRoom)))
+        #expect(await finalKeyState.parent == .location(engine.location(.startRoom)))
+        #expect(await finalCoinState.parent == .location(engine.location(.startRoom)))
+        #expect(await finalLampState.parent == .location(engine.location(.startRoom)))
 
         // Assert: Appropriate message
         let output = await mockIO.flush()
@@ -298,8 +298,8 @@ struct AllCommandTests {
         )
 
         // Assert: Item is taken
-        let finalKeyState = try await engine.item(.startItem)
-        #expect(try await finalKeyState.playerIsHolding)
+        let finalKeyState = await engine.item(.startItem)
+        #expect(await finalKeyState.playerIsHolding)
     }
 
     @Test("DROP ALL single item uses singular message")
@@ -330,8 +330,8 @@ struct AllCommandTests {
         )
 
         // Assert: Item is dropped
-        let finalKeyState = try await engine.item(.startItem)
-        #expect(try await finalKeyState.parent == .location(engine.location(.startRoom)))
+        let finalKeyState = await engine.item(.startItem)
+        #expect(await finalKeyState.parent == .location(engine.location(.startRoom)))
     }
 
     @Test("TAKE ALL skips items already held")
@@ -360,11 +360,11 @@ struct AllCommandTests {
         try await engine.execute("take all")
 
         // Assert: Only room key is taken (held key skipped)
-        let finalHeldKeyState = try await engine.item(.startItem)
-        let finalRoomKeyState = try await engine.item("roomKey")
+        let finalHeldKeyState = await engine.item(.startItem)
+        let finalRoomKeyState = await engine.item("roomKey")
 
-        #expect(try await finalHeldKeyState.playerIsHolding)  // Still held
-        #expect(try await finalRoomKeyState.playerIsHolding)  // Now taken
+        #expect(await finalHeldKeyState.playerIsHolding)  // Still held
+        #expect(await finalRoomKeyState.playerIsHolding)  // Now taken
 
         // Assert: Message only mentions newly taken item
         let output = await mockIO.flush()

@@ -34,13 +34,14 @@ public struct FindActionHandler: ActionHandler {
         }
 
         // Check if the player is holding it
-        let message = if try await targetItem.playerIsHolding {
-            context.msg.youHaveIt()
-        } else if await targetItem.playerCanReach {
-            context.msg.itsRightHere()
-        } else {
-            context.msg.unknownItem(targetItem.id)
-        }
+        let message =
+            if await targetItem.playerIsHolding {
+                context.msg.youHaveIt()
+            } else if await targetItem.playerCanReach {
+                context.msg.itsRightHere()
+            } else {
+                context.msg.unknownItem(targetItem.id)
+            }
 
         return ActionResult(message)
     }

@@ -26,7 +26,7 @@ public struct PullActionHandler: ActionHandler {
             throw ActionResponse.doWhat(context)
         }
 
-        return try await ActionResult(
+        return await ActionResult(
             item.response(
                 object: context.msg.pullObject,
                 character: context.msg.pullCharacter,

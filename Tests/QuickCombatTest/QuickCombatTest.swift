@@ -135,7 +135,7 @@ struct QuickCombatTest {
         #expect(output.contains("sword") || output.contains("rat"))
 
         // Rat likely died from powerful weapon, but verify it was processed
-        let finalRat = try? await engine.item("rat")
+        let finalRat = await engine.item("rat")
         // Rat might be dead (removed) or still exist with damage
     }
 }

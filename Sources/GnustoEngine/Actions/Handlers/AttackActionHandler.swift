@@ -53,8 +53,8 @@ public struct AttackActionHandler: ActionHandler {
         }
 
         // First check: Is target NOT a character?
-        guard try await target.isCharacter else {
-            return try await ActionResult(
+        guard await target.isCharacter else {
+            return await ActionResult(
                 context.msg.attackNonCharacter(target.withDefiniteArticle),
                 target.setFlag(.isTouched)
             )
@@ -64,8 +64,8 @@ public struct AttackActionHandler: ActionHandler {
         let playerWeapon = try await findPlayerWeapon(in: context)
 
         // Check if an opponent requires a weapon for fight it
-        if playerWeapon == nil, try await target.characterSheet.requiresWeapon == true {
-            return try await ActionResult(
+        if playerWeapon == nil, await target.characterSheet.requiresWeapon == true {
+            return await ActionResult(
                 context.engine.combatMessenger(for: target.id).unarmedAttackDenied(
                     enemy: target,
                     enemyWeapon: target.preferredWeapon
@@ -77,8 +77,8 @@ public struct AttackActionHandler: ActionHandler {
         if let combat = await context.engine.combatState {
             // TODO: allow combat with multiple foes?
             guard combat.enemyID == target.id else {
-                let enemy = try await combat.enemy(with: context.engine)
-                return try await ActionResult(
+                let enemy = await combat.enemy(with: context.engine)
+                return await ActionResult(
                     context.msg.alreadyInCombat(
                         with: enemy.withDefiniteArticle
                     ),
@@ -88,7 +88,7 @@ public struct AttackActionHandler: ActionHandler {
 
             // Already in combat with this enemy: do not reset the combat state.
             // Simply mark interaction and let the combat system advance state this turn.
-            return try await ActionResult(
+            return await ActionResult(
                 target.setFlag(.isTouched)
             )
         }
@@ -101,7 +101,7 @@ public struct AttackActionHandler: ActionHandler {
         }
 
         // Begin combat and hand off to combat system
-        return try await context.engine.playerAttacks(
+        return await context.engine.playerAttacks(
             enemy: target,
             playerWeapon: playerWeapon,
             enemyWeapon: target.preferredWeapon
@@ -115,15 +115,15 @@ public struct AttackActionHandler: ActionHandler {
                 specified
             } else if let previousID = await context.engine.combatState?.playerWeaponID {
                 // Weapon used in previous combat turn
-                try await context.engine.item(previousID)
+                await context.item(previousID)
             } else {
                 // Best weapon (by damage) in player inventory
-                try await context.player.preferredWeapon
+                await context.player.preferredWeapon
             }
         guard let weapon else {
             return nil
         }
-        guard try await weapon.playerIsHolding else {
+        guard await weapon.playerIsHolding else {
             throw ActionResponse.itemNotHeld(weapon)
         }
         return weapon

@@ -55,7 +55,7 @@ struct ConversationManagerArchitectureTest {
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         // When: Creating a clarified command and asking a yes/no question
-        let appleProxy = try await engine.item("apple")
+        let appleProxy = await engine.item("apple")
         let eatCommand = Command(
             verb: .eat,
             directObject: .item(appleProxy),
@@ -97,7 +97,7 @@ struct ConversationManagerArchitectureTest {
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         // Set up a yes/no question
-        let appleProxy = try await engine.item("apple")
+        let appleProxy = await engine.item("apple")
         let eatCommand = Command(
             verb: .eat,
             directObject: .item(appleProxy),
@@ -207,7 +207,7 @@ struct ConversationManagerArchitectureTest {
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         // When: Using the askToConfirm convenience method
-        let appleProxy = try await engine.item("apple")
+        let appleProxy = await engine.item("apple")
         let eatCommand = Command(
             verb: .eat,
             directObject: .item(appleProxy),

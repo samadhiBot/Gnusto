@@ -1,5 +1,7 @@
 import Foundation
 
+// swiftlint:disable sorted_enum_cases
+
 /// Represents universal concepts that are implicitly present in interactive fiction
 /// but don't need to be explicitly modeled as Item objects.
 ///
@@ -20,7 +22,7 @@ import Foundation
 ///     switch command.directObject {
 ///     case .item(let targetItemID): ...
 ///     case .universal(let universal):
-///         if UniversalObject.diggableUniversals.contains(universal) {
+///         if Universal.diggableUniversals.contains(universal) {
 ///             ActionResult(
 ///                 engine.messenger.digUniversalIneffective()
 ///             )
@@ -33,31 +35,25 @@ import Foundation
 ///     }
 /// }
 /// ```
-public enum UniversalObject: String, CaseIterable, Sendable, Codable {
+public enum Universal: String, CaseIterable, Sendable, Codable {
     // MARK: - Ground and Earth
-
-    /// The ground, earth, or floor surface
-    case ground
-
-    /// Earth, dirt, or soil
-    case earth
-
-    /// Soil for digging or planting
-    case soil
 
     /// Dirt or earth material
     case dirt
 
+    /// Earth, dirt, or soil
+    case earth
+
     /// The floor surface
     case floor
 
+    /// The ground, earth, or floor surface
+    case ground
+
+    /// Soil for digging or planting
+    case soil
+
     // MARK: - Sky and Atmosphere
-
-    /// The sky or heavens above
-    case sky
-
-    /// The heavens or celestial sphere
-    case heavens
 
     /// Air or atmosphere
     case air
@@ -65,56 +61,62 @@ public enum UniversalObject: String, CaseIterable, Sendable, Codable {
     /// Clouds in the sky
     case clouds
 
-    /// The sun
-    case sun
+    /// The heavens or celestial sphere
+    case heavens
 
     /// The moon
     case moon
 
+    /// The sky or heavens above
+    case sky
+
     /// Stars in the sky
     case stars
+
+    /// The sun
+    case sun
 
     // MARK: - Architectural Elements
 
     /// The ceiling above
     case ceiling
 
-    /// Walls around the location
-    case walls
+    /// The roof above
+    case roof
 
     /// A wall (singular)
     case wall
 
-    /// The roof above
-    case roof
+    /// Walls around the location
+    case walls
 
     // MARK: - Water Features
-
-    /// Water in general
-    case water
-
-    /// A river or stream
-    case river
-
-    /// A stream of water
-    case stream
 
     /// A lake or pond
     case lake
 
+    /// An ocean or sea
+    case ocean
+
     /// A pond of water
     case pond
 
-    /// An ocean or sea
-    case ocean
+    /// A river or stream
+    case river
 
     /// The sea
     case sea
 
+    /// A stream of water
+    case stream
+
+    /// Water in general
+    case water
+
     // MARK: - Natural Elements
 
-    /// Wind or breeze
-    case wind
+    /// Dust particles
+    case dust
 
     /// Fire or flames
     case fire
@@ -122,43 +124,43 @@ public enum UniversalObject: String, CaseIterable, Sendable, Codable {
     /// Flames
     case flames
 
-    /// Smoke
-    case smoke
-
-    /// Dust particles
-    case dust
-
     /// Mud or muddy ground
     case mud
-
-    /// Sand
-    case sand
 
     /// Rock or stone
     case rock
 
+    /// Sand
+    case sand
+
+    /// Smoke
+    case smoke
+
     /// Stone material
     case stone
+
+    /// Wind or breeze
+    case wind
 
     // MARK: - Abstract Concepts
 
     /// Darkness or shadows
     case darkness
 
-    /// Shadows
-    case shadows
-
     /// Light in general
     case light
+
+    /// Noise
+    case noise
+
+    /// Shadows
+    case shadows
 
     /// Silence or quiet
     case silence
 
     /// Sound or noise
     case sound
-
-    /// Noise
-    case noise
 
     // MARK: - Properties
 
@@ -177,13 +179,35 @@ public enum UniversalObject: String, CaseIterable, Sendable, Codable {
     }
 }
 
-extension UniversalObject {
-    public func matches(_ other: UniversalObject) -> Bool {
+// swiftlint:enable sorted_enum_cases
+
+extension Universal {
+    /// Checks if this universal matches or is related to another universal.
+    ///
+    /// This method determines whether two universals are conceptually related by checking
+    /// if the other universal is contained within this universal's set of related objects.
+    /// Related universals typically share similar properties, behaviors, or can be used
+    /// interchangeably in certain contexts.
+    ///
+    /// - Parameter other: The universal to compare against
+    /// - Returns: `true` if the universals are related, `false` otherwise
+    ///
+    /// ## Example Usage
+    ///
+    /// ```swift
+    /// let ground = Universal.ground
+    /// let floor = Universal.floor
+    /// let sky = Universal.sky
+    ///
+    /// print(ground.matches(floor)) // true - both are floor-like surfaces
+    /// print(ground.matches(sky))   // false - unrelated concepts
+    /// ```
+    public func matches(_ other: Universal) -> Bool {
         self.relatedUniversals.contains(other)
     }
 
     /// Related universal objects that share similar properties or behaviors
-    public var relatedUniversals: Set<UniversalObject> {
+    public var relatedUniversals: Set<Universal> {
         switch self {
         case .ground, .floor:
             [.ground, .floor, .earth, .soil, .dirt]
@@ -302,13 +326,13 @@ extension UniversalObject {
 
 // MARK: - Conformances
 
-extension UniversalObject: Comparable {
-    public static func < (lhs: UniversalObject, rhs: UniversalObject) -> Bool {
+extension Universal: Comparable {
+    public static func < (lhs: Universal, rhs: Universal) -> Bool {
         lhs.rawValue < rhs.rawValue
     }
 }
 
-extension UniversalObject: CustomStringConvertible {
+extension Universal: CustomStringConvertible {
     public var description: String {
         rawValue
     }
@@ -316,26 +340,26 @@ extension UniversalObject: CustomStringConvertible {
 
 // MARK: - Set helpers
 
-extension Set where Element == UniversalObject {
-    /// Finds the closest matching UniversalObject to the given raw input string.
+extension Set where Element == Universal {
+    /// Finds the closest matching Universal to the given raw input string.
     ///
     /// This method first attempts to find an exact match by comparing the raw input
-    /// to the raw values of UniversalObjects in the set. If no exact match is found,
+    /// to the raw values of Universals in the set. If no exact match is found,
     /// it returns the first element when the set is sorted alphabetically.
     ///
-    /// - Parameter rawInput: The raw string input to match against UniversalObject raw values
-    /// - Returns: The matching UniversalObject if found, or the first sorted element as a fallback,
+    /// - Parameter rawInput: The raw string input to match against Universal raw values
+    /// - Returns: The matching Universal if found, or the first sorted element as a fallback,
     ///           or nil if the set is empty
     ///
     /// ## Example Usage
     ///
     /// ```swift
-    /// let universals: Set<UniversalObject> = [.ground, .sky, .water]
+    /// let universals: Set<Universal> = [.ground, .sky, .water]
     /// let match = universals.closestMatch(to: "ground") // Returns .ground
     /// let fallback = universals.closestMatch(to: "invalid") // Returns .ground (first sorted)
     /// ```
-    public func closestMatch(to rawInput: String) -> UniversalObject? {
-        if let exactMatch = first(where: { $0 == UniversalObject(rawValue: rawInput) }) {
+    public func closestMatch(to rawInput: String) -> Universal? {
+        if let exactMatch = first(where: { $0 == Universal(rawValue: rawInput) }) {
             return exactMatch
         }
         return sorted().first

@@ -29,9 +29,7 @@ extension GameEngine {
 
         // --- Process Fuses ---
         // Explicitly define the action type to match Fuse.action
-        typealias FuseActionType = @Sendable (GameEngine, FuseState) async throws -> ActionResult?
-        var expiredFuseIDsToExecute:
-            [(id: FuseID, action: FuseActionType, definition: Fuse, state: FuseState)] = []
+        var expiredFuseIDsToExecute = [FuseAction]()
 
         // Iterate over a copy of keys from gameState.activeFuses for safe modification
         let activeFuseIDsInState = Array(gameState.activeFuses.keys)
@@ -41,7 +39,14 @@ extension GameEngine {
                 continue
             }
 
-            let newTurns = currentFuseState.turns - 1
+            guard let currentTurns = currentFuseState.turns else {
+                logger.error("Active fuse '\(fuseID)' has nil turns - this should never happen")
+                let removeChangeOnError = StateChange.removeActiveFuse(fuseID: fuseID)
+                try gameState.apply(removeChangeOnError)
+                continue
+            }
+
+            let newTurns = currentTurns - 1
 
             let updateChange = StateChange.updateFuseTurns(fuseID: fuseID, turns: newTurns)
             try gameState.apply(updateChange)
@@ -57,10 +62,13 @@ extension GameEngine {
                     continue
                 }
                 expiredFuseIDsToExecute.append(
-                    (
-                        id: fuseID, action: definition.action, definition: definition,
+                    FuseAction(
+                        id: fuseID,
+                        action: definition.action,
+                        definition: definition,
                         state: currentFuseState
-                    ))
+                    )
+                )
 
                 let removeChange = StateChange.removeActiveFuse(fuseID: fuseID)
                 try gameState.apply(removeChange)
@@ -77,7 +85,7 @@ extension GameEngine {
             if fuseToExecute.definition.repeats {
                 let newFuseState = FuseState(
                     turns: fuseToExecute.definition.initialTurns,
-                    state: fuseToExecute.state.dictionary
+                    payload: fuseToExecute.state.payload
                 )
                 let restartChange = StateChange.addActiveFuse(
                     fuseID: fuseToExecute.id,
@@ -90,8 +98,8 @@ extension GameEngine {
         }
 
         // --- Process Daemons ---
-        // Daemons are only checked against gameState.activeDaemons, no direct state change here.
-        for daemonID in gameState.activeDaemons {
+        // Iterate through active daemons and their states
+        for (daemonID, daemonState) in gameState.activeDaemons {
             // Get definition from registry
             guard let definition = daemons[daemonID] else {
                 logger.warning(
@@ -103,12 +111,48 @@ extension GameEngine {
             // Check if it's time for this daemon to run based on frequency
             // Skip execution on turn 0 and run only on turns where currentTurn % frequency == 0
             if currentTurn > 0 && currentTurn % definition.frequency == 0 {
-                // Execute the daemon's action
-                if let actionResult = try await definition.action(self) {
+                // Update execution tracking before running the daemon
+                let updatedStateForExecution = daemonState.incrementingExecution(
+                    currentTurn: currentTurn
+                )
+
+                // Execute the daemon's action with current state
+                let actionResult = try await definition.action(self, updatedStateForExecution)
+
+                // Check if the daemon explicitly updated its own state
+                let daemonExplicitlyUpdatedState =
+                    actionResult?.changes.contains { change in
+                        if case .updateDaemonState(let id, _) = change {
+                            return id == daemonID
+                        }
+                        return false
+                    } ?? false
+
+                // Process any action result
+                if let actionResult {
                     try await processActionResult(actionResult)
                 }
+
+                // If daemon didn't explicitly update its state, ensure execution tracking is applied
+                if !daemonExplicitlyUpdatedState {
+                    let updateChange = StateChange.updateDaemonState(
+                        daemonID: daemonID,
+                        daemonState: updatedStateForExecution
+                    )
+                    try gameState.apply(updateChange)
+                }
+
                 if shouldQuit || shouldRestart { return }
             }
         }
+    }
+}
+
+extension GameEngine {
+    struct FuseAction {
+        let id: FuseID
+        let action: @Sendable (GameEngine, FuseState) async throws -> ActionResult?
+        let definition: Fuse
+        let state: FuseState
     }
 }

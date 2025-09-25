@@ -23,7 +23,7 @@ struct ItemProxyTests {
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         // When
-        let proxy = try await engine.item("testItem")
+        let proxy = await engine.item("testItem")
 
         // Then
         #expect(proxy.id == "testItem")
@@ -44,19 +44,19 @@ struct ItemProxyTests {
 
         let game = MinimalGame(items: testItem)
         let (engine, _) = await GameEngine.test(blueprint: game)
-        let proxy = try await engine.item("testItem")
+        let proxy = await engine.item("testItem")
 
         // When/Then - Test basic property access
-        let name = try await proxy.property(.name)?.toString
+        let name = await proxy.property(.name)?.toString
         #expect(name == "test item")
 
-        let description = try await proxy.property(.description)?.toString
+        let description = await proxy.property(.description)?.toString
         #expect(description == "A test item.")
 
-        let isTakable = try await proxy.property(.isTakable)?.toBool
+        let isTakable = await proxy.property(.isTakable)?.toBool
         #expect(isTakable == true)
 
-        let isContainer = try await proxy.property(.isContainer)?.toBool
+        let isContainer = await proxy.property(.isContainer)?.toBool
         #expect(isContainer != true)  // nil or false
     }
 
@@ -82,9 +82,9 @@ struct ItemProxyTests {
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         // When
-        let proxy1a = try await engine.item("item1")
-        let proxy1b = try await engine.item("item1")
-        let proxy2 = try await engine.item("item2")
+        let proxy1a = await engine.item("item1")
+        let proxy1b = await engine.item("item1")
+        let proxy2 = await engine.item("item2")
 
         // Then
         #expect(proxy1a == proxy1b)

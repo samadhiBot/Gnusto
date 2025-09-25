@@ -26,42 +26,45 @@ struct AttackActionHandlerTests {
             output,
             """
             > attack the troll
-            You attack barehanded against his axe in what might be suicide
-            but the violence is already chosen.
+            With nothing but rage you rush the fearsome beast as his
+            gruesome ax gleams cold and ready for the blood you're
+            offering.
 
-            The monster has left himself wide open and completely
-            vulnerable to your attack.
+            The angry beast's defenses crumble! He stands exposed, unable
+            to protect himself.
 
-            The fearsome beast's retaliatory strike with his axe cuts
-            toward you but your body knows how to flow around death.
-
-            > attack the troll
-            Your fist finds nothing but air! The creature watches with
-            amusement, his ax at the ready.
-
-            In the exchange, his ax slips through to mark you--a stinging
-            reminder that the angry beast still has teeth. The wound is
-            trivial against your battle fury.
+            The angry monster strikes back with his axe but you've already
+            moved, a ghost that steel cannot touch.
 
             > attack the troll
-            The blow rocks the grotesque monster backward! He stumbles and
-            sways fighting desperately for balance.
+            Your blow bypasses his gruesome axe and lands true, the force
+            driving breath from the beast's lungs. The wound is real but
+            manageable.
 
-            The fearsome monster's retaliation with his axe sends you
-            stumbling like a drunk, with the world tilting at impossible
-            angles.
+            The grotesque monster whips his axe across in answer--steel
+            whispers against skin, leaving a thin signature of pain. The
+            cut registers dimly. Blood, but not enough to matter.
 
-            > attack the troll
-            Your blow bypasses his axe and lands true, the force driving
-            breath from the creature's lungs. The blow lands solidly,
-            drawing blood. He feels the sting but remains strong.
-
-            The monster's retaliation with his ax tears through your guard,
-            and in an instant you're completely exposed.
+            The troll says something, probably uncomplimentary, in his
+            guttural tongue.
 
             > attack the troll
-            The brutal exchange ends with your killing blow! The terrible
-            monster goes limp and crashes down, utterly still.
+            You slip inside the reach of his bloody axe and drive your
+            knuckles hard into the angry monster's body. You see the ripple
+            of pain, but his body absorbs it. He remains dangerous.
+
+            The beast's counter with his axe misses completely, the weapon
+            whistling through empty space.
+
+            > attack the troll
+            You land the decisive hit! The fearsome beast wavers for a
+            heartbeat, then collapses into permanent silence.
+
+            > attack the troll
+            You throw yourself at the beast despite his nicked axe because
+            sometimes fury must answer steel even when flesh cannot win.
+
+            You're too late--the fierce troll is already deceased.
             """
         )
     }
@@ -103,32 +106,34 @@ struct AttackActionHandlerTests {
             output,
             """
             > attack dragon with sword
-            Armed and hungry for violence, you strike with your steel sword
-            as the wyrm can only dodge and weave against the advantage of
-            sharpened metal.
+            You drive forward with your steel sword seeking its purpose as
+            the fierce creature meets you barehanded, flesh against steel
+            in the oldest gamble.
 
-            A disastrous miss--your steel sword cuts through empty air and
-            the terrible wyrm effortlessly evades your mistimed attack.
+            Your steel sword swings wide, and the wyrm avoids your poorly
+            aimed strike with ease.
 
-            The wyrm's brutal retaliation breaks through your defenses
-            completely, rendering you vulnerable as an opened shell.
-
-            > attack dragon with sword
-            Your blow with your steel sword catches the wyrm cleanly,
-            tearing flesh and drawing crimson. The blow lands solidly,
-            drawing blood. It feels the sting but remains strong.
-
-            Then the wyrm recovers and strikes true. Your jaw takes the
-            full force. Blood and fragments of teeth spray the air. First
-            blood draws a gasp. You touch the wound, fingers coming away
-            red.
+            The awesome creature counters with a force that shatters your
+            guard, leaving you exposed to whatever violence comes next.
 
             > attack dragon with sword
-            Your strike with your steel sword grazes the fierce wyrm,
-            drawing minimal blood. The strike lands, but doesn't slow it.
+            Direct hit with your steel sword! The creature sways
+            dangerously, unable to mount any defense while fighting to stay
+            upright.
 
-            The wyrm retaliates with raw force that rocks you hard, leaving
-            you stumbling through space that won't hold still.
+            The wyrm's lightning-fast counter strikes your wrist, causing
+            your steel sword to drop from shocked fingers.
+
+            > attack dragon with sword
+            You aren't holding the steel sword.
+
+            Your steel sword finds the fierce wyrm exposed, carving a solid
+            wound that draws a grunt of pain. The wound is real but
+            manageable.
+
+            Then the wyrm's strike hammers home with the sound of a mallet
+            on meat. Something structural fails inside you. First blood
+            draws a gasp. You touch the wound, fingers coming away red.
             """
         )
     }
@@ -159,30 +164,35 @@ struct AttackActionHandlerTests {
             output,
             """
             > fight the orc
-            No weapons needed as you attack with pure violence while the
-            warrior braces for the inevitable collision of flesh and bone.
+            You close the distance fast with fists ready as the angry
+            warrior mirrors your stance, both of you committed to finding
+            out who breaks first.
 
-            You catch the angry warrior with minimal force, the blow almost
-            gentle. The light wound barely seems to register.
+            Your punch connects lightly, leaving perhaps a small bruise. It
+            registers the wound with annoyance.
 
-            The warrior's brutal retaliation breaks through your defenses
-            completely, rendering you vulnerable as an opened shell.
-
-            > fight the orc
-            You catch the warrior with minimal force, the blow almost
-            gentle. The light wound barely seems to register.
-
-            In the exchange, the warrior lands clean. The world lurches as
-            your body absorbs punishment it won't soon forget. The blow
-            lands solidly, drawing blood. You feel the sting but remain
-            strong.
+            Then the angry warrior's strike hammers home with the sound of
+            a mallet on meat. Something structural fails inside you. First
+            blood draws a gasp. You touch the wound, fingers coming away
+            red.
 
             > fight the orc
-            The blow rocks the warrior backward! It stumbles and sways
-            fighting desperately for balance.
+            Your strike sends the warrior stumbling sideways! It sways
+            precariously, barely maintaining its footing.
 
-            The warrior's brutal retaliation breaks through your defenses
-            completely, rendering you vulnerable as an opened shell.
+            The warrior finishes you with nothing but flesh and bone,
+            proving that the oldest weapons still kill just as dead.
+
+            ****  You have died  ****
+
+            The curtain falls on this particular act of your existence. But
+            all good stories deserve another telling...
+
+            You scored 0 out of a possible 10 points, in 1 moves.
+
+            Would you like to RESTART, RESTORE a saved game, or QUIT?
+
+            >
             """
         )
     }
@@ -217,22 +227,19 @@ struct AttackActionHandlerTests {
             sneaky goblin braces for the inevitable collision of flesh and
             bone.
 
-            You land a punishing blow to the sneaky goblin, and it grunts
-            from the force. The blow lands solidly, drawing blood. It feels
-            the sting but remains strong.
+            You catch the sneaky goblin with minimal force, the blow almost
+            gentle. It registers the wound with annoyance.
 
-            In the scramble, the sneaky goblin throws a desperate hook that
-            barely connects, all motion and no mass. The graze is utterly
-            trivial. You barely register it happened.
+            The sneaky goblin's counter-punch goes wide, rage making the
+            strike clumsy and predictable.
 
             > hit the goblin
-            The brutal exchange ends with your killing blow! The sneaky
-            goblin goes limp and crashes down, utterly still.
+            Your final strike lands with devastating force! The sneaky
+            goblin drops to its knees, then pitches forward into death.
 
             > hit the goblin
-            No weapons needed as you attack with pure violence while the
-            sneaky goblin braces for the inevitable collision of flesh and
-            bone.
+            You charge with fists raised as the sneaky goblin meets you
+            halfway in what will be brutal and personal.
 
             You're too late--the sneaky goblin is already deceased.
             """
@@ -250,10 +257,7 @@ struct AttackActionHandlerTests {
             .in(.startRoom)
         )
 
-        let game = MinimalGame(
-            items: spider
-        )
-
+        let game = MinimalGame(items: spider)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // When
@@ -270,27 +274,25 @@ struct AttackActionHandlerTests {
             bone.
 
             You catch the giant spider with minimal force, the blow almost
-            gentle. The light wound barely seems to register.
+            gentle. It registers the wound with annoyance.
 
-            In the tangle, the giant spider drives an elbow home--sudden
-            pressure that blooms into dull pain. The wound is trivial
-            against your battle fury.
-
-            > kill the giant spider
-            You catch the giant spider with minimal force, the blow almost
-            gentle. The strike lands, but doesn't slow it.
-
-            In the tangle, the giant spider drives an elbow home--sudden
-            pressure that blooms into dull pain. The strike lands but
-            doesn't slow you. Not yet.
+            The giant spider's counter-punch goes wide, rage making the
+            strike clumsy and predictable.
 
             > kill the giant spider
-            You catch the giant spider with minimal force, the blow almost
-            gentle. The sting adds to its growing catalog of pain.
+            You drive your bare hands into the giant spider, feeling the
+            satisfying thud of impact. The wound is real but manageable.
 
-            In the scramble, the giant spider throws a desperate hook that
-            barely connects, all motion and no mass. The graze adds another
-            small discomfort to your growing list.
+            The giant spider swings in retaliation but you slip the attack,
+            flowing around the violence like water around stone.
+
+            > kill the giant spider
+            Your bare-handed assault leaves the giant spider momentarily
+            stunned. Blood seeps from the new wound.
+
+            The giant spider crashes forward in response, the impact
+            jarring but glancing as you roll with it. The cut registers
+            dimly. Blood, but not enough to matter.
             """
         )
     }
@@ -451,7 +453,7 @@ struct AttackActionHandlerTests {
             """
         )
 
-        let finalState = try await engine.item("rock")
+        let finalState = await engine.item("rock")
         #expect(await finalState.hasFlag(.isTouched) == true)
     }
 
@@ -483,13 +485,15 @@ struct AttackActionHandlerTests {
             output,
             """
             > attack the dragon
-            No weapons needed as you attack with pure violence while the
-            wyrm braces for the inevitable collision of flesh and bone.
+            You attack with nothing but will and bone as the fierce
+            creature meets your charge head-on, no weapons, no rules, no
+            mercy.
 
-            The terrible wyrm catches your fist, stopping your attack cold.
+            Your attack misses! Empty space is all you encounter while the
+            wyrm watches with amusement.
 
-            The creature's brutal retaliation breaks through your defenses
-            completely, rendering you vulnerable as an opened shell.
+            The awesome creature counters with a force that shatters your
+            guard, leaving you exposed to whatever violence comes next.
             """
         )
     }
@@ -528,16 +532,16 @@ struct AttackActionHandlerTests {
             output,
             """
             > attack the bandit with a stick
-            Armed and hungry for violence, you strike with your wooden
-            stick as the dangerous bandit can only dodge and weave against
-            the advantage of sharpened metal.
+            Your wooden stick cuts through air toward the dangerous bandit
+            who has no steel to answer yours, only the speed of
+            desperation.
 
-            The wooden stick wasn't designed for combat, but you wield it
-            against the dangerous bandit regardless!
+            You attack with the wooden stick! The dangerous bandit dodges,
+            more puzzled than threatened by your choice of weapon.
 
             In the tangle, the dangerous bandit drives an elbow
-            home--sudden pressure that blooms into dull pain. The wound is
-            trivial against your battle fury.
+            home--sudden pressure that blooms into dull pain. The cut
+            registers dimly. Blood, but not enough to matter.
             """
         )
     }
@@ -581,31 +585,29 @@ struct AttackActionHandlerTests {
             dagger as the evil monster can only dodge and weave against the
             advantage of sharpened metal.
 
-            Your strike with your sharp dagger grazes the evil monster,
-            drawing minimal blood. The light wound barely seems to
-            register.
+            The evil monster nimbly dodges and twists away from your sharp
+            dagger, using speed to compensate for being unarmed.
 
-            In the exchange, the evil monster lands clean. The world
-            lurches as your body absorbs punishment it won't soon forget.
-            The blow lands solidly, drawing blood. You feel the sting but
-            remain strong.
+            The evil monster's counter-strike punches through air, missing
+            by the width of good instincts.
 
             > attack the monster with my dagger
-            Your strike with your sharp dagger grazes the evil monster,
-            drawing minimal blood. The light wound barely seems to
-            register.
+            You nick the evil monster with your sharp dagger, the weapon
+            barely breaking skin. It notes the minor damage and dismisses
+            it.
 
-            The evil monster's lightning-fast counter strikes your wrist,
-            causing your sharp dagger to drop from shocked fingers.
+            In the tangle, the evil monster drives an elbow home--sudden
+            pressure that blooms into dull pain. The cut registers dimly.
+            Blood, but not enough to matter.
 
             > attack the monster with my dagger
-            You aren't holding the sharp dagger.
+            Your sharp dagger swings wide, and the evil monster avoids your
+            poorly aimed strike with ease.
 
-            Your strike with your sharp dagger grazes the evil monster,
-            drawing minimal blood. The strike lands, but doesn't slow it.
-
-            The evil monster retaliates with raw force that rocks you hard,
-            leaving you stumbling through space that won't hold still.
+            The evil monster pivots and strikes true--impact ripples
+            through muscle and bone, stealing balance and breath together.
+            You absorb the hit, feeling flesh tear but knowing you can
+            endure.
             """
         )
     }
@@ -659,13 +661,11 @@ struct AttackActionHandlerTests {
             you'd better use this advantage.
 
             > attack the monster with my dagger
-            Your blow with your sharp dagger catches the evil monster
-            cleanly, tearing flesh and drawing crimson. The blow lands
-            solidly, drawing blood. It feels the sting but remains strong.
+            Your strike with your sharp dagger grazes the evil monster,
+            drawing minimal blood. It registers the wound with annoyance.
 
-            In the tangle, the evil monster drives an elbow home--sudden
-            pressure that blooms into dull pain. The wound is trivial
-            against your battle fury.
+            The evil monster's counter-punch goes wide, rage making the
+            strike clumsy and predictable.
             """
         )
     }
@@ -709,30 +709,29 @@ struct AttackActionHandlerTests {
             dagger as the evil monster can only dodge and weave against the
             advantage of sharpened metal.
 
-            Your strike with your sharp dagger grazes the evil monster,
-            drawing minimal blood. The light wound barely seems to
-            register.
+            The evil monster nimbly dodges and twists away from your sharp
+            dagger, using speed to compensate for being unarmed.
 
-            In the exchange, the evil monster lands clean. The world
-            lurches as your body absorbs punishment it won't soon forget.
-            The blow lands solidly, drawing blood. You feel the sting but
-            remain strong.
+            The evil monster's counter-strike punches through air, missing
+            by the width of good instincts.
 
             > stab the monster
-            Your strike with your sharp dagger grazes the evil monster,
-            drawing minimal blood. The light wound barely seems to
-            register.
+            You nick the evil monster with your sharp dagger, the weapon
+            barely breaking skin. It notes the minor damage and dismisses
+            it.
 
-            The evil monster's lightning-fast counter strikes your wrist,
-            causing your sharp dagger to drop from shocked fingers.
+            In the tangle, the evil monster drives an elbow home--sudden
+            pressure that blooms into dull pain. The cut registers dimly.
+            Blood, but not enough to matter.
 
             > stab the monster
-            You aren't holding the sharp dagger.
+            Your sharp dagger swings wide, and the evil monster avoids your
+            poorly aimed strike with ease.
 
-            The evil monster catches your fist, stopping your attack cold.
-
-            The evil monster retaliates with raw force that rocks you hard,
-            leaving you stumbling through space that won't hold still.
+            The evil monster pivots and strikes true--impact ripples
+            through muscle and bone, stealing balance and breath together.
+            You absorb the hit, feeling flesh tear but knowing you can
+            endure.
             """
         )
     }

@@ -39,37 +39,35 @@ public struct ClimbActionHandler: ActionHandler {
             throw ActionResponse.doWhat(context)
         }
 
-        let currentLocation = try await context.player.location
+        let currentLocation = await context.player.location
 
         // Check if this object enables traversal of any exit in the current location
-        let sortedExits = try await currentLocation.exits.sorted { $0.direction < $1.direction }
+        let sortedExits = await currentLocation.exits.sorted { $0.direction < $1.direction }
 
-        for exit in sortedExits {
-            // Check if object enables traversal in this direction
-            if exit.doorID == targetItem.id {
-                // For global objects like stairs, verify they're actually present
-                if try await targetItem.parent == .nowhere,
-                   try await currentLocation.localGlobals.contains(targetItem.id) == false
-                {
-                    throw ActionResponse.itemNotAccessible(targetItem)
-                }
-
-                // Execute movement in the appropriate direction
-                let goResult = try await GoActionHandler().process(
-                    context: ActionContext(
-                        Command(verb: .go, direction: exit.direction),
-                        context.engine
-                    )
-                )
-
-                // Combine state changes from climb (touch/pronouns) with go result
-                return try await ActionResult(
-                    message: goResult.message,
-                    changes: [
-                        targetItem.setFlag(.isTouched)
-                    ] + goResult.changes
-                )
+        // Check if object enables traversal in this direction
+        for exit in sortedExits where exit.doorID == targetItem.id {
+            // For global objects like stairs, verify they're actually present
+            if await targetItem.parent == .nowhere,
+               await currentLocation.localGlobals.contains(targetItem.id) == false
+            {
+                throw ActionResponse.itemNotAccessible(targetItem)
             }
+
+            // Execute movement in the appropriate direction
+            let goResult = try await GoActionHandler().process(
+                context: ActionContext(
+                    Command(verb: .go, direction: exit.direction),
+                    context.engine
+                )
+            )
+
+            // Combine state changes from climb (touch/pronouns) with go result
+            return await ActionResult(
+                message: goResult.message,
+                changes: [
+                    targetItem.setFlag(.isTouched)
+                ] + goResult.changes
+            )
         }
 
         // No exit uses this object, so handle as regular climbing
@@ -87,7 +85,7 @@ public struct ClimbActionHandler: ActionHandler {
                 )
             }
 
-        return try await ActionResult(
+        return await ActionResult(
             message,
             targetItem.setFlag(.isTouched)
         )

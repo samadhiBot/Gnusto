@@ -91,7 +91,7 @@ extension GameEngine {
             player: blueprint.player,
             pronoun: nil,
             activeFuses: [:],
-            activeDaemons: [],
+            activeDaemons: [:],
             globalState: [:]
         )
 

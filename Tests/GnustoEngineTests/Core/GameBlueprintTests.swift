@@ -74,32 +74,29 @@ struct GameBlueprintTests {
         ]
 
         let fuses = [
-            FuseID("testFuse"): Fuse(
-                initialTurns: 5,
-                action: { _, _ in ActionResult("Fuse triggered!") }
-            )
+            "testFuse": Fuse(
+                initialTurns: 5
+            )                { _, _ in ActionResult("Fuse triggered!") },
         ]
 
         let daemons = [
-            DaemonID("testDaemon"): Daemon(
-                action: { _ in ActionResult("Daemon running!") }
-            )
+            DaemonID("testDaemon"): Daemon                { _, _ in ActionResult("Daemon running!") }
         ]
 
         let itemComputers = [
             ItemID("testSword"): ItemComputer(for: ItemID("testSword")) {
-                itemProperty(ItemPropertyID.description) { context in
-                    return .string("A dynamically computed description")
+                itemProperty(ItemPropertyID.description) { _ in
+                    .string("A dynamically computed description")
                 }
-            }
+            },
         ]
 
         let locationComputers = [
             LocationID("entrance"): LocationComputer(for: LocationID("entrance")) {
-                locationProperty(.description) { context in
-                    return .string("A dynamically computed location description")
+                locationProperty(.description) { _ in
+                    .string("A dynamically computed location description")
                 }
-            }
+            },
         ]
 
         let messenger = TestMessenger()
@@ -199,7 +196,7 @@ struct GameBlueprintTests {
         let blueprint = CompleteGameBlueprint()
 
         #expect(blueprint.fuses.count == 1)
-        #expect(blueprint.fuses[FuseID("testFuse")] != nil)
+        #expect(blueprint.fuses["testFuse"] != nil)
 
         #expect(blueprint.daemons.count == 1)
         #expect(blueprint.daemons[DaemonID("testDaemon")] != nil)
@@ -303,7 +300,7 @@ struct GameBlueprintTests {
         let itemComputer = blueprint.itemComputers[ItemID("testSword")]
         #expect(itemComputer != nil)
 
-        let computedDescription = try await itemComputer?.compute(
+        let computedDescription = await itemComputer?.compute(
             ItemComputeContext(
                 propertyID: .description,
                 item: gameState.items[ItemID("testSword")]!,
@@ -312,7 +309,7 @@ struct GameBlueprintTests {
         )
         #expect(computedDescription == .string("A dynamically computed description"))
 
-        let nonComputedProperty = try await itemComputer?.compute(
+        let nonComputedProperty = await itemComputer?.compute(
             ItemComputeContext(
                 propertyID: .name,
                 item: gameState.items[ItemID("testSword")]!,
@@ -325,7 +322,7 @@ struct GameBlueprintTests {
         let locationComputer = blueprint.locationComputers[LocationID("entrance")]
         #expect(locationComputer != nil)
 
-        let computedLocationDescription = try await locationComputer?.compute(
+        let computedLocationDescription = await locationComputer?.compute(
             LocationComputeContext(
                 propertyID: .description,
                 location: gameState.locations[LocationID("entrance")]!,
@@ -336,7 +333,7 @@ struct GameBlueprintTests {
             computedLocationDescription == .string("A dynamically computed location description")
         )
 
-        let nonComputedLocationProperty = try await locationComputer?.compute(
+        let nonComputedLocationProperty = await locationComputer?.compute(
             LocationComputeContext(
                 propertyID: .name,
                 location: gameState.locations[LocationID("entrance")]!,
@@ -353,15 +350,15 @@ struct GameBlueprintTests {
         let blueprint = MinimalGameBlueprint()
 
         // All collections should be empty and non-nil
-        #expect(blueprint.items.count == 0)
-        #expect(blueprint.locations.count == 0)
-        #expect(blueprint.customActionHandlers.count == 0)
-        #expect(blueprint.itemEventHandlers.count == 0)
-        #expect(blueprint.locationEventHandlers.count == 0)
-        #expect(blueprint.fuses.count == 0)
-        #expect(blueprint.daemons.count == 0)
-        #expect(blueprint.itemComputers.count == 0)
-        #expect(blueprint.locationComputers.count == 0)
+        #expect(blueprint.items.isEmpty)
+        #expect(blueprint.locations.isEmpty)
+        #expect(blueprint.customActionHandlers.isEmpty)
+        #expect(blueprint.itemEventHandlers.isEmpty)
+        #expect(blueprint.locationEventHandlers.isEmpty)
+        #expect(blueprint.fuses.isEmpty)
+        #expect(blueprint.daemons.isEmpty)
+        #expect(blueprint.itemComputers.isEmpty)
+        #expect(blueprint.locationComputers.isEmpty)
     }
 
     @Test("GameBlueprint properties are accessible")
@@ -404,7 +401,7 @@ struct TestCustomActionHandler: ActionHandler {
 /// Test ItemEventHandler for testing item event handlers
 struct TestItemEventHandler {
     func createHandler() -> ItemEventHandler {
-        ItemEventHandler { engine, event in
+        ItemEventHandler { _, _ in
             ActionResult("Test item event handled")
         }
     }
@@ -413,7 +410,7 @@ struct TestItemEventHandler {
 /// Test LocationEventHandler for testing location event handlers
 struct TestLocationEventHandler {
     func createHandler() -> LocationEventHandler {
-        LocationEventHandler { engine, event in
+        LocationEventHandler { _, _ in
             ActionResult("Test location event handled")
         }
     }
@@ -421,8 +418,8 @@ struct TestLocationEventHandler {
 
 /// Test MessageProvider for testing custom message providers
 class TestMessenger: StandardMessenger, @unchecked Sendable {
-    override func anySomething(_ text: String) -> String {
-        "Custom: Cannot see any \(text) here."
+    override func anySuchThing() -> String {
+        "Custom: Cannot see any such thing in these parts."
     }
 }
 

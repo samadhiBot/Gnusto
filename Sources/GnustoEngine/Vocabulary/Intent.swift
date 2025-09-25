@@ -15,156 +15,32 @@ public typealias ActionID = Intent
 /// For example, both "LIGHT LAMP" and "TURN ON LAMP" might represent the `.lightSource` action,
 /// while "EXTINGUISH LAMP", "TURN OFF LAMP", and "DOUSE LAMP" might all represent the `.extinguish` action.
 public enum Intent: String, CaseIterable, Sendable, Codable {
-    // MARK: - Movement & Navigation
-
-    /// Moving from one location to another
-    case move
-
-    /// Entering a location or container
-    case enter
-
-    /// Looking around or examining something
-    case examine
-
-    /// Looking around the current location
-    case look
-
-    // MARK: - Object Manipulation
-
-    /// Taking or picking up an object
-    case take
-
-    /// Dropping or putting down an object
-    case drop
-
-    /// Putting an object inside a container
-    case insert
-
-    /// Removing an object from a container
-    case remove
-
-    /// Opening a container, door, or similar object
-    case open
-
-    /// Closing a container, door, or similar object
-    case close
-
-    // MARK: - Light & Power
-
-    /// Activating a light source or powering something on
-    case lightSource
-
-    /// Extinguishing a light source or powering something off
-    case extinguish
-
-    // MARK: - Physical Actions
-
-    /// Attempting to inflict irreversible destruction or damage on something
-    case mung
-
-    /// Pushing, moving, or physically manipulating an object
-    case push
-
-    /// Pulling an object
-    case pull
-
-    /// Turning or rotating an object
-    case turn
-
-    /// Climbing on or mounting something
-    case climb
-
-    /// Attacking or striking something
-    case attack
-
-    /// Defending from an attack
-    case defend
-
-    // MARK: - Communication & Information
+    /// Throwing an object
+    case `throw`
 
     /// Asking someone about something
     case ask
 
-    /// Telling someone something
-    case tell
+    /// Attacking or striking something
+    case attack
 
-    /// Reading text or examining written material
-    case read
+    /// Burning something
+    case burn
 
-    /// Listening to sounds
-    case listen
+    /// Climbing on or mounting something
+    case climb
 
-    // MARK: - Game Meta Actions
-
-    /// Checking inventory
-    case inventory
-
-    /// Getting help or instructions
-    case help
-
-    /// Saving the game
-    case save
-
-    /// Restoring a saved game
-    case restore
-
-    /// Quitting the game
-    case quit
-
-    /// Restarting the game
-    case restart
-
-    /// Waiting or passing time
-    case wait
-
-    /// Any meta action
-    case meta
-
-    // MARK: - Sensory Actions
-
-    /// Touching or feeling an object
-    case touch
-
-    /// Smelling something
-    case smell
-
-    /// Tasting something
-    case taste
-
-    // MARK: - Complex Actions
-
-    /// Giving an object to someone
-    case give
-
-    /// Wearing or putting on clothing/equipment
-    case wear
-
-    /// Locking something with a key
-    case lock
-
-    /// Unlocking something with a key
-    case unlock
-
-    /// Filling a container with liquid
-    case fill
-
-    /// Emptying a container
-    case empty
-
-    /// Pouring liquid from one container to another
-    case pour
-
-    /// Throwing an object
-    case `throw`
+    /// Closing a container, door, or similar object
+    case close
 
     /// Cutting or slicing something
     case cut
 
-    /// Tying something
-    case tie
+    /// Debug-related actions (development only)
+    case debug
 
-    /// Burning something
-    case burn
+    /// Defending from an attack
+    case defend
 
     /// Digging
     case dig
@@ -172,17 +48,92 @@ public enum Intent: String, CaseIterable, Sendable, Codable {
     /// Drinking something
     case drink
 
+    /// Dropping or putting down an object
+    case drop
+
     /// Eating something
     case eat
+
+    /// Emptying a container
+    case empty
+
+    /// Entering a location or container
+    case enter
+
+    /// Looking around or examining something
+    case examine
+
+    /// Extinguishing a light source or powering something off
+    case extinguish
+
+    /// Filling a container with liquid
+    case fill
+
+    /// Giving an object to someone
+    case give
+
+    /// Getting help or instructions
+    case help
+
+    /// Putting an object inside a container
+    case insert
+
+    /// Checking inventory
+    case inventory
 
     /// Jumping
     case jump
 
-    /// Swimming
-    case swim
+    /// Activating a light source or powering something on
+    case lightSource
 
-    /// Thinking about something
-    case think
+    /// Listening to sounds
+    case listen
+
+    /// Locking something with a key
+    case lock
+
+    /// Looking around the current location
+    case look
+
+    /// Any meta action
+    case meta
+
+    /// Moving from one location to another
+    case move
+
+    /// Attempting to inflict irreversible destruction or damage on something
+    case mung
+
+    /// Opening a container, door, or similar object
+    case open
+
+    /// Pouring liquid from one container to another
+    case pour
+
+    /// Pulling an object
+    case pull
+
+    /// Pushing, moving, or physically manipulating an object
+    case push
+
+    /// Quitting the game
+    case quit
+
+    /// Reading text or examining written material
+    case read
+
+    /// Removing an object from a container
+    case remove
+
+    /// Restarting the game
+    case restart
+
+    /// Restoring a saved game
+    case restore
+
+    /// Saving the game
+    case save
 
     /// Searching for something
     case search
@@ -190,6 +141,39 @@ public enum Intent: String, CaseIterable, Sendable, Codable {
     /// Sitting down or positioning oneself
     case sit
 
-    /// Debug-related actions (development only)
-    case debug
+    /// Smelling something
+    case smell
+
+    /// Swimming
+    case swim
+
+    /// Taking or picking up an object
+    case take
+
+    /// Tasting something
+    case taste
+
+    /// Telling someone something
+    case tell
+
+    /// Thinking about something
+    case think
+
+    /// Tying something
+    case tie
+
+    /// Touching or feeling an object
+    case touch
+
+    /// Turning or rotating an object
+    case turn
+
+    /// Unlocking something with a key
+    case unlock
+
+    /// Waiting or passing time
+    case wait
+
+    /// Wearing or putting on clothing/equipment
+    case wear
 }

@@ -48,11 +48,11 @@ struct EmptyActionHandlerTests {
             """
         )
 
-        let finalBoxState = try await engine.item("box")
-        let finalCoinState = try await engine.item("coin")
-        let startRoom = try await engine.location(.startRoom)
+        let finalBoxState = await engine.item("box")
+        let finalCoinState = await engine.item("coin")
+        let startRoom = await engine.location(.startRoom)
         #expect(await finalBoxState.hasFlag(.isTouched) == true)
-        #expect(try await finalCoinState.parent == .location(startRoom))
+        #expect(await finalCoinState.parent == .location(startRoom))
     }
 
     @Test("EMPTY DIRECTOBJECT INTO INDIRECTOBJECT syntax works")
@@ -106,8 +106,8 @@ struct EmptyActionHandlerTests {
             """
         )
 
-        let finalGemState = try await engine.item("gem")
-        #expect(try await finalGemState.parent == .item(basket.proxy(engine)))
+        let finalGemState = await engine.item("gem")
+        #expect(await finalGemState.parent == .item(basket.proxy(engine)))
     }
 
     @Test("EMPTY OUT DIRECTOBJECT syntax works")
@@ -150,9 +150,9 @@ struct EmptyActionHandlerTests {
             """
         )
 
-        let finalKeyState = try await engine.item("key")
-        let startRoom = try await engine.location(.startRoom)
-        #expect(try await finalKeyState.parent == .location(startRoom))
+        let finalKeyState = await engine.item("key")
+        let startRoom = await engine.location(.startRoom)
+        #expect(await finalKeyState.parent == .location(startRoom))
     }
 
     @Test("DUMP syntax works")
@@ -546,13 +546,13 @@ struct EmptyActionHandlerTests {
         )
 
         // Verify all items moved to room
-        let finalBookState = try await engine.item("book")
-        let finalScrollState = try await engine.item("scroll")
-        let finalQuillState = try await engine.item("quill")
-        let startRoom = try await engine.location(.startRoom)
-        #expect(try await finalBookState.parent == .location(startRoom))
-        #expect(try await finalScrollState.parent == .location(startRoom))
-        #expect(try await finalQuillState.parent == .location(startRoom))
+        let finalBookState = await engine.item("book")
+        let finalScrollState = await engine.item("scroll")
+        let finalQuillState = await engine.item("quill")
+        let startRoom = await engine.location(.startRoom)
+        #expect(await finalBookState.parent == .location(startRoom))
+        #expect(await finalScrollState.parent == .location(startRoom))
+        #expect(await finalQuillState.parent == .location(startRoom))
     }
 
     @Test("Empty container held by player")
@@ -596,11 +596,11 @@ struct EmptyActionHandlerTests {
             """
         )
 
-        let finalPouchState = try await engine.item("pouch")
-        let finalRingState = try await engine.item("ring")
-        let startRoom = try await engine.location(.startRoom)
-        #expect(try await finalPouchState.playerIsHolding)  // Pouch still held
-        #expect(try await finalRingState.parent == .location(startRoom))  // Ring dumped to room
+        let finalPouchState = await engine.item("pouch")
+        let finalRingState = await engine.item("ring")
+        let startRoom = await engine.location(.startRoom)
+        #expect(await finalPouchState.playerIsHolding)  // Pouch still held
+        #expect(await finalRingState.parent == .location(startRoom))  // Ring dumped to room
     }
 
     @Test("Empty sets touched flag on container")
@@ -634,11 +634,11 @@ struct EmptyActionHandlerTests {
         try await engine.execute("empty jar")
 
         // Then: Verify state changes
-        let finalJarState = try await engine.item("jar")
-        let finalMarbleState = try await engine.item("marble")
-        let startRoom = try await engine.location(.startRoom)
+        let finalJarState = await engine.item("jar")
+        let finalMarbleState = await engine.item("marble")
+        let startRoom = await engine.location(.startRoom)
         #expect(await finalJarState.hasFlag(.isTouched) == true)
-        #expect(try await finalMarbleState.parent == .location(startRoom))
+        #expect(await finalMarbleState.parent == .location(startRoom))
 
         // Verify message
         let output = await mockIO.flush()

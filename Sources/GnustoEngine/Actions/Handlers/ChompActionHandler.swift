@@ -48,7 +48,7 @@ public struct ChompActionHandler: ActionHandler {
                 )
         }
 
-        return try await ActionResult(
+        return await ActionResult(
             item.response(
                 object: context.msg.chompItem,
                 character: context.msg.chompCharacter,

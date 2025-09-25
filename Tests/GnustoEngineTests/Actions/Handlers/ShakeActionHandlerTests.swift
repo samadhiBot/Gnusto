@@ -39,7 +39,7 @@ struct ShakeActionHandlerTests {
             """
         )
 
-        let finalState = try await engine.item("bottle")
+        let finalState = await engine.item("bottle")
         #expect(await finalState.hasFlag(.isTouched) == true)
     }
 
@@ -237,14 +237,14 @@ struct ShakeActionHandlerTests {
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         // Verify initial state
-        let initialState = try await engine.item("bell")
+        let initialState = await engine.item("bell")
         #expect(await initialState.hasFlag(.isTouched) == false)
 
         // When
         try await engine.execute("shake bell")
 
         // Then
-        let finalState = try await engine.item("bell")
+        let finalState = await engine.item("bell")
         #expect(await finalState.hasFlag(.isTouched) == true)
     }
 
@@ -292,8 +292,8 @@ struct ShakeActionHandlerTests {
             """
         )
 
-        let box1State = try await engine.item("box1")
-        let box2State = try await engine.item("box2")
+        let box1State = await engine.item("box1")
+        let box2State = await engine.item("box2")
         #expect(await box1State.hasFlag(.isTouched) == true)
         #expect(await box2State.hasFlag(.isTouched) == true)
     }

@@ -342,7 +342,7 @@ struct DigActionHandlerTests {
         )
 
         // Verify .isTouched flag was set
-        let finalMound = try await engine.item("mound")
+        let finalMound = await engine.item("mound")
         #expect(await finalMound.hasFlag(.isTouched) == true)
     }
 
@@ -382,7 +382,7 @@ struct DigActionHandlerTests {
         )
 
         // Verify .isTouched flag was set
-        let finalMound = try await engine.item("mound")
+        let finalMound = await engine.item("mound")
         #expect(await finalMound.hasFlag(.isTouched) == true)
     }
 
@@ -422,7 +422,7 @@ struct DigActionHandlerTests {
         )
 
         // Verify .isTouched flag was set
-        let finalMound = try await engine.item("mound")
+        let finalMound = await engine.item("mound")
         #expect(await finalMound.hasFlag(.isTouched) == true)
     }
 
@@ -446,7 +446,7 @@ struct DigActionHandlerTests {
     }
 
     @Test("Cannot dig with universal object as tool")
-    func testCannotDigWithUniversalObjectAsTool() async throws {
+    func testCannotDigWithUniversalAsTool() async throws {
         let mound = Item(
             id: "mound",
             .name("dirt mound"),
@@ -473,7 +473,7 @@ struct DigActionHandlerTests {
     }
 
     @Test("Cannot dig unsupported universal object")
-    func testCannotDigUnsupportedUniversalObject() async throws {
+    func testCannotDigUnsupportedUniversal() async throws {
         let game = MinimalGame()
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
@@ -534,7 +534,7 @@ struct DigActionHandlerTests {
         )
 
         // Verify .isTouched flag was set
-        let finalMound = try await engine.item("mound")
+        let finalMound = await engine.item("mound")
         #expect(await finalMound.hasFlag(.isTouched) == true)
     }
 

@@ -24,7 +24,7 @@ public struct BriefActionHandler: ActionHandler {
     /// Sets the game to brief mode, where location descriptions are only shown
     /// when entering a location for the first time or when explicitly looking.
     public func process(context: ActionContext) async throws -> ActionResult {
-        return await ActionResult(
+        await ActionResult(
             context.msg.briefMode(),
             context.engine.clearFlag(.isVerboseMode)
         )

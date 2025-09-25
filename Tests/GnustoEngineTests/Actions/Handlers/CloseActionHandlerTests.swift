@@ -39,7 +39,7 @@ struct CloseActionHandlerTests {
             """
         )
 
-        let finalState = try await engine.item("chest")
+        let finalState = await engine.item("chest")
         #expect(await finalState.hasFlag(.isOpen) == false)
         #expect(await finalState.hasFlag(.isTouched) == true)
     }
@@ -241,7 +241,7 @@ struct CloseActionHandlerTests {
             """
         )
 
-        let finalState = try await engine.item("box")
+        let finalState = await engine.item("box")
         #expect(await finalState.hasFlag(.isOpen) == false)
         #expect(await finalState.hasFlag(.isTouched) == true)
     }
@@ -277,7 +277,7 @@ struct CloseActionHandlerTests {
             """
         )
 
-        let finalState = try await engine.item("closedChest")
+        let finalState = await engine.item("closedChest")
         #expect(await finalState.hasFlag(.isOpen) == false)
     }
 
@@ -303,7 +303,7 @@ struct CloseActionHandlerTests {
         try await engine.execute("close container")
 
         // Then
-        let finalState = try await engine.item("container")
+        let finalState = await engine.item("container")
         #expect(await finalState.hasFlag(.isTouched) == true)
     }
 

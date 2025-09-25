@@ -31,7 +31,7 @@ public struct SqueezeActionHandler: ActionHandler {
             throw ActionResponse.doWhat(context)
         }
 
-        return try await ActionResult(
+        return await ActionResult(
             item.response(
                 object: { context.msg.squeezeObject(context.command, item: $0) },
                 character: { context.msg.squeezeCharacter(context.command, character: $0) },

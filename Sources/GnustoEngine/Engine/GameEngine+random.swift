@@ -12,18 +12,23 @@ extension GameEngine {
         Double.random(in: 0.0..<1.0, using: &randomNumberGenerator)
     }
 
-    /// Generates a random Boolean value based on the specified percentage chance.
+    /// Returns a random element from the given collection.
     ///
-    /// This method provides a convenient way to perform percentage-based probability checks.
-    /// For example, passing 75 as the chance parameter gives a 75% probability of returning true.
+    /// This method provides a convenient way to select a random element from any collection
+    /// using the engine's seeded random number generator, ensuring reproducible randomness
+    /// across game sessions.
     ///
-    /// - Parameter chance: The percentage chance (0-100) of returning true.
-    ///   0 means never true, 100 means always true.
-    /// - Returns: True if the random roll succeeds based on the given percentage, false otherwise.
-    /// - Precondition: chance must be between 0 and 100 (inclusive).
-    public func randomPercentage(chance: Int) -> Bool {
-        assert(chance >= 0 && chance <= 100, "Chance must be between 0 and 100")
-        return Int.random(in: 0...100, using: &randomNumberGenerator) <= chance
+    /// - Parameter collection: The collection to select a random element from.
+    /// - Returns: A random element from the collection.
+    /// - Throws: `ActionResponse.internalEngineError` if the collection is empty.
+    public func randomElement<T: Comparable>(in collection: some Collection<T>) -> T? {
+        switch collection.count {
+        case 0: return nil
+        case 1: return collection.first
+        default:
+            let index = randomInt(in: 0...collection.count - 1)
+            return collection.sorted()[index]
+        }
     }
 
     /// Generates a random integer within the specified range.
@@ -36,23 +41,18 @@ extension GameEngine {
         Int.random(in: range, using: &randomNumberGenerator)
     }
 
-    /// Returns a random element from the given collection.
+    /// Generates a random Boolean value based on the specified percentage chance.
     ///
-    /// This method provides a convenient way to select a random element from any collection
-    /// using the engine's seeded random number generator, ensuring reproducible randomness
-    /// across game sessions.
+    /// This method provides a convenient way to perform percentage-based probability checks.
+    /// For example, passing 75 as the chance parameter gives a 75% probability of returning true.
     ///
-    /// The implementation uses direct calls to `randomNumberGenerator.next()` and modulo
-    /// arithmetic to avoid actor isolation issues with inout references.
-    ///
-    /// - Parameter collection: The collection to select a random element from.
-    /// - Returns: A random element from the collection.
-    /// - Throws: `ActionResponse.internalEngineError` if the collection is empty.
-    public func randomElement<T>(in collection: some Collection<T>) -> T? {
-        guard collection.isNotEmpty else { return nil }
-        let randomValue = randomNumberGenerator.next()
-        let randomIndex = Int(randomValue % UInt64(collection.count))
-        return collection[collection.index(collection.startIndex, offsetBy: randomIndex)]
+    /// - Parameter chance: The percentage chance (0-100) of returning true.
+    ///   0 means never true, 100 means always true.
+    /// - Returns: True if the random roll succeeds based on the given percentage, false otherwise.
+    /// - Precondition: chance must be between 0 and 100 (inclusive).
+    public func randomPercentage(chance: Int) -> Bool {
+        assert(chance >= 0 && chance <= 100, "Chance must be between 0 and 100")
+        return Int.random(in: 0...100, using: &randomNumberGenerator) <= chance
     }
 
     /// Rolls a 10-sided die and checks if it meets or exceeds the threshold.

@@ -194,7 +194,7 @@ public struct VocabularyEnhancer: Sendable, Equatable {
             scheme: .lexicalClass,
             options: options
         ) { tag, tokenRange in
-            guard let tag = tag,
+            guard let tag,
                 tag == .noun,
                 synonyms.count < configuration.maxSynonyms
             else {

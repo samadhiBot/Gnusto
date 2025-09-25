@@ -35,7 +35,7 @@ struct StandardCombatSystemUnitTests {
     }
 
     func attackContext(for engine: GameEngine) async throws -> ActionContext {
-        let command = try await Command(
+        let command = await Command(
             verb: .attack,
             directObject: .item(Lab.troll.proxy(engine))
         )
@@ -57,13 +57,12 @@ struct StandardCombatSystemUnitTests {
         expectNoDifference(
             result.message,
             """
-            Your blow with your iron sword catches the beast cleanly,
-            tearing flesh and drawing crimson. The blow lands solidly, drawing blood. He
+            Your iron sword bites deep into the beast, inflicting damage
+            that shows immediately. The blow lands solidly, drawing blood. He
             feels the sting but remains strong.
 
-            In the exchange, the monster lands clean. The world lurches
-            as your body absorbs punishment it won't soon forget. The blow lands solidly, \
-            drawing blood. You feel the sting but remain strong.
+            The angry beast hammers back instantly--the blow lands solid,
+            driving air from lungs and thought from mind. The blow lands solidly, drawing blood. You feel the sting but remain strong.
             """
         )
         expectNoDifference(result.changes.count, 3)
@@ -82,13 +81,12 @@ struct StandardCombatSystemUnitTests {
         expectNoDifference(
             result.message,
             """
-            Your blow with your iron sword catches the beast cleanly,
-            tearing flesh and drawing crimson. The blow lands solidly, drawing blood. He
+            Your iron sword bites deep into the beast, inflicting damage
+            that shows immediately. The blow lands solidly, drawing blood. He
             feels the sting but remains strong.
 
-            In the exchange, the monster lands clean. The world lurches
-            as your body absorbs punishment it won't soon forget. The blow lands solidly, \
-            drawing blood. You feel the sting but remain strong.
+            The angry beast hammers back instantly--the blow lands solid,
+            driving air from lungs and thought from mind. The blow lands solidly, drawing blood. You feel the sting but remain strong.
             """
         )
         expectNoDifference(result.changes.count, 3)
@@ -100,7 +98,7 @@ struct StandardCombatSystemUnitTests {
     func testDetermineEnemyActionBasic() async throws {
         let (engine, _) = await createTestGame()
         let combatSystem = StandardCombatSystem(versus: "troll")
-        let troll = try await engine.item("troll")
+        let troll = await engine.item("troll")
         let playerAction = PlayerAction.attack
         let enemyEvent = try await combatSystem.determineEnemyAction(
             against: playerAction,
@@ -117,7 +115,7 @@ struct StandardCombatSystemUnitTests {
     @Test("determineEnemyAction handles unconscious enemy")
     func testDetermineEnemyActionUnconsciousEnemy() async throws {
         let (engine, _) = await createTestGame()
-        let troll = try await engine.item("troll")
+        let troll = await engine.item("troll")
 
         // Make troll unconscious
         try await engine.apply(
@@ -142,8 +140,8 @@ struct StandardCombatSystemUnitTests {
     func testSelectTaunt() async throws {
         let (engine, _) = await createTestGame()
         let combatSystem = StandardCombatSystem(versus: "troll")
-        let troll = try await engine.item("troll")
-        let tauntEvent = try await combatSystem.selectTaunt(
+        let troll = await engine.item("troll")
+        let tauntEvent = await combatSystem.selectTaunt(
             from: troll,
             in: CombatTurn(
                 playerEvent: .enemyMissed(enemy: troll, playerWeapon: nil, enemyWeapon: nil),
@@ -156,7 +154,10 @@ struct StandardCombatSystemUnitTests {
             tauntEvent,
             .enemyTaunts(
                 enemy: troll,
-                message: "The troll laughs at your puny gesture."
+                message: """
+                    The troll spits in your face, grunting "Better luck next time"
+                    in a rather barbarous accent.
+                    """
             )
         )
     }
@@ -167,8 +168,8 @@ struct StandardCombatSystemUnitTests {
     func testPlayerCombatEventAttack() async throws {
         let (engine, _) = await createTestGame()
         let combatSystem = StandardCombatSystem(versus: "troll")
-        let troll = try await engine.item("troll")
-        let sword = try await engine.item("sword")
+        let troll = await engine.item("troll")
+        let sword = await engine.item("sword")
         let playerEvent = try await combatSystem.playerCombatEvent(
             for: .attack,
             against: troll,
@@ -190,7 +191,7 @@ struct StandardCombatSystemUnitTests {
     func testPlayerCombatEventFlee() async throws {
         let (engine, _) = await createTestGame()
         let combatSystem = StandardCombatSystem(versus: "troll")
-        let troll = try await engine.item("troll")
+        let troll = await engine.item("troll")
         let playerEvent = try await combatSystem.playerCombatEvent(
             for: .flee(direction: .south),
             against: troll,
@@ -206,8 +207,8 @@ struct StandardCombatSystemUnitTests {
     func testRecalculateCombatState() async throws {
         let (engine, _) = await createTestGame()
         let combatSystem = StandardCombatSystem(versus: "troll")
-        let troll = try await engine.item("troll")
-        let sword = try await engine.item("sword")
+        let troll = await engine.item("troll")
+        let sword = await engine.item("sword")
         try await engine.apply(
             engine.setCombatState(
                 to: CombatState(
@@ -326,8 +327,8 @@ struct StandardCombatSystemUnitTests {
     func testGenerateTurnResult() async throws {
         let (engine, _) = await createTestGame()
         let combatSystem = StandardCombatSystem(versus: "troll")
-        let troll = try await engine.item("troll")
-        let sword = try await engine.item("sword")
+        let troll = await engine.item("troll")
+        let sword = await engine.item("sword")
 
         let combatTurn = CombatTurn(
             playerEvent: .enemyInjured(
@@ -350,16 +351,15 @@ struct StandardCombatSystemUnitTests {
         expectNoDifference(
             result.message,
             """
-            Your blow with your iron sword catches the creature cleanly,
-            tearing flesh and drawing crimson. The blow lands solidly, drawing blood. He
-            feels the sting but remains strong.
+            Your blow with your iron sword catches the fearsome beast cleanly,
+            tearing flesh and drawing crimson. He absorbs the hit, flesh suffering
+            but endurance holding.
 
-            The beast's retaliatory strike comes fast but you're faster, sidestepping \
-            the violence with practiced grace.
+            The terrible monster's counter whistles past as you weave aside, your body remembering how to avoid pain.
             """
         )
         #expect(
-            result.changes == [try await troll.setCharacterAttributes(health: 46)]
+            result.changes == [await troll.setCharacterAttributes(health: 46)]
         )
     }
 
@@ -369,8 +369,8 @@ struct StandardCombatSystemUnitTests {
     func testGenerateEventResultDamage() async throws {
         let (engine, _) = await createTestGame()
         let combatSystem = StandardCombatSystem(versus: "troll")
-        let troll = try await engine.item("troll")
-        let sword = try await engine.item("sword")
+        let troll = await engine.item("troll")
+        let sword = await engine.item("sword")
 
         let damageEvent = CombatEvent.enemyInjured(
             enemy: troll,
@@ -384,11 +384,11 @@ struct StandardCombatSystemUnitTests {
             in: attackContext(for: engine)
         )
 
-        let expected = try await ActionResult(
+        let expected = await ActionResult(
             """
-            Your blow with your iron sword catches the creature cleanly,
-            tearing flesh and drawing crimson. The blow lands solidly, drawing blood. He
-            feels the sting but remains strong.
+            Your blow with your iron sword catches the fearsome beast cleanly,
+            tearing flesh and drawing crimson. He absorbs the hit, flesh suffering
+            but endurance holding.
             """,
             troll.setCharacterAttributes(health: 43)
         )
@@ -401,7 +401,7 @@ struct StandardCombatSystemUnitTests {
     func testGenerateEventResultKnockout() async throws {
         let (engine, mockIO) = await createTestGame()
         let combatSystem = StandardCombatSystem(versus: .troll)
-        let troll = try await engine.item(.troll)
+        let troll = await engine.item(.troll)
 
         try await engine.apply(
             engine.player.move(to: "entrance"),
@@ -419,9 +419,9 @@ struct StandardCombatSystemUnitTests {
 
             There is a fierce troll here.
 
-            Despite having no weapon, the creature charges with terrifying
-            resolve! You grip your iron sword tighter, knowing you'd better
-            use this advantage.
+            The fearsome beast abandons caution and lunges straight at you!
+            Your iron sword suddenly feels less reassuring as the distance
+            vanishes.
             """
         )
 
@@ -436,15 +436,15 @@ struct StandardCombatSystemUnitTests {
             in: attackContext(for: engine)
         )
 
-        let expected = await ActionResult(
+        let expected = try await ActionResult(
             message: """
-                Then the beast's strike connects with your jaw at exactly
-                the right angle to shut down your brain without breaking it.
+                The monster retaliates with precision, bare knuckles finding the spot
+                where consciousness lives and evicting it.
 
                 * * *
 
                 Your eyes crack open to an empty scene. How long were you out? Hours? Minutes?
-                The beast is nowhere to be seen--perhaps called away by urgent matters. Whatever
+                The monster is nowhere to be seen--perhaps called away by urgent matters. Whatever
                 the reason, this reprieve won't last. Move now or die here.
                 """,
             changes: [
@@ -457,13 +457,12 @@ struct StandardCombatSystemUnitTests {
                     enemyID: .troll,
                     to: .startRoom,
                     message: """
-                        Disaster. The terrible monster reappears just as \
-                        you're examining your surroundings--clearly
-                        the wrong priority. He takes in your recovered
-                        state with what reads as dark amusement. \
-                        You should have run when you could.
+                        The worst possible timing: the creature comes back to find you still present,
+                        apparently fascinated by your surroundings rather than your survival.
+                        He doesn't hesitate--violence resumes immediately.
+                        You had your chance to leave.
                         """,
-                    turns: 3
+                    turns: 2
                 )
             ]
         )
@@ -528,10 +527,10 @@ struct StandardCombatSystemUnitTests {
 
         let player = await engine.player
         let attacker = Combatant.player(player)
-        let weapon = try await engine.item("sword")
+        let weapon = await engine.item("sword")
         let intensity = 1.0
 
-        let modifier = try await combatSystem.computeOffenseModifier(
+        let modifier = await combatSystem.computeOffenseModifier(
             for: attacker,
             weapon: weapon,
             intensity: intensity
@@ -549,7 +548,7 @@ struct StandardCombatSystemUnitTests {
         let attacker = Combatant.player(player)
         let intensity = 1.0
 
-        let modifier = try await combatSystem.computeOffenseModifier(
+        let modifier = await combatSystem.computeOffenseModifier(
             for: attacker,
             weapon: nil,
             intensity: intensity
@@ -565,10 +564,10 @@ struct StandardCombatSystemUnitTests {
         let (engine, _) = await createTestGame()
         let combatSystem = StandardCombatSystem(versus: "troll")
 
-        let troll = try await engine.item("troll")
+        let troll = await engine.item("troll")
         let defender = Combatant.enemy(troll)
 
-        let adjustment = try await combatSystem.computeDefenseAdjustment(
+        let adjustment = await combatSystem.computeDefenseAdjustment(
             for: defender
         )
 
@@ -584,12 +583,12 @@ struct StandardCombatSystemUnitTests {
 
         let player = await engine.player
         let attacker = Combatant.player(player)
-        let troll = try await engine.item("troll")
+        let troll = await engine.item("troll")
         let defender = Combatant.enemy(troll)
-        let weapon = try await engine.item("sword")
+        let weapon = await engine.item("sword")
         let intensity = 1.5
 
-        let adjustment = try await combatSystem.computeDamageAdjustment(
+        let adjustment = await combatSystem.computeDamageAdjustment(
             attacker: attacker,
             defender: defender,
             weapon: weapon,
@@ -608,12 +607,12 @@ struct StandardCombatSystemUnitTests {
 
         let player = await engine.player
         let attacker = Combatant.player(player)
-        let troll = try await engine.item("troll")
+        let troll = await engine.item("troll")
         let defender = Combatant.enemy(troll)
-        let weapon = try await engine.item("sword")
+        let weapon = await engine.item("sword")
         let intensity = 1.0
 
-        let adjustment = try await combatSystem.computeDamageAdjustment(
+        let adjustment = await combatSystem.computeDamageAdjustment(
             attacker: attacker,
             defender: defender,
             weapon: weapon,
@@ -627,42 +626,191 @@ struct StandardCombatSystemUnitTests {
 
     // MARK: - shouldTriggerSpecialEvent Tests
 
-    @Test("shouldTriggerSpecialEvent with high escalation")
-    func testShouldTriggerSpecialEventHighEscalation() async throws {
+    @Test("shouldTriggerSpecialEvent with natural 20 always triggers")
+    func testShouldTriggerSpecialEventNatural20() async throws {
         let (engine, _) = await createTestGame()
         let combatSystem = StandardCombatSystem(versus: "troll")
 
         let shouldTrigger = await combatSystem.shouldTriggerSpecialEvent(
-            attackRoll: 18,
-            marginOfHit: 10,
-            escalation: 3.0,
-            intensity: 2.0,
-            attacker: CharacterSheet(strength: 18),
-            defender: CharacterSheet(constitution: 12),
+            attackRoll: 20,
+            marginOfHit: 1,
+            escalation: 0.1,
+            intensity: 0.1,
+            attacker: CharacterSheet(strength: 10),
+            defender: CharacterSheet(constitution: 10),
             engine: engine
         )
 
-        // High escalation and good roll should potentially trigger special event
-        #expect(shouldTrigger == true || shouldTrigger == false)  // Valid boolean result
+        #expect(shouldTrigger == true)
     }
 
-    @Test("shouldTriggerSpecialEvent with low values")
-    func testShouldTriggerSpecialEventLowValues() async throws {
+    @Test("shouldTriggerSpecialEvent is rare with low values")
+    func testShouldTriggerSpecialEventRarity() async throws {
         let (engine, _) = await createTestGame()
         let combatSystem = StandardCombatSystem(versus: "troll")
 
-        let shouldTrigger = await combatSystem.shouldTriggerSpecialEvent(
-            attackRoll: 5,
-            marginOfHit: 1,
-            escalation: 0.5,
-            intensity: 0.5,
-            attacker: CharacterSheet(strength: 10),
-            defender: CharacterSheet(constitution: 15),
-            engine: engine
+        // Test multiple times to ensure special events are truly rare
+        var triggerCount = 0
+        let testIterations = 50
+
+        for _ in 0..<testIterations {
+            let shouldTrigger = await combatSystem.shouldTriggerSpecialEvent(
+                attackRoll: 15,  // Good roll but not crit
+                marginOfHit: 3,
+                escalation: 0.5,
+                intensity: 0.5,
+                attacker: CharacterSheet(strength: 12),
+                defender: CharacterSheet(constitution: 12),
+                engine: engine
+            )
+            if shouldTrigger {
+                triggerCount += 1
+            }
+        }
+
+        // Special events should be RARE - expect less than 30% trigger rate
+        let triggerRate = Double(triggerCount) / Double(testIterations)
+        #expect(triggerRate < 0.3, "Special events should be rare, got \(triggerRate) trigger rate")
+    }
+
+    @Test("shouldTriggerSpecialEvent increases with escalation")
+    func testShouldTriggerSpecialEventEscalation() async throws {
+        let (engine, _) = await createTestGame()
+        let combatSystem = StandardCombatSystem(versus: "troll")
+
+        var lowEscalationTriggers = 0
+        var highEscalationTriggers = 0
+        let testIterations = 30
+
+        for _ in 0..<testIterations {
+            // Low escalation test
+            let lowTrigger = await combatSystem.shouldTriggerSpecialEvent(
+                attackRoll: 16,
+                marginOfHit: 5,
+                escalation: 0.2,
+                intensity: 0.8,
+                attacker: CharacterSheet(strength: 14),
+                defender: CharacterSheet(constitution: 12),
+                engine: engine
+            )
+            if lowTrigger { lowEscalationTriggers += 1 }
+
+            // High escalation test
+            let highTrigger = await combatSystem.shouldTriggerSpecialEvent(
+                attackRoll: 16,
+                marginOfHit: 5,
+                escalation: 2.5,
+                intensity: 0.8,
+                attacker: CharacterSheet(strength: 14),
+                defender: CharacterSheet(constitution: 12),
+                engine: engine
+            )
+            if highTrigger { highEscalationTriggers += 1 }
+        }
+
+        // High escalation should trigger more often than low escalation
+        #expect(
+            highEscalationTriggers >= lowEscalationTriggers,
+            "High escalation should trigger more special events than low escalation")
+    }
+
+    @Test("Combat conditions affect subsequent attacks")
+    func testCombatConditionsAffectAttacks() async throws {
+        // Given: A combat scenario with staggered enemy
+        let staggeredTroll = Item(
+            id: "staggeredTroll",
+            .name("staggered troll"),
+            .characterSheet(
+                CharacterSheet(
+                    strength: 16,
+                    constitution: 14,
+                    combatCondition: .offBalance  // -2 AC, -1 attack
+                )
+            ),
+            .in("combatRoom")
         )
 
-        // Low values should be less likely to trigger special events
-        #expect(shouldTrigger == true || shouldTrigger == false)  // Valid boolean result
+        let vulnerableTroll = Item(
+            id: "vulnerableTroll",
+            .name("vulnerable troll"),
+            .characterSheet(
+                CharacterSheet(
+                    strength: 16,
+                    constitution: 14,
+                    combatCondition: .vulnerable  // -3 AC, no attack penalty
+                )
+            ),
+            .in("combatRoom")
+        )
+
+        let normalTroll = Item(
+            id: "normalTroll",
+            .name("normal troll"),
+            .characterSheet(
+                CharacterSheet(
+                    strength: 16,
+                    constitution: 14,
+                    combatCondition: .normal  // No penalties
+                )
+            ),
+            .in("combatRoom")
+        )
+
+        let player = Player(
+            in: "combatRoom",
+            characterSheet: CharacterSheet(strength: 14, dexterity: 12)
+        )
+
+        let testRoom = Location(
+            id: "combatRoom",
+            .name("Combat Room"),
+            .inherentlyLit
+        )
+
+        let game = MinimalGame(
+            player: player,
+            locations: testRoom,
+            items: staggeredTroll, vulnerableTroll, normalTroll
+        )
+
+        let (engine, _) = await GameEngine.test(blueprint: game)
+        let combatSystem = StandardCombatSystem(versus: "staggeredTroll")
+
+        // When: Computing offense modifiers for each enemy
+        let staggeredProxy = await engine.item("staggeredTroll")
+        let vulnerableProxy = await engine.item("vulnerableTroll")
+        let normalProxy = await engine.item("normalTroll")
+
+        let staggeredOffense = await combatSystem.computeOffenseModifier(
+            for: .enemy(staggeredProxy),
+            weapon: nil,
+            intensity: 0.5
+        )
+
+        let vulnerableOffense = await combatSystem.computeOffenseModifier(
+            for: .enemy(vulnerableProxy),
+            weapon: nil,
+            intensity: 0.5
+        )
+
+        let normalOffense = await combatSystem.computeOffenseModifier(
+            for: .enemy(normalProxy),
+            weapon: nil,
+            intensity: 0.5
+        )
+
+        // Then: Combat conditions should affect combat effectiveness
+        #expect(staggeredOffense < normalOffense, "Staggered enemy should have reduced offense")
+        #expect(vulnerableOffense == normalOffense, "Vulnerable doesn't affect offense")
+
+        // Defense adjustments don't include combat condition modifiers (they're in effectiveArmorClass)
+        // but we can verify the effectiveArmorClass includes the penalties
+        let staggeredAC = await staggeredProxy.characterSheet.effectiveArmorClass
+        let vulnerableAC = await vulnerableProxy.characterSheet.effectiveArmorClass
+        let normalAC = await normalProxy.characterSheet.effectiveArmorClass
+
+        #expect(staggeredAC == normalAC - 2, "Staggered enemy should have -2 AC")
+        #expect(vulnerableAC == normalAC - 3, "Vulnerable enemy should have -3 AC")
     }
 
     // MARK: - defaultCombatDescription Tests
@@ -671,8 +819,8 @@ struct StandardCombatSystemUnitTests {
     func testDefaultCombatDescription() async throws {
         let (engine, _) = await createTestGame()
         let combatSystem = StandardCombatSystem(versus: "troll")
-        let troll = try await engine.item("troll")
-        let sword = try await engine.item("sword")
+        let troll = await engine.item("troll")
+        let sword = await engine.item("sword")
 
         let hitEvent = CombatEvent.enemyInjured(
             enemy: troll,
@@ -683,7 +831,7 @@ struct StandardCombatSystemUnitTests {
 
         let messenger = await engine.combatMessenger(for: "troll")
 
-        let description = try await combatSystem.defaultCombatDescription(
+        let description = await combatSystem.defaultCombatDescription(
             of: hitEvent,
             via: messenger
         )
@@ -698,8 +846,8 @@ struct StandardCombatSystemUnitTests {
     func testDefaultCombatDescriptionMiss() async throws {
         let (engine, _) = await createTestGame()
         let combatSystem = StandardCombatSystem(versus: "troll")
-        let troll = try await engine.item("troll")
-        let sword = try await engine.item("sword")
+        let troll = await engine.item("troll")
+        let sword = await engine.item("sword")
 
         let missEvent = CombatEvent.enemyMissed(
             enemy: troll,
@@ -709,7 +857,7 @@ struct StandardCombatSystemUnitTests {
 
         let messenger = await engine.combatMessenger(for: "troll")
 
-        let description = try await combatSystem.defaultCombatDescription(
+        let description = await combatSystem.defaultCombatDescription(
             of: missEvent,
             via: messenger
         )
@@ -724,8 +872,8 @@ struct StandardCombatSystemUnitTests {
     func testDefaultCombatDescriptionCritical() async throws {
         let (engine, _) = await createTestGame()
         let combatSystem = StandardCombatSystem(versus: "troll")
-        let troll = try await engine.item("troll")
-        let sword = try await engine.item("sword")
+        let troll = await engine.item("troll")
+        let sword = await engine.item("sword")
 
         let criticalEvent = CombatEvent.enemyCriticallyWounded(
             enemy: troll,
@@ -736,7 +884,7 @@ struct StandardCombatSystemUnitTests {
 
         let messenger = await engine.combatMessenger(for: "troll")
 
-        let description = try await combatSystem.defaultCombatDescription(
+        let description = await combatSystem.defaultCombatDescription(
             of: criticalEvent,
             via: messenger
         )
@@ -757,7 +905,7 @@ struct StandardCombatSystemUnitTests {
         let player = await engine.player
 
         // Test computeOffenseModifier with nil weapon
-        let modifier = try await combatSystem.computeOffenseModifier(
+        let modifier = await combatSystem.computeOffenseModifier(
             for: .player(player),
             weapon: nil,
             intensity: 1.0
@@ -777,7 +925,7 @@ struct StandardCombatSystemUnitTests {
         let player = await engine.player
 
         // Test with very high intensity
-        let highIntensityModifier = try await combatSystem.computeOffenseModifier(
+        let highIntensityModifier = await combatSystem.computeOffenseModifier(
             for: .player(player),
             weapon: nil,
             intensity: 10.0
@@ -785,7 +933,7 @@ struct StandardCombatSystemUnitTests {
         #expect(highIntensityModifier >= -20)
 
         // Test with zero intensity
-        let zeroIntensityModifier = try await combatSystem.computeOffenseModifier(
+        let zeroIntensityModifier = await combatSystem.computeOffenseModifier(
             for: .player(player),
             weapon: nil,
             intensity: 0.0

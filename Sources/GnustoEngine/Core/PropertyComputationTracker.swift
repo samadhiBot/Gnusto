@@ -23,13 +23,12 @@
 ///     return try await computer.compute(context)
 /// }
 /// ```
-public enum PropertyComputationTracker {
-
+enum PropertyComputationTracker {
     /// Task-local storage for tracking active property computations across the call chain.
     ///
     /// This set contains unique computation keys for all currently active property
     /// computations, automatically managing scope through Swift's task-local storage.
-    @TaskLocal public static var activeComputations: Set<String> = []
+    @TaskLocal static var activeComputations: Set<String> = []
 
     /// Creates a unique computation key for an item property.
     ///
@@ -40,7 +39,7 @@ public enum PropertyComputationTracker {
     ///   - itemID: The item whose property is being computed
     ///   - propertyID: The specific property being computed
     /// - Returns: A unique string key for this computation
-    public static func key(for itemID: ItemID, property propertyID: ItemPropertyID) -> String {
+    static func key(for itemID: ItemID, property propertyID: ItemPropertyID) -> String {
         "item:\(itemID.rawValue):\(propertyID.rawValue)"
     }
 
@@ -53,9 +52,7 @@ public enum PropertyComputationTracker {
     ///   - locationID: The location whose property is being computed
     ///   - propertyID: The specific property being computed
     /// - Returns: A unique string key for this computation
-    public static func key(for locationID: LocationID, property propertyID: LocationPropertyID)
-        -> String
-    {
+    static func key(for locationID: LocationID, property propertyID: LocationPropertyID) -> String {
         "location:\(locationID.rawValue):\(propertyID.rawValue)"
     }
 
@@ -63,7 +60,7 @@ public enum PropertyComputationTracker {
     ///
     /// - Parameter computationKey: The computation key to check
     /// - Returns: `true` if this computation is already in progress, indicating a circular dependency
-    public static func isActive(_ computationKey: String) -> Bool {
+    static func isActive(_ computationKey: String) -> Bool {
         activeComputations.contains(computationKey)
     }
 
@@ -77,7 +74,7 @@ public enum PropertyComputationTracker {
     ///   - computation: The async computation to perform
     /// - Returns: The result of the computation
     /// - Throws: Any error thrown by the computation
-    public static func withTracking<T>(
+    static func withTracking<T>(
         _ computationKey: String,
         perform computation: () async throws -> T
     ) async rethrows -> T {

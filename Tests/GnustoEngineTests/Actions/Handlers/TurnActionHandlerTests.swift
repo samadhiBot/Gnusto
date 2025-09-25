@@ -38,7 +38,7 @@ struct TurnActionHandlerTests {
             """
         )
 
-        let finalState = try await engine.item("dial")
+        let finalState = await engine.item("dial")
         #expect(await finalState.hasFlag(.isTouched) == true)
     }
 
@@ -335,14 +335,14 @@ struct TurnActionHandlerTests {
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         // Verify initial state
-        let initialState = try await engine.item("valve")
+        let initialState = await engine.item("valve")
         #expect(await initialState.hasFlag(.isTouched) == false)
 
         // When
         try await engine.execute("turn valve")
 
         // Then
-        let finalState = try await engine.item("valve")
+        let finalState = await engine.item("valve")
         #expect(await finalState.hasFlag(.isTouched) == true)
     }
 
@@ -387,8 +387,8 @@ struct TurnActionHandlerTests {
             """
         )
 
-        let dial1State = try await engine.item("dial1")
-        let dial2State = try await engine.item("dial2")
+        let dial1State = await engine.item("dial1")
+        let dial2State = await engine.item("dial2")
         #expect(await dial1State.hasFlag(.isTouched) == true)
         #expect(await dial2State.hasFlag(.isTouched) == true)
     }

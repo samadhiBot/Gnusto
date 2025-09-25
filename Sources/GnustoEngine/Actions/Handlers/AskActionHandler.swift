@@ -40,7 +40,7 @@ public struct AskActionHandler: ActionHandler {
 
         // Case 1: "ask wizard about crystal" - both character and topic
         if let character, let topic {
-            guard try await character.isCharacter else {
+            guard await character.isCharacter else {
                 throw await ActionResponse.feedback(
                     context.msg.cannotAskAboutThat(character.withDefiniteArticle)
                 )
@@ -54,7 +54,7 @@ public struct AskActionHandler: ActionHandler {
 
         // Case 2: "ask wizard" - character only, prompt for topic
         if let character, topic == nil {
-            guard try await character.isCharacter else {
+            guard await character.isCharacter else {
                 throw await ActionResponse.feedback(
                     context.msg.cannotAskAboutThat(character.withDefiniteArticle)
                 )
@@ -80,7 +80,7 @@ public struct AskActionHandler: ActionHandler {
         in context: ActionContext
     ) async throws -> ActionResult {
         // Default response - games can override with ItemEventHandlers
-        return try await ActionResult(
+        await ActionResult(
             context.msg.characterDoesNotSeemToKnow(
                 character.withDefiniteArticle,
                 topic: topic.withDefiniteArticle
@@ -102,10 +102,10 @@ public struct AskActionHandler: ActionHandler {
             context: context
         )
 
-        return ActionResult(
+        return await ActionResult(
             message: questionResult.message,
             changes: questionResult.changes + [
-                try await character.setFlag(.isTouched)
+                character.setFlag(.isTouched)
             ],
             effects: questionResult.effects
         )

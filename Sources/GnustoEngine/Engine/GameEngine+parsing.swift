@@ -141,8 +141,9 @@ extension GameEngine {
             // For generic references, we need to extract the noun from the original input
             if let originalInput {
                 let words = originalInput.lowercased().split(separator: " ").map(String.init)
-                // Try to find the noun by looking for common patterns
-                // This is a simplified heuristic - in a full implementation you might want more sophisticated noun extraction
+                // Try to find the noun by looking for common patterns.
+                // This is a simplified heuristic - in the future we might want
+                // more sophisticated noun extraction.
                 if let potentialNoun = extractNounFromCommand(words) {
                     storeDisambiguationContext(
                         originalInput: originalInput,
@@ -174,10 +175,8 @@ extension GameEngine {
         // Skip prepositions like "on", "in", "with", etc.
         let prepositions = Set(["on", "in", "with", "at", "under", "over", "through", "to", "from"])
 
-        for word in remainingWords {
-            if !prepositions.contains(word) {
-                return word
-            }
+        for word in remainingWords where !prepositions.contains(word) {
+            return word
         }
 
         return remainingWords.first
@@ -189,15 +188,20 @@ extension GameEngine {
     ///   - noun: The ambiguous noun from the command
     ///   - options: The disambiguation options presented to the user
     func storeDisambiguationContext(
-        originalInput: String?, noun: String, options: [String]
+        originalInput: String?,
+        noun: String,
+        options: [String]
     ) {
-        guard let originalInput = originalInput else { return }
+        guard let originalInput else { return }
 
         // Try to extract the verb from the original input
         let words = originalInput.lowercased().split(separator: " ").map(String.init)
         if let firstWord = words.first {
-            let verb = Verb(id: firstWord)
-            lastDisambiguationContext = (originalInput: originalInput, verb: verb, noun: noun)
+            lastDisambiguationContext = LastDisambiguationContext(
+                originalInput: originalInput,
+                verb: Verb(id: firstWord),
+                noun: noun
+            )
             lastDisambiguationOptions = options
         }
     }
@@ -210,11 +214,9 @@ extension GameEngine {
     /// - Returns: True if the input was handled as a disambiguation response, false otherwise
     func tryHandleDisambiguationResponse(
         input: String,
-        context: (originalInput: String, verb: Verb, noun: String)
+        context: LastDisambiguationContext
     ) async -> Bool {
-        guard let options = lastDisambiguationOptions else {
-            return false
-        }
+        guard let options = lastDisambiguationOptions else { return false }
 
         let trimmedInput = input.trimmingCharacters(in: .whitespacesAndNewlines)
 

@@ -54,24 +54,24 @@ public struct ExamineActionHandler: ActionHandler {
                     throw ActionResponse.itemNotAccessible(item)
                 }
 
-                try await addMessage(
+                await addMessage(
                     item.name,
                     examineItem(item)
                 )
-                try await allStateChanges.append(
+                await allStateChanges.append(
                     item.setFlag(.isTouched)
                 )
                 examinedItems.append(item)
 
             case .location(let location):
-                try await addMessage(
+                await addMessage(
                     location.name,
                     location.description,
                 )
 
             case .player:
-                let healthRatio = await Double(context.engine.player.health) /
-                                        Double(context.engine.player.maxHealth)
+                let healthRatio =
+                    await Double(context.player.health) / Double(context.player.maxHealth)
                 addMessage(
                     context.msg.you(),
                     context.msg.examineYourself(healthRatio: healthRatio)
@@ -101,11 +101,11 @@ public struct ExamineActionHandler: ActionHandler {
 }
 
 extension ExamineActionHandler {
-    func examineItem(_ targetItem: ItemProxy) async throws -> String {
+    func examineItem(_ targetItem: ItemProxy) async -> String {
         var messages = [String]()
 
         // Check if item has an explicit description (not just the default "nothing special" message)
-        let hasExplicitDescription = try await targetItem.property(.description) != nil
+        let hasExplicitDescription = await targetItem.property(.description) != nil
 
         // For containers and surfaces without explicit descriptions, skip the default message
         let isContainer = await targetItem.isContainer
@@ -117,18 +117,14 @@ extension ExamineActionHandler {
         }
 
         if await targetItem.hasFlag(.isSurface) {
-            try await messages.append(
+            await messages.append(
                 describeSurface(item: targetItem)
             )
-        }
-
-        else if await targetItem.isContainer {
-            try await messages.append(
+        } else if await targetItem.isContainer {
+            await messages.append(
                 describeContainer(item: targetItem)
             )
-        }
-
-        else if await targetItem.isDoor {
+        } else if await targetItem.isDoor {
             await messages.append(
                 describeDoor(item: targetItem)
             )
@@ -137,7 +133,7 @@ extension ExamineActionHandler {
         return messages.joined(separator: " ")
     }
 
-    private func describeContainer(item: ItemProxy) async throws -> String? {
+    private func describeContainer(item: ItemProxy) async -> String? {
         var messages = [String]()
         let isOpen = await item.hasFlag(.isOpen)
         let isTransparent = await item.hasFlag(.isTransparent)
@@ -154,7 +150,7 @@ extension ExamineActionHandler {
             return messages[0]
         }
 
-        let itemsInside = try await item.contents
+        let itemsInside = await item.contents
 
         if itemsInside.isEmpty {
             await messages.append(
@@ -184,8 +180,8 @@ extension ExamineActionHandler {
         }
     }
 
-    private func describeSurface(item: ItemProxy) async throws -> String? {
-        let itemsOnSurface = try await item.contents
+    private func describeSurface(item: ItemProxy) async -> String? {
+        let itemsOnSurface = await item.contents
         var itemsToDescribe = [ItemProxy]()
         var messages = [String]()
 
@@ -200,7 +196,7 @@ extension ExamineActionHandler {
                     let isTransparent = await surfaceItem.hasFlag(.isTransparent)
 
                     if isOpen || isTransparent {
-                        if let containerDescription = try await describeContainer(item: surfaceItem)
+                        if let containerDescription = await describeContainer(item: surfaceItem)
                         {
                             messages.append(containerDescription)
                         }

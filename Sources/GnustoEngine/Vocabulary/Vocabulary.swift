@@ -20,11 +20,11 @@ public struct Vocabulary: Equatable, Sendable {
     /// Maps known location names to the LocationID they refer to.
     public var locationNames: [String: LocationID]
 
-    /// Maps known universal object names to the Set of UniversalObjects they can refer to.
+    /// Maps known universal object names to the Set of Universals they can refer to.
     /// Universal objects are implicit concepts like "ground", "sky", "walls" that don't
     /// need explicit Item objects but can still be referenced by players.
     /// Example: `["ground": [.ground, .earth], "sky": [.sky, .heavens]]`
-    public var universals: [String: Set<UniversalObject>]
+    public var universals: [String: Set<Universal>]
 
     /// A set of "noise" words to be ignored by the parser (articles, punctuation, etc.).
     /// Example: `["a", "an", "the", ".", ","]`
@@ -104,7 +104,7 @@ public struct Vocabulary: Equatable, Sendable {
         items: [String: Set<ItemID>] = [:],
         adjectives: [String: Set<ItemID>] = [:],
         locationNames: [String: LocationID] = [:],
-        universals: [String: Set<UniversalObject>] = Vocabulary.defaultUniversals,
+        universals: [String: Set<Universal>] = Vocabulary.defaultUniversals,
         directions: [String: Direction] = [:],
         noiseWords: Set<String> = Vocabulary.defaultNoiseWords,
         playerAliases: Set<String> = Vocabulary.defaultPlayerAliases,
@@ -355,6 +355,7 @@ public struct Vocabulary: Equatable, Sendable {
     ///   - locations: An array of `Location` objects specific to the game.
     ///   - verbs: An array of `Verb` objects specific to the game.
     ///   - verbToSyntax: A mapping from verbs to their syntax rules from ActionHandlers.
+    ///   - enhancer: An optional vocabulary enhancer for customizing word recognition.
     /// - Returns: A populated `Vocabulary` instance.
     public static func build(
         items: [Item] = [],
@@ -417,7 +418,7 @@ public struct Vocabulary: Equatable, Sendable {
 
     /// Checks if a given word is a known pronoun.
     public func isPronoun(_ word: String) -> Bool {
-        return pronouns.contains(word.lowercased())
+        pronouns.contains(word.lowercased())
     }
 
     // MARK: - Default Universal Objects
@@ -425,7 +426,7 @@ public struct Vocabulary: Equatable, Sendable {
     /// Default mapping of common English words to universal objects.
     /// This provides sensible defaults that work for most English IF games.
     /// Games can override or extend this mapping for localization or customization.
-    public static let defaultUniversals: [String: Set<UniversalObject>] = [
+    public static let defaultUniversals: [String: Set<Universal>] = [
         // Ground and earth
         "ground": [.ground],
         "earth": [.earth, .ground],

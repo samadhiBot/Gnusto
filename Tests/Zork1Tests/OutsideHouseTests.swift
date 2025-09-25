@@ -96,11 +96,11 @@ struct OutsideHouseTests {
             smelling of hot peppers.
 
             > open sack
-            The brown sack parts to disclose a clove of garlic and a lunch,
-            previously hidden from view.
+            Opening the brown sack brings a clove of garlic and a lunch
+            into the light.
 
             > inventory
-            You are unburdened by material possessions.
+            You carry nothing but your own thoughts.
 
             > take all
             You take the glass bottle and the brown sack.
@@ -171,10 +171,11 @@ struct OutsideHouseTests {
             which is slightly ajar.
 
             > examine the window
-            The window is slightly ajar, but not enough to allow entry.
+            The window is slightly ajar, but not enough to allow entry. The
+            kitchen window is closed.
 
             > look through the window
-            The window is slightly ajar, but not enough to allow entry.
+            You can see what appears to be a kitchen.
 
             > take the window
             You cannot take the kitchen window, much as you might wish
@@ -231,10 +232,10 @@ struct OutsideHouseTests {
             the trophy case hangs an elvish sword of great antiquity.
 
             > take lamp
-            Acquired.
+            Got it.
 
             > take sword
-            Got it.
+            Acquired.
 
             > examine lamp
             The lamp is turned off.
@@ -262,7 +263,7 @@ struct OutsideHouseTests {
             Got it.
 
             > take knife
-            Acquired.
+            Got it.
 
             > inventory
             You are carrying:
@@ -311,14 +312,14 @@ struct OutsideHouseTests {
             smelling of hot peppers.
 
             > take sack
-            Acquired.
+            Got it.
 
             > examine sack
             The brown sack is closed.
 
             > open sack
-            Opening the brown sack brings a clove of garlic and a lunch
-            into the light.
+            The brown sack parts to disclose a clove of garlic and a lunch,
+            previously hidden from view.
 
             > examine sack
             The brown sack contains a clove of garlic and a lunch.
@@ -330,7 +331,7 @@ struct OutsideHouseTests {
             Got it.
 
             > take bottle
-            Acquired.
+            Got it.
 
             > examine bottle
             The glass bottle contains a quantity of water.
@@ -360,7 +361,7 @@ struct OutsideHouseTests {
             - A brown sack
 
             >
-            May your adventures elsewhere prove fruitful!
+            Until we meet again in another tale...
             """
         )
     }

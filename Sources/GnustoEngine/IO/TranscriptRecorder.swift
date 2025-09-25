@@ -5,6 +5,7 @@ import Logging
 ///
 /// The TranscriptRecorder handles writing transcript data to a file.
 public final class TranscriptRecorder: Sendable {
+    /// The URL where the transcript file is written.
     public let transcriptURL: URL
 
     private let fileHandle: FileHandle
@@ -26,11 +27,13 @@ public final class TranscriptRecorder: Sendable {
 
         FileManager.default.createFile(
             atPath: transcriptURL.path(),
-            contents: """
+            contents: Data(
+                """
                 \(title)
                 Transcript started: \(started.formatted())
 
-                """.data(using: .utf8)
+                """.utf8
+            )
         )
 
         self.fileHandle = try FileHandle(forWritingTo: transcriptURL)
@@ -41,7 +44,7 @@ public final class TranscriptRecorder: Sendable {
             try write(
                 """
 
-                Transcript ended: \(Date().formatted())
+                Transcript ended.
 
                 """
             )

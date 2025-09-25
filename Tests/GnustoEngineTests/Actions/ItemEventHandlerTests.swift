@@ -26,7 +26,7 @@ struct ItemEventHandlerTests {
     func testInitialization() async throws {
         let handlerState = HandlerState()
 
-        let handler = ItemEventHandler { engine, event in
+        let handler = ItemEventHandler { _, _ in
             await handlerState.setCalled(true)
             return nil
         }
@@ -54,7 +54,7 @@ struct ItemEventHandlerTests {
     func testBeforeTurnEvent() async throws {
         let commandCapture = CommandCapture()
 
-        let handler = ItemEventHandler { engine, event in
+        let handler = ItemEventHandler { _, event in
             if case .beforeTurn(let command) = event {
                 await commandCapture.setCommand(command)
             }
@@ -80,9 +80,9 @@ struct ItemEventHandlerTests {
     func testAfterTurnEvent() async throws {
         let eventCapture = EventCapture()
 
-        let handler = ItemEventHandler { engine, event in
+        let handler = ItemEventHandler { _, event in
             switch event {
-            case .beforeTurn(_):
+            case .beforeTurn:
                 await eventCapture.setEventType("before")
             case .afterTurn(let command):
                 await eventCapture.setEventType("after")
@@ -117,7 +117,7 @@ struct ItemEventHandlerTests {
         // on ItemEvent. The equivalent functionality is now tested through full integration.
 
         let handler = ItemEventHandler(for: "testItem") {
-            before(.examine) { context, command in
+            before(.examine) { _, _ in
                 ActionResult("Intent matched!")
             }
         }
@@ -140,7 +140,7 @@ struct ItemEventHandlerTests {
         // Test that handlers only respond to their specified intents
 
         let handler = ItemEventHandler(for: "testItem") {
-            before(.take) { context, command in
+            before(.take) { _, _ in
                 ActionResult("Should not be called")
             }
         }
@@ -164,7 +164,7 @@ struct ItemEventHandlerTests {
         // Test that handlers can match multiple intents
 
         let handler = ItemEventHandler(for: "testItem") {
-            before(.examine, .take, .drop) { context, command in
+            before(.examine, .take, .drop) { _, _ in
                 ActionResult("One intent matched!")
             }
         }
@@ -187,7 +187,7 @@ struct ItemEventHandlerTests {
         // Test that handlers don't match when no intents match
 
         let handler = ItemEventHandler(for: "testItem") {
-            before(.take, .drop, .open) { context, command in
+            before(.take, .drop, .open) { _, _ in
                 ActionResult("Should not be called")
             }
         }
@@ -212,12 +212,12 @@ struct ItemEventHandlerTests {
         let messageCapture = MessageCapture()
 
         let handler = ItemEventHandler(for: "testItem") {
-            before(.examine) { context, command in
+            before(.examine) { _, _ in
                 await messageCapture.addMessage("beforeTurn called")
                 return nil  // Allow default processing
             }
 
-            after { context, command in
+            after { _, _ in
                 await messageCapture.addMessage("afterTurn called")
                 return nil
             }
@@ -242,7 +242,7 @@ struct ItemEventHandlerTests {
     @Test("ItemEventHandler can override command behavior before turn")
     func testBeforeTurnOverride() async throws {
         let handler = ItemEventHandler(for: "testItem") {
-            before(.examine) { context, command in
+            before(.examine) { _, _ in
                 ActionResult("This item has a special examination behavior!")
             }
         }
@@ -271,8 +271,8 @@ struct ItemEventHandlerTests {
     func testAfterTurnProcessing() async throws {
         let afterTurnState = HandlerState()
 
-        let handler = ItemEventHandler { engine, event in
-            if case .afterTurn(_) = event {
+        let handler = ItemEventHandler { _, event in
+            if case .afterTurn = event {
                 await afterTurnState.setCalled(true)
             }
             return nil
@@ -294,7 +294,7 @@ struct ItemEventHandlerTests {
 
     @Test("ItemEventHandler can log errors gracefully")
     func testErrorHandling() async throws {
-        let handler = ItemEventHandler { engine, event in
+        let handler = ItemEventHandler { _, _ in
             struct TestError: Error {}
             throw TestError()
         }
@@ -321,14 +321,14 @@ struct ItemEventHandlerTests {
         let item2Events = MessageCapture()
 
         let handler1 = ItemEventHandler(for: "item1") {
-            before(.examine) { context, command in
+            before(.examine) { _, _ in
                 await item1Events.addMessage("Item 1 examined")
                 return nil
             }
         }
 
         let handler2 = ItemEventHandler(for: "item2") {
-            before(.examine) { context, command in
+            before(.examine) { _, _ in
                 await item2Events.addMessage("Item 2 examined")
                 return nil
             }
@@ -376,7 +376,7 @@ struct ItemEventHandlerTests {
     @Test("ItemEventHandler beforeTurn can prevent default action")
     func testBeforeTurnPreventsDefault() async throws {
         let handler = ItemEventHandler(for: "testItem") {
-            before(.take) { context, command in
+            before(.take) { _, _ in
                 ActionResult("This item cannot be taken – it's cursed!")
             }
         }
@@ -401,8 +401,8 @@ struct ItemEventHandlerTests {
         )
 
         // Verify the item was not actually taken
-        let finalState = try await engine.item("testItem")
-        let wasNotTaken = try await !finalState.playerIsHolding
+        let finalState = await engine.item("testItem")
+        let wasNotTaken = await !finalState.playerIsHolding
         #expect(wasNotTaken == true)
     }
 
@@ -410,7 +410,7 @@ struct ItemEventHandlerTests {
     func testMultiIntentMatching() async throws {
         let intentCapture = IntentCapture()
 
-        let handler = ItemEventHandler { engine, event in
+        let handler = ItemEventHandler { _, event in
             if case .beforeTurn(let command) = event {
                 for intent in [Intent.take, .drop, .examine] {
                     if command.verb.intents.contains(intent) {
@@ -440,7 +440,7 @@ struct ItemEventHandlerTests {
         let handler = ItemEventHandler { engine, event in
             if case .beforeTurn(let command) = event, command.verb.intents.contains(.examine) {
                 // Set a custom flag when player examines this item
-                let stateChange = await engine.setGlobal(.isVerboseMode, to: true)
+                let stateChange = await engine.setFlag(.isVerboseMode)
                 return ActionResult(
                     "You feel a strange energy emanating from the item...",
                     stateChange
@@ -481,7 +481,7 @@ struct ItemEventHandlerTests {
     func testConditionalTriggering() async throws {
         let handler = ItemEventHandler { engine, event in
             if case .beforeTurn(let command) = event, command.verb.intents.contains(.examine) {
-                let item = try await engine.item("magicOrb")
+                let item = await engine.item("magicOrb")
                 let isActive = await item.hasFlag(.isOn)
 
                 if isActive {
@@ -545,7 +545,7 @@ struct ItemEventHandlerTests {
     func testAfterTurnCommandContext() async throws {
         let verbCapture = VerbCapture()
 
-        let handler = ItemEventHandler { engine, event in
+        let handler = ItemEventHandler { _, event in
             if case .afterTurn(let command) = event {
                 let verbName = command.verb.rawValue
                 await verbCapture.addVerb(verbName)
@@ -576,7 +576,7 @@ struct ItemEventHandlerTests {
     func testEventChaining() async throws {
         let eventSequence = SequenceCapture()
 
-        let handler = ItemEventHandler { engine, event in
+        let handler = ItemEventHandler { _, event in
             switch event {
             case .beforeTurn(let command):
                 await eventSequence.addEvent("Before: \(command.verb.rawValue)")
@@ -606,7 +606,7 @@ struct ItemEventHandlerTests {
     @Test("ItemEventHandler respects handler return values for flow control")
     func testFlowControl() async throws {
         let handler = ItemEventHandler(for: "testItem") {
-            before(.take) { context, command in
+            before(.take) { _, _ in
                 ActionResult("The item is magically protected from being taken!")
             }
         }
@@ -631,15 +631,15 @@ struct ItemEventHandlerTests {
         )
 
         // Verify the item was not actually taken
-        let finalState = try await engine.item("testItem")
-        let wasNotTaken = try await !finalState.playerIsHolding
+        let finalState = await engine.item("testItem")
+        let wasNotTaken = await !finalState.playerIsHolding
         #expect(wasNotTaken == true)
     }
 
     @Test("ItemEventHandler can modify item properties during events")
     func testItemPropertyModification() async throws {
         let handler = ItemEventHandler(for: "glowItem") {
-            before(.examine) { context, command in
+            before(.examine) { _, _ in
                 ActionResult(
                     "As you examine the item, it begins to glow!"
                 )
@@ -667,14 +667,14 @@ struct ItemEventHandlerTests {
         let (engine, mockIO) = await GameEngine.test(blueprint: blueprint)
 
         // Verify item is off initially
-        let initialState = try await engine.item("glowItem")
+        let initialState = await engine.item("glowItem")
         let initiallyOn = await initialState.hasFlag(.isOn)
         #expect(initiallyOn == false)
 
         try await engine.execute("examine glowing stone")
 
         // Verify item was turned on by the handler
-        let finalState = try await engine.item("glowItem")
+        let finalState = await engine.item("glowItem")
         let finallyOn = await finalState.hasFlag(.isOn)
         #expect(finallyOn == false)  // Handler doesn't actually change state in simplified version
 
@@ -690,9 +690,9 @@ struct ItemEventHandlerTests {
 
     @Test("ItemEventHandler handles edge case of handler returning nil")
     func testNilReturn() async throws {
-        let handler = ItemEventHandler { engine, event in
+        let handler = ItemEventHandler { _, _ in
             // Always return nil to test default behavior continues
-            return nil
+            nil
         }
 
         let game = createTestGame()
@@ -714,7 +714,7 @@ struct ItemEventHandlerTests {
     func testVerbDistinction() async throws {
         let verbCapture = VerbCapture()
 
-        let handler = ItemEventHandler { engine, event in
+        let handler = ItemEventHandler { _, event in
             if case .beforeTurn(let command) = event {
                 let verbName = command.verb.rawValue
                 await verbCapture.addVerb(verbName)
@@ -783,7 +783,7 @@ struct ItemEventHandlerTests {
         let messageCapture = MessageCapture()
 
         let handler = ItemEventHandler(for: "testItem") {
-            before(.examine) { context, command in
+            before(.examine) { context, _ in
                 await messageCapture.addMessage(
                     "Context handler called for item: \(context.item.id)")
                 return ActionResult("Custom examine message from context handler.")
@@ -862,10 +862,10 @@ struct ItemEventHandlerTests {
         )
 
         // Both bottle and water should be gone
-        let finalBottle = try await engine.item("bottle")
-        let finalWater = try await engine.item("water")
-        #expect(try await finalBottle.parent == .nowhere)
-        #expect(try await finalWater.parent == .nowhere)
+        let finalBottle = await engine.item("bottle")
+        let finalWater = await engine.item("water")
+        #expect(await finalBottle.parent == .nowhere)
+        #expect(await finalWater.parent == .nowhere)
     }
 
     @Test("Bottle handler - throw empty bottle")
@@ -917,8 +917,8 @@ struct ItemEventHandlerTests {
         )
 
         // Bottle should be gone
-        let finalBottle = try await engine.item("bottle")
-        #expect(try await finalBottle.parent == .nowhere)
+        let finalBottle = await engine.item("bottle")
+        #expect(await finalBottle.parent == .nowhere)
     }
 
     @Test("Bottle handler - attack bottle with water")
@@ -965,10 +965,10 @@ struct ItemEventHandlerTests {
         )
 
         // Both bottle and water should be gone
-        let finalBottle = try await engine.item("bottle")
-        let finalWater = try await engine.item("water")
-        #expect(try await finalBottle.parent == .nowhere)
-        #expect(try await finalWater.parent == .nowhere)
+        let finalBottle = await engine.item("bottle")
+        let finalWater = await engine.item("water")
+        #expect(await finalBottle.parent == .nowhere)
+        #expect(await finalWater.parent == .nowhere)
     }
 
     @Test("Bottle handler - shake open bottle with water")
@@ -1014,10 +1014,10 @@ struct ItemEventHandlerTests {
         )
 
         // Water should be gone, bottle should remain
-        let finalBottle = try await engine.item("bottle")
-        let finalWater = try await engine.item("water")
-        #expect(try await finalBottle.parent == .player)
-        #expect(try await finalWater.parent == .nowhere)
+        let finalBottle = await engine.item("bottle")
+        let finalWater = await engine.item("water")
+        #expect(await finalBottle.parent == .player)
+        #expect(await finalWater.parent == .nowhere)
     }
 
     @Test("Bottle handler - shake closed bottle with water does nothing special")
@@ -1058,18 +1058,18 @@ struct ItemEventHandlerTests {
         #expect(!output.contains("The water spills"))
 
         // Both bottle and water should remain unchanged
-        let finalBottle = try await engine.item("bottle")
-        let finalWater = try await engine.item("water")
-        #expect(try await finalBottle.parent == .player)
-        #expect(try await finalWater.parent == .item(finalBottle))
+        let finalBottle = await engine.item("bottle")
+        let finalWater = await engine.item("water")
+        #expect(await finalBottle.parent == .player)
+        #expect(await finalWater.parent == .item(finalBottle))
     }
 }
 
 extension ItemEventHandlerTests {
     static let bottleHandler = ItemEventHandler(for: "bottle") {
-        before(.throw) { context, command in
-            let water = try await context.engine.item("water")
-            let hasWater = try await water.parent == .item(context.item)
+        before(.throw) { context, _ in
+            let water = await context.item("water")
+            let hasWater = await water.parent == .item(context.item)
 
             return if hasWater {
                 ActionResult(
@@ -1088,9 +1088,9 @@ extension ItemEventHandlerTests {
             }
         }
 
-        before(.attack) { context, command in
-            let water = try await context.engine.item("water")
-            let hasWater = try await water.parent == .item(context.item)
+        before(.attack) { context, _ in
+            let water = await context.item("water")
+            let hasWater = await water.parent == .item(context.item)
 
             return if hasWater {
                 ActionResult(
@@ -1109,9 +1109,9 @@ extension ItemEventHandlerTests {
             }
         }
 
-        before(.push) { context, command in
-            let water = try await context.engine.item("water")
-            let hasWater = try await water.parent == .item(context.item)
+        before(.push) { context, _ in
+            let water = await context.item("water")
+            let hasWater = await water.parent == .item(context.item)
             let isOpen = await context.item.hasFlag(.isOpen)
 
             return if isOpen && hasWater {

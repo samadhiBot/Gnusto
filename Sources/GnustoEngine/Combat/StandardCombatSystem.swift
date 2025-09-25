@@ -1,10 +1,10 @@
 import Foundation
 import Logging
 
-/// Default implementation of turn-based combat system with D&D-style mechanics.
+/// Default implementation of turn-based melee combat system with D&D-style mechanics.
 ///
 /// This combat system provides:
-/// - Turn-based combat with player actions and enemy reactions
+/// - Turn-based melee combat with player actions and enemy reactions
 /// - D&D-style d20 attack rolls and damage calculations
 /// - Character attribute-based combat modifiers
 /// - Dynamic enemy AI that responds to combat state
@@ -18,7 +18,7 @@ public struct StandardCombatSystem: CombatSystem {
     /// When provided, this closure allows games to override default combat messages
     /// with custom narrative descriptions. If the closure returns `nil` for an event,
     /// the system falls back to default descriptions.
-    public let description: @Sendable (CombatEvent, CombatMessenger) async throws -> String?
+    public let description: @Sendable (CombatEvent, CombatMessenger) async -> String?
 
     /// Private logger for combat system messages, warnings, and errors.
     private let logger = Logger(label: "com.samadhibot.Gnusto.StandardCombatSystem")
@@ -35,10 +35,7 @@ public struct StandardCombatSystem: CombatSystem {
     ///   - descriptions: Optional closure for custom combat event descriptions
     public init(
         versus enemyID: ItemID,
-        descriptions:
-            @escaping @Sendable (
-                CombatEvent, CombatMessenger
-            ) async throws -> String? = { _, _ in nil }
+        descriptions: @escaping @Sendable (CombatEvent, CombatMessenger) async -> String? = { _, _ in nil }
     ) {
         self.enemyID = enemyID
         self.description = descriptions
@@ -54,11 +51,23 @@ public struct StandardCombatSystem: CombatSystem {
         playerAction: PlayerAction,
         in context: ActionContext
     ) async throws -> ActionResult {
-        let enemy = try await context.engine.item(enemyID)
+        let enemy = await context.item(enemyID)
 
-        guard try await enemy.isAlive else {
+        guard await enemy.isAlive else {
             return await ActionResult(
                 context.msg.alreadyDead(enemy.withDefiniteArticle),
+                context.engine.endCombat()
+            )
+        }
+
+        // Check if enemy and player are still in the same location
+        let playerLocationID = await context.player.location.id
+        let enemyParent = await enemy.parent
+        guard case .location(let enemyLocationID) = enemyParent,
+            enemyLocationID == playerLocationID
+        else {
+            // Enemy and player are in different locations - end combat
+            return await ActionResult(
                 context.engine.endCombat()
             )
         }
@@ -70,7 +79,7 @@ public struct StandardCombatSystem: CombatSystem {
         }
 
         // Process player action (will return nil for .other commands)
-        let playerCombatEvent = try await playerCombatEvent(
+        let playerCombatEvent = await playerCombatEvent(
             for: playerAction,
             against: enemy,
             in: context
@@ -79,7 +88,7 @@ public struct StandardCombatSystem: CombatSystem {
         // Process enemy reaction (if enemy is still alive and able)
         var enemyEvent: CombatEvent?
         if playerCombatEvent?.incapacitatesOpponent != true {
-            enemyEvent = try await determineEnemyAction(
+            enemyEvent = await determineEnemyAction(
                 against: playerAction,
                 enemy: enemy,
                 in: context
@@ -93,12 +102,12 @@ public struct StandardCombatSystem: CombatSystem {
         )
 
         // Occasionally add a random enemy taunt
-        if let enemyTaunt = try await selectTaunt(from: enemy, in: combatTurn) {
+        if let enemyTaunt = await selectTaunt(from: enemy, in: combatTurn) {
             combatTurn.addEvent(enemyTaunt)
         }
 
         // Update combat state for next round
-        let updatedCombatState = try await recalculateCombatState(
+        let updatedCombatState = await recalculateCombatState(
             after: combatTurn,
             in: context
         )
@@ -109,11 +118,9 @@ public struct StandardCombatSystem: CombatSystem {
         // Add combat state update to the result only if combat continues
         let combinedChanges: [StateChange]
         if let updatedCombatState {
-            logger.debug("⚔️ Combat continues with state: \(updatedCombatState)")
             let combatStateChange = await context.engine.setCombatState(to: updatedCombatState)
             combinedChanges = result.changes + [combatStateChange]
         } else {
-            logger.debug("⚔️ Combat ended - no state update")
             combinedChanges = result.changes
         }
 
@@ -127,7 +134,7 @@ public struct StandardCombatSystem: CombatSystem {
 
     // MARK: - Enhanced Combat Calculations
 
-    /// Calculates the outcome of an attack between two combatants using enhanced action-packed mechanics.
+    /// Calculates the outcome of an attack between two combatants using action-packed mechanics.
     ///
     /// This method performs a complete attack resolution including:
     /// - Rolling a d20 for the attack with improved hit chances
@@ -138,7 +145,7 @@ public struct StandardCombatSystem: CombatSystem {
     /// - Determining special combat events like disarming, staggering, and vulnerability
     /// - Escalating combat intensity over time
     ///
-    /// The enhanced system reduces complete misses and adds exciting special outcomes
+    /// The system reduces complete misses and adds exciting special outcomes
     /// like weapon disarming, temporary stuns, and tactical advantages.
     ///
     /// - Parameters:
@@ -153,7 +160,7 @@ public struct StandardCombatSystem: CombatSystem {
         defender: Combatant,
         weapon playerWeapon: ItemProxy?,
         in context: ActionContext
-    ) async throws -> CombatEvent {
+    ) async -> CombatEvent {
         let engine = context.engine
 
         // Get current combat state for intensity and fatigue calculations
@@ -170,20 +177,20 @@ public struct StandardCombatSystem: CombatSystem {
 
         // Roll d20 for attack with dynamic combat intensity bonus
         let attackRoll = await engine.randomInt(in: 1...20)
-        let attackBonus = (try? await attacker.characterSheet.attackBonus) ?? 0
+        let attackBonus = await attacker.characterSheet.attackBonus
         let weaponBonus = await playerWeapon?.value ?? 0
         let intensityBonus = Int(3.0 + (intensity * 5.0))  // 3-8 bonus based on intensity
         let fatiguePenalty = Int(attackerFatigue * 3.0)  // 0-3 penalty from fatigue
 
         // Attribute-driven offense/defense weighting
         let offenseModifier =
-            (try? await computeOffenseModifier(
+            await computeOffenseModifier(
                 for: attacker,
                 weapon: playerWeapon,
                 intensity: intensity
-            )) ?? 0
-        let baseDefenderAC = (try? await defender.characterSheet.effectiveArmorClass) ?? 10
-        let defenseAdjustment = (try? await computeDefenseAdjustment(for: defender)) ?? 0
+            )
+        let baseDefenderAC = await defender.characterSheet.effectiveArmorClass
+        let defenseAdjustment = await computeDefenseAdjustment(for: defender)
 
         let totalAttack =
             attackRoll
@@ -203,16 +210,19 @@ public struct StandardCombatSystem: CombatSystem {
         // Special combat events: use contextual helper
         let escalation = combatState?.escalationLevel ?? 0.1
         let marginOfHitCandidate =
-            ((try? await attacker.characterSheet.attackBonus) ?? 0)
-            + weaponBonus + intensityBonus - fatiguePenalty + attackRoll
-            - ((try? await defender.characterSheet.effectiveArmorClass) ?? 10)
+            await attacker.characterSheet.attackBonus
+            - (await defender.characterSheet.effectiveArmorClass)
+            + weaponBonus
+            + intensityBonus
+            - fatiguePenalty
+            + attackRoll
         let triggerSpecialEvent = await shouldTriggerSpecialEvent(
             attackRoll: attackRoll,
             marginOfHit: marginOfHitCandidate,
             escalation: escalation,
             intensity: intensity,
-            attacker: try? await attacker.characterSheet,
-            defender: try? await defender.characterSheet,
+            attacker: await attacker.characterSheet,
+            defender: await defender.characterSheet,
             engine: engine
         )
 
@@ -226,7 +236,7 @@ public struct StandardCombatSystem: CombatSystem {
 
         logger.debug(
             """
-            \n🎲 \(attacker.description.capitalizedFirst.possessive) enhanced attack roll:
+            \n🎲 \(attacker.description.capitalizedFirst.possessive) attack roll:
             ------------------------------------
             attackRoll:      \(attackRoll)
             attackBonus:     \(attackBonus)
@@ -309,12 +319,13 @@ public struct StandardCombatSystem: CombatSystem {
             }
         }
 
-        // Check for special combat events before damage calculation
+        // Store special event for potential use alongside damage
+        var specialEvent: CombatEvent?
         if triggerSpecialEvent {
             let eventType = await engine.randomInt(in: 1...6)
 
             switch eventType {
-            case 1:  // Disarm
+            case 1:  // Disarm - dramatic, no damage
                 if case .enemy(let enemy) = defender, let playerWeapon, let enemyWeapon {
                     return .enemyDisarmed(
                         enemy: enemy,
@@ -324,7 +335,7 @@ public struct StandardCombatSystem: CombatSystem {
                     )
                 }
                 if case .enemy(let enemy) = attacker,
-                    let defenderWeapon = try await defender.preferredWeapon
+                    let defenderWeapon = await defender.preferredWeapon
                 {
                     return .playerDisarmed(
                         enemy: enemy,
@@ -333,39 +344,39 @@ public struct StandardCombatSystem: CombatSystem {
                         wasFumble: false
                     )
                 }
-            case 2:  // Stagger
+            case 2:  // Stagger - status effect, allow damage
                 if case .enemy(let enemy) = defender {
-                    return .enemyStaggers(
+                    specialEvent = .enemyStaggers(
                         enemy: enemy, playerWeapon: playerWeapon, enemyWeapon: nil)
                 }
                 if case .enemy(let enemy) = attacker {
-                    return .playerStaggers(enemy: enemy, enemyWeapon: enemyWeapon)
+                    specialEvent = .playerStaggers(enemy: enemy, enemyWeapon: enemyWeapon)
                 }
-            case 3:  // Hesitate
+            case 3:  // Hesitate - status effect, allow damage
                 if case .enemy(let enemy) = defender {
-                    return .enemyHesitates(
+                    specialEvent = .enemyHesitates(
                         enemy: enemy,
                         playerWeapon: playerWeapon,
                         enemyWeapon: nil
                     )
                 }
                 if case .enemy(let enemy) = attacker {
-                    return .playerHesitates(enemy: enemy, enemyWeapon: enemyWeapon)
+                    specialEvent = .playerHesitates(enemy: enemy, enemyWeapon: enemyWeapon)
                 }
-            case 4:  // Vulnerable
+            case 4:  // Vulnerable - status effect, allow damage
                 if case .enemy(let enemy) = defender {
-                    return .enemyVulnerable(
+                    specialEvent = .enemyVulnerable(
                         enemy: enemy,
                         playerWeapon: playerWeapon,
                         enemyWeapon: nil
                     )
                 }
                 if case .enemy(let enemy) = attacker {
-                    return .playerVulnerable(enemy: enemy, enemyWeapon: enemyWeapon)
+                    specialEvent = .playerVulnerable(enemy: enemy, enemyWeapon: enemyWeapon)
                 }
-            case 5:  // Unconscious (rare, only on very damaged opponents)
-                let defenderHealth = (try? await defender.health) ?? 0
-                let defenderMaxHealth = (try? await defender.characterSheet.maxHealth) ?? 100
+            case 5:  // Unconscious - dramatic, no damage
+                let defenderHealth = await defender.health
+                let defenderMaxHealth = await defender.characterSheet.maxHealth
                 let defenderHealthPercent = (defenderHealth * 100) / defenderMaxHealth
                 if defenderHealthPercent <= 25 {
                     if case .enemy(let enemy) = defender {
@@ -381,22 +392,29 @@ public struct StandardCombatSystem: CombatSystem {
             }
         }
 
-        // Calculate enhanced base damage with intensity and fatigue modifiers
+        // If we have a special event that allows damage, we'll combine them
+        // Most special events now happen IN ADDITION to damage, not instead of it
+
+        // Return special event first if it exists and precludes damage
+        if let specialEvent {
+            return specialEvent
+        }
+
+        // Calculate base damage with intensity and fatigue modifiers
         let weaponDamage = await playerWeapon?.weaponDamage ?? 8  // Increased from 4
         let baseDamage = await engine.randomInt(in: 2...weaponDamage)  // Minimum 2 damage
-        let attackerBonus = (try? await attacker.characterSheet.damageBonus) ?? 0
+        let attackerBonus = await attacker.characterSheet.damageBonus
         let intensityDamageBonus = Int(intensity * 4.0)  // 0-4 bonus damage from intensity
         let fatigueDamagePenalty = Int(attackerFatigue * 2.0)  // 0-2 damage reduction from fatigue
 
         // Attribute-driven damage adjustments
-        let damageAdjustment =
-            (try? await computeDamageAdjustment(
-                attacker: attacker,
-                defender: defender,
-                weapon: playerWeapon,
-                intensity: intensity,
-                isCritical: false
-            )) ?? (flat: 0, multiplier: 1.0)
+        let damageAdjustment = await computeDamageAdjustment(
+            attacker: attacker,
+            defender: defender,
+            weapon: playerWeapon,
+            intensity: intensity,
+            isCritical: false
+        )
 
         var damage =
             baseDamage
@@ -431,7 +449,7 @@ public struct StandardCombatSystem: CombatSystem {
 
         // Apply weapon weaknesses and resistances for enemy defenders
         if case .enemy(let enemy) = defender, let playerWeapon {
-            let characterSheet = try await enemy.characterSheet
+            let characterSheet = await enemy.characterSheet
             // Check for weakness (bonus damage)
             if let weakness = characterSheet.weaponWeaknesses[playerWeapon.id] {
                 stats.append("weakness: +\(weakness)")
@@ -444,7 +462,7 @@ public struct StandardCombatSystem: CombatSystem {
             }
         }
 
-        let defenderHealth = (try? await defender.health) ?? 0
+        let defenderHealth = await defender.health
         if let weaponName = await playerWeapon?.name {
             stats.append("weapon:       \(weaponName.capitalizedFirst)")
         }
@@ -452,12 +470,12 @@ public struct StandardCombatSystem: CombatSystem {
         // Categorize the outcome based on damage and defender health
         let category = CombatEvent.DamageCategory(
             damage: damage,
-            currentHealth: (try? await defender.health) ?? 0
+            currentHealth: await defender.health
         )
 
         logger.debug(
             """
-            \n🎲 \(attacker.description.capitalizedFirst.possessive) enhanced damage roll:
+            \n🎲 \(attacker.description.capitalizedFirst.possessive) damage roll:
             ------------------------------------
             \(stats.joined(separator: .linebreak))
             prev health:  \(defenderHealth)
@@ -592,10 +610,10 @@ public struct StandardCombatSystem: CombatSystem {
         against playerAction: PlayerAction,
         enemy: ItemProxy,
         in context: ActionContext
-    ) async throws -> CombatEvent? {
-        guard try await enemy.isAwake else { return nil }
+    ) async -> CombatEvent? {
+        guard await enemy.isAwake else { return nil }
 
-        let characterSheet = try await enemy.characterSheet
+        let characterSheet = await enemy.characterSheet
 
         // Calculate current health percentage and get combat state
         let healthPercent = 100 * characterSheet.health / characterSheet.maxHealth
@@ -608,8 +626,8 @@ public struct StandardCombatSystem: CombatSystem {
         if healthPercent <= characterSheet.fleeHealthPercent || enemyFatigue > 0.8 {
             if await context.engine.randomPercentage(chance: fleeChance) {
                 // Determine flee destination (simple implementation)
-                let currentLocation = try await context.player.location
-                let validExits = try await currentLocation.exits.filter {
+                let currentLocation = await context.player.location
+                let validExits = await currentLocation.exits.filter {
                     $0.destinationID != nil && $0.blockedMessage == nil
                 }
                 if let flightExit = await context.engine.randomElement(in: validExits) {
@@ -654,7 +672,7 @@ public struct StandardCombatSystem: CombatSystem {
             let bestRoll = max(roll1, roll2)
 
             // Calculate attack with advantage, considering enemy fatigue
-            let attackBonus = try await enemy.characterSheet.attackBonus
+            let attackBonus = await enemy.characterSheet.attackBonus
             let opportunityBonus = 7 - Int(enemyFatigue * 3.0)  // Reduced bonus if enemy is tired
             let totalAttack = bestRoll + attackBonus + opportunityBonus
 
@@ -692,9 +710,9 @@ public struct StandardCombatSystem: CombatSystem {
                 return .playerDodged(enemy: enemy, enemyWeapon: enemyWeapon)
             }
 
-            // Calculate enhanced damage with bonus for distracted player and intensity
+            // Calculate damage with bonus for distracted player and intensity
             var damage = await context.engine.randomInt(in: 3...12)  // Higher base damage when distracted
-            damage += try await enemy.characterSheet.damageBonus
+            damage += await enemy.characterSheet.damageBonus
             damage += 5 - Int(enemyFatigue * 2.0)  // Reduced bonus if enemy is fatigued
             damage += Int(intensity * 3.0)  // Intensity bonus for opportunity attacks
             if isCritical {
@@ -727,7 +745,7 @@ public struct StandardCombatSystem: CombatSystem {
         }
 
         // Counter-attack
-        return try await calculateAttackOutcome(
+        return await calculateAttackOutcome(
             attacker: .enemy(enemy),
             defender: .player(context.player),
             weapon: nil,  // Enemy weapons handled internally
@@ -746,14 +764,14 @@ public struct StandardCombatSystem: CombatSystem {
         from enemy: ItemProxy,
         in combatTurn: CombatTurn,
         tauntRoll: Int = 13
-    ) async throws -> CombatEvent? {
+    ) async -> CombatEvent? {
         guard await enemy.engine.rollD20(rollsAtLeast: tauntRoll) else {
             return nil
         }
         let enemyTauntChance = combatTurn.enemyEvent?.chanceToProvokeEnemyTaunt ?? 0
         let playerTauntChance = combatTurn.playerEvent?.chanceToProvokeEnemyTaunt ?? 0
         if await enemy.engine.randomDouble() < max(enemyTauntChance, playerTauntChance),
-            let taunt = try await enemy.engine.randomElement(in: enemy.characterSheet.taunts)
+            let taunt = await enemy.engine.randomElement(in: enemy.characterSheet.taunts)
         {
             return .enemyTaunts(enemy: enemy, message: taunt)
         }
@@ -778,8 +796,8 @@ public struct StandardCombatSystem: CombatSystem {
         for playerAction: PlayerAction,
         against enemy: ItemProxy,
         in context: ActionContext
-    ) async throws -> CombatEvent? {
-        let characterSheet = try await enemy.characterSheet
+    ) async -> CombatEvent? {
+        let characterSheet = await enemy.characterSheet
 
         // If player cannot act (unconscious/asleep/coma), interrupt combat with narrative only
         if await context.player.canAct == false {
@@ -794,7 +812,7 @@ public struct StandardCombatSystem: CombatSystem {
                 if let specified = context.command.indirectObject?.itemProxy {
                     specified
                 } else {
-                    try await context.player.preferredWeapon
+                    await context.player.preferredWeapon
                 }
 
             // Check for weapon requirements
@@ -810,7 +828,7 @@ public struct StandardCombatSystem: CombatSystem {
             }
 
             // Calculate attack outcome
-            return try await calculateAttackOutcome(
+            return await calculateAttackOutcome(
                 attacker: .player(context.player),
                 defender: .enemy(enemy),
                 weapon: weapon,
@@ -890,13 +908,13 @@ public struct StandardCombatSystem: CombatSystem {
     func recalculateCombatState(
         after turn: CombatTurn,
         in context: ActionContext
-    ) async throws -> CombatState? {
+    ) async -> CombatState? {
         guard let currentState = await context.engine.combatState else {
             // Create initial combat state if none exists
             return CombatState(
                 enemyID: enemyID,
-                playerWeaponID: try await context.player.preferredWeapon?.id,
-                enemyWeaponID: try await context.engine.item(enemyID).preferredWeapon?.id
+                playerWeaponID: await context.player.preferredWeapon?.id,
+                enemyWeaponID: await context.item(enemyID).preferredWeapon?.id
             )
         }
 
@@ -911,36 +929,30 @@ public struct StandardCombatSystem: CombatSystem {
             }
         }
 
-        logger.debug(
-            "🔍 Combat state check: combatShouldEnd=\(combatShouldEnd), events=\(turn.allEvents.map { String(describing: $0) })"
-        )
-
         guard !combatShouldEnd else {
-            logger.debug("⚔️ Combat ending due to combat-ending events")
             return nil  // Combat ends
         }
 
         // Get character sheets for attribute-based calculations
         let playerSheet = await context.player.characterSheet
-        let enemySheet = try await context.engine.item(enemyID).characterSheet
+        let enemySheet = await context.item(enemyID).characterSheet
 
         // Calculate attribute-based base fatigue and intensity modifiers
         let (baseFatigueModifiers, baseIntensityModifier) =
-            try await calculateAttributeBasedModifiers(
+            await calculateAttributeBasedModifiers(
                 playerSheet: playerSheet,
                 enemySheet: enemySheet,
                 currentState: currentState,
                 context: context
             )
 
-        // Start with enhanced base values influenced by character attributes
+        // Start with base values influenced by character attributes
         var intensityDelta = 0.08 + baseIntensityModifier  // Increased from 0.05
         var playerFatigueDelta = 0.06 + baseFatigueModifiers.player  // Increased from 0.03
         var enemyFatigueDelta = 0.06 + baseFatigueModifiers.enemy  // Increased from 0.03
 
         var newPlayerWeapon = currentState.playerWeaponID
         var newEnemyWeapon = currentState.enemyWeaponID
-        var additionalModifiers: [String: StateValue] = [:]
 
         // Analyze events for intensity and fatigue modifiers
         for event in turn.allEvents {
@@ -966,21 +978,21 @@ public struct StandardCombatSystem: CombatSystem {
             case .enemyDisarmed:
                 newEnemyWeapon = nil
                 intensityDelta += 0.25  // Increased from 0.20 - Disarmament is dramatic
-                additionalModifiers["enemyDisarmed"] = .bool(true)
+
                 enemyFatigueDelta += 0.05  // Disarming is exhausting
 
             case .playerDisarmed:
                 newPlayerWeapon = nil
                 intensityDelta += 0.25  // Increased from 0.20
-                additionalModifiers["playerDisarmed"] = .bool(true)
+
                 playerFatigueDelta += 0.05  // Disarming is exhausting
 
             case .enemyStaggers:
-                additionalModifiers["enemyStaggered"] = .bool(true)
+
                 enemyFatigueDelta += 0.05  // Increased from 0.03
 
             case .playerStaggers:
-                additionalModifiers["playerStaggered"] = .bool(true)
+
                 playerFatigueDelta += 0.05  // Increased from 0.03
 
             case .enemyMissed, .enemyBlocked:
@@ -1002,7 +1014,7 @@ public struct StandardCombatSystem: CombatSystem {
         }
 
         // Apply round duration fatigue based on constitution and armor
-        let roundDurationFatigue = try await calculateRoundDurationFatigue(
+        let roundDurationFatigue = await calculateRoundDurationFatigue(
             playerSheet: playerSheet,
             enemySheet: enemySheet,
             currentState: currentState,
@@ -1016,8 +1028,7 @@ public struct StandardCombatSystem: CombatSystem {
             playerFatigueDelta: playerFatigueDelta,
             enemyFatigueDelta: enemyFatigueDelta,
             newPlayerWeapon: newPlayerWeapon,
-            newEnemyWeapon: newEnemyWeapon,
-            additionalModifiers: additionalModifiers
+            newEnemyWeapon: newEnemyWeapon
         )
     }
 
@@ -1041,7 +1052,7 @@ public struct StandardCombatSystem: CombatSystem {
         enemySheet: CharacterSheet,
         currentState: CombatState,
         context: ActionContext
-    ) async throws -> (fatigue: (player: Double, enemy: Double), intensity: Double) {
+    ) async -> (fatigue: (player: Double, enemy: Double), intensity: Double) {
 
         // Player fatigue modifiers
         var playerFatigueMod = 0.0
@@ -1098,18 +1109,15 @@ public struct StandardCombatSystem: CombatSystem {
 
         // Higher bravery and lower wisdom lead to more intense combat
         intensityMod += Double(playerSheet.braveryModifier + enemySheet.braveryModifier) * 0.06
-        intensityMod -= Double(playerSheet.wisdomModifier + enemySheet.wisdomModifier) * 0.03  // Wisdom tempers intensity
+
+        // Wisdom tempers intensity
+        intensityMod -= Double(playerSheet.wisdomModifier + enemySheet.wisdomModifier) * 0.03
 
         // Low health combats are more desperate and intense
         let avgHealthPercent = (playerHealthPercent + enemyHealthPercent) / 2
         if avgHealthPercent < 60 {
             intensityMod += Double(60 - avgHealthPercent) * 0.005
         }
-
-        // Clamp modifiers to reasonable ranges
-        //        playerFatigueMod = max(-0.03, min(0.05, playerFatigueMod))
-        //        enemyFatigueMod = max(-0.03, min(0.05, enemyFatigueMod))
-        //        intensityMod = max(-0.02, min(0.04, intensityMod))
 
         return (
             fatigue: (player: playerFatigueMod, enemy: enemyFatigueMod), intensity: intensityMod
@@ -1135,7 +1143,7 @@ public struct StandardCombatSystem: CombatSystem {
         enemySheet: CharacterSheet,
         currentState: CombatState,
         context: ActionContext
-    ) async throws -> (player: Double, enemy: Double) {
+    ) async -> (player: Double, enemy: Double) {
 
         // Base round fatigue - everyone gets a little tired each round
         var playerRoundFatigue = 0.08  // Base fatigue per round (increased for 5-round combat)
@@ -1146,14 +1154,14 @@ public struct StandardCombatSystem: CombatSystem {
         enemyRoundFatigue -= Double(enemySheet.constitutionModifier) * 0.015
 
         // Heavy weapons are more tiring to wield
-        if let playerWeapon = try? await currentState.playerWeapon(with: context.engine) {
+        if let playerWeapon = await currentState.playerWeapon(with: context.engine) {
             let weaponDamage = await playerWeapon.weaponDamage
             if weaponDamage > 8 {  // Heavy weapons
                 playerRoundFatigue += Double(weaponDamage - 8) * 0.01
             }
         }
 
-        if let enemyWeapon = try? await currentState.enemyWeapon(with: context.engine) {
+        if let enemyWeapon = await currentState.enemyWeapon(with: context.engine) {
             let weaponDamage = await enemyWeapon.weaponDamage
             if weaponDamage > 8 {
                 enemyRoundFatigue += Double(weaponDamage - 8) * 0.01
@@ -1224,10 +1232,10 @@ public struct StandardCombatSystem: CombatSystem {
         in context: ActionContext
     ) async throws -> ActionResult {
         let description =
-            if let custom = try await description(event, context.combatMsg) {
+            if let custom = await description(event, context.combatMsg) {
                 custom
             } else {
-                try await defaultCombatDescription(of: event, via: context.combatMsg)
+                await defaultCombatDescription(of: event, via: context.combatMsg)
             }
 
         switch event {
@@ -1242,7 +1250,7 @@ public struct StandardCombatSystem: CombatSystem {
         // Enemy damage events
 
         case .enemySlain(let enemy, _, _, let damage):
-            return try await ActionResult(
+            return await ActionResult(
                 description,
                 enemy.takeDamage(damage),
                 context.engine.endCombat(),
@@ -1262,9 +1270,10 @@ public struct StandardCombatSystem: CombatSystem {
                 effects: [
                     .startEnemyWakeUpFuse(
                         enemyID: enemy.id,
+                        locationID: await context.player.location.id,
                         message: context.combatMsg.enemyWakes(enemy: enemy),
                         turns: context.engine.randomInt(in: 3...6)
-                    )
+                    ),
                 ]
             )
 
@@ -1273,7 +1282,7 @@ public struct StandardCombatSystem: CombatSystem {
             .enemyInjured(let enemy, _, _, let damage),
             .enemyLightlyInjured(let enemy, _, _, let damage),
             .enemyGrazed(let enemy, _, _, let damage):
-            return try await ActionResult(
+            return await ActionResult(
                 description,
                 enemy.takeDamage(damage)
             )
@@ -1284,7 +1293,7 @@ public struct StandardCombatSystem: CombatSystem {
         // Player damage events
 
         case .playerSlain(let enemy, _, let damage):
-            return try await ActionResult(
+            return await ActionResult(
                 description,
                 context.player.takeDamage(damage),
                 context.player.setCharacterAttributes(
@@ -1296,7 +1305,6 @@ public struct StandardCombatSystem: CombatSystem {
             )
 
         case .playerUnconscious(let enemy, _, let damage):
-            let currentLocation = try await context.player.location
             return try await ActionResult(
                 message: description,
                 changes: [
@@ -1307,10 +1315,10 @@ public struct StandardCombatSystem: CombatSystem {
                 effects: [
                     .startEnemyReturnFuse(
                         enemyID: enemy.id,
-                        to: currentLocation.id,
+                        to: await context.player.location.id,
                         message: context.combatMsg.enemyReturns(enemy: enemy),
                         turns: context.engine.randomInt(in: 2...4)
-                    )
+                    ),
                 ]
             )
 
@@ -1330,26 +1338,26 @@ public struct StandardCombatSystem: CombatSystem {
         // Special outcomes
 
         case .enemyDisarmed(let enemy, _, let enemyWeapon, _):
-            return try await ActionResult(
+            return await ActionResult(
                 description,
                 enemy.setCharacterAttributes(combatCondition: .disarmed),
                 enemyWeapon.move(to: context.player.location.id),
             )
 
         case .enemyStaggers(let enemy, _, _):
-            return try await ActionResult(
+            return await ActionResult(
                 description,
                 enemy.setCharacterAttributes(combatCondition: .offBalance)
             )
 
         case .enemyHesitates(let enemy, _, _):
-            return try await ActionResult(
+            return await ActionResult(
                 description,
                 enemy.setCharacterAttributes(combatCondition: .uncertain)
             )
 
         case .enemyVulnerable(let enemy, _, _):
-            return try await ActionResult(
+            return await ActionResult(
                 description,
                 enemy.setCharacterAttributes(combatCondition: .vulnerable)
             )
@@ -1366,17 +1374,17 @@ public struct StandardCombatSystem: CombatSystem {
             }
 
         case .enemyPacified(let enemy, _):
-            return try await ActionResult(
+            return await ActionResult(
                 description,
                 context.engine.endCombat(),
                 enemy.setCharacterAttributes(isFighting: false),
             )
 
         case .enemySurrenders(let enemy, _):
-            var sheet = try await enemy.characterSheet
+            var sheet = await enemy.characterSheet
             sheet.isFighting = false
             sheet.combatCondition = .surrendered
-            return try await ActionResult(
+            return await ActionResult(
                 description,
                 context.engine.endCombat(),
                 enemy.setCharacterAttributes(
@@ -1413,7 +1421,7 @@ public struct StandardCombatSystem: CombatSystem {
     /// - Returns: The enemy's weapon as an ItemProxy, or nil if no weapon or no combat
     func getEnemyWeapon(from engine: GameEngine) async -> ItemProxy? {
         guard let combatState = await engine.combatState else { return nil }
-        return try? await combatState.enemyWeapon(with: engine)
+        return await combatState.enemyWeapon(with: engine)
     }
 
     // MARK: - Weighting Helpers
@@ -1427,8 +1435,8 @@ public struct StandardCombatSystem: CombatSystem {
         for attacker: Combatant,
         weapon: ItemProxy?,
         intensity: Double
-    ) async throws -> Int {
-        let sheet = try await attacker.characterSheet
+    ) async -> Int {
+        let sheet = await attacker.characterSheet
 
         var modifier = 0
 
@@ -1454,6 +1462,9 @@ public struct StandardCombatSystem: CombatSystem {
         // Slight benefit when properly armed (without inspecting weapon style)
         if weapon != nil { modifier += 1 }
 
+        // Combat condition effects on offense
+        modifier += sheet.combatCondition.attackModifier
+
         // Intensity can sharpen focus a bit
         modifier += Int(intensity * 2.0)  // 0..2
 
@@ -1467,8 +1478,8 @@ public struct StandardCombatSystem: CombatSystem {
     /// Considers perception, luck, bravery, morale, health, consciousness, and general condition.
     func computeDefenseAdjustment(
         for defender: Combatant
-    ) async throws -> Int {
-        let sheet = try await defender.characterSheet
+    ) async -> Int {
+        let sheet = await defender.characterSheet
 
         var adjustment = 0
 
@@ -1499,17 +1510,19 @@ public struct StandardCombatSystem: CombatSystem {
 
     /// Computes damage adjustments as a flat bonus and a multiplier.
     ///
-    /// - Flat bonus reflects raw power and technique (strength, dexterity, level, morale, bravery, luck, health).
-    /// - Multiplier reflects tactical advantage and state (intimidation vs bravery, conditions, intensity, target health).
+    /// - Flat bonus reflects raw power and technique (strength, dexterity, level, morale,
+    ///   bravery, luck, health).
+    /// - Multiplier reflects tactical advantage and state (intimidation vs bravery, conditions,
+    ///   intensity, target health).
     func computeDamageAdjustment(
         attacker: Combatant,
         defender: Combatant,
         weapon: ItemProxy?,
         intensity: Double,
         isCritical: Bool
-    ) async throws -> (flat: Int, multiplier: Double) {
-        let atk = try await attacker.characterSheet
-        let def = try await defender.characterSheet
+    ) async -> (flat: Int, multiplier: Double) {
+        let atk = await attacker.characterSheet
+        let def = await defender.characterSheet
 
         // Flat component
         var flat = 0
@@ -1557,7 +1570,7 @@ public struct StandardCombatSystem: CombatSystem {
     ///
     /// Factors include: natural roll, margin of hit, escalation, intensity, attacker and defender luck,
     /// and defender current health percent. The threshold is conservative so specials remain exciting.
-    func shouldTriggerSpecialEvent(
+    func shouldTriggerSpecialEvent(  // swiftlint:disable:this function_parameter_count
         attackRoll: Int,
         marginOfHit: Int,
         escalation: Double,
@@ -1568,21 +1581,21 @@ public struct StandardCombatSystem: CombatSystem {
     ) async -> Bool {
         if attackRoll == 20 { return true }
 
-        // Base threshold starts high, lowered by favorable context
-        var threshold: Double = 20.0
-        threshold -= escalation * 8.0  // 0..8 easier with escalation
-        threshold -= intensity * 4.0  // 0..4 easier with intensity
-        threshold -= Double(max(0, marginOfHit)) * 0.8  // strong hits more likely
+        // Base threshold starts very high to keep special events RARE
+        var threshold: Double = 25.0
+        threshold -= escalation * 3.0  // 0..3 easier with escalation (reduced from 8.0)
+        threshold -= intensity * 1.5  // 0..1.5 easier with intensity (reduced from 4.0)
+        threshold -= Double(max(0, marginOfHit)) * 0.3  // strong hits slightly more likely (reduced from 0.8)
 
-        // Luck influences
-        if let attacker { threshold -= Double(attacker.luckModifier) * 0.6 }
-        if let defender { threshold += Double(defender.luckModifier) * 0.4 }
+        // Luck influences (much reduced)
+        if let attacker { threshold -= Double(attacker.luckModifier) * 0.2 }
+        if let defender { threshold += Double(defender.luckModifier) * 0.1 }
 
         // Very low defender health makes dramatic outcomes more likely
-        if let defender, defender.healthPercent <= 25 { threshold -= 2.0 }
+        if let defender, defender.healthPercent <= 15 { threshold -= 1.5 }  // Only at very low health
 
-        // Clamp threshold to sane bounds
-        threshold = max(8.0, min(20.0, threshold))
+        // Clamp threshold to maintain rarity - most special events require 18+ on d20
+        threshold = max(15.0, min(25.0, threshold))
 
         let roll = await engine.randomInt(in: 1...20)
         return Double(roll) >= threshold

@@ -32,7 +32,7 @@ public struct TouchActionHandler: ActionHandler {
             throw ActionResponse.doWhat(context)
         }
 
-        return try await ActionResult(
+        return await ActionResult(
             item.response(
                 object: { context.msg.touchObject(context.verb, item: $0) },
                 character: { context.msg.touchCharacter(context.verb, character: $0) },

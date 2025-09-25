@@ -41,7 +41,7 @@ public struct DeflateActionHandler: ActionHandler {
                 context.msg.itemNotInflated(await item.withDefiniteArticle)
             }
 
-        return try await ActionResult(
+        return await ActionResult(
             message,
             item.setFlag(.isTouched),
             item.clearFlag(.isInflated)

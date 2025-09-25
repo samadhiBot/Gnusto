@@ -39,7 +39,7 @@ struct OpenActionHandlerTests {
             """
         )
 
-        let finalState = try await engine.item("chest")
+        let finalState = await engine.item("chest")
         #expect(await finalState.hasFlag(.isOpen) == true)
         #expect(await finalState.hasFlag(.isTouched) == true)
     }
@@ -239,7 +239,7 @@ struct OpenActionHandlerTests {
             """
         )
 
-        let finalState = try await engine.item("box")
+        let finalState = await engine.item("box")
         #expect(await finalState.hasFlag(.isOpen) == true)
         #expect(await finalState.hasFlag(.isTouched) == true)
     }
@@ -314,7 +314,7 @@ struct OpenActionHandlerTests {
             """
         )
 
-        let finalState = try await engine.item("mailbox")
+        let finalState = await engine.item("mailbox")
         #expect(await finalState.hasFlag(.isOpen) == true)
     }
 
@@ -418,7 +418,7 @@ struct OpenActionHandlerTests {
         try await engine.execute("open container")
 
         // Then
-        let finalState = try await engine.item("container")
+        let finalState = await engine.item("container")
         #expect(await finalState.hasFlag(.isTouched) == true)
     }
 

@@ -48,7 +48,7 @@ struct FillActionHandlerTests {
             """
         )
 
-        let finalState = try await engine.item("bucket")
+        let finalState = await engine.item("bucket")
         #expect(await finalState.hasFlag(.isTouched) == true)
     }
 
@@ -438,8 +438,8 @@ struct FillActionHandlerTests {
             """
         )
 
-        let finalFlaskState = try await engine.item("flask")
-        #expect(try await finalFlaskState.playerIsHolding)  // Still held by player
+        let finalFlaskState = await engine.item("flask")
+        #expect(await finalFlaskState.playerIsHolding)  // Still held by player
         #expect(await finalFlaskState.hasFlag(.isTouched) == true)
     }
 
@@ -474,7 +474,7 @@ struct FillActionHandlerTests {
         try await engine.execute("fill mug with pond")
 
         // Then: Verify state changes
-        let finalState = try await engine.item("mug")
+        let finalState = await engine.item("mug")
         #expect(await finalState.hasFlag(.isTouched) == true)
 
         // Verify message
@@ -560,8 +560,8 @@ struct FillActionHandlerTests {
         )
 
         // Verify both containers were touched
-        let bottleState = try await engine.item("bottle")
-        let bucketState = try await engine.item("bucket")
+        let bottleState = await engine.item("bottle")
+        let bucketState = await engine.item("bucket")
         #expect(await bottleState.hasFlag(.isTouched) == true)
         #expect(await bucketState.hasFlag(.isTouched) == true)
     }

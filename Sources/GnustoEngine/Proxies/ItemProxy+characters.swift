@@ -12,9 +12,10 @@ extension ItemProxy {
     ///
     /// Returns nil for non-character items.
     public var characterSheet: CharacterSheet {
-        get async throws {
-            guard let sheet = try await property(.characterSheet)?.toCharacterSheet else {
-                throw ItemError.notACharacter(id)
+        get async {
+            guard let sheet = await property(.characterSheet)?.toCharacterSheet else {
+                assertionFailure("ItemProxy.characterSheet called on non-character item")
+                return CharacterSheet()
             }
             return sheet
         }
@@ -25,8 +26,8 @@ extension ItemProxy {
     /// Returns the gender from the character sheet for pronoun and article resolution.
     /// - Throws: `ItemError.notACharacter` if the item doesn't have a character sheet.
     public var classification: Classification {
-        get async throws {
-            try await characterSheet.classification
+        get async {
+            await characterSheet.classification
         }
     }
 
@@ -35,8 +36,8 @@ extension ItemProxy {
     /// Used for combat and other health-related mechanics.
     /// - Throws: `ItemError.notACharacter` if the item doesn't have a character sheet.
     public var health: Int {
-        get async throws {
-            try await characterSheet.health
+        get async {
+            await characterSheet.health
         }
     }
 
@@ -46,11 +47,10 @@ extension ItemProxy {
     /// the `.isDead` flag set or having health <= 0).
     /// This property is used to determine if a character can perform actions, be interacted with,
     /// or participate in combat.
-    ///
-    /// - Throws: `ItemError.notACharacter` if the item doesn't have a character sheet.
     public var isAlive: Bool {
-        get async throws {
-            try await !characterSheet.isDead
+        get async {
+            guard await isCharacter else { return false }
+            return await !characterSheet.isDead
         }
     }
 
@@ -59,11 +59,10 @@ extension ItemProxy {
     /// Returns `true` only if the item is a character, is not dead, and is not
     /// unconscious. This property is used to determine if a character can perform
     /// conscious actions, respond to interactions, or participate in dialogue.
-    ///
-    /// - Throws: `ItemError.notACharacter` if the item doesn't have a character sheet.
     public var isAwake: Bool {
-        get async throws {
-            try await characterSheet.isAwake
+        get async {
+            guard await isCharacter else { return false }
+            return await characterSheet.isAwake
         }
     }
 
@@ -72,8 +71,8 @@ extension ItemProxy {
     /// Returns `true` if the item has a character sheet defined.
     /// Characters and persons can be talked to, fought, and may have special behaviors.
     public var isCharacter: Bool {
-        get async throws {
-            try await property(.characterSheet)?.toCharacterSheet != nil
+        get async {
+            await property(.characterSheet)?.toCharacterSheet != nil
         }
     }
 
@@ -81,11 +80,10 @@ extension ItemProxy {
     ///
     /// Returns `true` only if the item is a character and is either marked as dead
     /// in the character sheet or has health <= 0. This property is the inverse of `isAlive`.
-    ///
-    /// - Throws: `ItemError.notACharacter` if the item doesn't have a character sheet.
     public var isDead: Bool {
-        get async throws {
-            try await characterSheet.isDead
+        get async {
+            guard await isCharacter else { return false }
+            return await characterSheet.isDead
         }
     }
 
@@ -93,11 +91,10 @@ extension ItemProxy {
     ///
     /// Returns `true` only if the item is a character and is marked as disarmed
     /// in the character sheet. Disarmed characters fight with reduced effectiveness.
-    ///
-    /// - Throws: `ItemError.notACharacter` if the item doesn't have a character sheet.
     public var isDisarmed: Bool {
-        get async throws {
-            try await characterSheet.combatCondition == .disarmed
+        get async {
+            guard await isCharacter else { return false }
+            return await characterSheet.combatCondition == .disarmed
         }
     }
 
@@ -105,11 +102,10 @@ extension ItemProxy {
     ///
     /// Returns `true` only if the item is a character and has the fighting flag set.
     /// Fighting characters may attack the player or have different interaction behaviors.
-    ///
-    /// - Throws: `ItemError.notACharacter` if the item doesn't have a character sheet.
     public var isFighting: Bool {
-        get async throws {
-            try await characterSheet.isFighting
+        get async {
+            guard await isCharacter else { return false }
+            return await characterSheet.isFighting
         }
     }
 
@@ -117,13 +113,12 @@ extension ItemProxy {
     ///
     /// Returns `true` if the item is a character and is awake and actively fighting. Hostile
     /// enemies will attack the player and require different interaction handling.
-    ///
-    /// - Throws: `ItemError.notACharacter` if the item doesn't have a character sheet.
     public var isHostileEnemy: Bool {
-        get async throws {
-            let isAwake = try await isAwake
-            let isFighting = try await isFighting
-            let isSurrendered = try await isSurrendered
+        get async {
+            guard await isCharacter else { return false }
+            let isAwake = await isAwake
+            let isFighting = await isFighting
+            let isSurrendered = await isSurrendered
             return isAwake && isFighting && !isSurrendered
         }
     }
@@ -132,11 +127,10 @@ extension ItemProxy {
     ///
     /// Returns `true` only if the item is a character and is marked as off balance
     /// in the character sheet. Off-balance characters have reduced defensive capabilities.
-    ///
-    /// - Throws: `ItemError.notACharacter` if the item doesn't have a character sheet.
     public var isOffBalance: Bool {
-        get async throws {
-            try await characterSheet.combatCondition == .offBalance
+        get async {
+            guard await isCharacter else { return false }
+            return await characterSheet.combatCondition == .offBalance
         }
     }
 
@@ -144,11 +138,10 @@ extension ItemProxy {
     ///
     /// Returns `true` only if the item is a character and has surrendered
     /// according to the character sheet. Surrendered characters cease hostile actions.
-    ///
-    /// - Throws: `ItemError.notACharacter` if the item doesn't have a character sheet.
     public var isSurrendered: Bool {
-        get async throws {
-            try await characterSheet.combatCondition == .surrendered
+        get async {
+            guard await isCharacter else { return false }
+            return await characterSheet.combatCondition == .surrendered
         }
     }
 
@@ -156,11 +149,10 @@ extension ItemProxy {
     ///
     /// Returns `true` only if the item is a character and is marked as unconscious
     /// in the character sheet. Unconscious characters cannot act or defend effectively.
-    ///
-    /// - Throws: `ItemError.notACharacter` if the item doesn't have a character sheet.
     public var isUnconscious: Bool {
-        get async throws {
-            try await characterSheet.isUnconscious
+        get async {
+            guard await isCharacter else { return false }
+            return await characterSheet.isUnconscious
         }
     }
 
@@ -168,11 +160,10 @@ extension ItemProxy {
     ///
     /// Returns `true` only if the item is a character and is marked as vulnerable
     /// in the character sheet. Vulnerable characters are easier targets for attacks.
-    ///
-    /// - Throws: `ItemError.notACharacter` if the item doesn't have a character sheet.
     public var isVulnerable: Bool {
-        get async throws {
-            try await characterSheet.combatCondition == .vulnerable
+        get async {
+            guard await isCharacter else { return false }
+            return await characterSheet.combatCondition == .vulnerable
         }
     }
 
@@ -181,8 +172,8 @@ extension ItemProxy {
     /// Uses character properties health if available.
     /// - Throws: `ItemError.notACharacter` if the item doesn't have a character sheet.
     public var maxHealth: Int {
-        get async throws {
-            try await characterSheet.maxHealth
+        get async {
+            await characterSheet.maxHealth
         }
     }
 
@@ -190,8 +181,8 @@ extension ItemProxy {
     ///
     /// - Throws: Re-throws any errors from accessing the character's contents or weapon properties.
     public var preferredWeapon: ItemProxy? {
-        get async throws {
-            try await contents.sortedByWeaponDamage.first
+        get async {
+            await contents.sortedByWeaponDamage.first
         }
     }
 
@@ -201,26 +192,9 @@ extension ItemProxy {
     /// effectiveness, carrying capacity, and the success of strength-based actions
     /// like breaking objects or forcing doors. Higher strength values indicate
     /// greater physical capability.
-    ///
-    /// - Throws: `ItemError.notACharacter` if the item doesn't have a character sheet.
     public var strength: Int {
-        get async throws {
-            try await characterSheet.strength
-        }
-    }
-}
-
-// MARK: - ItemError
-
-/// Errors that can occur when working with ItemProxy character operations.
-public enum ItemError: Error, CustomStringConvertible {
-    /// Thrown when trying to access character-specific properties on a non-character item.
-    case notACharacter(ItemID)
-
-    public var description: String {
-        switch self {
-        case .notACharacter(let itemID):
-            return "Item '\(itemID)' is not a character and doesn't have a character sheet."
+        get async {
+            await characterSheet.strength
         }
     }
 }

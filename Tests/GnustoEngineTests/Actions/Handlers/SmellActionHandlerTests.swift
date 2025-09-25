@@ -35,12 +35,12 @@ struct SmellActionHandlerTests {
             output,
             """
             > smell lamp
-            The brass lamp smells exactly as you\'d expect, which is to say,
+            The brass lamp smells exactly as you'd expect, which is to say,
             not particularly noteworthy.
             """
         )
 
-        let finalState = try await engine.item("lamp")
+        let finalState = await engine.item("lamp")
         #expect(await finalState.hasFlag(.isTouched) == true)
     }
 
@@ -190,11 +190,11 @@ struct SmellActionHandlerTests {
             output,
             """
             > smell the wizard
-            The old wizard\'s personal aroma remains their private business.
+            The old wizard's personal aroma remains their private business.
             """
         )
 
-        let finalState = try await engine.item("wizard")
+        let finalState = await engine.item("wizard")
         #expect(await finalState.hasFlag(.isTouched) == true)
     }
 
@@ -226,16 +226,16 @@ struct SmellActionHandlerTests {
             output,
             """
             > smell the necromancer
-            You detect nothing unusual about the furious necromancer\'s
+            You detect nothing unusual about the furious necromancer's
             scent.
 
-            In a moment of raw violence, the furious necromancer comes at
-            you with nothing but fury! You raise your fists, knowing this
-            will hurt regardless of who wins.
+            No weapons between you--just the furious necromancer's
+            aggression and your desperation! You collide in a tangle of
+            strikes and blocks.
             """
         )
 
-        let finalState = try await engine.item("necromancer")
+        let finalState = await engine.item("necromancer")
         #expect(await finalState.hasFlag(.isTouched) == true)
     }
 

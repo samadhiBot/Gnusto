@@ -68,15 +68,15 @@ struct FuseIDTests {
     @Test("FuseID Hashability")
     func testHashability() throws {
         let fuseDict = [
-            FuseID("bombFuse"): "Explosive timer",
-            FuseID("candleTimer"): "Candle burndown",
-            FuseID("alarmClock"): "Scheduled alarm",
+            "bombFuse": "Explosive timer",
+            "candleTimer": "Candle burndown",
+            "alarmClock": "Scheduled alarm",
         ]
 
-        #expect(fuseDict[FuseID("bombFuse")] == "Explosive timer")
-        #expect(fuseDict[FuseID("candleTimer")] == "Candle burndown")
-        #expect(fuseDict[FuseID("alarmClock")] == "Scheduled alarm")
-        #expect(fuseDict[FuseID("nonexistent")] == nil)
+        #expect(fuseDict["bombFuse"] == "Explosive timer")
+        #expect(fuseDict["candleTimer"] == "Candle burndown")
+        #expect(fuseDict["alarmClock"] == "Scheduled alarm")
+        #expect(fuseDict["nonexistent"] == nil)
     }
 
     @Test("FuseID Set Operations")
@@ -141,8 +141,7 @@ struct FuseIDTests {
             "💣定时器",
         ]
 
-        let encoder = JSONEncoder()
-        encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
+        let encoder = JSONEncoder.sorted(.prettyPrinted)
         let decoder = JSONDecoder()
 
         for originalID in originalIDs {
@@ -157,7 +156,7 @@ struct FuseIDTests {
     @Test("FuseID JSON Representation")
     func testJSONRepresentation() throws {
         let id: FuseID = "bombFuse"
-        let encoder = JSONEncoder()
+        let encoder = JSONEncoder.sorted()
         let jsonData = try encoder.encode(id)
         let jsonString = String(data: jsonData, encoding: .utf8)
 
@@ -195,7 +194,7 @@ struct FuseIDTests {
         let results = await withTaskGroup(of: FuseID.self) { group in
             for fuseID in fuseIDs {
                 group.addTask {
-                    return fuseID
+                    fuseID
                 }
             }
 
@@ -219,10 +218,10 @@ struct FuseIDTests {
     @Test("FuseID Large Collection Performance")
     func testLargeCollectionPerformance() throws {
         // Create a large set of FuseIDs
-        let fuseIDs = (0..<1000).map { FuseID("fuse\($0)") }
+        let fuseIDs = (0..<1_000).map { FuseID("fuse\($0)") }
         let fuseSet = Set(fuseIDs)
 
-        #expect(fuseSet.count == 1000)
+        #expect(fuseSet.count == 1_000)
 
         // Test lookup performance
         let lookupID: FuseID = "fuse500"
@@ -233,7 +232,7 @@ struct FuseIDTests {
 
     @Test("FuseID Very Long String")
     func testVeryLongString() throws {
-        let longString = String(repeating: "a", count: 10000)
+        let longString = String(repeating: "a", count: 10_000)
         let id = FuseID(longString)
         #expect(id.rawValue == longString)
     }

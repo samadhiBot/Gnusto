@@ -46,7 +46,7 @@ struct AskActionHandlerTests {
             """
         )
 
-        let finalState = try await engine.item("wizard")
+        let finalState = await engine.item("wizard")
         #expect(await finalState.hasFlag(.isTouched) == true)
     }
 
@@ -339,7 +339,7 @@ struct AskActionHandlerTests {
         try await engine.execute("ask sage about scroll")
 
         // Then: Verify state change
-        let finalState = try await engine.item("sage")
+        let finalState = await engine.item("sage")
         #expect(await finalState.hasFlag(.isTouched) == true)
 
         // Verify message
@@ -484,7 +484,7 @@ struct AskActionHandlerTests {
         #expect(stillPending == false)
 
         // Verify wizard was touched and pronouns updated
-        let finalWizard = try await engine.item("wizard")
+        let finalWizard = await engine.item("wizard")
         #expect(await finalWizard.hasFlag(.isTouched) == true)
     }
 
@@ -531,7 +531,7 @@ struct AskActionHandlerTests {
         #expect(hasPending == false)
 
         // Verify oracle was touched
-        let finalOracle = try await engine.item("oracle")
+        let finalOracle = await engine.item("oracle")
         #expect(await finalOracle.hasFlag(.isTouched) == true)
     }
 

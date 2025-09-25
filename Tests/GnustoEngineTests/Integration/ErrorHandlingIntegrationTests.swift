@@ -417,8 +417,8 @@ struct ErrorHandlingIntegrationTests {
         )
 
         // And: Game state should be consistent
-        let item = try await engine.item("testItem")
-        #expect(try await item.parent == .player)
+        let item = await engine.item("testItem")
+        #expect(await item.parent == .player)
     }
 
     // MARK: - Edge Case Command Parsing
@@ -516,8 +516,8 @@ struct ErrorHandlingIntegrationTests {
         #expect(output.contains("ethereal item") && output.contains("Taken"))
 
         // Huge item might be rejected for size
-        let etherealItem = try await engine.item("zeroSize")
-        #expect(try await etherealItem.parent == .player)
+        let etherealItem = await engine.item("zeroSize")
+        #expect(await etherealItem.parent == .player)
     }
 
     // MARK: - Concurrent Operation Error Tests
@@ -571,8 +571,8 @@ struct ErrorHandlingIntegrationTests {
         )
 
         // Final state should be consistent
-        let finalItem = try await engine.item("item")
-        let finalParent = try await finalItem.parent
+        let finalItem = await engine.item("item")
+        let finalParent = await finalItem.parent
         if case .location(let parentLocation) = finalParent {
             #expect(parentLocation.id == .startRoom)
         }

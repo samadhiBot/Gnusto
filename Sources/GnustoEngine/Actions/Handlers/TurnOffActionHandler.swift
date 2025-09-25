@@ -9,12 +9,10 @@ public struct TurnOffActionHandler: ActionHandler {
     // MARK: - Verb Definition Properties
 
     public let syntax: [SyntaxRule] = [
-        .match(.verb, .off, .directObject),
+        .match(.verb, .off, .directObject)
     ]
 
     public let synonyms: [Verb] = [.switch, .turn]
-
-    public let actions: [Intent] = [.lightSource]
 
     public let requiresLight: Bool = false
 
@@ -46,7 +44,7 @@ public struct TurnOffActionHandler: ActionHandler {
             )
         }
 
-        return try await ActionResult(
+        return await ActionResult(
             context.msg.lightIsNowOff(targetItem.withDefiniteArticle),
             targetItem.setFlag(.isTouched),
             targetItem.clearFlag(.isOn)

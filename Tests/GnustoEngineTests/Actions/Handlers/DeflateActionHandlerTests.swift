@@ -40,7 +40,7 @@ struct DeflateActionHandlerTests {
             """
         )
 
-        let finalState = try await engine.item("balloon")
+        let finalState = await engine.item("balloon")
         #expect(await finalState.hasFlag(.isTouched) == true)
         #expect(await finalState.hasFlag(.isInflated) == false)
     }
@@ -203,7 +203,7 @@ struct DeflateActionHandlerTests {
         try await engine.execute("deflate raft")
 
         // Then: Verify state changes
-        let finalState = try await engine.item("raft")
+        let finalState = await engine.item("raft")
         #expect(await finalState.hasFlag(.isTouched) == true)
         #expect(await finalState.hasFlag(.isInflated) == false)
         #expect(await finalState.hasFlag(.isInflatable) == true)  // Still inflatable
@@ -252,7 +252,7 @@ struct DeflateActionHandlerTests {
         )
 
         // Should still touch the item
-        let finalState = try await engine.item("balloon")
+        let finalState = await engine.item("balloon")
         #expect(await finalState.hasFlag(.isTouched) == true)
         #expect(await finalState.hasFlag(.isInflated) == false)
     }
@@ -289,9 +289,9 @@ struct DeflateActionHandlerTests {
             """
         )
 
-        let finalState = try await engine.item("balloon")
+        let finalState = await engine.item("balloon")
         #expect(await finalState.hasFlag(.isInflated) == false)
-        #expect(try await finalState.playerIsHolding)  // Still held by player
+        #expect(await finalState.playerIsHolding)  // Still held by player
     }
 
     @Test("Deflate multiple different items")
@@ -348,8 +348,8 @@ struct DeflateActionHandlerTests {
         )
 
         // Verify both items are deflated
-        let balloonState = try await engine.item("balloon")
-        let mattressState = try await engine.item("mattress")
+        let balloonState = await engine.item("balloon")
+        let mattressState = await engine.item("mattress")
         #expect(await balloonState.hasFlag(.isInflated) == false)
         #expect(await mattressState.hasFlag(.isInflated) == false)
     }

@@ -34,13 +34,14 @@ import Foundation
 /// - `Sendable` for concurrency safety
 /// - Convenience initializer `init(_:)`
 public protocol GnustoID: Codable,
-                          Comparable,
-                          CustomDumpStringConvertible,
-                          CustomStringConvertible,
-                          ExpressibleByStringLiteral,
-                          Hashable,
-                          RawRepresentable,
-                          Sendable where RawValue == String {
+    Comparable,
+    CustomDumpStringConvertible,
+    CustomStringConvertible,
+    ExpressibleByStringLiteral,
+    Hashable,
+    RawRepresentable,
+    Sendable
+where RawValue == String {
     /// The underlying string value of the identifier.
     var rawValue: String { get }
 
@@ -97,10 +98,15 @@ extension GnustoID {
         lhs.rawValue.lowercased() < rhs.rawValue.lowercased()
     }
 
+    /// Returns a custom dump description for the ID.
+    /// Used by the CustomDump library for debugging output.
+    /// - Returns: A string representation prefixed with a dot (e.g., ".myId").
     public var customDumpDescription: String {
         ".\(rawValue)"
     }
 
+    /// Returns a string representation of the ID.
+    /// - Returns: A string representation prefixed with a dot (e.g., ".myId").
     public var description: String {
         ".\(rawValue)"
     }

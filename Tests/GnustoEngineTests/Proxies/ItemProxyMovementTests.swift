@@ -60,15 +60,15 @@ struct ItemProxyMovementTests {
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         // When: Getting available exits with .any behavior
-        let guardProxy = try await engine.item("guard")
-        let availableExits = try await guardProxy.availableExits(behavior: .any)
+        let guardProxy = await engine.item("guard")
+        let availableExits = await guardProxy.availableExits(behavior: .any)
 
         // Then: All exits should be available regardless of doors or blocked messages
         expectNoDifference(availableExits, [
             .north("library"),
             .east(blocked: "The wall is too thick"),
             .south("kitchen", via: "kitchenDoor"),
-            .west("garden")
+            .west("garden"),
         ])
     }
 
@@ -119,8 +119,8 @@ struct ItemProxyMovementTests {
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         // When: Getting available exits with normal behavior
-        let merchantProxy = try await engine.item("merchant")
-        let availableExits = try await merchantProxy.availableExits(behavior: .normal)
+        let merchantProxy = await engine.item("merchant")
+        let availableExits = await merchantProxy.availableExits(behavior: .normal)
 
         // Then: Only open exits and open doors should be available
         expectNoDifference(availableExits, [
@@ -182,13 +182,13 @@ struct ItemProxyMovementTests {
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         // When: Getting available exits with .closedDoors behavior
-        let thiefProxy = try await engine.item("thief")
-        let availableExits = try await thiefProxy.availableExits(behavior: .closedDoors)
+        let thiefProxy = await engine.item("thief")
+        let availableExits = await thiefProxy.availableExits(behavior: .closedDoors)
 
         // Then: Should be able to pass through open doors and closed unlocked doors
         expectNoDifference(availableExits, [
             .north("hall1", via: "door1"),
-            .east("hall3", via: "door3")
+            .east("hall3", via: "door3"),
         ])
     }
 
@@ -239,8 +239,8 @@ struct ItemProxyMovementTests {
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         // When: Getting available exits with specific keys
-        let burglarProxy = try await engine.item("burglar")
-        let availableExitsWithVaultKey = try await burglarProxy.availableExits(
+        let burglarProxy = await engine.item("burglar")
+        let availableExitsWithVaultKey = await burglarProxy.availableExits(
             behavior: .lockedDoorsUnlockedByKeys(["vaultKey"])
         )
 
@@ -250,7 +250,7 @@ struct ItemProxyMovementTests {
         ])
 
         // When: Getting available exits with both keys
-        let availableExitsWithBothKeys = try await burglarProxy.availableExits(
+        let availableExitsWithBothKeys = await burglarProxy.availableExits(
             behavior: .lockedDoorsUnlockedByKeys(["vaultKey", "safeKey"])
         )
 
@@ -285,8 +285,8 @@ struct ItemProxyMovementTests {
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         // When: Getting available exits
-        let ghostProxy = try await engine.item("ghost")
-        let availableExits = try await ghostProxy.availableExits()
+        let ghostProxy = await engine.item("ghost")
+        let availableExits = await ghostProxy.availableExits()
 
         // Then: Should return empty array
         #expect(availableExits.isEmpty)
@@ -317,8 +317,8 @@ struct ItemProxyMovementTests {
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         // When: Getting available exits
-        let prisonerProxy = try await engine.item("prisoner")
-        let availableExits = try await prisonerProxy.availableExits()
+        let prisonerProxy = await engine.item("prisoner")
+        let availableExits = await prisonerProxy.availableExits()
 
         // Then: Should return empty array
         #expect(availableExits.isEmpty)

@@ -36,7 +36,7 @@ public struct LookUnderActionHandler: ActionHandler {
             targetItem.withDefiniteArticle
         )
 
-        return try await ActionResult(
+        return await ActionResult(
             message,
             targetItem.setFlag(.isTouched)
         )

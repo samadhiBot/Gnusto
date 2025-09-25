@@ -2,33 +2,27 @@
 
 # Gnusto: A Modern Interactive Fiction Engine
 
-Gnusto is a powerful, flexible Swift-based framework for creating interactive fiction games. Drawing inspiration from the Infocom classics, it provides a modern toolkit that makes building rich, dynamic text adventures easy and enjoyable--allowing you to focus on storytelling and world-building rather than engine mechanics.
+Gnusto is a flexible and powerful framework for writing interactive fiction games. Drawing inspiration from the Infocom classics of the 1980s, it provides a modern toolkit that makes building rich, dynamic text adventures easy and enjoyable—allowing you to focus on storytelling and world-building rather than engine mechanics.
+
+Gnusto is written in cross-platform Swift, allowing you to deploy your games on Mac, Linux, Windows, iOS and Android. The framework emphasizes ergonomics and developer experience, providing type safety without boilerplate code. Built with extensibility in mind, you can customize and extend Gnusto to fit your creative vision.
+
+At its core, Gnusto uses a state change pipeline that ensures safe state management, eliminating many of the bugs that can plague interactive fiction engines. Whether you're creating your first text adventure or building a complex, multi-layered world, Gnusto provides the foundation you need while staying out of your way.
 
 ## For Game Creators
 
-### Why Gnusto?
+### Key Features
 
-- **Zero Boilerplate:** The GnustoAutoWiringPlugin automatically generates all ID constants and wires up your game components--no tedious manual setup required
-- **Modern Swift Foundation:** Built with Swift 6 concurrency, SOLID principles, and clean architecture for maintainable, safe code
-- **Thoroughly Tested:** Engine maintains 80%+ test coverage
 - **Cross-Platform Ready:** Deploy your game on macOS, iOS, Linux, Windows, and Android
-- **Powerful Yet Approachable:** Start with simple text adventures and scale up to complex, dynamic worlds with timed events and sophisticated puzzles
-- **Battle-Tested Patterns:** Leverage proven design patterns from the golden age of interactive fiction, rebuilt with modern tools
-- **Nostalgic Excellence:** Authentic phrases and mechanics from the interactive fiction classics
-
-### Key Features for Creators
-
-- **Automatic Setup:** GnustoAutoWiringPlugin discovers your game patterns and generates all necessary ID constants, GameBlueprint wiring, and component connections
-- **Dynamic Content:** Create living, breathing worlds with state-driven descriptions and behaviors using ItemEventHandlers and LocationEventHandlers
+- **Automatic Setup:** The GnustoAutoWiringPlugin discovers your game patterns and generates all necessary boilerplate code
+- **Dynamic Content:** Create living, breathing worlds with state-driven descriptions and behaviors
 - **Rich Action System:** Support complex player interactions with a flexible action pipeline that's easy to customize
 - **Smart Parser:** Natural language understanding with support for complex commands, synonyms, adjectives, and object references
-- **Comprehensive State Management:** Track game progress with the new Proxy system, handle timed events (fuses and daemons), and manage complex game states with full Codable support
-- **Combat & Character Systems:** Full RPG-style combat mechanics with character sheets, health/consciousness tracking, and combat state management
-- **Conversations & NPCs:** Simple dialogue systems and character interactions
-- **Localization Ready:** Centralized Messenger system enables easy customization of all player-facing text
-- **Extensible Architecture:** Add custom behaviors and game mechanics without fighting the engine--everything is designed for modularity
+- **Combat & Character Systems:** Full RPG-style mechanics with character sheets, health tracking, and combat management
+- **Conversations & NPCs:** Built-in dialogue systems and character interactions
+- **Localization Ready:** Centralized messaging system enables easy customization of all player-facing text
+- **Extensible Architecture:** Add custom behaviors and game mechanics without fighting the engine
 
-### Quick Start for Creators
+### Quick Start
 
 1. **Add Gnusto to Your Project:**
 
@@ -95,21 +89,11 @@ struct OperaHouse {  // Organize content into logical areas
         .isWorn,
     )
 
-    let hook = Item(
-        id: .hook,  // Plugin auto-generates ItemID.hook
-        .adjectives("small", "brass"),
-        .in(.cloakroom),
-        .omitDescription,
-        .isSurface,
-        .name("small brass hook"),
-        .synonyms("peg"),
-    )
-
-    // Custom behavior for examining the hook
+    // Custom behavior for examining items
     let hookHandler = ItemEventHandler(for: .hook) {
         before(.examine) { context, command in
             let hookDetail =
-                if try await context.item.isHolding(.cloak) {
+                if await context.item.isHolding(.cloak) {
                     "with a cloak hanging on it"
                 } else {
                     "screwed to the wall"
@@ -120,151 +104,15 @@ struct OperaHouse {  // Organize content into logical areas
 }
 ```
 
-### The Power of the GnustoAutoWiringPlugin
+For a complete working example, see the [Cloak of Darkness](Executables/CloakOfDarkness/) implementation that demonstrates these concepts in a playable game.
 
-Gnusto includes a build tool plugin that **eliminates virtually all boilerplate code**. The plugin automatically:
-
-- **Discovers ID Patterns:** Scans `Location(id: .foyer, ...)` and generates `LocationID.foyer` extensions
-- **Aggregates Content:** Collects all your items and locations from multiple area files
-- **Wires Event Handlers:** Automatically connects your ItemEventHandlers and LocationEventHandlers
-- **Sets Up Time Registry:** Discovers and registers Fuses and Daemons
-- **Handles Custom Actions:** Integrates custom ActionHandler implementations
-
-This means you can focus purely on creating your game world without worrying about the connection logic!
-
-### Ready to Start?
-
-Check out our comprehensive resources:
-
-- **[Complete Documentation](Sources/GnustoEngine/Documentation.docc/Documentation.md):** Detailed guides and API reference
-- **[Cloak of Darkness](Executables/CloakOfDarkness):** A complete, playable example showcasing core features
-- **[Frobozz Magic Demo Kit](Executables/FrobozzMagicDemoKit):** Templates and advanced patterns (in progress)
-- **[Zork 1](Executables/Zork1):** A faithful replica of _Zork I: The Great Underground Empire_ (in progress)
-- **[GnustoAutoWiringPlugin Guide](Sources/GnustoEngine/Documentation.docc/GnustoAutoWiringPlugin.md):** Master the automatic setup system
-
----
-
-## For Engine Developers
-
-## Project Architecture
-
-The project is organized with a clean separation between the core engine and example implementations:
-
-- **`Sources/GnustoEngine`:** The complete interactive fiction engine
-- **`Executables`:** Example games and demos showcasing engine capabilities
-
-### Core Engine Components
-
-- **`Core`:** Fundamental types (GameState, Item, Location, ScopeResolver)
-- **`Engine`:** The central GameEngine orchestrator
-- **`Actions`:** Action handling pipeline with 80+ built-in ActionHandlers
-- **`Proxies`:** Safe state mutation system using proxy objects
-- **`Combat`:** Complete combat mechanics and state management
-- **`Character`:** Character sheets, classifications, and condition tracking
-- **`Messenger`:** Centralized localization and message handling
-- **`Parsing`:** Command parsing and vocabulary systems
-- **`IO`:** Input/output abstraction for different frontends
-- **`Time`:** Fuse and daemon system for timed events
-- **`Vocabulary`:** Word recognition and synonym systems
-- **`Extensions`:** Utility extensions
-
-## Core Concepts
-
-### Modern Swift Architecture
-
-- **Sendable Throughout:** Full Swift 6 concurrency compliance with `Sendable` types
-- **Proxy-Based State Management:** Safe state mutations through proxy objects that provide access to both static and computed values
-- **State Change Pipeline:** All mutations flow through `StateChange` objects for proper validation and event handling
-- **Protocol-Oriented Design:** Extensible architecture using protocols like `ActionHandler`, `IOHandler`, and `GameBlueprint`
-- **Type Safety:** Strong typing with specialized ID types (`ItemID`, `LocationID`, `Verb`) prevents common errors
-
-### Game World Model
-
-- **Entities:** The game world consists of `Location` and `Item` objects with:
-
-  - Static definition data (ID, name, vocabulary words)
-  - Dynamic state via `[PropertyID: StateValue]` properties dictionary
-  - Optional event handlers for dynamic descriptions and custom behavior
-  - Codable support for save/load functionality
-
-- **Centralized State Management:**
-
-  - Single source of truth in `GameState`
-  - All mutations tracked via `StateChange` objects
-  - Support for custom state on items, locations, and global game state
-  - Automatic validation and event handler triggering
-
-- **Action Processing Pipeline:**
-  - Player input parsed into structured `Command` objects
-  - `ActionHandler`s process commands through validate → process → postProcess
-  - Returns `ActionResult` with success status, messages, and state changes
-  - Easy customization and extension of game verbs
-
-### Key Engine Features
-
-#### Automatic Boilerplate Elimination
-
-The **GnustoAutoWiringPlugin** revolutionizes game development by:
-
-- Scanning source files for patterns like `Location(id: .foyer, ...)`
-- Generating all necessary ID extensions automatically
-- Aggregating game content from multiple area files
-- Wiring up event handlers with proper scoping
-- Handling both static (enum-based) and instance (struct-based) architectures
-
-#### Dynamic Content System
-
-- **Event Handlers:** `ItemEventHandler` and `LocationEventHandler` enable custom responses
-- **State-Driven Descriptions:** Dynamic text based on current game state
-- **Flexible Properties:** Custom properties on any game entity
-- **Conditional Logic:** Easy branching based on game state
-
-#### Advanced Parser
-
-The `StandardParser` provides ZIL-inspired natural language processing:
-
-- **Flexible Grammar:** Multi-word verbs, synonyms, and adjectives
-- **Object Resolution:** Smart handling of pronouns and ambiguous references
-- **Scope Awareness:** Context-sensitive object recognition
-- **Error Handling:** Helpful messages for parsing failures
-
-#### Time and Event System
-
-- **Fuses:** One-time delayed events with automatic cleanup
-- **Daemons:** Recurring background processes
-- **TimeRegistry:** Centralized management of all timed events
-- **Integration:** Seamless integration with the state change pipeline
-
-## Development Standards
-
-### Code Organization
-
-Following SOLID principles and modern Swift best practices:
-
-- **Logical Grouping:** Properties → Initializers → Computed Properties → Public Methods → Private Methods
-- **Alphabetization:** Within logical groups (unless natural ordering is clearer)
-- **Nested Types:** Keep related types together, extract when files become large (~300+ lines)
-- **Documentation:** Comprehensive `///` documentation for all public APIs
-
-### Testing Excellence
-
-- **Framework:** Swift Testing for all new code
-- **Coverage:** 80%+ test coverage required for pull requests
-- **Organization:** Tests mirror source structure
-- **Patterns:** Helper methods for common test scenarios
-
-### Documentation Standards
-
-- **API Documentation:** Complete `///` documentation with examples
-- **Usage Guides:** Step-by-step tutorials for common patterns
-- **Best Practices:** Documented patterns and anti-patterns
-- **Examples:** Working code samples for all major features
+The `GnustoAutoWiringPlugin` automatically handles the tedious parts of game setup—it scans your code for game content patterns, generates ID constants, aggregates content from multiple files, and wires up event handlers. This lets you focus on creating your game world rather than managing boilerplate code to wire everything together.
 
 ## Example Games
 
 ### Cloak of Darkness
 
-A faithful recreation of the Interactive Fiction standard demo, showcasing:
+A faithful recreation of Roger Firth's standard interactive fiction demo, showcasing:
 
 - Three-room layout with dynamic connections
 - Light/dark mechanics affecting game state
@@ -272,9 +120,9 @@ A faithful recreation of the Interactive Fiction standard demo, showcasing:
 - Dynamic descriptions based on player actions
 - Score tracking and win conditions
 
-### Frobozz Magic Demo Kit
+### Frobozz Magic Demo Kit (In Progress)
 
-A comprehensive demonstration package featuring:
+A demonstration game that will feature:
 
 - Advanced pattern examples
 - Custom action handler implementations
@@ -287,56 +135,31 @@ A comprehensive demonstration package featuring:
 A faithful recreation of the original Zork I, featuring:
 
 - Complete world implementation with 15+ detailed areas (Forest, Underground, Dam, etc.)
-- Authentic Infocom-style messaging and interactions
+- Authentic messaging and interactions based on the original ZIL implementation
 - Complex puzzles and treasure hunting mechanics
 - Full reference implementation of classic IF patterns
-- **Note:** This is a work-in-progress implementation planned for completion before the 1.0 release
-
-## Getting Started as a Developer
-
-1. **Clone and Explore:**
-
-   ```bash
-   git clone https://github.com/samadhiBot/Gnusto
-   cd Gnusto
-   ```
-
-2. **Run the Examples:**
-
-   ```bash
-   swift run CloakOfDarkness
-   swift run FrobozzMagicDemoKit
-   swift run Zork1
-   ```
-
-3. **Study the Architecture:**
-
-   - Start with `Sources/GnustoEngine/Core/`
-   - Examine `GameEngine.swift` for the central orchestration
-   - Look at `Actions/` for the command processing pipeline
-
-4. **Reference Materials:**
-   Historical Interactive Fiction source code is available for research and inspiration, helping maintain authenticity to the classic IF experience.
 
 ## Contributing
 
-We welcome contributions! Please:
+We'd love to have you contribute to Gnusto! Whether you're interested in creating games with the engine or helping improve the engine itself, you're welcome here.
 
-1. Follow our development standards and Swift style guide
-2. Include comprehensive tests (80%+ coverage)
-3. Document your changes with clear `///` comments
-4. Reference the [Roadmap](Sources/GnustoEngine/Documentation.docc/Roadmap.md) for planned features
-5. Maintain the focus on developer ergonomics and zero-boilerplate experience
+If you're a game developer, we invite you to take Gnusto for a spin and see how it feels. Try building something small first, then let us know about any rough edges you encounter. We welcome bug reports, feature requests, documentation improvements, and any other contributions that help make interactive fiction development more accessible.
+
+For engine developers, we follow modern Swift development practices with comprehensive testing and clear documentation. Check out our development standards in the project documentation, and feel free to jump in with fixes, new features, or improvements to existing systems.
 
 ## What's Next?
 
-With major architectural systems now in place (Proxies, Combat, Characters, Messenger), current development priorities focus on:
+Ongoing development priorities:
 
-- **Completing Zork 1 Implementation:** Finishing the full Zork I recreation as a flagship demonstration
-- **Documentation Expansion:** Comprehensive guides for the new combat, character, and conversation systems
-- **API Stabilization:** Preparing for the 1.0 release with stable, ergonomic public APIs
+1. **Improving documentation:** More how-to articles and guides covering combat systems, character development, and messaging
+2. **Completing Zork 1 implementation:** Finishing the full Zork I recreation as a flagship demonstration
+3. **Improved conversation management:** Better tools for building dialogue systems and NPC interactions
+4. **Refine and balance melee combat:** The melee combat system is functional but still needs polish
+5. **Enhanced character sheet integration:** Making better use of character attributes throughout the engine
+6. **Enhanced platform integration:** Improved I/O wrappers and user interface components for different deployment targets
+7. **Expanded combat systems:** Adding ranged and magical combat to complement the existing melee system
 
-Check out our [development roadmap](Sources/GnustoEngine/Documentation.docc/Roadmap.md) for detailed feature planning and contribution opportunities.
+---
 
 ## License
 

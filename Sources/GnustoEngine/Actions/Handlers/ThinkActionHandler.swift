@@ -39,7 +39,7 @@ public struct ThinkActionHandler: ActionHandler {
             )
         }
 
-        return try await ActionResult(
+        return await ActionResult(
             topic.response(
                 object: context.msg.thinkAboutItem,
                 character: context.msg.thinkAboutCharacter,

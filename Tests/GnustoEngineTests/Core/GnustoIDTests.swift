@@ -9,10 +9,6 @@ import Testing
 /// A test ID type that conforms to GnustoID for testing the protocol's default implementations.
 private struct TestID: GnustoID {
     let rawValue: String
-
-    init(rawValue: String) {
-        self.rawValue = rawValue
-    }
 }
 
 @Suite("GnustoID Protocol Tests")
@@ -106,8 +102,7 @@ struct GnustoIDTests {
             TestID("🎮测试"),
         ]
 
-        let encoder = JSONEncoder()
-        encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
+        let encoder = JSONEncoder.sorted(.prettyPrinted)
         let decoder = JSONDecoder()
 
         for originalID in originalIDs {
@@ -122,7 +117,7 @@ struct GnustoIDTests {
     @Test("GnustoID JSON Representation")
     func testJSONRepresentation() throws {
         let id = TestID("testValue")
-        let encoder = JSONEncoder()
+        let encoder = JSONEncoder.sorted()
         let jsonData = try encoder.encode(id)
         let jsonString = String(data: jsonData, encoding: .utf8)
 
@@ -138,7 +133,7 @@ struct GnustoIDTests {
             TestID("third"),
         ]
 
-        let encoder = JSONEncoder()
+        let encoder = JSONEncoder.sorted()
         let decoder = JSONDecoder()
 
         let jsonData = try encoder.encode(originalIDs)
@@ -155,7 +150,7 @@ struct GnustoIDTests {
             "key2": "value2",
         ]
 
-        let encoder = JSONEncoder()
+        let encoder = JSONEncoder.sorted()
         let decoder = JSONDecoder()
 
         let jsonData = try encoder.encode(originalDict)
@@ -180,7 +175,7 @@ struct GnustoIDTests {
         let results = await withTaskGroup(of: TestID.self) { group in
             for testID in testIDs {
                 group.addTask {
-                    return testID
+                    testID
                 }
             }
 
@@ -208,7 +203,7 @@ struct GnustoIDTests {
         #expect(id.rawValue == specialChars)
 
         // Test that special characters work with encoding/decoding
-        let encoder = JSONEncoder()
+        let encoder = JSONEncoder.sorted()
         let decoder = JSONDecoder()
         let jsonData = try encoder.encode(id)
         let decodedID = try decoder.decode(TestID.self, from: jsonData)
@@ -226,7 +221,7 @@ struct GnustoIDTests {
         #expect(id == id2)
 
         // Test encoding/decoding
-        let encoder = JSONEncoder()
+        let encoder = JSONEncoder.sorted()
         let decoder = JSONDecoder()
         let jsonData = try encoder.encode(id)
         let decodedID = try decoder.decode(TestID.self, from: jsonData)
@@ -235,10 +230,10 @@ struct GnustoIDTests {
 
     @Test("GnustoID Very Long String")
     func testVeryLongString() throws {
-        let longString = String(repeating: "a", count: 10000)
+        let longString = String(repeating: "a", count: 10_000)
         let id = TestID(longString)
         #expect(id.rawValue == longString)
-        #expect(id.rawValue.count == 10000)
+        #expect(id.rawValue.count == 10_000)
     }
 
     @Test("GnustoID Whitespace Handling")
@@ -264,10 +259,10 @@ struct GnustoIDTests {
     @Test("GnustoID Large Collection Performance")
     func testLargeCollectionPerformance() throws {
         // Create a large set of TestIDs
-        let testIDs = (0..<1000).map { TestID("test\($0)") }
+        let testIDs = (0..<1_000).map { TestID("test\($0)") }
         let testSet = Set(testIDs)
 
-        #expect(testSet.count == 1000)
+        #expect(testSet.count == 1_000)
 
         // Test lookup performance
         let lookupID = TestID("test500")
@@ -318,7 +313,7 @@ struct GnustoIDTests {
         #expect(id1 < id2)
 
         // Test Codable
-        let encoder = JSONEncoder()
+        let encoder = JSONEncoder.sorted()
         let decoder = JSONDecoder()
         let jsonData = try encoder.encode(id)
         let decodedID = try decoder.decode(TestID.self, from: jsonData)

@@ -31,7 +31,7 @@ struct UndergroundTests {
             Your sword is glowing very brightly.
 
             >
-            May your adventures elsewhere prove fruitful!
+            Until we meet again in another tale...
             """
         )
     }
@@ -49,6 +49,8 @@ struct UndergroundTests {
             push the troll
             hit the troll with the lantern
             head west
+            go south
+            walk west
             """
         )
         await engine.run()
@@ -72,49 +74,48 @@ struct UndergroundTests {
             > walk east
             The troll fends you off with a menacing gesture.
 
-            Your sword is glowing very brightly.
-
             > go north
-            The universe conspires against your movement that way.
-
-            Your sword is glowing very brightly.
+            You can't go that way.
 
             > head west
             The troll fends you off with a menacing gesture.
-
-            Your sword is glowing very brightly.
 
             > talk to the troll
             The troll isn't much of a conversationalist.
 
-            Your sword is glowing very brightly.
-
             > push the troll
             The troll laughs at your puny gesture.
 
-            Your sword is glowing very brightly.
-
             > hit the troll with the lantern
-            No more waiting as you attack with your lantern raised and the
-            pathetic troll responds with his axe, two weapons now committed
-            to drawing blood.
+            Your blood sings as your brass lantern cuts toward the troll
+            who barely gets his bloody ax into position before impact.
 
-            The brass lantern makes a poor weapon against the pathetic
-            troll's his axe! This might not end well.
+            Attacking with the brass lantern? The pathetic troll grips his
+            ax tighter, unimpressed by your improvised weaponry.
 
-            The troll's retaliatory strike with his ax cuts toward you but
-            your body knows how to flow around death.
-
-            Your sword is glowing very brightly.
+            The riposte comes fast, his axe flicking out to trace a shallow
+            arc of red across your guard. The cut registers dimly. Blood,
+            but not enough to matter.
 
             > head west
             The troll fends you off with a menacing gesture.
 
-            In the exchange, his ax slips through to mark you--a stinging
-            reminder that the troll still has teeth. The wound is trivial
-            against your battle fury.
+            The troll turns your momentum against you, his axe catching
+            flesh in passing, painting a line of fire. The strike lands but
+            doesn't slow you. Not yet.
 
-            Your sword is glowing very brightly.
+            > go south
+            --- Cellar ---
+
+            Your sword is glowing with a faint blue glow.
+
+            > walk west
+            --- Bottom of Ramp ---
+
+            You are at the bottom of a steep metal ramp. The ramp leads up
+            to the west, but it is too steep and smooth to climb.
+
+            Your sword is no longer glowing.
 
             >
             May your adventures elsewhere prove fruitful!

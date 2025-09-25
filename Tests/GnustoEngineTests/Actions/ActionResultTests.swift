@@ -11,11 +11,7 @@ struct ActionResultTests {
 
     // - Simple Examples for Initialization Tests -
     let simpleChange = StateChange.setItemProperty(id: "lamp", property: .isOn, value: .bool(true))
-    let simpleEffect = SideEffect(
-        type: .startFuse,
-        targetID: .fuse("bomb"),
-        parameters: ["duration": .int(10)]
-    )
+    let simpleEffect = try? SideEffect.startFuse("bomb", turns: 10)
 
     // - Examples for Merging/Applying Tests -
     // Note: These are now instance properties. `testResult` uses them,
@@ -117,37 +113,29 @@ struct ActionResultTests {
     }
 
     @Test("SideEffect Initialization - Full")
-    func testSideEffectInitializationFull() {
-        let effect = SideEffect(
-            type: .runDaemon,
-            targetID: .daemon("clock"),
-            parameters: [
-                "interval": .int(60),
-                "message": .string("Tick tock"),
-            ]
-        )
+    func testSideEffectInitializationFull() throws {
+        let daemonState = DaemonState()
+        let effect = try SideEffect.runDaemon("clock", state: daemonState)
 
         #expect(effect.type == .runDaemon)
         #expect(effect.targetID == .daemon("clock"))
-        #expect(effect.parameters.count == 2)
-        #expect(effect.parameters["interval"] == .int(60))
-        #expect(effect.parameters["message"] == .string("Tick tock"))
+        #expect(effect.payload != nil)
     }
 
     @Test("SideEffect Initialization - Defaults")
-    func testSideEffectInitializationWithDefaultParameters() {
-        let effect = SideEffect.stopDaemon("clock")
+    func testSideEffectInitializationWithDefaultParameters() throws {
+        let effect = try SideEffect.stopDaemon("clock")
 
         #expect(effect.type == .stopDaemon)
         #expect(effect.targetID == .daemon("clock"))
-        #expect(effect.parameters.isEmpty)
+        #expect(effect.payload == nil)
     }
 
     // MARK: - Codable Conformance Tests
 
     @Test("StateValue Codable Conformance")
     func testStateValueCodable() throws {
-        let encoder = JSONEncoder()
+        let encoder = JSONEncoder.sorted()
         let decoder = JSONDecoder()
 
         let values: [StateValue] = [
@@ -170,7 +158,7 @@ struct ActionResultTests {
 
     @Test("StateChange Codable Conformance")
     func testStateChangeCodable() throws {
-        let encoder = JSONEncoder()
+        let encoder = JSONEncoder.sorted()
         let decoder = JSONDecoder()
 
         let changes: [StateChange] = [
@@ -224,14 +212,7 @@ struct ActionResultTests {
     }
 
     // Corrected SideEffect initialization:
-    let sideEffect1 = SideEffect(
-        type: .startFuse,
-        targetID: .fuse("fuse"),
-        parameters: [
-            "--turns": .int(5),
-            "eventName": .string("FuseBurnDown"),
-        ]
-    )
+    let sideEffect1 = try? SideEffect.startFuse("fuse", turns: 5)
 
     @Test("ActionResult Initialization - Previous Structure Style")
     func testInitializationFromPreviousStyle() {
@@ -252,8 +233,7 @@ struct ActionResultTests {
         let effect = resultWithChangesAndEffects.effects.first
         #expect(effect?.type == .startFuse)
         #expect(effect?.targetID == .fuse("fuse"))
-        #expect(effect?.parameters["--turns"] == .int(5))
-        #expect(effect?.parameters["eventName"] == .string("FuseBurnDown"))
+        #expect(effect?.payload != nil)
     }
 
     // MARK: - StateChange Pattern Matching Tests
@@ -355,5 +335,4 @@ struct ActionResultTests {
 
         #expect(change1 != change2)
     }
-
 }

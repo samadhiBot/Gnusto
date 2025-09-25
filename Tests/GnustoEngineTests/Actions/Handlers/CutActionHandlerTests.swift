@@ -46,7 +46,7 @@ struct CutActionHandlerTests {
             """
         )
 
-        let finalState = try await engine.item("rope")
+        let finalState = await engine.item("rope")
         #expect(await finalState.hasFlag(.isTouched) == false)
     }
 
@@ -305,7 +305,7 @@ struct CutActionHandlerTests {
             """
         )
 
-        let finalState = try await engine.item("fabric")
+        let finalState = await engine.item("fabric")
         #expect(await finalState.hasFlag(.isTouched) == false)
     }
 

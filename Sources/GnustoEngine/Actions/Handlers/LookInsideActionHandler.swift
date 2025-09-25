@@ -36,7 +36,7 @@ public struct LookInsideActionHandler: ActionHandler {
         if await container.isContainer {
             // For containers, provide container-specific messaging
             if await container.contentsAreVisible {
-                let contents = try await container.contents
+                let contents = await container.contents
                 if contents.isEmpty {
                     message = await context.msg.containerIsEmpty(
                         container.withDefiniteArticle
@@ -59,7 +59,7 @@ public struct LookInsideActionHandler: ActionHandler {
             )
         }
 
-        return try await ActionResult(
+        return await ActionResult(
             message,
             container.setFlag(.isTouched)
         )

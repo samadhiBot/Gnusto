@@ -38,7 +38,7 @@ public struct TasteActionHandler: ActionHandler {
             )
         }
 
-        return try await ActionResult(
+        return await ActionResult(
             item.response(
                 object: { context.msg.tasteObject(context.verb, item: $0) },
                 character: { context.msg.tasteCharacter(context.verb, character: $0) },

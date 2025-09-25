@@ -256,7 +256,7 @@ extension InsideHouse {
         .omitDescription,
         .requiresTryTake,
         .isSearchable,
-        .capacity(10000),
+        .capacity(10_000),
         .in(.livingRoom)
         // Note: Has action handler TROPHY-CASE-FCN
     )
@@ -302,9 +302,8 @@ extension InsideHouse {
 extension InsideHouse {
     static let kitchenComputer = LocationComputer(for: .kitchen) {
         locationProperty(.description) { context in
-            let kitchenWindow = context.gameState.items[.kitchenWindow]
-            let isWindowOpen = kitchenWindow?.properties[.isOpen]?.toBool ?? false
-            let windowState = isWindowOpen ? "open" : "slightly ajar"
+            let kitchenWindow = await context.item(.kitchenWindow)
+            let windowState = await kitchenWindow.isOpen ? "open" : "slightly ajar"
             return .string(
                 """
                 You are in the kitchen of the white house. A table seems to
@@ -316,71 +315,15 @@ extension InsideHouse {
             )
         }
     }
+}
 
-    /// Handles special lamp interactions based on the original ZIL `LANTERN` routine.
-    ///
-    /// This handler manages lamp behavior including:
-    /// - THROW: Smashes lamp and creates broken lamp
-    /// - TURN ON: Lights lamp (unless burned out)
-    /// - TURN OFF: Extinguishes lamp (unless burned out)
-    /// - EXAMINE: Shows lamp state (burned out, on, or off)
-    static let lampHandler = ItemEventHandler(for: .lamp) {
-        before(.throw) { context, command in
-            let playerLocation = try await context.engine.player.location
-            let brokenLamp = try await context.engine.item(.brokenLamp)
+// MARK: - Handlers
 
-            return try await ActionResult(
-                "The lamp has smashed into the floor, and the light has gone out.",
-                context.item.clearFlag(.isOn),
-                context.item.remove(),
-                brokenLamp.move(to: .location(playerLocation.id))
-            )
-        }
-
-        before(.lightSource) { context, command in
-            let isBurnedOut = await context.item.hasFlag(.isBurnedOut)
-            return isBurnedOut ? ActionResult("A burned-out lamp won't light.") : nil
-        }
-
-        before(.extinguish) { context, command in
-            let isBurnedOut = await context.item.hasFlag(.isBurnedOut)
-            return isBurnedOut ? ActionResult("The lamp has already burned out.") : nil
-        }
-
-        before(.examine) { context, command in
-            let isBurnedOut = await context.item.hasFlag(.isBurnedOut)
-            let isOn = await context.item.hasFlag(.isOn)
-
-            let statusMessage =
-                if isBurnedOut {
-                    "has burned out."
-                } else if isOn {
-                    "is on."
-                } else {
-                    "is turned off."
-                }
-
-            return ActionResult("The lamp \(statusMessage)")
-        }
-    }
-
-    static let waterHandler = ItemEventHandler(for: .water) {
-        before(.drink) { context, command in
-            guard try await context.engine.item(.bottle).isOpen else {
-                throw ActionResponse.feedback("You'll have to open the glass bottle first.")
-            }
-
-            return ActionResult(
-                "Thank you very much. I was rather thirsty (from all this talking, probably).",
-                context.item.remove()
-            )
-        }
-    }
-
+extension InsideHouse {
     static let bottleHandler = ItemEventHandler(for: .bottle) {
-        before(.throw) { context, command in
-            let water = try await context.engine.item(.water)
-            let hasWater = try await water.parent == .item(context.item)
+        before(.throw) { context, _ in
+            let water = await context.item(.water)
+            let hasWater = await water.parent == .item(context.item)
 
             return if hasWater {
                 ActionResult(
@@ -399,9 +342,9 @@ extension InsideHouse {
             }
         }
 
-        before(.attack) { context, command in
-            let water = try await context.engine.item(.water)
-            let hasWater = try await water.parent == .item(context.item)
+        before(.attack) { context, _ in
+            let water = await context.item(.water)
+            let hasWater = await water.parent == .item(context.item)
 
             return if hasWater {
                 ActionResult(
@@ -420,9 +363,9 @@ extension InsideHouse {
             }
         }
 
-        before(.push) { context, command in
-            let water = try await context.engine.item(.water)
-            let hasWater = try await water.parent == .item(context.item)
+        before(.push) { context, _ in
+            let water = await context.item(.water)
+            let hasWater = await water.parent == .item(context.item)
             let isOpen = await context.item.hasFlag(.isOpen)
 
             return if isOpen && hasWater {
@@ -435,9 +378,54 @@ extension InsideHouse {
             }
         }
     }
-}
 
-extension InsideHouse {
+    /// Handles special lamp interactions based on the original ZIL `LANTERN` routine.
+    ///
+    /// This handler manages lamp behavior including:
+    /// - THROW: Smashes lamp and creates broken lamp
+    /// - TURN ON: Lights lamp (unless burned out)
+    /// - TURN OFF: Extinguishes lamp (unless burned out)
+    /// - EXAMINE: Shows lamp state (burned out, on, or off)
+    static let lampHandler = ItemEventHandler(for: .lamp) {
+        before(.throw) { context, _ in
+            let playerLocation = await context.player.location
+            let brokenLamp = await context.item(.brokenLamp)
+
+            return await ActionResult(
+                "The lamp has smashed into the floor, and the light has gone out.",
+                context.item.clearFlag(.isOn),
+                context.item.remove(),
+                brokenLamp.move(to: .location(playerLocation.id))
+            )
+        }
+
+        before(.lightSource) { context, _ in
+            let isBurnedOut = await context.item.hasFlag(.isBurnedOut)
+            return isBurnedOut ? ActionResult("A burned-out lamp won't light.") : nil
+        }
+
+        before(.extinguish) { context, _ in
+            let isBurnedOut = await context.item.hasFlag(.isBurnedOut)
+            return isBurnedOut ? ActionResult("The lamp has already burned out.") : nil
+        }
+
+        before(.examine) { context, _ in
+            let isBurnedOut = await context.item.hasFlag(.isBurnedOut)
+            let isOn = await context.item.hasFlag(.isOn)
+
+            let statusMessage =
+                if isBurnedOut {
+                    "has burned out."
+                } else if isOn {
+                    "is on."
+                } else {
+                    "is turned off."
+                }
+
+            return ActionResult("The lamp \(statusMessage)")
+        }
+    }
+
     /// Handles special rug interactions based on the original ZIL `RUG-FCN`.
     ///
     /// This handler manages complex rug behavior including:
@@ -447,7 +435,7 @@ extension InsideHouse {
     /// - LOOK UNDER: Temporary trap door revelation
     /// - CLIMB ON: Irregularity detection and magic carpet joke
     static let rugHandler = ItemEventHandler(for: .rug) {
-        before(.take) { context, command in
+        before(.take) { context, _ in
             let wasRugMoved = await context.engine.hasFlag(.rugMoved)
             let baseMessage = "The rug is too heavy to lift"
             return if wasRugMoved {
@@ -462,7 +450,7 @@ extension InsideHouse {
             }
         }
 
-        before(.move, .push) { context, command in
+        before(.move, .push) { context, _ in
             let wasRugMoved = await context.engine.hasFlag(.rugMoved)
             if wasRugMoved {
                 return ActionResult(
@@ -473,7 +461,7 @@ extension InsideHouse {
                 )
             } else {
                 // Move the rug and reveal the trap door
-                let trapDoor = try await context.engine.item(.trapDoor)
+                let trapDoor = await context.item(.trapDoor)
                 return ActionResult(
                     """
                     With a great effort, the rug is moved to one side of the room,
@@ -482,18 +470,18 @@ extension InsideHouse {
                     // Mark rug as moved
                     await context.engine.setFlag(.rugMoved),
                     // Make trap door visible
-                    try await trapDoor.clearFlag(.isInvisible)
+                    await trapDoor.clearFlag(.isInvisible)
                 )
             }
         }
 
-        before(.take) { context, command in
+        before(.take) { _, _ in
             ActionResult("The rug is extremely heavy and cannot be carried.")
         }
 
-        before(.look) { context, command in
+        before(.look) { context, _ in
             let wasRugMoved = await context.engine.hasFlag(.rugMoved)
-            let trapDoor = try await context.engine.item(.trapDoor)
+            let trapDoor = await context.item(.trapDoor)
             let trapDoorOpen = await trapDoor.hasFlag(.isOpen)
 
             // Only show trap door if rug hasn't been moved and trap door isn't open
@@ -509,9 +497,9 @@ extension InsideHouse {
             }
         }
 
-        before(.climb) { context, command in
+        before(.climb) { context, _ in
             let wasRugMoved = await context.engine.hasFlag(.rugMoved)
-            let trapDoor = try await context.engine.item(.trapDoor)
+            let trapDoor = await context.item(.trapDoor)
             let trapDoorOpen = await trapDoor.hasFlag(.isOpen)
 
             return if !wasRugMoved && !trapDoorOpen {
@@ -527,6 +515,40 @@ extension InsideHouse {
         }
     }
 
+    /// Handles sword glow functionality based on the ZIL `SWORD-FCN` and `I-SWORD` routines.
+    ///
+    /// This handler manages:
+    /// - TAKE: Enables the sword glow daemon when taken (equivalent to ENABLE <QUEUE I-SWORD -1>)
+    /// - EXAMINE: Shows appropriate glow messages based on current glow state
+    /// - Daemon activation: Checks current location and adjacent locations for monsters
+    static let swordHandler = ItemEventHandler(for: .sword) {
+        // Show glow message based on current glow level (like SWORD-FCN in ZIL)
+        before(.examine) { context, _ in
+            switch await context.engine.global(.swordGlowLevel) ?? 0 {
+            case 1:
+                ActionResult("Your sword is glowing with a faint blue glow.")
+            case 2:
+                ActionResult("Your sword is glowing very brightly.")
+            default:
+                ActionResult("It's just a sword.")
+            }
+        }
+
+        // Disable sword glow daemon when dropped
+        after(.drop) { _, _ in
+            try ActionResult(
+                .stopDaemon(.swordDaemon)
+            )
+        }
+
+        // Enable sword glow daemon when taken (like SWORD-FCN in ZIL)
+        after(.take) { _, _ in
+            try ActionResult(
+                .runDaemon(.swordDaemon)
+            )
+        }
+    }
+
     /// Handles trap door interactions based on the original ZIL `TRAP-DOOR-FCN`.
     ///
     /// This handler manages the trap door's behavior depending on the player's location
@@ -535,8 +557,8 @@ extension InsideHouse {
     /// - **Cellar**: Prevents opening from below and has special behavior for closing.
     /// - **Raise**: Treats `RAISE` as an alias for `OPEN`.
     static let trapDoorHandler = ItemEventHandler(for: .trapDoor) {
-        before(.open, .pull) { context, command in
-            let location = try await context.engine.player.location.id
+        before(.open, .pull) { context, _ in
+            let location = await context.player.location.id
             let isTrapDoorOpen = await context.item.hasFlag(.isOpen)
 
             return if isTrapDoorOpen {
@@ -549,13 +571,13 @@ extension InsideHouse {
                     The door reluctantly opens to reveal a rickety staircase
                     descending into darkness.
                     """,
-                    try await context.item.setFlag(.isOpen)
+                    await context.item.setFlag(.isOpen)
                 )
             }
         }
 
-        before(.close) { context, command in
-            let location = try await context.engine.player.location.id
+        before(.close) { context, _ in
+            let location = await context.player.location.id
             let isTrapDoorOpen = await context.item.hasFlag(.isOpen)
 
             return if !isTrapDoorOpen {
@@ -565,46 +587,29 @@ extension InsideHouse {
             } else {
                 ActionResult(
                     "The door swings shut and closes.",
-                    try await context.item.clearFlag(.isOpen)
+                    await context.item.clearFlag(.isOpen)
                 )
             }
         }
     }
 
-    /// Handles sword glow functionality based on the ZIL `SWORD-FCN` and `I-SWORD` routines.
-    ///
-    /// This handler manages:
-    /// - TAKE: Enables the sword glow daemon when taken (equivalent to ENABLE <QUEUE I-SWORD -1>)
-    /// - EXAMINE: Shows appropriate glow messages based on current glow state
-    /// - Daemon activation: Checks current location and adjacent locations for monsters
-    static let swordHandler = ItemEventHandler(for: .sword) {
-        // Show glow message based on current glow level (like SWORD-FCN in ZIL)
-        before(.examine) { context, command in
-            switch await context.engine.global(.swordGlowLevel) ?? 0 {
-            case 1:
-                ActionResult("Your sword is glowing with a faint blue glow.")
-            case 2:
-                ActionResult("Your sword is glowing very brightly.")
-            default:
-                ActionResult("It's just a sword.")
+    static let waterHandler = ItemEventHandler(for: .water) {
+        before(.drink) { context, _ in
+            guard await context.item(.bottle).isOpen else {
+                throw ActionResponse.feedback("You'll have to open the glass bottle first.")
             }
-        }
 
-        // Disable sword glow daemon when dropped
-        after(.drop) { context, command in
-            ActionResult(
-                .stopDaemon(.swordDaemon)
-            )
-        }
-
-        // Enable sword glow daemon when taken (like SWORD-FCN in ZIL)
-        after(.take) { context, command in
-            ActionResult(
-                .runDaemon(.swordDaemon)
+            return ActionResult(
+                "Thank you very much. I was rather thirsty (from all this talking, probably).",
+                context.item.remove()
             )
         }
     }
+}
 
+// MARK: - Daemons
+
+extension InsideHouse {
     /// Sword glow daemon based on the ZIL `I-SWORD` interrupt routine.
     ///
     /// This daemon runs every turn when enabled and updates the sword glow level based on
@@ -612,84 +617,41 @@ extension InsideHouse {
     /// - Level 0: No monsters nearby (no glow)
     /// - Level 1: Monster in adjacent location (faint blue glow)
     /// - Level 2: Monster in current location (very bright glow)
-    static let swordDaemon = Daemon { engine in
-        let currentLocation = try await engine.player.location
-        var newGlowLevel = 0
+    static let swordDaemon = Daemon { engine, state in
+        let currentLocation = await engine.player.location
+        var newGlowLevel: SwordBrightness = .notGlowing
 
         // Check for monsters in current location (highest priority)
-        let currentLocationItems = try await currentLocation.items
-        var monstersInCurrentLocation: [ItemProxy] = []
-        for item in currentLocationItems {
-            if try await item.isCharacter {
-                monstersInCurrentLocation.append(item)
-            }
+        for item in await currentLocation.items where await item.isCharacter {
+            newGlowLevel = .glowingBrightly
+            break
         }
 
-        if monstersInCurrentLocation.isNotEmpty {
-            newGlowLevel = 2  // Very bright glow
-        } else {
+        if newGlowLevel != .glowingBrightly {
             // Check adjacent locations for monsters
-            for exit in try await currentLocation.exits {
-                guard let destination = exit.destinationID else {
-                    continue
-                }
-                let adjacentLocation = try await engine.location(destination)
-                let adjacentLocationItems = try await adjacentLocation.items
-                var monstersInAdjacentLocation: [ItemProxy] = []
-                for item in adjacentLocationItems {
-                    if try await item.isCharacter {
-                        monstersInAdjacentLocation.append(item)
-                    }
-                }
-
-                if monstersInAdjacentLocation.isNotEmpty {
-                    newGlowLevel = 1  // Faint blue glow
+            for exit in await currentLocation.exits {
+                guard let destination = exit.destinationID else { continue }
+                let adjacentLocation = await engine.location(destination)
+                for item in await adjacentLocation.items where await item.isCharacter {
+                    newGlowLevel = .glowingFaintly
                     break
                 }
             }
         }
 
         // Always update the glow level and show message if glowing
-        let currentGlowLevel = await engine.global(.swordGlowLevel) ?? 0
+        let currentGlowLevel = state.getPayload(as: SwordBrightness.self) ?? .notGlowing
 
-        // Determine the glow message based on current level
-        let message =
-            switch newGlowLevel {
-            case 1:
-                "Your sword is glowing with a faint blue glow."
-            case 2:
-                "Your sword is glowing very brightly."
-            default:
-                ""  // Level 0 - no message when not glowing
-            }
+        // Do nothing if the glow level has not changed
+        if newGlowLevel == currentGlowLevel { return nil }
 
-        // Update the glow level if it changed
-        if newGlowLevel != (currentGlowLevel.toInt ?? 0) {
-            let glowChange = StateChange.setGlobalInt(id: .swordGlowLevel, value: newGlowLevel)
-
-            return if message.isEmpty {
-                ActionResult(glowChange)
-            } else {
-                ActionResult(message, glowChange)
-            }
-        } else if message.isNotEmpty {
-            // Level didn't change but sword is still glowing - show the message
-            return ActionResult(message)
-        }
-
-        return nil
+        // Update and announce the glow level if it has changed
+        return try ActionResult(
+            newGlowLevel.description,
+            .updateDaemonState(
+                daemonID: .swordDaemon,
+                daemonState: state.updatingPayload(newGlowLevel)
+            )
+        )
     }
-}
-
-extension Item {
-    fileprivate var isMonster: Bool {
-        switch id {
-        case .troll, .thief, .cyclops, .bat, .ghosts: true
-        default: false
-        }
-    }
-}
-
-extension ItemPropertyID {
-    static let isBurnedOut = ItemPropertyID("isBurnedOut")
 }

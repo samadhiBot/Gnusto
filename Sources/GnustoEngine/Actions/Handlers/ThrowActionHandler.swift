@@ -25,8 +25,7 @@ public struct ThrowActionHandler: ActionHandler {
     /// - Throwing at specific targets
     /// - General throwing (drops item in current location)
     ///
-    /// - Parameter command: The command being processed.
-    /// - Parameter engine: The game context.engine.
+    /// - Parameter context: The action context containing the command and game state.
     /// - Returns: An `ActionResult` with appropriate throwing message and state changes.
     public func process(context: ActionContext) async throws -> ActionResult {
         // Throw requires a direct object (what to throw)
@@ -35,7 +34,7 @@ public struct ThrowActionHandler: ActionHandler {
         }
 
         // Check if item is held
-        guard try await projectile.playerIsHolding else {
+        guard await projectile.playerIsHolding else {
             throw ActionResponse.itemNotHeld(projectile)
         }
 
@@ -43,9 +42,9 @@ public struct ThrowActionHandler: ActionHandler {
 
         guard let target = try await context.itemIndirectObject() else {
             // General throwing - no specific target
-            let location = try await context.player.location
+            let location = await context.player.location
 
-            return try await ActionResult(
+            return await ActionResult(
                 context.msg.throwItem(context.command, item: theProjectile),
                 projectile.setFlag(.isTouched),
                 projectile.move(to: .location(location.id))
@@ -55,11 +54,18 @@ public struct ThrowActionHandler: ActionHandler {
         // If a target is specified, validate it
         switch context.command.preposition {
         case .at:
-            return try await ActionResult(
+            return await ActionResult(
                 target.response(
-                    object: { context.msg.throwAtObject(context.command, item: theProjectile, target: $0) },
-                    character:  { context.msg.throwAtCharacter(context.command, item: theProjectile, character: $0) },
-                    enemy:  { context.msg.throwAtEnemy(context.command, item: theProjectile, enemy: $0) },
+                    object: {
+                        context.msg.throwAtObject(context.command, item: theProjectile, target: $0)
+                    },
+                    character: {
+                        context.msg.throwAtCharacter(
+                            context.command, item: theProjectile, character: $0)
+                    },
+                    enemy: {
+                        context.msg.throwAtEnemy(context.command, item: theProjectile, enemy: $0)
+                    },
                 ),
                 projectile.setFlag(.isTouched),
                 projectile.move(to: .location(context.player.location.id)),
@@ -67,18 +73,19 @@ public struct ThrowActionHandler: ActionHandler {
             )
 
         default:  // case .to:
-            let roughValue = try await projectile.roughValue
-            let newParent: ParentEntity = if try await target.isCharacter {
-                .item(target.id)
-            } else {
-                try await .location(context.player.location.id)
-            }
-            return try await ActionResult(
+            let roughValue = await projectile.roughValue
+            let newParent: ParentEntity =
+                if await target.isCharacter {
+                    .item(target.id)
+                } else {
+                    await .location(context.player.location.id)
+                }
+            return await ActionResult(
                 target.response(
                     object: {
                         context.msg.throwToObject(context.command, item: theProjectile, target: $0)
                     },
-                    character:  {
+                    character: {
                         context.msg.throwToCharacter(
                             context.command,
                             item: theProjectile,
@@ -86,7 +93,7 @@ public struct ThrowActionHandler: ActionHandler {
                             value: roughValue
                         )
                     },
-                    enemy:  {
+                    enemy: {
                         context.msg.throwToEnemy(
                             context.command,
                             item: theProjectile,

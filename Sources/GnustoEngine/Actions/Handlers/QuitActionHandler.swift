@@ -41,9 +41,9 @@ public struct QuitActionHandler: ActionHandler {
 
         guard let response = await context.engine.ioHandler.readLine(prompt: "") else {
             // Handle EOF/nil input as quit confirmation
-            await context.engine.requestQuit()
             return ActionResult(
-                context.msg.goodbye()
+                context.msg.goodbye(),
+                .requestGameQuit
             )
         }
 
@@ -53,9 +53,9 @@ public struct QuitActionHandler: ActionHandler {
 
         if ["yes", "y"].contains(trimmedResponse) {
             // User confirmed quit
-            await context.engine.requestQuit()
             return ActionResult(
-                context.msg.goodbye()
+                context.msg.goodbye(),
+                .requestGameQuit
             )
         } else if ["no", "n"].contains(trimmedResponse) {
             // User cancelled quit

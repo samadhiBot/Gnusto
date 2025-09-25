@@ -1,3 +1,5 @@
+import Foundation
+
 // MARK: - State Change & Side Effect Application
 
 extension GameEngine {
@@ -40,12 +42,20 @@ extension GameEngine {
                 )
             }
 
-            let initialTurns = effect.parameters["--turns"]?.toInt ?? definition.initialTurns
+            var fuseState: FuseState
 
-            // Extract custom state (everything except "--turns" key)
-            let customState = effect.parameters.filter { $0.key != "--turns" }
+            // Extract FuseState from the strongly-typed payload
+            if let fuseStateFromPayload = effect.getPayload(as: FuseState.self) {
+                fuseState = fuseStateFromPayload
+                // If the FuseState has nil turns, use the definition's initialTurns
+                if fuseState.turns == nil {
+                    fuseState.turns = definition.initialTurns
+                }
+            } else {
+                // Fallback to default state if no payload provided
+                fuseState = FuseState(turns: definition.initialTurns)
+            }
 
-            let fuseState = FuseState(turns: initialTurns, state: customState)
             let addChange = StateChange.addActiveFuse(
                 fuseID: fuseID,
                 state: fuseState
@@ -64,15 +74,16 @@ extension GameEngine {
                     "No Daemon found for daemon ID '\(daemonID)' in runDaemon side effect."
                 )
             }
-            if !gameState.activeDaemons.contains(daemonID) {
+            if gameState.activeDaemons[daemonID] == nil {
+                let initialState = DaemonState()
                 try gameState.apply(
-                    StateChange.addActiveDaemon(daemonID: daemonID)
+                    StateChange.addActiveDaemon(daemonID: daemonID, daemonState: initialState)
                 )
             }
 
         case .stopDaemon:
             let daemonID = try effect.targetID.daemonID()
-            if gameState.activeDaemons.contains(daemonID) {
+            if gameState.activeDaemons[daemonID] != nil {
                 try gameState.apply(
                     StateChange.removeActiveDaemon(daemonID: daemonID)
                 )

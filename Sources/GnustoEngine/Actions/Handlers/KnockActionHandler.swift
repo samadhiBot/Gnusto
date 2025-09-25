@@ -28,7 +28,7 @@ public struct KnockActionHandler: ActionHandler {
             )
         }
 
-        return try await ActionResult(
+        return await ActionResult(
             await context.msg.youDo(
                 context.command,
                 item: item.withDefiniteArticle

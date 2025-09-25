@@ -33,7 +33,7 @@ public struct TieActionHandler: ActionHandler {
 
         guard let apparatus = try await context.itemIndirectObject() else {
             // General tying/binding - no specific target
-            return try await ActionResult(
+            return await ActionResult(
                 recipient.response(
                     object: { context.msg.tieItem(context.command, item: $0) },
                     character: { context.msg.tieCharacter(context.command, character: $0) },
@@ -54,7 +54,7 @@ public struct TieActionHandler: ActionHandler {
                 )
             }
 
-            return try await ActionResult(
+            return await ActionResult(
                 apparatus.response(
                     object: {
                         context.msg.tieItemTo(context.command, item: $0, to: theApparatus)
@@ -73,7 +73,7 @@ public struct TieActionHandler: ActionHandler {
                 )
             }
 
-            return try await ActionResult(
+            return await ActionResult(
                 recipient.response(
                     object: {
                         context.msg.tieItemWith(context.command, item: $0, with: theApparatus)

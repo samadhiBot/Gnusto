@@ -28,14 +28,14 @@ struct RestoreActionHandlerTests {
         try await engine.execute("save")
 
         // Verify sword is NOT in inventory at save, an zero moves
-        #expect(try await engine.item("sword").playerIsHolding == false)
+        #expect(await engine.item("sword").playerIsHolding == false)
         #expect(await engine.player.moves == 0)
 
         // Take the sword to change game state
         try await engine.execute("take sword")
 
         // Verify sword is in inventory before restore, and one move
-        #expect(try await engine.item("sword").playerIsHolding == true)
+        #expect(await engine.item("sword").playerIsHolding == true)
         #expect(await engine.player.moves == 1)
 
         // Set up mock to respond "y" to restore confirmation
@@ -63,7 +63,7 @@ struct RestoreActionHandlerTests {
         )
 
         // Verify sword is NOT in inventory after restore, and back to zero moves
-        #expect(try await engine.item("sword").playerIsHolding == false)
+        #expect(await engine.item("sword").playerIsHolding == false)
         #expect(await engine.player.moves == 0)
     }
 
@@ -87,14 +87,14 @@ struct RestoreActionHandlerTests {
         try await engine.execute("save")
 
         // Verify sword is NOT in inventory at save, an zero moves
-        #expect(try await engine.item("sword").playerIsHolding == false)
+        #expect(await engine.item("sword").playerIsHolding == false)
         #expect(await engine.player.moves == 0)
 
         // Take the sword to change game state
         try await engine.execute("take sword")
 
         // Verify sword is in inventory before restore, and one move
-        #expect(try await engine.item("sword").playerIsHolding == true)
+        #expect(await engine.item("sword").playerIsHolding == true)
         #expect(await engine.player.moves == 1)
 
         // Set up mock to respond "y" to restore confirmation
@@ -122,7 +122,7 @@ struct RestoreActionHandlerTests {
         )
 
         // Verify sword is NOT in inventory after restore, and back to zero moves
-        #expect(try await engine.item("sword").playerIsHolding == false)
+        #expect(await engine.item("sword").playerIsHolding == false)
         #expect(await engine.player.moves == 0)
     }
 
@@ -148,8 +148,8 @@ struct RestoreActionHandlerTests {
         _ = await mockIO.flush()  // Clear output buffer
 
         // Verify sword is in inventory before restore attempt
-        let swordBefore = try await engine.item("sword")
-        #expect(try await swordBefore.playerIsHolding)
+        let swordBefore = await engine.item("sword")
+        #expect(await swordBefore.playerIsHolding)
 
         // Set up mock to respond "n" to restore confirmation
         await mockIO.enqueueInput("n")
@@ -170,8 +170,8 @@ struct RestoreActionHandlerTests {
         )
 
         // Verify game state was not reset
-        let swordAfter = try await engine.item("sword")
-        #expect(try await swordAfter.playerIsHolding)
+        let swordAfter = await engine.item("sword")
+        #expect(await swordAfter.playerIsHolding)
     }
 
     @Test("RESTORE handles invalid responses")

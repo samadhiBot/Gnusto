@@ -29,7 +29,7 @@ actor MockActionHandler: ActionHandler {
     private(set) var processCalled: Bool = false
 
     /// The command received by the last call to `process` (or `validate`).
-    private(set) var lastCommandReceived: Command? = nil
+    private(set) var lastCommandReceived: Command?
 
     // Initializer for the actor
     init(

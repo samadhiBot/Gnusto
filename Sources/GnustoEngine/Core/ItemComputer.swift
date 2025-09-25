@@ -8,10 +8,10 @@
 /// static let magicSwordComputer = ItemComputer(for: .magicSword) {
 ///     itemProperty(.description) { context in
 ///         let enchantment = context.item.properties[.enchantmentLevel]?.intValue ?? 0
-///         let playerLevel = try await context.gameState.value(of: .playerLevel) ?? 1
+///         let playerLevel = await context.gameState.value(of: .playerLevel) ?? 1
 ///         return .string(enchantment > playerLevel ? "Blazing sword!" : "Glowing blade")
 ///     }
-///     
+///
 ///     itemProperty(.weight) { context in
 ///         let enchantment = context.item.properties[.enchantmentLevel]?.intValue ?? 0
 ///         return .int(10 + enchantment) // Enchanted weapons are heavier
@@ -19,13 +19,13 @@
 /// }
 /// ```
 public struct ItemComputer: Sendable {
-    public let compute: @Sendable (ItemComputeContext) async throws -> StateValue?
+    public let compute: @Sendable (ItemComputeContext) async -> StateValue?
 
     /// Creates a new ItemComputer with a compute closure.
     ///
     /// - Parameter compute: The function that computes property values for an item.
     ///   Returns `nil` if the property is not handled by this computer.
-    public init(compute: @escaping @Sendable (ItemComputeContext) async throws -> StateValue?) {
+    public init(compute: @escaping @Sendable (ItemComputeContext) async -> StateValue?) {
         self.compute = compute
     }
 
@@ -44,7 +44,7 @@ public struct ItemComputer: Sendable {
     ///         let enchantment = await context.item.enchantmentLevel
     ///         return .string(enchantment > 5 ? "Blazing sword!" : "Glowing blade")
     ///     }
-    ///     
+    ///
     ///     itemProperty(.weight, .size) { context in
     ///         let enchantment = await context.item.enchantmentLevel
     ///         return .int(10 + enchantment)
@@ -53,12 +53,12 @@ public struct ItemComputer: Sendable {
     /// ```
     public init(
         for itemID: ItemID,
-        @ItemComputeMatcherBuilder _ matchers: @Sendable @escaping () async throws -> [ItemComputeMatcher]
+        @ItemComputeMatcherBuilder _ matchers: @Sendable @escaping () async -> [ItemComputeMatcher]
     ) {
         self.compute = { context in
-            let matcherList = try await matchers()
+            let matcherList = await matchers()
             for matcher in matcherList {
-                if let result = try await matcher(context) {
+                if let result = await matcher(context) {
                     return result
                 }
             }
@@ -70,7 +70,7 @@ public struct ItemComputer: Sendable {
 // MARK: - Property Matching Result Builder
 
 /// A type alias for context-aware item property matcher functions.
-public typealias ItemComputeMatcher = (ItemComputeContext) async throws -> StateValue?
+public typealias ItemComputeMatcher = (ItemComputeContext) async -> StateValue?
 
 /// Result builder for creating clean, declarative item property computing.
 ///
@@ -81,7 +81,7 @@ public typealias ItemComputeMatcher = (ItemComputeContext) async throws -> State
 ///         let enchantment = await context.item.enchantmentLevel
 ///         return .string(enchantment > 5 ? "Blazing sword!" : "Glowing blade")
 ///     }
-///     
+///
 ///     itemProperty(.weight, .size) { context in
 ///         let enchantment = await context.item.enchantmentLevel
 ///         return .int(10 + enchantment)
@@ -90,6 +90,13 @@ public typealias ItemComputeMatcher = (ItemComputeContext) async throws -> State
 /// ```
 @resultBuilder
 public struct ItemComputeMatcherBuilder {
+    /// Builds a block of item compute matchers into an array.
+    ///
+    /// This is the core building block of the result builder that combines multiple
+    /// `ItemComputeMatcher` functions into a single array for processing.
+    ///
+    /// - Parameter matchers: Variable number of matcher functions
+    /// - Returns: An array containing all the provided matchers
     public static func buildBlock(_ matchers: ItemComputeMatcher...) -> [ItemComputeMatcher] {
         Array(matchers)
     }
@@ -105,11 +112,11 @@ public struct ItemComputeMatcherBuilder {
 /// - Returns: An ItemComputeMatcher that can be used in the result builder
 public func itemProperty(
     _ properties: ItemPropertyID...,
-    result: @escaping (ItemComputeContext) async throws -> StateValue?
+    result: @escaping (ItemComputeContext) async -> StateValue?
 ) -> ItemComputeMatcher {
     { context in
         if properties.contains(context.propertyID) {
-            try await result(context)
+            await result(context)
         } else {
             nil
         }

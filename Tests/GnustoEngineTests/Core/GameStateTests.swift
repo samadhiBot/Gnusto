@@ -89,7 +89,7 @@ struct GameStateTests {
         let originalState = createBasicGameState()
 
         // Encode and decode
-        let data = try JSONEncoder().encode(originalState)
+        let data = try JSONEncoder.sorted().encode(originalState)
         let decodedState = try JSONDecoder().decode(GameState.self, from: data)
 
         // Verify equality
@@ -309,11 +309,11 @@ struct GameStateTests {
             locations: [createTestLocation(id: .startRoom)],
             items: [createTestItem(id: "testItem")],
             player: Player(in: .startRoom),
-            activeDaemons: ["testDaemon"]
+            activeDaemons: ["testDaemon": DaemonState()]
         )
 
         #expect(state.activeDaemons.count == 1)
-        #expect(state.activeDaemons.contains("testDaemon"))
+        #expect(state.activeDaemons["testDaemon"] != nil)
     }
 
     // MARK: - Complex Integration Tests

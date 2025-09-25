@@ -36,7 +36,7 @@ public struct ClimbOnActionHandler: ActionHandler {
         }
 
         // Default behavior: You can't climb on most things
-        return try await ActionResult(
+        return await ActionResult(
             await context.msg.cannotDo(
                 context.command,
                 item: targetItem.withDefiniteArticle

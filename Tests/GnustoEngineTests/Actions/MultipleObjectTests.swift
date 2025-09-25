@@ -114,10 +114,10 @@ struct MultipleObjectTests {
         )
 
         // Verify items moved to merchant
-        let updatedCoin = try await engine.item("coin")
-        let updatedGem = try await engine.item("gem")
-        #expect(try await updatedCoin.parent == .item(merchant.proxy(engine)))
-        #expect(try await updatedGem.parent == .item(merchant.proxy(engine)))
+        let updatedCoin = await engine.item("coin")
+        let updatedGem = await engine.item("gem")
+        #expect(await updatedCoin.parent == .item(merchant.proxy(engine)))
+        #expect(await updatedGem.parent == .item(merchant.proxy(engine)))
     }
 
     @Test("GIVE COIN AND GEM TO MERCHANT works correctly")
@@ -158,10 +158,10 @@ struct MultipleObjectTests {
         )
 
         // Verify items moved to merchant
-        let updatedCoin = try await engine.item("coin")
-        let updatedGem = try await engine.item("gem")
-        #expect(try await updatedCoin.parent == .item(merchant.proxy(engine)))
-        #expect(try await updatedGem.parent == .item(merchant.proxy(engine)))
+        let updatedCoin = await engine.item("coin")
+        let updatedGem = await engine.item("gem")
+        #expect(await updatedCoin.parent == .item(merchant.proxy(engine)))
+        #expect(await updatedGem.parent == .item(merchant.proxy(engine)))
     }
 
     // MARK: - PUT Multiple Objects Tests
@@ -203,10 +203,10 @@ struct MultipleObjectTests {
         )
 
         // Verify items moved to box
-        let updatedCoin = try await engine.item("coin")
-        let updatedGem = try await engine.item("gem")
-        #expect(try await updatedCoin.parent == .item(box.proxy(engine)))
-        #expect(try await updatedGem.parent == .item(box.proxy(engine)))
+        let updatedCoin = await engine.item("coin")
+        let updatedGem = await engine.item("gem")
+        #expect(await updatedCoin.parent == .item(box.proxy(engine)))
+        #expect(await updatedGem.parent == .item(box.proxy(engine)))
     }
 
     @Test("PUT COIN AND GEM IN BOX works correctly")
@@ -246,10 +246,10 @@ struct MultipleObjectTests {
         )
 
         // Verify items moved to box
-        let updatedCoin = try await engine.item("coin")
-        let updatedGem = try await engine.item("gem")
-        #expect(try await updatedCoin.parent == .item(box.proxy(engine)))
-        #expect(try await updatedGem.parent == .item(box.proxy(engine)))
+        let updatedCoin = await engine.item("coin")
+        let updatedGem = await engine.item("gem")
+        #expect(await updatedCoin.parent == .item(box.proxy(engine)))
+        #expect(await updatedGem.parent == .item(box.proxy(engine)))
     }
 
     // MARK: - TAKE Multiple Objects Tests

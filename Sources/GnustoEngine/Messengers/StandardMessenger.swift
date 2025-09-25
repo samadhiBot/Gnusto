@@ -1,5 +1,7 @@
 import Logging
 
+// swiftlint:disable file_length
+
 /// A class responsible for generating user-facing messages in the interactive fiction game.
 ///
 /// The `StandardMessenger` class provides methods for creating standardized text responses
@@ -18,7 +20,7 @@ open class StandardMessenger: @unchecked Sendable {
     /// A random number generator used for response randomization.
     ///
     /// For testing purposes, a deterministic random number generator can specified when
-    /// initializing the GnustoMessenger. By default the SystemRandomNumberGenerator is used.
+    /// initializing the StandardMessenger. By default the SystemRandomNumberGenerator is used.
     private var randomNumberGenerator: RandomNumberGenerator
 
     public init(
@@ -119,10 +121,6 @@ open class StandardMessenger: @unchecked Sendable {
             but none can handle this syntax. Please be more specific.
             """
         )
-    }
-
-    open func anySomething(_ text: String) -> String {
-        output("any \(text)", capitalize: false)
     }
 
     open func anySuchThing() -> String {
@@ -607,8 +605,10 @@ open class StandardMessenger: @unchecked Sendable {
         output("Would you like to RESTART, RESTORE a saved game, or QUIT?")
     }
 
-    open func examineYourself(healthRatio: Double = 1) -> String {
-        return switch true {
+    open func examineYourself(
+        healthRatio: Double = 1
+    ) -> String {
+        switch true {
         case healthRatio == 0:
             oneOf(
                 """
@@ -745,14 +745,6 @@ open class StandardMessenger: @unchecked Sendable {
 
     open func extinguishSuccess(_ command: Command, item: String) -> String {
         output("You \(command.verbPhrase) \(item).")
-    }
-
-    open func failSound() -> String {
-        oneOf(
-            "Nothing happens.",
-            "The universe remains stubbornly unimpressed.",
-            "Reality fails to bend to your will."
-        )
     }
 
     open func feelNothingUnusual(_ verb: Verb) -> String {
@@ -1150,15 +1142,6 @@ open class StandardMessenger: @unchecked Sendable {
         output("nothing", capitalize: false)
     }
 
-    open func nothingHappens() -> String {
-        oneOf(
-            "Nothing happens.",
-            "The universe remains obstinately unchanged.",
-            "Your efforts produce no observable effect.",
-            "Reality continues its indifferent march."
-        )
-    }
-
     open func nothingHereToDo(_ command: Command) -> String {
         output("There is nothing here to \(command.verbPhrase).")
     }
@@ -1469,9 +1452,18 @@ open class StandardMessenger: @unchecked Sendable {
         oneOf(
             "Darkness presses against you like a physical thing. You are effectively blind.",
             "The darkness here is absolute, consuming all light and hope of sight.",
-            "You stand in a depthless black where even your thoughts seem to whisper, careful not to make a sound.",
-            "This is the kind of dark that swallows shapes and edges, leaving only breath and heartbeat to prove you exist.",
-            "Light feels theoretical here--an idea someone once had, now forgotten by the room itself."
+            """
+            You stand in a depthless black where even your thoughts seem to whisper,
+            careful not to make a sound.
+            """,
+            """
+            This is the kind of dark that swallows shapes and edges,
+            leaving only breath and heartbeat to prove you exist.
+            """,
+            """
+            Light feels theoretical here--an idea someone once had,
+            now forgotten by the room itself.
+            """,
         )
     }
 
@@ -1816,11 +1808,12 @@ open class StandardMessenger: @unchecked Sendable {
     }
 
     open func thereAreIndefiniteItemsHere(_ items: [ItemProxy]) async -> String {
-        let isAre = if items.count == 1 {
-            await items.first?.hasFlag(.isPlural) == true ? "are" : "is"
-        } else {
-            "are"
-        }
+        let isAre =
+            if items.count == 1 {
+                await items.first?.hasFlag(.isPlural) == true ? "are" : "is"
+            } else {
+                "are"
+            }
         let listWithDefiniteArticles = await items.listWithIndefiniteArticles() ?? "nothing"
         return oneOf(
             "There \(isAre) \(listWithDefiniteArticles) here.",
@@ -2087,7 +2080,7 @@ open class StandardMessenger: @unchecked Sendable {
     }
 
     open func transcriptEnded(_ path: String) -> String {
-        output("Transcript recording ended at '\(path)'.")
+        output("Transcript recording ended at '\(path)'.", capitalize: false)
     }
 
     open func transcriptError(_ error: String) -> String {
@@ -2452,7 +2445,11 @@ open class StandardMessenger: @unchecked Sendable {
     /// For testing purposes, a deterministic random number generator can specified when
     /// initializing the StandardMessenger. By default the SystemRandomNumberGenerator is used.
     ///
-    /// - Parameter responses: A collection of responses.
+    /// - Parameters:
+    ///   - responses: A collection of responses.
+    ///   - logLevel: The logging level for debug output (defaults to .debug).
+    ///   - capitalize: Whether to capitalize the first letter of the response (defaults to true).
+    ///   - function: The calling function name for debugging (defaults to #function).
     /// - Returns: A randomly selected response.
     open func oneOf(
         _ responses: String...,
@@ -2508,3 +2505,5 @@ open class StandardMessenger: @unchecked Sendable {
         return capitalize ? gameOutput().capitalizedSentences : gameOutput()
     }
 }
+
+// swiftlint:enable file_length

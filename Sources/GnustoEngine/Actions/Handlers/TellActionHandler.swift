@@ -43,7 +43,7 @@ public struct TellActionHandler: ActionHandler {
         // Case 1: "tell wizard about crystal" - both character and topic
         if let audience, let topic {
             let theTopic = await topic.withDefiniteArticle
-            return try await ActionResult(
+            return await ActionResult(
                 audience.response(
                     object: { context.msg.tellItemAboutTopic($0, topic: theTopic) },
                     character: { context.msg.tellCharacterAboutTopic($0, topic: theTopic) },
@@ -55,7 +55,7 @@ public struct TellActionHandler: ActionHandler {
 
         // Case 2: "tell wizard" - character only, prompt for topic
         if let audience {
-            return try await ActionResult(
+            return await ActionResult(
                 audience.response(
                     object: context.msg.tellObject,
                     character: context.msg.tellCharacter,

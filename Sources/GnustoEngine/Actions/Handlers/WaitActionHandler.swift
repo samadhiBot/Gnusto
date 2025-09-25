@@ -23,7 +23,7 @@ public struct WaitActionHandler: ActionHandler {
     /// has passed. It does not directly cause any state changes or side effects beyond
     /// advancing the game turn, which is handled by the `GameEngine`.
     public func process(context: ActionContext) async throws -> ActionResult {
-        return ActionResult(
+        ActionResult(
             context.msg.timePasses()
         )
     }

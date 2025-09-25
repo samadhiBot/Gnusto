@@ -40,7 +40,7 @@ public struct CutActionHandler: ActionHandler {
             throw ActionResponse.doWhat(context)
         }
 
-        return try await ActionResult(
+        return await ActionResult(
             targetItem.response(
                 object: context.msg.cutItem,
                 character: context.msg.cutCharacter,

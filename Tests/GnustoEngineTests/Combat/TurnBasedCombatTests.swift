@@ -57,8 +57,8 @@ struct TurnBasedCombatTests {
             the goblin can only dodge and weave against the advantage of
             sharpened metal.
 
-            You strike true with your sword! The goblin drops without a
-            sound, weaponless to the end.
+            Your sword finds its mark at last! The goblin staggers once,
+            then falls forever silent.
             """
         )
     }
@@ -95,10 +95,10 @@ struct TurnBasedCombatTests {
             No weapons needed as you attack with pure violence while the
             knight braces for the inevitable collision of flesh and bone.
 
-            The knight catches your fist, stopping your attack cold.
+            The knight manages to deflect its your blow.
 
-            The knight's counter-punch goes wide, rage making the strike
-            clumsy and predictable.
+            The knight's counter-strike punches through air, missing by the
+            width of good instincts.
             """
         )
     }
@@ -132,17 +132,15 @@ struct TurnBasedCombatTests {
             output,
             """
             > attack troll with lamp
-            Armed and hungry for violence, you strike with your lamp as the
-            creature can only dodge and weave against the advantage of
-            sharpened metal.
+            You drive forward with your lamp seeking its purpose as the
+            fearsome beast meets you barehanded, flesh against steel in the
+            oldest gamble.
 
-            The lamp wasn't designed for combat, but you wield it against
-            the beast regardless!
+            You swing the lamp at the creature with desperate creativity!
+            He prepare to defend against your improvised assault.
 
-            In the exchange, the beast lands clean. The world lurches as
-            your body absorbs punishment it won't soon forget. The blow
-            lands solidly, drawing blood. You feel the sting but remain
-            strong.
+            The angry beast swings back hard but his fist finds nothing but
+            the memory of where you stood.
             """
         )
     }
@@ -166,7 +164,7 @@ struct TurnBasedCombatTests {
             .description("A small dagger."),
             .isTakable,
             .isWeapon,
-            .damage(2), // Low damage
+            .damage(2),  // Low damage
             .in(.player)
         )
 
@@ -193,22 +191,11 @@ struct TurnBasedCombatTests {
             the ogre can only dodge and weave against the advantage of
             sharpened metal.
 
-            The ogre evades your dagger with a fluid sidestep, managing to
-            stay just out of reach.
+            The ogre nimbly dodges and twists away from your dagger, using
+            speed to compensate for being unarmed.
 
-            The ogre's final retaliation breaks something essential inside
-            you and you feel yourself folding inward like paper in rain.
-
-            ****  You have died  ****
-
-            Death, that most permanent of inconveniences, has claimed you.
-            Yet in these tales, even death offers second chances.
-
-            You scored 0 out of a possible 10 points, in 0 moves.
-
-            Would you like to RESTART, RESTORE a saved game, or QUIT?
-
-            >
+            The ogre's counter-strike punches through air, missing by the
+            width of good instincts.
             """
         )
     }
@@ -228,7 +215,7 @@ struct TurnBasedCombatTests {
                     intelligence: 10,
                     wisdom: 8,
                     charisma: 8,
-                    alignment: .chaoticGood // Easier to pacify
+                    alignment: .chaoticGood  // Easier to pacify
                 )
             ),
             .in(.startRoom)
@@ -266,7 +253,7 @@ struct TurnBasedCombatTests {
             bandit braces for the inevitable collision of flesh and bone.
 
             You catch the bandit with minimal force, the blow almost
-            gentle. The light wound barely seems to register.
+            gentle. It registers the wound with annoyance.
 
             The bandit's counter-punch goes wide, rage making the strike
             clumsy and predictable.
@@ -275,11 +262,12 @@ struct TurnBasedCombatTests {
             The subject of the peace cannot bridge the chasm between you
             and the bandit.
 
-            Something shifts in the bandit's posture. The aggression
-            dissipates like morning mist, replaced by wary peace.
+            The fight leaves the bandit entirely. It stand passive now, all
+            hostility forgotten.
 
-            Something shifts in the bandit's posture. The aggression
-            dissipates like morning mist, replaced by wary peace.
+            The bandit answers with raw violence, a clubbing strike that
+            finds you but lacks the angle to truly hurt. Pain flickers and
+            dies. Your body has more important work.
             """
         )
     }
@@ -398,11 +386,8 @@ struct TurnBasedCombatTests {
             the rat can only dodge and weave against the advantage of
             sharpened metal.
 
-            Your sword gives the rat serious pause! Unarmed, it suddenly
-            questions this confrontation.
-
-            The rat's counter-punch goes wide, rage making the strike
-            clumsy and predictable.
+            Your sword finds its mark at last! The rat staggers once, then
+            falls forever silent.
             """
         )
     }

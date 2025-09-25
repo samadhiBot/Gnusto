@@ -32,11 +32,11 @@ public struct GoActionHandler: ActionHandler {
         }
 
         // Get Current Location data
-        let currentLocation = try await context.player.location
+        let currentLocation = await context.player.location
 
         // Find Exit
         guard
-            let exit = try await currentLocation.exits
+            let exit = await currentLocation.exits
                 .first(where: { $0.direction == direction })
         else {
             throw ActionResponse.invalidDirection
@@ -57,7 +57,7 @@ public struct GoActionHandler: ActionHandler {
 
         // Check door conditions if exit has a doorID
         if let doorID = exit.doorID {
-            let door = try await context.engine.item(doorID)
+            let door = await context.item(doorID)
 
             // Apply door validation based on the item's specific capabilities
             // Check if the door is locked (only applies to lockable items)

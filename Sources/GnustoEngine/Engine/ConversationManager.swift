@@ -16,7 +16,7 @@ import Foundation
 ///     noMessage: "What did you want to do then?"
 /// )
 /// ```
-public actor ConversationManager: Sendable {
+public actor ConversationManager {
     /// The currently pending question, if any
     private var pendingQuestion: PendingQuestion?
 
@@ -161,6 +161,7 @@ public actor ConversationManager: Sendable {
     /// Processes player input as a potential response to a pending question.
     ///
     /// - Parameter input: The player's input string.
+    /// - Parameter engine: The game engine for accessing game state and context.
     /// - Returns: ActionResult if the input was handled as a question response, nil otherwise.
     public func processResponse(
         _ input: String,
@@ -257,8 +258,8 @@ public actor ConversationManager: Sendable {
         // If we found a topic, create an ASK command
         if let topicItemID {
             do {
-                let characterProxy = try await engine.item(question.characterID)
-                let topicProxy = try await engine.item(topicItemID)
+                let characterProxy = await engine.item(question.characterID)
+                let topicProxy = await engine.item(topicItemID)
 
                 let askCommand = Command(
                     verb: .ask,
@@ -291,10 +292,8 @@ public actor ConversationManager: Sendable {
 
         // Check for case-insensitive match
         let lowercasedInput = trimmedInput.lowercased()
-        for (choice, command) in question.choices {
-            if choice.lowercased() == lowercasedInput {
-                return try await executeCommand(command, with: engine)
-            }
+        for (choice, command) in question.choices where choice.lowercased() == lowercasedInput {
+            return try await executeCommand(command, with: engine)
         }
 
         // No valid choice found
@@ -313,7 +312,7 @@ public actor ConversationManager: Sendable {
         // Find the appropriate handler for the command
         let handler = await engine.findActionHandler(for: command)
 
-        guard let handler = handler else {
+        guard let handler else {
             return ActionResult(
                 engine.messenger.verbUnknown(command.verbPhrase)
             )
@@ -348,7 +347,7 @@ extension ConversationManager {
         command: Command,
         context: ActionContext
     ) async -> ActionResult {
-        return await askYesNo(
+        await askYesNo(
             question: question,
             yesCommand: command,
             noMessage: context.msg.conversationNeverMind()
@@ -366,7 +365,7 @@ extension ConversationManager {
         clarifiedCommand: Command,
         context: ActionContext
     ) async -> ActionResult {
-        return await askYesNo(
+        await askYesNo(
             question: question,
             yesCommand: clarifiedCommand,
             noMessage: context.msg.conversationWhatNext(),

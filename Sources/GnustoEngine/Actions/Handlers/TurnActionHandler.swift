@@ -31,7 +31,7 @@ public struct TurnActionHandler: ActionHandler {
 
         // Determine appropriate response based on object type
         let message =
-            if try await item.isCharacter {
+            if await item.isCharacter {
                 context.msg.turnCharacter(await item.withDefiniteArticle)
             } else if await item.hasFlag(.isTakable) {
                 context.msg.turnItem(await item.withDefiniteArticle)
@@ -39,7 +39,7 @@ public struct TurnActionHandler: ActionHandler {
                 context.msg.turnFixedObject(await item.withDefiniteArticle)
             }
 
-        return try await ActionResult(
+        return await ActionResult(
             message,
             item.setFlag(.isTouched)
         )

@@ -9,7 +9,7 @@ extension GameEngine {
     /// - Parameter saveName: Optional name for the save file. Defaults to "quicksave".
     /// - Throws: FileManager or encoding errors if the save operation fails.
     public func saveGame(saveName: String = "quicksave") async throws -> URL {
-        let saveData = try JSONEncoder().encode(gameState)
+        let saveData = try JSONEncoder.sorted().encode(gameState)
         let saveURL = try filesystemHandler.saveFileURL(game: abbreviatedTitle, filename: saveName)
         try saveData.write(to: saveURL, options: [.atomic])
         return saveURL
@@ -29,7 +29,7 @@ extension GameEngine {
         guard FileManager.default.fileExists(atPath: saveURL.path) else {
             throw NSError(
                 domain: "GnustoEngine",
-                code: 2001,
+                code: 2_001,
                 userInfo: [NSLocalizedDescriptionKey: "Save file '\(saveName)' not found."]
             )
         }
@@ -72,7 +72,7 @@ extension GameEngine {
         guard FileManager.default.fileExists(atPath: saveURL.path) else {
             throw NSError(
                 domain: "GnustoEngine",
-                code: 2001,
+                code: 2_001,
                 userInfo: [NSLocalizedDescriptionKey: "Save file '\(saveName)' not found."]
             )
         }

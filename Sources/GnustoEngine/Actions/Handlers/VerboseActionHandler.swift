@@ -24,7 +24,7 @@ public struct VerboseActionHandler: ActionHandler {
     /// Sets the game to verbose mode, where full location descriptions are shown
     /// every time the player enters a location.
     public func process(context: ActionContext) async throws -> ActionResult {
-        return await ActionResult(
+        await ActionResult(
             context.msg.maximumVerbosity(),
             context.engine.setFlag(.isVerboseMode)
         )

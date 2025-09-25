@@ -72,7 +72,7 @@ struct Thief {
         .requiresTryTake,
         .omitDescription,
         .isContainer,
-        .capacity(1000),  // Large capacity for stolen treasures
+        .capacity(1_000),  // Large capacity for stolen treasures
         .in(.item(.thief))
     )
 }
@@ -93,12 +93,12 @@ extension Thief {
             )
         }
 
-        before(.give) { context, command in
+        before(.give) { _, command in
             // Get the item being given from the direct object
             guard case .item(let giftProxy) = command.directObject else {
                 return nil
             }
-            return try await handleGiveToThief(item: giftProxy)
+            return await handleGiveToThief(item: giftProxy)
         }
 
         before(.listen) { _, _ in
@@ -109,13 +109,13 @@ extension Thief {
             ActionResult("Once you got him, what would you do with him?")
         }
 
-        before(.tell) { context, _ in
+        before(.tell) { _, _ in
             ActionResult("The thief is a strong, silent type.")
         }
 
         before(.throw) { context, command in
             if command.directObject?.itemProxy?.id == .knife {
-                try await throwNastyKnifeAtThief(in: context)
+                await throwNastyKnifeAtThief(in: context)
             } else {
                 nil
             }
@@ -125,7 +125,7 @@ extension Thief {
     /// Stiletto weapon handler with thief protection
     static let stilettoHandler = ItemEventHandler(for: .stiletto) {
         before(.examine) { context, _ in
-            guard try await isThiefHoldingStiletto(context.engine) else { return nil }
+            guard await isThiefHoldingStiletto(context.engine) else { return nil }
             return ActionResult(
                 """
                 It's a vicious-looking stiletto with a razor-sharp blade. The thief
@@ -136,7 +136,7 @@ extension Thief {
 
         before(.take) { context, _ in
             // Stiletto is protected while thief is alive and present
-            guard try await isThiefHoldingStiletto(context.engine) else { return nil }
+            guard await isThiefHoldingStiletto(context.engine) else { return nil }
             return ActionResult(
                 """
                 The thief is armed and dangerous. You'd have to defeat him first
@@ -148,8 +148,8 @@ extension Thief {
 
     /// Large bag handler with treasure integration
     static let largeBagHandler = ItemEventHandler(for: .largeBag) {
-        before(.examine) { context, command in
-            if try await isThiefHoldingLargeBag(context.engine) {
+        before(.examine) { context, _ in
+            if await isThiefHoldingLargeBag(context.engine) {
                 return ActionResult(
                     """
                     The thief's large bag bulges with what are obviously stolen goods.
@@ -158,7 +158,7 @@ extension Thief {
                 )
             }
 
-            let contents = try await context.item.contents
+            let contents = await context.item.contents
             if contents.isEmpty {
                 return ActionResult("The thief's bag lies empty on the ground.")
             } else {
@@ -171,8 +171,8 @@ extension Thief {
             }
         }
 
-        before(.take, .open) { context, command in
-            guard try await isThiefHoldingLargeBag(context.engine) else { return nil }
+        before(.take, .open) { context, _ in
+            guard await isThiefHoldingLargeBag(context.engine) else { return nil }
             return ActionResult(
                 """
                 The thief clutches his bag protectively. You'd need to defeat him
@@ -187,25 +187,25 @@ extension Thief {
     /// The `thiefDaemon` controls the thief's movement and tendency to steal.
     ///
     /// Based on Zork's `THIEF-VS-ADVENTURER` routine.
-    static let thiefDaemon = Daemon(frequency: 1) { engine in
-        let playerLocation = try await engine.player.location
-        let thief = try await engine.item(.thief)
-        let thiefLargeBag = try await engine.item(.largeBag)
-        let thiefLocation = try await thief.location
+    static let thiefDaemon = Daemon(frequency: 1) { engine, _ in
+        let playerLocation = await engine.player.location
+        let thief = await engine.item(.thief)
+        let thiefLargeBag = await engine.item(.largeBag)
+        let thiefLocation = await thief.location
 
         // Thief must be awake, not engaged in combat, and allowed in the current location
         guard
-            try await thief.isAwake,
-            try await !thief.isFighting,
-            try await thief.isAllowed(in: playerLocation.id)
+            await thief.isAwake,
+            await !thief.isFighting,
+            await thief.isAllowed(in: playerLocation.id)
         else {
             return .yield
         }
 
-        if try await thief.parent == .nowhere {
+        if await thief.parent == .nowhere {
             // Thief is not here, has 30% chance to spawn into the current location
             if await engine.randomPercentage(chance: 30) {
-                if try await thief.isHolding(.stiletto) {
+                if await thief.isHolding(.stiletto) {
                     return ActionResult(
                         """
                         Someone carrying a large bag is casually leaning against one of the
@@ -215,8 +215,8 @@ extension Thief {
                         thief.move(to: playerLocation.id)
                     )
                 }
-                if try await engine.player.isHolding(.stiletto) {
-                    return try await ActionResult(
+                if await engine.player.isHolding(.stiletto) {
+                    return await ActionResult(
                         """
                         You feel a light finger-touch, and turning, notice a grinning figure
                         holding a large bag in one hand and a stiletto in the other.
@@ -232,13 +232,13 @@ extension Thief {
             if await engine.randomPercentage(chance: 30) {
                 // Thief steals everything he can from the player and the room
                 var changes = [StateChange?]()
-                let roomItems = try await playerLocation.items.eligibleForTheft
+                let roomItems = await playerLocation.items.eligibleForTheft
                 for item in roomItems {
                     changes.append(
                         item.move(to: thiefLargeBag.id)
                     )
                 }
-                let playerItems = try await engine.player.inventory.eligibleForTheft
+                let playerItems = await engine.player.inventory.eligibleForTheft
                 for item in playerItems {
                     changes.append(
                         item.move(to: thiefLargeBag.id)
@@ -286,9 +286,7 @@ extension Thief {
 extension Thief {
     static let thiefCombatSystem = StandardCombatSystem(
         versus: .thief
-    ) {
-        event,
-        msg async throws -> String? in
+    ) { event, msg async -> String? in
         switch event {
         case .playerSlain:
             return msg.oneOf(
@@ -310,8 +308,8 @@ extension Thief {
                 "The thief knocks you out."
             )
         case let .playerDisarmed(enemy, playerWeapon, enemyWeapon, wasFumble):
-            let weapon = try await playerWeapon.alias(.withPossessiveAdjective)
-            let weaponAlt = try await playerWeapon.alias(.withPossessiveAdjective)
+            let weapon = await playerWeapon.alias(.withPossessiveAdjective)
+            let weaponAlt = await playerWeapon.alias(.withPossessiveAdjective)
             return msg.oneOf(
                 """
                 A long, theatrical slash. You catch it on \(weapon),
@@ -379,7 +377,7 @@ extension Thief {
 // MARK: - Helper functions
 
 extension Thief {
-    static func handleGiveToThief(item: ItemProxy) async throws -> ActionResult? {
+    static func handleGiveToThief(item: ItemProxy) async -> ActionResult? {
         if await item.value > 0 {
             await ActionResult(
                 """
@@ -399,28 +397,28 @@ extension Thief {
         }
     }
 
-    static func isThiefHoldingLargeBag(_ engine: GameEngine) async throws -> Bool {
-        let thief = try await engine.item(.thief)
-        let largeBag = try await engine.item(.largeBag)
-        return try await thief.isHolding(largeBag.id)
+    static func isThiefHoldingLargeBag(_ engine: GameEngine) async -> Bool {
+        let thief = await engine.item(.thief)
+        let largeBag = await engine.item(.largeBag)
+        return await thief.isHolding(largeBag.id)
     }
 
-    static func isThiefHoldingStiletto(_ engine: GameEngine) async throws -> Bool {
-        let thief = try await engine.item(.thief)
-        let stiletto = try await engine.item(.stiletto)
-        return try await thief.isHolding(stiletto.id)
+    static func isThiefHoldingStiletto(_ engine: GameEngine) async -> Bool {
+        let thief = await engine.item(.thief)
+        let stiletto = await engine.item(.stiletto)
+        return await thief.isHolding(stiletto.id)
     }
 
     static func throwNastyKnifeAtThief(
         in context: ItemEventContext
-    ) async throws -> ActionResult? {
-        let nastyKnife = try await context.engine.item(.knife)
+    ) async -> ActionResult? {
+        let nastyKnife = await context.item(.knife)
 
-        guard try await context.engine.player.isHolding(nastyKnife.id) else { return nil }
+        guard await context.player.isHolding(nastyKnife.id) else { return nil }
 
-        let thief = try await context.engine.item(.thief)
-        let largeBag = try await context.engine.item(.largeBag)
-        let playerLocation = try await context.engine.player.location
+        let thief = await context.item(.thief)
+        let largeBag = await context.item(.largeBag)
+        let playerLocation = await context.player.location
 
         if await context.engine.rollD10(rollsAtLeast: 10) {
             return ActionResult(
@@ -441,7 +439,7 @@ extension Thief {
                 """
             )
             .appending(
-                try await context.engine.enemyAttacks(enemy: thief)
+                await context.engine.enemyAttacks(enemy: thief)
             )
         }
     }
@@ -449,8 +447,8 @@ extension Thief {
 
 extension Array where Element == ItemProxy {
     var eligibleForTheft: [ItemProxy] {
-        get async throws {
-            try await asyncFilter {
+        get async {
+            await asyncFilter {
                 if await $0.value > 0, await $0.hasFlags(none: .isSacred, .isInvisible) {
                     true
                 } else {

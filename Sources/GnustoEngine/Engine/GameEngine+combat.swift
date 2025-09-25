@@ -35,13 +35,14 @@ extension GameEngine {
     public func enemyAttacks(
         enemy: ItemProxy,
         playerWeapon: ItemProxy? = nil
-    ) async throws -> ActionResult {
-        let playerWeapon = if let playerWeapon {
-            playerWeapon
-        } else {
-            try await player.preferredWeapon
-        }
-        return try await ActionResult(
+    ) async -> ActionResult {
+        let playerWeapon =
+            if let playerWeapon {
+                playerWeapon
+            } else {
+                await player.preferredWeapon
+            }
+        return await ActionResult(
             combatMessenger(for: enemy.id).enemyAttacks(
                 enemy: enemy,
                 playerWeapon: playerWeapon,
@@ -66,25 +67,28 @@ extension GameEngine {
     ///
     /// - Parameters:
     ///   - enemy: The enemy item that the player is attacking
-    ///   - weapon: The weapon the player is using for the attack, if any
+    ///   - playerWeapon: The weapon the player is using for the attack, if any
+    ///   - enemyWeapon: The weapon the enemy is using for defense, if any
     /// - Returns: An `ActionResult` containing the attack message and state changes
     /// - Throws: `ActionResponse` if there are issues with state changes
     public func playerAttacks(
         enemy: ItemProxy,
         playerWeapon: ItemProxy?,
         enemyWeapon: ItemProxy?,
-    ) async throws -> ActionResult {
-        let playerWeapon = if let playerWeapon {
-            playerWeapon
-        } else {
-            try await player.preferredWeapon
-        }
-        let enemyWeapon = if let enemyWeapon {
-            enemyWeapon
-        } else {
-            try await enemy.preferredWeapon
-        }
-        return try await ActionResult(
+    ) async -> ActionResult {
+        let playerWeapon =
+            if let playerWeapon {
+                playerWeapon
+            } else {
+                await player.preferredWeapon
+            }
+        let enemyWeapon =
+            if let enemyWeapon {
+                enemyWeapon
+            } else {
+                await enemy.preferredWeapon
+            }
+        return await ActionResult(
             combatMessenger(for: enemy.id).playerAttacks(
                 enemy: enemy,
                 playerWeapon: playerWeapon,
@@ -116,7 +120,8 @@ extension GameEngine {
     ///           or other `ActionResponse` errors from combat processing
     func getCombatResult(for command: Command) async throws -> ActionResult {
         guard let combatState else {
-            throw ActionResponse.internalEngineError("processCombatTurn invalid state")
+            assertionFailure("GameEngine.processCombatTurn invalid state")
+            return .yield
         }
 
         // Get the combat system for this enemy
@@ -130,7 +135,20 @@ extension GameEngine {
     }
 
     func combatSystem(versus enemyID: ItemID) -> CombatSystem {
-        gameBlueprint.combatSystems[enemyID] ?? StandardCombatSystem(versus: enemyID)
+        // Check if there's a custom combat system first
+        if let customSystem = gameBlueprint.combatSystems[enemyID] {
+            return customSystem
+        }
+
+        // Use cached StandardCombatSystem or create a new one if needed
+        if let cachedSystem = standardCombatSystemCache[enemyID] {
+            return cachedSystem
+        }
+
+        // Create new StandardCombatSystem and cache it
+        let newSystem = StandardCombatSystem(versus: enemyID)
+        standardCombatSystemCache[enemyID] = newSystem
+        return newSystem
     }
 
     /// Returns the appropriate combat messenger for the given enemy.
@@ -160,7 +178,7 @@ extension GameEngine {
     func getPlayerAction(
         for command: Command,
         in combatState: CombatState
-    ) async throws -> PlayerAction {
+    ) async -> PlayerAction {
         switch true {
         case command.hasIntent(.attack, .burn, .cut, .eat):
             .attack
@@ -191,34 +209,16 @@ extension GameEngine {
     ///
     /// - Parameter enemy: The enemy currently engaged in combat
     /// - Returns: `true` if combat should end, `false` if it should continue
-    func shouldEndCombat(enemy: ItemProxy) async throws -> Bool {
+    func shouldEndCombat(enemy: ItemProxy) async -> Bool {
         // Check if enemy is dead or unconscious
-        guard try await enemy.isCharacter else { return true }
-
-        do {
-            let isDead = try await enemy.isDead
-            let isUnconscious = try await enemy.isUnconscious
-            if isDead || isUnconscious {
-                return true
-            }
-        } catch {
-            // If we can't get character state, assume combat should end
-            return true
-        }
+        if await !enemy.isAwake { return true }
 
         // Check if player is dead
-        if await isPlayerDead {
-            return true
-        }
+        if await isPlayerDead { return true }
 
         // Check health conditions
-        do {
-            let playerHealth = await player.health
-            let enemyHealth = try await enemy.health
-            return playerHealth <= 0 || enemyHealth <= 0
-        } catch {
-            // If we can't get health, assume one character is dead
-            return true
-        }
+        let playerHealth = await player.health
+        let enemyHealth = await enemy.health
+        return playerHealth <= 0 || enemyHealth <= 0
     }
 }

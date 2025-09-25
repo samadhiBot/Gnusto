@@ -69,7 +69,8 @@ struct DirectionTests {
 
     @Test("Sort order is stable and consistent")
     func testSortOrder() throws {
-        let directions = Direction.allCases.shuffled()
+        var generator = SeededRandomNumberGenerator(seed: 42)
+        let directions = Direction.allCases.shuffled(using: &generator)
         let sorted = directions.sorted()
 
         let expectedOrder: [Direction] = [
@@ -116,7 +117,7 @@ struct DirectionTests {
 
     @Test("Direction encodes and decodes correctly")
     func testCodableConformance() throws {
-        let encoder = JSONEncoder()
+        let encoder = JSONEncoder.sorted()
         let decoder = JSONDecoder()
 
         for direction in Direction.allCases {
@@ -146,7 +147,7 @@ struct DirectionTests {
 
     @Test("Direction encoding produces expected JSON")
     func testEncodingProducesExpectedJSON() throws {
-        let encoder = JSONEncoder()
+        let encoder = JSONEncoder.sorted()
 
         let northData = try encoder.encode(Direction.north)
         let northString = String(data: northData, encoding: .utf8)

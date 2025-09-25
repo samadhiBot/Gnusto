@@ -44,11 +44,10 @@ struct GameEngineCombatTests {
             goblin braces for the inevitable collision of flesh and bone.
 
             You catch the goblin with minimal force, the blow almost
-            gentle. The light wound barely seems to register.
+            gentle. It registers the wound with annoyance.
 
-            In the tangle, the goblin drives an elbow home--sudden pressure
-            that blooms into dull pain. The wound is trivial against your
-            battle fury.
+            The goblin's counter-punch goes wide, rage making the strike
+            clumsy and predictable.
             """
         )
 
@@ -97,12 +96,12 @@ struct GameEngineCombatTests {
             the orc can only dodge and weave against the advantage of
             sharpened metal.
 
-            The sword wasn't designed for combat, but you wield it against
-            the orc regardless!
+            You swing the sword at the orc with desperate creativity! It
+            prepare to defend against your improvised assault.
 
-            In the tangle, the orc drives an elbow home--sudden pressure
-            that blooms into dull pain. The wound is trivial against your
-            battle fury.
+            The orc crashes forward in response, the impact jarring but
+            glancing as you roll with it. Pain flickers and dies. Your body
+            has more important work.
             """
         )
 
@@ -167,7 +166,7 @@ struct GameEngineCombatTests {
         )
 
         // And: Enemy should be marked as touched
-        let finalDragon = try await engine.item("dragon")
+        let finalDragon = await engine.item("dragon")
         #expect(await finalDragon.hasFlag(.isTouched) == true)
     }
 
@@ -200,9 +199,9 @@ struct GameEngineCombatTests {
 
             There is a fierce troll here.
 
-            Despite having no weapon, the creature charges with terrifying
-            resolve! You grip your battle axe tighter, knowing you'd better
-            use this advantage.
+            The fearsome beast abandons caution and lunges straight at you!
+            Your battle axe suddenly feels less reassuring as the distance
+            vanishes.
             """
         )
 
@@ -248,11 +247,10 @@ struct GameEngineCombatTests {
             and bone.
 
             You catch the skeleton warrior with minimal force, the blow
-            almost gentle. The light wound barely seems to register.
+            almost gentle. It registers the wound with annoyance.
 
-            In the tangle, the skeleton warrior drives an elbow
-            home--sudden pressure that blooms into dull pain. The wound is
-            trivial against your battle fury.
+            The skeleton warrior's counter-punch goes wide, rage making the
+            strike clumsy and predictable.
             """
         )
 
@@ -262,14 +260,14 @@ struct GameEngineCombatTests {
             enemyID: "skeleton",
             roundCount: 1,
             playerWeaponID: nil,
-            combatIntensity: 0.33999999999999997,
-            playerFatigue: 0.18,
+            combatIntensity: 0.23,
+            playerFatigue: 0.14,
             enemyFatigue: 0.18
         )
         expectNoDifference(combatState, expectedSkeleton)
 
         // And: Enemy should be marked as touched
-        let finalSkeleton = try await engine.item("skeleton")
+        let finalSkeleton = await engine.item("skeleton")
         #expect(await finalSkeleton.hasFlag(.isTouched) == true)
     }
 
@@ -307,12 +305,13 @@ struct GameEngineCombatTests {
             as the shambling zombie can only dodge and weave against the
             advantage of sharpened metal.
 
-            The iron mace wasn't designed for combat, but you wield it
-            against the shambling zombie regardless!
+            You swing the iron mace at the shambling zombie with desperate
+            creativity! It prepare to defend against your improvised
+            assault.
 
-            In the tangle, the shambling zombie drives an elbow
-            home--sudden pressure that blooms into dull pain. The wound is
-            trivial against your battle fury.
+            The shambling zombie crashes forward in response, the impact
+            jarring but glancing as you roll with it. Pain flickers and
+            dies. Your body has more important work.
             """
         )
 
@@ -330,18 +329,6 @@ struct GameEngineCombatTests {
     }
 
     // MARK: - Get Combat Result Tests
-
-    @Test("getCombatResult throws error when not in combat")
-    func testGetCombatResultThrowsWhenNotInCombat() async throws {
-        let game = MinimalGame()
-        let (engine, _) = await GameEngine.test(blueprint: game)
-
-        let command = Command(verb: .attack)
-
-        await #expect(throws: ActionResponse.self) {
-            try await engine.getCombatResult(for: command)
-        }
-    }
 
     @Test("getCombatResult uses default StandardCombatSystem when none specified")
     func testGetCombatResultUsesDefaultCombatSystem() async throws {
@@ -370,11 +357,10 @@ struct GameEngineCombatTests {
             goblin braces for the inevitable collision of flesh and bone.
 
             You catch the goblin with minimal force, the blow almost
-            gentle. The light wound barely seems to register.
+            gentle. It registers the wound with annoyance.
 
-            In the tangle, the goblin drives an elbow home--sudden pressure
-            that blooms into dull pain. The wound is trivial against your
-            battle fury.
+            The goblin's counter-punch goes wide, rage making the strike
+            clumsy and predictable.
             """
         )
     }
@@ -392,7 +378,7 @@ struct GameEngineCombatTests {
 
         for verb in attackVerbs {
             let command = Command(verb: verb)
-            let action = try await engine.getPlayerAction(
+            let action = await engine.getPlayerAction(
                 for: command,
                 in: combatState
             )
@@ -409,7 +395,7 @@ struct GameEngineCombatTests {
 
         // Test ask without topic
         let command = Command(verb: .ask)
-        let askAction = try await engine.getPlayerAction(for: command, in: combatState)
+        let askAction = await engine.getPlayerAction(for: command, in: combatState)
         if case .talk(let topic) = askAction {
             #expect(topic == nil)
         } else {
@@ -418,7 +404,7 @@ struct GameEngineCombatTests {
 
         // Test tell - since we can't easily create indirectObject, test basic tell
         let tellCommand = Command(verb: .tell)
-        let tellAction = try await engine.getPlayerAction(for: tellCommand, in: combatState)
+        let tellAction = await engine.getPlayerAction(for: tellCommand, in: combatState)
         if case .talk(let topic) = tellAction {
             #expect(topic == nil)
         } else {
@@ -434,7 +420,7 @@ struct GameEngineCombatTests {
         let combatState = CombatState(enemyID: "enemy", roundCount: 1)
 
         let moveCommand = Command(verb: .move, direction: .north)
-        let action = try await engine.getPlayerAction(for: moveCommand, in: combatState)
+        let action = await engine.getPlayerAction(for: moveCommand, in: combatState)
 
         if case .flee(let direction) = action {
             #expect(direction == .north)
@@ -451,7 +437,7 @@ struct GameEngineCombatTests {
     //        let combatState = CombatState(enemyID: "enemy", roundCount: 1)
     //
     //        let defendCommand = Command(verb: .block)  // Using block as defensive verb
-    //        let action = try await engine.getPlayerAction(for: defendCommand, in: combatState)
+    //        let action = await engine.getPlayerAction(for: defendCommand, in: combatState)
     //        switch action {
     //        case .defend:
     //            // Expected case
@@ -477,10 +463,10 @@ struct GameEngineCombatTests {
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         let combatState = CombatState(enemyID: "enemy", roundCount: 1)
-        let potionProxy = try await engine.item("potion")
+        let potionProxy = await engine.item("potion")
 
         let giveCommand = Command(verb: .give, directObject: .item(potionProxy))
-        let action = try await engine.getPlayerAction(for: giveCommand, in: combatState)
+        let action = await engine.getPlayerAction(for: giveCommand, in: combatState)
 
         if case .useItem(let item) = action {
             #expect(item.id == "potion")
@@ -497,7 +483,7 @@ struct GameEngineCombatTests {
         let combatState = CombatState(enemyID: "enemy", roundCount: 1)
 
         let unknownCommand = Command(verb: .look)
-        let action = try await engine.getPlayerAction(for: unknownCommand, in: combatState)
+        let action = await engine.getPlayerAction(for: unknownCommand, in: combatState)
         switch action {
         case .other:
             // Expected case
@@ -524,8 +510,8 @@ struct GameEngineCombatTests {
 
         let (engine, _) = await GameEngine.test(blueprint: game)
 
-        let enemyProxy = try await engine.item("deadEnemy")
-        let shouldEnd = try await engine.shouldEndCombat(enemy: enemyProxy)
+        let enemyProxy = await engine.item("deadEnemy")
+        let shouldEnd = await engine.shouldEndCombat(enemy: enemyProxy)
         #expect(shouldEnd == true)
     }
 
@@ -544,8 +530,8 @@ struct GameEngineCombatTests {
 
         let (engine, _) = await GameEngine.test(blueprint: game)
 
-        let enemyProxy = try await engine.item("unconsciousEnemy")
-        let shouldEnd = try await engine.shouldEndCombat(enemy: enemyProxy)
+        let enemyProxy = await engine.item("unconsciousEnemy")
+        let shouldEnd = await engine.shouldEndCombat(enemy: enemyProxy)
         #expect(shouldEnd == true)
     }
 
@@ -566,8 +552,8 @@ struct GameEngineCombatTests {
             engine.player.setHealth(to: 0)
         )
 
-        let enemyProxy = try await engine.item("enemy")
-        let shouldEnd = try await engine.shouldEndCombat(enemy: enemyProxy)
+        let enemyProxy = await engine.item("enemy")
+        let shouldEnd = await engine.shouldEndCombat(enemy: enemyProxy)
         #expect(shouldEnd == true)
     }
 
@@ -592,8 +578,8 @@ struct GameEngineCombatTests {
 
         let (engine, _) = await GameEngine.test(blueprint: game)
 
-        let enemyProxy = try await engine.item("enemy")
-        let shouldEnd = try await engine.shouldEndCombat(enemy: enemyProxy)
+        let enemyProxy = await engine.item("enemy")
+        let shouldEnd = await engine.shouldEndCombat(enemy: enemyProxy)
         #expect(shouldEnd == true)
     }
 
@@ -612,8 +598,8 @@ struct GameEngineCombatTests {
 
         let (engine, _) = await GameEngine.test(blueprint: game)
 
-        let enemyProxy = try await engine.item("weakEnemy")
-        let shouldEnd = try await engine.shouldEndCombat(enemy: enemyProxy)
+        let enemyProxy = await engine.item("weakEnemy")
+        let shouldEnd = await engine.shouldEndCombat(enemy: enemyProxy)
         #expect(shouldEnd == true)
     }
 
@@ -638,8 +624,8 @@ struct GameEngineCombatTests {
 
         let (engine, _) = await GameEngine.test(blueprint: game)
 
-        let enemyProxy = try await engine.item("healthyEnemy")
-        let shouldEnd = try await engine.shouldEndCombat(enemy: enemyProxy)
+        let enemyProxy = await engine.item("healthyEnemy")
+        let shouldEnd = await engine.shouldEndCombat(enemy: enemyProxy)
         #expect(shouldEnd == false)
     }
 
@@ -651,7 +637,7 @@ struct GameEngineCombatTests {
             id: "rat",
             .name("giant rat"),
             .characterSheet(
-                .init(health: 10)
+                .init(health: 13)
             ),
             .in(.startRoom)
         )
@@ -675,7 +661,7 @@ struct GameEngineCombatTests {
             bone.
 
             You catch the giant rat with minimal force, the blow almost
-            gentle. The light wound barely seems to register.
+            gentle. It registers the wound with annoyance.
 
             The giant rat's counter-punch goes wide, rage making the strike
             clumsy and predictable.
@@ -728,12 +714,13 @@ struct GameEngineCombatTests {
             as the fierce ogre can only dodge and weave against the
             advantage of sharpened metal.
 
-            The wooden club wasn't designed for combat, but you wield it
-            against the fierce ogre regardless!
+            You swing the wooden club at the fierce ogre with desperate
+            creativity! It prepare to defend against your improvised
+            assault.
 
-            In the tangle, the fierce ogre drives an elbow home--sudden
-            pressure that blooms into dull pain. The wound is trivial
-            against your battle fury.
+            The fierce ogre crashes forward in response, the impact jarring
+            but glancing as you roll with it. Pain flickers and dies. Your
+            body has more important work.
             """
         )
 
@@ -808,7 +795,7 @@ struct GameEngineCombatTests {
             of sharpened metal.
 
             Your strike with your steel sword grazes the dire wolf, drawing
-            minimal blood. The light wound barely seems to register.
+            minimal blood. It registers the wound with annoyance.
 
             The dire wolf's counter-punch goes wide, rage making the strike
             clumsy and predictable.
@@ -816,69 +803,23 @@ struct GameEngineCombatTests {
             > kill the bear
             You're currently engaged with the dire wolf--focus!
 
-            Your strike with your steel sword grazes the dire wolf, drawing
-            minimal blood. The light wound barely seems to register.
+            You strike the dire wolf with your steel sword, opening a wound
+            that bleeds steadily. The wound is real but manageable.
 
-            The dire wolf's retaliatory strike comes fast but you're
-            faster, sidestepping the violence with practiced grace.
+            The dire wolf swings in retaliation but you slip the attack,
+            flowing around the violence like water around stone.
 
             > kill the bear with the bow
             In case you hadn't noticed, the dire wolf is already trying to
             kill you!
 
-            The longbow wasn't designed for combat, but you wield it
-            against the dire wolf regardless!
+            You attack with the longbow! The dire wolf dodges, more puzzled
+            than threatened by your choice of weapon.
 
-            The dire wolf's lightning-fast counter strikes your wrist,
-            causing your steel sword to drop from shocked fingers.
+            The dire wolf's answer is swift and punishing--knuckles meet
+            flesh with the sound of meat hitting stone. You absorb the hit,
+            feeling flesh tear but knowing you can endure.
             """
         )
-    }
-
-    // MARK: - Error Handling Tests
-
-    @Test("combat methods handle invalid items gracefully")
-    func testCombatHandlesInvalidItems() async throws {
-        let (engine, _) = await GameEngine.test()
-
-        // Test with non-existent enemy should throw
-        await #expect(throws: ActionResponse.self) {
-            try await engine.item("nonExistentEnemy")
-        }
-    }
-
-    @Test("combat system handles missing enemy gracefully")
-    func testCombatSystemHandlesMissingEnemy() async throws {
-        let ghost = Item(
-            id: "ghost",
-            .name("ghost"),
-            .characterSheet(.default),
-            .in(.startRoom)
-        )
-
-        let game = MinimalGame(
-            items: ghost
-        )
-
-        let (engine, _) = await GameEngine.test(blueprint: game)
-
-        // Initiate combat
-        let ghostProxy = try await engine.item("ghost")
-        _ = try await engine.playerAttacks(enemy: ghostProxy, playerWeapon: nil, enemyWeapon: nil)
-
-        // Remove the enemy from the game world
-        try await engine.apply(ghostProxy.remove())
-
-        // Combat system should handle missing enemy
-        let command = Command(verb: .attack)
-
-        // This might throw or return a default result depending on StandardCombatSystem implementation
-        // The test verifies it doesn't crash the engine
-        do {
-            _ = try await engine.getCombatResult(for: command)
-        } catch {
-            // Expected if StandardCombatSystem validates enemy existence
-            #expect(error is ActionResponse)
-        }
     }
 }

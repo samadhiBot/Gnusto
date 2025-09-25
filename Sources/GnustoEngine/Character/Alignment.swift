@@ -1,5 +1,7 @@
 import Foundation
 
+// swiftlint:disable sorted_enum_cases
+
 /// Character alignment representing moral and ethical orientation.
 ///
 /// Based on the classic D&D alignment system, this enum combines two axes:
@@ -169,23 +171,25 @@ extension Alignment {
 /// The lawful/chaotic axis of character alignment.
 public enum LawChaosAxis: String, Codable, Sendable, Hashable {
     /// Respects law, order, and established systems.
-    case lawful = "lawful"
+    case lawful
 
     /// Balances law and chaos based on circumstances.
-    case neutral = "neutral"
+    case neutral
 
     /// Values freedom and spontaneity over rules.
-    case chaotic = "chaotic"
+    case chaotic
 }
 
 /// The good/evil axis of character alignment.
 public enum GoodEvilAxis: String, Codable, Sendable, Hashable {
     /// Acts for the benefit of others and the greater good.
-    case good = "good"
+    case good
 
     /// Neither particularly altruistic nor malicious.
-    case neutral = "neutral"
+    case neutral
 
     /// Acts primarily for selfish gain, often harming others.
-    case evil = "evil"
+    case evil
 }
+
+// swiftlint:enable sorted_enum_cases

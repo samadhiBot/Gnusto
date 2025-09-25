@@ -57,7 +57,7 @@ public struct Fuse: Sendable {
 }
 
 extension Fuse {
-    /// A predefined fuse that wakes up an unconscious enemy after 3 turns.
+    /// A predefined fuse that wakes up an unconscious enemy after some number of turns.
     ///
     /// This fuse requires specific state data to be provided when activated:
     /// - `"enemyID"`: The ID of the enemy item to wake up
@@ -67,38 +67,36 @@ extension Fuse {
     /// The fuse will only trigger if the enemy is still unconscious when the timer expires.
     /// If the enemy is already conscious or the required state data is missing, the fuse
     /// will complete silently without any effect.
-    static let enemyWakeUp = Fuse(
-        initialTurns: 3,
-        action: { engine, state in
-            // Specific enemy and location must be provided in the state
-            guard
-                let enemyID = state.getItemID("enemyID"),
-                let wakeUpLocationID = state.getLocationID("locationID"),
-                let message = state.getString("message"),
-                let enemy = try? await engine.item(enemyID)
-            else {
-                engine.logger.warning(".enemyWakeUp fuse called without required state")
-                return nil
-            }
-
-            guard try await enemy.isUnconscious else { return nil }
-
-            // Only include a message if the player present when the enemy wakes up
-            let wakeUpMessage: String? =
-                if try await engine.player.location == enemy.location {
-                    message
-                } else {
-                    nil
-                }
-
-            return try await ActionResult(
-                message: wakeUpMessage,
-                changes: [
-                    enemy.setCharacterAttributes(consciousness: .alert)
-                ]
-            )
+    static let enemyWakeUp = Fuse(initialTurns: 3) { engine, state in
+        // Specific enemy and location must be provided in the payload
+        guard let payload = state.getPayload(as: FuseState.EnemyLocationPayload.self) else {
+            engine.logger.warning(
+                ".enemyWakeUp fuse called without required EnemyLocationPayload")
+            return nil
         }
-    )
+
+        let enemyID = payload.enemyID
+        let wakeUpLocationID = payload.locationID
+        let message = payload.message
+        let enemy = await engine.item(enemyID)
+
+        guard await enemy.isUnconscious else { return nil }
+
+        // Only include a message if the player present when the enemy wakes up
+        let wakeUpMessage: String? =
+        if await engine.player.location == enemy.location {
+            message
+        } else {
+            nil
+        }
+
+        return await ActionResult(
+            message: wakeUpMessage,
+            changes: [
+                enemy.setCharacterAttributes(consciousness: .alert)
+            ]
+        )
+    }
 
     /// A predefined fuse that returns an enemy to a specific location after 3 turns.
     ///
@@ -110,36 +108,35 @@ extension Fuse {
     /// The message will only be displayed to the player if they are at the return location
     /// when the fuse triggers. If the required state data is missing, the fuse will complete
     /// silently without any effect.
-    static let enemyReturn = Fuse(
-        initialTurns: 3,
-        action: { engine, state in
-            // Specific enemy and location must be provided in the state
-            guard
-                let enemyID = state.getItemID("enemyID"),
-                let returnLocationID = state.getLocationID("locationID"),
-                let message = state.getString("message"),
-                let enemy = try? await engine.item(enemyID)
-            else {
-                engine.logger.warning(".enemyReturn fuse called without required state")
-                return nil
-            }
-
-            // Only include a message if the player is at the return location
-            let enemyReturnMessage: String? =
-                if try await engine.player.location.id == returnLocationID {
-                    message
-                } else {
-                    nil
-                }
-
-            return ActionResult(
-                message: enemyReturnMessage,
-                changes: [
-                    enemy.move(to: returnLocationID)
-                ]
-            )
+    static let enemyReturn = Fuse(initialTurns: 3) { engine, state in
+        // Specific enemy and location must be provided in the payload
+        guard let payload = state.getPayload(as: FuseState.EnemyLocationPayload.self) else {
+            engine.logger.warning(
+                ".enemyReturn fuse called without required EnemyLocationPayload")
+            return nil
         }
-    )
+
+        let enemyID = payload.enemyID
+        let returnLocationID = payload.locationID
+        let message = payload.message
+
+        let enemy = await engine.item(enemyID)
+
+        // Only include a message if the player is at the return location
+        let enemyReturnMessage: String? =
+        if await engine.player.location.id == returnLocationID {
+            message
+        } else {
+            nil
+        }
+
+        return ActionResult(
+            message: enemyReturnMessage,
+            changes: [
+                enemy.move(to: returnLocationID)
+            ]
+        )
+    }
 
     /// A predefined fuse that removes temporary status effects after a specified duration.
     ///
@@ -151,179 +148,128 @@ extension Fuse {
     /// and combat conditions (offBalance, uncertain, vulnerable, etc.). The fuse will only
     /// trigger if the character still has the specified effect when the timer expires.
     /// Messages are displayed to the player if they are present to witness the recovery.
-    static let statusEffectExpiry = Fuse(
-        initialTurns: 3,
-        action: { engine, state in
-            // Specific character and effect must be provided in the state
-            guard
-                let itemID = state.getItemID("itemID"),
-                let effectName = state.getString("effectName"),
-                let character = try? await engine.item(itemID)
-            else {
-                engine.logger.warning(".statusEffectExpiry fuse called without required state")
-                return nil
-            }
-
-            // Determine what type of effect we're dealing with and clear it
-            let message: String?
-            let stateChange: StateChange?
-
-            switch effectName.lowercased() {
-            // General conditions
-            case "poisoned":
-                guard
-                    try await character.characterSheet.generalCondition == GeneralCondition.poisoned
-                else { return nil }
-                message = await determineStatusExpiryMessage(
-                    for: character,
-                    engine: engine,
-                    recoveryMessage:
-                        "\(await character.withDefiniteArticle.capitalized) looks healthier as the poison wears off."
-                )
-                stateChange = try await character.setCharacterAttributes(
-                    generalCondition: GeneralCondition.normal)
-
-            case "cursed":
-                guard try await character.characterSheet.generalCondition == GeneralCondition.cursed
-                else { return nil }
-                message = await determineStatusExpiryMessage(
-                    for: character,
-                    engine: engine,
-                    recoveryMessage:
-                        "\(await character.withDefiniteArticle.capitalized) seems relieved as the curse lifts."
-                )
-                stateChange = try await character.setCharacterAttributes(
-                    generalCondition: GeneralCondition.normal)
-
-            case "blessed":
-                guard
-                    try await character.characterSheet.generalCondition == GeneralCondition.blessed
-                else { return nil }
-                message = await determineStatusExpiryMessage(
-                    for: character,
-                    engine: engine,
-                    recoveryMessage:
-                        "The divine blessing around \(await character.withDefiniteArticle) fades away."
-                )
-                stateChange = try await character.setCharacterAttributes(
-                    generalCondition: GeneralCondition.normal)
-
-            case "charmed":
-                guard
-                    try await character.characterSheet.generalCondition == GeneralCondition.charmed
-                else { return nil }
-                message = await determineStatusExpiryMessage(
-                    for: character,
-                    engine: engine,
-                    recoveryMessage:
-                        "\(await character.withDefiniteArticle.capitalized) shakes off the magical compulsion."
-                )
-                stateChange = try await character.setCharacterAttributes(
-                    generalCondition: GeneralCondition.normal)
-
-            case "terrified":
-                guard
-                    try await character.characterSheet.generalCondition
-                        == GeneralCondition.terrified
-                else { return nil }
-                message = await determineStatusExpiryMessage(
-                    for: character,
-                    engine: engine,
-                    recoveryMessage:
-                        "\(await character.withDefiniteArticle.capitalized) regains composure as the supernatural fear subsides."
-                )
-                stateChange = try await character.setCharacterAttributes(
-                    generalCondition: GeneralCondition.normal)
-
-            case "drunk":
-                guard try await character.characterSheet.generalCondition == GeneralCondition.drunk
-                else { return nil }
-                message = await determineStatusExpiryMessage(
-                    for: character,
-                    engine: engine,
-                    recoveryMessage:
-                        "\(await character.withDefiniteArticle.capitalized) sobers up."
-                )
-                stateChange = try await character.setCharacterAttributes(
-                    generalCondition: GeneralCondition.normal)
-
-            case "diseased":
-                guard
-                    try await character.characterSheet.generalCondition == GeneralCondition.diseased
-                else { return nil }
-                message = await determineStatusExpiryMessage(
-                    for: character,
-                    engine: engine,
-                    recoveryMessage:
-                        "\(await character.withDefiniteArticle.capitalized) recovers from the illness."
-                )
-                stateChange = try await character.setCharacterAttributes(
-                    generalCondition: GeneralCondition.normal)
-
-            // Combat conditions
-            case "offbalance", "off-balance":
-                guard
-                    try await character.characterSheet.combatCondition == CombatCondition.offBalance
-                else { return nil }
-                message = await determineStatusExpiryMessage(
-                    for: character,
-                    engine: engine,
-                    recoveryMessage:
-                        "\(await character.withDefiniteArticle.capitalized) regains balance."
-                )
-                stateChange = try await character.setCharacterAttributes(
-                    combatCondition: CombatCondition.normal)
-
-            case "uncertain":
-                guard
-                    try await character.characterSheet.combatCondition == CombatCondition.uncertain
-                else { return nil }
-                message = await determineStatusExpiryMessage(
-                    for: character,
-                    engine: engine,
-                    recoveryMessage:
-                        "\(await character.withDefiniteArticle.capitalized) appears more confident."
-                )
-                stateChange = try await character.setCharacterAttributes(
-                    combatCondition: CombatCondition.normal)
-
-            case "vulnerable":
-                guard
-                    try await character.characterSheet.combatCondition == CombatCondition.vulnerable
-                else { return nil }
-                message = await determineStatusExpiryMessage(
-                    for: character,
-                    engine: engine,
-                    recoveryMessage:
-                        "\(await character.withDefiniteArticle.capitalized) recovers a defensive posture."
-                )
-                stateChange = try await character.setCharacterAttributes(
-                    combatCondition: CombatCondition.normal)
-
-            case "disarmed":
-                guard try await character.characterSheet.combatCondition == CombatCondition.disarmed
-                else { return nil }
-                message = await determineStatusExpiryMessage(
-                    for: character,
-                    engine: engine,
-                    recoveryMessage:
-                        "\(await character.withDefiniteArticle.capitalized) adapts to fighting without a weapon."
-                )
-                stateChange = try await character.setCharacterAttributes(
-                    combatCondition: CombatCondition.normal)
-
-            default:
-                engine.logger.warning(
-                    "Unknown effect name '\(effectName)' in statusEffectExpiry fuse")
-                return nil
-            }
-
-            return ActionResult(
-                message: message,
-                changes: [stateChange].compactMap { $0 }
-            )
+    static let statusEffectExpiry = Fuse(initialTurns: 3) { engine, state in
+        // Specific character and effect must be provided in the payload
+        guard let payload = state.getPayload(as: FuseState.StatusEffectPayload.self) else {
+            engine.logger.warning(
+                ".statusEffectExpiry fuse called without required StatusEffectPayload")
+            return nil
         }
-    )
+
+        let itemID = payload.itemID
+        let effect = payload.effect
+
+        let character = await engine.item(itemID)
+
+        // Determine what type of effect we're dealing with and clear it
+        let message: String?
+        let stateChange: StateChange?
+
+        switch effect {
+            // General conditions
+        case .poisoned:
+            guard
+                await character.characterSheet.generalCondition == GeneralCondition.poisoned
+            else { return nil }
+            message = await determineStatusExpiryMessage(
+                for: character,
+                engine: engine,
+                recoveryMessage:
+                    "\(await character.withDefiniteArticle.capitalized) looks healthier as the poison wears off."
+            )
+            stateChange = await character.setCharacterAttributes(
+                generalCondition: GeneralCondition.normal)
+
+        case .cursed:
+            guard await character.characterSheet.generalCondition == GeneralCondition.cursed
+            else { return nil }
+            message = await determineStatusExpiryMessage(
+                for: character,
+                engine: engine,
+                recoveryMessage:
+                    "\(await character.withDefiniteArticle.capitalized) seems relieved as the curse lifts."
+            )
+            stateChange = await character.setCharacterAttributes(
+                generalCondition: GeneralCondition.normal)
+
+        case .blessed:
+            guard
+                await character.characterSheet.generalCondition == GeneralCondition.blessed
+            else { return nil }
+            message = await determineStatusExpiryMessage(
+                for: character,
+                engine: engine,
+                recoveryMessage:
+                    "The divine blessing around \(await character.withDefiniteArticle) fades away."
+            )
+            stateChange = await character.setCharacterAttributes(
+                generalCondition: GeneralCondition.normal)
+
+        case .charmed:
+            guard
+                await character.characterSheet.generalCondition == GeneralCondition.charmed
+            else { return nil }
+            message = await determineStatusExpiryMessage(
+                for: character,
+                engine: engine,
+                recoveryMessage:
+                    "\(await character.withDefiniteArticle.capitalized) shakes off the magical compulsion."
+            )
+            stateChange = await character.setCharacterAttributes(
+                generalCondition: GeneralCondition.normal)
+
+        case .terrified:
+            guard
+                await character.characterSheet.generalCondition
+                    == GeneralCondition.terrified
+            else { return nil }
+            message = await determineStatusExpiryMessage(
+                for: character,
+                engine: engine,
+                recoveryMessage: """
+                    \(await character.withDefiniteArticle.capitalized) regains composure
+                    as the supernatural fear subsides.
+                    """
+            )
+            stateChange = await character.setCharacterAttributes(
+                generalCondition: GeneralCondition.normal)
+
+        case .drunk:
+            guard await character.characterSheet.generalCondition == GeneralCondition.drunk
+            else { return nil }
+            message = await determineStatusExpiryMessage(
+                for: character,
+                engine: engine,
+                recoveryMessage:
+                    "\(await character.withDefiniteArticle.capitalized) sobers up."
+            )
+            stateChange = await character.setCharacterAttributes(
+                generalCondition: GeneralCondition.normal)
+
+        case .diseased:
+            guard
+                await character.characterSheet.generalCondition == GeneralCondition.diseased
+            else { return nil }
+            message = await determineStatusExpiryMessage(
+                for: character,
+                engine: engine,
+                recoveryMessage:
+                    "\(await character.withDefiniteArticle.capitalized) recovers from the illness."
+            )
+            stateChange = await character.setCharacterAttributes(
+                generalCondition: GeneralCondition.normal)
+
+        case .normal:
+            // Normal condition doesn't need to expire
+            engine.logger.warning("Attempted to expire normal condition - this shouldn't happen")
+            return nil
+        }
+
+        return ActionResult(
+            message: message,
+            changes: [stateChange].compactMap { $0 }
+        )
+    }
 
     /// A predefined fuse that handles delayed environmental changes.
     ///
@@ -331,16 +277,6 @@ extension Fuse {
     /// such as weather changes, lighting changes, or other atmospheric modifications.
     /// The specific environmental change and any associated data should be provided
     /// in the fuse state when activated.
-    ///
-    /// This is primarily a demonstration fuse that logs the environmental change.
-    /// Game developers should override or extend this for specific environmental effects.
-    static let environmentalChange = Fuse(
-        initialTurns: 2,
-        action: { engine, state in
-            engine.logger.info("Environmental change triggered with state: \(state.dictionary)")
-            return nil
-        }
-    )
 
     /// Helper function to determine if a status expiry message should be shown to the player.
     ///
@@ -355,12 +291,6 @@ extension Fuse {
         recoveryMessage: String
     ) async -> String? {
         // Only show message if player is present to witness the recovery
-        do {
-            return try await engine.player.location == character.location ? recoveryMessage : nil
-        } catch {
-            engine.logger.warning(
-                "Failed to determine location for status expiry message: \(error)")
-            return nil
-        }
+        await engine.player.location == character.location ? recoveryMessage : nil
     }
 }

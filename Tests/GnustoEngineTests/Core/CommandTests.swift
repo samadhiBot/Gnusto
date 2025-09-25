@@ -40,10 +40,10 @@ struct CommandTests {
             )
         )
 
-        lanternProxy = try await ProxyReference.item(lantern.proxy(engine))
-        caseProxy = try await ProxyReference.item(suitcase.proxy(engine))
-        lampProxy = try await ProxyReference.item(lamp.proxy(engine))
-        boxProxy = try await ProxyReference.item(box.proxy(engine))
+        lanternProxy = await ProxyReference.item(lantern.proxy(engine))
+        caseProxy = await ProxyReference.item(suitcase.proxy(engine))
+        lampProxy = await ProxyReference.item(lamp.proxy(engine))
+        boxProxy = await ProxyReference.item(box.proxy(engine))
     }
 
     // - Single Object Initializer Tests -

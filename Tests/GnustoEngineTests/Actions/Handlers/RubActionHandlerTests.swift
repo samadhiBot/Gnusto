@@ -40,7 +40,7 @@ struct RubActionHandlerTests {
             """
         )
 
-        let finalState = try await engine.item("lamp")
+        let finalState = await engine.item("lamp")
         #expect(await finalState.hasFlag(.isTouched) == true)
     }
 
@@ -82,7 +82,7 @@ struct RubActionHandlerTests {
             """
         )
 
-        let finalState = try await engine.item("table")
+        let finalState = await engine.item("table")
         #expect(await finalState.hasFlag(.isTouched) == true)
     }
 
@@ -321,7 +321,7 @@ struct RubActionHandlerTests {
             """
         )
 
-        let finalState = try await engine.item("wizard")
+        let finalState = await engine.item("wizard")
         #expect(await finalState.hasFlag(.isTouched) == true)
     }
 
@@ -355,13 +355,13 @@ struct RubActionHandlerTests {
             > rub the necromancer
             That would be quite inappropriate.
 
-            In a moment of raw violence, the furious necromancer comes at
-            you with nothing but fury! You raise your fists, knowing this
-            will hurt regardless of who wins.
+            No weapons between you--just the furious necromancer's
+            aggression and your desperation! You collide in a tangle of
+            strikes and blocks.
             """
         )
 
-        let finalState = try await engine.item("necromancer")
+        let finalState = await engine.item("necromancer")
         #expect(await finalState.hasFlag(.isTouched) == true)
     }
 
@@ -395,7 +395,7 @@ struct RubActionHandlerTests {
             """
         )
 
-        let finalState = try await engine.item("wall")
+        let finalState = await engine.item("wall")
         #expect(await finalState.hasFlag(.isTouched) == true)
     }
 
@@ -438,7 +438,7 @@ struct RubActionHandlerTests {
             """
         )
 
-        let finalState = try await engine.item("vase")
+        let finalState = await engine.item("vase")
         #expect(await finalState.hasFlag(.isTouched) == true)
     }
 

@@ -312,7 +312,7 @@ struct BurnActionHandlerTests {
             """
         )
 
-        let finalFlashlight = try await engine.item("flashlight")
+        let finalFlashlight = await engine.item("flashlight")
         #expect(await finalFlashlight.hasFlag(.isTouched) == true)
         #expect(await finalFlashlight.hasFlag(.isBurning) == false)
     }
@@ -388,7 +388,7 @@ struct BurnActionHandlerTests {
             """
         )
 
-        let finalCandle = try await engine.item("candle")
+        let finalCandle = await engine.item("candle")
         #expect(await finalCandle.hasFlag(.isBurning) == true)
         #expect(await finalCandle.hasFlag(.isTouched) == true)
     }
@@ -472,8 +472,8 @@ struct BurnActionHandlerTests {
             """
         )
 
-        let finalTorch = try await engine.item("torch")
-        let finalMatch = try await engine.item("match")
+        let finalTorch = await engine.item("torch")
+        let finalMatch = await engine.item("match")
         #expect(await finalTorch.hasFlag(.isBurning) == true)
         #expect(await finalTorch.hasFlag(.isTouched) == true)
         #expect(await finalMatch.hasFlag(.isTouched) == true)
@@ -520,8 +520,8 @@ struct BurnActionHandlerTests {
             """
         )
 
-        let finalTorch = try await engine.item("torch")
-        let finalLighter = try await engine.item("lighter")
+        let finalTorch = await engine.item("torch")
+        let finalLighter = await engine.item("lighter")
         #expect(await finalTorch.hasFlag(.isBurning) == true)
         #expect(await finalTorch.hasFlag(.isTouched) == true)
         #expect(await finalLighter.hasFlag(.isTouched) == true)
@@ -717,27 +717,27 @@ struct BurnActionHandlerTests {
             That would be needlessly cruel.
 
             > attack the troll
-            Armed and hungry for violence, you strike with your flaming
-            torch as the creature can only dodge and weave against the
-            advantage of sharpened metal.
+            You drive forward with your flaming torch seeking its purpose
+            as the fearsome beast meets you barehanded, flesh against steel
+            in the oldest gamble.
 
-            Your strike with your flaming torch grazes the grotesque
-            monster, drawing minimal blood. The light wound barely seems to
-            register.
+            Your flaming torch swings wide, and the fearsome creature
+            avoids your poorly aimed strike with ease.
 
-            The monster's brutal retaliation breaks through your defenses
-            completely, rendering you vulnerable as an opened shell.
+            The angry beast counters with a force that shatters your guard,
+            leaving you exposed to whatever violence comes next.
 
             > burn the troll
-            Your strike with your flaming torch grazes the creature,
-            drawing minimal blood. The strike lands, but doesn't slow him.
+            Your flaming torch inflicts a light wound on the creature, more
+            sting than damage. He registers the wound with annoyance.
 
-            The terrible monster's retaliatory strike comes fast but you're
-            faster, sidestepping the violence with practiced grace.
+            The monster's answer is swift and punishing--knuckles meet
+            flesh with the sound of meat hitting stone. The blow lands
+            solidly, drawing blood. You feel the sting but remain strong.
             """
         )
 
-        let finalTroll = try await engine.item("troll")
+        let finalTroll = await engine.item("troll")
         #expect(await finalTroll.hasFlag(.isTouched) == true)
     }
 
@@ -781,7 +781,7 @@ struct BurnActionHandlerTests {
             """
         )
 
-        let finalGuard = try await engine.item("guard")
+        let finalGuard = await engine.item("guard")
         #expect(await finalGuard.hasFlag(.isTouched) == true)
     }
 
@@ -792,7 +792,6 @@ struct BurnActionHandlerTests {
         let handler = BurnActionHandler()
 
         #expect(handler.requiresLight == false)
-        #expect(handler.actions == [.lightSource])
         #expect(handler.synonyms.contains(.burn))
         #expect(handler.synonyms.contains(.ignite))
         #expect(handler.synonyms.contains(.light))
@@ -938,7 +937,7 @@ struct BurnActionHandlerTests {
             """
         )
 
-        let finalCandle = try await engine.item("candle")
+        let finalCandle = await engine.item("candle")
         #expect(await finalCandle.hasFlag(.isBurning) == true)
     }
 }

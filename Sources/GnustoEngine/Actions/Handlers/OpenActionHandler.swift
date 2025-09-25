@@ -48,14 +48,14 @@ public struct OpenActionHandler: ActionHandler {
         // Determine appropriate message based on contents
         let message: String
         if await container.isContainer {
-            let itemsInside = try await container.visibleItems
+            let itemsInside = await container.visibleItems
             if itemsInside.isEmpty {
                 // Container is empty, use simple message
                 message = await context.msg.opened(container.withDefiniteArticle)
             } else {
                 // Announce what's revealed: "Opening the small mailbox reveals a leaflet."
-                let itemList = await itemsInside.sorted().listWithIndefiniteArticles() ??
-                context.msg.nothing()
+                let itemList =
+                    await itemsInside.sorted().listWithIndefiniteArticles() ?? context.msg.nothing()
 
                 message = await context.msg.openingRevealsContents(
                     container.withDefiniteArticle,
@@ -72,7 +72,7 @@ public struct OpenActionHandler: ActionHandler {
             )
         }
 
-        return try await ActionResult(
+        return await ActionResult(
             message,
             container.setFlag(.isOpen),
             container.setFlag(.isTouched)

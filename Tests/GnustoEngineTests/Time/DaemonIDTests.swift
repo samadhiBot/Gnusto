@@ -141,8 +141,7 @@ struct DaemonIDTests {
             "⚙️守护进程",
         ]
 
-        let encoder = JSONEncoder()
-        encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
+        let encoder = JSONEncoder.sorted(.prettyPrinted)
         let decoder = JSONDecoder()
 
         for originalID in originalIDs {
@@ -157,7 +156,7 @@ struct DaemonIDTests {
     @Test("DaemonID JSON Representation")
     func testJSONRepresentation() throws {
         let id: DaemonID = "heartbeat"
-        let encoder = JSONEncoder()
+        let encoder = JSONEncoder.sorted()
         let jsonData = try encoder.encode(id)
         let jsonString = String(data: jsonData, encoding: .utf8)
 
@@ -195,7 +194,7 @@ struct DaemonIDTests {
         let results = await withTaskGroup(of: DaemonID.self) { group in
             for daemonID in daemonIDs {
                 group.addTask {
-                    return daemonID
+                    daemonID
                 }
             }
 
@@ -219,10 +218,10 @@ struct DaemonIDTests {
     @Test("DaemonID Large Collection Performance")
     func testLargeCollectionPerformance() throws {
         // Create a large set of DaemonIDs
-        let daemonIDs = (0..<1000).map { DaemonID("daemon\($0)") }
+        let daemonIDs = (0..<1_000).map { DaemonID("daemon\($0)") }
         let daemonSet = Set(daemonIDs)
 
-        #expect(daemonSet.count == 1000)
+        #expect(daemonSet.count == 1_000)
 
         // Test lookup performance
         let lookupID: DaemonID = "daemon500"
@@ -233,7 +232,7 @@ struct DaemonIDTests {
 
     @Test("DaemonID Very Long String")
     func testVeryLongString() throws {
-        let longString = String(repeating: "a", count: 10000)
+        let longString = String(repeating: "a", count: 10_000)
         let id = DaemonID(longString)
         #expect(id.rawValue == longString)
     }

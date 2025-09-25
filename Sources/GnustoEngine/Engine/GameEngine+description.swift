@@ -19,11 +19,11 @@ extension GameEngine {
     /// - Parameter forceFullDescription: If true, always shows the full description regardless
     ///   of visit status. If false, shows brief description for previously visited rooms.
     func describeCurrentLocation(forceFullDescription: Bool = false) async throws -> ActionResult {
-        let location = try await player.location
+        let location = await player.location
         var changes = [StateChange]()
 
         // 1. Check for light
-        guard try await location.isLit else {
+        guard await location.isLit else {
             // It's dark! Do not describe the room or list items.
             throw ActionResponse.roomIsDark
         }
@@ -35,22 +35,23 @@ extension GameEngine {
         let isFirstVisit = await !location.hasFlag(.isVisited)
         let isVerboseMode = hasFlag(.isVerboseMode)
 
-        // 4. For subsequent visits without forceFullDescription and not in verbose mode, just show the room name (brief mode)
+        // 4. For subsequent visits without forceFullDescription and not in verbose mode,
+        //    just show the room name (brief mode)
         if forceFullDescription || isFirstVisit || isVerboseMode {
             // Generate and print the full description
-            try await messages.append(
+            await messages.append(
                 location.description
             )
 
             // List visible items
-            try await messages.append(
+            await messages.append(
                 listItemsInLocation(location)
             )
 
             // Mark the room as visited now that we've actually described it
             // (following ZIL's TOUCHBIT pattern - only set when room is lit and described)
             if isFirstVisit {
-                try await changes.append(
+                await changes.append(
                     location.setFlag(.isVisited)
                 )
             }
@@ -75,9 +76,7 @@ extension GameEngine {
         let result = try await describeCurrentLocation(forceFullDescription: forceFullDescription)
 
         // Apply state changes (like marking room as visited)
-        for change in result.changes {
-            try gameState.apply(change)
-        }
+        try applyActionResultChanges(result.changes)
 
         // Print the location description
         if let message = result.message {
@@ -93,10 +92,10 @@ extension GameEngine {
     /// 2. Items on surfaces or in open/transparent containers
     ///
     /// Returns an array of description strings that can be joined and displayed.
-    func listItemsInLocation(_ location: LocationProxy) async throws -> String? {
+    func listItemsInLocation(_ location: LocationProxy) async -> String? {
         // Get all items directly in the location (not inside containers)
         // Include items that should be described OR have visible contents (surfaces/open containers)
-        let allDirectItems = try await location.items
+        let allDirectItems = await location.items
         var directItems = [ItemProxy]()
         for item in allDirectItems {
             let shouldDescribe = await item.shouldDescribe
@@ -112,13 +111,11 @@ extension GameEngine {
 
         // Separate items with first descriptions from regular items
         // Only describe items that should be described (not those with .omitDescription)
-        for item in directItems.sorted() {
-            if await item.shouldDescribe {
-                if let firstDescription = await item.firstDescription {
-                    firstDescriptions.append(firstDescription)
-                } else {
-                    regularItems.append(item)
-                }
+        for item in directItems.sorted() where await item.shouldDescribe {
+            if let firstDescription = await item.firstDescription {
+                firstDescriptions.append(firstDescription)
+            } else {
+                regularItems.append(item)
             }
         }
 
@@ -135,7 +132,7 @@ extension GameEngine {
         // Handle contents of surfaces and open/transparent containers
         // This includes containers with .omitDescription that have visible contents
         for container in directItems.sorted() where await container.contentsAreVisible {
-            let contents = try await container.contents
+            let contents = await container.contents
             guard contents.isNotEmpty else { continue }
 
             var firstDescriptions = [String]()
