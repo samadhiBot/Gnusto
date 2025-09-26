@@ -12,7 +12,7 @@ public struct ExamineActionHandler: ActionHandler {
         .match(.look, .through, .directObject),
     ]
 
-    public let synonyms: [Verb] = [.examine, "x", .inspect, .describe, .look, "l"]
+    public let synonyms: [Verb] = [.examine, .x, .inspect, .describe, .look, .l]
 
     public let requiresLight: Bool = true
 

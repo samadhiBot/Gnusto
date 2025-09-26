@@ -50,7 +50,7 @@ struct CloakOfDarknessWalkthroughTests {
 
             > inventory
             You are carrying:
-            - A velvet cloak
+            - A velvet cloak (worn)
 
             > examine the cloak
             A handsome cloak, of velvet trimmed with satin, and slightly
@@ -168,7 +168,7 @@ struct CloakOfDarknessWalkthroughTests {
 
             > inventory
             You are carrying:
-            - A velvet cloak
+            - A velvet cloak (worn)
 
             > remove the cloak
             In the dark? You could easily disturb something!

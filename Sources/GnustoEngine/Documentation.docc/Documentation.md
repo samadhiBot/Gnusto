@@ -12,6 +12,7 @@ Gnusto is written in cross-platform Swift, allowing you to deploy your games on 
 
 At its core, Gnusto uses a state change pipeline that ensures safe state management, eliminating many of the bugs that can plague interactive fiction engines. Whether you're creating your first text adventure or building a complex, multi-layered world, Gnusto provides the foundation you need while staying out of your way.
 
+<script src="https://asciinema.org/a/743893.js" id="asciicast-743893" async="true"></script>
 
 ## Building Your First Game
 
@@ -197,7 +198,7 @@ git clone https://github.com/samadhiBot/Gnusto.git
 cd Gnusto
 
 # Run Cloak of Darkness
-swift run CloakOfDarkness 
+swift run CloakOfDarkness
 
 # Run Zork
 swift run Zork1

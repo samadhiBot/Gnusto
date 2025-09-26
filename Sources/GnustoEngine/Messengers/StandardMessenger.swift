@@ -2238,6 +2238,10 @@ open class StandardMessenger: @unchecked Sendable {
         )
     }
 
+    open func worn() -> String {
+        " (worn)"
+    }
+
     open func wrongKey(_ key: String, lock: String) -> String {
         oneOf(
             "\(key) and \(lock) were never meant to be together.",

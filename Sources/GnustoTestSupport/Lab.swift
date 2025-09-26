@@ -356,6 +356,8 @@ extension Lab {
     )
 }
 
+// MARK: - Item helpers
+
 extension Item {
     /// Returns a copy of this item with their fighting flag set to true.
     ///
@@ -373,19 +375,68 @@ extension Item {
         }
         return self
     }
+
+    /// Returns a copy of this item with its location set to the player's inventory.
+    ///
+    /// This computed property modifies the parent entity to place the item in the
+    /// player's possession, which is useful for testing scenarios where items
+    /// need to be moved to the player's inventory.
+    ///
+    /// - Returns: A new `Item` instance located in the player's inventory.
+    public var inPlayerInventory: Item {
+        var item = self
+        item.properties[.parentEntity] = .parentEntity(.player)
+        return item
+    }
 }
 
 // MARK: - Common Test IDs
 
 extension ItemID {
-    /// The item ID for the bloody axe weapon.
-    public static let axe: ItemID = "axe"
+    /// The item ID for the axe.
+    public static let axe = ItemID("axe")
+
+    /// The item ID for the castleGuard.
+    public static let castleGuard = ItemID("castleGuard")
+
+    /// The item ID for the dragon.
+    public static let dragon = ItemID("dragon")
+
+    /// The item ID for the fairy.
+    public static let fairy = ItemID("fairy")
+
+    /// The item ID for the grapes.
+    public static let grapes = ItemID("grapes")
+
+    /// The item ID for the ironSword.
+    public static let ironSword = ItemID("ironSword")
+
+    /// The item ID for the knight.
+    public static let knight = ItemID("knight")
+
+    /// The item ID for the matchStick.
+    public static let matchStick = ItemID("matchStick")
+
+    /// The item ID for the merchant.
+    public static let merchant = ItemID("merchant")
+
+    /// The item ID for the pebble.
+    public static let pebble = ItemID("pebble")
+
+    /// The item ID for the princess.
+    public static let princess = ItemID("princess")
 
     /// The item ID for the starting pebble item.
     public static let startItem: ItemID = "startItem"
 
-    /// The item ID for the fierce troll NPC.
-    public static let troll: ItemID = "troll"
+    /// The item ID for the torch.
+    public static let torch = ItemID("torch")
+
+    /// The item ID for the troll.
+    public static let troll = ItemID("troll")
+
+    /// The item ID for the wizard.
+    public static let wizard = ItemID("wizard")
 }
 
 extension LocationID {

@@ -73,17 +73,9 @@ struct InventoryActionHandlerTests {
     @Test("Single item inventory")
     func testSingleItemInventory() async throws {
         // Given
-        let sword = Item(
-            id: "sword",
-            .name("rusty sword"),
-            .description("An old rusty sword."),
-            .in(.player)
-        )
-
         let game = MinimalGame(
-            items: sword
+            items: Lab.ironSword.inPlayerInventory
         )
-
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // When
@@ -96,7 +88,7 @@ struct InventoryActionHandlerTests {
             """
             > inventory
             You are carrying:
-            - A rusty sword
+            - An iron sword
             """
         )
     }
@@ -144,6 +136,51 @@ struct InventoryActionHandlerTests {
             - A sparkling gem
             - A brass lantern
             - A rusty sword
+            """
+        )
+    }
+
+    @Test("Items being worn")
+    func testItemsBeingWorn() async throws {
+        // Given
+        let tiara = Item(
+            id: "tiara",
+            .name("lovely tiara"),
+            .in(.player),
+            .isWorn
+        )
+
+        let game = MinimalGame(
+            items: Lab.ironSword.inPlayerInventory, tiara
+        )
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // When
+        try await engine.execute(
+            """
+            inventory
+            remove the tiara
+            inventory
+            """
+        )
+
+        // Then
+        let output = await mockIO.flush()
+        expectNoDifference(
+            output,
+            """
+            > inventory
+            You are carrying:
+            - An iron sword
+            - A lovely tiara (worn)
+            
+            > remove the tiara
+            You remove the lovely tiara.
+            
+            > inventory
+            You are carrying:
+            - An iron sword
+            - A lovely tiara
             """
         )
     }
