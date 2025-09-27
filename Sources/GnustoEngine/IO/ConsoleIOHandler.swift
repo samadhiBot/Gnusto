@@ -40,7 +40,7 @@ public struct ConsoleIOHandler: IOHandler {
             markdownParser.parse(markdown),
             terminator: newline ? .paragraph : ""
         )
-        fflush(stdout)
+        try? FileHandle.standardOutput.synchronize()
 
         do {
             try transcriptRecorder?.write("\(markdown)\n")
@@ -70,7 +70,7 @@ public struct ConsoleIOHandler: IOHandler {
         let rightGap = String(repeating: " ", count: max(1, rightPartLen - turnsStr.count))
 
         Swift.print("❲ \(leftGap)\(scoreStr)\(rightGap)\(turnsStr) ❳")
-        fflush(stdout)
+        try? FileHandle.standardOutput.synchronize()
     }
 
     /// Clears the console screen.
@@ -82,7 +82,7 @@ public struct ConsoleIOHandler: IOHandler {
         // \u{001B}[2J clears the entire screen.
         // \u{001B}[H moves cursor to home position (top-left).
         Swift.print("\u{001B}[2J\u{001B}[H", terminator: "")
-        fflush(stdout)
+        try? FileHandle.standardOutput.synchronize()
 
         try? transcriptRecorder?.write("\n---\n")
     }
@@ -96,7 +96,7 @@ public struct ConsoleIOHandler: IOHandler {
     public func readLine(prompt: String) -> String? {
         // Print the prompt without a newline.
         Swift.print(prompt, terminator: "")
-        fflush(stdout)
+        try? FileHandle.standardOutput.synchronize()
 
         // Read input from the console.
         let input = Swift.readLine()
