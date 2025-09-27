@@ -41,6 +41,8 @@ xcuserdata
 References/*
 !References/Cloak of Darkness/
 !References/Zork 1/
+*.cast
+docs
 
 .vscode
 
