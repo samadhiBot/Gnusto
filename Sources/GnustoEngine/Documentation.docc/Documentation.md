@@ -232,11 +232,12 @@ For VS Code users, the Debug Console does not support interactive keyboard input
 - ``StandardMessenger``
 - ``StandardCombatSystem``
 
-### Engine Development Guides
-- <doc:ActionHandlerGuide>
-
 ### Main Types
 - ``GameEngine``
 - ``ActionHandler``
+
+### Further Reading
+- <doc:FAQs>
+- <doc:ActionHandlerGuide>
 
 Ready to start building? Check out the [Cloak of Darkness](https://github.com/samadhiBot/Gnusto/blob/main/Executables/CloakOfDarkness) source code to see these concepts in action!
