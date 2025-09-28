@@ -2,34 +2,34 @@
 
 Answers to common questions about the Gnusto Interactive Fiction Engine.
 
-If something's missing, please open an [issue](https://github.com/samadhiBot/Gnusto/issues) or discussion on GitHub.
+Please open an [issue](https://github.com/samadhiBot/Gnusto/issues) on GitHub if you have a question that's not covered here. 
 
 ## What is Gnusto?
 
 Gnusto is a modern interactive fiction engine with a declarative DSL for defining locations, items, and behaviors. It focuses on ergonomics, a safe state-change pipeline, and extensibility for parser-based games.
 
-- Repository: [https://github.com/samadhiBot/Gnusto](https://github.com/samadhiBot/Gnusto)
+- Home: [https://github.com/samadhiBot/Gnusto](https://github.com/samadhiBot/Gnusto)
 - Overview: <doc:GnustoEngine>
-- Game structure: <doc:GameStructure>
-- Auto-wiring plugin: <doc:GnustoAutoWiringPlugin>
+- More detail: <doc:GameStructure>
 
 ## What platforms are supported?
 
 | Platform | Status | Notes |
 |---|---|---|
-| macOS | Working | Development + Distribution |
-| Linux (Ubuntu 24.04) | Working | Development + Distribution |
-| Windows | Working | Development + Distribution |
-| iOS / Android | Planned | Distribution |
-| WebAssembly | Experimental | Distribution  |
+| macOS | ✅ Working | Development + Distribution |
+| Linux (Ubuntu 24.04) | ✅ Working | Development + Distribution |
+| Windows | ✅ Working | Development + Distribution |
+| iOS / Android | 🏗️ Planned | Distribution |
+| WebAssembly | 🔬 Experimental | Distribution  |
 
 ## What toolchain do I need?
 
-- Toolchain: Swift 6.2
-- Build system: Swift Package Manager
-- IDEs: Xcode, Zed, VS Code, or any editor and terminal
+- Toolchain: [Swift 6.2](https://www.swift.org/)
+- Build system: [Swift Package Manager](https://docs.swift.org/swiftpm/documentation/packagemanagerdocs/)
+- IDEs: [Xcode](https://developer.apple.com/xcode/), [Zed](https://zed.dev/), [VS Code](https://code.visualstudio.com/), or [any other editor](https://www.swift.org/tools/#editors) that supports the Language Server Protocol (LSP)
 
-Quickstart:
+## How do I test it out?
+
 ```
 git clone https://github.com/samadhiBot/Gnusto.git
 cd Gnusto
@@ -41,9 +41,11 @@ swift run CloakOfDarkness
 swift run Zork1
 ```
 
-### Windows and Linux notes
+## Can I use Linux and Windows?
 
-During Linux and Windows testing, it was necessary to disable the SwiftLint build tool plugin. This is only used for code linting, and does not prevent the use of these platforms. If you see plugin‑related build errors, comment it out in the `Package.swift` manifest:
+To install the Swift 6.2 toolchain, follow the [Linux](https://www.swift.org/install/linux/) or [Windows](https://www.swift.org/install/windows/) instructions at swift.org.
+
+During Linux and Windows testing, it was necessary to disable the [SwiftLint](https://realm.github.io/SwiftLint/) build tool plugin. If you see plugin‑related build errors, comment it out in your `Package.swift` manifest:
 
 ```swift
 plugins: [
@@ -87,24 +89,24 @@ Saves are a simple JSON snapshot of game state. The persistence mechanism may va
 
 Terminal (CLI). Packaging for desktop, mobile, and web is planned and will be guided by community feedback.
 
-## Accessibility
+## Accessibility?
 
 Gnusto's interface is currently terminal‑only. Accessibility will be a top priority as user interface work for desktop, mobile and web evolves. 
 
-## Naming: "Gnusto"
+## Why the name?
+
+The name is an homage.
 
 "Gnusto" is a magical incantation from Infocom's _Enchanter_ series of fantasy text adventure games. It allows a player to copy a spell from a scroll into their spellbook, enabling future use of that spell multiple times rather than just once.
 
 Gnusto has appeared historically in IF tooling, but this project is unrelated to prior tools.
 
-The name is an homage to the games we loved.
-
-## Examples
+## Are there example games?
 
 - Cloak of Darkness (complete demo): [CloakOfDarkness](https://github.com/samadhiBot/Gnusto/blob/main/Executables/CloakOfDarkness)
 - Zork 1 (in progress): [Zork1](https://github.com/samadhiBot/Gnusto/blob/main/Executables/Zork1)
 
-## Known limitations (beta)
+## What are the known limitations?
 
 - Terminal runtime only
 - No interoperability with existing IF formats
@@ -115,7 +117,7 @@ The name is an homage to the games we loved.
 - Melee combat has a lot of rough edges
 - Player/NPC Character Sheet is under-utilized 
 
-## Contributing
+## Can I contribute
 
 We welcome feedback, issues, feature requests, documentation improvements, and PRs.
 
