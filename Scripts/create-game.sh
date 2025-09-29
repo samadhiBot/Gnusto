@@ -243,45 +243,174 @@ struct CustodialSingularity {
 }
 EOF
 
-    create_file "${game_name}Tests/${game_name}Tests.swift" <<EOF
+    create_file "Tests/${game_name}Tests/${game_name}Tests.swift" <<EOF
 import GnustoEngine
+import GnustoTestSupport
+import Testing
 
-struct CustodialSingularity {
-    let broomCloset = Location(
-        id: .broomCloset,
-        .name("Broom Closet"),
-        .description("You are in a narrow closet that smells faintly of detergent."),
-        .inherentlyLit
-    )
+@testable import $game_name
 
-    let screwdriver = Item(
-        id: .screwdriver,
-        .name("left-handed screwdriver"),
-        .description(
-            """
-            It's a left-handed screwdriver. It looks it could be useful,
-            provided you could find a left-handed screw.
-            """
-        ),
-        .isTakable,
-        .in(.broomCloset)
-    )
+/// Integration tests for $game_name
+///
+/// These tests verify that the game works correctly by testing the full
+/// engine pipeline from command input to output. Always test through
+/// engine.execute() rather than testing individual components in isolation.
+@Suite("$game_name Integration Tests")
+struct ${game_name}Tests {
+    let engine: GameEngine
+    let mockIO: MockIOHandler
 
-    let broomClosetHandler = LocationEventHandler(for: .broomCloset) {
-        beforeTurn(.move) { context, command in
-            ActionResult(
-                context.msg.oneOf(
-                    "You stride purposefully into a shelf.",
-                    "You take a step, then space takes it back.",
-                    "Your movement is canceled on account of reality."
-                )
+    init() async {
+        (engine, mockIO) = await GameEngine.test(
+            blueprint: $game_name(
+                rng: SeededRandomNumberGenerator()
             )
-        }
+        )
+    }
+
+    @Test("Player starts in the correct location")
+    func testInitialLocation() async throws {
+        // When: Game is initialized
+        let player = await engine.player
+
+        // Then: Player should be in the starting room
+        #expect(await player.location == .broomCloset)
+    }
+
+    @Test("Look command shows starting room description")
+    func testLookCommand() async throws {
+        // When: Player looks around
+        try await engine.execute("look")
+
+        // Then: Should see the room description
+        await mockIO.expectOutput("""
+            > look
+            --- Broom Closet ---
+
+            You are in a narrow closet that smells faintly of detergent.
+
+            There is a left-handed screwdriver here.
+            """)
+
+    }
+
+    @Test("Player can take the sample item")
+    func testTakeSampleItem() async throws {
+        // When: Player takes the sample item
+        try await engine.execute("take the screwdriver")
+
+        // Then: Item should be taken successfully
+        await mockIO.expectOutput("""
+            > take the screwdriver
+            Taken.
+            """)
+
+        // And: Item should now be in player's inventory
+        let item = await engine.item(.screwdriver)
+        #expect(await item.parent == .player)
+    }
+
+    @Test("Inventory command shows carried items")
+    func testInventoryCommand() async throws {
+        // Given: Player has taken the sample item
+        try await engine.execute("""
+            inventory
+            take the screwdriver
+            i
+            """)
+
+        // Then: Item should be taken successfully
+        await mockIO.expectOutput("""
+            > inventory
+            Your hands are as empty as your pockets.
+
+            > take the screwdriver
+            Got it.
+
+            > i
+            You are carrying:
+            - A left-handed screwdriver
+            """)
+    }
+
+    @Test("Help command shows available commands")
+    func testHelpCommand() async throws {
+        // When: Player asks for help
+        try await engine.execute("help")
+
+        // Then: Should show command information
+        await mockIO.expectOutput("""
+            > help
+            This is an interactive fiction game. You control the story by
+            typing commands.
+
+            Common commands:
+            - LOOK or L - Look around your current location
+            - EXAMINE <object> or X <object> - Look at something closely
+            - TAKE <object> or GET <object> - Pick up an item
+            - DROP <object> - Put down an item you're carrying
+            - INVENTORY or I - See what you're carrying
+            - GO <direction> or just <direction> - Move in a direction (N,
+              S, E, W, etc.)
+            - OPEN <object> - Open doors, containers, etc.
+            - CLOSE <object> - Close doors, containers, etc.
+            - PUT <object> IN <container> - Put something in a container
+            - PUT <object> ON <surface> - Put something on a surface
+            - SAVE - Save your game
+            - RESTORE - Restore a saved game
+            - QUIT - End the game
+
+            You can use multiple objects with some commands (TAKE ALL, DROP
+            SWORD AND SHIELD).
+
+            Try different things--experimentation is part of the fun!
+            """)
     }
 }
+
 EOF
 
     print_success "Game structure created successfully!"
+}
+
+# Function to open the project in an appropriate editor
+open_project_in_editor() {
+    local target_dir="$1"
+    local game_name="$2"
+
+    print_status "Opening project in editor..."
+
+    # Check for Xcode first (preferred for Swift projects)
+    if command -v xed >/dev/null 2>&1; then
+        print_status "Opening in Xcode..."
+        xed "$target_dir/Package.swift"
+        return 0
+    elif [[ -d "/Applications/Xcode.app" ]]; then
+        print_status "Opening in Xcode..."
+        open -a Xcode "$target_dir/Package.swift"
+        return 0
+    fi
+
+    # Check for VS Code
+    if command -v code >/dev/null 2>&1; then
+        print_status "Opening in Visual Studio Code..."
+        code "$target_dir"
+        return 0
+    fi
+
+    # Fallback to system default (Finder on macOS, file manager on Linux, etc.)
+    if command -v open >/dev/null 2>&1; then
+        print_status "Opening project folder..."
+        open "$target_dir"
+        return 0
+    elif command -v xdg-open >/dev/null 2>&1; then
+        print_status "Opening project folder..."
+        xdg-open "$target_dir"
+        return 0
+    else
+        print_warning "Could not automatically open the project. Please navigate to: $target_dir"
+        return 1
+    fi
 }
 
 # Function to print usage instructions
@@ -293,9 +422,8 @@ print_usage_instructions() {
     echo "🎮 Your new Gnusto game '$game_name' has been created!"
     echo ""
     echo "Next steps:"
-    echo "  1. cd '$target_dir'"
-    echo "  2. swift build"
-    echo "  3. swift run $game_name"
+    echo "  1. swift build"
+    echo "  2. swift run $game_name"
     echo ""
     echo "To run tests:"
     echo "  swift test"
@@ -324,8 +452,8 @@ main() {
         echo ""
     done
 
-    # Get target directory (default to game name)
-    local default_target="./$game_name"
+    # Get target directory (default to game name in home directory)
+    local default_target="$HOME/$game_name"
     read -p "Enter target directory [$default_target]: " target_dir
     target_dir=${target_dir:-$default_target}
 
@@ -348,6 +476,9 @@ main() {
 
     # Create the game structure
     create_game_structure "$game_name" "$target_dir"
+
+    # Open project in appropriate editor
+    open_project_in_editor "$target_dir" "$game_name"
 
     # Print usage instructions
     print_usage_instructions "$game_name" "$target_dir"
