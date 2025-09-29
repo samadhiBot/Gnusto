@@ -1,134 +1,332 @@
 # Frequently Asked Questions
 
-Answers to common questions about the Gnusto Interactive Fiction Engine.
-
-Please open an [issue](https://github.com/samadhiBot/Gnusto/issues) on GitHub if you have a question that's not covered here. 
+Quick answers to common questions about the Gnusto Interactive Fiction Engine.
 
 ## What is Gnusto?
 
-Gnusto is a modern interactive fiction engine with a declarative DSL for defining locations, items, and behaviors. It focuses on ergonomics, a safe state-change pipeline, and extensibility for parser-based games.
+**Gnusto is a modern, open-source interactive fiction engine written in Swift that provides a declarative approach to creating parser-based text adventures.**
 
-- Home: [https://github.com/samadhiBot/Gnusto](https://github.com/samadhiBot/Gnusto)
-- Overview: <doc:GnustoEngine>
-- More detail: <doc:GameStructure>
+Rather than using a domain-specific language, Gnusto leverages Swift's type system and syntax to create a clean, intuitive DSL for defining game content. It emphasizes type safety, testability, and a structured state-change pipeline that prevents common IF programming bugs.
 
-## What platforms are supported?
+- **Repository**: [github.com/samadhiBot/Gnusto](https://github.com/samadhiBot/Gnusto)
+- **Documentation**: <doc:GnustoEngine> and <doc:GameStructure>
+- **License**: MIT (open source, commercial-friendly)
 
-| Platform | Status | Notes |
-|---|---|---|
-| macOS | ✅ Working | Development + Distribution |
-| Linux (Ubuntu 24.04) | ✅ Working | Development + Distribution |
-| Windows | ✅ Working | Development + Distribution |
-| iOS / Android | 🏗️ Planned | Distribution |
-| WebAssembly | 🔬 Experimental | Distribution  |
+## Why would I choose Gnusto over established systems like Inform 7 or TADS?
 
-## What toolchain do I need?
+**Gnusto offers modern tooling, type safety, and seamless integration with the Apple ecosystem while maintaining respect for IF traditions.**
 
-- Toolchain: [Swift 6.2](https://www.swift.org/)
-- Build system: [Swift Package Manager](https://docs.swift.org/swiftpm/documentation/packagemanagerdocs/)
-- IDEs: [Xcode](https://developer.apple.com/xcode/), [Zed](https://zed.dev/), [VS Code](https://code.visualstudio.com/), or [any other editor](https://www.swift.org/tools/#editors) that supports the Language Server Protocol (LSP)
+Key differentiators:
+- **Type Safety**: Compile-time checking prevents many runtime errors common in dynamic languages
+- **Modern IDE Support**: Full autocomplete, refactoring, and debugging in Xcode, VS Code, Zed, Neovim, etc.
+- **Testing Framework**: Built-in support for unit and integration testing your game logic
+- **Native Performance**: Compiled Swift runs efficiently on all platforms
+- **Ecosystem Access**: Leverage the entire Swift package ecosystem for advanced features
 
-## How do I test it out?
+That said, Gnusto is still in beta and lacks the maturity, community resources, and extensive libraries of established systems. It's best suited for authors comfortable with programming or those seeking modern development practices.
 
+## How do I write games in Gnusto?
+
+**You define your game world declaratively using Swift's DSL, then add dynamic behaviors through event handlers.**
+
+Here's a minimal example:
+
+```swift
+// Define a location
+let foyer = Location(
+    id: .foyer,
+    .name("Foyer of the Opera House"),
+    .description(
+        """
+        You are standing in a spacious hall, splendidly decorated in red
+        and gold, with glittering chandeliers overhead. The entrance from
+        the street is to the north, and there are doorways south and west.
+        """
+    ),
+    .exits(
+        .south(.bar),
+        .west(.cloakroom),
+        .north(
+            blocked: """
+                You've only just arrived, and besides, the weather outside
+                seems to be getting worse.
+                """
+        )
+    ),
+    .inherentlyLit
+)
+
+// Define an item
+let cloak = Item(
+    id: .cloak,
+    .name("velvet cloak"),
+    .description(
+        """
+        A handsome cloak, of velvet trimmed with satin, and slightly
+        spattered with raindrops. Its blackness is so deep that it
+        almost seems to suck light from the room.
+        """
+    ),
+    .adjectives("handsome", "dark", "black", "velvet", "satin"),
+    .in(.player),
+    .isTakable,
+    .isWearable,
+    .isWorn,
+)
+
+
+// Add dynamic behavior
+let cloakHandler = ItemEventHandler(for: .cloak) {
+    before(.drop, .insert) { context, _ in
+        guard await context.player.location == .cloakroom else {
+            throw ActionResponse.feedback(
+                "This isn't the best place to leave a smart cloak lying around."
+            )
+        }
+        return nil
+    }
+}
 ```
+
+The Gnusto auto-wiring tool automatically discovers your content and generates the necessary boilerplate, so you focus on game design rather than plumbing.
+
+## What platforms does Gnusto support?
+
+**Gnusto runs on macOS, Linux, and Windows today, with mobile and web platforms planned.**
+
+| Platform | Development | Distribution | Status |
+|----------|------------|--------------|---------|
+| macOS    | ✅ | ✅ | Fully supported |
+| Linux    | ✅ | ✅ | Fully supported (Ubuntu 24.04 tested) |
+| Windows  | ✅ | ✅ | Fully supported (may need to disable SwiftLint) |
+| iOS      | ✖️ | 🏗️ | Planned (Swift runs natively) |
+| Android  | ✖️ | 🏗️ | Planned (via Swift for Android) |
+| Web      | ✖️ | 🔬 | Experimental (via WebAssembly) |
+
+## What development tools do I need?
+
+**You need the Swift 6.2 toolchain and a text editor — everything else is included.**
+
+- **Required**: [Swift 6.2+](https://www.swift.org/download/)
+- **Recommended IDEs**:
+  - [Xcode](https://developer.apple.com/xcode/) (macOS only, best experience)
+  - [VS Code](https://code.visualstudio.com/) with Swift extension (all platforms)
+  - [Zed](https://zed.dev/) (fast, modern, great Swift support)
+- **Build System**: Swift Package Manager (included with Swift)
+
+## Can I try it without installing anything?
+
+**Yes! You can explore the example games with just a few terminal commands.**
+
+```bash
+# Clone and explore
 git clone https://github.com/samadhiBot/Gnusto.git
 cd Gnusto
 
-# Cloak of Darkness
+# Play the Cloak of Darkness demo
 swift run CloakOfDarkness
 
-# Zork 1 (in progress)
+# Try the Zork 1 port (work in progress)
 swift run Zork1
 ```
 
-## Can I use Linux and Windows?
+## How capable is the parser?
 
-To install the Swift 6.2 toolchain, follow the [Linux](https://www.swift.org/install/linux/) or [Windows](https://www.swift.org/install/windows/) instructions at swift.org.
+**The parser handles natural language input with support for complex commands, synonyms, and contextual understanding.**
 
-During Linux and Windows testing, it was necessary to disable the [SwiftLint](https://realm.github.io/SwiftLint/) build tool plugin. If you see plugin‑related build errors, comment it out in your `Package.swift` manifest:
+Built-in capabilities:
+- **80+ standard verbs** (examine, take, drop, open, close, light, attack, etc.)
+- **Complex commands** ("put the brass lamp in the trophy case")
+- **Pronouns** ("examine table" then "put lamp on it")
+- **Multiple objects** ("take lamp and sword")
+- **Disambiguation** ("which key do you mean, the brass key or the iron key?")
+- **Synonyms and adjectives** (customizable per game)
+
+The parser is extensible — you can add new verbs, modify syntax rules, or customize responses through the ``StandardMessenger`` system.
+
+## Can I import my existing Inform/TADS/Dialog game?
+
+**No, Gnusto doesn't support importing from or exporting to other IF systems.**
+
+This is a deliberate design choice to avoid the complexity of format conversion and to leverage Swift's native capabilities fully. To port an existing game, you'd need to recreate it using Gnusto's DSL, though the declarative syntax makes this relatively straightforward.
+
+## How does saving and restoring work?
+
+**Games are saved as JSON snapshots of the complete game state, making saves portable and human-readable.**
+
+The save system captures:
+- Player location and inventory
+- All item states and positions
+- Game flags and variables
+- Score and turn count
+- Active daemons and fuses
+
+Note: The save format may change during beta as we gather feedback on compatibility needs.
+
+## Is there support for multimedia (graphics, sound)?
+
+**Not yet. Gnusto currently focuses on text-only experiences.**
+
+The architecture is designed to support multimedia extensions in the future, but the initial release concentrates on getting the core parser and world model right. The I/O system is abstracted to allow for different presentation layers as the engine matures.
+
+## How do I handle NPCs and dialogue?
+
+**Gnusto provides basic NPC support through the ``CharacterSheet`` system. Conversation handling is on the roadmap.**
 
 ```swift
-plugins: [
-    "GnustoAutoWiringPlugin",
-    // .plugin(name: "SwiftLintBuildToolPlugin", package: "SwiftLintPlugins")  // Disabled for Windows/Linux
-]
+let thief = Item(
+    id: .thief,
+    .name("thief"),
+    .synonyms("thief", "robber", "man", "person"),
+    .adjectives("shady", "suspicious", "seedy", "suspicious-looking", "sneaky"),
+    .firstDescription(
+        """
+        There is a suspicious-looking individual, holding a large bag,
+        leaning against one wall. He is armed with a deadly stiletto.
+        """
+    ),
+    .characterSheet(
+        CharacterSheet(
+            strength: 14,
+            dexterity: 18,
+            intelligence: 13,
+            charisma: 7,
+            bravery: 9,
+            perception: 16,
+            accuracy: 15,
+            intimidation: 15,
+            stealth: 17,
+            level: 2,
+            classification: .masculine,
+            alignment: .neutralEvil
+        )
+    )
+)
 ```
 
-## How do I author games?
+The NPC system is functional but basic. At this stage, complex dialogue trees or sophisticated AI behaviors would need custom implementation.
 
-Gnusto uses a declarative DSL to define locations, items and behaviors. Games are written in Swift, but the DSL is simple and intuitive, and the engine and auto‑wiring tool remove the complexity. Here's the game development in a nutshell:
+## What about combat and RPG mechanics?
 
-- Define static content with ``Location`` and ``Item``
-- Add dynamic behavior via ``ItemEventHandler`` and ``LocationEventHandler``
-- Use ``ItemComputer`` and ``LocationComputer`` for computed descriptions and properties
-- Use ``Daemon`` and ``Fuse`` for time-based logic
+**Melee combat exists but needs refinement. The Character Sheet system provides RPG stats but is underutilized.**
 
-See <doc:GameStructure> for more more details, or look at [Cloak of Darkness](https://github.com/samadhiBot/Gnusto/blob/main/Executables/CloakOfDarkness/OperaHouse.swift) and [Zork 1](https://github.com/samadhiBot/Gnusto/tree/main/Executables/Zork1) to see some real examples. 
+Current support:
+- Simple turn-based attack mechanics
+- Hit points and basic stats
+- Simple weapon system
 
-## Is there a custom language or file format?
+This is an area marked for improvement. If your game needs sophisticated combat, you may want to wait for future updates, or contribute improvements.
 
-Games are written in Swift, using a declarative DSL. There is no separate language, and you have the full power of the Swift language at your disposal.
+## How mature is Gnusto?
 
-## Is it compatible with Inform, TADS, Dialog, Ink, Twine, or Z‑machine/Glulx?
+**Gnusto is in beta — stable enough for creating games but expect occasional API changes.**
 
-No. Gnusto is a separate engine and does not import or export those formats.
+Strengths:
+- Core engine is well-tested (80%+ test coverage)
+- Parser and world model are robust
+- Auto-wiring eliminates most boilerplate
 
-## How does the parser behave?
+Current limitations:
+- Documentation is still growing
+- No visual IDE or world builder
+- Limited community resources
+- Some systems (combat, NPCs) need polish
 
-- Natural‑language parser with synonyms, adjectives, and complex commands
-- 80+ built‑in actions (e.g., examine, take, drop, open/close, attack)
-- Customizable responses via StandardMessenger (override per game)
+## Can I contribute or get help?
 
-See the examples in <doc:GnustoEngine> and the example games.
+**Yes! We welcome questions, feedback, and contributions from the IF and open source communities.**
 
-## What's the save format?
+- **Questions & Issues**: [GitHub Issues](https://github.com/samadhiBot/Gnusto/issues)
+- **Contributions**: PRs welcome (see CONTRIBUTING.md)
+- **Community**: Growing! Early adopters shape the engine's direction
 
-Saves are a simple JSON snapshot of game state. The persistence mechanism may vary by I/O handler (today: terminal). The format is subject to change during beta; feedback on portability and versioning is welcome.
+We especially value input from experienced IF authors on API design, missing features, and usability improvements.
 
-## What's the current runtime?
+## Why is it called "Gnusto"?
 
-Terminal (CLI). Packaging for desktop, mobile, and web is planned and will be guided by community feedback.
+**It's an homage to Infocom's Enchanter series, where "gnusto" copies magical spells into your spellbook.**
 
-## Accessibility?
+Just as the spell preserves magic for reuse, the Gnusto engine aims to preserve and modernize the craft of interactive fiction. While the name has appeared in other IF tools historically, this project is unrelated to them.
 
-Gnusto's interface is currently terminal‑only. Accessibility will be a top priority as user interface work for desktop, mobile and web evolves. 
+## What's the development philosophy?
 
-## Why the name?
+**Gnusto balances respect for IF traditions with modern software engineering practices.**
 
-The name is an homage.
+Core principles:
+- **Safety First**: Type checking and structured state changes prevent common bugs
+- **Test Everything**: Games should be as testable as any other software
+- **Developer Experience**: Clear APIs, good error messages, and helpful tooling
+- **Honor the Past**: Respect IF conventions while enabling innovation
+- **Open Development**: Community feedback shapes the engine's evolution
 
-"Gnusto" is a magical incantation from Infocom's _Enchanter_ series of fantasy text adventure games. It allows a player to copy a spell from a scroll into their spellbook, enabling future use of that spell multiple times rather than just once.
+## What's on the roadmap?
 
-Gnusto has appeared historically in IF tooling, but this project is unrelated to prior tools.
+**The focus is on stabilizing the core engine, improving documentation, and building community.**
 
-## Are there example games?
+Near term:
+- Stabilize save/restore format
+- Improve combat and NPC systems
+- Expand documentation and tutorials
+- Create more example games
 
-- Cloak of Darkness (complete demo): [CloakOfDarkness](https://github.com/samadhiBot/Gnusto/blob/main/Executables/CloakOfDarkness)
-- Zork 1 (in progress): [Zork1](https://github.com/samadhiBot/Gnusto/blob/main/Executables/Zork1)
+Medium term:
+- Visual debugger/inspector
+- iOS and Android runtime
+- Web-based play via WebAssembly
+- World builder tools
 
-## What are the known limitations?
+Long term:
+- Multimedia support
+- Advanced NPC/dialogue systems
+- Integration with AI for dynamic content
 
-- Terminal runtime only
-- No interoperability with existing IF formats
-- Deployment targets (desktop/mobile/web) not packaged yet
-- SwiftLint build tool plugin may need to be disabled on Windows/Linux
-- Save format and APIs may change during beta
-- Documentation is evolving
-- Melee combat has a lot of rough edges
-- Player/NPC Character Sheet is under-utilized 
+## Should I use Gnusto for my next game?
 
-## Can I contribute
+**If you're comfortable with programming and want modern tooling for IF development, Gnusto is worth exploring.**
 
-We welcome feedback, issues, feature requests, documentation improvements, and PRs.
+Good fit if you:
+- Want type safety and IDE support
+- Enjoy test-driven development
+- Need to integrate with other Swift libraries
+- Prefer declarative, code-based authoring
+- Want to contribute to a growing project
 
-Please use [Gnusto/issues](https://github.com/samadhiBot/Gnusto/issues) to share your thoughts.
+Maybe wait if you:
+- Prefer visual tools or natural language authoring
+- Need extensive multimedia support
+- Want access to large existing libraries
+- Require stable, unchanging APIs
+- Need comprehensive documentation/tutorials
 
-License: MIT
+## Where can I see example code?
+
+**The repository includes two example games that demonstrate best practices.**
+
+- [**Cloak of Darkness**](https://github.com/samadhiBot/Gnusto/tree/main/Executables/CloakOfDarkness): The standard IF demo, showing core concepts in ~200 lines
+- [**Zork 1**](https://github.com/samadhiBot/Gnusto/tree/main/Executables/Zork1): A work-in-progress port demonstrating complex game mechanics
+
+Both examples include extensive comments and show idiomatic Gnusto patterns.
 
 ## Troubleshooting
 
-- VS Code Debug Console isn't interactive
-  - Use the integrated terminal and run swift run from there.
+### VS Code debug console isn't interactive
+Use the integrated terminal instead and run `swift run YourGame` directly.
 
-- Build fails due to SwiftLint plugin (Windows/Linux)
-  - Comment out the SwiftLint Build Tool Plugin in Package.swift (see note above).
+### Build fails with SwiftLint errors on Linux/Windows
+Disable SwiftLint in your `Package.swift`:
+```swift
+plugins: [
+    "GnustoAutoWiringPlugin",
+    // .plugin(name: "SwiftLintBuildToolPlugin", package: "SwiftLintPlugins")
+]
+```
+
+### "Cannot find type 'LocationID'" errors
+Make sure your game module includes the auto-wiring plugin in `Package.swift`. The plugin generates these types automatically.
+
+### Changes to items/locations aren't reflected
+The auto-wiring plugin needs to run. Try `swift package clean` then rebuild.
+
+---
+
+*Have a question not covered here? Please [open an issue](https://github.com/samadhiBot/Gnusto/issues) — we'd love to hear from you!*

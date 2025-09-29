@@ -5,7 +5,7 @@ import PackageDescription
 let package = Package(
     name: "Gnusto",
     platforms: [
-        .macOS(.v13),
+        .macOS(.v13)
     ],
     products: [
         .library(
@@ -15,10 +15,6 @@ let package = Package(
         .executable(
             name: "CloakOfDarkness",
             targets: ["CloakOfDarkness"]
-        ),
-        .executable(
-            name: "FrobozzMagicDemoKit",
-            targets: ["FrobozzMagicDemoKit"]
         ),
         .executable(
             name: "Zork1",
@@ -72,16 +68,6 @@ let package = Package(
             ]
         ),
         .executableTarget(
-            name: "FrobozzMagicDemoKit",
-            dependencies: ["GnustoEngine"],
-            path: "Executables/FrobozzMagicDemoKit",
-            exclude: ["README.md", "Docs/"],
-            plugins: [
-                "GnustoAutoWiringPlugin",
-                .plugin(name: "SwiftLintBuildToolPlugin", package: "SwiftLintPlugins"),
-            ]
-        ),
-        .executableTarget(
             name: "Zork1",
             dependencies: ["GnustoEngine"],
             path: "Executables/Zork1",
@@ -109,7 +95,7 @@ let package = Package(
         .target(
             name: "GnustoTestSupport",
             dependencies: [
-                "GnustoEngine",
+                "GnustoEngine"
             ],
             plugins: [
                 .plugin(name: "SwiftLintBuildToolPlugin", package: "SwiftLintPlugins")
@@ -119,14 +105,6 @@ let package = Package(
             name: "CloakOfDarknessTests",
             dependencies: [
                 "CloakOfDarkness",
-                "GnustoTestSupport",
-                .product(name: "CustomDump", package: "swift-custom-dump"),
-            ],
-        ),
-        .testTarget(
-            name: "FrobozzMagicDemoKitTests",
-            dependencies: [
-                "FrobozzMagicDemoKit",
                 "GnustoTestSupport",
                 .product(name: "CustomDump", package: "swift-custom-dump"),
             ],
