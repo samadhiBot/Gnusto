@@ -1,4 +1,3 @@
-import CustomDump
 import GnustoEngine
 import GnustoTestSupport
 import Testing
@@ -6,10 +5,24 @@ import Testing
 @testable import Zork1
 
 struct ItemMechanicsTests {
+    let engine: GameEngine
+    let mockIO: MockIOHandler
+
+    init() async {
+        (engine, mockIO) = await GameEngine.test(
+            blueprint: Zork1(
+                rng: SeededRandomNumberGenerator()
+            )
+        )
+    }
+
     @Test("Lamp and basic items collection")
     func testBasicItemCollection() async throws {
-        let (engine, mockIO) = await GameEngine.zork1(
-            pre: .enterKitchen,
+        try await engine.apply(
+            engine.player.move(to: .kitchen)
+        )
+
+        try await engine.execute(
             """
             west
             take all
@@ -23,7 +36,6 @@ struct ItemMechanicsTests {
             inventory
             """
         )
-        await engine.run()
 
         await mockIO.expectOutput(
             """
@@ -45,7 +57,7 @@ struct ItemMechanicsTests {
             The lamp is turned off.
 
             > turn on the lamp
-            You successfully turn on the brass lantern.
+            You turn on the brass lantern.
 
             > inventory
             You are carrying:
@@ -54,6 +66,15 @@ struct ItemMechanicsTests {
 
             > east
             --- Kitchen ---
+
+            You are in the kitchen of the white house. A table seems to
+            have been used recently for the preparation of food. A passage
+            leads to the west and a dark staircase can be seen leading
+            upward. A dark chimney leads down and to the east is a small
+            window which is slightly ajar.
+
+            A bottle is sitting on the table. On the table is an elongated
+            brown sack, smelling of hot peppers.
 
             > up
             --- Attic ---
@@ -64,10 +85,10 @@ struct ItemMechanicsTests {
             nasty-looking knife.
 
             > take rope
-            Acquired.
+            Got it.
 
             > take knife
-            Got it.
+            Acquired.
 
             > inventory
             You are carrying:
@@ -75,17 +96,17 @@ struct ItemMechanicsTests {
             - A brass lantern
             - A rope
             - A sword
-
-            >
-            May your adventures elsewhere prove fruitful!
             """
         )
     }
 
     @Test("Container interactions (brown sack and bottle)")
     func testContainerInteractions() async throws {
-        let (engine, mockIO) = await GameEngine.zork1(
-            pre: .enterKitchen,
+        try await engine.apply(
+            engine.player.move(to: .kitchen)
+        )
+
+        try await engine.execute(
             """
             examine table
             take sack
@@ -103,7 +124,6 @@ struct ItemMechanicsTests {
             inventory
             """
         )
-        await engine.run()
 
         await mockIO.expectOutput(
             """
@@ -113,20 +133,20 @@ struct ItemMechanicsTests {
             smelling of hot peppers.
 
             > take sack
-            Got it.
+            Taken.
 
             > examine sack
             The brown sack is closed.
 
             > open sack
-            The brown sack parts to disclose a clove of garlic and a lunch,
-            previously hidden from view.
+            Opening the brown sack brings a clove of garlic and a lunch
+            into the light.
 
             > examine sack
             The brown sack contains a clove of garlic and a lunch.
 
             > get lunch
-            Got it.
+            Acquired.
 
             > take garlic from sack
             Got it.
@@ -141,8 +161,8 @@ struct ItemMechanicsTests {
             You'll have to open the glass bottle first.
 
             > open bottle
-            The glass bottle parts to disclose a quantity of water,
-            previously hidden from view.
+            Opening the glass bottle brings a quantity of water into the
+            light.
 
             > drink water
             Thank you very much. I was rather thirsty (from all this
@@ -157,17 +177,17 @@ struct ItemMechanicsTests {
             - A clove of garlic
             - A lunch
             - A brown sack
-
-            >
-            Until we meet again in another tale...
             """
         )
     }
 
     @Test("Lamp mechanics")
     func testLampMechanics() async throws {
-        let (engine, mockIO) = await GameEngine.zork1(
-            pre: .enterKitchen,
+        try await engine.apply(
+            engine.player.move(to: .kitchen)
+        )
+
+        try await engine.execute(
             """
             west
             take the lamp
@@ -178,7 +198,6 @@ struct ItemMechanicsTests {
             extinguish the lamp
             """
         )
-        await engine.run()
 
         await mockIO.expectOutput(
             """
@@ -194,7 +213,7 @@ struct ItemMechanicsTests {
             the trophy case hangs an elvish sword of great antiquity.
 
             > take the lamp
-            Got it.
+            Taken.
 
             > examine it
             The lamp is turned off.
@@ -202,13 +221,22 @@ struct ItemMechanicsTests {
             > go east
             --- Kitchen ---
 
+            You are in the kitchen of the white house. A table seems to
+            have been used recently for the preparation of food. A passage
+            leads to the west and a dark staircase can be seen leading
+            upward. A dark chimney leads down and to the east is a small
+            window which is slightly ajar.
+
+            A bottle is sitting on the table. On the table is an elongated
+            brown sack, smelling of hot peppers.
+
             > climb the stairs
             You have moved into a dark place.
 
             It is pitch black. You are likely to be eaten by a grue.
 
             > light the lamp
-            With practiced efficiency, you light the brass lantern.
+            You successfully light the brass lantern.
 
             --- Attic ---
 
@@ -223,9 +251,6 @@ struct ItemMechanicsTests {
             You have moved into a dark place.
 
             It is pitch black. You are likely to be eaten by a grue.
-
-            >
-            May your adventures elsewhere prove fruitful!
             """
         )
     }

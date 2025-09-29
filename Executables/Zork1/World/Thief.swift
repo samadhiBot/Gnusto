@@ -120,6 +120,12 @@ extension Thief {
                 nil
             }
         }
+
+        after(.attack) { context, command in
+            if await context.item.isDead {
+                
+            }
+        }
     }
 
     /// Stiletto weapon handler with thief protection

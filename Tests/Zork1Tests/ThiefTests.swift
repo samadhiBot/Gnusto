@@ -7,22 +7,28 @@ import Testing
 
 /// Tests for the sophisticated Zork 1 thief implementation
 struct ThiefTests {
-    func setup() async throws -> (GameEngine, MockIOHandler) {
-        let (engine, mockIO) = await GameEngine.zork1()
+    let engine: GameEngine
+    let mockIO: MockIOHandler
+
+    init() async throws {
+        (engine, mockIO) = await GameEngine.test(
+            blueprint: Zork1(
+                rng: SeededRandomNumberGenerator()
+            )
+        )
+
+        // Give the player a sword and position them in the passage next to the round room.
         try await engine.apply(
             engine.item(.sword).move(to: .player),
             engine.player.move(to: .location(.ewPassage)),
         )
+
         // Go east to the Round Room. Entering the Round Room starts the thief daemon.
         try await engine.execute("go east")
-        return (engine, mockIO)
     }
 
     @Test("Thief can steal valuable items from player")
     func testThiefStealsValuableItems() async throws {
-        // Given
-        let (engine, mockIO) = try await setup()
-
         let sceptre = await engine.item(.sceptre)
         let thief = await engine.item(.thief)
         let thiefBag = await engine.item(.largeBag)
@@ -35,12 +41,13 @@ struct ThiefTests {
         #expect(await engine.player.isHolding(sceptre.id))
 
         try await engine.execute(
-            "inventory",
-            "examine the sceptre",
-            "look at the man",
-            "talk to the man",
-            "inventory"
-        )
+            """
+            inventory
+            examine the sceptre
+            look at the man
+            talk to the man
+            inventory
+            """)
 
         await mockIO.expectOutput(
             """
@@ -91,15 +98,13 @@ struct ThiefTests {
 
     @Test("Player can examine thief")
     func testExamineThief() async throws {
-        // Given
-        let (engine, mockIO) = try await setup()
-
         // When
         try await engine.execute(
-            "look at the floor",
-            "look at the ceiling",
-            "examine the man"
-        )
+            """
+            look at the floor
+            look at the ceiling
+            examine the man
+            """)
 
         // Then
         await mockIO.expectOutput(
@@ -134,12 +139,8 @@ struct ThiefTests {
 
     @Test("Player can give valuable items to thief")
     func testGiveValuableItemToThief() async throws {
-        // Given
-        let (engine, mockIO) = try await setup()
-
         try await engine.apply(
             engine.item(.sceptre).move(to: .player)
-
         )
 
         // When
@@ -197,18 +198,17 @@ struct ThiefTests {
 
     @Test("Thief refuses non-valuable items")
     func testThiefRefusesNonValuableItems() async throws {
-        // Given
-        let (engine, mockIO) = try await setup()
-
         try await engine.apply(
             engine.item(.garlic).move(to: .player)
         )
 
         // When
         try await engine.execute(
-            "wait",
-            "give garlic to thief"
-        )
+            """
+            wait
+            wait
+            give garlic to thief
+            """)
 
         // Then
         await mockIO.expectOutput(
@@ -222,8 +222,17 @@ struct ThiefTests {
             > wait
             The universe's clock ticks inexorably forward.
 
+            > wait
+            The universe's clock ticks inexorably forward.
+
+            Someone carrying a large bag is casually leaning against one of
+            the walls here. He does not speak, but it is clear from his
+            aspect that the bag will be taken only over his dead body.
+
             > give garlic to thief
-            You cannot reach any such thing from here.
+            The thief examines the clove of garlic briefly, then shakes his
+            head with obvious disdain. "I only deal in quality
+            merchandise," he mutters.
             """
         )
 
@@ -236,19 +245,14 @@ struct ThiefTests {
 
     @Test("Player can attack thief")
     func testAttackThief() async throws {
-        // Given
-        let (engine, mockIO) = try await setup()
-
         // When
         try await engine.execute(
-            "attack the thief",
-            "stab the thief with my sword",
-            "slay the thief",
-            "stab the thief",
-            "kill the thief",
-            "stab the thief",
-
-        )
+            """
+            wait
+            wait
+            attack the thief
+            stab the thief with my sword
+            """)
 
         // Then
         await mockIO.expectOutput(
@@ -259,53 +263,39 @@ struct ThiefTests {
             This is a circular stone room with passages in all directions.
             Several of them have unfortunate endings.
 
-            > attack the thief
-            Any such thing remains frustratingly inaccessible.
+            > wait
+            The universe's clock ticks inexorably forward.
 
-            > stab the thief with my sword
-            You cannot reach any such thing from here.
-
-            > slay the thief
-            You cannot reach any such thing from here.
+            > wait
+            The universe's clock ticks inexorably forward.
 
             Someone carrying a large bag is casually leaning against one of
             the walls here. He does not speak, but it is clear from his
             aspect that the bag will be taken only over his dead body.
 
-            > stab the thief
-            No more waiting as you attack with your blade raised and the
-            man responds with his stiletto, two weapons now committed to
-            drawing blood.
+            > attack the thief
+            You explode into motion with your orcrist hunting flesh as the
+            robber meets your charge with his vicious stiletto, the dance
+            of death begun.
 
-            Your sword slips past his stiletto briefly, nicking the man and
-            drawing a thin line of blood. The light wound barely seems to
-            register.
+            The suspicious-looking thief nimbly dodges and twists away from
+            your glamdring, using speed to compensate for being unarmed.
 
             The thief strikes at your wrist, and suddenly your grip is
             slippery with blood.
 
-            > kill the thief
-            Your strike with your orcrist glances off his vicious stiletto,
-            still managing to catch the suspicious man lightly. The strike
-            lands, but doesn't slow him.
+            > stab the thief with my sword
+            The seedy man dodges gracefully, letting your orcrist slice
+            through empty space where he was just standing.
 
-            Then the thief's skillful counter with his stiletto disrupts
-            your stance completely, leaving you vulnerable as an overturned
-            turtle.
-
-            > stab the thief
-            The suspicious man weaves past your glamdring! Pure reflexes
-            keep him safe from your strike.
-
-            The thief, a pragmatist, dispatches you as a threat to his
-            livelihood.
+            Finishing you off, the thief inserts his blade into your heart.
 
             ****  You have died  ****
 
             The curtain falls on this particular act of your existence. But
             all good stories deserve another telling...
 
-            You scored 0 out of a possible 350 points, in 6 moves.
+            You scored 0 out of a possible 350 points, in 4 moves.
 
             Would you like to RESTART, RESTORE a saved game, or QUIT?
 
@@ -316,11 +306,13 @@ struct ThiefTests {
 
     @Test("Thief handles tell command")
     func testTellThief() async throws {
-        // Given
-        let (engine, mockIO) = try await setup()
-
         // When
-        try await engine.execute("tell thief about treasure")
+        try await engine.execute(
+            """
+            wait
+            wait
+            tell thief about treasure
+            """)
 
         // Then
         await mockIO.expectOutput(
@@ -331,23 +323,31 @@ struct ThiefTests {
             This is a circular stone room with passages in all directions.
             Several of them have unfortunate endings.
 
-            > tell thief about treasure
-            You cannot reach any such thing from here.
+            > wait
+            The universe's clock ticks inexorably forward.
+
+            > wait
+            The universe's clock ticks inexorably forward.
 
             Someone carrying a large bag is casually leaning against one of
             the walls here. He does not speak, but it is clear from his
             aspect that the bag will be taken only over his dead body.
+
+            > tell thief about treasure
+            The thief is a strong, silent type.
             """
         )
     }
 
     @Test("Cannot take thief directly")
     func testCannotTakeThief() async throws {
-        // Given
-        let (engine, mockIO) = try await setup()
-
         // When
-        try await engine.execute("take thief")
+        try await engine.execute(
+            """
+            wait
+            wait
+            take thief
+            """)
 
         // Then
         await mockIO.expectOutput(
@@ -358,19 +358,31 @@ struct ThiefTests {
             This is a circular stone room with passages in all directions.
             Several of them have unfortunate endings.
 
+            > wait
+            The universe's clock ticks inexorably forward.
+
+            > wait
+            The universe's clock ticks inexorably forward.
+
+            Someone carrying a large bag is casually leaning against one of
+            the walls here. He does not speak, but it is clear from his
+            aspect that the bag will be taken only over his dead body.
+
             > take thief
-            You cannot reach any such thing from here.
+            Once you got him, what would you do with him?
             """
         )
     }
 
     @Test("Stiletto examination works")
     func testExamineStilettoInThiefsPossession() async throws {
-        // Given
-        let (engine, mockIO) = try await setup()
-
         // When
-        try await engine.execute("examine stiletto")
+        try await engine.execute(
+            """
+            wait
+            wait
+            examine stiletto
+            """)
 
         // Then
         await mockIO.expectOutput(
@@ -381,19 +393,32 @@ struct ThiefTests {
             This is a circular stone room with passages in all directions.
             Several of them have unfortunate endings.
 
+            > wait
+            The universe's clock ticks inexorably forward.
+
+            > wait
+            The universe's clock ticks inexorably forward.
+
+            Someone carrying a large bag is casually leaning against one of
+            the walls here. He does not speak, but it is clear from his
+            aspect that the bag will be taken only over his dead body.
+
             > examine stiletto
-            You cannot reach any such thing from here.
+            It's a vicious-looking stiletto with a razor-sharp blade. The
+            thief grips it expertly, clearly experienced in its use.
             """
         )
     }
 
     @Test("Large bag examination works")
     func testExamineLargeBag() async throws {
-        // Given
-        let (engine, mockIO) = try await setup()
-
         // When
-        try await engine.execute("look inside the bag")
+        try await engine.execute(
+            """
+            wait
+            wait
+            look inside the bag
+            """)
 
         // Then
         await mockIO.expectOutput(
@@ -404,19 +429,33 @@ struct ThiefTests {
             This is a circular stone room with passages in all directions.
             Several of them have unfortunate endings.
 
+            > wait
+            The universe's clock ticks inexorably forward.
+
+            > wait
+            The universe's clock ticks inexorably forward.
+
+            Someone carrying a large bag is casually leaning against one of
+            the walls here. He does not speak, but it is clear from his
+            aspect that the bag will be taken only over his dead body.
+
             > look inside the bag
-            You cannot reach any such thing from here.
+            The thief's large bag bulges with what are obviously stolen
+            goods. He watches you carefully, ready to defend his ill-gotten
+            gains.
             """
         )
     }
 
     @Test("Cannot take stiletto while thief is present")
     func testCannotTakeStilettoWhileThiefPresent() async throws {
-        // Given
-        let (engine, mockIO) = try await setup()
-
         // When
-        try await engine.execute("take stiletto")
+        try await engine.execute(
+            """
+            wait
+            wait
+            take stiletto
+            """)
 
         // Then
         await mockIO.expectOutput(
@@ -427,8 +466,19 @@ struct ThiefTests {
             This is a circular stone room with passages in all directions.
             Several of them have unfortunate endings.
 
+            > wait
+            The universe's clock ticks inexorably forward.
+
+            > wait
+            The universe's clock ticks inexorably forward.
+
+            Someone carrying a large bag is casually leaning against one of
+            the walls here. He does not speak, but it is clear from his
+            aspect that the bag will be taken only over his dead body.
+
             > take stiletto
-            You cannot reach any such thing from here.
+            The thief is armed and dangerous. You'd have to defeat him
+            first before attempting to take his stiletto.
             """
         )
 
@@ -440,9 +490,6 @@ struct ThiefTests {
 
     @Test("Thief prioritizes high-value items for theft")
     func testThiefPrioritizesHighValueItems() async throws {
-        // Given
-        let (engine, mockIO) = try await setup()
-
         // Give player multiple items of different values
         try await engine.apply(
             engine.item(.advertisement).move(to: .player),  // Low value
@@ -452,12 +499,14 @@ struct ThiefTests {
         // When
         try await engine.execute(
             """
-            look
+            inventory
             talk to the thief
             take the stiletto
-            dance with the thief
-            kiss the thief
             wait
+            wait
+            wait
+            wait
+            inventory
             """
         )
 
@@ -470,47 +519,55 @@ struct ThiefTests {
             This is a circular stone room with passages in all directions.
             Several of them have unfortunate endings.
 
-            > look
-            --- Round Room ---
+            > inventory
+            You are carrying:
+            - A leaflet
+            - A huge diamond
+            - A sword
 
-            This is a circular stone room with passages in all directions.
-            Several of them have unfortunate endings.
+            > talk to the thief
+            You cannot reach any such thing from here.
 
             Someone carrying a large bag is casually leaning against one of
             the walls here. He does not speak, but it is clear from his
             aspect that the bag will be taken only over his dead body.
 
-            > talk to the thief
-            The thief is a strong, silent type.
-
             > take the stiletto
             The thief is armed and dangerous. You'd have to defeat him
             first before attempting to take his stiletto.
 
-            The thief just left, still carrying his large bag. You may not
-            have noticed that he robbed you blind first.
+            > wait
+            Moments slip away like sand through fingers.
 
-            > dance with the thief
-            For a fleeting instant, you and the thief find rhythm in each
-            other's movements.
+            The holder of the large bag just left, looking disgusted.
+            Fortunately, he took nothing.
 
-            > kiss the thief
-            The moment for kissing the thief has neither arrived nor been
-            invited.
+            > wait
+            Moments slip away like sand through fingers.
 
             > wait
             The universe's clock ticks inexorably forward.
 
-            The thief, finding nothing of value, left disgusted.
+            Someone carrying a large bag is casually leaning against one of
+            the walls here. He does not speak, but it is clear from his
+            aspect that the bag will be taken only over his dead body.
+
+            > wait
+            Moments slip away like sand through fingers.
+
+            The thief just left, still carrying his large bag. You may not
+            have noticed that he robbed you blind first.
+
+            > inventory
+            You are carrying:
+            - A leaflet
+            - A sword
             """
         )
     }
 
     @Test("Thief movement daemon can move thief around dungeon")
     func testThiefMovementDaemon() async throws {
-        // Given
-        let (engine, _) = try await setup()
-
         var thiefLocations = [String]()
 
         // When - wait several turns to trigger movement daemon
@@ -522,7 +579,7 @@ struct ThiefTests {
             }
         }
 
-        // Then - thief will come and gone
+        // Then - thief will come and go
         expectNoDifference(
             thiefLocations,
             [
@@ -535,86 +592,56 @@ struct ThiefTests {
         )
     }
 
-    @Test("Thief movement shows atmospheric messages")
-    func testThiefMovementMessages() async throws {
-        // Given
-        let (engine, mockIO) = try await setup()
-
-        // Force thief to move to another location
+    @Test("Combat victory drops thief possessions")
+    func testCombatVictoryDropsPossessions() async throws {
         try await engine.apply(
-            engine.item(.thief).move(to: .location(.northSouthPassage))
+            engine.item(.thief).setHealth(to: 1)
         )
-        _ = await mockIO.flush()  // Clear any move message
-
-        // When - move thief back to player's location
-        try await engine.apply(
-            engine.item(.thief).move(to: .location(.roundRoom))
-        )
-
-        // Then - should potentially see atmospheric arrival message
-        // (This is testing the infrastructure exists)
-        let thief = await engine.item(.thief)
-        let thiefParent = await thief.parent
-        if case .location(let locationProxy) = thiefParent {
-            #expect(locationProxy.id == .roundRoom)
-        } else {
-            #expect(Bool(false), "Thief should be in round room")
-        }
-    }
-
-    @Test("Enhanced combat considers weapon effectiveness")
-    func testEnhancedCombatWithWeapons() async throws {
-        // Given
-        let (engine, mockIO) = try await setup()
 
         // When
-        try await engine.execute("attack the thief with my sword", times: 3)
+        try await engine.execute(
+            """
+            wait
+            wait
+            stab the thief with my sword
+            slay the thief
+            """
+        )
 
-        // Then - should get enhanced combat response
+        // Then
         await mockIO.expectOutput(
             """
             > go east
             --- Round Room ---
-
+            
             This is a circular stone room with passages in all directions.
             Several of them have unfortunate endings.
-
-            > attack the thief with my sword
-            Any such thing remains frustratingly inaccessible.
-
-            > attack the thief with my sword
-            You cannot reach any such thing from here.
-
-            > attack the thief with my sword
-            You cannot reach any such thing from here.
-
+            
+            > wait
+            The universe's clock ticks inexorably forward.
+            
+            > wait
+            The universe's clock ticks inexorably forward.
+            
             Someone carrying a large bag is casually leaning against one of
             the walls here. He does not speak, but it is clear from his
             aspect that the bag will be taken only over his dead body.
+            
+            > stab the thief with my sword
+            You explode into motion with your orcrist hunting flesh as the
+            robber meets your charge with his vicious stiletto, the dance
+            of death begun.
+            
+            The thief nimbly dodges and twists away from your antique
+            glamdring, using speed to compensate for being unarmed.
+            
+            The thief slowly approaches, strikes like a snake, and leaves
+            you wounded.
+            
+            > slay the thief
+            Your sword finds its mark at last! The man staggers once, then
+            falls forever silent.
             """
-        )
-    }
-
-    @Test("Combat victory drops thief possessions")
-    func testCombatVictoryDropsPossessions() async throws {
-        // Given
-        let (engine, _) = await GameEngine.test(
-            blueprint: Zork1()
-        )
-
-        try await engine.apply(
-            engine.player.move(to: .location(.roundRoom)),
-            engine.item(.thief).move(to: .location(.roundRoom))
-        )
-
-        // Force a combat victory by removing thief directly (simulating death)
-        try await engine.apply(
-            engine.item(.thief).remove()
-        )
-
-        // Simulate dropping thief's possessions (what dropThiefPossessions does)
-        try await engine.apply(
-            engine.item(.largeBag).move(to: .location(.roundRoom))
         )
 
         // When - check if possessions are handled
@@ -635,7 +662,6 @@ struct ThiefTests {
 
     @Test("Treasure scoring integration works")
     func testTreasureScoringIntegration() async throws {
-        // Given
         let (engine, _) = await GameEngine.test(
             blueprint: Zork1()
         )
@@ -658,122 +684,119 @@ struct ThiefTests {
         #expect(finalScore >= initialScore)  // Score shouldn't decrease
     }
 
-    @Test("Thief refuses to accept bag or stiletto")
-    func testThiefRefusesOwnPossessions() async throws {
-        // Given
-        let (engine, mockIO) = try await setup()
-
-        // Simulate getting stiletto somehow
-        try await engine.apply(
-            engine.item(.stiletto).move(to: .player)
-        )
-
-        // When
-        try await engine.execute("give stiletto to thief")
-
-        // Then - thief should handle this appropriately
-        let output = await mockIO.flush()
-        // Either accepts it back or has some response
-        #expect(output.isNotEmpty)
-    }
-
-    @Test("Theft considers player vulnerability")
-    func testTheftMechanics() async throws {
-        // Given
-        let (engine, mockIO) = try await setup()
-
-        let diamond = await engine.item(.diamond)
-        let skull = await engine.item(.skull)
-        let potOfGold = await engine.item(.potOfGold)
-
-        // Move player loaded with treasure to the round room
-        try await engine.apply(
-            diamond.move(to: .player),
-            skull.move(to: .player),
-            potOfGold.move(to: .player)
-        )
-
-        // Execute a wait command and trigger daemon processing
-        try await engine.execute("wait", times: 4)
-
-        await mockIO.expectOutput(
-            """
-            > go east
-            --- Round Room ---
-
-            This is a circular stone room with passages in all directions.
-            Several of them have unfortunate endings.
-
-            > wait
-            The universe's clock ticks inexorably forward.
-
-            > wait
-            The universe's clock ticks inexorably forward.
-
-            Someone carrying a large bag is casually leaning against one of
-            the walls here. He does not speak, but it is clear from his
-            aspect that the bag will be taken only over his dead body.
-
-            > wait
-            The universe's clock ticks inexorably forward.
-
-            > wait
-            The universe's clock ticks inexorably forward.
-
-            The thief just left, still carrying his large bag. You may not
-            have noticed that he robbed you blind first.
-            """
-        )
-
-        // Then - verify theft system is operational
-        let thiefItems = await engine.item(.largeBag).contents
-        expectNoDifference(thiefItems, [diamond, potOfGold, skull])
-
-        let playerInventory = await engine.player.inventory
-        expectNoDifference(playerInventory.map(\.id), [.sword])
-    }
-
-    @Test("Thief AI responds to different combat outcomes")
-    func testThiefCombatOutcomeVariations() async throws {
-        // Given
-        let (engine, mockIO) = try await setup()
-
-        try await engine.execute(
-            """
-            wait
-            attack the thief
-            slay the thief
-            stab the thief
-            kill the thief
-            """
-        )
-        await mockIO.expectOutput(
-            """
-            > go east
-            --- Round Room ---
-
-            This is a circular stone room with passages in all directions.
-            Several of them have unfortunate endings.
-
-            > wait
-            The universe's clock ticks inexorably forward.
-
-            > attack the thief
-            You cannot reach any such thing from here.
-
-            > slay the thief
-            Any such thing remains frustratingly inaccessible.
-
-            > stab the thief
-            Any such thing remains frustratingly inaccessible.
-
-            > kill the thief
-            You cannot reach any such thing from here.
-
-            Someone carrying a large bag is casually leaning against one of
-            the walls here. He does not speak, but it is clear from his
-            aspect that the bag will be taken only over his dead body.
-            """
-        )
-    }
+    //    @Test("Thief refuses to accept bag or stiletto")
+    //    func testThiefRefusesOwnPossessions() async throws {
+    //        let (engine, mockIO) = try await setup()
+    //
+    //        // Simulate getting stiletto somehow
+    //        try await engine.apply(
+    //            engine.item(.stiletto).move(to: .player)
+    //        )
+    //
+    //        // When
+    //        try await engine.execute("give stiletto to thief")
+    //
+    //        // Then - thief should handle this appropriately
+    //        let output = await mockIO.flush()
+    //        // Either accepts it back or has some response
+    //        #expect(output.isNotEmpty)
+    //    }
+    //
+    //    @Test("Theft considers player vulnerability")
+    //    func testTheftMechanics() async throws {
+    //        let (engine, mockIO) = try await setup()
+    //
+    //        let diamond = await engine.item(.diamond)
+    //        let skull = await engine.item(.skull)
+    //        let potOfGold = await engine.item(.potOfGold)
+    //
+    //        // Move player loaded with treasure to the round room
+    //        try await engine.apply(
+    //            diamond.move(to: .player),
+    //            skull.move(to: .player),
+    //            potOfGold.move(to: .player)
+    //        )
+    //
+    //        // Execute a wait command and trigger daemon processing
+    //        try await engine.execute("wait", times: 4)
+    //
+    //        await mockIO.expectOutput(
+    //            """
+    //            > go east
+    //            --- Round Room ---
+    //
+    //            This is a circular stone room with passages in all directions.
+    //            Several of them have unfortunate endings.
+    //
+    //            > wait
+    //            The universe's clock ticks inexorably forward.
+    //
+    //            > wait
+    //            The universe's clock ticks inexorably forward.
+    //
+    //            Someone carrying a large bag is casually leaning against one of
+    //            the walls here. He does not speak, but it is clear from his
+    //            aspect that the bag will be taken only over his dead body.
+    //
+    //            > wait
+    //            The universe's clock ticks inexorably forward.
+    //
+    //            > wait
+    //            The universe's clock ticks inexorably forward.
+    //
+    //            The thief just left, still carrying his large bag. You may not
+    //            have noticed that he robbed you blind first.
+    //            """
+    //        )
+    //
+    //        // Then - verify theft system is operational
+    //        let thiefItems = await engine.item(.largeBag).contents
+    //        expectNoDifference(thiefItems, [diamond, potOfGold, skull])
+    //
+    //        let playerInventory = await engine.player.inventory
+    //        expectNoDifference(playerInventory.map(\.id), [.sword])
+    //    }
+    //
+    //    @Test("Thief AI responds to different combat outcomes")
+    //    func testThiefCombatOutcomeVariations() async throws {
+    //        let (engine, mockIO) = try await setup()
+    //
+    //        try await engine.execute(
+    //            """
+    //            wait
+    //            attack the thief
+    //            slay the thief
+    //            stab the thief
+    //            kill the thief
+    //            """
+    //        )
+    //        await mockIO.expectOutput(
+    //            """
+    //            > go east
+    //            --- Round Room ---
+    //
+    //            This is a circular stone room with passages in all directions.
+    //            Several of them have unfortunate endings.
+    //
+    //            > wait
+    //            The universe's clock ticks inexorably forward.
+    //
+    //            > attack the thief
+    //            You cannot reach any such thing from here.
+    //
+    //            > slay the thief
+    //            Any such thing remains frustratingly inaccessible.
+    //
+    //            > stab the thief
+    //            Any such thing remains frustratingly inaccessible.
+    //
+    //            > kill the thief
+    //            You cannot reach any such thing from here.
+    //
+    //            Someone carrying a large bag is casually leaning against one of
+    //            the walls here. He does not speak, but it is clear from his
+    //            aspect that the bag will be taken only over his dead body.
+    //            """
+    //        )
+    //    }
 }

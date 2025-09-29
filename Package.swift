@@ -105,7 +105,6 @@ let package = Package(
             dependencies: [
                 "CloakOfDarkness",
                 "GnustoTestSupport",
-                .product(name: "CustomDump", package: "swift-custom-dump"),
             ],
         ),
         .testTarget(
@@ -113,7 +112,7 @@ let package = Package(
             dependencies: [
                 "GnustoEngine",
                 "GnustoTestSupport",
-                .product(name: "CustomDump", package: "swift-custom-dump"),
+//                .product(name: "CustomDump", package: "swift-custom-dump"),
             ],
         ),
         .testTarget(
@@ -121,7 +120,7 @@ let package = Package(
             dependencies: [
                 "GnustoEngine",
                 "GnustoAutoWiringTool",
-                .product(name: "CustomDump", package: "swift-custom-dump"),
+//                .product(name: "CustomDump", package: "swift-custom-dump"),
             ]
         ),
         .testTarget(
@@ -129,7 +128,6 @@ let package = Package(
             dependencies: [
                 "Zork1",
                 "GnustoTestSupport",
-                .product(name: "CustomDump", package: "swift-custom-dump"),
             ],
         ),
     ]

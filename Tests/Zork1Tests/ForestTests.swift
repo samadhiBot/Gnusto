@@ -1,4 +1,3 @@
-import CustomDump
 import GnustoEngine
 import GnustoTestSupport
 import Testing
@@ -6,9 +5,20 @@ import Testing
 @testable import Zork1
 
 struct ForestTests {
+    let engine: GameEngine
+    let mockIO: MockIOHandler
+
+    init() async {
+        (engine, mockIO) = await GameEngine.test(
+            blueprint: Zork1(
+                rng: SeededRandomNumberGenerator()
+            )
+        )
+    }
+
     @Test("Forest exploration and grating discovery")
     func testForestExploration() async throws {
-        let (engine, mockIO) = await GameEngine.zork1(
+        try await engine.execute(
             """
             north
             north
@@ -21,23 +31,9 @@ struct ForestTests {
             examine grating
             """
         )
-        await engine.run()
 
         await mockIO.expectOutput(
             """
-            Zork I: The Great Underground Empire
-
-            ZORK I: The Great Underground Empire Copyright (c) 1981, 1982,
-            1983 Infocom, Inc. All rights reserved. ZORK is a registered
-            trademark of Infocom, Inc. Revision 88 / Serial number 840726
-
-            --- West of House ---
-
-            You are standing in an open field west of a white house, with a
-            boarded front door.
-
-            There is a small mailbox here.
-
             > north
             --- North of House ---
 
@@ -68,7 +64,7 @@ struct ForestTests {
             The forest is all around you, with trees in every direction.
 
             > examine grating
-            You cannot reach any such thing from here.
+            Any such thing lurks beyond your reach.
 
             > move leaves
             In disturbing the pile of leaves, a grating is revealed.
@@ -84,11 +80,8 @@ struct ForestTests {
             On the ground is a pile of leaves.
 
             > examine grating
-            Your scrutiny of the grating yields no hidden depths or secret
-            purposes.
-
-            >
-            May your adventures elsewhere prove fruitful!
+            The grating stubbornly remains ordinary despite your thorough
+            examination.
             """
         )
     }

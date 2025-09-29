@@ -1,4 +1,3 @@
-import CustomDump
 import GnustoEngine
 import GnustoTestSupport
 import Testing
@@ -6,18 +5,24 @@ import Testing
 @testable import Zork1
 
 struct FormattingTests {
+    let engine: GameEngine
+    let mockIO: MockIOHandler
+
+    init() async {
+        (engine, mockIO) = await GameEngine.test(
+            blueprint: Zork1(
+                rng: SeededRandomNumberGenerator()
+            )
+        )
+    }
+
     @Test("Game introduction formatting has correct linebreaks")
     func testIntroductionFormatting() async throws {
-        let (engine, mockIO) = await GameEngine.zork1()
-
         // Just start the game without any commands
         await engine.run()
 
-        let transcript = await mockIO.flush()
-
         // Check that there's no double line break between introduction and location
-        expectNoDifference(
-            transcript,
+        await mockIO.expectOutput(
             """
             Zork I: The Great Underground Empire
 
@@ -40,7 +45,7 @@ struct FormattingTests {
 
     @Test("Visited location shows brief output")
     func testVisitedLocationBriefOutput() async throws {
-        let (engine, mockIO) = await GameEngine.zork1(
+        try await engine.execute(
             """
             north
             southwest
@@ -48,27 +53,9 @@ struct FormattingTests {
             """
         )
 
-        await engine.run()
-
-        let transcript = await mockIO.flush()
-
         // Check that visited locations show brief output (just name)
-        expectNoDifference(
-            transcript,
+        await mockIO.expectOutput(
             """
-            Zork I: The Great Underground Empire
-
-            ZORK I: The Great Underground Empire Copyright (c) 1981, 1982,
-            1983 Infocom, Inc. All rights reserved. ZORK is a registered
-            trademark of Infocom, Inc. Revision 88 / Serial number 840726
-
-            --- West of House ---
-
-            You are standing in an open field west of a white house, with a
-            boarded front door.
-
-            There is a small mailbox here.
-
             > north
             --- North of House ---
 
@@ -79,11 +66,13 @@ struct FormattingTests {
             > southwest
             --- West of House ---
 
+            You are standing in an open field west of a white house, with a
+            boarded front door.
+
+            There is a small mailbox here.
+
             > north
             --- North of House ---
-
-            >
-            May your adventures elsewhere prove fruitful!
             """
         )
     }
