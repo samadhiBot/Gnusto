@@ -36,9 +36,7 @@ struct TurnOffActionHandlerTests {
         try await engine.execute("turn off lamp")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > turn off lamp
             The brass lamp is now off.
@@ -78,9 +76,7 @@ struct TurnOffActionHandlerTests {
         try await engine.execute("switch off flashlight")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > switch off flashlight
             The small flashlight is now off.
@@ -104,9 +100,7 @@ struct TurnOffActionHandlerTests {
         try await engine.execute("turn off")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > turn off
             Turn off what?
@@ -124,9 +118,7 @@ struct TurnOffActionHandlerTests {
         try await engine.execute("turn off lamp")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > turn off lamp
             Any such thing lurks beyond your reach.
@@ -163,9 +155,7 @@ struct TurnOffActionHandlerTests {
         try await engine.execute("turn off lamp")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > turn off lamp
             Any such thing lurks beyond your reach.
@@ -194,9 +184,7 @@ struct TurnOffActionHandlerTests {
         try await engine.execute("turn off book")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > turn off book
             It lacks the necessary mechanism for deactivation.
@@ -226,9 +214,7 @@ struct TurnOffActionHandlerTests {
         try await engine.execute("turn off radio")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > turn off radio
             It's already off.
@@ -265,9 +251,7 @@ struct TurnOffActionHandlerTests {
         try await engine.execute("turn off computer")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > turn off computer
             The laptop computer is now off.
@@ -315,9 +299,7 @@ struct TurnOffActionHandlerTests {
         try await engine.execute("turn off lantern")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > turn off lantern
             The electric lantern is now off.
@@ -377,9 +359,7 @@ struct TurnOffActionHandlerTests {
         try await engine.execute("turn off lantern")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > turn off lantern
             The electric lantern is now off.
@@ -419,9 +399,7 @@ struct TurnOffActionHandlerTests {
         try await engine.execute("turn off lamp")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > turn off lamp
             The desk lamp is now off.
@@ -460,9 +438,7 @@ struct TurnOffActionHandlerTests {
         try await engine.execute("turn off fan")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > turn off fan
             The electric fan is now off.
@@ -569,9 +545,7 @@ struct TurnOffActionHandlerTests {
             try await engine.execute("\(verb) off device")
 
             // Then
-            let output = await mockIO.flush()
-            expectNoDifference(
-                output,
+            await mockIO.expectOutput(
                 """
                 > \(verb) off device
                 The test device is now off.

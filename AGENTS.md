@@ -128,9 +128,7 @@ func testSomething() async throws {
     try await engine.execute("take test item")
 
     // Then: Verify results
-    let output = await mockIO.flush()
-    expectNoDifference(
-        output,
+    await mockIO.expectOutput(
         """
         > take test item
         Taken.

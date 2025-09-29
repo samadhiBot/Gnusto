@@ -29,9 +29,7 @@ struct ShakeActionHandlerTests {
         try await engine.execute("shake bottle")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > shake bottle
             Your agitation of the empty bottle produces no observable
@@ -55,9 +53,7 @@ struct ShakeActionHandlerTests {
         try await engine.execute("shake")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > shake
             You give yourself a thorough rattling. It's oddly satisfying.
@@ -92,9 +88,7 @@ struct ShakeActionHandlerTests {
         try await engine.execute("shake item")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > shake item
             You cannot reach any such thing from here.
@@ -130,9 +124,7 @@ struct ShakeActionHandlerTests {
         try await engine.execute("shake jar")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > shake jar
             The darkness here is absolute, consuming all light and hope of
@@ -164,9 +156,7 @@ struct ShakeActionHandlerTests {
         try await engine.execute("shake the wizard")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > shake the wizard
             Your urge to shake the old wizard must remain forever
@@ -188,9 +178,7 @@ struct ShakeActionHandlerTests {
         try await engine.execute("shake the troll")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > shake the troll
             Your urge to shake the fierce troll must remain forever
@@ -209,9 +197,7 @@ struct ShakeActionHandlerTests {
         try await engine.execute("shake myself")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > shake myself
             You shake yourself like a wet dog, dignity be damned.
@@ -280,9 +266,7 @@ struct ShakeActionHandlerTests {
         )
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > shake small box
             Your agitation of the small box produces no observable effect.

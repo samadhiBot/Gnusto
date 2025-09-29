@@ -48,9 +48,7 @@ struct AllCommandTests {
         #expect(await finalLampState.playerIsHolding)
 
         // Assert: Appropriate message
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > take all
             You take the gold coin, the brass lamp, and the brass key.
@@ -75,9 +73,7 @@ struct AllCommandTests {
         try await engine.execute("take all")
 
         // Assert: Appropriate message
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > take all
             Take what?
@@ -126,9 +122,7 @@ struct AllCommandTests {
         #expect(await finalWallState.parent == .location(engine.location(.startRoom)))  // Wall stays
 
         // Assert: Appropriate message
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > take all
             You take the gold coin and the brass key.
@@ -178,9 +172,7 @@ struct AllCommandTests {
         #expect(await finalBoulderState.parent == .location(engine.location(.startRoom)))
 
         // Assert: Appropriate message
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > take all
             You take the gold coin and the brass key.
@@ -229,9 +221,7 @@ struct AllCommandTests {
         #expect(await finalLampState.parent == .location(engine.location(.startRoom)))
 
         // Assert: Appropriate message
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > drop all
             You drop the gold coin, the brass lamp, and the brass key.
@@ -259,9 +249,7 @@ struct AllCommandTests {
         try await engine.execute("drop all")
 
         // Assert: Appropriate message
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > drop all
             Your hands are as empty as your pockets.
@@ -288,9 +276,7 @@ struct AllCommandTests {
         try await engine.execute("take all")
 
         // Assert: Singular message format
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > take all
             You take the brass key.
@@ -320,9 +306,7 @@ struct AllCommandTests {
         try await engine.execute("drop all")
 
         // Assert: Singular message format
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > drop all
             You drop the brass key.
@@ -367,9 +351,7 @@ struct AllCommandTests {
         #expect(await finalRoomKeyState.playerIsHolding)  // Now taken
 
         // Assert: Message only mentions newly taken item
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > take all
             You take the brass key.

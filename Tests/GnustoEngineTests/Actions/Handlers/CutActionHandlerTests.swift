@@ -37,9 +37,7 @@ struct CutActionHandlerTests {
         try await engine.execute("cut rope")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > cut rope
             The thick rope resists division with stubborn integrity.
@@ -79,9 +77,7 @@ struct CutActionHandlerTests {
         try await engine.execute("cut paper with scissors")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > cut paper with scissors
             The piece of paper resists division with stubborn integrity.
@@ -118,9 +114,7 @@ struct CutActionHandlerTests {
         try await engine.execute("slice bread")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > slice bread
             The loaf of bread resists division with stubborn integrity.
@@ -157,9 +151,7 @@ struct CutActionHandlerTests {
         try await engine.execute("chop wood")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > chop wood
             The piece of wood resists division with stubborn integrity.
@@ -179,9 +171,7 @@ struct CutActionHandlerTests {
         try await engine.execute("cut")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > cut
             Cut what?
@@ -216,9 +206,7 @@ struct CutActionHandlerTests {
         try await engine.execute("cut rope")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > cut rope
             Any such thing lurks beyond your reach.
@@ -254,9 +242,7 @@ struct CutActionHandlerTests {
         try await engine.execute("cut rope")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > cut rope
             The darkness here is absolute, consuming all light and hope of
@@ -296,9 +282,7 @@ struct CutActionHandlerTests {
         try await engine.execute("cut the fabric with the sword")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > cut the fabric with the sword
             The piece of fabric resists division with stubborn integrity.
@@ -337,9 +321,7 @@ struct CutActionHandlerTests {
         try await engine.execute("cut myself")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > cut myself
             Self-harm is not the solution to your problems.

@@ -37,9 +37,7 @@ struct GiveActionHandlerTests {
         try await engine.execute("give coin to merchant")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > give coin to merchant
             You give the gold coin to the traveling merchant.
@@ -80,9 +78,7 @@ struct GiveActionHandlerTests {
         try await engine.execute("give wizard the scroll")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > give wizard the scroll
             You give the ancient scroll to the old wizard.
@@ -122,9 +118,7 @@ struct GiveActionHandlerTests {
         try await engine.execute("offer flower to princess")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > offer flower to princess
             You give the red flower to the kind princess.
@@ -161,9 +155,7 @@ struct GiveActionHandlerTests {
         try await engine.execute("donate bread to beggar")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > donate bread to beggar
             You give the loaf of bread to the hungry beggar.
@@ -194,9 +186,7 @@ struct GiveActionHandlerTests {
         try await engine.execute("give")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > give
             Give what to whom?
@@ -225,9 +215,7 @@ struct GiveActionHandlerTests {
         try await engine.execute("give key")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > give key
             Give what to whom?
@@ -264,9 +252,7 @@ struct GiveActionHandlerTests {
         try await engine.execute("give gem to collector")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > give gem to collector
             You search in vain for the precious gem among your belongings.
@@ -302,9 +288,7 @@ struct GiveActionHandlerTests {
         try await engine.execute("give apple to rock")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > give apple to rock
             You'll need someone animate to give to.
@@ -348,9 +332,7 @@ struct GiveActionHandlerTests {
         try await engine.execute("give ring to person")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > give ring to person
             You cannot reach any such thing from here.
@@ -396,9 +378,7 @@ struct GiveActionHandlerTests {
         try await engine.execute("give coin to stranger")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > give coin to stranger
             The darkness here is absolute, consuming all light and hope of
@@ -443,9 +423,7 @@ struct GiveActionHandlerTests {
         #expect(await finalBookState.hasFlag(.isTouched))
 
         // Verify message
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > give book to librarian
             You give the leather book to the old librarian.
@@ -492,9 +470,7 @@ struct GiveActionHandlerTests {
         try await engine.execute("give silver coin and copper coin to merchant")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > give silver coin and copper coin to merchant
             You give the silver coin and the copper coin to the coin
@@ -546,9 +522,7 @@ struct GiveActionHandlerTests {
         try await engine.execute("give all to knight")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > give all to knight
             You give the wooden shield and the steel sword to the noble
@@ -584,9 +558,7 @@ struct GiveActionHandlerTests {
         try await engine.execute("give all to sage")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > give all to sage
             You carry nothing but your own thoughts.
@@ -628,9 +600,7 @@ struct GiveActionHandlerTests {
         #expect(await finalCrystalState.parent == .item(mage.proxy(engine)))
 
         // Verify message
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > give crystal to mage
             You give the magic crystal to the ancient mage.
@@ -683,9 +653,7 @@ struct GiveActionHandlerTests {
         try await engine.execute("give food to chef")
 
         // Then
-        let output1 = await mockIO.flush()
-        expectNoDifference(
-            output1,
+        await mockIO.expectOutput(
             """
             > give food to chef
             You give the fresh food to the busy chef.
@@ -696,9 +664,7 @@ struct GiveActionHandlerTests {
         try await engine.execute("give money to banker")
 
         // Then
-        let output2 = await mockIO.flush()
-        expectNoDifference(
-            output2,
+        await mockIO.expectOutput(
             """
             > give money to banker
             You give the bag of money to the bank clerk.

@@ -30,9 +30,7 @@ struct InflateActionHandlerTests {
         try await engine.execute("inflate balloon")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > inflate balloon
             You inflate the red balloon.
@@ -74,9 +72,7 @@ struct InflateActionHandlerTests {
         try await engine.execute("inflate raft with pump")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > inflate raft with pump
             You inflate the rubber raft.
@@ -106,9 +102,7 @@ struct InflateActionHandlerTests {
         try await engine.execute("blow up mattress")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > blow up mattress
             You inflate the air mattress.
@@ -146,9 +140,7 @@ struct InflateActionHandlerTests {
         try await engine.execute("blow up tire with compressor")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > blow up tire with compressor
             You inflate the bicycle tire.
@@ -168,9 +160,7 @@ struct InflateActionHandlerTests {
         try await engine.execute("inflate")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > inflate
             Inflate what?
@@ -206,9 +196,7 @@ struct InflateActionHandlerTests {
         try await engine.execute("inflate balloon")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > inflate balloon
             Any such thing lurks beyond your reach.
@@ -236,9 +224,7 @@ struct InflateActionHandlerTests {
         try await engine.execute("inflate rock")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > inflate rock
             The large rock stubbornly resists your attempts to inflate it.
@@ -276,9 +262,7 @@ struct InflateActionHandlerTests {
         try await engine.execute("inflate balloon")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > inflate balloon
             The darkness here is absolute, consuming all light and hope of
@@ -317,9 +301,7 @@ struct InflateActionHandlerTests {
         #expect(await finalState.hasFlag(.isInflatable))  // Still inflatable
 
         // Verify message
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > inflate vest
             You inflate the life vest.
@@ -350,9 +332,7 @@ struct InflateActionHandlerTests {
         try await engine.execute("inflate balloon")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > inflate balloon
             The blue balloon is already inflated.
@@ -387,9 +367,7 @@ struct InflateActionHandlerTests {
         try await engine.execute("inflate balloon")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > inflate balloon
             You inflate the green balloon.
@@ -430,9 +408,7 @@ struct InflateActionHandlerTests {
         try await engine.execute("inflate balloon")
 
         // Then
-        let output1 = await mockIO.flush()
-        expectNoDifference(
-            output1,
+        await mockIO.expectOutput(
             """
             > inflate balloon
             You inflate the yellow balloon.
@@ -443,9 +419,7 @@ struct InflateActionHandlerTests {
         try await engine.execute("blow up raft")
 
         // Then
-        let output2 = await mockIO.flush()
-        expectNoDifference(
-            output2,
+        await mockIO.expectOutput(
             """
             > blow up raft
             You inflate the life raft.
@@ -486,9 +460,7 @@ struct InflateActionHandlerTests {
         #expect(await finalState.hasFlag(.isInflated))
 
         // Verify message
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > inflate tube
             You inflate the inner tube.
@@ -533,9 +505,7 @@ struct InflateActionHandlerTests {
         try await engine.execute("inflate red balloon")
 
         // Then
-        let output1 = await mockIO.flush()
-        expectNoDifference(
-            output1,
+        await mockIO.expectOutput(
             """
             > inflate red balloon
             You inflate the red balloon.
@@ -546,9 +516,7 @@ struct InflateActionHandlerTests {
         try await engine.execute("blow up blue balloon with pump")
 
         // Then
-        let output2 = await mockIO.flush()
-        expectNoDifference(
-            output2,
+        await mockIO.expectOutput(
             """
             > blow up blue balloon with pump
             You inflate the blue balloon.
@@ -584,9 +552,7 @@ struct InflateActionHandlerTests {
         try await engine.execute("inflate cushion")
 
         // Then
-        let output1 = await mockIO.flush()
-        expectNoDifference(
-            output1,
+        await mockIO.expectOutput(
             """
             > inflate cushion
             You inflate the air cushion.
@@ -597,9 +563,7 @@ struct InflateActionHandlerTests {
         try await engine.execute("inflate cushion")
 
         // Then
-        let output2 = await mockIO.flush()
-        expectNoDifference(
-            output2,
+        await mockIO.expectOutput(
             """
             > inflate cushion
             The air cushion is already inflated.

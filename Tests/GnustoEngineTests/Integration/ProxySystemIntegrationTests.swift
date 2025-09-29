@@ -35,9 +35,7 @@ struct ProxySystemIntegrationTests {
         )
 
         // Then: All operations should work correctly
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > take lamp
             Taken.
@@ -172,9 +170,7 @@ struct ProxySystemIntegrationTests {
         #expect(playerItems.count == 1)
         #expect(playerItems.first?.id == ItemID("coin"))
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > take coin
             Taken.
@@ -280,9 +276,7 @@ struct ProxySystemIntegrationTests {
         let playerLocation = await playerProxy.location
         #expect(playerLocation.id == LocationID("darkVault"))
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > examine mysterious box
             A strange box with glowing runes. The mysterious box is closed.
@@ -350,9 +344,7 @@ struct ProxySystemIntegrationTests {
         let playerItems = await playerProxy.inventory
         #expect(playerItems.count == 5)
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > take all
             You take the test item 1, the test item 2, the test item 3, the
@@ -433,9 +425,7 @@ struct ProxySystemIntegrationTests {
         }
         #expect(totalSize == 3)
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > open mechanical device
             As the mechanical device opens, it reveals a bronze gear and a
@@ -516,9 +506,7 @@ struct ProxySystemIntegrationTests {
             #expect(loc.id == LocationID("magicShop"))
         }
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > take magic wand
             Taken.

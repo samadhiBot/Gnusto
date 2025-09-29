@@ -15,11 +15,12 @@ struct DaemonStateIntegrationTest {
 
         let statefulDaemon = Daemon(frequency: 2) { _, state in
             // Get current payload or create initial state
-            var payload = state.getPayload(as: CounterPayload.self)
-                          ?? CounterPayload(
-                              counter: 0,
-                              message: "Starting"
-                          )
+            var payload =
+                state.getPayload(as: CounterPayload.self)
+                ?? CounterPayload(
+                    counter: 0,
+                    message: "Starting"
+                )
 
             // Update the counter and message
             payload.counter += 1
@@ -51,9 +52,7 @@ struct DaemonStateIntegrationTest {
         try await engine.execute("wait")  // turn 2 - daemon should run
 
         // Then: Daemon should have executed once
-        let output1 = await mockIO.flush()
-        expectNoDifference(
-            output1,
+        await mockIO.expectOutput(
             """
             > wait
             Time flows onward, indifferent to your concerns.
@@ -79,9 +78,7 @@ struct DaemonStateIntegrationTest {
         try await engine.execute("wait")  // turn 4 - daemon should run again
 
         // Then: Daemon should have executed twice with updated state
-        let output2 = await mockIO.flush()
-        expectNoDifference(
-            output2,
+        await mockIO.expectOutput(
             """
             > wait
             Moments slip away like sand through fingers.
@@ -126,9 +123,7 @@ struct DaemonStateIntegrationTest {
         try await engine.execute("wait")  // turn 1 - daemon should run
 
         // Then: Execution tracking should still work even without payload changes
-        let output1 = await mockIO.flush()
-        expectNoDifference(
-            output1,
+        await mockIO.expectOutput(
             """
             > wait
             Time flows onward, indifferent to your concerns.
@@ -147,9 +142,7 @@ struct DaemonStateIntegrationTest {
         try await engine.execute("wait")  // turn 2 - daemon should run again
 
         // Then: Execution tracking should increment
-        let output2 = await mockIO.flush()
-        expectNoDifference(
-            output2,
+        await mockIO.expectOutput(
             """
             > wait
             The universe's clock ticks inexorably forward.
@@ -173,11 +166,12 @@ struct DaemonStateIntegrationTest {
         }
 
         let daemon1 = Daemon(frequency: 1) { _, state in
-            var payload = state.getPayload(as: DaemonPayload.self) ??
-                          DaemonPayload(
-                              name: "Alpha",
-                              count: 0
-                          )
+            var payload =
+                state.getPayload(as: DaemonPayload.self)
+                ?? DaemonPayload(
+                    name: "Alpha",
+                    count: 0
+                )
             payload.count += 10
             let newState = try state.updatingPayload(payload)
             return ActionResult(
@@ -190,11 +184,12 @@ struct DaemonStateIntegrationTest {
         }
 
         let daemon2 = Daemon(frequency: 1) { _, state in
-            var payload = state.getPayload(as: DaemonPayload.self) ??
-                          DaemonPayload(
-                              name: "Beta",
-                              count: 0
-                          )
+            var payload =
+                state.getPayload(as: DaemonPayload.self)
+                ?? DaemonPayload(
+                    name: "Beta",
+                    count: 0
+                )
             payload.count += 5
             let newState = try state.updatingPayload(payload)
             return ActionResult(

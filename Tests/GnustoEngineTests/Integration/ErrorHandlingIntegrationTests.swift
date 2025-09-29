@@ -25,9 +25,7 @@ struct ErrorHandlingIntegrationTests {
         )
 
         // Then: Should handle gracefully with appropriate messages
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             I beg your pardon?
 
@@ -72,9 +70,7 @@ struct ErrorHandlingIntegrationTests {
         try await engine.execute("take book")
 
         // Then: Should request clarification
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > take book
             Which do you mean, the blue book or the red book?
@@ -120,9 +116,7 @@ struct ErrorHandlingIntegrationTests {
         )
 
         // Then: Should provide appropriate error messages
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > look in wooden box
             The wooden box is closed.
@@ -170,9 +164,7 @@ struct ErrorHandlingIntegrationTests {
         try await engine.execute("put large book in small bag")
 
         // Then: Should reject with capacity message
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > put large book in small bag
             The large book won't fit in the small bag.
@@ -215,9 +207,7 @@ struct ErrorHandlingIntegrationTests {
         try await engine.execute("take all")
 
         // Then: Should eventually hit capacity limits
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > take all
             You take the 1st heavy item, the 10th heavy item, the 11th
@@ -252,8 +242,16 @@ struct ErrorHandlingIntegrationTests {
         try await engine.execute("go to nowhere")
 
         // Then: Should provide appropriate error messages
-        let output = await mockIO.flush()
-        #expect(output.contains("can't go") || output.contains("no exit") || output.contains("way"))
+        await mockIO.expectOutput("""
+            > go north
+            That way lies only disappointment.
+
+            > go east
+            Your path does not extend in that direction.
+
+            > go to nowhere
+            Which direction?
+            """)
     }
 
     // MARK: - Light Source Error Tests
@@ -290,9 +288,7 @@ struct ErrorHandlingIntegrationTests {
         try await engine.execute("examine hidden treasure")
 
         // Then: Should indicate darkness prevents actions
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > look
             The darkness here is absolute, consuming all light and hope of
@@ -336,9 +332,7 @@ struct ErrorHandlingIntegrationTests {
         )
 
         // Then: Should indicate device doesn't respond
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > turn on broken machine
             It remains stubbornly inert despite your ministrations.
@@ -361,9 +355,7 @@ struct ErrorHandlingIntegrationTests {
         try await engine.execute("take the bewilderingly and unbelievably long named item")
 
         // Then: Should handle without crashing
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > take the bewilderingly and unbelievably long named item
             Take what?
@@ -397,9 +389,7 @@ struct ErrorHandlingIntegrationTests {
         )
 
         // Then: Valid commands should still work after errors
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > invalid command
             The art of invalid-ing remains a mystery to me.
@@ -500,9 +490,7 @@ struct ErrorHandlingIntegrationTests {
         )
 
         // Then: Should handle boundary values appropriately
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > take ethereal item
             Taken.
@@ -511,9 +499,6 @@ struct ErrorHandlingIntegrationTests {
             Your hands are full and your pockets protest.
             """
         )
-
-        // Zero-size item should be takeable
-        #expect(output.contains("ethereal item") && output.contains("Taken"))
 
         // Huge item might be rejected for size
         let etherealItem = await engine.item("zeroSize")
@@ -549,9 +534,7 @@ struct ErrorHandlingIntegrationTests {
         )
 
         // Then: All commands should execute in order correctly
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > take test item
             Taken.

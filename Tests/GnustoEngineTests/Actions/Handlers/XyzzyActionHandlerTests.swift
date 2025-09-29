@@ -18,9 +18,7 @@ struct XyzzyActionHandlerTests {
         try await engine.execute("xyzzy")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > xyzzy
             A hollow voice says 'Fool.'
@@ -51,9 +49,7 @@ struct XyzzyActionHandlerTests {
         try await engine.execute("xyzzy")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > xyzzy
             A hollow voice says 'Fool.'
@@ -98,9 +94,7 @@ struct XyzzyActionHandlerTests {
         #expect(finalScore == initialScore)
         #expect(finalTurnCount == initialTurnCount + 1)
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > xyzzy
             A hollow voice says 'Fool.'

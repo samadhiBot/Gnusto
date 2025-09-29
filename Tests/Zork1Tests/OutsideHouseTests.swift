@@ -21,9 +21,7 @@ struct OutsideHouseTests {
         )
         await engine.run()
 
-        let transcript = await mockIO.flush()
-        expectNoDifference(
-            transcript,
+        await mockIO.expectOutput(
             """
             Zork I: The Great Underground Empire
 
@@ -86,9 +84,7 @@ struct OutsideHouseTests {
         )
         await engine.run()
 
-        let transcript = await mockIO.flush()
-        expectNoDifference(
-            transcript,
+        await mockIO.expectOutput(
             """
             > examine table
             A bottle is sitting on the table. The glass bottle contains a
@@ -118,7 +114,7 @@ struct OutsideHouseTests {
 
     @Test("Interacting with the boards on the house")
     func testBoards() async throws {
-            let (engine, mockIO) = await GameEngine.zork1(
+        let (engine, mockIO) = await GameEngine.zork1(
             """
             take the boards
             north
@@ -133,9 +129,7 @@ struct OutsideHouseTests {
         )
         await engine.run()
 
-        let transcript = await mockIO.flush()
-        expectNoDifference(
-            transcript,
+        await mockIO.expectOutput(
             """
             Zork I: The Great Underground Empire
 
@@ -216,9 +210,7 @@ struct OutsideHouseTests {
         )
         await engine.run()
 
-        let transcript = await mockIO.flush()
-        expectNoDifference(
-            transcript,
+        await mockIO.expectOutput(
             """
             > west
             --- Living Room ---
@@ -280,7 +272,7 @@ struct OutsideHouseTests {
 
     @Test("Container interactions (brown sack and bottle)")
     func testContainerInteractions() async throws {
-            let (engine, mockIO) = await GameEngine.zork1(
+        let (engine, mockIO) = await GameEngine.zork1(
             pre: .enterKitchen,
             """
             examine table
@@ -302,9 +294,7 @@ struct OutsideHouseTests {
         )
         await engine.run()
 
-        let transcript = await mockIO.flush()
-        expectNoDifference(
-            transcript,
+        await mockIO.expectOutput(
             """
             > examine table
             A bottle is sitting on the table. The glass bottle contains a

@@ -28,9 +28,7 @@ struct BlowActionHandlerTests {
         try await engine.execute("blow feather")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > blow feather
             Your breath plays across the fluffy feather to no discernible
@@ -71,9 +69,7 @@ struct BlowActionHandlerTests {
         try await engine.execute("blow feather")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > blow feather
             Any such thing lurks beyond your reach.
@@ -109,9 +105,7 @@ struct BlowActionHandlerTests {
         try await engine.execute("blow feather")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > blow feather
             The darkness here is absolute, consuming all light and hope of
@@ -132,9 +126,7 @@ struct BlowActionHandlerTests {
         try await engine.execute("blow")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > blow
             You exhale dramatically into the void.

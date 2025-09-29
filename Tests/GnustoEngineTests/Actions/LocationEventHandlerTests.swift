@@ -137,10 +137,7 @@ struct LocationEventHandlerTests {
             north
             """
         )
-        let output = await mockIO.flush()
-
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > look
             --- Starting Room ---
@@ -226,9 +223,7 @@ struct LocationEventHandlerTests {
 
         try await engine.execute("look")
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > look
             Custom look behavior!
@@ -306,9 +301,7 @@ struct LocationEventHandlerTests {
                 "Entered the test room!"
             ])
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > look
             --- Test Room ---
@@ -340,9 +333,7 @@ struct LocationEventHandlerTests {
         try await engine.execute("look")
 
         // Should still get normal look output despite handler error
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > look
             --- Starting Room ---
@@ -435,9 +426,7 @@ struct LocationEventHandlerTests {
 
         try await engine.execute("look")
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > look
             You are not allowed to look here!
@@ -540,9 +529,7 @@ struct LocationEventHandlerTests {
         let finalCount = await enterCounter.value()
         #expect(finalCount == 1)
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > look
             --- Test Room ---
@@ -601,9 +588,7 @@ struct LocationEventHandlerTests {
         let finalFlag = await engine.hasFlag(.isVerboseMode)
         #expect(finalFlag == true)
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > look
             You sense something mystical about this place...
@@ -639,8 +624,10 @@ struct LocationEventHandlerTests {
                 "Context handler called for location: .startRoom"
             ])
 
-        let output = await mockIO.flush()
-        #expect(output.contains("Custom look message from context handler."))
+        await mockIO.expectOutput("""
+            > look
+            Custom look message from context handler.
+            """)
     }
 
     @Test("LocationEventHandler ActionResult.yield allows normal processing to continue")
@@ -694,9 +681,7 @@ struct LocationEventHandlerTests {
         // Test 1: When room is dark, handler should block actions
         try await engine.execute("look")
 
-        let output1 = await mockIO.flush()
-        expectNoDifference(
-            output1,
+        await mockIO.expectOutput(
             """
             > look
             Too dark to do that!
@@ -706,9 +691,7 @@ struct LocationEventHandlerTests {
         // Test 2: When room is dark, handler should block movement
         try await engine.execute("north")
 
-        let output2 = await mockIO.flush()
-        expectNoDifference(
-            output2,
+        await mockIO.expectOutput(
             """
             > north
             You stumble in the darkness!

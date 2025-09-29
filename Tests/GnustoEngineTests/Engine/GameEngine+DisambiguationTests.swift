@@ -284,9 +284,7 @@ struct GameEngineDisambiguationTests {
         )
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > put book on table
             Which do you mean: the new book or the old book?

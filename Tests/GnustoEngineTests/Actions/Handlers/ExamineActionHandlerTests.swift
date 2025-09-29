@@ -29,9 +29,7 @@ struct ExamineActionHandlerTests {
         try await engine.execute("examine book")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > examine book
             A worn leather-bound book with mysterious symbols.
@@ -63,9 +61,7 @@ struct ExamineActionHandlerTests {
         try await engine.execute("x gem")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > x gem
             A beautiful gem that catches the light.
@@ -97,9 +93,7 @@ struct ExamineActionHandlerTests {
         try await engine.execute("inspect sword")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > inspect sword
             A sharp steel sword with intricate engravings.
@@ -128,9 +122,7 @@ struct ExamineActionHandlerTests {
         try await engine.execute("describe the ruby")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > describe the ruby
             A beautiful ruby that catches the light.
@@ -161,9 +153,7 @@ struct ExamineActionHandlerTests {
         try await engine.execute("look at painting")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > look at painting
             A masterful oil painting of a distant landscape.
@@ -200,9 +190,7 @@ struct ExamineActionHandlerTests {
         try await engine.execute("examine all")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > examine all
             - Red book: A red leather book.
@@ -223,9 +211,7 @@ struct ExamineActionHandlerTests {
         try await engine.execute("examine")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > examine
             Examine what?
@@ -243,9 +229,7 @@ struct ExamineActionHandlerTests {
         try await engine.execute("examine nonexistent")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > examine nonexistent
             Any such thing lurks beyond your reach.
@@ -280,9 +264,7 @@ struct ExamineActionHandlerTests {
         try await engine.execute("examine book")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > examine book
             Any such thing lurks beyond your reach.
@@ -319,9 +301,7 @@ struct ExamineActionHandlerTests {
         try await engine.execute("examine book")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > examine book
             The darkness here is absolute, consuming all light and hope of
@@ -342,9 +322,7 @@ struct ExamineActionHandlerTests {
         try await engine.execute("examine me")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > examine me
             As good-looking as ever, which is to say, adequately
@@ -378,9 +356,7 @@ struct ExamineActionHandlerTests {
         )
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > examine scroll
             An ancient parchment scroll.
@@ -429,9 +405,7 @@ struct ExamineActionHandlerTests {
         try await engine.execute("examine box")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > examine box
             A sturdy wooden box. In the wooden box you can see a gold coin
@@ -470,9 +444,7 @@ struct ExamineActionHandlerTests {
         try await engine.execute("examine chest")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > examine chest
             An ornate treasure chest. The treasure chest is closed.
@@ -517,9 +489,7 @@ struct ExamineActionHandlerTests {
         try await engine.execute("examine table")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > examine table
             A solid oak table. On the oak table you can see a leather book
@@ -550,9 +520,7 @@ struct ExamineActionHandlerTests {
         try await engine.execute("examine bag")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > examine bag
             A worn leather bag. The leather bag is empty.
@@ -581,9 +549,7 @@ struct ExamineActionHandlerTests {
         try await engine.execute("examine desk")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > examine desk
             A simple wooden desk.
@@ -612,9 +578,7 @@ struct ExamineActionHandlerTests {
         try await engine.execute("examine door")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > examine door
             A heavy oak door. The oak door is open.
@@ -646,9 +610,7 @@ struct ExamineActionHandlerTests {
         )
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > examine book
             A worn leather book.
@@ -672,9 +634,7 @@ struct ExamineActionHandlerTests {
         try await engine.execute("examine all")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > examine all
             There is nothing here to examine.
@@ -712,9 +672,7 @@ struct ExamineActionHandlerTests {
         try await engine.execute("look in box")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > look in box
             In the wooden box you can see a ruby gem.
@@ -751,9 +709,7 @@ struct ExamineActionHandlerTests {
         try await engine.execute("look on table")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > look on table
             A wooden table. On the wooden table you can see a red book.

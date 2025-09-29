@@ -243,6 +243,44 @@ struct CustodialSingularity {
 }
 EOF
 
+    create_file "${game_name}Tests/${game_name}Tests.swift" <<EOF
+import GnustoEngine
+
+struct CustodialSingularity {
+    let broomCloset = Location(
+        id: .broomCloset,
+        .name("Broom Closet"),
+        .description("You are in a narrow closet that smells faintly of detergent."),
+        .inherentlyLit
+    )
+
+    let screwdriver = Item(
+        id: .screwdriver,
+        .name("left-handed screwdriver"),
+        .description(
+            """
+            It's a left-handed screwdriver. It looks it could be useful,
+            provided you could find a left-handed screw.
+            """
+        ),
+        .isTakable,
+        .in(.broomCloset)
+    )
+
+    let broomClosetHandler = LocationEventHandler(for: .broomCloset) {
+        beforeTurn(.move) { context, command in
+            ActionResult(
+                context.msg.oneOf(
+                    "You stride purposefully into a shelf.",
+                    "You take a step, then space takes it back.",
+                    "Your movement is canceled on account of reality."
+                )
+            )
+        }
+    }
+}
+EOF
+
     print_success "Game structure created successfully!"
 }
 

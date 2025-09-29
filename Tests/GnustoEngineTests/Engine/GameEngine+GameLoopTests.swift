@@ -20,9 +20,7 @@ struct GameEngineGameLoopTests {
 
         try await engine.processTurn()
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > look
             --- Laboratory ---
@@ -63,9 +61,7 @@ struct GameEngineGameLoopTests {
 
         #expect(await engine.shouldQuit == true)
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             >
             Farewell, brave soul!
@@ -84,9 +80,7 @@ struct GameEngineGameLoopTests {
 
         try await engine.processTurn()
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > xyzzy nonexistent very complex invalid syntax
             The phrase 'nonexistent very complex invalid syntax' eludes my
@@ -195,9 +189,7 @@ struct GameEngineGameLoopTests {
 
         await engine.run()
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             Minimal Game
 
@@ -233,9 +225,7 @@ struct GameEngineGameLoopTests {
 
         await engine.run()
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             Minimal Game
 
@@ -269,9 +259,7 @@ struct GameEngineGameLoopTests {
 
         await engine.run()
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             Minimal Game
 
@@ -304,9 +292,7 @@ struct GameEngineGameLoopTests {
         // Should not throw - errors should be caught and logged
         try await engine.processTurn()
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > examine nonexistent very complex item with multiple words
             The phrase 'with multiple words' eludes my comprehension.
@@ -395,9 +381,7 @@ struct GameEngineGameLoopTests {
 
         await engine.run()
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             Minimal Game
 
@@ -460,9 +444,7 @@ struct GameEngineGameLoopTests {
         let playerLocation = await engine.player.location
         #expect(playerLocation.id == .startRoom)
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > take test item
             Taken.

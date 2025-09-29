@@ -31,9 +31,7 @@ struct ExtinguishActionHandlerTests {
         try await engine.execute("blow out candle")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > blow out candle
             You blow out the small candle.
@@ -68,9 +66,7 @@ struct ExtinguishActionHandlerTests {
         try await engine.execute("extinguish torch")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > extinguish torch
             You extinguish the wooden torch.
@@ -103,9 +99,7 @@ struct ExtinguishActionHandlerTests {
         try await engine.execute("douse fire")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > douse fire
             You douse the small fire.
@@ -129,9 +123,7 @@ struct ExtinguishActionHandlerTests {
         try await engine.execute("extinguish")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > extinguish
             Extinguish what?
@@ -167,9 +159,7 @@ struct ExtinguishActionHandlerTests {
         try await engine.execute("extinguish candle")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > extinguish candle
             Any such thing lurks beyond your reach.
@@ -206,9 +196,7 @@ struct ExtinguishActionHandlerTests {
         try await engine.execute("extinguish candle")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > extinguish candle
             You extinguish the small candle.
@@ -247,9 +235,7 @@ struct ExtinguishActionHandlerTests {
         try await engine.execute("extinguish lamp")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > extinguish lamp
             You extinguish the oil lamp.
@@ -284,9 +270,7 @@ struct ExtinguishActionHandlerTests {
         try await engine.execute("extinguish torch")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > extinguish torch
             The wooden torch refuses to be extinguished.
@@ -323,9 +307,7 @@ struct ExtinguishActionHandlerTests {
         try await engine.execute("extinguish paper")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > extinguish paper
             You extinguish the piece of paper.
@@ -358,9 +340,7 @@ struct ExtinguishActionHandlerTests {
         try await engine.execute("extinguish book")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > extinguish book
             The leather book refuses to be extinguished.
@@ -435,9 +415,7 @@ struct ExtinguishActionHandlerTests {
         try await engine.execute("extinguish candle")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > extinguish candle
             You extinguish the small candle.
@@ -490,9 +468,7 @@ struct ExtinguishActionHandlerTests {
         try await engine.execute("extinguish candle")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > extinguish candle
             You extinguish the small candle.
@@ -532,9 +508,7 @@ struct ExtinguishActionHandlerTests {
         try await engine.execute("extinguish candle")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > extinguish candle
             You extinguish the small candle.
@@ -606,9 +580,7 @@ struct ExtinguishActionHandlerTests {
             try await engine.execute("\(verb) candle")
         }
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > extinguish candle
             You extinguish the small candle.

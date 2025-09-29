@@ -28,9 +28,7 @@ struct RaiseActionHandlerTests {
         try await engine.execute("raise box")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > raise box
             You consider whether to raise the wooden box, then decide
@@ -62,9 +60,7 @@ struct RaiseActionHandlerTests {
         try await engine.execute("lift stone")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > lift stone
             You consider whether to lift the heavy stone, then decide
@@ -93,9 +89,7 @@ struct RaiseActionHandlerTests {
         try await engine.execute("hoist beam")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > hoist beam
             You consider whether to hoist the steel beam, then decide
@@ -116,9 +110,7 @@ struct RaiseActionHandlerTests {
         try await engine.execute("raise")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > raise
             Raise what?
@@ -136,9 +128,7 @@ struct RaiseActionHandlerTests {
         try await engine.execute("raise nonexistent")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > raise nonexistent
             Any such thing lurks beyond your reach.
@@ -173,9 +163,7 @@ struct RaiseActionHandlerTests {
         try await engine.execute("raise box")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > raise box
             Any such thing lurks beyond your reach.
@@ -193,9 +181,7 @@ struct RaiseActionHandlerTests {
         try await engine.execute("raise testRoom")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > raise testRoom
             Any such thing lurks beyond your reach.
@@ -213,9 +199,7 @@ struct RaiseActionHandlerTests {
         try await engine.execute("raise me")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > raise me
             The logistics of raising oneself prove insurmountable.
@@ -252,9 +236,7 @@ struct RaiseActionHandlerTests {
         try await engine.execute("raise box")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > raise box
             The darkness here is absolute, consuming all light and hope of
@@ -292,9 +274,7 @@ struct RaiseActionHandlerTests {
         let finalState = await engine.item("crate")
         #expect(await finalState.hasFlag(.isTouched) == true)
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > raise crate
             You consider whether to raise the wooden crate, then decide
@@ -335,9 +315,7 @@ struct RaiseActionHandlerTests {
         // Then - "examine it" should now refer to the table
         try await engine.execute("examine it")
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > examine book
             An old leather book.
@@ -373,9 +351,7 @@ struct RaiseActionHandlerTests {
         try await engine.execute("raise weight")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > raise weight
             You consider whether to raise the iron weight, then decide
@@ -416,9 +392,7 @@ struct RaiseActionHandlerTests {
         try await engine.execute("raise anvil")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > raise anvil
             You consider whether to raise the iron anvil, then decide
@@ -469,9 +443,7 @@ struct RaiseActionHandlerTests {
             "raise machine"
         )
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > raise chair
             You consider whether to raise the wooden chair, then decide
@@ -514,9 +486,7 @@ struct RaiseActionHandlerTests {
         // When - Raise small item
         try await engine.execute("raise feather")
 
-        let featherOutput = await mockIO.flush()
-        expectNoDifference(
-            featherOutput,
+        await mockIO.expectOutput(
             """
             > raise feather
             You consider whether to raise the small feather, then decide
@@ -527,9 +497,7 @@ struct RaiseActionHandlerTests {
         // When - Raise large item
         try await engine.execute("raise boulder")
 
-        let boulderOutput = await mockIO.flush()
-        expectNoDifference(
-            boulderOutput,
+        await mockIO.expectOutput(
             """
             > raise boulder
             You start to raise the massive boulder but stop yourself at the
@@ -562,9 +530,7 @@ struct RaiseActionHandlerTests {
             "lift barrel",
             "hoist barrel"
         )
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > raise barrel
             You consider whether to raise the oak barrel, then decide

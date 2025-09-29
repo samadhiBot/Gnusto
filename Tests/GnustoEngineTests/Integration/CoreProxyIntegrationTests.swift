@@ -33,9 +33,7 @@ struct CoreProxyIntegrationTests {
         #expect(await itemProxy.hasFlag(ItemPropertyID.isTouched) == true)
         #expect(await itemProxy.name == "test item")
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > take test item
             Taken.
@@ -213,9 +211,18 @@ struct CoreProxyIntegrationTests {
         #expect(inventory.contains { $0.id == ItemID("coin") })
         #expect(inventory.contains { $0.id == ItemID("key") })
 
-        let output = await mockIO.flush()
-        #expect(output.contains("gold coin"))
-        #expect(output.contains("silver key"))
+        await mockIO.expectOutput("""
+            > take coin
+            Taken.
+
+            > take key
+            Got it.
+
+            > inventory
+            You are carrying:
+            - A gold coin
+            - A silver key
+            """)
     }
 
     // MARK: - Proxy Consistency Tests
@@ -304,8 +311,16 @@ struct CoreProxyIntegrationTests {
         let boxContents = await boxProxy.contents
         #expect(boxContents.isEmpty)  // Gem was taken out
 
-        let output = await mockIO.flush()
-        #expect(output.contains("ruby gem"))
+        await mockIO.expectOutput("""
+            > look in box
+            In the wooden box you can see a ruby gem.
+
+            > take gem
+            Taken.
+
+            > take box
+            Got it.
+            """)
     }
 
     // MARK: - State Change Validation Tests
@@ -338,9 +353,7 @@ struct CoreProxyIntegrationTests {
             #expect(parentLocation.id == .startRoom)
         }
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > take heavy rock
             The heavy rock stubbornly resists your attempts to take it.

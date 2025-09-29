@@ -30,9 +30,7 @@ struct ReadActionHandlerTests {
         try await engine.execute("read book")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > read book
             The book contains powerful incantations.
@@ -55,9 +53,7 @@ struct ReadActionHandlerTests {
         try await engine.execute("read")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > read
             Read what?
@@ -93,9 +89,7 @@ struct ReadActionHandlerTests {
         try await engine.execute("read book")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > read book
             Any such thing lurks beyond your reach.
@@ -123,9 +117,7 @@ struct ReadActionHandlerTests {
         try await engine.execute("read rock")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > read rock
             The large rock stubbornly resists your attempts to read it.
@@ -163,9 +155,7 @@ struct ReadActionHandlerTests {
         try await engine.execute("read book")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > read book
             The darkness here is absolute, consuming all light and hope of
@@ -198,9 +188,7 @@ struct ReadActionHandlerTests {
         try await engine.execute("read scroll")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > read scroll
             Here lies the wisdom of the ancients.
@@ -229,9 +217,7 @@ struct ReadActionHandlerTests {
         try await engine.execute("read card")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > read card
             The blank card bears no inscription, message, or literary
@@ -262,9 +248,7 @@ struct ReadActionHandlerTests {
         try await engine.execute("read note")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > read note
             The empty note bears no inscription, message, or literary
@@ -296,9 +280,7 @@ struct ReadActionHandlerTests {
         try await engine.execute("read letter")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > read letter
             Dear friend, I hope this letter finds you well.
@@ -329,9 +311,7 @@ struct ReadActionHandlerTests {
         try await engine.execute("read leaflet")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > read leaflet
             (Taken)
@@ -366,9 +346,7 @@ struct ReadActionHandlerTests {
         try await engine.execute("read sign")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > read sign
             Welcome to the enchanted forest.
@@ -439,9 +417,7 @@ struct ReadActionHandlerTests {
         try await engine.execute("read recipe")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > read recipe
             (Taken)
@@ -483,9 +459,7 @@ struct ReadActionHandlerTests {
         try await engine.execute("read note")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > read journal
             Day 1: Started the journey today.

@@ -30,9 +30,7 @@ struct EatActionHandlerTests {
         try await engine.execute("eat apple")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > eat apple
             Your appetite for the red apple must wait for better
@@ -66,9 +64,7 @@ struct EatActionHandlerTests {
         try await engine.execute("consume bread")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > consume bread
             Your appetite for the piece of bread must wait for better
@@ -99,9 +95,7 @@ struct EatActionHandlerTests {
         try await engine.execute("devour cake")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > devour cake
             Your appetite for the chocolate cake must wait for better
@@ -122,9 +116,7 @@ struct EatActionHandlerTests {
         try await engine.execute("eat")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > eat
             Eat what?
@@ -142,9 +134,7 @@ struct EatActionHandlerTests {
         try await engine.execute("eat nonexistent")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > eat nonexistent
             Any such thing lurks beyond your reach.
@@ -174,9 +164,7 @@ struct EatActionHandlerTests {
         try await engine.execute("eat apple")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > eat apple
             Taken.
@@ -208,9 +196,7 @@ struct EatActionHandlerTests {
         try await engine.execute("eat rock")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > eat rock
             The large rock falls well outside the realm of culinary
@@ -250,9 +236,7 @@ struct EatActionHandlerTests {
         try await engine.execute("eat apple")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > eat apple
             The darkness here is absolute, consuming all light and hope of
@@ -288,9 +272,7 @@ struct EatActionHandlerTests {
         let finalState = await engine.item("orange")
         #expect(await finalState.hasFlag(.isTouched) == true)
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > eat orange
             Your appetite for the juicy orange must wait for better
@@ -322,9 +304,7 @@ struct EatActionHandlerTests {
         try await engine.execute("eat cookie")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > eat cookie
             Your appetite for the chocolate cookie must wait for better
@@ -366,9 +346,7 @@ struct EatActionHandlerTests {
         try await engine.execute("eat it")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > eat banana
             Your appetite for the yellow banana must wait for better
@@ -416,9 +394,7 @@ struct EatActionHandlerTests {
         try await engine.execute("eat box")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > eat box
             Your appetite for the lunch box must wait for better
@@ -454,9 +430,7 @@ struct EatActionHandlerTests {
         try await engine.execute("eat soup")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > eat soup
             Your appetite for the hot soup must wait for better

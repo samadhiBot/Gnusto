@@ -18,9 +18,7 @@ struct CurseActionHandlerTests {
         try await engine.execute("curse")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > curse
             You unleash a cascade of inventive profanity.
@@ -50,9 +48,7 @@ struct CurseActionHandlerTests {
         try await engine.execute("curse")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > curse
             You unleash a cascade of inventive profanity.

@@ -27,10 +27,7 @@ struct CloakOfDarknessWalkthroughTests {
         )
         await engine.run()
 
-        let transcript = await mockIO.flush()
-
-        expectNoDifference(
-            transcript,
+        await mockIO.expectOutput(
             """
             Cloak of Darkness
 
@@ -135,10 +132,7 @@ struct CloakOfDarknessWalkthroughTests {
         )
         await engine.run()
 
-        let transcript = await mockIO.flush()
-
-        expectNoDifference(
-            transcript,
+        await mockIO.expectOutput(
             """
             Cloak of Darkness
 

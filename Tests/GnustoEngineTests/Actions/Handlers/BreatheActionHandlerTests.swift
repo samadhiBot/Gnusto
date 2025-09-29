@@ -18,9 +18,7 @@ struct BreatheActionHandlerTests {
         try await engine.execute("breathe")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > breathe
             You draw in a deep, contemplative breath.
@@ -48,9 +46,7 @@ struct BreatheActionHandlerTests {
         try await engine.execute("breathe on flower")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > breathe on flower
             You breathe on the red flower. Nothing happens.
@@ -80,9 +76,7 @@ struct BreatheActionHandlerTests {
         try await engine.execute("breathe mist")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > breathe mist
             That defies the fundamental laws of breathing.
@@ -110,9 +104,7 @@ struct BreatheActionHandlerTests {
         try await engine.execute("breathe with mask")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > breathe with mask
             The phrase 'with mask' eludes my comprehension.
@@ -130,9 +122,7 @@ struct BreatheActionHandlerTests {
         try await engine.execute("breathe on air")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > breathe on air
             You draw in a deep, contemplative breath.
@@ -160,9 +150,7 @@ struct BreatheActionHandlerTests {
         try await engine.execute("breathe")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > breathe
             You draw in a deep, contemplative breath.
@@ -193,9 +181,7 @@ struct BreatheActionHandlerTests {
         try await engine.execute("breathe the air")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > breathe the air
             You draw in a deep, contemplative breath.

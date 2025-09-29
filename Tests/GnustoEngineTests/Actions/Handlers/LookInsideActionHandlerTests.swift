@@ -38,9 +38,7 @@ struct LookInsideActionHandlerTests {
         try await engine.execute("look in box")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > look in box
             In the wooden box you can see a sparkling gem.
@@ -74,9 +72,7 @@ struct LookInsideActionHandlerTests {
         try await engine.execute("look inside chest")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > look inside chest
             The treasure chest is empty.
@@ -114,9 +110,7 @@ struct LookInsideActionHandlerTests {
         try await engine.execute("peek in bag")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > peek in bag
             In the leather bag you can see a gold coin.
@@ -136,9 +130,7 @@ struct LookInsideActionHandlerTests {
         try await engine.execute("look in")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > look in
             Look in what?
@@ -174,9 +166,7 @@ struct LookInsideActionHandlerTests {
         try await engine.execute("look in container")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > look in container
             Any such thing lurks beyond your reach.
@@ -213,9 +203,7 @@ struct LookInsideActionHandlerTests {
         try await engine.execute("look in box")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > look in box
             The darkness here is absolute, consuming all light and hope of
@@ -263,9 +251,7 @@ struct LookInsideActionHandlerTests {
         try await engine.execute("look inside suitcase")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > look inside suitcase
             In the old suitcase you can see a red book and a fountain pen.
@@ -296,9 +282,7 @@ struct LookInsideActionHandlerTests {
         try await engine.execute("look in box")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > look in box
             The empty box is empty.
@@ -335,9 +319,7 @@ struct LookInsideActionHandlerTests {
         try await engine.execute("look inside trunk")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > look inside trunk
             The closed trunk is closed.
@@ -365,9 +347,7 @@ struct LookInsideActionHandlerTests {
         try await engine.execute("look inside statue")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > look inside statue
             The interior of the marble statue disappoints with its mundane
@@ -396,9 +376,7 @@ struct LookInsideActionHandlerTests {
         try await engine.execute("look in rock")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > look in rock
             The interior of the small rock disappoints with its mundane
@@ -464,9 +442,7 @@ struct LookInsideActionHandlerTests {
         try await engine.execute("peek in bottle")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > peek in bottle
             In the glass bottle you can see a handwritten note.

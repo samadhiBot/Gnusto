@@ -18,9 +18,7 @@ struct ScoreActionHandlerTests {
         try await engine.execute("score")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > score
             Your score is 0 (total of 10 points), in 0 moves.
@@ -50,9 +48,7 @@ struct ScoreActionHandlerTests {
         try await engine.execute("score")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > score
             Your score is 0 (total of 10 points), in 0 moves.
@@ -74,9 +70,7 @@ struct ScoreActionHandlerTests {
         )
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > wait
             Time flows onward, indifferent to your concerns.
@@ -100,9 +94,7 @@ struct ScoreActionHandlerTests {
         try await engine.execute("score")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > score
             Your score is 0 (total of 10 points), in 0 moves.

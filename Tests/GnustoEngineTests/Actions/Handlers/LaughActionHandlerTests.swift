@@ -18,9 +18,7 @@ struct LaughActionHandlerTests {
         try await engine.execute("laugh")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > laugh
             Laughter bubbles up from somewhere deep within.
@@ -50,9 +48,7 @@ struct LaughActionHandlerTests {
         try await engine.execute("laugh")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > laugh
             Laughter bubbles up from somewhere deep within.

@@ -28,9 +28,7 @@ struct ClimbOnActionHandlerTests {
         try await engine.execute("climb on table")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > climb on table
             The wooden table stubbornly resists your attempts to climb on
@@ -62,9 +60,7 @@ struct ClimbOnActionHandlerTests {
         try await engine.execute("get on chair")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > get on chair
             The comfortable chair stubbornly resists your attempts to get
@@ -93,9 +89,7 @@ struct ClimbOnActionHandlerTests {
         try await engine.execute("sit on bench")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > sit on bench
             The stone bench stubbornly resists your attempts to sit on it.
@@ -123,9 +117,7 @@ struct ClimbOnActionHandlerTests {
         try await engine.execute("mount horse")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > mount horse
             The white horse stubbornly resists your attempts to mount it.
@@ -145,9 +137,7 @@ struct ClimbOnActionHandlerTests {
         try await engine.execute("climb on")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > climb on
             Climb on what?
@@ -182,9 +172,7 @@ struct ClimbOnActionHandlerTests {
         try await engine.execute("climb on table")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > climb on table
             Any such thing lurks beyond your reach.
@@ -221,9 +209,7 @@ struct ClimbOnActionHandlerTests {
         try await engine.execute("climb on table")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > climb on table
             The darkness here is absolute, consuming all light and hope of
@@ -258,9 +244,7 @@ struct ClimbOnActionHandlerTests {
         #expect(await finalState.hasFlag(.isTouched) == true)
 
         // Verify message
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > climb on stool
             The wooden stool stubbornly resists your attempts to climb on
@@ -296,9 +280,7 @@ struct ClimbOnActionHandlerTests {
         try await engine.execute("climb on rock")
 
         // Then
-        let output1 = await mockIO.flush()
-        expectNoDifference(
-            output1,
+        await mockIO.expectOutput(
             """
             > climb on rock
             The large rock stubbornly resists your attempts to climb on it.
@@ -309,9 +291,7 @@ struct ClimbOnActionHandlerTests {
         try await engine.execute("sit on tree")
 
         // Then
-        let output2 = await mockIO.flush()
-        expectNoDifference(
-            output2,
+        await mockIO.expectOutput(
             """
             > sit on tree
             You cannot sit on the tall tree, much as you might wish
@@ -341,9 +321,7 @@ struct ClimbOnActionHandlerTests {
         try await engine.execute("climb on box")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > climb on box
             The small box stubbornly resists your attempts to climb on it.

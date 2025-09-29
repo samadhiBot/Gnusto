@@ -36,9 +36,7 @@ struct AskActionHandlerTests {
         try await engine.execute("ask wizard about crystal")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > ask wizard about crystal
             The old wizard meets your inquiry about the magic crystal with
@@ -78,9 +76,7 @@ struct AskActionHandlerTests {
         try await engine.execute("question guard about sword")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > question guard about sword
             The castle guard meets your inquiry about the silver sword with
@@ -111,9 +107,7 @@ struct AskActionHandlerTests {
         try await engine.execute("inquire about the magic crystal")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > inquire about the magic crystal
             Ask whom?
@@ -131,9 +125,7 @@ struct AskActionHandlerTests {
         try await engine.execute("ask about the emerald tablet")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > ask about the emerald tablet
             Ask whom?
@@ -162,9 +154,7 @@ struct AskActionHandlerTests {
         try await engine.execute("ask merchant")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > ask merchant
             What do you want to ask the traveling merchant about?
@@ -206,9 +196,7 @@ struct AskActionHandlerTests {
         try await engine.execute("ask rock about crystal")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > ask rock about crystal
             The large rock lacks the capacity for conversation.
@@ -251,9 +239,7 @@ struct AskActionHandlerTests {
         try await engine.execute("ask wizard about crystal")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > ask wizard about crystal
             Any such thing lurks beyond your reach.
@@ -298,9 +284,7 @@ struct AskActionHandlerTests {
         try await engine.execute("ask wizard about crystal")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > ask wizard about crystal
             The darkness here is absolute, consuming all light and hope of
@@ -343,9 +327,7 @@ struct AskActionHandlerTests {
         #expect(await finalState.hasFlag(.isTouched) == true)
 
         // Verify message
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > ask sage about scroll
             The wise sage meets your inquiry about the ancient scroll with
@@ -375,9 +357,7 @@ struct AskActionHandlerTests {
         try await engine.execute("ask oracle about me")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > ask oracle about me
             The mystical oracle meets your inquiry about yourself with
@@ -414,9 +394,7 @@ struct AskActionHandlerTests {
         try await engine.execute("ask librarian about library")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > ask librarian about library
             The old librarian meets your inquiry about the Ancient Library
@@ -454,9 +432,7 @@ struct AskActionHandlerTests {
 
         // Phase 1: Ask without topic
         try await engine.execute("ask the wizard")
-        let phase1Output = await mockIO.flush()
-        expectNoDifference(
-            phase1Output,
+        await mockIO.expectOutput(
             """
             > ask the wizard
             What do you want to ask the old wizard about?
@@ -469,9 +445,7 @@ struct AskActionHandlerTests {
 
         // Phase 2: Provide topic
         try await engine.execute("the treasure")
-        let phase2Output = await mockIO.flush()
-        expectNoDifference(
-            phase2Output,
+        await mockIO.expectOutput(
             """
             > the treasure
             The old wizard meets your inquiry about the golden treasure
@@ -516,9 +490,7 @@ struct AskActionHandlerTests {
         try await engine.execute("ask oracle about crystal")
 
         // Then: Should work immediately without prompting
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > ask oracle about crystal
             The mystical oracle meets your inquiry about the magic crystal

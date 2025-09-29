@@ -28,9 +28,7 @@ struct TasteActionHandlerTests {
         try await engine.execute("taste apple")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > taste apple
             The moldy apple tastes remarkably like you'd expect the moldy
@@ -51,9 +49,7 @@ struct TasteActionHandlerTests {
         try await engine.execute("taste")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > taste
             The flavor profile proves disappointingly ordinary.
@@ -88,9 +84,7 @@ struct TasteActionHandlerTests {
         try await engine.execute("taste cake")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > taste cake
             Any such thing remains frustratingly inaccessible.
@@ -126,9 +120,7 @@ struct TasteActionHandlerTests {
         try await engine.execute("taste bread")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > taste bread
             Any such thing remains frustratingly inaccessible.
@@ -158,9 +150,7 @@ struct TasteActionHandlerTests {
         try await engine.execute("taste berry")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > taste berry
             The wild berry tastes remarkably like you'd expect the wild
@@ -194,9 +184,7 @@ struct TasteActionHandlerTests {
         )
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > taste the wizard
             Tasting the old wizard would end your relationship and possibly
@@ -241,9 +229,7 @@ struct TasteActionHandlerTests {
         )
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > lick the necromancer
             Tasting the furious necromancer ranks among history's worst
@@ -290,9 +276,7 @@ struct TasteActionHandlerTests {
         )
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > taste myself
             You sample your own flavor. The results are predictably salty.
@@ -340,9 +324,7 @@ struct TasteActionHandlerTests {
         )
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > taste the moldy orange
             The moldy orange tastes remarkably like you'd expect the moldy
@@ -389,9 +371,7 @@ struct TasteActionHandlerTests {
         )
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > lick the cookie
             The ancient cookie tastes remarkably like you'd expect the
@@ -427,9 +407,7 @@ struct TasteActionHandlerTests {
         )
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > taste the slime
             The bubbling slime tastes remarkably like you'd expect the
@@ -472,9 +450,7 @@ struct TasteActionHandlerTests {
         )
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > taste rock
             The smooth rock tastes remarkably like you'd expect the smooth
@@ -511,9 +487,7 @@ struct TasteActionHandlerTests {
         )
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > taste the slop
             The bowl of slop tastes remarkably like you'd expect the bowl

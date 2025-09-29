@@ -18,9 +18,7 @@ struct VerboseActionHandlerTests {
         try await engine.execute("verbose")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > verbose
             Maximum verbosity. Full location descriptions will be shown
@@ -46,9 +44,7 @@ struct VerboseActionHandlerTests {
         try await engine.execute("verbose")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > verbose
             Maximum verbosity. Full location descriptions will be shown
@@ -101,9 +97,7 @@ struct VerboseActionHandlerTests {
         try await engine.execute("verbose")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > verbose
             Maximum verbosity. Full location descriptions will be shown

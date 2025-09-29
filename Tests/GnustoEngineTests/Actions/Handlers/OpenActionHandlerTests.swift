@@ -30,9 +30,7 @@ struct OpenActionHandlerTests {
         try await engine.execute("open chest")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > open chest
             You open the wooden chest with a satisfying sense of purpose.
@@ -56,9 +54,7 @@ struct OpenActionHandlerTests {
         try await engine.execute("open")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > open
             Open what?
@@ -94,9 +90,7 @@ struct OpenActionHandlerTests {
         try await engine.execute("open door")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > open door
             Any such thing lurks beyond your reach.
@@ -124,9 +118,7 @@ struct OpenActionHandlerTests {
         try await engine.execute("open rock")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > open rock
             The large rock stubbornly resists your attempts to open it.
@@ -156,9 +148,7 @@ struct OpenActionHandlerTests {
         try await engine.execute("open box")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > open box
             The locked box is locked.
@@ -195,9 +185,7 @@ struct OpenActionHandlerTests {
         try await engine.execute("open chest")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > open chest
             The darkness here is absolute, consuming all light and hope of
@@ -230,9 +218,7 @@ struct OpenActionHandlerTests {
         try await engine.execute("open box")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > open box
             You open the cardboard box with a satisfying sense of purpose.
@@ -266,9 +252,7 @@ struct OpenActionHandlerTests {
         try await engine.execute("open chest")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > open chest
             The open chest is already open.
@@ -305,9 +289,7 @@ struct OpenActionHandlerTests {
         try await engine.execute("open mailbox")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > open mailbox
             As the small mailbox opens, it reveals a leaflet within.
@@ -340,9 +322,7 @@ struct OpenActionHandlerTests {
         try await engine.execute("open box")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > open box
             You open the empty box with a satisfying sense of purpose.
@@ -386,9 +366,7 @@ struct OpenActionHandlerTests {
         try await engine.execute("open trunk")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > open trunk
             As the old trunk opens, it reveals a leather book and a white
@@ -443,9 +421,7 @@ struct OpenActionHandlerTests {
         try await engine.execute("open door")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > open door
             You open the wooden door with a satisfying sense of purpose.

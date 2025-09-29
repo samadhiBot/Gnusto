@@ -53,9 +53,7 @@ struct NibbleActionHandlerTests {
         try await engine.execute("nibble apple")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > nibble apple
             Do you mean you want to eat the red apple?
@@ -78,9 +76,7 @@ struct NibbleActionHandlerTests {
         try await engine.execute("bite cookie")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > bite cookie
             Do you mean you want to eat the chocolate cookie?
@@ -102,9 +98,7 @@ struct NibbleActionHandlerTests {
         try await engine.execute("nibble")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > nibble
             Nibble what?
@@ -143,9 +137,7 @@ struct NibbleActionHandlerTests {
         try await engine.execute("nibble cake")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > nibble cake
             Any such thing lurks beyond your reach.
@@ -165,9 +157,7 @@ struct NibbleActionHandlerTests {
         try await engine.execute("nibble rock")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > nibble rock
             The gray rock falls well outside the realm of culinary
@@ -210,9 +200,7 @@ struct NibbleActionHandlerTests {
         try await engine.execute("nibble bread")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > nibble bread
             The darkness here is absolute, consuming all light and hope of
@@ -242,9 +230,7 @@ struct NibbleActionHandlerTests {
         try await engine.execute("yes")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > nibble cookie
             Do you mean you want to eat the chocolate cookie?
@@ -271,9 +257,7 @@ struct NibbleActionHandlerTests {
         )
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > nibble apple
             Do you mean you want to eat the red apple?
@@ -308,9 +292,7 @@ struct NibbleActionHandlerTests {
         try await engine.execute("inventory")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > nibble apple
             Do you mean you want to eat the red apple?
@@ -341,9 +323,7 @@ struct NibbleActionHandlerTests {
         try await engine.execute("nibble apple")
 
         // Then: Should create a yes/no question
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > nibble apple
             Do you mean you want to eat the red apple?
@@ -367,9 +347,7 @@ struct NibbleActionHandlerTests {
             // Execute the command
             try await engine.execute("\(verb) apple")
 
-            let output = await mockIO.flush()
-            expectNoDifference(
-                output,
+            await mockIO.expectOutput(
                 """
                 > \(verb) apple
                 Do you mean you want to eat the red apple?
@@ -459,9 +437,7 @@ struct NibbleActionHandlerTests {
         // YES response should handle missing EAT handler gracefully
         try await engine.execute("yes")
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > nibble apple
             Do you mean you want to eat the red apple?

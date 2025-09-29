@@ -353,8 +353,7 @@ func testTakeSyntax() async throws {
 
     try await engine.execute("take lamp")
 
-    let output = await mockIO.flush()
-    expectNoDifference(output, """
+    await mockIO.expectOutput("""
         > take lamp
         Taken.
         """)
@@ -439,8 +438,7 @@ func testSomething() async throws {
     try await engine.execute("take test item")
 
     // Then: Verify results
-    let output = await mockIO.flush()
-    expectNoDifference(output, """
+    await mockIO.expectOutput("""
         > take test item
         Taken.
         """)
@@ -516,8 +514,7 @@ for directObjectRef in context.command.directObjects {
 
 ```swift
 // ✅ RIGHT: Exact message matching with command echo
-let output = await mockIO.flush()
-expectNoDifference(output, """
+await mockIO.expectOutput("""
     > take lamp
     Taken.
     """)

@@ -18,9 +18,7 @@ struct SingActionHandlerTests {
         try await engine.execute("sing")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > sing
             You unleash a melodic assault upon the immediate vicinity.
@@ -48,9 +46,7 @@ struct SingActionHandlerTests {
         try await engine.execute("serenade the wooden box")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > serenade the wooden box
             Your serenade to the wooden box falls upon deaf... Well, absent
@@ -80,9 +76,7 @@ struct SingActionHandlerTests {
         try await engine.execute("sing to the old wizard")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > sing to the old wizard
             The old wizard endures your impromptu serenade with admirable
@@ -104,9 +98,7 @@ struct SingActionHandlerTests {
         try await engine.execute("sing to the hideous troll")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > sing to the hideous troll
             You can't see any hideous troll here.
@@ -136,9 +128,7 @@ struct SingActionHandlerTests {
         try await engine.execute("sing")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > sing
             You unleash a melodic assault upon the immediate vicinity.

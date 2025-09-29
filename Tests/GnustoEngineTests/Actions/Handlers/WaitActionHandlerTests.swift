@@ -18,9 +18,7 @@ struct WaitActionHandlerTests {
         try await engine.execute("wait")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > wait
             Time flows onward, indifferent to your concerns.
@@ -50,9 +48,7 @@ struct WaitActionHandlerTests {
         try await engine.execute("wait")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > wait
             Time flows onward, indifferent to your concerns.

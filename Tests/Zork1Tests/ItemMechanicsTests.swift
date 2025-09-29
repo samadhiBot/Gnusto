@@ -25,9 +25,7 @@ struct ItemMechanicsTests {
         )
         await engine.run()
 
-        let transcript = await mockIO.flush()
-        expectNoDifference(
-            transcript,
+        await mockIO.expectOutput(
             """
             > west
             --- Living Room ---
@@ -107,9 +105,7 @@ struct ItemMechanicsTests {
         )
         await engine.run()
 
-        let transcript = await mockIO.flush()
-        expectNoDifference(
-            transcript,
+        await mockIO.expectOutput(
             """
             > examine table
             A bottle is sitting on the table. The glass bottle contains a
@@ -184,9 +180,7 @@ struct ItemMechanicsTests {
         )
         await engine.run()
 
-        let transcript = await mockIO.flush()
-        expectNoDifference(
-            transcript,
+        await mockIO.expectOutput(
             """
             > west
             --- Living Room ---

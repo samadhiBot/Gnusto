@@ -28,9 +28,7 @@ struct TouchActionHandlerTests {
         try await engine.execute("touch vase")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > touch vase
             The ceramic vase feels exactly as it looks--solidly real and
@@ -55,9 +53,7 @@ struct TouchActionHandlerTests {
         try await engine.execute("touch")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > touch
             Touch what?
@@ -92,9 +88,7 @@ struct TouchActionHandlerTests {
         try await engine.execute("touch object")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > touch object
             Any such thing remains frustratingly inaccessible.
@@ -130,9 +124,7 @@ struct TouchActionHandlerTests {
         try await engine.execute("touch statue")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > touch statue
             The darkness here is absolute, consuming all light and hope of
@@ -163,9 +155,7 @@ struct TouchActionHandlerTests {
         try await engine.execute("touch table")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > touch table
             The wooden table feels exactly as it looks--solidly real and
@@ -199,9 +189,7 @@ struct TouchActionHandlerTests {
         try await engine.execute("touch coin")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > touch coin
             The gold coin feels exactly as it looks--solidly real and
@@ -244,9 +232,7 @@ struct TouchActionHandlerTests {
         try await engine.execute("touch gem")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > touch gem
             The sparkling gem feels exactly as it looks--solidly real and
@@ -319,9 +305,7 @@ struct TouchActionHandlerTests {
         )
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > touch wall
             The stone wall feels exactly as it looks--solidly real and
@@ -361,9 +345,7 @@ struct TouchActionHandlerTests {
         try await engine.execute("touch orb")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > touch orb
             The glowing orb feels exactly as it looks--solidly real and
@@ -397,9 +379,7 @@ struct TouchActionHandlerTests {
         try await engine.execute("touch wizard")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > touch wizard
             The old wizard has not invited your touch.
@@ -424,9 +404,7 @@ struct TouchActionHandlerTests {
         try await engine.execute("feel troll")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > feel troll
             The fierce troll has not invited your touch.
@@ -448,9 +426,7 @@ struct TouchActionHandlerTests {
         try await engine.execute("touch me")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > touch me
             You confirm your continued corporeal existence with a
@@ -487,9 +463,7 @@ struct TouchActionHandlerTests {
         try await engine.execute("touch wizard")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > touch wizard
             Any such thing remains frustratingly inaccessible.
@@ -527,9 +501,7 @@ struct TouchActionHandlerTests {
         try await engine.execute("feel troll")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > feel troll
             Any such thing remains frustratingly inaccessible.
@@ -566,9 +538,7 @@ struct TouchActionHandlerTests {
         try await engine.execute("touch wizard")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > touch wizard
             The darkness here is absolute, consuming all light and hope of
@@ -598,9 +568,7 @@ struct TouchActionHandlerTests {
         try await engine.execute("feel troll")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > feel troll
             The darkness here is absolute, consuming all light and hope of
@@ -631,9 +599,7 @@ struct TouchActionHandlerTests {
         try await engine.execute("touch fairy")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > touch fairy
             The tiny fairy has not invited your touch.
@@ -677,9 +643,7 @@ struct TouchActionHandlerTests {
         )
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > touch wizard
             The old wizard has not invited your touch.

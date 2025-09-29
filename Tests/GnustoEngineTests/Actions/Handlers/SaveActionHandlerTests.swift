@@ -18,9 +18,7 @@ struct SaveActionHandlerTests {
         try await engine.execute("save")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > save
             Game saved.
@@ -51,9 +49,7 @@ struct SaveActionHandlerTests {
         try await engine.execute("save")
 
         // Then: Should succeed even without light
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > save
             Game saved.
@@ -71,9 +67,7 @@ struct SaveActionHandlerTests {
         try await engine.execute("save")
 
         // Then: Should always succeed
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > save
             Game saved.
@@ -112,9 +106,7 @@ struct SaveActionHandlerTests {
         try await engine.execute("save")
 
         // Then: Should succeed regardless of state
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > save
             Game saved.
@@ -132,9 +124,7 @@ struct SaveActionHandlerTests {
         try await engine.execute("save")
 
         // Then: Should work each time
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > save
             Game saved.
@@ -177,9 +167,7 @@ struct SaveActionHandlerTests {
         #expect(finalScore == initialScore)
         #expect(finalTurnCount == initialTurnCount)
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > save
             Game saved.
@@ -217,9 +205,7 @@ struct SaveActionHandlerTests {
         try await engine.execute("save")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > save
             Game saved.
@@ -301,9 +287,7 @@ struct SaveActionHandlerTests {
         try await engine.execute("save")
 
         // Then: Should still provide feedback
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > save
             Game saved.

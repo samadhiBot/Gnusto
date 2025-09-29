@@ -31,9 +31,7 @@ struct TurnOnActionHandlerTests {
         try await engine.execute("turn on flashlight")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > turn on flashlight
             You turn on the silver flashlight.
@@ -67,9 +65,7 @@ struct TurnOnActionHandlerTests {
         try await engine.execute("switch on lantern")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > switch on lantern
             You switch on the camping lantern.
@@ -103,9 +99,7 @@ struct TurnOnActionHandlerTests {
         try await engine.execute("turn flashlight on")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > turn flashlight on
             You turn on the silver flashlight.
@@ -128,9 +122,7 @@ struct TurnOnActionHandlerTests {
         try await engine.execute("turn on")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > turn on
             Turn on what?
@@ -148,9 +140,7 @@ struct TurnOnActionHandlerTests {
         try await engine.execute("turn on nonexistent")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > turn on nonexistent
             Any such thing lurks beyond your reach.
@@ -187,9 +177,7 @@ struct TurnOnActionHandlerTests {
         try await engine.execute("turn on lamp")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > turn on lamp
             Any such thing lurks beyond your reach.
@@ -217,9 +205,7 @@ struct TurnOnActionHandlerTests {
         try await engine.execute("turn on rock")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > turn on rock
             It remains stubbornly inert despite your ministrations.
@@ -255,9 +241,7 @@ struct TurnOnActionHandlerTests {
         try await engine.execute("turn on lamp")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > turn on lamp
             It's already on.
@@ -297,9 +281,7 @@ struct TurnOnActionHandlerTests {
         try await engine.execute("turn on lamp")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > turn on lamp
             You turn on the brass lamp.
@@ -346,9 +328,7 @@ struct TurnOnActionHandlerTests {
         try await engine.execute("turn on lamp")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > turn on lamp
             Any such thing lurks beyond your reach.
@@ -390,9 +370,7 @@ struct TurnOnActionHandlerTests {
         try await engine.execute("turn on radio")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > turn on radio
             Any such thing lurks beyond your reach.
@@ -429,9 +407,7 @@ struct TurnOnActionHandlerTests {
         #expect(await finalState.hasFlag(.isOn) == true)
         #expect(await finalState.hasFlag(.isTouched) == true)
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > turn on lamp
             You turn on the brass lamp.
@@ -474,9 +450,7 @@ struct TurnOnActionHandlerTests {
         )
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > turn on torch
             You turn on the silver torch.
@@ -522,9 +496,7 @@ struct TurnOnActionHandlerTests {
         try await engine.execute("turn on radio")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > turn on radio
             You turn on the portable radio.
@@ -561,9 +533,7 @@ struct TurnOnActionHandlerTests {
         )
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > turn on lamp
             You turn on the brass lamp.
@@ -606,9 +576,7 @@ struct TurnOnActionHandlerTests {
         try await engine.execute("turn on lamp")
 
         // Then - Should not show "You can see your surroundings now" message
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > turn on lamp
             You turn on the desk lamp.

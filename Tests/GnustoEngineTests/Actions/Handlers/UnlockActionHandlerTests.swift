@@ -31,9 +31,7 @@ struct UnlockActionHandlerTests {
         try await engine.execute("unlock chest")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > unlock chest
             Unlock the wooden chest with what?
@@ -72,9 +70,7 @@ struct UnlockActionHandlerTests {
         try await engine.execute("unlock door with key")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > unlock door with key
             The oak door is now unlocked.
@@ -100,9 +96,7 @@ struct UnlockActionHandlerTests {
         try await engine.execute("unlock")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > unlock
             Unlock what?
@@ -133,9 +127,7 @@ struct UnlockActionHandlerTests {
         try await engine.execute("unlock safe")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > unlock safe
             Unlock the metal safe with what?
@@ -174,9 +166,7 @@ struct UnlockActionHandlerTests {
         try await engine.execute("unlock box with key")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > unlock box with key
             You aren't holding the silver key.
@@ -221,9 +211,7 @@ struct UnlockActionHandlerTests {
         try await engine.execute("unlock door with key")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > unlock door with key
             Any such thing lurks beyond your reach.
@@ -259,9 +247,7 @@ struct UnlockActionHandlerTests {
         try await engine.execute("unlock table with key")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > unlock table with key
             That's not something you can unlock.
@@ -300,9 +286,7 @@ struct UnlockActionHandlerTests {
         try await engine.execute("unlock cabinet with key")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > unlock cabinet with key
             The glass cabinet is already unlocked.
@@ -341,9 +325,7 @@ struct UnlockActionHandlerTests {
         try await engine.execute("unlock strongbox with key")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > unlock strongbox with key
             The copper key and the iron strongbox were never meant to be
@@ -392,9 +374,7 @@ struct UnlockActionHandlerTests {
         try await engine.execute("unlock chest with key")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > unlock chest with key
             The darkness here is absolute, consuming all light and hope of
@@ -444,9 +424,7 @@ struct UnlockActionHandlerTests {
         #expect(await finalKey.hasFlag(.isTouched) == true)
 
         // Verify message
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > unlock lockbox with key
             The steel lockbox is now unlocked.
@@ -503,9 +481,7 @@ struct UnlockActionHandlerTests {
         try await engine.execute("unlock door with door key")
 
         // Then
-        let output1 = await mockIO.flush()
-        expectNoDifference(
-            output1,
+        await mockIO.expectOutput(
             """
             > unlock door with door key
             The wooden door is now unlocked.
@@ -516,9 +492,7 @@ struct UnlockActionHandlerTests {
         try await engine.execute("unlock chest with chest key")
 
         // Then
-        let output2 = await mockIO.flush()
-        expectNoDifference(
-            output2,
+        await mockIO.expectOutput(
             """
             > unlock chest with chest key
             The small chest is now unlocked.
@@ -572,9 +546,7 @@ struct UnlockActionHandlerTests {
         #expect(await finalContainer.hasFlag(.isLockable) == true)
         #expect(await finalContainer.isOpenable == true)
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > unlock container with key
             The magic container is now unlocked.

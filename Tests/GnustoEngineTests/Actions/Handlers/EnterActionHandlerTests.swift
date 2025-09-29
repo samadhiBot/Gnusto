@@ -47,9 +47,7 @@ struct EnterActionHandlerTests {
         try await engine.execute("enter door")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > enter door
             --- Inside ---
@@ -101,9 +99,7 @@ struct EnterActionHandlerTests {
         try await engine.execute("get in hatch")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > get in hatch
             --- Inside ---
@@ -155,9 +151,7 @@ struct EnterActionHandlerTests {
         try await engine.execute("go in entrance")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > go in entrance
             --- Inside ---
@@ -209,9 +203,7 @@ struct EnterActionHandlerTests {
         try await engine.execute("go through portal")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > go through portal
             --- Inside ---
@@ -237,9 +229,7 @@ struct EnterActionHandlerTests {
         try await engine.execute("enter")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > enter
             Multiple entrances present themselves. Which calls to you?
@@ -285,9 +275,7 @@ struct EnterActionHandlerTests {
         try await engine.execute("enter")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > enter
             --- Inside ---
@@ -354,9 +342,7 @@ struct EnterActionHandlerTests {
         try await engine.execute("enter")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > enter
             Multiple entrances present themselves. Which calls to you?
@@ -394,9 +380,7 @@ struct EnterActionHandlerTests {
         try await engine.execute("enter door")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > enter door
             Any such thing lurks beyond your reach.
@@ -424,9 +408,7 @@ struct EnterActionHandlerTests {
         try await engine.execute("enter rock")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > enter rock
             The large rock stubbornly resists your attempts to enter it.
@@ -473,9 +455,7 @@ struct EnterActionHandlerTests {
         try await engine.execute("enter trapdoor")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > enter trapdoor
             The darkness here is absolute, consuming all light and hope of
@@ -571,9 +551,7 @@ struct EnterActionHandlerTests {
         try await engine.execute("enter door")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > enter door
             --- Office ---
@@ -659,9 +637,7 @@ struct EnterActionHandlerTests {
         try await engine.execute("enter door")
 
         // Then
-        let output1 = await mockIO.flush()
-        expectNoDifference(
-            output1,
+        await mockIO.expectOutput(
             """
             > enter door
             --- Shop ---
@@ -679,9 +655,7 @@ struct EnterActionHandlerTests {
         try await engine.execute("enter entrance")
 
         // Then
-        let output2 = await mockIO.flush()
-        expectNoDifference(
-            output2,
+        await mockIO.expectOutput(
             """
             > south
             --- Town Plaza ---
@@ -740,9 +714,7 @@ struct EnterActionHandlerTests {
         try await engine.execute("enter door")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > enter door
             Any such thing lurks beyond your reach.

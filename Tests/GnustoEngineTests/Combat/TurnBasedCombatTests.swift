@@ -48,9 +48,7 @@ struct TurnBasedCombatTests {
         try await engine.execute("attack goblin with sword")
 
         // Then: Verify combat occurred with proper turn structure
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > attack goblin with sword
             Armed and hungry for violence, you strike with your sword as
@@ -87,9 +85,7 @@ struct TurnBasedCombatTests {
         try await engine.execute("attack knight")
 
         // Then: Attack should be denied
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > attack knight
             No weapons needed as you attack with pure violence while the
@@ -127,9 +123,7 @@ struct TurnBasedCombatTests {
         try await engine.execute("attack troll with lamp")
 
         // Then: Attack should note the lamp is ineffective
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > attack troll with lamp
             You drive forward with your lamp seeking its purpose as the
@@ -182,9 +176,7 @@ struct TurnBasedCombatTests {
         try await engine.execute("attack ogre")
 
         // Then: Combat should occur (results will vary due to dice rolls)
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > attack ogre
             Armed and hungry for violence, you strike with your dagger as
@@ -244,9 +236,7 @@ struct TurnBasedCombatTests {
         )
 
         // Then: Might surrender (depends on dice roll with high charisma)
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > attack bandit
             No weapons needed as you attack with pure violence while the
@@ -293,9 +283,7 @@ struct TurnBasedCombatTests {
         try await engine.execute("attack statue")
 
         // Then: Should get message about fighting inanimate objects
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > attack statue
             The statue is immune to your hostility.
@@ -324,9 +312,7 @@ struct TurnBasedCombatTests {
         try await engine.execute("attack zombie")
 
         // Then: Should indicate it's already dead
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > attack zombie
             No weapons needed as you attack with pure violence while the
@@ -377,9 +363,7 @@ struct TurnBasedCombatTests {
         try await engine.execute("attack rat with sword")
 
         // Then: Check combat occurred
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > attack rat with sword
             Armed and hungry for violence, you strike with your sword as

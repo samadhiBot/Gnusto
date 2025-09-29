@@ -28,9 +28,7 @@ struct KnockActionHandlerTests {
         try await engine.execute("knock")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > knock
             Knock what?
@@ -58,9 +56,7 @@ struct KnockActionHandlerTests {
         try await engine.execute("tap table")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > tap table
             You tap the wooden table.
@@ -91,9 +87,7 @@ struct KnockActionHandlerTests {
         try await engine.execute("knock on door")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > knock on door
             You knock on the front door.
@@ -121,9 +115,7 @@ struct KnockActionHandlerTests {
         try await engine.execute("rap on window")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > rap on window
             You rap on the glass window.
@@ -143,9 +135,7 @@ struct KnockActionHandlerTests {
         try await engine.execute("knock on")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > knock on
             Knock on what?
@@ -180,9 +170,7 @@ struct KnockActionHandlerTests {
         try await engine.execute("knock on door")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > knock on door
             Any such thing lurks beyond your reach.
@@ -219,9 +207,7 @@ struct KnockActionHandlerTests {
         try await engine.execute("knock on door")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > knock on door
             The darkness here is absolute, consuming all light and hope of
@@ -253,9 +239,7 @@ struct KnockActionHandlerTests {
         try await engine.execute("knock on chest")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > knock on chest
             You knock on the treasure chest.
@@ -286,9 +270,7 @@ struct KnockActionHandlerTests {
         try await engine.execute("knock on wall")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > knock on wall
             You knock on the stone wall.
@@ -320,9 +302,7 @@ struct KnockActionHandlerTests {
         #expect(await finalState.hasFlag(.isTouched))
 
         // Verify message
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > tap post
             You tap the wooden post.
@@ -369,9 +349,7 @@ struct KnockActionHandlerTests {
         )
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > knock on door
             You knock on the blue door.
@@ -431,9 +409,7 @@ struct KnockActionHandlerTests {
         )
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > knock on red door
             You knock on the red door.
@@ -488,9 +464,7 @@ struct KnockActionHandlerTests {
         )
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > knock on the open door
             You knock on the open door.

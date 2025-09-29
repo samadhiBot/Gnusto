@@ -29,9 +29,7 @@ struct FindActionHandlerTests {
         try await engine.execute("find book")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > find book
             It stands before you in all its mundane glory!
@@ -60,9 +58,7 @@ struct FindActionHandlerTests {
         try await engine.execute("search for key")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > search for key
             It rests securely in your possession.
@@ -91,9 +87,7 @@ struct FindActionHandlerTests {
         try await engine.execute("locate coin")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > locate coin
             It stands before you in all its mundane glory!
@@ -113,9 +107,7 @@ struct FindActionHandlerTests {
         try await engine.execute("find")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > find
             Find what?
@@ -153,9 +145,7 @@ struct FindActionHandlerTests {
         try await engine.execute("find gem")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > find gem
             The darkness here is absolute, consuming all light and hope of
@@ -187,9 +177,7 @@ struct FindActionHandlerTests {
         try await engine.execute("find sword")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > find sword
             It rests securely in your possession.
@@ -217,9 +205,7 @@ struct FindActionHandlerTests {
         try await engine.execute("find table")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > find table
             It stands before you in all its mundane glory!
@@ -257,9 +243,7 @@ struct FindActionHandlerTests {
         try await engine.execute("find ring")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > find ring
             It stands before you in all its mundane glory!
@@ -295,9 +279,7 @@ struct FindActionHandlerTests {
         try await engine.execute("find treasure")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > find treasure
             Any such thing lurks beyond your reach.
@@ -315,9 +297,7 @@ struct FindActionHandlerTests {
         try await engine.execute("find dragon")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > find dragon
             Any such thing lurks beyond your reach.
@@ -355,9 +335,7 @@ struct FindActionHandlerTests {
         try await engine.execute("find jewelry")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > find jewelry
             Any such thing lurks beyond your reach.
@@ -393,9 +371,7 @@ struct FindActionHandlerTests {
         try await engine.execute("find lamp")
 
         // Then
-        let output1 = await mockIO.flush()
-        expectNoDifference(
-            output1,
+        await mockIO.expectOutput(
             """
             > find lamp
             It rests securely in your possession.
@@ -406,9 +382,7 @@ struct FindActionHandlerTests {
         try await engine.execute("find statue")
 
         // Then
-        let output2 = await mockIO.flush()
-        expectNoDifference(
-            output2,
+        await mockIO.expectOutput(
             """
             > find statue
             Your powers of observation are truly remarkable--it's right
@@ -446,9 +420,7 @@ struct FindActionHandlerTests {
         try await engine.execute("find paper")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > find paper
             It stands before you in all its mundane glory!
@@ -477,9 +449,7 @@ struct FindActionHandlerTests {
         try await engine.execute("find crystal")
 
         // Then
-        let output1 = await mockIO.flush()
-        expectNoDifference(
-            output1,
+        await mockIO.expectOutput(
             """
             > find crystal
             It stands before you in all its mundane glory!
@@ -490,9 +460,7 @@ struct FindActionHandlerTests {
         try await engine.execute("locate crystal")
 
         // Then
-        let output2 = await mockIO.flush()
-        expectNoDifference(
-            output2,
+        await mockIO.expectOutput(
             """
             > locate crystal
             Your powers of observation are truly remarkable--it's right

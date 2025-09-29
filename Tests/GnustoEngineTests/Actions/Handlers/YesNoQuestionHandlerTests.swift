@@ -18,9 +18,7 @@ struct YesNoQuestionHandlerTests {
         try await engine.execute("yes")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > yes
             Your affirmation lacks context. Yes to what, exactly?
@@ -41,9 +39,7 @@ struct YesNoQuestionHandlerTests {
         try await engine.execute("no")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > no
             No what?
@@ -70,9 +66,7 @@ struct YesNoQuestionHandlerTests {
         try await engine.execute("yes")
 
         // Then - should get the response from ConversationManager
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > yes
             Okay.
@@ -99,9 +93,7 @@ struct YesNoQuestionHandlerTests {
         try await engine.execute("no")
 
         // Then - should get the custom no message
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > no
             Okay, stopping.
@@ -148,9 +140,7 @@ struct YesNoQuestionHandlerTests {
         try await engine.execute("yes")
 
         // Then - should execute the eat command
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > yes
             Taken.
@@ -185,9 +175,7 @@ struct YesNoQuestionHandlerTests {
             try await engine.execute(synonym)
 
             // Then
-            let output = await mockIO.flush()
-            expectNoDifference(
-                output,
+            await mockIO.expectOutput(
                 """
                 > \(synonym)
                 Okay.
@@ -217,9 +205,7 @@ struct YesNoQuestionHandlerTests {
             try await engine.execute(synonym)
 
             // Then
-            let output = await mockIO.flush()
-            expectNoDifference(
-                output,
+            await mockIO.expectOutput(
                 """
                 > \(synonym)
                 Custom no message.
@@ -389,9 +375,7 @@ struct YesNoQuestionHandlerTests {
         try await engine.execute("yes")
 
         // Then - should execute the clarified command
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > yes
             Taken.
@@ -444,9 +428,7 @@ struct YesNoQuestionHandlerTests {
         try await engine.execute("no")
 
         // Then - should get disambiguation cancellation message
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > no
             What would you like to do next?
@@ -480,9 +462,7 @@ struct YesNoQuestionHandlerTests {
         try await engine.execute("maybe")
 
         // Then - should get responseNotUnderstood message
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > maybe
             The art of maybe-ing remains a mystery to me.
@@ -514,9 +494,7 @@ struct YesNoQuestionHandlerTests {
         try await engine.execute("yes thing")
 
         // Then - should treat as plain YES
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > yes thing
             Your affirmation lacks context. Yes to what, exactly?
@@ -548,9 +526,7 @@ struct YesNoQuestionHandlerTests {
             try await engine.execute("yes")
 
             // If we get here, the command succeeded unexpectedly
-            let output = await mockIO.flush()
-            expectNoDifference(
-                output,
+            await mockIO.expectOutput(
                 """
                 > yes
                 Ask whom?

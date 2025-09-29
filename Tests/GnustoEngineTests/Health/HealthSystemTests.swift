@@ -133,9 +133,7 @@ struct HealthSystemTests {
 
         try await engine.execute("examine me", times: 3)
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > examine me
             As good-looking as ever, which is to say, adequately
@@ -162,9 +160,7 @@ struct HealthSystemTests {
 
         try await engine.execute("examine me")
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > examine me
             You're nearly pristine, with only the faintest marks to show
@@ -183,9 +179,7 @@ struct HealthSystemTests {
 
         try await engine.execute("examine me")
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > examine me
             You're lightly scuffed up. A few scrapes and bruises mark your
@@ -204,9 +198,7 @@ struct HealthSystemTests {
 
         try await engine.execute("examine me")
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > examine me
             You're somewhat worse for wear. A collection of minor injuries
@@ -225,9 +217,7 @@ struct HealthSystemTests {
 
         try await engine.execute("examine me")
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > examine me
             You're battered but functional. Various cuts and bruises make
@@ -246,9 +236,7 @@ struct HealthSystemTests {
 
         try await engine.execute("examine me")
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > examine me
             You're wounded and weary. Several painful injuries slow your
@@ -268,9 +256,7 @@ struct HealthSystemTests {
 
         try await engine.execute("examine me")
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > examine me
             You're seriously hurt. Deep injuries throb with persistent
@@ -290,9 +276,7 @@ struct HealthSystemTests {
 
         try await engine.execute("examine me")
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > examine me
             You're badly wounded. Pain radiates through your body with
@@ -312,9 +296,7 @@ struct HealthSystemTests {
 
         try await engine.execute("examine me")
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > examine me
             You're in critical condition. Blood seeps from numerous wounds,
@@ -334,9 +316,7 @@ struct HealthSystemTests {
 
         try await engine.execute("examine me")
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > examine me
             You're a breath away from oblivion. Every movement is agony,
@@ -357,9 +337,7 @@ struct HealthSystemTests {
 
         try await engine.execute("examine me")
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > examine me
             Against all logic, you examine your deceased form. The
@@ -501,9 +479,7 @@ struct HealthSystemTests {
         // Execute combat
         try await engine.execute("attack creature")
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > attack creature
             Armed and hungry for violence, you strike with your sword as

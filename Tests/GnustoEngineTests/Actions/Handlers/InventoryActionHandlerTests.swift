@@ -18,9 +18,7 @@ struct InventoryActionHandlerTests {
         try await engine.execute("inventory")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > inventory
             Your hands are as empty as your pockets.
@@ -38,9 +36,7 @@ struct InventoryActionHandlerTests {
         try await engine.execute("i")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > i
             Your hands are as empty as your pockets.
@@ -60,9 +56,7 @@ struct InventoryActionHandlerTests {
         try await engine.execute("inventory")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > inventory
             Your hands are as empty as your pockets.
@@ -82,9 +76,7 @@ struct InventoryActionHandlerTests {
         try await engine.execute("inventory")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > inventory
             You are carrying:
@@ -127,9 +119,7 @@ struct InventoryActionHandlerTests {
         try await engine.execute("inventory")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > inventory
             You are carrying:
@@ -165,18 +155,16 @@ struct InventoryActionHandlerTests {
         )
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > inventory
             You are carrying:
             - An iron sword
             - A lovely tiara (worn)
-            
+
             > remove the tiara
             You remove the lovely tiara.
-            
+
             > inventory
             You are carrying:
             - An iron sword
@@ -213,9 +201,7 @@ struct InventoryActionHandlerTests {
         try await engine.execute("inventory")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > inventory
             You are carrying:
@@ -246,9 +232,7 @@ struct InventoryActionHandlerTests {
         try await engine.execute("inventory")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > take key
             Taken.

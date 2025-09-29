@@ -30,9 +30,7 @@ struct RubActionHandlerTests {
         try await engine.execute("rub lamp")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > rub lamp
             The brass lamp endures your rubbing without transformation or
@@ -72,9 +70,7 @@ struct RubActionHandlerTests {
         try await engine.execute("rub table with cloth")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > rub table with cloth
             The wooden table endures your rubbing without transformation or
@@ -107,9 +103,7 @@ struct RubActionHandlerTests {
         try await engine.execute("polish mirror")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > polish mirror
             The silver mirror endures your rubbing without transformation
@@ -138,9 +132,7 @@ struct RubActionHandlerTests {
         try await engine.execute("clean window")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > clean window
             The dirty window endures your rubbing without transformation or
@@ -161,9 +153,7 @@ struct RubActionHandlerTests {
         try await engine.execute("rub")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > rub
             Rub what?
@@ -181,9 +171,7 @@ struct RubActionHandlerTests {
         try await engine.execute("rub nonexistent")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > rub nonexistent
             You cannot reach any such thing from here.
@@ -218,9 +206,7 @@ struct RubActionHandlerTests {
         try await engine.execute("rub statue")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > rub statue
             You cannot reach any such thing from here.
@@ -238,9 +224,7 @@ struct RubActionHandlerTests {
         try await engine.execute("rub me")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > rub me
             You rub yourself vigorously, achieving little beyond mild
@@ -278,9 +262,7 @@ struct RubActionHandlerTests {
         try await engine.execute("rub statue")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > rub statue
             The darkness here is absolute, consuming all light and hope of
@@ -312,9 +294,7 @@ struct RubActionHandlerTests {
         try await engine.execute("rub the wizard")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > rub the wizard
             I don't think the old wizard would appreciate that.
@@ -348,9 +328,7 @@ struct RubActionHandlerTests {
         try await engine.execute("rub the necromancer")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > rub the necromancer
             That would be quite inappropriate.
@@ -385,9 +363,7 @@ struct RubActionHandlerTests {
         try await engine.execute("rub the wall")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > rub the wall
             The stone wall endures your rubbing without transformation or
@@ -428,9 +404,7 @@ struct RubActionHandlerTests {
         try await engine.execute("rub vase with rag")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > rub vase with rag
             The ceramic vase endures your rubbing without transformation or

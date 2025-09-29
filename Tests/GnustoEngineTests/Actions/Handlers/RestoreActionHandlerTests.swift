@@ -45,9 +45,7 @@ struct RestoreActionHandlerTests {
         try await engine.execute("restore")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > save
             Game saved.
@@ -104,9 +102,7 @@ struct RestoreActionHandlerTests {
         try await engine.execute("load")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > save
             Game saved.
@@ -158,9 +154,7 @@ struct RestoreActionHandlerTests {
         try await engine.execute("restore")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > restore
             If you restore your saved game now you will lose any unsaved
@@ -187,9 +181,7 @@ struct RestoreActionHandlerTests {
         try await engine.execute("restore")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > restore
             If you restore your saved game now you will lose any unsaved
@@ -226,9 +218,7 @@ struct RestoreActionHandlerTests {
         try await engine.execute("restore")
 
         // Then: Should succeed even without light
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > restore
             If you restore your saved game now you will lose any unsaved

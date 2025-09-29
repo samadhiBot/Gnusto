@@ -30,9 +30,7 @@ struct CloseActionHandlerTests {
         try await engine.execute("close chest")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > close chest
             Firmly closed.
@@ -66,9 +64,7 @@ struct CloseActionHandlerTests {
         try await engine.execute("shut door")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > shut door
             Firmly closed.
@@ -88,9 +84,7 @@ struct CloseActionHandlerTests {
         try await engine.execute("close")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > close
             Close what?
@@ -127,9 +121,7 @@ struct CloseActionHandlerTests {
         try await engine.execute("close door")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > close door
             Any such thing lurks beyond your reach.
@@ -157,9 +149,7 @@ struct CloseActionHandlerTests {
         try await engine.execute("close rock")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > close rock
             The large rock stubbornly resists your attempts to close it.
@@ -197,9 +187,7 @@ struct CloseActionHandlerTests {
         try await engine.execute("close chest")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > close chest
             The darkness here is absolute, consuming all light and hope of
@@ -232,9 +220,7 @@ struct CloseActionHandlerTests {
         try await engine.execute("close box")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > close box
             Firmly closed.
@@ -268,9 +254,7 @@ struct CloseActionHandlerTests {
         try await engine.execute("close chest")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > close chest
             The closed chest is already closed.

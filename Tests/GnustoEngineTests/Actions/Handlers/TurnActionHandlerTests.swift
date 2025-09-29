@@ -28,9 +28,7 @@ struct TurnActionHandlerTests {
         try await engine.execute("turn dial")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > turn dial
             The brass dial remains fixed in its orientation, defying
@@ -62,9 +60,7 @@ struct TurnActionHandlerTests {
         try await engine.execute("rotate wheel")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > rotate wheel
             The steering wheel remains fixed in its orientation, defying
@@ -93,9 +89,7 @@ struct TurnActionHandlerTests {
         try await engine.execute("twist knob")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > twist knob
             The door knob remains fixed in its orientation, defying
@@ -116,9 +110,7 @@ struct TurnActionHandlerTests {
         try await engine.execute("turn")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > turn
             Turn what?
@@ -153,9 +145,7 @@ struct TurnActionHandlerTests {
         try await engine.execute("turn dial")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > turn dial
             Any such thing lurks beyond your reach.
@@ -191,9 +181,7 @@ struct TurnActionHandlerTests {
         try await engine.execute("turn handle")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > turn handle
             The darkness here is absolute, consuming all light and hope of
@@ -225,9 +213,7 @@ struct TurnActionHandlerTests {
         try await engine.execute("turn guard")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > turn guard
             The palace guard is not a crank to be turned at your whim.
@@ -256,9 +242,7 @@ struct TurnActionHandlerTests {
         try await engine.execute("turn cube")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > turn cube
             You rotate the puzzle cube experimentally. Nothing of
@@ -287,9 +271,7 @@ struct TurnActionHandlerTests {
         try await engine.execute("turn statue")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > turn statue
             The marble statue remains fixed in its orientation, defying
@@ -308,9 +290,7 @@ struct TurnActionHandlerTests {
         try await engine.execute("turn Test Room")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > turn Test Room
             Any such thing lurks beyond your reach.
@@ -374,9 +354,7 @@ struct TurnActionHandlerTests {
         try await engine.execute("rotate second dial")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > turn first dial
             The first dial remains fixed in its orientation, defying

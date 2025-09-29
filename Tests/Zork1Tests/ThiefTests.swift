@@ -42,9 +42,7 @@ struct ThiefTests {
             "inventory"
         )
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > go east
             --- Round Room ---
@@ -104,9 +102,7 @@ struct ThiefTests {
         )
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > go east
             --- Round Room ---
@@ -157,9 +153,7 @@ struct ThiefTests {
         )
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > go east
             --- Round Room ---
@@ -217,9 +211,7 @@ struct ThiefTests {
         )
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > go east
             --- Round Room ---
@@ -259,9 +251,7 @@ struct ThiefTests {
         )
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > go east
             --- Round Room ---
@@ -333,9 +323,7 @@ struct ThiefTests {
         try await engine.execute("tell thief about treasure")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > go east
             --- Round Room ---
@@ -362,9 +350,7 @@ struct ThiefTests {
         try await engine.execute("take thief")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > go east
             --- Round Room ---
@@ -387,9 +373,7 @@ struct ThiefTests {
         try await engine.execute("examine stiletto")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > go east
             --- Round Room ---
@@ -412,9 +396,7 @@ struct ThiefTests {
         try await engine.execute("look inside the bag")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > go east
             --- Round Room ---
@@ -437,9 +419,7 @@ struct ThiefTests {
         try await engine.execute("take stiletto")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > go east
             --- Round Room ---
@@ -482,9 +462,7 @@ struct ThiefTests {
         )
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > go east
             --- Round Room ---
@@ -593,9 +571,7 @@ struct ThiefTests {
         try await engine.execute("attack the thief with my sword", times: 3)
 
         // Then - should get enhanced combat response
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > go east
             --- Round Room ---
@@ -720,9 +696,7 @@ struct ThiefTests {
         // Execute a wait command and trigger daemon processing
         try await engine.execute("wait", times: 4)
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > go east
             --- Round Room ---
@@ -773,10 +747,7 @@ struct ThiefTests {
             kill the thief
             """
         )
-        let output = await mockIO.flush()
-
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > go east
             --- Round Room ---

@@ -29,9 +29,7 @@ struct SqueezeActionHandlerTests {
         try await engine.execute("squeeze sponge")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > squeeze sponge
             You give the wet sponge a firm squeezing. It yields little and
@@ -64,9 +62,7 @@ struct SqueezeActionHandlerTests {
         try await engine.execute("compress bellows")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > compress bellows
             You give the leather bellows a firm compressing. It yields
@@ -87,9 +83,7 @@ struct SqueezeActionHandlerTests {
         try await engine.execute("squeeze")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > squeeze
             Squeeze what?
@@ -107,9 +101,7 @@ struct SqueezeActionHandlerTests {
         try await engine.execute("squeeze nonexistent")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > squeeze nonexistent
             You cannot reach any such thing from here.
@@ -145,9 +137,7 @@ struct SqueezeActionHandlerTests {
         try await engine.execute("squeeze pillow")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > squeeze pillow
             You cannot reach any such thing from here.
@@ -165,9 +155,7 @@ struct SqueezeActionHandlerTests {
         try await engine.execute("squeeze the ocean")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > squeeze the ocean
             You cannot squeeze that, despite your best intentions.
@@ -205,9 +193,7 @@ struct SqueezeActionHandlerTests {
         try await engine.execute("squeeze cushion")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > squeeze cushion
             The darkness here is absolute, consuming all light and hope of
@@ -239,9 +225,7 @@ struct SqueezeActionHandlerTests {
         try await engine.execute("squeeze the rubber ball")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > squeeze the rubber ball
             You give the rubber ball a firm squeezing. It yields little and
@@ -274,9 +258,7 @@ struct SqueezeActionHandlerTests {
         try await engine.execute("squeeze the cat")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > squeeze the cat
             You reach toward the fluffy cat and pause. This is not the
@@ -311,9 +293,7 @@ struct SqueezeActionHandlerTests {
         try await engine.execute("squeeze the necromancer")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > squeeze the necromancer
             Aggression is one thing; squeezing the furious necromancer is
@@ -339,9 +319,7 @@ struct SqueezeActionHandlerTests {
         try await engine.execute("squeeze myself")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > squeeze myself
             You embrace yourself in a moment of self-comfort.
@@ -381,9 +359,7 @@ struct SqueezeActionHandlerTests {
         )
 
         // Then - verify second pillow was squeezed
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > squeeze red pillow
             You give the red pillow a firm squeezing. It yields little and

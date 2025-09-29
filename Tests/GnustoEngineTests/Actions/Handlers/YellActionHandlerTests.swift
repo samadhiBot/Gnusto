@@ -18,9 +18,7 @@ struct YellActionHandlerTests {
         try await engine.execute("yell")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > yell
             Your voice tears through the silence like a blade.
@@ -50,9 +48,7 @@ struct YellActionHandlerTests {
         try await engine.execute("yell")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > yell
             Your voice tears through the silence like a blade.

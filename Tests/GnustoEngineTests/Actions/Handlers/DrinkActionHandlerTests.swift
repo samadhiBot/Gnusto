@@ -30,9 +30,7 @@ struct DrinkActionHandlerTests {
         try await engine.execute("drink water")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > drink water
             Now is not the moment for imbibing the glass of water.
@@ -65,9 +63,7 @@ struct DrinkActionHandlerTests {
         try await engine.execute("sip coffee")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > sip coffee
             Now is not the moment for imbibing the cup of coffee.
@@ -97,9 +93,7 @@ struct DrinkActionHandlerTests {
         try await engine.execute("imbibe potion")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > imbibe potion
             Now is not the moment for imbibing the magic potion.
@@ -119,9 +113,7 @@ struct DrinkActionHandlerTests {
         try await engine.execute("drink")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > drink
             Drink what?
@@ -139,9 +131,7 @@ struct DrinkActionHandlerTests {
         try await engine.execute("drink nonexistent")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > drink nonexistent
             Any such thing lurks beyond your reach.
@@ -171,9 +161,7 @@ struct DrinkActionHandlerTests {
         try await engine.execute("drink water")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > drink water
             Now is not the moment for imbibing the glass of water.
@@ -202,9 +190,7 @@ struct DrinkActionHandlerTests {
         try await engine.execute("drink rock")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > drink rock
             The large rock was never meant to pass human lips.
@@ -243,9 +229,7 @@ struct DrinkActionHandlerTests {
         try await engine.execute("drink water")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > drink water
             The darkness here is absolute, consuming all light and hope of
@@ -281,9 +265,7 @@ struct DrinkActionHandlerTests {
         let finalState = await engine.item("juice")
         #expect(await finalState.hasFlag(.isTouched) == true)
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > drink juice
             Now is not the moment for imbibing the orange juice.
@@ -324,9 +306,7 @@ struct DrinkActionHandlerTests {
         try await engine.execute("drink elixir")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > drink elixir
             The elixir tastes magical and you feel your strength returning.
@@ -366,9 +346,7 @@ struct DrinkActionHandlerTests {
         try await engine.execute("drink bottle")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > drink bottle
             Now is not the moment for imbibing the red wine.
@@ -412,9 +390,7 @@ struct DrinkActionHandlerTests {
         try await engine.execute("drink bottle")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > drink bottle
             Now is not the moment for imbibing the pure water.
@@ -445,9 +421,7 @@ struct DrinkActionHandlerTests {
         try await engine.execute("drink cup")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > drink cup
             The empty cup offers nothing to slake your thirst.
@@ -490,9 +464,7 @@ struct DrinkActionHandlerTests {
         )
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > drink tea
             Now is not the moment for imbibing the hot tea.
@@ -530,9 +502,7 @@ struct DrinkActionHandlerTests {
         try await engine.execute("drink smoothie")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > drink smoothie
             Now is not the moment for imbibing the fruit smoothie.

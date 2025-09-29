@@ -28,9 +28,7 @@ struct MoveActionHandlerTests {
         try await engine.execute("move box")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > move box
             The wooden box remains firmly where it is, despite your
@@ -62,9 +60,7 @@ struct MoveActionHandlerTests {
         try await engine.execute("shift stone")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > shift stone
             The large stone remains firmly where it is, despite your
@@ -93,9 +89,7 @@ struct MoveActionHandlerTests {
         try await engine.execute("slide block")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > slide block
             The ice block remains firmly where it is, despite your efforts.
@@ -130,9 +124,7 @@ struct MoveActionHandlerTests {
         try await engine.execute("move chair to table")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > move chair to table
             Moving the wooden chair to the wooden table proves impossible.
@@ -152,9 +144,7 @@ struct MoveActionHandlerTests {
         try await engine.execute("move")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > move
             Nervous movement carries you nowhere in particular.
@@ -172,9 +162,7 @@ struct MoveActionHandlerTests {
         try await engine.execute("move nonexistent")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > move nonexistent
             You cannot reach any such thing from here.
@@ -209,9 +197,7 @@ struct MoveActionHandlerTests {
         try await engine.execute("move box")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > move box
             You cannot reach any such thing from here.
@@ -229,9 +215,7 @@ struct MoveActionHandlerTests {
         try await engine.execute("move testRoom")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > move testRoom
             You cannot reach any such thing from here.
@@ -249,9 +233,7 @@ struct MoveActionHandlerTests {
         try await engine.execute("move me")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > move me
             You pace about with restless energy.
@@ -288,9 +270,7 @@ struct MoveActionHandlerTests {
         try await engine.execute("move box")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > move box
             The darkness here is absolute, consuming all light and hope of
@@ -328,9 +308,7 @@ struct MoveActionHandlerTests {
         let finalState = await engine.item("barrel")
         #expect(await finalState.hasFlag(.isTouched) == true)
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > move barrel
             The oak barrel remains firmly where it is, despite your
@@ -371,9 +349,7 @@ struct MoveActionHandlerTests {
         // Then - "examine it" should now refer to the chest
         try await engine.execute("examine it")
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > examine sword
             A sharp steel sword.
@@ -409,9 +385,7 @@ struct MoveActionHandlerTests {
         try await engine.execute("move book")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > move book
             The heavy book remains firmly where it is, despite your
@@ -454,9 +428,7 @@ struct MoveActionHandlerTests {
         try await engine.execute("move gem")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > move gem
             The ruby gem remains firmly where it is, despite your efforts.
@@ -502,9 +474,7 @@ struct MoveActionHandlerTests {
         // When - Move character
         try await engine.execute("move wizard")
 
-        let characterOutput = await mockIO.flush()
-        expectNoDifference(
-            characterOutput,
+        await mockIO.expectOutput(
             """
             > move wizard
             The old wizard remains firmly where it is, despite your
@@ -515,9 +485,7 @@ struct MoveActionHandlerTests {
         // When - Move device
         try await engine.execute("move device")
 
-        let deviceOutput = await mockIO.flush()
-        expectNoDifference(
-            deviceOutput,
+        await mockIO.expectOutput(
             """
             > move device
             The mechanical device remains firmly where it is, despite your
@@ -528,9 +496,7 @@ struct MoveActionHandlerTests {
         // When - Move scenery
         try await engine.execute("move pillar")
 
-        let sceneryOutput = await mockIO.flush()
-        expectNoDifference(
-            sceneryOutput,
+        await mockIO.expectOutput(
             """
             > move pillar
             The stone pillar remains firmly where it is, despite your
@@ -549,9 +515,7 @@ struct MoveActionHandlerTests {
         try await engine.execute("move all")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > move all
             The verb 'move' doesn't support multiple objects.
@@ -593,9 +557,7 @@ struct MoveActionHandlerTests {
         try await engine.execute("move all")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > move all
             The verb 'move' doesn't support multiple objects.
@@ -637,9 +599,7 @@ struct MoveActionHandlerTests {
         try await engine.execute("move all")
 
         // Then - Should only move reachable items
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > move all
             The verb 'move' doesn't support multiple objects.

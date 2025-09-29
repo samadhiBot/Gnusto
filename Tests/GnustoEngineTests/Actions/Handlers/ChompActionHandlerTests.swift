@@ -29,9 +29,7 @@ struct ChompActionHandlerTests {
         try await engine.execute("chomp apple")
 
         // Then: Should ask whether to eat it
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > chomp apple
             Do you mean you want to eat the red apple?
@@ -64,9 +62,7 @@ struct ChompActionHandlerTests {
         try await engine.execute("chomp apple", "yes")
 
         // Then: Should eat the apple (delegate to EatActionHandler)
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > chomp apple
             Do you mean you want to eat the red apple?
@@ -105,9 +101,7 @@ struct ChompActionHandlerTests {
         try await engine.execute("chomp apple", "no")
 
         // Then: Should just decline
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > chomp apple
             Do you mean you want to eat the red apple?
@@ -144,9 +138,7 @@ struct ChompActionHandlerTests {
         try await engine.execute("bite bread")
 
         // Then: Should ask for disambiguation
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > bite bread
             Do you mean you want to eat the piece of bread?
@@ -164,9 +156,7 @@ struct ChompActionHandlerTests {
         try await engine.execute("chew")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > chew
             Your teeth clack together in a display of purposeless
@@ -205,9 +195,7 @@ struct ChompActionHandlerTests {
         try await engine.execute("chomp apple")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > chomp apple
             Any such thing lurks beyond your reach.
@@ -244,9 +232,7 @@ struct ChompActionHandlerTests {
         try await engine.execute("chomp apple")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > chomp apple
             The darkness here is absolute, consuming all light and hope of
@@ -267,9 +253,7 @@ struct ChompActionHandlerTests {
         try await engine.execute("chomp")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > chomp
             Your teeth clack together in a display of purposeless
@@ -299,9 +283,7 @@ struct ChompActionHandlerTests {
         try await engine.execute("chomp cookie")
 
         // Then: Should ask for disambiguation
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > chomp cookie
             Do you mean you want to eat the chocolate cookie?
@@ -334,9 +316,7 @@ struct ChompActionHandlerTests {
         try await engine.execute("chomp guard")
 
         // Then: Should give humorous response directly (no disambiguation)
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > chomp guard
             Your dental assault on the castle guard would likely end your
@@ -368,9 +348,7 @@ struct ChompActionHandlerTests {
         try await engine.execute("chomp rock")
 
         // Then: Should give humorous response directly (no disambiguation)
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > chomp rock
             Your teeth are no match for the smooth rock.
@@ -402,9 +380,7 @@ struct ChompActionHandlerTests {
         try await engine.execute("chomp apple", "look")
 
         // Then: Question should be automatically cleared
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > chomp apple
             Do you mean you want to eat the red apple?

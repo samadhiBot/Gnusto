@@ -18,9 +18,7 @@ struct BriefActionHandlerTests {
         try await engine.execute("brief")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > brief
             Brief mode is now on. Full location descriptions will be shown
@@ -46,9 +44,7 @@ struct BriefActionHandlerTests {
         try await engine.execute("brief")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > brief
             Brief mode is now on. Full location descriptions will be shown
@@ -103,9 +99,7 @@ struct BriefActionHandlerTests {
         try await engine.execute("brief")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > brief
             Brief mode is now on. Full location descriptions will be shown

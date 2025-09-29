@@ -31,9 +31,7 @@ struct DeflateActionHandlerTests {
         try await engine.execute("deflate balloon")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > deflate balloon
             You deflate the red balloon.
@@ -57,9 +55,7 @@ struct DeflateActionHandlerTests {
         try await engine.execute("deflate")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > deflate
             Deflate what?
@@ -96,9 +92,7 @@ struct DeflateActionHandlerTests {
         try await engine.execute("deflate balloon")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > deflate balloon
             Any such thing lurks beyond your reach.
@@ -126,9 +120,7 @@ struct DeflateActionHandlerTests {
         try await engine.execute("deflate rock")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > deflate rock
             The large rock stubbornly resists your attempts to deflate it.
@@ -167,9 +159,7 @@ struct DeflateActionHandlerTests {
         try await engine.execute("deflate balloon")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > deflate balloon
             The darkness here is absolute, consuming all light and hope of
@@ -209,9 +199,7 @@ struct DeflateActionHandlerTests {
         #expect(await finalState.hasFlag(.isInflatable) == true)  // Still inflatable
 
         // Verify message
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > deflate raft
             You deflate the rubber raft.
@@ -242,9 +230,7 @@ struct DeflateActionHandlerTests {
         try await engine.execute("deflate balloon")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > deflate balloon
             The blue balloon is not inflated.
@@ -280,9 +266,7 @@ struct DeflateActionHandlerTests {
         try await engine.execute("deflate balloon")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > deflate balloon
             You deflate the green balloon.
@@ -325,9 +309,7 @@ struct DeflateActionHandlerTests {
         try await engine.execute("deflate balloon")
 
         // Then
-        let output1 = await mockIO.flush()
-        expectNoDifference(
-            output1,
+        await mockIO.expectOutput(
             """
             > deflate balloon
             You deflate the yellow balloon.
@@ -338,9 +320,7 @@ struct DeflateActionHandlerTests {
         try await engine.execute("deflate mattress")
 
         // Then
-        let output2 = await mockIO.flush()
-        expectNoDifference(
-            output2,
+        await mockIO.expectOutput(
             """
             > deflate mattress
             You deflate the air mattress.

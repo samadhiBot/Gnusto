@@ -18,9 +18,7 @@ struct ModernizationSuccessTests {
         try await engine.execute("look")
 
         // Then: Modern expectation syntax works
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > look
             --- Laboratory ---
@@ -66,9 +64,7 @@ struct ModernizationSuccessTests {
             #expect(Bool(false), "Item should be with player")
         }
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > take modern item
             Taken.

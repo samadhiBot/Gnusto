@@ -88,8 +88,7 @@ struct QuickCombatTest {
         // Combat state might be created or might be nil if combat ended quickly
         // Both are valid depending on the random combat outcome
 
-        let output = await mockIO.flush()
-        #expect(output.contains("> attack orc"))
+        await mockIO.expectOutput("> attack orc"))
     }
 
     @Test("Weapons affect combat")
@@ -129,9 +128,7 @@ struct QuickCombatTest {
         try await engine.execute("attack rat with sword")
 
         // Then: Attack should be processed
-        let output = await mockIO.flush()
-
-        #expect(output.contains("> attack rat with sword"))
+        await mockIO.expectOutput("> attack rat with sword"))
         #expect(output.contains("sword") || output.contains("rat"))
 
         // Rat likely died from powerful weapon, but verify it was processed

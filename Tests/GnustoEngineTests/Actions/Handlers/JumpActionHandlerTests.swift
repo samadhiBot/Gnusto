@@ -18,9 +18,7 @@ struct JumpActionHandlerTests {
         try await engine.execute("jump")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > jump
             You spring upward with temporary defiance of gravity.
@@ -48,9 +46,7 @@ struct JumpActionHandlerTests {
         try await engine.execute("jump log")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > jump log
             You can't jump over the fallen log.
@@ -81,9 +77,7 @@ struct JumpActionHandlerTests {
         try await engine.execute("jump over stream")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > jump over stream
             You can't jump over the small stream.
@@ -120,9 +114,7 @@ struct JumpActionHandlerTests {
         try await engine.execute("jump obstacle")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > jump obstacle
             Any such thing lurks beyond your reach.
@@ -150,9 +142,7 @@ struct JumpActionHandlerTests {
         try await engine.execute("jump")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > jump
             You spring upward with temporary defiance of gravity.
@@ -175,9 +165,7 @@ struct JumpActionHandlerTests {
         try await engine.execute("jump troll")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > jump troll
             Leaping upon the fierce troll would be an extraordinary breach
@@ -209,9 +197,7 @@ struct JumpActionHandlerTests {
         try await engine.execute("jump boulder")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > jump boulder
             You can't jump over the large boulder.
@@ -266,9 +252,7 @@ struct JumpActionHandlerTests {
         try await engine.execute("jump over puddle")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > jump over puddle
             You can't jump over the mud puddle.

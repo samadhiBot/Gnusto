@@ -18,9 +18,7 @@ struct DanceActionHandlerTests {
         try await engine.execute("dance")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > dance
             You execute a series of movements that could generously be
@@ -49,9 +47,7 @@ struct DanceActionHandlerTests {
         try await engine.execute("dance with statue")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > dance with statue
             The stone statue proves a disappointingly rigid dance partner.
@@ -80,9 +76,7 @@ struct DanceActionHandlerTests {
         try await engine.execute("dance with partner")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > dance with partner
             You and the dance partner move together in unexpected harmony,
@@ -112,9 +106,7 @@ struct DanceActionHandlerTests {
         )
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > look
             --- Laboratory ---
@@ -152,9 +144,7 @@ struct DanceActionHandlerTests {
         try await engine.execute("dance")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > dance
             You execute a series of movements that could generously be
@@ -183,9 +173,7 @@ struct DanceActionHandlerTests {
         try await engine.execute("dance with chair")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > dance with chair
             The wooden chair proves a disappointingly rigid dance partner.

@@ -18,9 +18,7 @@ struct ThinkActionHandlerTests {
         try await engine.execute("think")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > think
             Deep cogitation yields no immediate revelations.
@@ -48,9 +46,7 @@ struct ThinkActionHandlerTests {
         try await engine.execute("think about puzzle")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > think about puzzle
             The ancient puzzle occupies your mental landscape for a
@@ -82,9 +78,7 @@ struct ThinkActionHandlerTests {
         try await engine.execute("consider gem")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > consider gem
             The sparkling gem occupies your mental landscape for a
@@ -116,9 +110,7 @@ struct ThinkActionHandlerTests {
         try await engine.execute("ponder over riddle")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > ponder over riddle
             The complex riddle occupies your mental landscape for a
@@ -142,9 +134,7 @@ struct ThinkActionHandlerTests {
         try await engine.execute("think about nonexistent")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > think about nonexistent
             You cannot reach any such thing from here.
@@ -179,9 +169,7 @@ struct ThinkActionHandlerTests {
         try await engine.execute("think about object")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > think about object
             You cannot reach any such thing from here.
@@ -210,9 +198,7 @@ struct ThinkActionHandlerTests {
         try await engine.execute("think")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > think
             Deep cogitation yields no immediate revelations.
@@ -249,9 +235,7 @@ struct ThinkActionHandlerTests {
         try await engine.execute("think about stone")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > think about stone
             The smooth stone occupies your mental landscape for a
@@ -283,9 +267,7 @@ struct ThinkActionHandlerTests {
         try await engine.execute("think about wizard")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > think about wizard
             You think about the old wizard.
@@ -309,9 +291,7 @@ struct ThinkActionHandlerTests {
         try await engine.execute("think about troll")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > think about troll
             You think about the fierce troll.
@@ -342,9 +322,7 @@ struct ThinkActionHandlerTests {
         try await engine.execute("think about box")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > think about box
             The wooden box occupies your mental landscape for a thoughtful
@@ -366,9 +344,7 @@ struct ThinkActionHandlerTests {
         try await engine.execute("think about myself")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > think about myself
             You turn your thoughts inward, finding the usual mixture of
@@ -387,9 +363,7 @@ struct ThinkActionHandlerTests {
         try await engine.execute("think about the test room")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > think about the test room
             You cannot reach any such thing from here.
@@ -407,9 +381,7 @@ struct ThinkActionHandlerTests {
         try await engine.execute("think about silence")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > think about silence
             The nature of the silence occupies your philosophical
@@ -428,9 +400,7 @@ struct ThinkActionHandlerTests {
         try await engine.execute("think")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > think
             Deep cogitation yields no immediate revelations.

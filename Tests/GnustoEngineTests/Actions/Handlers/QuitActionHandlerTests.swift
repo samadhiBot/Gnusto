@@ -22,9 +22,7 @@ struct QuitActionHandlerTests {
         try await engine.execute("quit")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > quit
             Your score is 0 (total of 10 points), in 0 moves. Do you wish
@@ -47,9 +45,7 @@ struct QuitActionHandlerTests {
         try await engine.execute("q")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > q
             Your score is 0 (total of 10 points), in 0 moves. Do you wish
@@ -85,9 +81,7 @@ struct QuitActionHandlerTests {
         try await engine.execute("quit")
 
         // Then - Quit should work even in darkness
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > quit
             Your score is 0 (total of 10 points), in 0 moves. Do you wish
@@ -110,9 +104,7 @@ struct QuitActionHandlerTests {
         try await engine.execute("quit")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > quit
             Your score is 0 (total of 10 points), in 0 moves. Do you wish
@@ -137,9 +129,7 @@ struct QuitActionHandlerTests {
         try await engine.execute("quit")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > quit
             Your score is 0 (total of 10 points), in 0 moves. Do you wish
@@ -166,9 +156,7 @@ struct QuitActionHandlerTests {
         try await engine.execute("quit")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > quit
             Your score is 0 (total of 10 points), in 0 moves. Do you wish
@@ -194,9 +182,7 @@ struct QuitActionHandlerTests {
         try await engine.execute("quit")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > quit
             Your score is 0 (total of 10 points), in 0 moves. Do you wish
@@ -223,9 +209,7 @@ struct QuitActionHandlerTests {
         try await engine.execute("quit")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > quit
             Your score is 0 (total of 10 points), in 0 moves. Do you wish
@@ -251,9 +235,7 @@ struct QuitActionHandlerTests {
         try await engine.execute("quit")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > quit
             Your score is 0 (total of 10 points), in 0 moves. Do you wish
@@ -280,9 +262,7 @@ struct QuitActionHandlerTests {
         try await engine.execute("quit")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > quit
             Your score is 0 (total of 10 points), in 0 moves. Do you wish
@@ -320,9 +300,7 @@ struct QuitActionHandlerTests {
         try await engine.execute("quit")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > look
             --- Laboratory ---
@@ -354,9 +332,7 @@ struct QuitActionHandlerTests {
         try await engine.execute("quit")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > quit
             Your score is 0 (total of 10 points), in 0 moves. Do you wish
@@ -376,9 +352,7 @@ struct QuitActionHandlerTests {
         try await engine.execute("quit")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > quit
             Your score is 0 (total of 10 points), in 0 moves. Do you wish
@@ -401,9 +375,7 @@ struct QuitActionHandlerTests {
         try await engine.execute("quit")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > quit
             Your score is 0 (total of 10 points), in 0 moves. Do you wish
@@ -429,9 +401,7 @@ struct QuitActionHandlerTests {
         try await engine.execute("quit")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > quit
             Your score is 0 (total of 10 points), in 0 moves. Do you wish

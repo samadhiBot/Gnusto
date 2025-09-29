@@ -18,9 +18,7 @@ struct ClimbActionHandlerTests {
         try await engine.execute("climb")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > climb
             Climb what?
@@ -49,9 +47,7 @@ struct ClimbActionHandlerTests {
         try await engine.execute("climb tree")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > climb tree
             You climb the tall tree.
@@ -83,9 +79,7 @@ struct ClimbActionHandlerTests {
         try await engine.execute("ascend ladder")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > ascend ladder
             You climb the wooden ladder.
@@ -123,9 +117,7 @@ struct ClimbActionHandlerTests {
         try await engine.execute("climb tree")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > climb tree
             Any such thing lurks beyond your reach.
@@ -143,9 +135,7 @@ struct ClimbActionHandlerTests {
         try await engine.execute("climb me")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > climb me
             The logistics of climbing oneself prove insurmountable.
@@ -182,9 +172,7 @@ struct ClimbActionHandlerTests {
         try await engine.execute("climb tree")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > climb tree
             The darkness here is absolute, consuming all light and hope of
@@ -216,9 +204,7 @@ struct ClimbActionHandlerTests {
         try await engine.execute("climb rope")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > climb rope
             You climb the thick rope.
@@ -249,9 +235,7 @@ struct ClimbActionHandlerTests {
         try await engine.execute("climb table")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > climb table
             The heavy table stubbornly resists your attempts to climb it.
@@ -309,9 +293,7 @@ struct ClimbActionHandlerTests {
         )
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > look
             --- Round Room ---

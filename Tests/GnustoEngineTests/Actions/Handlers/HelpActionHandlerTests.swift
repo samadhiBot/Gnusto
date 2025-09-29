@@ -45,8 +45,7 @@ struct HelpActionHandlerTests {
         try await engine.execute("help")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(output, helpResponse)
+        await mockIO.expectOutput(helpResponse)
     }
 
     // MARK: - Validation Testing
@@ -72,8 +71,7 @@ struct HelpActionHandlerTests {
         try await engine.execute("help")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(output, helpResponse)
+        await mockIO.expectOutput(helpResponse)
     }
 
     // MARK: - Intent Testing

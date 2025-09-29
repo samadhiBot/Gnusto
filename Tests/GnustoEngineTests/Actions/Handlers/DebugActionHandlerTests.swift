@@ -32,9 +32,7 @@ struct DebugActionHandlerTests {
         try await engine.execute("debug lamp")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > debug lamp
             ```
@@ -67,9 +65,7 @@ struct DebugActionHandlerTests {
         try await engine.execute("debug")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > debug
             DEBUG requires a direct object to examine.
@@ -87,9 +83,7 @@ struct DebugActionHandlerTests {
         try await engine.execute("debug nonexistent")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > debug nonexistent
             ```
@@ -135,9 +129,7 @@ struct DebugActionHandlerTests {
         try await engine.execute("debug lamp")
 
         // Then - Debug should work even in darkness
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > debug lamp
             ```
@@ -183,9 +175,7 @@ struct DebugActionHandlerTests {
         try await engine.execute("debug sword")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > debug sword
             ```
@@ -215,9 +205,7 @@ struct DebugActionHandlerTests {
         try await engine.execute("debug startRoom")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > debug startRoom
             ```
@@ -244,9 +232,7 @@ struct DebugActionHandlerTests {
         try await engine.execute("debug me")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > debug me
             ```
@@ -298,9 +284,7 @@ struct DebugActionHandlerTests {
         try await engine.execute("debug self")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > debug self
             ```
@@ -372,9 +356,7 @@ struct DebugActionHandlerTests {
         try await engine.execute("debug lamp")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > debug lamp
             ```
@@ -425,9 +407,7 @@ struct DebugActionHandlerTests {
         try await engine.execute("debug remoteItem")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > debug remoteItem
             ```

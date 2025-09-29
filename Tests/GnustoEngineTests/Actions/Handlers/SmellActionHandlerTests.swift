@@ -30,9 +30,7 @@ struct SmellActionHandlerTests {
         try await engine.execute("smell lamp")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > smell lamp
             The brass lamp smells exactly as you'd expect, which is to say,
@@ -56,9 +54,7 @@ struct SmellActionHandlerTests {
         try await engine.execute("smell nonexistent")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > smell nonexistent
             Any such thing remains frustratingly inaccessible.
@@ -93,9 +89,7 @@ struct SmellActionHandlerTests {
         try await engine.execute("smell statue")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > smell statue
             Any such thing remains frustratingly inaccessible.
@@ -113,9 +107,7 @@ struct SmellActionHandlerTests {
         try await engine.execute("smell the sky")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > smell the sky
             You detect no olfactory surprises.
@@ -152,9 +144,7 @@ struct SmellActionHandlerTests {
         try await engine.execute("smell the dark room")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > smell the dark room
             You detect no olfactory surprises.
@@ -185,9 +175,7 @@ struct SmellActionHandlerTests {
         try await engine.execute("smell the wizard")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > smell the wizard
             The old wizard's personal aroma remains their private business.
@@ -221,9 +209,7 @@ struct SmellActionHandlerTests {
         try await engine.execute("smell the necromancer")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > smell the necromancer
             You detect nothing unusual about the furious necromancer's
@@ -249,9 +235,7 @@ struct SmellActionHandlerTests {
         try await engine.execute("sniff")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > sniff
             Nothing remarkable greets your nostrils.
@@ -269,9 +253,7 @@ struct SmellActionHandlerTests {
         try await engine.execute("sniff myself")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > sniff myself
             Your personal aroma falls within acceptable parameters.

@@ -87,9 +87,7 @@ struct UnscriptActionHandlerTests {
         try await engine.execute("unscript")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > unscript
             Scripting is not currently on.
@@ -384,9 +382,7 @@ struct UnscriptActionHandlerTests {
         )
 
         // Then: Should fail each time
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > unscript
             Scripting is not currently on.

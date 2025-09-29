@@ -29,9 +29,7 @@ struct BurnActionHandlerTests {
         try await engine.execute("burn paper")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > burn paper
             The piece of paper stubbornly resists your attempts to burn it.
@@ -68,9 +66,7 @@ struct BurnActionHandlerTests {
         try await engine.execute("burn paper with match")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > burn paper with match
             You can't burn the piece of paper with the wooden match.
@@ -99,9 +95,7 @@ struct BurnActionHandlerTests {
         try await engine.execute("ignite wood")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > ignite wood
             The dry wood stubbornly resists your attempts to ignite it.
@@ -130,9 +124,7 @@ struct BurnActionHandlerTests {
         try await engine.execute("light tinder")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > light tinder
             The dry tinder stubbornly resists your attempts to light it.
@@ -152,9 +144,7 @@ struct BurnActionHandlerTests {
         try await engine.execute("burn")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > burn
             Burn what?
@@ -190,9 +180,7 @@ struct BurnActionHandlerTests {
         try await engine.execute("burn paper")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > burn paper
             Any such thing lurks beyond your reach.
@@ -229,9 +217,7 @@ struct BurnActionHandlerTests {
         try await engine.execute("burn paper")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > burn paper
             The piece of paper stubbornly resists your attempts to burn it.
@@ -268,9 +254,7 @@ struct BurnActionHandlerTests {
         try await engine.execute("burn paper with match")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > burn paper with match
             You aren't holding the wooden match.
@@ -303,9 +287,7 @@ struct BurnActionHandlerTests {
         try await engine.execute("light flashlight")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > light flashlight
             You light the electric flashlight.
@@ -345,9 +327,7 @@ struct BurnActionHandlerTests {
         try await engine.execute("light torch")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > light torch
             The wooden torch already dances with flame.
@@ -379,9 +359,7 @@ struct BurnActionHandlerTests {
         try await engine.execute("light candle")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > light candle
             You light the white candle. You can see your surroundings now.
@@ -417,9 +395,7 @@ struct BurnActionHandlerTests {
         try await engine.execute("light torch")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > light torch
             You need something to light the wooden torch with.
@@ -463,9 +439,7 @@ struct BurnActionHandlerTests {
         try await engine.execute("light torch with match")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > light torch with match
             You light the wooden torch. You can see your surroundings now.
@@ -511,9 +485,7 @@ struct BurnActionHandlerTests {
         try await engine.execute("light torch with lighter")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > light torch with lighter
             You light the wooden torch. You can see your surroundings now.
@@ -558,9 +530,7 @@ struct BurnActionHandlerTests {
         try await engine.execute("light torch with rock")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > light torch with rock
             You can't light the wooden torch with the granite rock.
@@ -591,9 +561,7 @@ struct BurnActionHandlerTests {
         try await engine.execute("burn book")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > burn book
             The leather book stubbornly resists your attempts to burn it.
@@ -631,9 +599,7 @@ struct BurnActionHandlerTests {
         try await engine.execute("burn paper with match")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > burn paper with match
             The wooden match proves woefully inadequate as an implement of
@@ -665,9 +631,7 @@ struct BurnActionHandlerTests {
         try await engine.execute("burn wizard")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > burn wizard
             That would be needlessly cruel.
@@ -702,9 +666,7 @@ struct BurnActionHandlerTests {
         )
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > look
             --- Laboratory ---
@@ -771,9 +733,7 @@ struct BurnActionHandlerTests {
         try await engine.execute("burn guard with torch")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > burn guard with torch
             The burning torch proves woefully inadequate as an implement of
@@ -843,9 +803,7 @@ struct BurnActionHandlerTests {
         try await engine.execute("light paper")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > burn paper
             The piece of paper stubbornly resists your attempts to burn it.
@@ -881,9 +839,7 @@ struct BurnActionHandlerTests {
         try await engine.execute("burn paper with unicorn")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > burn paper with unicorn
             Any such thing lurks beyond your reach.
@@ -924,9 +880,7 @@ struct BurnActionHandlerTests {
         try await engine.execute("light candle")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > light candle
             You light the white candle. You can see your surroundings now.

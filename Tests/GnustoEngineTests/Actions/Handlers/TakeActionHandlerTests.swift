@@ -29,9 +29,7 @@ struct TakeActionHandlerTests {
         try await engine.execute("take book")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > take book
             Taken.
@@ -64,9 +62,7 @@ struct TakeActionHandlerTests {
         try await engine.execute("get coin")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > get coin
             Taken.
@@ -98,9 +94,7 @@ struct TakeActionHandlerTests {
         try await engine.execute("grab key")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > grab key
             Taken.
@@ -132,9 +126,7 @@ struct TakeActionHandlerTests {
         try await engine.execute("steal gem")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > steal gem
             Taken.
@@ -166,9 +158,7 @@ struct TakeActionHandlerTests {
         try await engine.execute("pick up feather")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > pick up feather
             Taken.
@@ -209,9 +199,7 @@ struct TakeActionHandlerTests {
         try await engine.execute("take ring from box")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > take ring from box
             Taken.
@@ -251,9 +239,7 @@ struct TakeActionHandlerTests {
         try await engine.execute("take all")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > take all
             You take the red book and the gold coin.
@@ -278,9 +264,7 @@ struct TakeActionHandlerTests {
         try await engine.execute("take")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > take
             Take what?
@@ -298,9 +282,7 @@ struct TakeActionHandlerTests {
         try await engine.execute("take nonexistent")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > take nonexistent
             Any such thing lurks beyond your reach.
@@ -336,9 +318,7 @@ struct TakeActionHandlerTests {
         try await engine.execute("take book")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > take book
             Any such thing lurks beyond your reach.
@@ -367,9 +347,7 @@ struct TakeActionHandlerTests {
         try await engine.execute("take statue")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > take statue
             The stone statue stubbornly resists your attempts to take it.
@@ -398,9 +376,7 @@ struct TakeActionHandlerTests {
         try await engine.execute("take book")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > take book
             That already resides among your possessions.
@@ -438,9 +414,7 @@ struct TakeActionHandlerTests {
         try await engine.execute("take treasure")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > take treasure
             Any such thing lurks beyond your reach.
@@ -480,9 +454,7 @@ struct TakeActionHandlerTests {
         try await engine.execute("take marble")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > take marble
             The glass jar is closed.
@@ -519,9 +491,7 @@ struct TakeActionHandlerTests {
         try await engine.execute("take coin")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > take coin
             Taken.
@@ -568,9 +538,7 @@ struct TakeActionHandlerTests {
         try await engine.execute("take ring from bag")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > take ring from bag
             The silver ring is not in the leather bag.
@@ -608,9 +576,7 @@ struct TakeActionHandlerTests {
         try await engine.execute("take book")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > take book
             The darkness here is absolute, consuming all light and hope of
@@ -651,9 +617,7 @@ struct TakeActionHandlerTests {
         try await engine.execute("take vase")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > take vase
             Taken.
@@ -694,9 +658,7 @@ struct TakeActionHandlerTests {
         try await engine.execute("take candle")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > take candle
             Taken.
@@ -744,9 +706,7 @@ struct TakeActionHandlerTests {
         try await engine.execute("take all")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > take all
             You take the red book and the blue pen.
@@ -784,9 +744,7 @@ struct TakeActionHandlerTests {
         try await engine.execute("take all")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > take all
             Take what?
@@ -823,9 +781,7 @@ struct TakeActionHandlerTests {
         try await engine.execute("take all")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > take all
             You take the blue pen.
@@ -858,9 +814,7 @@ struct TakeActionHandlerTests {
         try await engine.execute("examine it")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > take book
             Taken.

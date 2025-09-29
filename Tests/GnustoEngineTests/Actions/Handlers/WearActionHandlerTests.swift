@@ -30,9 +30,7 @@ struct WearActionHandlerTests {
         try await engine.execute("wear hat")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > wear hat
             You don the red hat with practiced ease.
@@ -66,9 +64,7 @@ struct WearActionHandlerTests {
         try await engine.execute("put on jacket")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > put on jacket
             You don the leather jacket with practiced ease.
@@ -101,9 +97,7 @@ struct WearActionHandlerTests {
         try await engine.execute("don cloak")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > don cloak
             You don the dark cloak with practiced ease.
@@ -142,9 +136,7 @@ struct WearActionHandlerTests {
         try await engine.execute("wear all")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > wear all
             You don the wool gloves and the blue hat with practiced ease.
@@ -169,9 +161,7 @@ struct WearActionHandlerTests {
         try await engine.execute("wear")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > wear
             Wear what?
@@ -201,9 +191,7 @@ struct WearActionHandlerTests {
         try await engine.execute("wear hat")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > wear hat
             You aren't holding the fancy hat.
@@ -232,9 +220,7 @@ struct WearActionHandlerTests {
         try await engine.execute("wear rock")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > wear rock
             The heavy rock stubbornly resists your attempts to wear it.
@@ -269,9 +255,7 @@ struct WearActionHandlerTests {
         try await engine.execute("wear boots")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > wear boots
             You are already wearing the hiking boots.
@@ -310,9 +294,7 @@ struct WearActionHandlerTests {
         try await engine.execute("wear scarf")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > wear scarf
             The darkness here is absolute, consuming all light and hope of
@@ -350,9 +332,7 @@ struct WearActionHandlerTests {
         #expect(await finalState.hasFlag(.isTouched) == true)
 
         // Verify message
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > wear ring
             You don the gold ring with practiced ease.
@@ -396,9 +376,7 @@ struct WearActionHandlerTests {
         #expect(await finalShoes.hasFlag(.isWorn) == true)
         #expect(await finalSocks.hasFlag(.isWorn) == true)
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > wear shoes and socks
             You don the running shoes and the cotton socks with practiced
@@ -454,9 +432,7 @@ struct WearActionHandlerTests {
         #expect(await finalBook.hasFlag(.isWorn) == false)
         #expect(await finalTie.hasFlag(.isWorn) == true)
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > wear all
             You don the white shirt and the silk tie with practiced ease.
@@ -493,9 +469,7 @@ struct WearActionHandlerTests {
         try await engine.execute("wear all")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > wear all
             There is nothing here to wear.
@@ -545,9 +519,7 @@ struct WearActionHandlerTests {
         #expect(await finalHat.hasFlag(.isWorn) == true)
         #expect(await finalMittens.hasFlag(.isWorn) == true)
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > wear all
             You don the wool mittens with practiced ease.

@@ -20,9 +20,7 @@ struct Zork1TrollCombatTests {
         try await engine.execute("go east")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > go east
             The troll fends you off with a menacing gesture.
@@ -112,9 +110,7 @@ struct Zork1TrollCombatTests {
         try await engine.execute("give sword to troll")
 
         // Then - should get a combat-related response
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > give sword to troll
             The troll, who is not overly proud, graciously accepts the gift
@@ -140,9 +136,7 @@ struct Zork1TrollCombatTests {
         try await engine.execute("attack the troll with my sword", times: 3)
 
         // Then - should get a response related to troll combat
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > attack the troll with my sword
             Your blood sings as your sword cuts toward the nasty troll who

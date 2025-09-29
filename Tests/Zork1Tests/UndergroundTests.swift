@@ -14,9 +14,7 @@ struct UndergroundTests {
         )
         await engine.run()
 
-        let transcript = await mockIO.flush()
-        expectNoDifference(
-            transcript,
+        await mockIO.expectOutput(
             """
             > north
             --- Troll Room ---
@@ -55,9 +53,7 @@ struct UndergroundTests {
         )
         await engine.run()
 
-        let transcript = await mockIO.flush()
-        expectNoDifference(
-            transcript,
+        await mockIO.expectOutput(
             """
             > north
             --- Troll Room ---

@@ -39,9 +39,7 @@ struct FillActionHandlerTests {
         try await engine.execute("fill bucket")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > fill bucket
             Fill the metal bucket with what?
@@ -83,9 +81,7 @@ struct FillActionHandlerTests {
         try await engine.execute("fill bottle with stream")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > fill bottle with stream
             You fill the glass bottle from the crystal stream.
@@ -124,9 +120,7 @@ struct FillActionHandlerTests {
         try await engine.execute("fill cup from fountain")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > fill cup from fountain
             You fill the ceramic cup from the marble fountain.
@@ -146,9 +140,7 @@ struct FillActionHandlerTests {
         try await engine.execute("fill")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > fill
             Fill what?
@@ -185,9 +177,7 @@ struct FillActionHandlerTests {
         try await engine.execute("fill bucket")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > fill bucket
             Any such thing lurks beyond your reach.
@@ -215,9 +205,7 @@ struct FillActionHandlerTests {
         try await engine.execute("fill rock")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > fill rock
             You can't put things in the large rock.
@@ -255,9 +243,7 @@ struct FillActionHandlerTests {
         try await engine.execute("fill jar")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > fill jar
             The sealed jar is closed.
@@ -302,9 +288,7 @@ struct FillActionHandlerTests {
         try await engine.execute("fill bucket from well")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > fill bucket from well
             Any such thing lurks beyond your reach.
@@ -343,9 +327,7 @@ struct FillActionHandlerTests {
         try await engine.execute("fill bucket")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > fill bucket
             The darkness here is absolute, consuming all light and hope of
@@ -388,9 +370,7 @@ struct FillActionHandlerTests {
         try await engine.execute("fill bottle from box")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > fill bottle from box
             You fill the empty bottle from the wooden box.
@@ -429,9 +409,7 @@ struct FillActionHandlerTests {
         try await engine.execute("fill flask")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > fill flask
             Fill the silver flask with what?
@@ -478,9 +456,7 @@ struct FillActionHandlerTests {
         #expect(await finalState.hasFlag(.isTouched) == true)
 
         // Verify message
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > fill mug with pond
             You fill the ceramic mug from the small pond.
@@ -537,9 +513,7 @@ struct FillActionHandlerTests {
         try await engine.execute("fill bottle from well")
 
         // Then
-        let output1 = await mockIO.flush()
-        expectNoDifference(
-            output1,
+        await mockIO.expectOutput(
             """
             > fill bottle from well
             You fill the glass bottle from the deep well.
@@ -550,9 +524,7 @@ struct FillActionHandlerTests {
         try await engine.execute("fill bucket with stream")
 
         // Then
-        let output2 = await mockIO.flush()
-        expectNoDifference(
-            output2,
+        await mockIO.expectOutput(
             """
             > fill bucket with stream
             You fill the metal bucket from the flowing stream.

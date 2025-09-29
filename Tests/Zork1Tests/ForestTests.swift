@@ -23,9 +23,7 @@ struct ForestTests {
         )
         await engine.run()
 
-        let transcript = await mockIO.flush()
-        expectNoDifference(
-            transcript,
+        await mockIO.expectOutput(
             """
             Zork I: The Great Underground Empire
 

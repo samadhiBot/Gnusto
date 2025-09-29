@@ -18,9 +18,7 @@ struct CryActionHandlerTests {
         try await engine.execute("cry")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > cry
             A moment of melancholy overtakes you.
@@ -50,9 +48,7 @@ struct CryActionHandlerTests {
         try await engine.execute("cry")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > cry
             A moment of melancholy overtakes you.

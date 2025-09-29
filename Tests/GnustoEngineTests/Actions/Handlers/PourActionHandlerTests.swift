@@ -36,9 +36,7 @@ struct PourActionHandlerTests {
         try await engine.execute("pour bottle on plant")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > pour bottle on plant
             You pour the water bottle on the small plant.
@@ -72,9 +70,7 @@ struct PourActionHandlerTests {
         try await engine.execute("pour water")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > pour water
             Pour the glass of water on what?
@@ -110,9 +106,7 @@ struct PourActionHandlerTests {
         try await engine.execute("spill milk on table")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > spill milk on table
             You pour the glass of milk on the wooden table.
@@ -132,9 +126,7 @@ struct PourActionHandlerTests {
         try await engine.execute("pour")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > pour
             Pour what?
@@ -163,9 +155,7 @@ struct PourActionHandlerTests {
         try await engine.execute("pour juice")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > pour juice
             Pour the orange juice on what?
@@ -193,9 +183,7 @@ struct PourActionHandlerTests {
         try await engine.execute("pour nonexistent on plant")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > pour nonexistent on plant
             You cannot reach any such thing from here.
@@ -224,9 +212,7 @@ struct PourActionHandlerTests {
         try await engine.execute("pour water on nonexistent")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > pour water on nonexistent
             You cannot reach any such thing from here.
@@ -269,9 +255,7 @@ struct PourActionHandlerTests {
         try await engine.execute("pour water on plant")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > pour water on plant
             You cannot reach any such thing from here.
@@ -314,9 +298,7 @@ struct PourActionHandlerTests {
         try await engine.execute("pour water on plant")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > pour water on plant
             You cannot reach any such thing from here.
@@ -344,9 +326,7 @@ struct PourActionHandlerTests {
         try await engine.execute("pour testRoom on plant")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > pour testRoom on plant
             You cannot reach any such thing from here.
@@ -375,9 +355,7 @@ struct PourActionHandlerTests {
         try await engine.execute("pour water on testRoom")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > pour water on testRoom
             You cannot reach any such thing from here.
@@ -405,9 +383,7 @@ struct PourActionHandlerTests {
         try await engine.execute("pour me on plant")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > pour me on plant
             That lacks the necessary fluidity for pouring.
@@ -436,9 +412,7 @@ struct PourActionHandlerTests {
         try await engine.execute("pour water on me")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > pour water on me
             You pour the glass of water on yourself. How refreshing.
@@ -483,9 +457,7 @@ struct PourActionHandlerTests {
         try await engine.execute("pour water on plant")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > pour water on plant
             The darkness here is absolute, consuming all light and hope of
@@ -536,9 +508,7 @@ struct PourActionHandlerTests {
         #expect(await finalOil.hasFlag(.isTouched) == true)
         #expect(await finalLamp.hasFlag(.isTouched) == true)
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > pour oil on lamp
             You pour the bottle of oil on the oil lamp.
@@ -584,10 +554,8 @@ struct PourActionHandlerTests {
             "examine it"
         )
 
-        let output = await mockIO.flush()
         // The "it" should refer to either the water or the flower
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > examine book
             An old leather book.
@@ -622,9 +590,7 @@ struct PourActionHandlerTests {
         try await engine.execute("pour water on water")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > pour water on water
             You cannot pour something onto itself without breaking reality.
@@ -670,9 +636,7 @@ struct PourActionHandlerTests {
             "pour coffee on table"
         )
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > pour wine on table
             You pour the bottle of wine on the marble table.
@@ -720,9 +684,7 @@ struct PourActionHandlerTests {
             "pour water on carpet"
         )
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > pour water on floor
             You pour the glass of water on the wooden floor.

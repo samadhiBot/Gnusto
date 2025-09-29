@@ -29,9 +29,7 @@ struct KissActionHandlerTests {
         try await engine.execute("kiss princess")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > kiss princess
             The moment for kissing the beautiful princess has neither
@@ -55,9 +53,7 @@ struct KissActionHandlerTests {
         try await engine.execute("kiss")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > kiss
             Kiss what?
@@ -93,9 +89,7 @@ struct KissActionHandlerTests {
         try await engine.execute("kiss princess")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > kiss princess
             You cannot reach any such thing from here.
@@ -133,9 +127,7 @@ struct KissActionHandlerTests {
         try await engine.execute("kiss stranger")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > kiss stranger
             The darkness here is absolute, consuming all light and hope of
@@ -156,9 +148,7 @@ struct KissActionHandlerTests {
         try await engine.execute("kiss me")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > kiss me
             Your flexibility, while admirable, has limits.
@@ -187,9 +177,7 @@ struct KissActionHandlerTests {
         try await engine.execute("kiss friend")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > kiss friend
             The moment for kissing the old friend has neither arrived nor
@@ -222,9 +210,7 @@ struct KissActionHandlerTests {
         try await engine.execute("kiss troll")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > kiss troll
             That's an unusual combat strategy, and the angry troll seems
@@ -259,9 +245,7 @@ struct KissActionHandlerTests {
         try await engine.execute("kiss statue")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > kiss statue
             Your lips and the marble statue are destined never to meet.
@@ -297,9 +281,7 @@ struct KissActionHandlerTests {
         #expect(await finalState.hasFlag(.isTouched))
 
         // Verify message
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > kiss cat
             The moment for kissing the fluffy cat has neither arrived nor
@@ -339,9 +321,7 @@ struct KissActionHandlerTests {
         )
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > kiss knight
             The moment for kissing the brave knight has neither arrived nor
@@ -380,9 +360,7 @@ struct KissActionHandlerTests {
         try await engine.execute("kiss locket")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > kiss locket
             Your lips and the golden locket are destined never to meet.
@@ -411,9 +389,7 @@ struct KissActionHandlerTests {
         )
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > kiss merchant
             The moment for kissing the traveling merchant has neither
@@ -480,9 +456,7 @@ struct KissActionHandlerTests {
         )
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > kiss mirror
             Your lips and the magic mirror are destined never to meet.

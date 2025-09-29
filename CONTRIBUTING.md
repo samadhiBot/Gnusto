@@ -90,9 +90,7 @@ func testTakeItem() async throws {
     
     try await engine.execute("take gem")
     
-    let output = await mockIO.flush()
-    expectNoDifference(
-        output,
+    await mockIO.expectOutput(
         """
         > take gem
         Taken.

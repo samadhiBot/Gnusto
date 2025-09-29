@@ -29,9 +29,7 @@ struct TieActionHandlerTests {
         try await engine.execute("tie rope")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > tie rope
             You can't tie the thick rope.
@@ -70,9 +68,7 @@ struct TieActionHandlerTests {
         try await engine.execute("tie rope to post")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > tie rope to post
             You can't tie the wooden post to the wooden post.
@@ -114,9 +110,7 @@ struct TieActionHandlerTests {
         try await engine.execute("tie box with string")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > tie box with string
             You can't tie the cardboard box with the ball of string.
@@ -145,9 +139,7 @@ struct TieActionHandlerTests {
         try await engine.execute("fasten belt")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > fasten belt
             You can't tie the leather belt.
@@ -176,9 +168,7 @@ struct TieActionHandlerTests {
         try await engine.execute("bind package")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > bind package
             You can't tie the small package.
@@ -207,9 +197,7 @@ struct TieActionHandlerTests {
         try await engine.execute("tie up rope")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > tie up rope
             You can't tie the heavy rope.
@@ -246,9 +234,7 @@ struct TieActionHandlerTests {
         try await engine.execute("tie up package with ribbon")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > tie up package with ribbon
             You can't tie the gift package with the silk ribbon.
@@ -268,9 +254,7 @@ struct TieActionHandlerTests {
         try await engine.execute("tie")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > tie
             Tie what?
@@ -305,9 +289,7 @@ struct TieActionHandlerTests {
         try await engine.execute("tie rope")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > tie rope
             Any such thing lurks beyond your reach.
@@ -349,9 +331,7 @@ struct TieActionHandlerTests {
         try await engine.execute("tie rope to post")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > tie rope to post
             Any such thing lurks beyond your reach.
@@ -388,9 +368,7 @@ struct TieActionHandlerTests {
         try await engine.execute("tie rope")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > tie rope
             The darkness here is absolute, consuming all light and hope of
@@ -422,9 +400,7 @@ struct TieActionHandlerTests {
         try await engine.execute("tie wizard")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > tie wizard
             Binding the old wizard would transform you from adventurer to
@@ -451,9 +427,7 @@ struct TieActionHandlerTests {
         try await engine.execute("tie troll")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > tie troll
             Binding the fierce troll would transform you from adventurer to
@@ -493,9 +467,7 @@ struct TieActionHandlerTests {
         try await engine.execute("tie guard to post")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > tie guard to post
             You can't tie the wooden post to the wooden post.
@@ -539,9 +511,7 @@ struct TieActionHandlerTests {
         try await engine.execute("tie orc with rope")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > tie orc with rope
             The angry orc would resist binding with extreme prejudice.
@@ -586,9 +556,7 @@ struct TieActionHandlerTests {
         try await engine.execute("tie up merchant with rope")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > tie up merchant with rope
             Binding the traveling merchant would transform you from
@@ -623,9 +591,7 @@ struct TieActionHandlerTests {
         try await engine.execute("tie wizard to wizard")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > tie wizard to wizard
             You can't tie the old wizard to itself.
@@ -646,9 +612,7 @@ struct TieActionHandlerTests {
         try await engine.execute("tie troll to troll")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > tie troll to troll
             You can't tie the fierce troll to itself.
@@ -677,9 +641,7 @@ struct TieActionHandlerTests {
         try await engine.execute("tie guard with guard")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > tie guard with guard
             You can't tie the castle guard with itself.
@@ -710,9 +672,7 @@ struct TieActionHandlerTests {
         try await engine.execute("tie orc with orc")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > tie orc with orc
             You can't tie the angry orc with itself.
@@ -751,9 +711,7 @@ struct TieActionHandlerTests {
         try await engine.execute("tie wizard")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > tie wizard
             Any such thing lurks beyond your reach.
@@ -791,9 +749,7 @@ struct TieActionHandlerTests {
         try await engine.execute("tie troll")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > tie troll
             Any such thing lurks beyond your reach.
@@ -830,9 +786,7 @@ struct TieActionHandlerTests {
         try await engine.execute("tie wizard to guard")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > tie wizard to guard
             Binding the castle guard would transform you from adventurer to

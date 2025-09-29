@@ -316,9 +316,7 @@ struct GameEngineActionResultTests {
         try await engine.execute("activate device")
 
         // Then: All aspects of ActionResult should be processed
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > activate device
             The mysterious device hums to life with complex activation!
@@ -451,9 +449,7 @@ struct GameEngineActionResultTests {
         try await engine.execute("sequence")
 
         // Then: Final message should be displayed
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > sequence
             First action completed.
@@ -492,9 +488,7 @@ struct GameEngineActionResultTests {
         #expect(pronoun != nil)
 
         // And: Command should work normally
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > examine test item
             A simple test item.
@@ -685,9 +679,7 @@ struct GameEngineActionResultTests {
         try await engine.execute("take gold coin")
 
         // Then: ActionResult should be processed correctly
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > take gold coin
             Taken.
@@ -728,9 +720,7 @@ struct GameEngineActionResultTests {
         )
 
         // Then: Both ActionResults should be processed
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > take lamp
             Taken.
@@ -765,9 +755,7 @@ struct GameEngineActionResultTests {
 
         try await engine.processActionResult(multilineResult)
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             This is a complex message that spans multiple lines and
             contains various formatting.
@@ -841,9 +829,7 @@ struct GameEngineActionResultTests {
         // Trigger the fuse by advancing time
         try await engine.execute("wait")
 
-        let finalOutput = await mockIO.flush()
-        expectNoDifference(
-            finalOutput,
+        await mockIO.expectOutput(
             """
             > wait
             Time flows onward, indifferent to your concerns.
@@ -894,9 +880,7 @@ struct GameEngineActionResultTests {
         // Trigger the fuse
         try await engine.execute("wait")
 
-        let finalOutput = await mockIO.flush()
-        expectNoDifference(
-            finalOutput,
+        await mockIO.expectOutput(
             """
             > wait
             Time flows onward, indifferent to your concerns.

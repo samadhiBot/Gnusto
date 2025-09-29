@@ -28,9 +28,7 @@ struct PullActionHandlerTests {
         try await engine.execute("pull rope")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > pull rope
             The thick rope resists your tugging with stoic determination.
@@ -62,9 +60,7 @@ struct PullActionHandlerTests {
         try await engine.execute("pull guard")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > pull guard
             The surly guard is not a rope to be tugged at your convenience.
@@ -88,9 +84,7 @@ struct PullActionHandlerTests {
         try await engine.execute("pull troll")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > pull troll
             The fierce troll is not a rope to be tugged at your
@@ -114,9 +108,7 @@ struct PullActionHandlerTests {
         try await engine.execute("pull")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > pull
             Pull what?
@@ -151,9 +143,7 @@ struct PullActionHandlerTests {
         try await engine.execute("pull lever")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > pull lever
             Any such thing lurks beyond your reach.
@@ -189,9 +179,7 @@ struct PullActionHandlerTests {
         try await engine.execute("pull chain")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > pull chain
             The darkness here is absolute, consuming all light and hope of
@@ -260,9 +248,7 @@ struct PullActionHandlerTests {
         )
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > pull first rope
             The first rope resists your tugging with stoic determination.
@@ -308,9 +294,7 @@ struct PullActionHandlerTests {
         try await engine.execute("pull string")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > pull string
             The pull string resists your tugging with stoic determination.

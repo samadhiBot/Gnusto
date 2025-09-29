@@ -141,9 +141,7 @@ struct VocabularyTests {
         try await engine.execute("examine lamp")
 
         // Then: Commands should work correctly
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > take brass lamp
             Taken.

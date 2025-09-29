@@ -41,9 +41,7 @@ struct RestartActionHandlerTests {
         try await engine.execute("restart")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > restart
             If you restart now you will lose any unsaved progress. Are you
@@ -88,9 +86,7 @@ struct RestartActionHandlerTests {
         try await engine.execute("restart")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > restart
             If you restart now you will lose any unsaved progress. Are you
@@ -121,9 +117,7 @@ struct RestartActionHandlerTests {
         try await engine.execute("restart")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > restart
             If you restart now you will lose any unsaved progress. Are you
@@ -160,9 +154,7 @@ struct RestartActionHandlerTests {
         try await engine.execute("restart")
 
         // Then: Should succeed even without light
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > restart
             If you restart now you will lose any unsaved progress. Are you

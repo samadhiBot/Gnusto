@@ -27,9 +27,7 @@ struct DigActionHandlerTests {
 
         try await engine.execute("dig")
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > dig
             The ground here resists your archaeological ambitions.
@@ -54,9 +52,7 @@ struct DigActionHandlerTests {
 
         try await engine.execute("dig mound")
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > dig mound
             The ground here resists your archaeological ambitions.
@@ -81,9 +77,7 @@ struct DigActionHandlerTests {
 
         try await engine.execute("dig in the sand")
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > dig in the sand
             The ground here resists your archaeological ambitions.
@@ -117,9 +111,7 @@ struct DigActionHandlerTests {
 
         try await engine.execute("dig mound with shovel")
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > dig mound with shovel
             The ground here resists your archaeological ambitions.
@@ -146,9 +138,7 @@ struct DigActionHandlerTests {
 
         try await engine.execute("dig with shovel")
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > dig with shovel
             The ground here resists your archaeological ambitions.
@@ -175,9 +165,7 @@ struct DigActionHandlerTests {
 
         try await engine.execute("excavate with shovel")
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > excavate with shovel
             The ground here resists your archaeological ambitions.
@@ -204,9 +192,7 @@ struct DigActionHandlerTests {
 
         try await engine.execute("dig")
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > dig
             The darkness here is absolute, consuming all light and hope of
@@ -239,9 +225,7 @@ struct DigActionHandlerTests {
 
         try await engine.execute("dig mound")
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > dig mound
             Any such thing lurks beyond your reach.
@@ -275,9 +259,7 @@ struct DigActionHandlerTests {
 
         try await engine.execute("dig mound with shovel")
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > dig mound with shovel
             You aren't holding the shovel.
@@ -303,9 +285,7 @@ struct DigActionHandlerTests {
 
         try await engine.execute("dig coin")
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > dig coin
             The ground here resists your archaeological ambitions.
@@ -332,9 +312,7 @@ struct DigActionHandlerTests {
 
         try await engine.execute("dig mound")
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > dig mound
             The ground here resists your archaeological ambitions.
@@ -372,9 +350,7 @@ struct DigActionHandlerTests {
 
         try await engine.execute("dig mound")
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > dig mound
             The ground here resists your archaeological ambitions.
@@ -412,9 +388,7 @@ struct DigActionHandlerTests {
 
         try await engine.execute("dig mound with shovel")
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > dig mound with shovel
             The ground here resists your archaeological ambitions.
@@ -435,9 +409,7 @@ struct DigActionHandlerTests {
 
         try await engine.execute("dig ground")
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > dig ground
             The ground here resists your archaeological ambitions.
@@ -462,9 +434,7 @@ struct DigActionHandlerTests {
 
         try await engine.execute("dig mound with ground")
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > dig mound with ground
             You can't dig the dirt mound with that.
@@ -479,9 +449,7 @@ struct DigActionHandlerTests {
 
         try await engine.execute("dig ceiling")
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > dig ceiling
             That defies the fundamental laws of digging.
@@ -521,9 +489,7 @@ struct DigActionHandlerTests {
             "examine it"
         )
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > dig mound with shovel
             The ground here resists your archaeological ambitions.
@@ -547,9 +513,7 @@ struct DigActionHandlerTests {
 
         try await engine.execute("dig")
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > dig
             The ground here resists your archaeological ambitions.
@@ -581,9 +545,7 @@ struct DigActionHandlerTests {
         try await engine.execute("dig the ground")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > dig the ground
             The ground here resists your archaeological ambitions.

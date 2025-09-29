@@ -42,9 +42,7 @@ struct StandardCombatSystemIntegrationTests {
         try await engine.execute("attack goblin with sword")
 
         // Then: Combat should initiate and process turn
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > attack goblin with sword
             Armed and hungry for violence, you strike with your steel sword
@@ -107,9 +105,7 @@ struct StandardCombatSystemIntegrationTests {
         try await engine.execute("attack goblin with sword", times: 2)
 
         // Then: Goblin should die and combat should end
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > attack goblin with sword
             Armed and hungry for violence, you strike with your legendary
@@ -157,9 +153,7 @@ struct StandardCombatSystemIntegrationTests {
         try await engine.execute("attack the guard", times: 5)
 
         // Then: Should see various damage descriptions
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > attack the guard
             You drive forward with your variable sword seeking its purpose
@@ -245,9 +239,7 @@ struct StandardCombatSystemIntegrationTests {
         try await engine.execute("attack enemy", times: 10)
 
         // Then: Should eventually see critical hit language (probabilistic)
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > attack enemy
             Armed and hungry for violence, you strike with your sharp sword
@@ -322,11 +314,6 @@ struct StandardCombatSystemIntegrationTests {
             The test enemy is already dead.
             """
         )
-
-        // Look for critical hit indicators or high damage
-        _ =
-            output.lowercased().contains("critical") || output.lowercased().contains("devastating")
-            || output.lowercased().contains("powerful")
 
         // At minimum, enemy should have taken damage
         let finalEnemy = await engine.item("enemy")
@@ -430,9 +417,7 @@ struct StandardCombatSystemIntegrationTests {
         // When: Engage in extended combat
         try await engine.execute("attack enemy", times: 4)
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > attack enemy
             Armed and hungry for violence, you strike with your training
@@ -602,9 +587,7 @@ struct StandardCombatSystemIntegrationTests {
         try await engine.execute("attack enemy", times: 7)
 
         // Then: Should potentially see special events (probabilistic)
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > attack enemy
             Your masterwork sword cuts through air toward the skilled enemy
@@ -660,18 +643,6 @@ struct StandardCombatSystemIntegrationTests {
             The skilled enemy has already departed this mortal coil.
             """
         )
-
-        let specialEventTerms = [
-            "disarm", "stagger", "hesitat", "vulnerabl", "unconscious",
-            "dodge", "block", "parr", "miss",
-        ]
-
-        _ = specialEventTerms.contains { term in
-            output.lowercased().contains(term)
-        }
-
-        // At minimum, should have standard combat terms
-        #expect(output.contains("attack enemy"))
 
         // Enemy should have taken damage
         let finalEnemy = await engine.item("enemy")
@@ -730,9 +701,7 @@ struct StandardCombatSystemIntegrationTests {
         try await engine.execute("attack bandit", times: 3)
 
         // Then: Bandit should eventually flee (probabilistic)
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > attack bandit
             No weapons needed as you attack with pure violence while the
@@ -757,15 +726,6 @@ struct StandardCombatSystemIntegrationTests {
             The cowardly bandit is beyond such concerns now, being dead.
             """
         )
-
-        // Look for flee indicators
-        let fleeTerms = ["flee", "flees", "retreat", "escap", "run"]
-        _ = fleeTerms.contains { term in
-            output.lowercased().contains(term)
-        }
-
-        // At minimum, combat should have occurred
-        #expect(output.contains("bandit"))
     }
 
     @Test("Enemy surrenders when outmatched")
@@ -815,9 +775,7 @@ struct StandardCombatSystemIntegrationTests {
         try await engine.execute("attack scholar", times: 2)
 
         // Then: May surrender (probabilistic based on intelligence/wisdom)
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > attack scholar
             Armed and hungry for violence, you strike with your
@@ -835,15 +793,6 @@ struct StandardCombatSystemIntegrationTests {
             Death has already claimed the scholar warrior.
             """
         )
-
-        // Look for surrender indicators
-        let surrenderTerms = ["surrender", "yield", "submit", "give up"]
-        _ = surrenderTerms.contains { term in
-            output.lowercased().contains(term)
-        }
-
-        // At minimum, combat should have engaged
-        #expect(output.contains("scholar"))
     }
 
     // MARK: - Pacification Tests
@@ -886,9 +835,7 @@ struct StandardCombatSystemIntegrationTests {
         try await engine.execute("talk to guard")
 
         // Then: May result in pacification (probabilistic)
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > talk to guard
             The confused guard responds to your overture with hostile
@@ -898,9 +845,6 @@ struct StandardCombatSystemIntegrationTests {
             now, all hostility forgotten.
             """
         )
-
-        // Look for pacification or continued combat
-        #expect(output.contains("talk") || output.contains("guard"))
 
         // Guard state should be affected
         let finalGuard = await engine.item("guard")
@@ -937,9 +881,7 @@ struct StandardCombatSystemIntegrationTests {
         try await engine.execute("attack knight")
 
         // Then: Should be warned about needing weapons
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > attack knight
             Fighting the armored knight bare-handed seems inadvisable. Find
@@ -950,10 +892,6 @@ struct StandardCombatSystemIntegrationTests {
             blocks.
             """
         )
-
-        #expect(output.contains("> attack knight"))
-        // Should contain some form of combat message
-        #expect(output.contains("knight"))
     }
 
     // MARK: - Non-Combat Actions During Combat Tests
@@ -1000,9 +938,7 @@ struct StandardCombatSystemIntegrationTests {
         try await engine.execute("take sword")
 
         // Then: Enemy should get buffed attack
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > take sword
             Got it.
@@ -1012,12 +948,6 @@ struct StandardCombatSystemIntegrationTests {
             against your battle fury.
             """
         )
-
-        #expect(output.contains("> take sword"))
-        #expect(output.contains("Got it."))
-
-        // Should show enemy taking advantage
-        #expect(output.contains("warrior"))
 
         // Player should have taken the sword
         let finalSword = await engine.item("sword")
@@ -1095,9 +1025,7 @@ struct StandardCombatSystemIntegrationTests {
         try await engine.execute("attack corpse")
 
         // Then: Should indicate enemy is already dead
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > attack corpse
             Barehanded, you commit to the assault as the corpse accepts the
@@ -1106,10 +1034,6 @@ struct StandardCombatSystemIntegrationTests {
             The dead bandit is beyond such concerns now, being dead.
             """
         )
-
-        #expect(output.contains("> attack corpse"))
-        // Should contain some message about the enemy being dead
-        #expect(output.contains("dead") || output.contains("corpse") || output.contains("already"))
     }
 
     @Test("Combat system handles missing weapon gracefully")
@@ -1139,9 +1063,7 @@ struct StandardCombatSystemIntegrationTests {
         try await engine.execute("attack bandit with nonexistent")
 
         // Then: Should handle gracefully
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > attack bandit with nonexistent
             You cannot reach any such thing from here.
@@ -1151,9 +1073,6 @@ struct StandardCombatSystemIntegrationTests {
             hurt regardless of who wins.
             """
         )
-
-        #expect(output.contains("> attack bandit with nonexistent"))
-        #expect(output.contains("don't see") || output.contains("bandit"))
     }
 
     @Test("Combat handles non-weapon items gracefully")
@@ -1190,9 +1109,7 @@ struct StandardCombatSystemIntegrationTests {
         try await engine.execute("attack thug with book")
 
         // Then: Should handle non-weapon attack appropriately
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > attack thug with book
             Armed and hungry for violence, you strike with your heavy book
@@ -1208,8 +1125,5 @@ struct StandardCombatSystemIntegrationTests {
             body has more important work.
             """
         )
-
-        #expect(output.contains("> attack thug with book"))
-        #expect(output.contains("book") && output.contains("thug"))
     }
 }

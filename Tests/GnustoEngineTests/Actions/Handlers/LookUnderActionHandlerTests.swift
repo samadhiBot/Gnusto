@@ -28,9 +28,7 @@ struct LookUnderActionHandlerTests {
         try await engine.execute("look under table")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > look under table
             Beneath the wooden table lurks only disappointment and possibly
@@ -62,9 +60,7 @@ struct LookUnderActionHandlerTests {
         try await engine.execute("look beneath rock")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > look beneath rock
             Beneath the large rock lurks only disappointment and possibly
@@ -93,9 +89,7 @@ struct LookUnderActionHandlerTests {
         try await engine.execute("look below bridge")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > look below bridge
             Beneath the stone bridge lurks only disappointment and possibly
@@ -124,9 +118,7 @@ struct LookUnderActionHandlerTests {
         try await engine.execute("peek under bed")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > peek under bed
             Beneath the old bed lurks only disappointment and possibly
@@ -147,9 +139,7 @@ struct LookUnderActionHandlerTests {
         try await engine.execute("look under")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > look under
             Look under what?
@@ -167,9 +157,7 @@ struct LookUnderActionHandlerTests {
         try await engine.execute("look under nonexistent")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > look under nonexistent
             Any such thing lurks beyond your reach.
@@ -204,9 +192,7 @@ struct LookUnderActionHandlerTests {
         try await engine.execute("look under table")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > look under table
             Any such thing lurks beyond your reach.
@@ -224,9 +210,7 @@ struct LookUnderActionHandlerTests {
         try await engine.execute("look under testRoom")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > look under testRoom
             Any such thing lurks beyond your reach.
@@ -244,9 +228,7 @@ struct LookUnderActionHandlerTests {
         try await engine.execute("look under me")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > look under me
             The logistics of looking oneself prove insurmountable.
@@ -283,9 +265,7 @@ struct LookUnderActionHandlerTests {
         try await engine.execute("look under table")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > look under table
             The darkness here is absolute, consuming all light and hope of
@@ -323,9 +303,7 @@ struct LookUnderActionHandlerTests {
         let finalState = await engine.item("chest")
         #expect(await finalState.hasFlag(.isTouched) == true)
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > look under chest
             Beneath the treasure chest lurks only disappointment and
@@ -366,9 +344,7 @@ struct LookUnderActionHandlerTests {
         // Then - "examine it" should now refer to the table
         try await engine.execute("examine it")
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > examine book
             An old leather book.
@@ -404,9 +380,7 @@ struct LookUnderActionHandlerTests {
         try await engine.execute("look under box")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > look under box
             Beneath the small box lurks only disappointment and possibly
@@ -449,9 +423,7 @@ struct LookUnderActionHandlerTests {
         try await engine.execute("look under coin")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > look under coin
             Beneath the gold coin lurks only disappointment and possibly
@@ -498,9 +470,7 @@ struct LookUnderActionHandlerTests {
         // When - Look under rug
         try await engine.execute("look under rug")
 
-        let rugOutput = await mockIO.flush()
-        expectNoDifference(
-            rugOutput,
+        await mockIO.expectOutput(
             """
             > look under rug
             Beneath the persian rug lurks only disappointment and possibly
@@ -511,9 +481,7 @@ struct LookUnderActionHandlerTests {
         // When - Look under character
         try await engine.execute("look under man")
 
-        let characterOutput = await mockIO.flush()
-        expectNoDifference(
-            characterOutput,
+        await mockIO.expectOutput(
             """
             > look under man
             The space beneath the old man harbors no secrets worth
@@ -524,9 +492,7 @@ struct LookUnderActionHandlerTests {
         // When - Look under device
         try await engine.execute("look under device")
 
-        let deviceOutput = await mockIO.flush()
-        expectNoDifference(
-            deviceOutput,
+        await mockIO.expectOutput(
             """
             > look under device
             Your investigation under the strange device reveals a profound

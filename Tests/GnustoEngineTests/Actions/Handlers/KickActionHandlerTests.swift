@@ -28,9 +28,7 @@ struct KickActionHandlerTests {
         try await engine.execute("kick rock")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > kick rock
             Your foot meets the large rock in an unequal contest. Your foot
@@ -54,9 +52,7 @@ struct KickActionHandlerTests {
         try await engine.execute("kick")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > kick
             Kick what?
@@ -91,9 +87,7 @@ struct KickActionHandlerTests {
         try await engine.execute("kick rock")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > kick rock
             Any such thing lurks beyond your reach.
@@ -129,9 +123,7 @@ struct KickActionHandlerTests {
         try await engine.execute("kick rock")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > kick rock
             The darkness here is absolute, consuming all light and hope of
@@ -155,9 +147,7 @@ struct KickActionHandlerTests {
         try await engine.execute("kick troll")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > kick troll
             Kicking the fierce troll would irreparably damage your
@@ -189,9 +179,7 @@ struct KickActionHandlerTests {
         try await engine.execute("kick box")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > kick box
             Your foot meets the wooden box in an unequal contest. Your foot
@@ -224,9 +212,7 @@ struct KickActionHandlerTests {
         try await engine.execute("kick pebble")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > kick pebble
             You nudge the small pebble with your foot. The universe yawns.
@@ -285,9 +271,7 @@ struct KickActionHandlerTests {
         try await engine.execute("kick table", "kick chair")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > kick table
             Your foot meets the oak table in an unequal contest. Your foot

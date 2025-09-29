@@ -29,9 +29,7 @@ struct ThrowActionHandlerTests {
         try await engine.execute("throw ball")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > throw ball
             You throw the rubber ball in a lazy arc. It lands nearby with
@@ -73,9 +71,7 @@ struct ThrowActionHandlerTests {
         try await engine.execute("throw rock at target")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > throw rock at target
             You throw the small rock at the wooden target. It bounces off
@@ -121,9 +117,7 @@ struct ThrowActionHandlerTests {
         try await engine.execute("throw key to guard")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > throw key to guard
             You throw the brass key to the castle guard, who catches it
@@ -159,9 +153,7 @@ struct ThrowActionHandlerTests {
         try await engine.execute("hurl spear")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > hurl spear
             You hurl the wooden spear in a lazy arc. It lands nearby with
@@ -191,9 +183,7 @@ struct ThrowActionHandlerTests {
         try await engine.execute("toss coin")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > toss coin
             You toss the gold coin in a lazy arc. It lands nearby with
@@ -223,9 +213,7 @@ struct ThrowActionHandlerTests {
         try await engine.execute("chuck stone")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > chuck stone
             You chuck the heavy stone in a lazy arc. It lands nearby with
@@ -246,9 +234,7 @@ struct ThrowActionHandlerTests {
         try await engine.execute("throw")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > throw
             Throw what?
@@ -277,9 +263,7 @@ struct ThrowActionHandlerTests {
         try await engine.execute("throw ball")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > throw ball
             You aren't holding the rubber ball.
@@ -297,9 +281,7 @@ struct ThrowActionHandlerTests {
         try await engine.execute("throw nonexistent")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > throw nonexistent
             Any such thing lurks beyond your reach.
@@ -328,9 +310,7 @@ struct ThrowActionHandlerTests {
         try await engine.execute("throw ball at nonexistent")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > throw ball at nonexistent
             Any such thing lurks beyond your reach.
@@ -373,9 +353,7 @@ struct ThrowActionHandlerTests {
         try await engine.execute("throw ball at target")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > throw ball at target
             Any such thing lurks beyond your reach.
@@ -413,9 +391,7 @@ struct ThrowActionHandlerTests {
         try await engine.execute("throw ball")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > throw ball
             The darkness here is absolute, consuming all light and hope of
@@ -447,9 +423,7 @@ struct ThrowActionHandlerTests {
         try await engine.execute("throw bottle", times: 2)
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > throw bottle
             You throw the glass bottle in a lazy arc. It lands nearby with
@@ -497,9 +471,7 @@ struct ThrowActionHandlerTests {
         try await engine.execute("throw apple at wizard", times: 2)
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > throw apple at wizard
             You throw the red apple at the old wizard, who dodges aside
@@ -550,9 +522,7 @@ struct ThrowActionHandlerTests {
         try await engine.execute("throw apple at wizard", times: 2)
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > throw apple at wizard
             You throw the red apple at the old wizard, but your aim falls
@@ -609,9 +579,7 @@ struct ThrowActionHandlerTests {
         try await engine.execute("throw dart at board", times: 2)
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > throw dart at board
             You throw the sharp dart at the dartboard. It bounces off and
@@ -661,9 +629,7 @@ struct ThrowActionHandlerTests {
         try await engine.execute("throw coin to merchant", times: 2)
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > throw coin to merchant
             You throw the gold coin to the traveling merchant, who catches
@@ -711,9 +677,7 @@ struct ThrowActionHandlerTests {
         try await engine.execute("throw coin to merchant", times: 2)
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > throw coin to merchant
             You throw the gold coin to the traveling merchant, who catches
@@ -760,9 +724,7 @@ struct ThrowActionHandlerTests {
         try await engine.execute("throw ball to basket", times: 2)
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > throw ball to basket
             You throw the tennis ball toward the wicker basket, but
@@ -816,9 +778,7 @@ struct ThrowActionHandlerTests {
         )
 
         // Then - verify first ball was thrown
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expectOutput(
             """
             > throw red ball
             You throw the red ball in a lazy arc. It lands nearby with
