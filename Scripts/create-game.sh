@@ -120,8 +120,7 @@ let package = Package(
         .executable(name: "$game_name", targets: ["$game_name"]),
     ],
     dependencies: [
-//        .package(url: "https://github.com/samadhiBot/Gnusto.git", from: "0.1.0"),
-        .package(path: "~/Gnusto")
+        .package(url: "https://github.com/samadhiBot/Gnusto.git", from: "0.1.0")
     ],
     targets: [
         .executableTarget(
@@ -134,7 +133,7 @@ let package = Package(
             ]
         ),
         .testTarget(
-            name: "$game_nameTests",
+            name: "${game_name}Tests",
             dependencies: [
                 "$game_name",
                 .product(name: "GnustoEngine", package: "Gnusto"),
@@ -150,7 +149,7 @@ EOF
 import GnustoEngine
 
 let engine = await GameEngine(
-    blueprint: FrobozzMagicDemoKit(),
+    blueprint: $game_name(),
     parser: StandardParser(),
     ioHandler: ConsoleIOHandler(
         markdownParser: MarkdownParser(columns: 64)
@@ -164,10 +163,10 @@ EOF
     create_file "Sources/$game_name/$game_name.swift" <<EOF
 import GnustoEngine
 
-public struct FrobozzMagicDemoKit: GameBlueprint {
-    public let title = "FrobozzMagicDemoKit"
+public struct $game_name: GameBlueprint {
+    public let title = "$game_name"
 
-    public let abbreviatedTitle = "FrobozzMagicDemoKit"
+    public let abbreviatedTitle = "$game_name"
 
     public let introduction = """
         You awaken in the Custodial Singularity.
