@@ -975,14 +975,18 @@ struct StandardCombatSystemIntegrationTests {
         )
 
         // Create custom combat system
-        let customSystem = StandardCombatSystem(versus: "dragon") { event, _ in
-            switch event {
-            case .enemyInjured:
-                return "The ancient dragon roars in fury as your blade finds its mark!"
-            default:
-                return nil  // Use default for other events
+        let customSystem = StandardCombatSystem(
+            versus: "dragon",
+            eventHandler: { event, _ in
+                switch event {
+                case .enemyInjured:
+                    return ActionResult(
+                        "The ancient dragon roars in fury as your blade finds its mark!")
+                default:
+                    return nil  // Use default for other events
+                }
             }
-        }
+        )
 
         let game = MinimalGame(
             items: specialEnemy

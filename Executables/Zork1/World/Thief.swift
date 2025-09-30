@@ -121,11 +121,6 @@ extension Thief {
             }
         }
 
-        after(.attack) { context, command in
-            if await context.item.isDead {
-                
-            }
-        }
     }
 
     /// Stiletto weapon handler with thief protection
@@ -199,7 +194,7 @@ extension Thief {
         let thiefLargeBag = await engine.item(.largeBag)
         let thiefLocation = await thief.location
 
-        // Thief must be awake, not engaged in combat, and allowed in the current location
+        // Thief must be alive, awake, not engaged in combat, and allowed in the current location
         guard
             await thief.isAwake,
             await !thief.isFighting,
@@ -246,7 +241,8 @@ extension Thief {
                 }
                 let playerItems = await engine.player.inventory.eligibleForTheft
                 for item in playerItems {
-                    changes.append(
+                    changes
+                        .append(
                         item.move(to: thiefLargeBag.id)
                     )
                 }
@@ -292,97 +288,218 @@ extension Thief {
 extension Thief {
     static let thiefCombatSystem = StandardCombatSystem(
         versus: .thief
-    ) { event, msg async -> String? in
+    ) { event, context async throws -> ActionResult? in
         switch event {
+
         case .playerSlain:
-            return msg.oneOf(
-                "The thief, forgetting his essentially genteel upbringing, cuts your throat.",
-                "The thief, a pragmatist, dispatches you as a threat to his livelihood.",
-                "Finishing you off, the thief inserts his blade into your heart.",
-                "The thief comes in from the side, feints, and inserts the blade into your ribs.",
-                """
-                The thief bows formally, raises his stiletto,
-                and with a wry grin, ends the battle and your life.
-                """,
+            await ActionResult(
+                context.combatMsg.oneOf(
+                    "The thief, forgetting his essentially genteel upbringing, cuts your throat.",
+                    "The thief, a pragmatist, dispatches you as a threat to his livelihood.",
+                    "Finishing you off, the thief inserts his blade into your heart.",
+                    "The thief comes in from the side, feints, and inserts the blade into your ribs.",
+                    """
+                    The thief bows formally, raises his stiletto,
+                    and with a wry grin, ends the battle and your life.
+                    """
+                )
             )
+
         case .playerUnconscious:
-            return msg.oneOf(
-                """
-                Shifting in the midst of a thrust, the thief knocks you unconscious
-                with the haft of his stiletto.
-                """,
-                "The thief knocks you out."
+            await ActionResult(
+                context.combatMsg.oneOf(
+                    """
+                    Shifting in the midst of a thrust, the thief knocks you unconscious
+                    with the haft of his stiletto.
+                    """,
+                    "The thief knocks you out."
+                )
             )
-        case let .playerDisarmed(enemy, playerWeapon, enemyWeapon, wasFumble):
-            let weapon = await playerWeapon.alias(.withPossessiveAdjective)
-            let weaponAlt = await playerWeapon.alias(.withPossessiveAdjective)
-            return msg.oneOf(
+
+        case .playerDisarmed(_, let playerWeapon, _, _):
+            await playerDisarmedResult(playerWeapon, context)
+
+        case .playerCriticallyWounded:
+            await ActionResult(
+                context.combatMsg.oneOf(
+                    "The butt of his stiletto cracks you on the skull, and you stagger back.",
+                    """
+                    The thief rams the haft of his blade into your stomach,
+                    leaving you out of breath.
+                    """,
+                    "The thief attacks, and you fall back desperately."
+                )
+            )
+
+        case .playerGravelyInjured:
+            await ActionResult(
+                context.combatMsg.oneOf(
+                    "The thief strikes like a snake! The resulting wound is serious.",
+                    "The thief stabs a deep cut in your upper arm.",
+                    "The stiletto touches your forehead, and the blood obscures your vision.",
+                    "The thief strikes at your wrist, and suddenly your grip is slippery with blood."
+                )
+            )
+
+        case .playerLightlyInjured:
+            await ActionResult(
+                context.combatMsg.oneOf(
+                    "A quick thrust pinks your left arm, and blood starts to trickle down.",
+                    "The thief draws blood, raking his stiletto across your arm.",
+                    "The stiletto flashes faster than you can follow, and blood wells from your leg.",
+                    "The thief slowly approaches, strikes like a snake, and leaves you wounded."
+                )
+            )
+
+        case .playerMissed:
+            await ActionResult(
+                context.combatMsg.oneOf(
+                    "The thief stabs nonchalantly with his stiletto and misses.",
+                    "You dodge as the thief comes in low."
+                )
+            )
+
+        case .playerDodged:
+            await ActionResult(
+                context.combatMsg.oneOf(
+                    "You parry a lightning thrust, and the thief salutes you with a grim nod.",
+                    "The thief tries to sneak past your guard, but you twist away."
+                )
+            )
+
+        case .enemyFlees:
+            await ActionResult(
+                context.combatMsg.output(
+                    """
+                    Your opponent, determining discretion to be the better part of
+                    valor, decides to terminate this little contretemps. With a rueful
+                    nod of his head, he steps backward into the gloom and disappears.
+                    """
+                )
+            )
+
+        case .enemySpecialAction:
+            await ActionResult(
+                context.combatMsg.oneOf(
+                    """
+                    The thief, a man of superior breeding, pauses for a moment
+                    to consider the propriety of finishing you off.
+                    """,
+                    "The thief amuses himself by searching your pockets.",
+                    "The thief entertains himself by rifling your pack."
+                )
+            )
+
+        case .enemySlain(let enemy, _, _, let damage):
+            await thiefSlainResult(context, enemy, damage)
+
+        default:
+            nil
+        }
+    }
+
+    static func thiefSlainResult(
+        _ context: ActionContext,
+        _ enemy: ItemProxy,
+        _ damage: Int
+    ) async -> ActionResult? {
+        let currentLocation = await context.player.location
+        let thief = await context.engine.item(.thief)
+        let largeBag = await context.engine.item(.largeBag)
+        let stiletto = await context.engine.item(.stiletto)
+
+        var changes: [StateChange] = [
+            thief.remove()
+        ]
+        var treasuresDeposited = false
+
+        // Drop the stiletto at current location if thief is holding it
+        if await thief.isHolding(stiletto.id) {
+            changes.append(
+                stiletto.move(to: currentLocation.id)
+            )
+        }
+
+        // Move valuable contents from bag to current location
+        if await thief.isHolding(largeBag.id) {
+            for item in await largeBag.contents {
+                let itemId = item.id
+                if itemId == .stiletto || itemId == .largeBag {
+                    continue
+                }
+
+                if await item.value > 0 {
+                    changes.append(
+                        item.move(to: currentLocation.id)
+                    )
+                    treasuresDeposited = true
+
+                    // Special handling for the egg - open it when deposited
+                    if itemId == .egg {
+                        changes.append(
+                            await item.setFlag(.isOpen)
+                        )
+                    }
+                }
+            }
+
+            // Move the empty bag to current location
+            changes.append(
+                largeBag.move(to: currentLocation.id)
+            )
+        }
+
+        // Add standard death changes
+        //        changes.append(await enemy.takeDamage(damage))
+        //        changes.append(await context.engine.endCombat())
+        //        changes.append(
+        //            await enemy.setCharacterAttributes(
+        //                consciousness: .dead,
+        //                isFighting: false
+        //            )
+        //        )
+
+        print("🎾 changes:", changes)
+
+        let bootyStatus = treasuresDeposited ? " His booty remains." : ""
+
+        await print("🎾 roundRoom.items:", context.location(.roundRoom).items.map(\.id))
+
+        return ActionResult(
+            message: """
+                Almost as soon as the thief breathes his last breath, a cloud
+                of sinister black fog envelops him, and when the fog lifts, the
+                carcass has disappeared.\(bootyStatus)
+                """,
+            changes: changes
+//            executionFlow: treasuresDeposited ? .yield : .override
+        )
+    }
+
+    static func playerDisarmedResult(
+        _ playerWeapon: ItemProxy,
+        _ context: ActionContext
+    ) async -> ActionResult? {
+        let weapon = await playerWeapon.alias(.withPossessiveAdjective)
+        let weaponAlt = await playerWeapon.alias(.withPossessiveAdjective)
+        return await ActionResult(
+            context.combatMsg.oneOf(
                 """
                 A long, theatrical slash. You catch it on \(weapon),
                 but the thief twists his knife, and \(weaponAlt) goes flying.
                 """,
                 "The thief neatly flips \(weapon) out of your hands, and it drops to the floor.",
-                "You parry a low thrust, and \(weapon) slips out of your hand.",
+                "You parry a low thrust, and \(weapon) slips out of your hand."
             )
-        case .playerCriticallyWounded:
-            return msg.oneOf(
-                "The butt of his stiletto cracks you on the skull, and you stagger back.",
-                """
-                The thief rams the haft of his blade into your stomach,
-                leaving you out of breath.
-                """,
-                "The thief attacks, and you fall back desperately.",
-            )
-        case .playerGravelyInjured:
-            return msg.oneOf(
-                "The thief strikes like a snake! The resulting wound is serious.",
-                "The thief stabs a deep cut in your upper arm.",
-                "The stiletto touches your forehead, and the blood obscures your vision.",
-                "The thief strikes at your wrist, and suddenly your grip is slippery with blood.",
-            )
-        case .playerLightlyInjured:
-            return msg.oneOf(
-                "A quick thrust pinks your left arm, and blood starts to trickle down.",
-                "The thief draws blood, raking his stiletto across your arm.",
-                "The stiletto flashes faster than you can follow, and blood wells from your leg.",
-                "The thief slowly approaches, strikes like a snake, and leaves you wounded.",
-            )
-        case .playerMissed:
-            return msg.oneOf(
-                "The thief stabs nonchalantly with his stiletto and misses.",
-                "You dodge as the thief comes in low.",
-            )
-        case .playerDodged:
-            return msg.oneOf(
-                "You parry a lightning thrust, and the thief salutes you with a grim nod.",
-                "The thief tries to sneak past your guard, but you twist away.",
-            )
-        case .enemyFlees:
-            return msg.output(
-                """
-                Your opponent, determining discretion to be the better part of
-                valor, decides to terminate this little contretemps. With a rueful
-                nod of his head, he steps backward into the gloom and disappears.
-                """
-            )
-        case .enemySpecialAction:
-            return msg.oneOf(
-                """
-                The thief, a man of superior breeding, pauses for a moment
-                to consider the propriety of finishing you off.
-                """,
-                "The thief amuses himself by searching your pockets.",
-                "The thief entertains himself by rifling your pack."
-            )
-        default:
-            return nil
-        }
+        )
     }
+
 }
 
 // MARK: - Helper functions
 
 extension Thief {
+
     static func handleGiveToThief(item: ItemProxy) async -> ActionResult? {
         if await item.value > 0 {
             await ActionResult(

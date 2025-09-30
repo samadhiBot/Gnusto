@@ -282,32 +282,96 @@ struct ActionResultTests {
     func testYield() {
         let result = ActionResult.yield
 
-        #expect(result.shouldYieldToEngine == true)
+        #expect(result.executionFlow == .yield)
         #expect(result.message == nil)
         #expect(result.changes.isEmpty)
         #expect(result.effects.isEmpty)
     }
 
-    @Test("ActionResult with shouldYieldToEngine set manually")
+    @Test("ActionResult with executionFlow set manually")
     func testYieldToEngineProperty() {
         let result = ActionResult(
             message: "Test message",
             changes: [simpleChange],
-            shouldYieldToEngine: true
+            executionFlow: .yield
         )
 
-        #expect(result.shouldYieldToEngine == true)
+        #expect(result.executionFlow == .yield)
         #expect(result.message == "Test message")
         #expect(result.changes.count == 1)
         #expect(result.effects.isEmpty)
     }
 
-    @Test("ActionResult with shouldYieldToEngine false by default")
+    @Test("ActionResult with executionFlow override by default")
     func testDefaultYieldToEngine() {
         let result = ActionResult("Regular message")
 
-        #expect(result.shouldYieldToEngine == false)
+        #expect(result.executionFlow == .append)
         #expect(result.message == "Regular message")
+    }
+
+    @Test("ExecutionFlow.append case")
+    func testExecutionFlowAppend() {
+        let result = ActionResult(
+            message: "Additional content",
+            changes: [simpleChange],
+            executionFlow: .append
+        )
+
+        #expect(result.executionFlow == .append)
+        #expect(result.message == "Additional content")
+        #expect(result.changes.count == 1)
+    }
+
+    @Test("ExecutionFlow.prepend case")
+    func testExecutionFlowPrepend() {
+        let result = ActionResult(
+            message: "Priority content",
+            changes: [simpleChange],
+            executionFlow: .prepend
+        )
+
+        #expect(result.executionFlow == .prepend)
+        #expect(result.message == "Priority content")
+        #expect(result.changes.count == 1)
+    }
+
+    @Test("ExecutionFlow.override case")
+    func testExecutionFlowOverride() {
+        let result = ActionResult(
+            message: "Complete replacement",
+            changes: [simpleChange],
+            executionFlow: .override
+        )
+
+        #expect(result.executionFlow == .override)
+        #expect(result.message == "Complete replacement")
+        #expect(result.changes.count == 1)
+    }
+
+    @Test("ExecutionFlow.yield case with content")
+    func testExecutionFlowYieldWithContent() {
+        let result = ActionResult(
+            message: "Apply changes but continue",
+            changes: [simpleChange],
+            executionFlow: .yield
+        )
+
+        #expect(result.executionFlow == .yield)
+        #expect(result.message == "Apply changes but continue")
+        #expect(result.changes.count == 1)
+    }
+
+    @Test("Empty result automatically becomes .yield")
+    func testEmptyResultBecomesYield() {
+        let result = ActionResult(
+            message: nil,
+            changes: [],
+            effects: [],
+            executionFlow: .override
+        )
+
+        #expect(result.executionFlow == .yield)
     }
 
     // MARK: - StateChange Equality Tests

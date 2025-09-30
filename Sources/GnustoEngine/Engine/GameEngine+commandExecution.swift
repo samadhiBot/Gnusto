@@ -609,7 +609,7 @@ extension GameEngine {
         }
 
         // Return whether we should yield to engine
-        return result.shouldYieldToEngine
+        return result.executionFlow == .yield
     }
 
     /// Applies state changes from an ActionResult to the game state.

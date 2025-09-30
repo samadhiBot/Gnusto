@@ -22,7 +22,7 @@ extension RangeReplaceableCollection {
     /// - Parameter newElement: An optional element to append to the collection.
     ///   If `nil`, no operation is performed.
     /// - Complexity: O(1) amortized, over many calls to `append(_:)` on the same collection.
-    mutating func append(_ newElements: Element?...) {
+    public mutating func append(_ newElements: Element?...) {
         for element in newElements {
             guard let element else { continue }
             self.append(element)

@@ -52,20 +52,26 @@ public protocol CombatSystem: Sendable {
     /// have the `.isCharacter` or `.isPerson` flag set to participate in combat.
     var enemyID: ItemID { get }
 
-    /// Provides descriptive text for combat events.
+    /// Provides complete custom handling for specific combat events.
     ///
-    /// This closure generates narrative descriptions for combat events, allowing for rich
-    /// storytelling during combat encounters. The descriptions should be contextually
-    /// appropriate and enhance the player's understanding of what occurred.
+    /// This closure allows full customization of combat event processing, including
+    /// both narrative messages and state changes. When provided, this takes precedence
+    /// over the default event handling. If it returns nil for an event, the system
+    /// falls back to default behavior.
     ///
-    /// - Parameter event: The combat event to describe
-    /// - Returns: A descriptive string for the event, or nil to use default descriptions
-    /// - Throws: If description generation fails
-    var description:
+    /// This is particularly useful for enemies that need special behavior on death,
+    /// victory conditions, or unique combat mechanics that go beyond simple damage.
+    ///
+    /// - Parameters:
+    ///   - event: The combat event to handle
+    ///   - context: The action context for accessing and modifying game state
+    /// - Returns: Complete ActionResult with messages and state changes, or nil for default behavior
+    /// - Throws: If event handling fails
+    var eventHandler:
         @Sendable (
             CombatEvent,
-            CombatMessenger
-        ) async -> String?
+            ActionContext
+        ) async throws -> ActionResult?
     { get }
 
     /// Processes a complete turn of combat including player action and enemy reaction.
@@ -140,4 +146,13 @@ public protocol CombatSystem: Sendable {
         enemy: ItemProxy,
         in context: ActionContext
     ) async -> CombatEvent?
+}
+
+// MARK: - Default Implementations
+
+extension CombatSystem {
+    /// Default implementation that returns nil, falling back to standard event handling.
+    public var eventHandler: @Sendable (CombatEvent, ActionContext) async throws -> ActionResult? {
+        { _, _ in nil }
+    }
 }
