@@ -161,19 +161,6 @@ extension RoundRoom {
         // Note: VALUE 10, TVALUE 5, SACREDBIT
     )
 
-    static let stiletto = Item(
-        id: .stiletto,
-        .name("stiletto"),
-        .synonyms("stiletto"),
-        .adjectives("vicious"),
-        .isWeapon,
-        .requiresTryTake,
-        .isTakable,
-        .omitDescription,
-        .size(10),
-        .in(.item(.thief))
-        // Note: Has action handler STILETTO-FUNCTION
-    )
 }
 
 extension RoundRoom {

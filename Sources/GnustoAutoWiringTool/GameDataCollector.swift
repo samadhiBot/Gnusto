@@ -129,11 +129,32 @@ class GameDataCollector {
         {
             let globalIDName = memberAccess.declName.baseName.text
 
-            // To distinguish from an Item property, we check the number of arguments.
-            // A global flag call will have exactly one argument.
-            if functionCall.arguments.count == 1 {
+            // Only treat as GlobalID if called on engine/context, not on item instances
+            // Check if this is likely an engine-level call vs item-level call
+            if functionCall.arguments.count == 1 && isEngineOrContextCall(calledExpression) {
                 gameData.globalIDs.insert(globalIDName)
             }
+        }
+    }
+
+    /// Determines if a member access expression represents a call on engine/context vs item instance
+    private func isEngineOrContextCall(_ memberAccess: MemberAccessExprSyntax) -> Bool {
+        guard let base = memberAccess.base else { return false }
+
+        let baseText = base.trimmedDescription.trimmingCharacters(in: .whitespacesAndNewlines)
+
+        // Be very restrictive - only direct engine references
+        // Exclude proxy calls like "context.location(.foo)", "item.hasFlag", "bar.setFlag", etc.
+        let directEnginePatterns = [
+            "engine",
+            "context.engine",
+            "await engine",
+            "await context.engine",
+        ]
+
+        // Must be an exact match or end with these patterns to avoid false positives
+        return directEnginePatterns.contains { pattern in
+            baseText == pattern || baseText.hasSuffix(".\(pattern)")
         }
     }
 
@@ -210,8 +231,6 @@ class GameDataCollector {
                         } else if isCombatMessengerType(functionName) {
                             extractCombatMessengerData(
                                 from: functionCall, propertyName: propertyName, isStatic: isStatic)
-                        } else if functionName == "Player" {
-                            extractPlayerLocationData(from: functionCall)
                         } else if functionName == "Fuse" {
                             extractFuseData(
                                 propertyName: propertyName, isStatic: isStatic)
@@ -478,18 +497,6 @@ class GameDataCollector {
         // Filter out common method names that aren't IDs
         let methodNames = ["name", "description", "location", "in", "to", "exits", "adjectives"]
         return !methodNames.contains(memberName)
-    }
-
-    private func extractPlayerLocationData(from functionCall: FunctionCallExprSyntax) {
-        // Look for Player(in: .locationID) pattern
-        for argument in functionCall.arguments {
-            if argument.label?.text == "in" {
-                if let memberAccess = argument.expression.as(MemberAccessExprSyntax.self) {
-                    let locationID = memberAccess.declName.baseName.text
-                    gameData.locationIDs.insert(locationID)
-                }
-            }
-        }
     }
 
     private func extractFuseData(

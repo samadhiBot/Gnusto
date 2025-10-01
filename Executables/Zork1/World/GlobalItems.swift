@@ -21,15 +21,6 @@ enum GlobalItems {
         // Note: Has action handler BOARD-F
     )
 
-    static let boardedWindow = Item(
-        id: .boardedWindow,
-        .name("boarded window"),
-        .synonyms("window"),
-        .adjectives("boarded"),
-        .omitDescription
-        // Note: Has action handler BOARDED-WINDOW-FCN
-    )
-
     static let brokenCanary = Item(
         id: .brokenCanary,
         .name("broken clockwork canary"),
@@ -248,14 +239,6 @@ enum GlobalItems {
         // Note: Has action handler WATER-F
     )
 
-    static let whiteHouse = Item(
-        id: .whiteHouse,
-        .name("white house"),
-        .synonyms("house"),
-        .adjectives("white", "beautiful", "colonial"),
-        .omitDescription
-        // Note: Has action handler WHITE-HOUSE-F
-    )
 }
 
 extension GlobalItems {
