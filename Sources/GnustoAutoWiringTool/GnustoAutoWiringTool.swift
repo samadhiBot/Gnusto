@@ -1,13 +1,20 @@
 import ArgumentParser
 import Foundation
 
+struct ConflictLocation {
+    let fileName: String
+    let fullPath: String
+    let lineNumber: Int
+}
+
 struct ConflictInfo {
     let id: String
     let type: String
-    let files: [String]
+    let locations: [ConflictLocation]
 
     var description: String {
-        let fileList = files.map { "    📁 \($0)" }.joined(separator: "\n")
+        let fileList = locations.map { "    📁 \($0.fileName):\($0.lineNumber)" }.joined(
+            separator: "\n")
         return """
             \(type): \(id)
             \(fileList)
@@ -23,18 +30,40 @@ extension AutoWiringError: LocalizedError {
     var errorDescription: String? {
         switch self {
         case .duplicateIDs(let conflicts):
-            let conflictDescriptions = conflicts.map { $0.description }.joined(separator: "\n\n")
+            // Generate Xcode-compatible error format for each conflict
+            var xcodeErrors: [String] = []
+
+            for conflict in conflicts {
+                let actionableMessage =
+                    "Duplicate \(conflict.type) '\(conflict.id)' found in \(conflict.locations.count) files. Rename one of them to resolve conflict."
+
+                // Add an error line for each location containing this duplicate
+                for location in conflict.locations {
+                    xcodeErrors.append(
+                        "\(location.fullPath):\(location.lineNumber):1: error: \(actionableMessage)"
+                    )
+                }
+
+                // Add a note with guidance
+                let guidance =
+                    "note: Search for 'id: .\(conflict.id)' in these files and rename duplicates to unique IDs"
+                if let firstLocation = conflict.locations.first {
+                    xcodeErrors.append(
+                        "\(firstLocation.fullPath):\(firstLocation.lineNumber):1: \(guidance)")
+                }
+            }
+
+            // Add actionable summary
             let totalCount = conflicts.count
-            let idCount = conflicts.reduce(0) { $0 + $1.files.count }
+            let idCount = conflicts.reduce(0) { $0 + $1.locations.count }
+            xcodeErrors.append(
+                "error: Build failed due to \(totalCount) duplicate ID conflicts affecting \(idCount) definitions. Each ID must be unique across the entire game."
+            )
+            xcodeErrors.append(
+                "note: Fix duplicates by renaming IDs to unique values, e.g., change 'id: .chest' to 'id: .treasureChest' or 'id: .woodenChest'"
+            )
 
-            return """
-                ❌ Found \(totalCount) duplicate ID conflicts affecting \(idCount) definitions:
-
-                \(conflictDescriptions)
-
-                Each ID must be unique across the entire game. Please rename the duplicates
-                to resolve these conflicts.
-                """
+            return xcodeErrors.joined(separator: "\n")
         }
     }
 }
@@ -42,6 +71,7 @@ extension AutoWiringError: LocalizedError {
 struct FileGameData {
     let gameData: GameData
     let fileName: String
+    let fullPath: String
 }
 
 @main
@@ -71,17 +101,19 @@ struct GnustoAutoWiringTool: AsyncParsableCommand {
 
         for sourceURL in sourceURLs {
             let scanner = Scanner(
-                source: try String(contentsOf: sourceURL, encoding: .utf8)
+                source: try String(contentsOf: sourceURL, encoding: .utf8),
+                fileName: sourceURL.lastPathComponent
             )
             let fileGameData = scanner.process()
 
             fileGameDataList.append(
                 FileGameData(
                     gameData: fileGameData,
-                    fileName: sourceURL.lastPathComponent
+                    fileName: sourceURL.lastPathComponent,
+                    fullPath: sourceURL.path
                 ))
 
-            print("📁 Processing: \(sourceURL.lastPathComponent)")
+            // Process file silently - summary will be shown at end
         }
 
         // Detect all conflicts across all files
@@ -97,9 +129,6 @@ struct GnustoAutoWiringTool: AsyncParsableCommand {
             allGameData = mergeGameDataUnsafe(allGameData, fileData.gameData)
         }
 
-        // Print summary of discovered game data
-        printGameDataSummary(allGameData)
-
         // Generate Swift code
         let codeGenerator = CodeGenerator()
         let generatedCode = codeGenerator.generate(from: allGameData)
@@ -108,7 +137,17 @@ struct GnustoAutoWiringTool: AsyncParsableCommand {
         let outputURL = URL(fileURLWithPath: output)
         try generatedCode.write(to: outputURL, atomically: true, encoding: .utf8)
 
-        print("\n✅ Generated code written to: \(output)")
+        // Print success summary
+        let fileCount = fileGameDataList.count
+        let totalIDs =
+            allGameData.locationIDs.keys.count + allGameData.itemIDs.keys.count
+            + allGameData.globalIDs.keys.count
+            + allGameData.fuseIDs.keys.count + allGameData.daemonIDs.keys.count
+            + allGameData.verbIDs.keys.count
+
+        print(
+            "✅ Successfully processed \(fileCount) files and generated \(totalIDs) ID definitions")
+        print("📝 Output written to: \(output)")
     }
 }
 
@@ -159,57 +198,69 @@ extension GnustoAutoWiringTool {
 
     private func detectAllConflicts(_ fileDataList: [FileGameData]) -> [ConflictInfo] {
         var allConflicts: [ConflictInfo] = []
-        var idToFiles: [String: [String]] = [:]
+        var idToLocations: [String: [ConflictLocation]] = [:]
 
-        // Build comprehensive ID-to-files mapping
+        // Build comprehensive ID-to-files mapping (avoiding duplicates)
         for fileData in fileDataList {
             let fileName = fileData.fileName
+            let fullPath = fileData.fullPath
             let gameData = fileData.gameData
 
-            // Track all IDs from this file
-            for id in gameData.locationIDs { addIDSource("LocationID:\(id)", fileName, &idToFiles) }
-            for id in gameData.itemIDs { addIDSource("ItemID:\(id)", fileName, &idToFiles) }
-            for id in gameData.globalIDs { addIDSource("GlobalID:\(id)", fileName, &idToFiles) }
-            for id in gameData.fuseIDs { addIDSource("FuseID:\(id)", fileName, &idToFiles) }
-            for id in gameData.daemonIDs { addIDSource("DaemonID:\(id)", fileName, &idToFiles) }
-            for id in gameData.verbIDs { addIDSource("VerbID:\(id)", fileName, &idToFiles) }
+            // Track main ID types with actual source locations
+            for (id, location) in gameData.locationIDs {
+                addIDLocation(
+                    "Location:\(id)", fileName, fullPath, location.lineNumber, &idToLocations)
+            }
+            for (id, location) in gameData.itemIDs {
+                addIDLocation("Item:\(id)", fileName, fullPath, location.lineNumber, &idToLocations)
+            }
+            for (id, location) in gameData.globalIDs {
+                addIDLocation(
+                    "GlobalID:\(id)", fileName, fullPath, location.lineNumber, &idToLocations)
+            }
+            for (id, location) in gameData.fuseIDs {
+                addIDLocation("Fuse:\(id)", fileName, fullPath, location.lineNumber, &idToLocations)
+            }
+            for (id, location) in gameData.daemonIDs {
+                addIDLocation(
+                    "Daemon:\(id)", fileName, fullPath, location.lineNumber, &idToLocations)
+            }
+            for (id, location) in gameData.verbIDs {
+                addIDLocation("Verb:\(id)", fileName, fullPath, location.lineNumber, &idToLocations)
+            }
 
             for id in gameData.itemEventHandlers {
-                addIDSource("ItemEventHandler:\(id)", fileName, &idToFiles)
+                addIDLocation("ItemEventHandler:\(id)", fileName, fullPath, 1, &idToLocations)
             }
             for id in gameData.locationEventHandlers {
-                addIDSource("LocationEventHandler:\(id)", fileName, &idToFiles)
+                addIDLocation("LocationEventHandler:\(id)", fileName, fullPath, 1, &idToLocations)
             }
             for id in gameData.itemComputeHandlers {
-                addIDSource("ItemComputeHandler:\(id)", fileName, &idToFiles)
+                addIDLocation("ItemComputeHandler:\(id)", fileName, fullPath, 1, &idToLocations)
             }
             for id in gameData.locationComputeHandlers {
-                addIDSource("LocationComputeHandler:\(id)", fileName, &idToFiles)
+                addIDLocation("LocationComputeHandler:\(id)", fileName, fullPath, 1, &idToLocations)
             }
             for id in gameData.gameBlueprintTypes {
-                addIDSource("GameBlueprintType:\(id)", fileName, &idToFiles)
+                addIDLocation("GameBlueprint:\(id)", fileName, fullPath, 1, &idToLocations)
             }
             for id in gameData.gameAreaTypes {
-                addIDSource("GameAreaType:\(id)", fileName, &idToFiles)
+                addIDLocation("GameArea:\(id)", fileName, fullPath, 1, &idToLocations)
             }
             for id in gameData.customActionHandlers {
-                addIDSource("CustomActionHandler:\(id)", fileName, &idToFiles)
+                addIDLocation("ActionHandler:\(id)", fileName, fullPath, 1, &idToLocations)
             }
             for id in gameData.combatSystems {
-                addIDSource("CombatSystem:\(id)", fileName, &idToFiles)
+                addIDLocation("CombatSystem:\(id)", fileName, fullPath, 1, &idToLocations)
             }
             for id in gameData.combatMessengers {
-                addIDSource("CombatMessenger:\(id)", fileName, &idToFiles)
+                addIDLocation("CombatMessenger:\(id)", fileName, fullPath, 1, &idToLocations)
             }
-            for id in gameData.fuses { addIDSource("Fuse:\(id)", fileName, &idToFiles) }
-            for id in gameData.daemons { addIDSource("Daemon:\(id)", fileName, &idToFiles) }
-            for id in gameData.items { addIDSource("Item:\(id)", fileName, &idToFiles) }
-            for id in gameData.locations { addIDSource("Location:\(id)", fileName, &idToFiles) }
         }
 
-        // Find all conflicts (IDs appearing in multiple files)
-        for (idWithType, files) in idToFiles {
-            if files.count > 1 {
+        // Find all conflicts (IDs appearing in multiple locations)
+        for (idWithType, locations) in idToLocations {
+            if locations.count > 1 {
                 let parts = idWithType.split(separator: ":", maxSplits: 1)
                 let type = String(parts[0])
                 let id = String(parts[1])
@@ -218,7 +269,7 @@ extension GnustoAutoWiringTool {
                     ConflictInfo(
                         id: id,
                         type: type,
-                        files: files.sorted()
+                        locations: locations.sorted { $0.fullPath < $1.fullPath }
                     ))
             }
         }
@@ -226,24 +277,30 @@ extension GnustoAutoWiringTool {
         return allConflicts.sorted { $0.type < $1.type || ($0.type == $1.type && $0.id < $1.id) }
     }
 
-    private func addIDSource(
-        _ idWithType: String, _ fileName: String, _ idToFiles: inout [String: [String]]
+    private func addIDLocation(
+        _ idWithType: String, _ fileName: String, _ fullPath: String, _ lineNumber: Int,
+        _ idToLocations: inout [String: [ConflictLocation]]
     ) {
-        if idToFiles[idWithType] == nil {
-            idToFiles[idWithType] = []
+        if idToLocations[idWithType] == nil {
+            idToLocations[idWithType] = []
         }
-        idToFiles[idWithType]?.append(fileName)
+        let location = ConflictLocation(
+            fileName: fileName,
+            fullPath: fullPath,
+            lineNumber: lineNumber
+        )
+        idToLocations[idWithType]?.append(location)
     }
 
     private func mergeGameDataUnsafe(_ target: GameData, _ source: GameData) -> GameData {
         var merged = target
 
-        merged.locationIDs.formUnion(source.locationIDs)
-        merged.itemIDs.formUnion(source.itemIDs)
-        merged.globalIDs.formUnion(source.globalIDs)
-        merged.fuseIDs.formUnion(source.fuseIDs)
-        merged.daemonIDs.formUnion(source.daemonIDs)
-        merged.verbIDs.formUnion(source.verbIDs)
+        merged.locationIDs.merge(source.locationIDs) { _, new in new }
+        merged.itemIDs.merge(source.itemIDs) { _, new in new }
+        merged.globalIDs.merge(source.globalIDs) { _, new in new }
+        merged.fuseIDs.merge(source.fuseIDs) { _, new in new }
+        merged.daemonIDs.merge(source.daemonIDs) { _, new in new }
+        merged.verbIDs.merge(source.verbIDs) { _, new in new }
 
         merged.itemEventHandlers.formUnion(source.itemEventHandlers)
         merged.locationEventHandlers.formUnion(source.locationEventHandlers)
@@ -270,12 +327,12 @@ extension GnustoAutoWiringTool {
 
     private func printGameDataSummary(_ gameData: GameData) {
         print("\n🎮 Discovered Game Data:")
-        print("  📍 LocationIDs: \(gameData.locationIDs.sorted().joined(separator: ", "))")
-        print("  📦 ItemIDs: \(gameData.itemIDs.sorted().joined(separator: ", "))")
-        print("  🌐 GlobalIDs: \(gameData.globalIDs.sorted().joined(separator: ", "))")
-        print("  🧨 FuseIDs: \(gameData.fuseIDs.sorted().joined(separator: ", "))")
-        print("  👿 DaemonIDs: \(gameData.daemonIDs.sorted().joined(separator: ", "))")
-        print("  🎯 Custom Verbs: \(gameData.verbIDs.sorted().joined(separator: ", "))")
+        print("  📍 LocationIDs: \(gameData.locationIDs.keys.sorted().joined(separator: ", "))")
+        print("  📦 ItemIDs: \(gameData.itemIDs.keys.sorted().joined(separator: ", "))")
+        print("  🌐 GlobalIDs: \(gameData.globalIDs.keys.sorted().joined(separator: ", "))")
+        print("  🧨 FuseIDs: \(gameData.fuseIDs.keys.sorted().joined(separator: ", "))")
+        print("  👿 DaemonIDs: \(gameData.daemonIDs.keys.sorted().joined(separator: ", "))")
+        print("  🎯 Custom Verbs: \(gameData.verbIDs.keys.sorted().joined(separator: ", "))")
         print(
             "  🎪 GameBlueprint Types: \(gameData.gameBlueprintTypes.sorted().joined(separator: ", "))"
         )

@@ -18,7 +18,8 @@ enum Underground {
             .south(.eastOfChasm),
             .west(.steepRamp),
             .up(.livingRoom, via: .trapDoor, blocked: "The trap door is locked from above.")
-        )
+        ),
+        .localGlobals(.trapDoor, .slide, .stairs)
     )
 
     static let complexJunction = Location(
@@ -50,9 +51,24 @@ enum Underground {
         ),
         .exits(
             .north(.cellar),
-            .east(.gallery)
+            .east(.gallery),
+            .down(blocked: "The chasm probably leads straight to the infernal regions.")
         )
     )
+
+    /*
+        <ROUTINE CHASM-PSEUDO ()
+             <COND (<OR <VERB? LEAP>
+                    <AND <VERB? PUT> <EQUAL? ,PRSO ,ME>>>
+                <TELL
+        "You look before leaping, and realize that you would never survive." CR>)
+                   (<VERB? CROSS>
+                <TELL "It's too far to jump, and there's no bridge." CR>)
+                   (<AND <VERB? PUT THROW-OFF> <EQUAL? ,PRSI ,PSEUDO-OBJECT>>
+                <TELL
+        "The " D ,PRSO " drops out of sight into the chasm." CR>
+                <REMOVE-CAREFULLY ,PRSO>)>>
+     */
 
     static let eastWestPassage = Location(
         id: .eastWestPassage,
@@ -81,16 +97,8 @@ enum Underground {
         .exits(
             .north(.studio),
             .west(.eastOfChasm)
-        )
-    )
-
-    static let maze1 = Location(
-        id: .maze1,
-        .name("Maze"),
-        .description("This is part of a maze of twisty little passages, all alike."),
-        .exits(
-            .east(.trollRoom)
-        )
+        ),
+        .inherentlyLit
     )
 
     static let northSouthPassage = Location(
@@ -118,37 +126,6 @@ enum Underground {
         .exits(
             .southeast(.roundRoom)
         )
-    )
-
-    static let reservoir = Location(
-        id: .reservoir,
-        .name("Reservoir"),
-        .description("This is a large underground reservoir."),
-        .exits(
-            .up(.eastWestPassage)
-        )
-    )
-
-    static let roundRoom = Location(
-        id: .roundRoom,
-        .name("Round Room"),
-        .description(
-            """
-            This is a circular stone room with passages in all directions. Several of them
-            have unfortunate endings.
-            """
-        ),
-        .exits(
-            .north(.northSouthPassage),
-            .northeast(.northeastPassage),
-            .east(.deadEnd),
-            .southeast(.complexJunction),
-            .south(.southPassage),
-            .southwest(.southwestPassage),
-            .west(.eastWestPassage),
-            .northwest(.northwestPassage)
-        ),
-        .inherentlyLit
     )
 
     static let southPassage = Location(
@@ -205,6 +182,61 @@ enum Underground {
 // MARK: - Items
 
 extension Underground {
+    static let axe = Item(
+        id: .axe,
+        .name("bloody axe"),
+        .synonyms("axe", "ax"),
+        .adjectives("bloody"),
+        .isWeapon,
+        .requiresTryTake,
+        .isTakable,
+        .omitDescription,
+        .size(25),
+        .in(.item(.troll))
+        // Note: Has action handler AXE-F
+    )
+
+    static let ownersManual = Item(
+        id: .ownersManual,
+        .name("ZORK owner's manual"),
+        .synonyms("manual", "piece", "paper"),
+        .adjectives("zork", "owners", "small"),
+        .isReadable,
+        .isTakable,
+        .firstDescription("Loosely attached to a wall is a small piece of paper."),
+        .readText(
+            """
+            Congratulations!
+            
+            You are the privileged owner of ZORK I: The Great Underground Empire,
+            a self-contained and self-maintaining universe. If used and maintained
+            in accordance with normal operating practices for small universes, ZORK
+            will provide many months of trouble-free operation.
+            """
+        ),
+        .in(.studio)
+    )
+
+    static let painting = Item(
+        id: .painting,
+        .name("painting"),
+        .synonyms("painting", "art", "canvas", "treasure"),
+        .adjectives("beautiful"),
+        .isTakable,
+        .isFlammable,
+        .firstDescription(
+            """
+            Fortunately, there is still one chance for you to be a vandal, for on
+            the far wall is a painting of unparalleled beauty.
+            """
+        ),
+        .description("A painting by a neglected genius is here."),
+        .size(15),
+        .in(.gallery),
+        .value(4)
+        // Note: VALUE 4, TVALUE 6, has action handler PAINTING-FCN
+    )
+
     static let steepRampItem = Item(
         id: .steepRampItem,
         .name("steep metal ramp"),

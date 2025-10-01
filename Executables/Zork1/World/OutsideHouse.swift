@@ -12,7 +12,7 @@ enum OutsideHouse {
             .west(.kitchen, via: .kitchenWindow),
             .northwest(.northOfHouse),
             .southwest(.southOfHouse),
-            .east(.clearing),
+            .east(.eastClearing),
             .inside(.kitchen, via: .kitchenWindow)
         ),
         .inherentlyLit,
@@ -261,7 +261,7 @@ extension OutsideHouse {
         //                ]
         //                if !atHouseLocations.contains(currentLocation) {
         //                    // Player is not at the house
-        //                    if currentLocation == .gratingClearing {
+        //                    if currentLocation == .northClearing {
         //                        return ActionResult("It seems to be to the west.")
         //                    } else {
         //                        return ActionResult("It was here just a minute ago....")

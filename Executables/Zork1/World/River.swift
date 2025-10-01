@@ -55,9 +55,9 @@ enum River {
         .exits(
             .east(.cliffMiddle),
             .down(.cliffMiddle),
-            .northwest(.clearing),
+            .northwest(.eastClearing),
+            .south(blocked: "Storm-tossed trees block your way."),
             .west(.forest3)
-            // Note: SOUTH exit has custom message
         ),
         .inherentlyLit,
         .localGlobals(.climbableCliff, .river, .rainbow)
@@ -365,6 +365,16 @@ extension River {
         .size(10),
         .in(.river4)
         // Note: Has action handler TREASURE-INSIDE
+    )
+
+    static let climbableCliff = Item(
+        id: .climbableCliff,
+        .name("cliff"),
+        .synonyms("wall", "cliff", "walls", "ledge"),
+        .adjectives("rocky", "sheer"),
+        .omitDescription,
+        .isClimbable
+        // Note: Has action handler CLIFF-OBJECT
     )
 
     static let emerald = Item(

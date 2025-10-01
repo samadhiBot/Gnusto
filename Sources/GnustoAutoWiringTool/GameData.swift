@@ -1,14 +1,20 @@
 import Foundation
 
-/// Holds all discovered game-related information from parsing Swift source code.
+/// Represents a source location for tracking where IDs are defined
+struct SourceLocation {
+    let fileName: String
+    let lineNumber: Int
+}
+
+/// Data structure that holds all discovered game patterns from scanning Swift source files.
 struct GameData {
-    // ID collections
-    var daemonIDs: Set<String> = []
-    var fuseIDs: Set<String> = []
-    var globalIDs: Set<String> = []
-    var itemIDs: Set<String> = []
-    var locationIDs: Set<String> = []
-    var verbIDs: Set<String> = []
+    // Core ID sets with source locations
+    var locationIDs: [String: SourceLocation] = [:]
+    var itemIDs: [String: SourceLocation] = [:]
+    var globalIDs: [String: SourceLocation] = [:]
+    var fuseIDs: [String: SourceLocation] = [:]
+    var daemonIDs: [String: SourceLocation] = [:]
+    var verbIDs: [String: SourceLocation] = [:]
 
     // Type collections
     var combatMessengers: Set<String> = []

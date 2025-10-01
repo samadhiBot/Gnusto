@@ -333,6 +333,14 @@ struct CoalMine {
         // Note: VALUE 5, TVALUE 5
     )
 
+    let ladder = Item(
+        id: .ladder,
+        .name("wooden ladder"),
+        .adjectives("wooden", "rickety", "narrow"),
+        .isClimbable,
+        .omitDescription
+    )
+
     let loweredBasket = Item(
         id: .loweredBasket,
         .name("basket"),
@@ -377,6 +385,15 @@ struct CoalMine {
         .capacity(50),
         .in(.shaftRoom)
         // Note: Has action handler BASKET-F
+    )
+
+    let slide = Item(
+        id: .slide,
+        .name("slide"),
+        .synonyms("chute", "ramp", "slide"),
+        .adjectives("steep", "metal", "twisting"),
+        .isClimbable
+        // (ACTION SLIDE-FUNCTION)
     )
 
     let timbers = Item(

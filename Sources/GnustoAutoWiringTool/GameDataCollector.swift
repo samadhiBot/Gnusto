@@ -7,9 +7,13 @@ class GameDataCollector {
     var gameData = GameData()
 
     private var currentAreaType: String?
+    private var currentFileName: String = ""
+    private var sourceLocationConverter: SourceLocationConverter?
 
-    func collect(from source: String) {
+    func collect(from source: String, fileName: String) {
+        currentFileName = fileName
         let tree = Parser.parse(source: source)
+        sourceLocationConverter = SourceLocationConverter(fileName: fileName, tree: tree)
         walk(tree)
     }
 
@@ -132,7 +136,9 @@ class GameDataCollector {
             // Only treat as GlobalID if called on engine/context, not on item instances
             // Check if this is likely an engine-level call vs item-level call
             if functionCall.arguments.count == 1 && isEngineOrContextCall(calledExpression) {
-                gameData.globalIDs.insert(globalIDName)
+                let lineNumber = getLineNumber(for: memberAccess)
+                gameData.globalIDs[globalIDName] = SourceLocation(
+                    fileName: currentFileName, lineNumber: lineNumber)
             }
         }
     }
@@ -174,7 +180,8 @@ class GameDataCollector {
                 let segment = stringLiteral.segments.first?.as(StringSegmentSyntax.self)
             {
                 let daemonID = segment.content.text
-                gameData.daemonIDs.insert(daemonID)
+                gameData.daemonIDs[daemonID] = SourceLocation(
+                    fileName: currentFileName, lineNumber: 1)
             }
         }
 
@@ -186,7 +193,7 @@ class GameDataCollector {
                 let segment = stringLiteral.segments.first?.as(StringSegmentSyntax.self)
             {
                 let fuseID = segment.content.text
-                gameData.fuseIDs.insert(fuseID)
+                gameData.fuseIDs[fuseID] = SourceLocation(fileName: currentFileName, lineNumber: 1)
             }
         }
     }
@@ -233,10 +240,10 @@ class GameDataCollector {
                                 from: functionCall, propertyName: propertyName, isStatic: isStatic)
                         } else if functionName == "Fuse" {
                             extractFuseData(
-                                propertyName: propertyName, isStatic: isStatic)
+                                from: varDecl, propertyName: propertyName, isStatic: isStatic)
                         } else if functionName == "Daemon" {
                             extractDaemonData(
-                                propertyName: propertyName, isStatic: isStatic)
+                                from: varDecl, propertyName: propertyName, isStatic: isStatic)
                         }
                     }
                 }
@@ -325,7 +332,9 @@ class GameDataCollector {
             arguments.label?.text == "id"
         {
             let locationID = memberAccess.declName.baseName.text
-            gameData.locationIDs.insert(locationID)
+            let lineNumber = getLineNumber(for: memberAccess)
+            gameData.locationIDs[locationID] = SourceLocation(
+                fileName: currentFileName, lineNumber: lineNumber)
             gameData.locations.insert(propertyName)
 
             // Map this location property to its area type
@@ -362,7 +371,8 @@ class GameDataCollector {
             if argument.label?.text == "enemyID" {
                 if let memberAccess = argument.expression.as(MemberAccessExprSyntax.self) {
                     let enemyID = memberAccess.declName.baseName.text
-                    gameData.itemIDs.insert(enemyID)
+                    gameData.itemIDs[enemyID] = SourceLocation(
+                        fileName: currentFileName, lineNumber: 1)
                     gameData.combatSystems.insert(propertyName)
 
                     if let currentAreaType {
@@ -383,7 +393,7 @@ class GameDataCollector {
             enemyID = String(enemyID.dropLast("Combat".count))
         }
 
-        gameData.itemIDs.insert(enemyID)
+        gameData.itemIDs[enemyID] = SourceLocation(fileName: currentFileName, lineNumber: 1)
         gameData.combatSystems.insert(propertyName)
 
         if let currentAreaType {
@@ -405,7 +415,8 @@ class GameDataCollector {
             if argument.label?.text == "enemyID" {
                 if let memberAccess = argument.expression.as(MemberAccessExprSyntax.self) {
                     let enemyID = memberAccess.declName.baseName.text
-                    gameData.itemIDs.insert(enemyID)
+                    gameData.itemIDs[enemyID] = SourceLocation(
+                        fileName: currentFileName, lineNumber: 1)
                     gameData.combatMessengers.insert(propertyName)
 
                     if let currentAreaType {
@@ -426,7 +437,7 @@ class GameDataCollector {
             enemyID = String(enemyID.dropLast("Messenger".count))
         }
 
-        gameData.itemIDs.insert(enemyID)
+        gameData.itemIDs[enemyID] = SourceLocation(fileName: currentFileName, lineNumber: 1)
         gameData.combatMessengers.insert(propertyName)
 
         if let currentAreaType {
@@ -447,7 +458,9 @@ class GameDataCollector {
             arguments.label?.text == "id"
         {
             let itemID = memberAccess.declName.baseName.text
-            gameData.itemIDs.insert(itemID)
+            let lineNumber = getLineNumber(for: memberAccess)
+            gameData.itemIDs[itemID] = SourceLocation(
+                fileName: currentFileName, lineNumber: lineNumber)
             gameData.items.insert(propertyName)
 
             // Map this item property to its area type
@@ -472,12 +485,15 @@ class GameDataCollector {
                 // Try to determine the ID type from context
                 if let base = memberAccess.base?.trimmedDescription {
                     if base.contains("location") {
-                        gameData.locationIDs.insert(idName)
+                        gameData.locationIDs[idName] = SourceLocation(
+                            fileName: currentFileName, lineNumber: 1)
                     } else if base.contains("item") {
-                        gameData.itemIDs.insert(idName)
+                        gameData.itemIDs[idName] = SourceLocation(
+                            fileName: currentFileName, lineNumber: 1)
                     } else if base.contains("player") {
                         // Player is a special case - it's an implicit ID
-                        gameData.locationIDs.insert(idName)
+                        gameData.locationIDs[idName] = SourceLocation(
+                            fileName: currentFileName, lineNumber: 1)
                     }
                 }
             }
@@ -500,12 +516,15 @@ class GameDataCollector {
     }
 
     private func extractFuseData(
+        from varDecl: VariableDeclSyntax,
         propertyName: String,
         isStatic: Bool
     ) {
         // Since Fuse no longer takes an ID parameter, we derive the ID from the property name
         // e.g., "explodingFuse" -> "explodingFuse"
-        gameData.fuseIDs.insert(propertyName)
+        let lineNumber = getLineNumber(for: varDecl)
+        gameData.fuseIDs[propertyName] = SourceLocation(
+            fileName: currentFileName, lineNumber: lineNumber)
         gameData.fuses.insert(propertyName)
 
         // Map this fuse definition to its area type
@@ -516,18 +535,31 @@ class GameDataCollector {
     }
 
     private func extractDaemonData(
+        from varDecl: VariableDeclSyntax,
         propertyName: String,
         isStatic: Bool
     ) {
         // Since Daemon no longer takes an ID parameter, we derive the ID from the property name
-        // e.g., "swordDaemon" -> "swordDaemon"
-        gameData.daemonIDs.insert(propertyName)
+        // e.g., "thiefDaemon" -> "thiefDaemon"
+        let lineNumber = getLineNumber(for: varDecl)
+        gameData.daemonIDs[propertyName] = SourceLocation(
+            fileName: currentFileName, lineNumber: lineNumber)
         gameData.daemons.insert(propertyName)
 
-        // Map this daemon definition to its area type
+        // Map this daemon to its area type
         if let currentAreaType {
             gameData.handlerToAreaMap[propertyName] = currentAreaType
             gameData.propertyIsStatic[propertyName] = isStatic
         }
+    }
+
+    /// Extract line number from a SwiftSyntax node
+    private func getLineNumber(for node: SyntaxProtocol) -> Int {
+        guard let converter = sourceLocationConverter else {
+            return 1  // Fallback if converter not available
+        }
+
+        let location = converter.location(for: node.position)
+        return location.line
     }
 }

@@ -126,15 +126,6 @@ enum RoundRoom {
 // MARK: - Items
 
 extension RoundRoom {
-    static let climbableCliff = Item(
-        id: .climbableCliff,
-        .name("cliff"),
-        .synonyms("wall", "cliff", "walls", "ledge"),
-        .adjectives("rocky", "sheer"),
-        .omitDescription,
-        .isClimbable
-        // Note: Has action handler CLIFF-OBJECT
-    )
 
     static let crack = Item(
         id: .crack,

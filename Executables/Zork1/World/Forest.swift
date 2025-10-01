@@ -5,27 +5,8 @@ import GnustoEngine
 enum Forest {
     // MARK: - Locations
 
-    static let canyonView = Location(
-        id: .canyonView,
-        .name("Canyon View"),
-        .description(
-            """
-            You are in a clearing, with a forest surrounding you on all
-            sides. A path leads south.
-            """
-        ),
-        .exits(
-            .down(blocked: "GRATING PUZZLE"),
-            .east(.forest2),
-            .south(.forestPath),
-            .west(.forest1),
-        ),
-        .inherentlyLit,
-        .localGlobals(.forest)
-    )
-
-    static let clearing = Location(
-        id: .clearing,
+    static let eastClearing = Location(
+        id: .eastClearing,
         .name("Clearing"),
         .description(
             """
@@ -54,7 +35,7 @@ enum Forest {
             """
         ),
         .exits(
-            .north(.gratingClearing),
+            .north(.northClearing),
             .east(.forestPath),
             .south(.forest3),
             // Note: UP and WEST exits have custom messages
@@ -73,7 +54,7 @@ enum Forest {
         ),
         .exits(
             .east(.mountains),
-            .south(.clearing),
+            .south(.eastClearing),
             .west(.forestPath),
             // Note: UP and NORTH exits have custom messages
         ),
@@ -90,7 +71,7 @@ enum Forest {
             """
         ),
         .exits(
-            .north(.clearing),
+            .north(.eastClearing),
             .west(.forest1),
             .northwest(.southOfHouse),
             // Note: UP, EAST, and SOUTH exits have custom messages
@@ -111,7 +92,7 @@ enum Forest {
         ),
         .exits(
             .up(.upATree),
-            .north(.gratingClearing),
+            .north(.northClearing),
             .east(.forest2),
             .south(.northOfHouse),
             .west(.forest1),
@@ -120,8 +101,8 @@ enum Forest {
         .localGlobals(.songbird, .whiteHouse, .forest)
     )
 
-    static let gratingClearing = Location(
-        id: .gratingClearing,
+    static let northClearing = Location(
+        id: .northClearing,
         .name("Clearing"),
         .exits(
             .east(.forest2),
@@ -226,7 +207,7 @@ enum Forest {
         .isFlammable,
         .requiresTryTake,
         .size(25),
-        .in(.gratingClearing)
+        .in(.northClearing)
     )
 
     static let songbird = Item(
@@ -262,7 +243,7 @@ extension Forest {
         }
     }
 
-    static let gratingClearingComputer = LocationComputer(for: .gratingClearing) {
+    static let northClearingComputer = LocationComputer(for: .northClearing) {
         locationProperty(.description) { context in
             let grate = await context.item(.grate)
             var description = [
@@ -284,7 +265,7 @@ extension Forest {
         }
     }
 
-    static let gratingClearingHandler = LocationEventHandler(for: .gratingClearing) {
+    static let northClearingHandler = LocationEventHandler(for: .northClearing) {
         onEnter { context in
             // ZIL M-ENTER: If grate is not revealed, set it invisible
             let isGrateInvisible = await context.item(.grate).hasFlag(.isInvisible)
@@ -376,7 +357,7 @@ extension Forest {
                         "The grate is unlocked.",
                         await context.item(.grate).clearFlag(.isLocked)
                     )
-                } else if currentLocation.id == .gratingClearing {
+                } else if currentLocation.id == .northClearing {
                     return ActionResult("You can't reach the lock from here.")
                 } else {
                     return nil
@@ -391,7 +372,7 @@ extension Forest {
                 let isOpen = await context.item(.grate).hasFlag(.isOpen)
                 if !isOpen {
                     let message =
-                        if currentLocation.id == .gratingClearing {
+                        if currentLocation.id == .northClearing {
                             "The grating opens."
                         } else {
                             "The grating opens to reveal trees above you."
@@ -429,7 +410,7 @@ extension Forest {
                     "The grate is unlocked.",
                     await context.item(.grate).clearFlag(.isLocked)
                 )
-            } else if currentLocation.id == .gratingClearing {
+            } else if currentLocation.id == .northClearing {
                 return ActionResult("You can't reach the lock from here.")
             } else {
                 return nil
