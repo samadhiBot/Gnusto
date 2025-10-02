@@ -120,7 +120,7 @@ let package = Package(
         .executable(name: "$game_name", targets: ["$game_name"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/samadhiBot/Gnusto.git", from: "0.1.0")
+        .package(url: "https://github.com/samadhiBot/Gnusto.git", from: "0.2.0")
     ],
     targets: [
         .executableTarget(
@@ -129,7 +129,7 @@ let package = Package(
                 .product(name: "GnustoEngine", package: "Gnusto"),
             ],
             plugins: [
-                .plu.in(name: "GnustoAutoWiringPlugin", package: "Gnusto")
+                .plugin(name: "GnustoAutoWiringPlugin", package: "Gnusto")
             ]
         ),
         .testTarget(
@@ -137,6 +137,7 @@ let package = Package(
             dependencies: [
                 "$game_name",
                 .product(name: "GnustoEngine", package: "Gnusto"),
+                .product(name: "GnustoTestSupport", package: "Gnusto"),
             ]
         ),
     ]
@@ -149,7 +150,7 @@ EOF
 import GnustoEngine
 
 let engine = await GameEngine(
-    blueprint: $game.name()
+    blueprint: $game_name(),
     parser: StandardParser(),
     ioHandler: ConsoleIOHandler(
         markdownParser: MarkdownParser(columns: 64)
@@ -221,10 +222,9 @@ struct CustodialSingularity {
             It's a left-handed screwdriver. It looks it could be useful,
             provided you could find a left-handed screw.
             """
-        ),
+        )
         .isTakable
         .in(.broomCloset)
-    )
 
     let broomClosetHandler = LocationEventHandler(for: .broomCloset) {
         beforeTurn(.move) { context, command in

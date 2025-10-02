@@ -443,16 +443,6 @@ extension Thief {
             )
         }
 
-        // Add standard death changes
-        //        changes.append(await enemy.takeDamage(damage))
-        //        changes.append(await context.engine.endCombat())
-        //        changes.append(
-        //            await enemy.setCharacterAttributes(
-        //                consciousness: .dead,
-        //                isFighting: false
-        //            )
-        //        )
-
         let bootyStatus = treasuresDeposited ? " His booty remains." : ""
 
         return ActionResult(
@@ -462,7 +452,6 @@ extension Thief {
                 carcass has disappeared.\(bootyStatus)
                 """,
             changes: changes
-                //            executionFlow: treasuresDeposited ? .yield : .override
         )
     }
 
