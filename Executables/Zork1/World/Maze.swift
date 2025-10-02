@@ -166,7 +166,7 @@ enum Maze {
         )
         .southwest(.maze11)
         // Note: UP exit to grating clearing conditional on grate being open
-        .localGlobals(.grate)
+        .scenery(.grate)
 
     static let maze12 = Location(.maze12)
         .name("Maze")

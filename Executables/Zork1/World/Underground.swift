@@ -16,7 +16,7 @@ enum Underground {
         .south(.eastOfChasm)
         .west(.steepRamp)
         .up(.livingRoom, via: .trapDoor, blocked: "The trap door is locked from above.")
-        .localGlobals(.trapDoor, .slide, .stairs)
+        .scenery(.trapDoor, .slide, .stairs)
 
     static let complexJunction = Location(.complexJunction)
         .name("Complex Junction")

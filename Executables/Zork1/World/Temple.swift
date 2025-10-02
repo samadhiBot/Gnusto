@@ -21,7 +21,7 @@ enum Temple {
         )
         .west(.northTemple)
         .up(.northTemple)
-        .localGlobals(.stairs)
+        .scenery(.stairs)
 
     static let engravingsCave = Location(.engravingsCave)
         .name("Engravings Cave")
@@ -51,7 +51,7 @@ enum Temple {
         .up(.torchRoom)
         .south(.southTemple)
         .inherentlyLit
-        .localGlobals(.stairs)
+        .scenery(.stairs)
 
     static let southTemple = Location(.southTemple)
         .name("Altar")
@@ -76,7 +76,7 @@ enum Temple {
     // Note: UP exit has custom message about not reaching rope
         .south(.northTemple)
         .down(.northTemple)
-        .localGlobals(.stairs)
+        .scenery(.stairs)
 }
 
 // MARK: - Items

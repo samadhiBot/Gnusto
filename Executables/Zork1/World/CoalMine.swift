@@ -32,7 +32,7 @@ struct CoalMine {
         )
         .up(.smellyRoom)
         .east(.mine1)
-        .localGlobals(.stairs)
+        .scenery(.stairs)
 
     let ladderBottom = Location(.ladderBottom)
         .name("Ladder Bottom")
@@ -46,7 +46,7 @@ struct CoalMine {
         .south(.deadEnd5)
         .west(.timberRoom)
         .up(.ladderTop)
-        .localGlobals(.ladder)
+        .scenery(.ladder)
 
     let ladderTop = Location(.ladderTop)
         .name("Ladder Top")
@@ -59,7 +59,7 @@ struct CoalMine {
         )
         .down(.ladderBottom)
         .up(.mine4)
-        .localGlobals(.ladder, .stairs)
+        .scenery(.ladder, .stairs)
 
     let lowerShaft = Location(.lowerShaft)
         .name("Drafty Room")
@@ -151,7 +151,7 @@ struct CoalMine {
         .east(.coldPassage)
         .north(.mineEntrance)
         .down(.cellar)
-        .localGlobals(.slide)
+        .scenery(.slide)
 
     let smellyRoom = Location(.smellyRoom)
         .name("Smelly Room")
@@ -164,7 +164,7 @@ struct CoalMine {
         )
         .down(.gasRoom)
         .south(.shaftRoom)
-        .localGlobals(.stairs)
+        .scenery(.stairs)
 
     let squeakyRoom = Location(.squeakyRoom)
         .name("Squeaky Room")

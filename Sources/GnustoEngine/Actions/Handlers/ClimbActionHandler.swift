@@ -48,7 +48,7 @@ public struct ClimbActionHandler: ActionHandler {
         for exit in sortedExits where exit.doorID == targetItem.id {
             // For global objects like stairs, verify they're actually present
             if await targetItem.parent == .nowhere,
-               await currentLocation.localGlobals.contains(targetItem.id) == false
+               await currentLocation.scenery.contains(targetItem.id) == false
             {
                 throw ActionResponse.itemNotAccessible(targetItem)
             }

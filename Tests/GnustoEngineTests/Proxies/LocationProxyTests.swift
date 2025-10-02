@@ -33,7 +33,7 @@ struct LocationProxyTests {
             .name("Test Room")
             .description("A room for testing.")
             .inherentlyLit
-            .localGlobals("globalItem1", "globalItem2")
+            .scenery("globalItem1", "globalItem2")
 
         let game = MinimalGame(locations: testRoom)
         let (engine, _) = await GameEngine.test(blueprint: game)
@@ -303,14 +303,14 @@ struct LocationProxyTests {
         let testRoom = Location(.startRoom)
             .name("Test Room")
             .inherentlyLit
-            .localGlobals("globalItem1", "globalItem2", "globalItem3")
+            .scenery("globalItem1", "globalItem2", "globalItem3")
 
         let game = MinimalGame(locations: testRoom)
         let (engine, _) = await GameEngine.test(blueprint: game)
         let proxy = await engine.location(.startRoom)
 
         // When/Then
-        let globals = await proxy.localGlobals
+        let globals = await proxy.scenery
         #expect(globals.count == 3)
         #expect(globals.contains("globalItem1"))
         #expect(globals.contains("globalItem2"))

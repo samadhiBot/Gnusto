@@ -13,7 +13,7 @@ struct Hades {
         .up(.tinyCave)
         // Note: IN and SOUTH exits to land of living dead conditional on LLD-FLAG
         .inherentlyLit
-        .localGlobals(.bodies)
+        .scenery(.bodies)
 
     let landOfLivingDead = Location(.landOfLivingDead)
         .name("Land of the Dead")
@@ -28,7 +28,7 @@ struct Hades {
         .outside(.entranceToHades)
         .north(.entranceToHades)
         .inherentlyLit
-        .localGlobals(.bodies)
+        .scenery(.bodies)
 
     // MARK: - Items
 

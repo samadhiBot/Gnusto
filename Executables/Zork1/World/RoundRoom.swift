@@ -14,7 +14,7 @@ enum RoundRoom {
         .up(.ewPassage)
         .south(.nsPassage)
         // Note: DOWN exit has custom message
-        .localGlobals(.crack, .stairs)
+        .scenery(.crack, .stairs)
 
     static let dampCave = Location(.dampCave)
         .name("Damp Cave")
@@ -27,7 +27,7 @@ enum RoundRoom {
         .west(.loudRoom)
         .east(.whiteCliffsNorth)
         // Note: SOUTH exit has custom message about being too narrow
-        .localGlobals(.crack)
+        .scenery(.crack)
 
     static let deepCanyon = Location(.deepCanyon)
         .name("Deep Canyon")
@@ -40,7 +40,7 @@ enum RoundRoom {
         .east(.damRoom)
         .southwest(.nsPassage)
         .down(.loudRoom)
-        .localGlobals(.stairs)
+        .scenery(.stairs)
 
     static let ewPassage = Location(.ewPassage)
         .name("East-West Passage")
@@ -54,7 +54,7 @@ enum RoundRoom {
         .west(.trollRoom)
         .down(.chasmRoom)
         .north(.chasmRoom)
-        .localGlobals(.stairs)
+        .scenery(.stairs)
 
     static let loudRoom = Location(.loudRoom)
         .name("Loud Room")
@@ -66,7 +66,7 @@ enum RoundRoom {
         .east(.dampCave)
         .west(.roundRoom)
         .up(.deepCanyon)
-        .localGlobals(.stairs)
+        .scenery(.stairs)
 
     static let nsPassage = Location(.nsPassage)
         .name("North-South Passage")

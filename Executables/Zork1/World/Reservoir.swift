@@ -15,7 +15,7 @@ struct Reservoir {
         .down(.reservoir)
         .east(.reservoir)
         // Note: This is NONLANDBIT in ZIL
-        .localGlobals(.globalWater)
+        .scenery(.globalWater)
 
     let reservoir = Location(.reservoir)
         .name("Reservoir")
@@ -30,7 +30,7 @@ struct Reservoir {
         .west(.inStream)
         // Note: DOWN exit has custom message about dam blocking way
         // Note: This is NONLANDBIT in ZIL
-        .localGlobals(.globalWater)
+        .scenery(.globalWater)
 
     let reservoirNorth = Location(.reservoirNorth)
         .name("Reservoir North")
@@ -41,7 +41,7 @@ struct Reservoir {
         )
         .north(.atlantisRoom)
         // Note: SOUTH exit to reservoir conditional on LOW-TIDE
-        .localGlobals(.globalWater, .stairs)
+        .scenery(.globalWater, .stairs)
 
     let reservoirSouth = Location(.reservoirSouth)
         .name("Reservoir South")
@@ -55,7 +55,7 @@ struct Reservoir {
         .east(.damRoom)
         .west(.streamView)
         // Note: NORTH exit to reservoir conditional on LOW-TIDE
-        .localGlobals(.globalWater)
+        .scenery(.globalWater)
 
     let streamView = Location(.streamView)
         .name("Stream View")
@@ -67,7 +67,7 @@ struct Reservoir {
         )
         .east(.reservoirSouth)
         // Note: WEST exit has custom message about stream being too small
-        .localGlobals(.globalWater)
+        .scenery(.globalWater)
 
     // MARK: - Items
 

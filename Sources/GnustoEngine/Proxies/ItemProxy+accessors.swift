@@ -296,7 +296,7 @@ extension ItemProxy {
     ///
     /// This check considers:
     /// - Direct location placement (item's parent is the location)
-    /// - Local globals (item is listed in the location's localGlobals)
+    /// - Local globals (item is listed in the location's scenery)
     /// - Items inside containers that are in the player's location will return `false`
     ///   unless the container itself is being checked.
     public var hasSameLocationAsPlayer: Bool {
@@ -313,7 +313,7 @@ extension ItemProxy {
             }
 
             // Check if item is a local global of the player's location
-            return await playerLocation.localGlobals.contains(id)
+            return await playerLocation.scenery.contains(id)
         }
     }
 

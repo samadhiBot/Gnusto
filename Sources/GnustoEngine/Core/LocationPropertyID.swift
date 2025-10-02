@@ -18,11 +18,11 @@ extension LocationPropertyID {
     /// The available exits from a location.
     public static let exits = LocationPropertyID("exits")
 
-    /// Items that are considered local to a location (e.g. fixed scenery) and always in scope.
-    public static let localGlobals = LocationPropertyID("localGlobals")
-
     /// The primary noun used to refer to the item (ZIL: `DESC`).
     public static let name = LocationPropertyID("name")
+
+    /// Items that are considered local to a location (e.g. fixed scenery) and always in scope.
+    public static let scenery = LocationPropertyID("scenery")
 }
 
 // MARK: - Descriptions

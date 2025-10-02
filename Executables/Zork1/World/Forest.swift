@@ -19,7 +19,7 @@ enum Forest {
         .west(.eastOfHouse)
         .up("There is no tree here suitable for climbing.")
         .inherentlyLit
-        .localGlobals(.songbird, .whiteHouse, .forest)
+        .scenery(.songbird, .whiteHouse, .forest)
 
     static let forest1 = Location(.forest1)
         .name("Forest")
@@ -34,7 +34,7 @@ enum Forest {
         .south(.forest3)
         // Note: UP and WEST exits have custom messages
         .inherentlyLit
-        .localGlobals(.songbird, .whiteHouse, .forest)
+        .scenery(.songbird, .whiteHouse, .forest)
 
     static let forest2 = Location(.forest2)
         .name("Forest")
@@ -48,7 +48,7 @@ enum Forest {
         .west(.forestPath)
         // Note: UP and NORTH exits have custom messages
         .inherentlyLit
-        .localGlobals(.songbird, .whiteHouse, .forest)
+        .scenery(.songbird, .whiteHouse, .forest)
 
     static let forest3 = Location(.forest3)
         .name("Forest")
@@ -62,7 +62,7 @@ enum Forest {
         .northwest(.southOfHouse)
         // Note: UP, EAST, and SOUTH exits have custom messages
         .inherentlyLit
-        .localGlobals(.songbird, .whiteHouse, .forest)
+        .scenery(.songbird, .whiteHouse, .forest)
 
     static let forestPath = Location(.forestPath)
         .name("Forest Path")
@@ -79,7 +79,7 @@ enum Forest {
         .south(.northOfHouse)
         .west(.forest1)
         .inherentlyLit
-        .localGlobals(.songbird, .whiteHouse, .forest)
+        .scenery(.songbird, .whiteHouse, .forest)
 
     static let northClearing = Location(.northClearing)
         .name("Clearing")
@@ -89,7 +89,7 @@ enum Forest {
         .north(blocked: "The forest becomes impenetrable to the north.")
         // Note: DOWN exit has special condition handling via GRATING-EXIT
         .inherentlyLit
-        .localGlobals(.whiteHouse, .forest, .grate)
+        .scenery(.whiteHouse, .forest, .grate)
 
     static let mountains = Location(.mountains)
         .name("Forest")
@@ -100,7 +100,7 @@ enum Forest {
         .up(blocked: "The mountains are impassable.")
         .west(.forest2)
         .inherentlyLit
-        .localGlobals(.whiteHouse)
+        .scenery(.whiteHouse)
 
     static let upATree = Location(.upATree)
         .name("Up a Tree")
@@ -113,7 +113,7 @@ enum Forest {
         .down(.forestPath)
         // Note: UP exit has custom message
         .inherentlyLit
-        .localGlobals(.forest, .songbird, .whiteHouse)
+        .scenery(.forest, .songbird, .whiteHouse)
 
     // MARK: - Items
 

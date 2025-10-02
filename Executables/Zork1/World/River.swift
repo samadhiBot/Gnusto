@@ -12,7 +12,7 @@ enum River {
         // Note: DOWN exit has custom message
         .north(.shore)
         .inherentlyLit
-        .localGlobals(.globalWater, .river, .rainbow)
+        .scenery(.globalWater, .river, .rainbow)
 
     static let canyonBottom = Location(.canyonBottom)
         .name("Canyon Bottom")
@@ -26,7 +26,7 @@ enum River {
         .up(.cliffMiddle)
         .north(.endOfRainbow)
         .inherentlyLit
-        .localGlobals(.globalWater, .climbableCliff, .river)
+        .scenery(.globalWater, .climbableCliff, .river)
 
     static let canyonView = Location(.canyonView)
         .name("Canyon View")
@@ -49,7 +49,7 @@ enum River {
         .south("Storm-tossed trees block your way.")
         .west(.forest3)
         .inherentlyLit
-        .localGlobals(.climbableCliff, .river, .rainbow)
+        .scenery(.climbableCliff, .river, .rainbow)
 
     static let cliffMiddle = Location(.cliffMiddle)
         .name("Rocky Ledge")
@@ -65,7 +65,7 @@ enum River {
         .up(.canyonView)
         .down(.canyonBottom)
         .inherentlyLit
-        .localGlobals(.climbableCliff, .river)
+        .scenery(.climbableCliff, .river)
 
     static let damBase = Location(.damBase)
         .name("Dam Base")
@@ -81,7 +81,7 @@ enum River {
         .north(.damRoom)
         .up(.damRoom)
         .inherentlyLit
-        .localGlobals(.globalWater, .river)
+        .scenery(.globalWater, .river)
 
     static let endOfRainbow = Location(.endOfRainbow)
         .name("End of Rainbow")
@@ -97,7 +97,7 @@ enum River {
         // Note: UP, NE, EAST exits to rainbow conditional on RAINBOW-FLAG
         .southwest(.canyonBottom)
         .inherentlyLit
-        .localGlobals(.globalWater, .rainbow, .river)
+        .scenery(.globalWater, .rainbow, .river)
 
     static let onRainbow = Location(.onRainbow)
         .name("On the Rainbow")
@@ -111,7 +111,7 @@ enum River {
         .west(.endOfRainbow)
         .east(.aragainFalls)
         .inherentlyLit
-        .localGlobals(.rainbow)
+        .scenery(.rainbow)
 
     static let river1 = Location(.river1)
         .name("Frigid River")
@@ -128,7 +128,7 @@ enum River {
         // Note: EAST exit has custom message about White Cliffs
         // Note: This is NONLANDBIT in ZIL
         .inherentlyLit
-        .localGlobals(.globalWater, .river)
+        .scenery(.globalWater, .river)
 
     static let river2 = Location(.river2)
         .name("Frigid River")
@@ -143,7 +143,7 @@ enum River {
         .down(.river3)
         // Note: LAND, EAST, WEST exits have custom messages
         // Note: This is NONLANDBIT in ZIL
-        .localGlobals(.globalWater, .river)
+        .scenery(.globalWater, .river)
 
     static let river3 = Location(.river3)
         .name("Frigid River")
@@ -158,7 +158,7 @@ enum River {
         .down(.river4)
         // Note: LAND and WEST exits to white cliffs north
         // Note: This is NONLANDBIT in ZIL
-        .localGlobals(.globalWater, .river)
+        .scenery(.globalWater, .river)
 
     static let river4 = Location(.river4)
         .name("Frigid River")
@@ -175,7 +175,7 @@ enum River {
         .west(.whiteCliffsSouth)
         .east(.sandyBeach)
         // Note: This is NONLANDBIT in ZIL
-        .localGlobals(.globalWater, .river)
+        .scenery(.globalWater, .river)
 
     static let river5 = Location(.river5)
         .name("Frigid River")
@@ -190,7 +190,7 @@ enum River {
         // Note: LAND exit to shore
         // Note: This is NONLANDBIT in ZIL
         .inherentlyLit
-        .localGlobals(.globalWater, .river)
+        .scenery(.globalWater, .river)
 
     static let sandyBeach = Location(.sandyBeach)
         .name("Sandy Beach")
@@ -203,7 +203,7 @@ enum River {
         )
         .northeast(.sandyCave)
         .south(.shore)
-        .localGlobals(.globalWater, .river)
+        .scenery(.globalWater, .river)
 
     static let sandyCave = Location(.sandyCave)
         .name("Sandy Cave")
@@ -226,7 +226,7 @@ enum River {
         .north(.sandyBeach)
         .south(.aragainFalls)
         .inherentlyLit
-        .localGlobals(.globalWater, .river)
+        .scenery(.globalWater, .river)
 
     static let whiteCliffsNorth = Location(.whiteCliffsNorth)
         .name("White Cliffs Beach")
@@ -237,7 +237,7 @@ enum River {
             and a tight passage leading west into the cliffs themselves.
             """
         )
-        .localGlobals(.globalWater, .whiteCliff, .river)
+        .scenery(.globalWater, .whiteCliff, .river)
 
     static let whiteCliffsSouth = Location(.whiteCliffsSouth)
         .name("White Cliffs Beach")
@@ -247,7 +247,7 @@ enum River {
             narrow path leads north along the shore.
             """
         )
-        .localGlobals(.globalWater, .whiteCliff, .river)
+        .scenery(.globalWater, .whiteCliff, .river)
 }
 
 // MARK: - Items

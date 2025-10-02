@@ -9,7 +9,7 @@ enum CyclopsHideaway {
             """
         )
         .northwest(.maze15)
-        .localGlobals(.stairs)
+        .scenery(.stairs)
         // Note: EAST exit to strange passage conditional on MAGIC-FLAG
         // Note: UP exit to treasure room conditional on CYCLOPS-FLAG
 
@@ -36,7 +36,7 @@ enum CyclopsHideaway {
             """
         )
         .down(.cyclopsRoom)
-        .localGlobals(.stairs)
+        .scenery(.stairs)
 }
 
 // MARK: - Items

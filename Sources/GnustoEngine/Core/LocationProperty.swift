@@ -50,17 +50,6 @@ extension LocationProperty {
         )
     }
 
-    /// Items that are considered local to a location (e.g. fixed scenery) and always in scope.
-    ///
-    /// - Parameter localGlobals: Items that are considered local to a location.
-    /// - Returns: A .localGlobals property.
-    public static func localGlobals(_ localGlobals: ItemID...) -> LocationProperty {
-        LocationProperty(
-            id: .localGlobals,
-            rawValue: .itemIDSet(Set(localGlobals))
-        )
-    }
-
     /// The primary name used to refer to the location (ZIL: `DESC`).
     ///
     /// - Parameter name: The primary name used to refer to the location.
@@ -69,6 +58,17 @@ extension LocationProperty {
         LocationProperty(
             id: .name,
             rawValue: .string(name)
+        )
+    }
+
+    /// Items that are considered local to a location, i.e. fixed scenery, and always in scope.
+    ///
+    /// - Parameter scenery: Items that are considered local to a location.
+    /// - Returns: A .scenery property.
+    public static func scenery(_ scenery: ItemID...) -> LocationProperty {
+        LocationProperty(
+            id: .scenery,
+            rawValue: .itemIDSet(Set(scenery))
         )
     }
 }

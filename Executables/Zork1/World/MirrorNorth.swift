@@ -11,7 +11,7 @@ enum MirrorNorth {
         )
         .up(.smallCave)
         .south(.reservoirNorth)
-        .localGlobals(.stairs)
+        .scenery(.stairs)
 
     static let coldPassage = Location(.coldPassage)
         .name("Cold Passage")
@@ -47,7 +47,7 @@ enum MirrorNorth {
         .down(.atlantisRoom)
         .south(.atlantisRoom)
         .west(.twistingPassage)
-        .localGlobals(.stairs)
+        .scenery(.stairs)
 
     static let twistingPassage = Location(.twistingPassage)
         .name("Twisting Passage")

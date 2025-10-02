@@ -11,7 +11,7 @@ enum InsideHouse {
             """
         )
         .down(.kitchen, via: .stairs)
-        .localGlobals(.stairs)
+        .scenery(.stairs)
 
     static let kitchen = Location(.kitchen)
         .name("Kitchen")
@@ -20,7 +20,7 @@ enum InsideHouse {
         // Note: EAST and OUT exits to east-of-house conditional on kitchen window being open
         // Note: DOWN exit to studio conditional on FALSE-FLAG
         .inherentlyLit
-        .localGlobals(.kitchenWindow, .chimney, .stairs)
+        .scenery(.kitchenWindow, .chimney, .stairs)
 
     static let livingRoom = Location(.livingRoom)
         .name("Living Room")
@@ -35,7 +35,7 @@ enum InsideHouse {
         .west(blocked: "The door is nailed shut.")
         .down(.cellar, via: .trapDoor)
         .inherentlyLit
-        .localGlobals(.stairs)
+        .scenery(.stairs)
 }
 
 // MARK: - Items

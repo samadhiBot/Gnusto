@@ -111,20 +111,20 @@ extension Location {
         assigning(.exits, to: .exits(Set(exits)))
     }
 
-    /// Items that are considered local to a location (e.g. fixed scenery) and always in scope.
-    ///
-    /// - Parameter localGlobals: Items that are considered local to a location.
-    /// - Returns: A .localGlobals property.
-    public func localGlobals(_ localGlobals: ItemID...) -> Location {
-        assigning(.localGlobals, to: .itemIDSet(Set(localGlobals)))
-    }
-
     /// The primary name used to refer to the location (ZIL: `DESC`).
     ///
     /// - Parameter name: The primary name used to refer to the location.
     /// - Returns: A .name property.
     public func name(_ name: String) -> Location {
         assigning(.name, to: .string(name))
+    }
+
+    /// Items that are considered local to a location, i.e. fixed scenery, and always in scope.
+    ///
+    /// - Parameter scenery: Items that are considered local to a location.
+    /// - Returns: A .scenery property.
+    public func scenery(_ scenery: ItemID...) -> Location {
+        assigning(.scenery, to: .itemIDSet(Set(scenery)))
     }
 }
 

@@ -35,8 +35,8 @@ extension GameEngine {
             reachableItems.formUnion(locationItems)
 
             // Add local globals for the current location
-            let localGlobals = await currentLocation.localGlobals
-            for globalItemID in localGlobals {
+            let scenery = await currentLocation.scenery
+            for globalItemID in scenery {
                 let globalItem = item(globalItemID)
                 let isInvisible = await globalItem.hasFlag(.isInvisible)
                 if !isInvisible {

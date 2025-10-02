@@ -24,7 +24,7 @@ enum Dam {
         .north(.damLobby)
         .west(.damLobby)
         .inherentlyLit
-        .localGlobals(.globalWater)
+        .scenery(.globalWater)
 
     static let maintenanceRoom = Location(.maintenanceRoom)
         .name("Maintenance Room")

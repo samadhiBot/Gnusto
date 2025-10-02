@@ -25,7 +25,7 @@ struct LocationTests {
             .west("You head west.")
             .east("A solid wall blocks your path.")
             .inherentlyLit
-            .localGlobals("rug", "fireplace")
+            .scenery("rug", "fireplace")
     }
 
     // MARK: - Core Struct Tests
@@ -46,7 +46,7 @@ struct LocationTests {
                 .description: "A nondescript room.",
             ])
         #expect(location.properties[.inherentlyLit] == nil)
-        #expect(location.properties[.localGlobals] == nil)  // Not set, so nil
+        #expect(location.properties[.scenery] == nil)  // Not set, so nil
     }
 
     @Test("Location Custom Initialization")
@@ -69,8 +69,8 @@ struct LocationTests {
                 .west("You head west."),
             ])
         #expect(location.properties[.inherentlyLit]?.toBool == true)
-        #expect(location.properties[.localGlobals]?.toItemIDs?.count == 2)
-        #expect(location.properties[.localGlobals]?.toItemIDs?.contains(rugID) == true)
+        #expect(location.properties[.scenery]?.toItemIDs?.count == 2)
+        #expect(location.properties[.scenery]?.toItemIDs?.contains(rugID) == true)
         // Check the full properties dictionary for completeness
         #expect(
             location.properties == [
@@ -81,7 +81,7 @@ struct LocationTests {
                     .east("A solid wall blocks your path."),
                 ]),
                 .inherentlyLit: true,
-                .localGlobals: .itemIDSet(["rug", "fireplace"]),
+                .scenery: .itemIDSet(["rug", "fireplace"]),
             ]
         )
     }
@@ -183,7 +183,7 @@ struct LocationTests {
             ])
         #expect(decodedLocation.properties == originalLocation.properties)
         #expect(
-            decodedLocation.properties[.localGlobals] == originalLocation.properties[.localGlobals])
+            decodedLocation.properties[.scenery] == originalLocation.properties[.scenery])
     }
 
     @Test("Location Value Semantics")
@@ -332,7 +332,7 @@ struct LocationTests {
             ])
     }
 
-    @Test("LocationProxy handles localGlobals correctly")
+    @Test("LocationProxy handles scenery correctly")
     func testLocationProxyLocalGlobals() async throws {
         let location = createCustomLocation()
         let game = MinimalGame(
@@ -343,11 +343,11 @@ struct LocationTests {
 
         let proxy = await engine.location("livingRoom")
 
-        let localGlobalsValue = await proxy.property(.localGlobals)
-        let localGlobals = localGlobalsValue?.toItemIDs
+        let sceneryValue = await proxy.property(.scenery)
+        let scenery = sceneryValue?.toItemIDs
 
-        #expect(localGlobals?.count == 2)
-        #expect(localGlobals?.contains("rug") == true)
-        #expect(localGlobals?.contains("fireplace") == true)
+        #expect(scenery?.count == 2)
+        #expect(scenery?.contains("rug") == true)
+        #expect(scenery?.contains("fireplace") == true)
     }
 }

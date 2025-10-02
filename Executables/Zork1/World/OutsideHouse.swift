@@ -13,7 +13,7 @@ struct OutsideHouse {
         .east(.eastClearing)
         .inside(.kitchen, via: .kitchenWindow)
         .inherentlyLit
-        .localGlobals(.whiteHouse, .kitchenWindow, .forest)
+        .scenery(.whiteHouse, .kitchenWindow, .forest)
 
     let northOfHouse = Location(.northOfHouse)
         .name("North of House")
@@ -31,7 +31,7 @@ struct OutsideHouse {
         .north(.forestPath)
         .south(blocked: "The windows are all boarded.")
         .inherentlyLit
-        .localGlobals(.boardedWindow, .boards, .whiteHouse, .forest)
+        .scenery(.boardedWindow, .boards, .whiteHouse, .forest)
 
     let southOfHouse = Location(.southOfHouse)
         .name("South of House")
@@ -48,7 +48,7 @@ struct OutsideHouse {
         .south(.forest3)
         .north(blocked: "The windows are all boarded.")
         .inherentlyLit
-        .localGlobals(.boardedWindow, .boards, .whiteHouse, .forest)
+        .scenery(.boardedWindow, .boards, .whiteHouse, .forest)
 
     let stoneBarrow = Location(.stoneBarrow)
         .name("Stone Barrow")
@@ -76,7 +76,7 @@ struct OutsideHouse {
         // Note: SW and IN exits to Stone Barrow conditional on WON-FLAG
         .east(blocked: "The door is boarded and you can't remove the boards.")
         .inherentlyLit
-        .localGlobals(.whiteHouse, .boards, .forest)
+        .scenery(.whiteHouse, .boards, .forest)
 
     // MARK: - Items
 

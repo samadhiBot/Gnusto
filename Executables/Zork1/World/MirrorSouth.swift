@@ -35,7 +35,7 @@ enum MirrorSouth {
         .north(.mirrorRoomSouth)
         .west(.windingPassage)
         .down(.entranceToHades)
-        .localGlobals(.stairs)
+        .scenery(.stairs)
 
     static let windingPassage = Location(.windingPassage)
         .name("Winding Passage")
