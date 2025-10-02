@@ -607,12 +607,10 @@ struct ThiefTests {
         // Bring thief close to death, and place some treasure in his bag
         try await engine.apply(
             engine.item(.thief).setHealth(to: 1),
+            engine.item(.scarab).clearFlag(.isInvisible),
             engine.item(.scarab).move(to: .largeBag),
             engine.item(.diamond).move(to: .largeBag)
         )
-
-        await print("🎾 thief:", engine.item(.thief).contents.map(\.id))
-        await print("🎾 largeBag:", engine.item(.largeBag).contents.map(\.id))
 
         // When
         try await engine.execute(
@@ -672,7 +670,7 @@ struct ThiefTests {
             This is a circular stone room with passages in all directions.
             Several of them have unfortunately been blocked by cave-ins.
 
-            You can see a huge diamond here.
+            You can see a huge diamond and a beautiful jeweled scarab here.
             """
         )
 

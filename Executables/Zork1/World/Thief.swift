@@ -453,11 +453,7 @@ extension Thief {
         //            )
         //        )
 
-        print("🎾 changes:", changes)
-
         let bootyStatus = treasuresDeposited ? " His booty remains." : ""
-
-        await print("🎾 roundRoom.items:", context.location(.roundRoom).items.map(\.id))
 
         return ActionResult(
             message: """
