@@ -241,7 +241,7 @@ struct TurnOnActionHandlerTests {
         let darkRoom = Location("darkRoom")
             .name("Dark Room")
             .description("A pitch black room.")
-            // Note: No .inherentlyLit property
+        // Note: No .inherentlyLit property
 
         let lamp = Item("lamp")
             .name("brass lamp")
@@ -284,7 +284,7 @@ struct TurnOnActionHandlerTests {
         let darkRoom = Location("darkRoom")
             .name("Dark Room")
             .description("A pitch black room.")
-            // Note: No .inherentlyLit property
+        // Note: No .inherentlyLit property
 
         let lamp = Item("lamp")
             .name("brass lamp")
@@ -323,7 +323,7 @@ struct TurnOnActionHandlerTests {
         let darkRoom = Location("darkRoom")
             .name("Dark Room")
             .description("A pitch black room.")
-            // Note: No .inherentlyLit property
+        // Note: No .inherentlyLit property
 
         let radio = Item("radio")
             .name("portable radio")
@@ -393,7 +393,7 @@ struct TurnOnActionHandlerTests {
         let darkRoom = Location("darkRoom")
             .name("Dark Room")
             .description("A room that is dark without a light source.")
-            // Note: No .inherentlyLit property
+        // Note: No .inherentlyLit property
 
         let torch = Item("torch")
             .name("silver torch")

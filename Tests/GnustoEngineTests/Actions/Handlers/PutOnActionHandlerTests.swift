@@ -482,7 +482,7 @@ struct PutOnActionHandlerTests {
         await mockIO.expectOutput(
             """
             > put table on table
-            The wooden table cannot rest upon itself--that way lies
+            The wooden table cannot rest upon itself -- that way lies
             madness.
             """
         )
@@ -599,7 +599,7 @@ struct PutOnActionHandlerTests {
         let darkRoom = Location("darkRoom")
             .name("Dark Room")
             .description("A pitch black room.")
-            // Note: No .inherentlyLit property
+        // Note: No .inherentlyLit property
 
         let book = Item("book")
             .name("red book")

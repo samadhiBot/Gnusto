@@ -43,7 +43,7 @@ struct EnterActionHandlerTests {
             """
             > enter door
             --- Inside ---
-            
+
             You are inside.
             """
         )
@@ -87,7 +87,7 @@ struct EnterActionHandlerTests {
             """
             > get in hatch
             --- Inside ---
-            
+
             You are inside.
             """
         )
@@ -131,7 +131,7 @@ struct EnterActionHandlerTests {
             """
             > go in entrance
             --- Inside ---
-            
+
             You are inside.
             """
         )
@@ -175,7 +175,7 @@ struct EnterActionHandlerTests {
             """
             > go through portal
             --- Inside ---
-            
+
             You are inside.
             """
         )
@@ -239,7 +239,7 @@ struct EnterActionHandlerTests {
             """
             > enter
             --- Inside ---
-            
+
             You are inside.
             """
         )
@@ -363,7 +363,7 @@ struct EnterActionHandlerTests {
             .name("Dark Room")
             .description("A pitch black room.")
             .up("attic", via: "trapdoor")
-            // Note: No .inherentlyLit property
+        // Note: No .inherentlyLit property
 
         let attic = Location("attic")
             .name("Attic")
@@ -471,7 +471,7 @@ struct EnterActionHandlerTests {
             """
             > enter door
             --- Office ---
-            
+
             A small office.
             """
         )
@@ -539,7 +539,7 @@ struct EnterActionHandlerTests {
             """
             > enter door
             --- Shop ---
-            
+
             You are in a shop.
             """
         )
@@ -557,14 +557,14 @@ struct EnterActionHandlerTests {
             """
             > south
             --- Town Plaza ---
-            
+
             You are in the town plaza.
-            
+
             There are a shop door, a cave entrance, and a tower gate here.
-            
+
             > enter entrance
             --- Cave ---
-            
+
             You are in a cave.
             """
         )

@@ -537,7 +537,8 @@ extension GameEngine {
                 \(messenger.nowDark())
 
                 \(messenger.roomIsDark())
-                """)
+                """
+            )
             shouldDescribe = false
             forceFullDescription = true
         } else if !wasLitBeforeCommand && isLitAfterCommand
@@ -598,7 +599,8 @@ extension GameEngine {
                     Failed to process side effects during processEventResult:
                        - \(error)
                        - Side Effects: \(result.effects)
-                    """)
+                    """
+                )
                 throw error
             }
         }

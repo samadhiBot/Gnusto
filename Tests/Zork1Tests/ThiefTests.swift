@@ -47,7 +47,8 @@ struct ThiefTests {
             look at the man
             talk to the man
             inventory
-            """)
+            """
+        )
 
         await mockIO.expectOutput(
             """
@@ -104,7 +105,8 @@ struct ThiefTests {
             look at the floor
             look at the ceiling
             examine the man
-            """)
+            """
+        )
 
         // Then
         await mockIO.expectOutput(
@@ -208,7 +210,8 @@ struct ThiefTests {
             wait
             wait
             give garlic to thief
-            """)
+            """
+        )
 
         // Then
         await mockIO.expectOutput(
@@ -253,7 +256,8 @@ struct ThiefTests {
             attack the thief
             stab the thief with my sword
             slay the thief
-            """)
+            """
+        )
 
         // Then
         await mockIO.expectOutput(
@@ -322,7 +326,8 @@ struct ThiefTests {
             wait
             wait
             tell thief about treasure
-            """)
+            """
+        )
 
         // Then
         await mockIO.expectOutput(
@@ -357,7 +362,8 @@ struct ThiefTests {
             wait
             wait
             take thief
-            """)
+            """
+        )
 
         // Then
         await mockIO.expectOutput(
@@ -392,7 +398,8 @@ struct ThiefTests {
             wait
             wait
             examine stiletto
-            """)
+            """
+        )
 
         // Then
         await mockIO.expectOutput(
@@ -428,7 +435,8 @@ struct ThiefTests {
             wait
             wait
             look inside the bag
-            """)
+            """
+        )
 
         // Then
         await mockIO.expectOutput(
@@ -465,7 +473,8 @@ struct ThiefTests {
             wait
             wait
             take stiletto
-            """)
+            """
+        )
 
         // Then
         await mockIO.expectOutput(
@@ -656,7 +665,7 @@ struct ThiefTests {
             manageable.
 
             > slay the thief
-            Your armed advantage proves decisive--your antique glamdring
+            Your armed advantage proves decisive -- your antique glamdring
             ends it! The robber crumples, having fought barehanded and
             lost.
 

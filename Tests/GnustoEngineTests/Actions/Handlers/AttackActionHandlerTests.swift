@@ -39,7 +39,7 @@ struct AttackActionHandlerTests {
             driving breath from the beast's lungs. The wound is real but
             manageable.
 
-            The grotesque monster whips his axe across in answer--steel
+            The grotesque monster whips his axe across in answer -- steel
             whispers against skin, leaving a thin signature of pain. The
             cut registers dimly. Blood, but not enough to matter.
 
@@ -62,7 +62,7 @@ struct AttackActionHandlerTests {
             You throw yourself at the beast despite his nicked axe because
             sometimes fury must answer steel even when flesh cannot win.
 
-            You're too late--the fierce troll is already deceased.
+            You're too late -- the fierce troll is already deceased.
             """
         )
     }
@@ -225,7 +225,7 @@ struct AttackActionHandlerTests {
             You charge with fists raised as the sneaky goblin meets you
             halfway in what will be brutal and personal.
 
-            You're too late--the sneaky goblin is already deceased.
+            You're too late -- the sneaky goblin is already deceased.
             """
         )
     }
@@ -363,7 +363,7 @@ struct AttackActionHandlerTests {
         let darkRoom = Location("darkRoom")
             .name("Dark Room")
             .description("A pitch black room.")
-            // Note: No .inherentlyLit property
+        // Note: No .inherentlyLit property
 
         let game = MinimalGame(
             player: Player(in: "darkRoom"),
@@ -489,9 +489,9 @@ struct AttackActionHandlerTests {
             You attack with the wooden stick! The dangerous bandit dodges,
             more puzzled than threatened by your choice of weapon.
 
-            In the tangle, the dangerous bandit drives an elbow
-            home--sudden pressure that blooms into dull pain. The cut
-            registers dimly. Blood, but not enough to matter.
+            In the tangle, the dangerous bandit drives an elbow home --
+            sudden pressure that blooms into dull pain. The cut registers
+            dimly. Blood, but not enough to matter.
             """
         )
     }
@@ -540,7 +540,7 @@ struct AttackActionHandlerTests {
             barely breaking skin. It notes the minor damage and dismisses
             it.
 
-            In the tangle, the evil monster drives an elbow home--sudden
+            In the tangle, the evil monster drives an elbow home -- sudden
             pressure that blooms into dull pain. The cut registers dimly.
             Blood, but not enough to matter.
 
@@ -548,7 +548,7 @@ struct AttackActionHandlerTests {
             Your sharp dagger swings wide, and the evil monster avoids your
             poorly aimed strike with ease.
 
-            The evil monster pivots and strikes true--impact ripples
+            The evil monster pivots and strikes true -- impact ripples
             through muscle and bone, stealing balance and breath together.
             You absorb the hit, feeling flesh tear but knowing you can
             endure.
@@ -652,7 +652,7 @@ struct AttackActionHandlerTests {
             barely breaking skin. It notes the minor damage and dismisses
             it.
 
-            In the tangle, the evil monster drives an elbow home--sudden
+            In the tangle, the evil monster drives an elbow home -- sudden
             pressure that blooms into dull pain. The cut registers dimly.
             Blood, but not enough to matter.
 
@@ -660,7 +660,7 @@ struct AttackActionHandlerTests {
             Your sharp dagger swings wide, and the evil monster avoids your
             poorly aimed strike with ease.
 
-            The evil monster pivots and strikes true--impact ripples
+            The evil monster pivots and strikes true -- impact ripples
             through muscle and bone, stealing balance and breath together.
             You absorb the hit, feeling flesh tear but knowing you can
             endure.

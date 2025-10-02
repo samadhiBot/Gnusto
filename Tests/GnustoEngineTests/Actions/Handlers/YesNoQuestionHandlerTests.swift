@@ -177,7 +177,8 @@ struct YesNoQuestionHandlerTests {
                 """
                 > \(synonym)
                 Okay.
-                """)
+                """
+            )
 
             let hasPending = await engine.conversationManager.hasPendingQuestion
             #expect(hasPending == false)
@@ -207,7 +208,8 @@ struct YesNoQuestionHandlerTests {
                 """
                 > \(synonym)
                 Custom no message.
-                """)
+                """
+            )
 
             let hasPending = await engine.conversationManager.hasPendingQuestion
             #expect(hasPending == false)
@@ -518,7 +520,8 @@ struct YesNoQuestionHandlerTests {
                 """
                 > yes
                 Ask whom?
-                """)
+                """
+            )
 
             let hasPending = await engine.conversationManager.hasPendingQuestion
             #expect(hasPending == false)

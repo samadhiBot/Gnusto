@@ -115,7 +115,7 @@ struct FindActionHandlerTests {
         let darkRoom = Location("darkRoom")
             .name("Dark Room")
             .description("A pitch black room.")
-            // Note: No .inherentlyLit property
+        // Note: No .inherentlyLit property
 
         let gem = Item("gem")
             .name("precious gem")
@@ -355,7 +355,7 @@ struct FindActionHandlerTests {
         await mockIO.expectOutput(
             """
             > find statue
-            Your powers of observation are truly remarkable--it's right
+            Your powers of observation are truly remarkable -- it's right
             here!
             """
         )
@@ -427,7 +427,7 @@ struct FindActionHandlerTests {
         await mockIO.expectOutput(
             """
             > locate crystal
-            Your powers of observation are truly remarkable--it's right
+            Your powers of observation are truly remarkable -- it's right
             here!
             """
         )

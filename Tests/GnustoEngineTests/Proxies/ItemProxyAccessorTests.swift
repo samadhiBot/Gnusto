@@ -35,7 +35,7 @@ struct ItemProxyAccessorTests {
         let coinDescription = await coinProxy.description
         #expect(
             coinDescription
-                == "The gold coin reveals itself to be exactly what it appears--nothing more, nothing less."
+                == "The gold coin reveals itself to be exactly what it appears -- nothing more, nothing less."
         )
     }
 

@@ -63,7 +63,7 @@ open class StandardMessenger: @unchecked Sendable {
             "\(character) has already departed this mortal coil.",
             "Death has already claimed \(character).",
             "\(character) is beyond such concerns now, being dead.",
-            "You're too late--\(character) is already deceased."
+            "You're too late -- \(character) is already deceased."
         )
     }
 
@@ -75,7 +75,7 @@ open class StandardMessenger: @unchecked Sendable {
         oneOf(
             "You're already locked in combat with \(enemy)!",
             "The fight with \(enemy) has already begun!",
-            "You're currently engaged with \(enemy)--focus!",
+            "You're currently engaged with \(enemy) -- focus!",
             "In case you hadn't noticed, \(enemy) is already trying to kill you!",
             "You and \(enemy) are already exchanging blows!"
         )
@@ -218,7 +218,7 @@ open class StandardMessenger: @unchecked Sendable {
         oneOf(
             "You can't ask \(item) about anything.",
             "\(item) lacks the capacity for conversation.",
-            "Questions require someone who can answer--\(item) cannot.",
+            "Questions require someone who can answer -- \(item) cannot.",
             "\(item) remains unresponsive to your queries.",
             "Your interrogation of \(item) yields only silence."
         )
@@ -280,7 +280,7 @@ open class StandardMessenger: @unchecked Sendable {
     open func cannotPutItemInItself(_ item: String) -> String {
         oneOf(
             "The universe politely but firmly prevents such recursive madness.",
-            "\(item) cannot contain itself--this isn't that kind of story.",
+            "\(item) cannot contain itself -- this isn't that kind of story.",
             "You'd need to break several laws of physics to achieve that."
         )
     }
@@ -438,14 +438,14 @@ open class StandardMessenger: @unchecked Sendable {
         oneOf(
             "Violence against \(character) would solve nothing and create many new problems.",
             "\(character) deserves better than casual brutality.",
-            "Your blade must find purpose elsewhere--not in \(character)'s flesh."
+            "Your blade must find purpose elsewhere -- not in \(character)'s flesh."
         )
     }
 
     open func cutEnemy(_ enemy: String) -> String {
         oneOf(
             "Perhaps words might succeed where blades would only escalate matters.",
-            "Violence begets violence--consider a less sanguinary approach.",
+            "Violence begets violence -- consider a less sanguinary approach.",
             "Your conflict with \(enemy) need not be written in blood."
         )
     }
@@ -480,7 +480,7 @@ open class StandardMessenger: @unchecked Sendable {
 
     open func danceWithEnemy(_ enemy: String) -> String {
         oneOf(
-            "\(enemy) prefers a different sort of deadly dance--one involving weapons.",
+            "\(enemy) prefers a different sort of deadly dance -- one involving weapons.",
             "Your invitation to dance meets with hostile incredulity from \(enemy).",
             "\(enemy) interprets your dance request as mockery, and not without reason."
         )
@@ -822,7 +822,7 @@ open class StandardMessenger: @unchecked Sendable {
 
             You can use multiple objects with some commands (TAKE ALL, DROP SWORD AND SHIELD).
 
-            Try different things--experimentation is part of the fun!
+            Try different things -- experimentation is part of the fun!
             """
         )
     }
@@ -937,7 +937,7 @@ open class StandardMessenger: @unchecked Sendable {
         oneOf(
             "It stands before you in all its mundane glory!",
             "Behold! It's right here!",
-            "Your powers of observation are truly remarkable--it's right here!"
+            "Your powers of observation are truly remarkable -- it's right here!"
         )
     }
 
@@ -980,7 +980,7 @@ open class StandardMessenger: @unchecked Sendable {
     open func kickHeldObject(_ item: String) -> String {
         oneOf(
             "The logistics of kicking \(item) while holding it defy basic anatomy.",
-            "You'd need to let go of \(item) first--kicking requires distance.",
+            "You'd need to let go of \(item) first -- kicking requires distance.",
             "Your grip on \(item) rather precludes the kicking option."
         )
     }
@@ -1164,7 +1164,7 @@ open class StandardMessenger: @unchecked Sendable {
 
     open func nothingSpecialAbout(_ item: String) -> String {
         oneOf(
-            "\(item) reveals itself to be exactly what it appears--nothing more, nothing less.",
+            "\(item) reveals itself to be exactly what it appears -- nothing more, nothing less.",
             "Your scrutiny of \(item) yields no hidden depths or secret purposes.",
             "\(item) stubbornly remains ordinary despite your thorough examination."
         )
@@ -1340,7 +1340,7 @@ open class StandardMessenger: @unchecked Sendable {
     open func putCannotPutOnSelf(_ item: String) -> String {
         oneOf(
             "The topology required to put \(item) on itself eludes you.",
-            "\(item) cannot rest upon itself--that way lies madness.",
+            "\(item) cannot rest upon itself -- that way lies madness.",
             "You'd need to fold space to put \(item) on itself."
         )
     }
@@ -1380,7 +1380,7 @@ open class StandardMessenger: @unchecked Sendable {
     open func quitCancelled() -> String {
         oneOf(
             "The adventure continues!",
-            "Death postponed--onwards!",
+            "Death postponed -- onwards!",
             "Your story isn't over yet."
         )
     }
@@ -1461,7 +1461,7 @@ open class StandardMessenger: @unchecked Sendable {
             leaving only breath and heartbeat to prove you exist.
             """,
             """
-            Light feels theoretical here--an idea someone once had,
+            Light feels theoretical here -- an idea someone once had,
             now forgotten by the room itself.
             """,
         )
@@ -1590,7 +1590,7 @@ open class StandardMessenger: @unchecked Sendable {
     open func smellSelf(_ verb: Verb) -> String {
         oneOf(
             "Your personal aroma falls within acceptable parameters.",
-            "You smell of adventure, sweat, and determination--the usual.",
+            "You smell of adventure, sweat, and determination -- the usual.",
             "Your scent speaks of recent exertions but nothing alarming."
         )
     }
@@ -2062,7 +2062,7 @@ open class StandardMessenger: @unchecked Sendable {
     open func touchObject(_ verb: Verb, item: String) -> String {
         oneOf(
             "Your fingers explore \(item)'s surface, finding it satisfyingly tangible.",
-            "\(item) feels exactly as it looks--solidly real and utterly ordinary.",
+            "\(item) feels exactly as it looks -- solidly real and utterly ordinary.",
             "Your tactile investigation of \(item) yields no surprises."
         )
     }
@@ -2315,7 +2315,7 @@ open class StandardMessenger: @unchecked Sendable {
         oneOf(
             "That already resides among your possessions.",
             "You need not acquire what you already possess.",
-            "Check your inventory--you already have that."
+            "Check your inventory -- you already have that."
         )
     }
 

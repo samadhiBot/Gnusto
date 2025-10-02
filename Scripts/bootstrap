@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# create-game.sh - Scaffolds a new Gnusto interactive fiction game project
+# bootstrap - Scaffolds a new Gnusto interactive fiction game project
 #
 # This script creates a complete Swift package structure for a new Gnusto game,
 # including Package.swift, source files, and tests with proper boilerplate code.
@@ -172,7 +172,7 @@ public struct $game_name: GameBlueprint {
     public let introduction = """
         You awaken in the Custodial Singularity.
 
-        If you're reading this, congratulations--your game compiles and runs! This is
+        If you're reading this, congratulations -- your game compiles and runs! This is
         the default world that ships with every new Gnusto project: one closet, one
         screwdriver, infinite possibility.
 
@@ -280,14 +280,16 @@ struct ${game_name}Tests {
         try await engine.execute("look")
 
         // Then: Should see the room description
-        await mockIO.expectOutput("""
+        await mockIO.expectOutput(
+            """
             > look
             --- Broom Closet ---
 
             You are in a narrow closet that smells faintly of detergent.
 
             There is a left-handed screwdriver here.
-            """)
+            """
+        )
 
     }
 
@@ -297,10 +299,12 @@ struct ${game_name}Tests {
         try await engine.execute("take the screwdriver")
 
         // Then: Item should be taken successfully
-        await mockIO.expectOutput("""
+        await mockIO.expectOutput(
+            """
             > take the screwdriver
             Taken.
-            """)
+            """
+        )
 
         // And: Item should now be in player's inventory
         let item = await engine.item(.screwdriver)
@@ -310,14 +314,17 @@ struct ${game_name}Tests {
     @Test("Inventory command shows carried items")
     func testInventoryCommand() async throws {
         // Given: Player has taken the sample item
-        try await engine.execute("""
+        try await engine.execute(
+            """
             inventory
             take the screwdriver
             i
-            """)
+            """
+        )
 
         // Then: Item should be taken successfully
-        await mockIO.expectOutput("""
+        await mockIO.expectOutput(
+            """
             > inventory
             Your hands are as empty as your pockets.
 
@@ -327,7 +334,8 @@ struct ${game_name}Tests {
             > i
             You are carrying:
             - A left-handed screwdriver
-            """)
+            """
+        )
     }
 
     @Test("Help command shows available commands")
@@ -336,7 +344,8 @@ struct ${game_name}Tests {
         try await engine.execute("help")
 
         // Then: Should show command information
-        await mockIO.expectOutput("""
+        await mockIO.expectOutput(
+            """
             > help
             This is an interactive fiction game. You control the story by
             typing commands.
@@ -360,8 +369,9 @@ struct ${game_name}Tests {
             You can use multiple objects with some commands (TAKE ALL, DROP
             SWORD AND SHIELD).
 
-            Try different things--experimentation is part of the fun!
-            """)
+            Try different things -- experimentation is part of the fun!
+            """
+        )
     }
 }
 
@@ -419,16 +429,15 @@ print_usage_instructions() {
     echo "🎮 Your new Gnusto game '$game_name' has been created!"
     echo ""
     echo "Next steps:"
-    echo "  1. swift build"
-    echo "  2. swift run $game_name"
+    echo "  swift run $game_name"
     echo ""
     echo "To run tests:"
     echo "  swift test"
     echo ""
     echo "To customize your game:"
-    echo "  - Edit Sources/$game_name/$game_name.swift to add locations, items, and behaviors"
-    echo "  - Add tests in Tests/${game_name}Tests/${game_name}Tests.swift"
-    echo "  - Update README.md with your game's description"
+    echo "  - Edit Sources/$game_name/$game_name.swift to set your names title and introduction"
+    echo "  - Edit Sources/$game_name/World to add locations, items, and behaviors"
+    echo "  - Test your world! Add tests in Tests/${game_name}Tests"
     echo ""
     echo "Happy coding! 🚀"
 }

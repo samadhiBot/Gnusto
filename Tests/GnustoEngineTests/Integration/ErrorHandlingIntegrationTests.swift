@@ -86,13 +86,13 @@ struct ErrorHandlingIntegrationTests {
             .isOpenable
             .isTakable
             .in(.startRoom)
-            // Starts closed
+        // Starts closed
 
         let heavyRock = Item("heavyRock")
             .name("heavy rock")
             .description("An immovable boulder.")
             .in(.startRoom)
-            // Not takable
+        // Not takable
 
         let game = MinimalGame(
             items: closedBox, heavyRock
@@ -211,7 +211,7 @@ struct ErrorHandlingIntegrationTests {
             .name("Isolated Room")
             .description("A room with no exits.")
             .inherentlyLit
-            // No exits defined
+        // No exits defined
 
         let game = MinimalGame(
             player: Player(in: "isolatedRoom"),
@@ -226,7 +226,8 @@ struct ErrorHandlingIntegrationTests {
         try await engine.execute("go to nowhere")
 
         // Then: Should provide appropriate error messages
-        await mockIO.expectOutput("""
+        await mockIO.expectOutput(
+            """
             > go north
             That way lies only disappointment.
 
@@ -235,7 +236,8 @@ struct ErrorHandlingIntegrationTests {
 
             > go to nowhere
             Which direction?
-            """)
+            """
+        )
     }
 
     // MARK: - Light Source Error Tests
@@ -246,7 +248,7 @@ struct ErrorHandlingIntegrationTests {
         let darkRoom = Location("darkRoom")
             .name("Dark Room")
             .description("A pitch black room.")
-            // No inherent lighting
+        // No inherent lighting
 
         let hiddenItem = Item("hiddenItem")
             .name("hidden treasure")
@@ -295,7 +297,7 @@ struct ErrorHandlingIntegrationTests {
             .description("A machine that doesn't work.")
             .isTakable
             .in(.startRoom)
-            // Device but cannot be turned on/off
+        // Device but cannot be turned on/off
 
         let game = MinimalGame(
             items: brokenDevice

@@ -53,7 +53,7 @@ open class CombatMessenger: StandardMessenger, @unchecked Sendable {
                 intent! You desperately twist \(yourWeapon) into a guard that saves your life.
                 """,
                 """
-                Without warning \(theEnemy) charges! The world narrows to this moment--
+                Without warning \(theEnemy) charges! The world narrows to this moment --
                 \(yourWeapon) against \(itsWeapon), with everything hanging in the balance.
                 """
             )
@@ -95,7 +95,7 @@ open class CombatMessenger: StandardMessenger, @unchecked Sendable {
                 """,
                 """
                 \(theEnemy) comes at you unarmed but fearless! You level \(yourWeapon) at
-                \(enemyRef.possessiveAdjective) approach--will your weapon stop such
+                \(enemyRef.possessiveAdjective) approach -- will your weapon stop such
                 determination?
                 """,
                 """
@@ -113,7 +113,7 @@ open class CombatMessenger: StandardMessenger, @unchecked Sendable {
             oneOf(
                 """
                 \(theEnemy) charges with violent intent! You meet \(enemyRef.objectPronoun)
-                halfway--no weapons, no mercy, just the brutal arithmetic of survival.
+                halfway -- no weapons, no mercy, just the brutal arithmetic of survival.
                 """,
                 """
                 In a moment of raw violence, \(theEnemy) comes at you with nothing but fury!
@@ -124,12 +124,12 @@ open class CombatMessenger: StandardMessenger, @unchecked Sendable {
                 the impact, guard up, ready for the worst kind of fight.
                 """,
                 """
-                No weapons between you--just \(theEnemy.possessive) aggression and your
+                No weapons between you -- just \(theEnemy.possessive) aggression and your
                 desperation! You collide in a tangle of strikes and blocks.
                 """,
                 """
                 \(theEnemy) rushes in for close combat! With only your bare hands, you meet
-                \(enemyRef.possessiveAdjective) assault head-on--this will be messy.
+                \(enemyRef.possessiveAdjective) assault head-on -- this will be messy.
                 """
             )
         }
@@ -213,7 +213,7 @@ open class CombatMessenger: StandardMessenger, @unchecked Sendable {
                 from \(theEnemy.possessive) grasp as life leaves \(enemyRef.objectPronoun).
                 """,
                 """
-                The final strike--\(yourWeapon) defeats \(theEnemy) decisively!
+                The final strike -- \(yourWeapon) defeats \(theEnemy) decisively!
                 \(enemyRef.objectPronoun) drops \(itsWeapon), collapses, and moves no more.
                 """,
                 """
@@ -223,7 +223,7 @@ open class CombatMessenger: StandardMessenger, @unchecked Sendable {
                 to the ground lifeless.
                 """,
                 """
-                One perfect moment--\(yourWeapon) slips past \(itsWeapon)! \(theEnemy)
+                One perfect moment -- \(yourWeapon) slips past \(itsWeapon)! \(theEnemy)
                 goes rigid, then topples forward into stillness.
                 """
             )
@@ -240,7 +240,7 @@ open class CombatMessenger: StandardMessenger, @unchecked Sendable {
                 \(enemyRef.verb("falls")), defeated.
                 """,
                 """
-                Weaponless but victorious--your final blow lands! \(theEnemy) releases
+                Weaponless but victorious -- your final blow lands! \(theEnemy) releases
                 \(itsWeapon) and collapses into stillness.
                 """,
                 """
@@ -264,7 +264,7 @@ open class CombatMessenger: StandardMessenger, @unchecked Sendable {
                 weaponless to the end.
                 """,
                 """
-                Your armed advantage proves decisive--\(yourWeapon) ends it! \(theEnemy)
+                Your armed advantage proves decisive -- \(yourWeapon) ends it! \(theEnemy)
                 crumples, having fought barehanded and lost.
                 """,
                 """
@@ -929,7 +929,7 @@ open class CombatMessenger: StandardMessenger, @unchecked Sendable {
                     """,
                     """
                     The devastating reversal shows in \(enemyRef.possessiveAdjective)
-                    eyes--shock giving way to the knowledge of mortality.
+                    eyes -- shock giving way to the knowledge of mortality.
                     """
                 )
             case .healthy:
@@ -946,7 +946,7 @@ open class CombatMessenger: StandardMessenger, @unchecked Sendable {
                     \(enemyRef.possessiveAdjective) wound is a masterpiece of destruction.
                     """,
                     """
-                    The shock is total--a body that knew no pain now drowns in it.
+                    The shock is total -- a body that knew no pain now drowns in it.
                     """,
                     """
                     Virgin flesh splits and bleeds. The wound is an education in mortality.
@@ -1205,7 +1205,7 @@ open class CombatMessenger: StandardMessenger, @unchecked Sendable {
                     """,
                     """
                     \(yourWeapon) finds \(theEnemy) exposed, carving a serious wound
-                    that will need tending--if there's time.
+                    that will need tending -- if there's time.
                     """,
                     """
                     Your blow with \(yourWeapon) catches \(theEnemy) cleanly, opening
@@ -1536,7 +1536,7 @@ open class CombatMessenger: StandardMessenger, @unchecked Sendable {
                     but not breaking rhythm.
                     """,
                     """
-                    A flash of pain, quickly suppressed--\(enemyRef.subjectPronoun)
+                    A flash of pain, quickly suppressed -- \(enemyRef.subjectPronoun)
                     has taken worse.
                     """
                 )
@@ -1895,15 +1895,15 @@ open class CombatMessenger: StandardMessenger, @unchecked Sendable {
                 wild swing with ease.
                 """,
                 """
-                A disastrous miss--\(yourWeapon) cuts through empty air and
+                A disastrous miss -- \(yourWeapon) cuts through empty air and
                 \(theEnemy) effortlessly evades your mistimed attack.
                 """,
                 """
-                \(yourWeapon) misses completely--\(theEnemy) wasn't even near
+                \(yourWeapon) misses completely -- \(theEnemy) wasn't even near
                 where you struck.
                 """,
                 """
-                A catastrophic failure--\(yourWeapon) finds nothing as \(theEnemy)
+                A catastrophic failure -- \(yourWeapon) finds nothing as \(theEnemy)
                 sidesteps your clumsy attempt.
                 """,
                 """
@@ -2176,7 +2176,7 @@ open class CombatMessenger: StandardMessenger, @unchecked Sendable {
 
         let returnToConsciousness = oneOf(
             """
-            Consciousness returns like a cruel joke--every nerve screaming, head pounding with each
+            Consciousness returns like a cruel joke -- every nerve screaming, head pounding with each
             heartbeat. \(theEnemy) is gone, apparently satisfied with your destruction. Best to move
             now before \(enemyRef.subjectPronoun) returns to verify the kill.
             """,
@@ -2184,23 +2184,23 @@ open class CombatMessenger: StandardMessenger, @unchecked Sendable {
             """
             You wake to find yourself crumpled where you fell, dried blood crusting your face.
             \(theEnemy) must have left you for dead. Fighting waves of nausea, you need to leave
-            immediately--\(enemyRef.subjectPronoun) could return at any moment.
+            immediately -- \(enemyRef.subjectPronoun) could return at any moment.
             """,
 
             """
-            Pain drags you back from the void--sharp, insistent, and very much proof you're alive.
+            Pain drags you back from the void -- sharp, insistent, and very much proof you're alive.
             The battlefield is quiet now. \(theEnemy) has moved on to other business, but
             \(enemyRef.subjectPronoun) won't stay gone long. Get out while you can.
             """,
 
             """
             Your eyes crack open to an empty scene. How long were you out? Hours? Minutes?
-            \(theEnemy) is nowhere to be seen--perhaps called away by urgent matters. Whatever
+            \(theEnemy) is nowhere to be seen -- perhaps called away by urgent matters. Whatever
             the reason, this reprieve won't last. Move now or die here.
             """,
 
             """
-            The world swims back into focus through a haze of hurt. You're alone now--\(theEnemy)
+            The world swims back into focus through a haze of hurt. You're alone now -- \(theEnemy)
             either thought the job finished or had somewhere better to be. Every movement is agony,
             but staying means certain death when \(enemyRef.subjectPronoun) returns. Time to go.
             """
@@ -2233,11 +2233,11 @@ open class CombatMessenger: StandardMessenger, @unchecked Sendable {
             // Enemy WITH weapon, player fumbles (drops own weapon)
             oneOf(
                 """
-                In the chaos of dodging \(itsWeapon), your grip betrays you--\(yourWeapon)
+                In the chaos of dodging \(itsWeapon), your grip betrays you -- \(yourWeapon)
                 spins away into darkness as \(theEnemy) presses the advantage.
                 """,
                 """
-                Sweat and blood conspire--\(yourWeapon) tears free from slick fingers
+                Sweat and blood conspire -- \(yourWeapon) tears free from slick fingers
                 as \(theEnemy) drives in with \(itsWeapon), sensing victory.
                 """,
                 """
@@ -2245,7 +2245,7 @@ open class CombatMessenger: StandardMessenger, @unchecked Sendable {
                 from \(theEnemy.possessive) strike with \(itsWeapon). Suddenly the odds shift hard.
                 """,
                 """
-                Your parry goes wrong--\(yourWeapon) jolts loose and clatters away
+                Your parry goes wrong -- \(yourWeapon) jolts loose and clatters away
                 while \(theEnemy) advances with \(itsWeapon), death in \(enemyRef.possessivePronoun) eyes.
                 """,
                 """
@@ -2283,7 +2283,7 @@ open class CombatMessenger: StandardMessenger, @unchecked Sendable {
             // Enemy WITHOUT weapon, player fumbles
             oneOf(
                 """
-                Your own momentum betrays you--\(yourWeapon) flies from your grasp,
+                Your own momentum betrays you -- \(yourWeapon) flies from your grasp,
                 leaving you and \(theEnemy) to settle this with fists and fury.
                 """,
                 """
@@ -2295,7 +2295,7 @@ open class CombatMessenger: StandardMessenger, @unchecked Sendable {
                 \(theEnemy) surges in, ready to make this personal.
                 """,
                 """
-                The weapon tears free--\(yourWeapon) abandons you as \(theEnemy)
+                The weapon tears free -- \(yourWeapon) abandons you as \(theEnemy)
                 closes the distance, violence written in every movement.
                 """,
                 """
@@ -2555,14 +2555,14 @@ open class CombatMessenger: StandardMessenger, @unchecked Sendable {
                     "From capable to dying in one strike. Your body betrays your confidence.",
                     "You look down at the damage in disbelief. The blood tells the truth.",
                     "What were scratches are now preludes to this symphony of trauma.",
-                    "The devastating reversal shows in your vision--shock giving way to the knowledge of mortality."
+                    "The devastating reversal shows in your vision -- shock giving way to the knowledge of mortality."
                 )
             case .healthy:
                 oneOf(
                     "Your unblemished flesh is torn open, revealing the meat beneath. First blood is the worst blood.",
                     "From whole to broken in an instant. Your pristine body learns what damage means.",
                     "Your first wound is a masterpiece of destruction. Innocence dies with the skin.",
-                    "The shock is total--a body that knew no pain now drowns in it.",
+                    "The shock is total -- a body that knew no pain now drowns in it.",
                     "Virgin flesh splits and bleeds. The wound is an education in mortality."
                 )
             }
@@ -2601,7 +2601,7 @@ open class CombatMessenger: StandardMessenger, @unchecked Sendable {
                 // Enemy WITHOUT weapon
                 oneOf(
                     """
-                    \(theEnemy) answers with devastating force--bone meets bone in wet percussion.
+                    \(theEnemy) answers with devastating force -- bone meets bone in wet percussion.
                     Your body folds wrong, organs shifting in ways they shouldn't.
                     """,
                     """
@@ -2609,7 +2609,7 @@ open class CombatMessenger: StandardMessenger, @unchecked Sendable {
                     your guard like a piston, and something vital ruptures inside.
                     """,
                     """
-                    \(theEnemy) strikes back with primal violence--knuckles find temple,
+                    \(theEnemy) strikes back with primal violence -- knuckles find temple,
                     and the world fragments into red static and the taste of iron.
                     """,
                     """
@@ -2617,7 +2617,7 @@ open class CombatMessenger: StandardMessenger, @unchecked Sendable {
                     rearranges your insides while your vision splits into crimson doubles.
                     """,
                     """
-                    \(theEnemy.possessive) response is immediate and catastrophic--a blow that
+                    \(theEnemy.possessive) response is immediate and catastrophic -- a blow that
                     caves ribs inward, painting your lungs with your own blood.
                     """
                 )
@@ -2806,7 +2806,7 @@ open class CombatMessenger: StandardMessenger, @unchecked Sendable {
                 // Enemy WITHOUT weapon
                 oneOf(
                     """
-                    \(theEnemy) hammers back instantly--the blow lands solid,
+                    \(theEnemy) hammers back instantly -- the blow lands solid,
                     driving air from lungs and thought from mind.
                     """,
                     """
@@ -2814,7 +2814,7 @@ open class CombatMessenger: StandardMessenger, @unchecked Sendable {
                     finds ribs, and pain blooms like fire through your chest.
                     """,
                     """
-                    \(theEnemy) pivots and strikes true--impact ripples through
+                    \(theEnemy) pivots and strikes true -- impact ripples through
                     muscle and bone, stealing balance and breath together.
                     """,
                     """
@@ -2822,7 +2822,7 @@ open class CombatMessenger: StandardMessenger, @unchecked Sendable {
                     as your body absorbs punishment it won't soon forget.
                     """,
                     """
-                    \(theEnemy.possessive) answer is swift and punishing--knuckles
+                    \(theEnemy.possessive) answer is swift and punishing -- knuckles
                     meet flesh with the sound of meat hitting stone.
                     """
                 )
@@ -2883,20 +2883,20 @@ open class CombatMessenger: StandardMessenger, @unchecked Sendable {
             case .some(let itsWeapon):
                 // Enemy WITH weapon
                 oneOf(
-                    "\(theEnemy) whips \(itsWeapon) across in answer--steel whispers against skin, leaving a thin signature of pain.",
+                    "\(theEnemy) whips \(itsWeapon) across in answer -- steel whispers against skin, leaving a thin signature of pain.",
                     "The riposte comes fast, \(itsWeapon) flicking out to trace a shallow arc of red across your guard.",
                     "\(theEnemy) pivots and \(itsWeapon) bites quick, a serpent's kiss that draws blood but finds no vein.",
-                    "In the exchange, \(itsWeapon) slips through to mark you--a stinging reminder that \(theEnemy) still has teeth.",
+                    "In the exchange, \(itsWeapon) slips through to mark you -- a stinging reminder that \(theEnemy) still has teeth.",
                     "\(theEnemy) turns your momentum against you, \(itsWeapon) catching flesh in passing, painting a line of fire."
                 )
 
             case .none:
                 // Enemy WITHOUT weapon
                 oneOf(
-                    "\(theEnemy) surges back instantly, fist cracking against your ribs--more warning than wound.",
+                    "\(theEnemy) surges back instantly, fist cracking against your ribs -- more warning than wound.",
                     "The counterblow comes wild and desperate, \(theEnemy) hammering through your guard to bruise rather than break.",
                     "\(theEnemy) crashes forward in response, the impact jarring but glancing as you roll with it.",
-                    "In the tangle, \(theEnemy) drives an elbow home--sudden pressure that blooms into dull pain.",
+                    "In the tangle, \(theEnemy) drives an elbow home -- sudden pressure that blooms into dull pain.",
                     "\(theEnemy) answers with raw violence, a clubbing strike that finds you but lacks the angle to truly hurt."
                 )
             }
@@ -2956,17 +2956,17 @@ open class CombatMessenger: StandardMessenger, @unchecked Sendable {
             case .some(let itsWeapon):
                 // Enemy WITH weapon
                 oneOf(
-                    "\(theEnemy) lashes out in response--\(itsWeapon) skims past, close enough to feel the wind of its passing.",
+                    "\(theEnemy) lashes out in response -- \(itsWeapon) skims past, close enough to feel the wind of its passing.",
                     "The counter comes swift but shallow, \(itsWeapon) tracing air an inch from opening veins.",
                     "\(theEnemy) whips \(itsWeapon) through the space you just vacated, steel singing a near-miss song.",
-                    "In the exchange, \(itsWeapon) flickers past--death's whisper without its bite.",
+                    "In the exchange, \(itsWeapon) flickers past -- death's whisper without its bite.",
                     "\(theEnemy) strikes back instantly, but \(itsWeapon) finds only the ghost of where you were."
                 )
             case .none:
                 // Enemy WITHOUT weapon
                 oneOf(
                     "\(theEnemy) swings back hard, knuckles grazing past as you twist away from impact.",
-                    "The counterstrike comes wild--\(theEnemy.possessive) fist clips you without finding purchase.",
+                    "The counterstrike comes wild -- \(theEnemy.possessive) fist clips you without finding purchase.",
                     "\(theEnemy) lunges forward in answer, fingertips raking air where throat should be.",
                     "In the scramble, \(theEnemy) throws a desperate hook that barely connects, all motion and no mass.",
                     "\(theEnemy) surges back, but the blow slides off your moving form like water."
@@ -3069,7 +3069,7 @@ open class CombatMessenger: StandardMessenger, @unchecked Sendable {
                 \(enemyRef.subjectPronoun) \(enemyRef.verb("sprints")) \(inSomeDirection) and out of sight.
                 """,
                 """
-                The fight is over--\(theEnemy) retreats! \(enemyRef.subjectPronoun)
+                The fight is over -- \(theEnemy) retreats! \(enemyRef.subjectPronoun)
                 take \(itsWeapon) and disappear \(inSomeDirection) without looking back.
                 """,
                 """
@@ -3180,7 +3180,7 @@ open class CombatMessenger: StandardMessenger, @unchecked Sendable {
             """,
 
             """
-            Disaster. \(theEnemy) reappears just as you're examining your surroundings--clearly
+            Disaster. \(theEnemy) reappears just as you're examining your surroundings -- clearly
             the wrong priority. \(enemyRef.subjectPronoun) takes in your recovered
             state with what reads as dark amusement. You should have run when you could.
             """,
@@ -3188,7 +3188,7 @@ open class CombatMessenger: StandardMessenger, @unchecked Sendable {
             """
             \(theEnemy) walks back in to find you standing there like nothing happened.
             The momentary confusion gives way to focused aggression. All that time you wasted
-            investigating instead of escaping--now the bill comes due.
+            investigating instead of escaping -- now the bill comes due.
             """,
 
             """
@@ -3200,7 +3200,7 @@ open class CombatMessenger: StandardMessenger, @unchecked Sendable {
             """
             The worst possible timing: \(theEnemy) comes back to find you still present,
             apparently fascinated by your surroundings rather than your survival.
-            \(enemyRef.subjectPronoun) doesn't hesitate--violence resumes immediately.
+            \(enemyRef.subjectPronoun) doesn't hesitate -- violence resumes immediately.
             You had your chance to leave.
             """
         )
@@ -3297,7 +3297,7 @@ open class CombatMessenger: StandardMessenger, @unchecked Sendable {
             """,
 
             """
-            Movement from the fallen form--\(theEnemy) is coming around. \(enemyRef.subjectPronoun)
+            Movement from the fallen form -- \(theEnemy) is coming around. \(enemyRef.subjectPronoun)
             pushes up from the ground, fury building with each labored breath. You should have finished
             this, or fled. Now you'll face the consequences.
             """,
@@ -3309,7 +3309,7 @@ open class CombatMessenger: StandardMessenger, @unchecked Sendable {
             """,
 
             """
-            \(theEnemy) jolts awake with violent purpose, immediately scanning for you--and finding you.
+            \(theEnemy) jolts awake with violent purpose, immediately scanning for you -- and finding you.
             The humiliation of defeat burns in \(enemyRef.possessivePronoun) stance.
             \(enemyRef.subjectPronoun) won't underestimate you twice.
             """,
@@ -3317,7 +3317,7 @@ open class CombatMessenger: StandardMessenger, @unchecked Sendable {
             """
             Your hesitation bears bitter fruit as \(theEnemy) regains consciousness.
             \(enemyRef.subjectPronoun) staggers upright, wounded pride mixing with
-            murderous intent. Whatever advantage you had is gone--replaced by an enemy who knows
+            murderous intent. Whatever advantage you had is gone -- replaced by an enemy who knows
             your measure and wants revenge.
             """
         )

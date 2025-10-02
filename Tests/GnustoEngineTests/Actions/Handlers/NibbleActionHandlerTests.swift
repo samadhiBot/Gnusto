@@ -337,7 +337,8 @@ struct NibbleActionHandlerTests {
                 """
                 > \(verb) apple
                 Do you mean you want to eat the red apple?
-                """)
+                """
+            )
 
             // Clear the question for next test
             try await engine.execute("no")

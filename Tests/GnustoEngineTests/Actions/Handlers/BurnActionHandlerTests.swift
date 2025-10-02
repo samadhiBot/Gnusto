@@ -351,7 +351,7 @@ struct BurnActionHandlerTests {
             .description("A wooden torch.")
             .isLightSource
             .isFlammable
-        // Note: NOT self-ignitable
+            // Note: NOT self-ignitable
             .isTakable
             .in(.player)
 
@@ -618,30 +618,30 @@ struct BurnActionHandlerTests {
             """
             > look
             --- Laboratory ---
-            
+
             A laboratory in which strange experiments are being conducted.
-            
+
             There is a fierce troll here.
-            
+
             > burn the troll
             That would be needlessly cruel.
-            
+
             > attack the troll
             You drive forward with your flaming torch seeking its purpose
             as the fearsome beast meets you barehanded, flesh against steel
             in the oldest gamble.
-            
+
             Your flaming torch swings wide, and the fearsome creature
             avoids your poorly aimed strike with ease.
-            
+
             The angry beast counters with a force that shatters your guard,
             leaving you exposed to whatever violence comes next.
-            
+
             > burn the troll
             Your flaming torch inflicts a light wound on the creature, more
             sting than damage. He registers the wound with annoyance.
-            
-            The monster's answer is swift and punishing--knuckles meet
+
+            The monster's answer is swift and punishing -- knuckles meet
             flesh with the sound of meat hitting stone. The blow lands
             solidly, drawing blood. You feel the sting but remain strong.
             """
@@ -749,11 +749,11 @@ struct BurnActionHandlerTests {
             """
             > burn paper
             The piece of paper stubbornly resists your attempts to burn it.
-            
+
             > ignite paper
             You cannot ignite the piece of paper, much as you might wish
             otherwise.
-            
+
             > light paper
             The universe denies your request to light the piece of paper.
             """
@@ -820,9 +820,9 @@ struct BurnActionHandlerTests {
             """
             > light candle
             You light the white candle. You can see your surroundings now.
-            
+
             --- Dark Room ---
-            
+
             A room shrouded in darkness.
             """
         )

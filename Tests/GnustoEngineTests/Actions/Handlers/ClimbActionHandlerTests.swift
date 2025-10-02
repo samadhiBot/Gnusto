@@ -273,15 +273,15 @@ struct ClimbActionHandlerTests {
             """
             > look
             --- Round Room ---
-            
+
             This is a round room with a set of wooden stairs leading up.
-            
+
             > examine the stairs
             You see a polished set of wooden stairs leading up.
-            
+
             > climb stairs
             --- Upper Room ---
-            
+
             This location is still under construction. The game developers
             apologize for any inconvenience.
             """

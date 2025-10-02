@@ -225,7 +225,7 @@ struct RubActionHandlerTests {
         let darkRoom = Location("darkRoom")
             .name("Dark Room")
             .description("A pitch black room.")
-            // Note: No .inherentlyLit property
+        // Note: No .inherentlyLit property
 
         let statue = Item("statue")
             .name("stone statue")
@@ -311,7 +311,7 @@ struct RubActionHandlerTests {
             > rub the necromancer
             That would be quite inappropriate.
 
-            No weapons between you--just the furious necromancer's
+            No weapons between you -- just the furious necromancer's
             aggression and your desperation! You collide in a tangle of
             strikes and blocks.
             """

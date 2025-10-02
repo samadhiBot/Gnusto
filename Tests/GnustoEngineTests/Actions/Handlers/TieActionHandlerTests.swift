@@ -471,9 +471,10 @@ struct TieActionHandlerTests {
             """
             > tie orc with rope
             The angry orc would resist binding with extreme prejudice.
-            
-            No weapons between you--just the warrior's aggression and your
-            desperation! You collide in a tangle of strikes and blocks.
+
+            No weapons between you -- just the warrior's aggression and
+            your desperation! You collide in a tangle of strikes and
+            blocks.
             """
         )
 
@@ -622,9 +623,10 @@ struct TieActionHandlerTests {
             """
             > tie orc with orc
             You can't tie the angry orc with itself.
-            
-            No weapons between you--just the warrior's aggression and your
-            desperation! You collide in a tangle of strikes and blocks.
+
+            No weapons between you -- just the warrior's aggression and
+            your desperation! You collide in a tangle of strikes and
+            blocks.
             """
         )
     }

@@ -64,6 +64,16 @@ public struct Location: Codable, Identifiable, Hashable, Sendable {
     /// later using the fluent helpers (for example: `.name("...")`, `.description("...")`,
     /// `.north(.otherLocation)`, etc.).
     ///
+    /// Example:
+    /// ```swift
+    /// let livingRoom = Location(.livingRoom)
+    ///     .name("Living Room")
+    ///     .description("A comfortably furnished living room. There are exits to the north and east.")
+    ///     .north(.garden)
+    ///     .east(.kitchen)
+    ///     .isInherentlyLit
+    /// ```
+    ///
     /// - Parameter id: The unique `LocationID` for the new location.
     public init(_ id: LocationID) {
         self.id = id

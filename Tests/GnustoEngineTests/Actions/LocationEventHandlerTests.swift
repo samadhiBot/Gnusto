@@ -602,10 +602,12 @@ struct LocationEventHandlerTests {
                 "Context handler called for location: .startRoom"
             ])
 
-        await mockIO.expectOutput("""
+        await mockIO.expectOutput(
+            """
             > look
             Custom look message from context handler.
-            """)
+            """
+        )
     }
 
     @Test("LocationEventHandler ActionResult.yield allows normal processing to continue")
@@ -676,7 +678,7 @@ struct LocationEventHandlerTests {
         let litTestRoom = Location(.startRoom)
             .name("Test Room")
             .description("A test room that can be lit or dark.")
-            .inherentlyLit  // This room starts lit
+            .inherentlyLit
             .north("otherRoom")
 
         let litGame = MinimalGame(
@@ -688,18 +690,26 @@ struct LocationEventHandlerTests {
         // Test 3: When room is lit, handler should yield and allow normal processing
         try await litEngine.execute("look")
 
-        let output3 = await litMockIO.flush()
-        // Should get normal room description because handler yielded
-        #expect(output3.contains("-- Test Room --"))
-        #expect(output3.contains("A test room that can be lit or dark."))
+        await litMockIO.expectOutput(
+            """
+            > look
+            --- Test Room ---
+
+            A test room that can be lit or dark.
+            """
+        )
 
         // Test 4: Verify movement works when lit (handler yields)
         try await litEngine.execute("north")
 
-        let output4 = await litMockIO.flush()
-        // Should successfully move to other room
-        #expect(output4.contains("-- Other Room --"))
-        #expect(output4.contains("Another room."))
+        await litMockIO.expectOutput(
+            """
+            > north
+            --- Other Room ---
+
+            Another room.
+            """
+        )
     }
 }
 

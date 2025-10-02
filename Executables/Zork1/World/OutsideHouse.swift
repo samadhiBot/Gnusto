@@ -157,7 +157,8 @@ struct OutsideHouse {
                 You are behind the white house. A path leads into the forest
                 to the east. In one corner of the house there is a small window
                 which is \(windowState).
-                """)
+                """
+            )
         }
     }
 

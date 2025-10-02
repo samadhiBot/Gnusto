@@ -118,13 +118,13 @@ def apply_changes(file_path, changes)
         end
         puts "    Found #{heredocs.length} heredoc(s): #{heredocs.map { |s, e| "#{s + 1}-#{e + 1}" }.join(', ')}"
 
-        # Find expectNoDifference calls and match to error line
+        # Find expectOutput calls and match to error line
         expect_calls = []
         k = func_decl + 1
         while k < test_end
-            if lines[k].include?('expectNoDifference')
-                puts "    DEBUG: Found expectNoDifference at line #{k + 1}: #{lines[k].strip}"
-                # Find the heredoc associated with this expectNoDifference call
+            if lines[k].include?('expectOutput')
+                puts "    DEBUG: Found expectOutput at line #{k + 1}: #{lines[k].strip}"
+                # Find the heredoc associated with this expectOutput call
                 heredoc_start = nil
                 heredoc_end = nil
 
@@ -157,7 +157,7 @@ def apply_changes(file_path, changes)
         end
 
         if expect_calls.empty?
-            puts "    ❌ No expectNoDifference calls with heredocs found in test block"
+            puts "    ❌ No expectOutput calls with heredocs found in test block"
             puts "    DEBUG: Lines #{func_decl + 1} to #{test_end}:"
             (func_decl + 1...test_end).each do |i|
                 puts "    #{i + 1}: #{lines[i].strip}" if lines[i].include?('expect') || lines[i].include?('"""')
@@ -165,17 +165,17 @@ def apply_changes(file_path, changes)
             next
         end
 
-        puts "    Found #{expect_calls.length} expectNoDifference call(s) with heredocs: #{expect_calls.map { |c| "line #{c[:expect_line] + 1}" }.join(', ')}"
+        puts "    Found #{expect_calls.length} expectOutput call(s) with heredocs: #{expect_calls.map { |c| "line #{c[:expect_line] + 1}" }.join(', ')}"
 
-        # Find the expectNoDifference call that contains or is closest to the error line
+        # Find the expectOutput call that contains or is closest to the error line
         target_heredoc = nil
         best_expect_call = nil
         min_distance = Float::INFINITY
 
         expect_calls.each do |call|
-            # Calculate distance from error line to this expectNoDifference call
+            # Calculate distance from error line to this expectOutput call
             distance = if error_idx >= call[:expect_line] && error_idx <= call[:heredoc_end]
-                0  # Error line is within this expectNoDifference block
+                0  # Error line is within this expectOutput block
             elsif error_idx < call[:expect_line]
                 call[:expect_line] - error_idx  # Error line is before this call
             else
@@ -190,11 +190,11 @@ def apply_changes(file_path, changes)
         end
 
         unless target_heredoc
-            puts "    ❌ No matching expectNoDifference call found for error line"
+            puts "    ❌ No matching expectOutput call found for error line"
             next
         end
 
-        puts "    ✓ Selected expectNoDifference call at line #{best_expect_call[:expect_line] + 1} (distance: #{min_distance})"
+        puts "    ✓ Selected expectOutput call at line #{best_expect_call[:expect_line] + 1} (distance: #{min_distance})"
 
         hs, he = target_heredoc
         puts "    ✓ Found target heredoc at lines #{hs + 1}-#{he + 1}"
@@ -255,13 +255,17 @@ def find_test_failures(output)
 
     # Step 2: For each test failure, find the corresponding heredoc
     output_lines = output.lines
-    test_failure_lines.each do |failure|
+    test_failure_lines.each_with_index do |failure, idx|
+
+        # Determine search boundaries: from this failure to the next failure (or end of output)
+        start_search = failure[:line_index]
+        next_failure_idx = idx + 1 < test_failure_lines.length ? test_failure_lines[idx + 1][:line_index] : output_lines.length
 
         # Look for "Difference:" followed by heredoc starting from the failure line
-        start_search = failure[:line_index]
+        # Search only within this test's output section
         diff_line_idx = nil
 
-        (start_search...[output_lines.length, start_search + 20].min).each do |i|
+        (start_search...next_failure_idx).each do |i|
             if output_lines[i].include?('Difference:')
                 diff_line_idx = i
                 break
@@ -274,7 +278,7 @@ def find_test_failures(output)
         heredoc_start = nil
         heredoc_end = nil
 
-        (diff_line_idx + 1...output_lines.length).each do |i|
+        (diff_line_idx + 1...next_failure_idx).each do |i|
             if output_lines[i].strip == '"""'
                 heredoc_start = i
                 break
@@ -283,8 +287,8 @@ def find_test_failures(output)
 
         next unless heredoc_start
 
-        # Find heredoc end
-        (heredoc_start + 1...output_lines.length).each do |i|
+        # Find heredoc end (stay within this test's section)
+        (heredoc_start + 1...next_failure_idx).each do |i|
             if output_lines[i].strip == '"""'
                 heredoc_end = i
                 break

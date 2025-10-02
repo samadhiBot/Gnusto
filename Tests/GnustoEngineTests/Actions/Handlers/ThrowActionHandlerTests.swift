@@ -341,7 +341,7 @@ struct ThrowActionHandlerTests {
         let darkRoom = Location("darkRoom")
             .name("Dark Room")
             .description("A pitch black room.")
-            // Note: No .inherentlyLit property
+        // Note: No .inherentlyLit property
 
         let ball = Item("ball")
             .name("rubber ball")
@@ -495,7 +495,7 @@ struct ThrowActionHandlerTests {
             > throw apple at wizard
             You aren't holding the red apple.
 
-            In the tangle, the old wizard drives an elbow home--sudden
+            In the tangle, the old wizard drives an elbow home -- sudden
             pressure that blooms into dull pain. Pain flickers and dies.
             Your body has more important work.
             """

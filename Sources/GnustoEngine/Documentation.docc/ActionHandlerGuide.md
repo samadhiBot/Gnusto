@@ -349,10 +349,12 @@ func testTakeSyntax() async throws {
 
     try await engine.execute("take lamp")
 
-    await mockIO.expectOutput("""
+    await mockIO.expectOutput(
+        """
         > take lamp
         Taken.
-        """)
+        """
+    )
 }
 
 @Test("Invalid syntax patterns are rejected")
@@ -430,10 +432,12 @@ func testSomething() async throws {
     try await engine.execute("take test item")
 
     // Then: Verify results
-    await mockIO.expectOutput("""
+    await mockIO.expectOutput(
+        """
         > take test item
         Taken.
-        """)
+        """
+    )
 
     let finalState = await engine.item("testItem")
     #expect(await finalState.parent == .player)
@@ -506,10 +510,12 @@ for directObjectRef in context.command.directObjects {
 
 ```swift
 // ✅ RIGHT: Exact message matching with command echo
-await mockIO.expectOutput("""
+await mockIO.expectOutput(
+    """
     > take lamp
     Taken.
-    """)
+    """
+)
 
 // ❌ WRONG: Partial matching
 #expect(output.contains("Taken"))

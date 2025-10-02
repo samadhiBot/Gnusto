@@ -97,7 +97,7 @@ struct KissActionHandlerTests {
         let darkRoom = Location("darkRoom")
             .name("Dark Room")
             .description("A pitch black room.")
-            // Note: No .inherentlyLit property
+        // Note: No .inherentlyLit property
 
         let stranger = Item("stranger")
             .name("mysterious stranger")
@@ -202,7 +202,7 @@ struct KissActionHandlerTests {
             That's an unusual combat strategy, and the angry troll seems
             unlikely to reciprocate.
 
-            No weapons between you--just the enemy's aggression and your
+            No weapons between you -- just the enemy's aggression and your
             desperation! You collide in a tangle of strikes and blocks.
             """
         )
@@ -379,15 +379,15 @@ struct KissActionHandlerTests {
             That's an unusual combat strategy, and the terrible dragon
             seems unlikely to reciprocate.
 
-            In the tangle, the terrible dragon drives an elbow home--sudden
-            pressure that blooms into dull pain. Pain flickers and dies.
-            Your body has more important work.
+            In the tangle, the terrible dragon drives an elbow home --
+            sudden pressure that blooms into dull pain. Pain flickers and
+            dies. Your body has more important work.
 
             > kiss fairy
             The moment for kissing the woodland fairy has neither arrived
             nor been invited.
 
-            The terrible dragon's answer is swift and punishing--knuckles
+            The terrible dragon's answer is swift and punishing -- knuckles
             meet flesh with the sound of meat hitting stone. You grunt from
             the impact but maintain your stance.
             """

@@ -173,7 +173,7 @@ let package = Package(
         .executableTarget(
             name: "MyGame",
             dependencies: ["GnustoEngine"],
-            plugins: ["GnustoAutoWiringPlugin"]  // Add this line
+            plugins: ["GnustoAutoWiringPlugin"]  // <- Add this line
         ),
     ]
 )

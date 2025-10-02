@@ -133,7 +133,8 @@ struct ItemEventHandlerTests {
             """
             > examine test item
             Intent matched!
-            """)
+            """
+        )
     }
 
     @Test("beforeTurn with single intent does not match incorrect intent")
@@ -183,7 +184,8 @@ struct ItemEventHandlerTests {
             """
             > take test item
             One intent matched!
-            """)
+            """
+        )
     }
 
     @Test("beforeTurn with multiple intents does not match if none match")
@@ -1004,7 +1006,8 @@ struct ItemEventHandlerTests {
             > shake bottle
             Your agitation of the glass bottle produces no observable
             effect.
-            """)
+            """
+        )
 
         // Both bottle and water should remain unchanged
         let finalBottle = await engine.item("bottle")

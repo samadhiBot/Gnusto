@@ -9,7 +9,7 @@ This script analyzes StandardMessenger.swift to:
 4. Maintain proper Swift formatting and documentation
 
 Usage:
-    python messenger_cleanup.py [--remove-unused] [--dry-run]
+    python messenger_cleanup [--remove-unused] [--dry-run]
 """
 
 import os
@@ -20,34 +20,42 @@ from pathlib import Path
 from typing import List, Dict, Tuple, Set
 import subprocess
 
+
 class MessengerAnalyzer:
     def __init__(self, project_root: Path):
         self.project_root = project_root
-        self.messenger_file = project_root / "Sources/GnustoEngine/Messenger/StandardMessenger.swift"
+        self.messenger_file = (
+            project_root / "Sources/GnustoEngine/Messenger/StandardMessenger.swift"
+        )
         self.functions: Dict[str, Dict] = {}
         self.unused_functions: Set[str] = set()
 
     def extract_functions(self) -> Dict[str, Dict]:
         """Extract all function definitions from StandardMessenger.swift"""
         if not self.messenger_file.exists():
-            raise FileNotFoundError(f"StandardMessenger.swift not found at {self.messenger_file}")
+            raise FileNotFoundError(
+                f"StandardMessenger.swift not found at {self.messenger_file}"
+            )
 
-        with open(self.messenger_file, 'r', encoding='utf-8') as f:
+        with open(self.messenger_file, "r", encoding="utf-8") as f:
             content = f.read()
 
         functions = {}
-        lines = content.split('\n')
+        lines = content.split("\n")
         i = 0
 
         while i < len(lines):
             # Look for function definitions (handle access modifiers)
-            func_match = re.match(r'\s*(?:open\s+|public\s+|private\s+|internal\s+)?func\s+(\w+)\s*\(', lines[i])
+            func_match = re.match(
+                r"\s*(?:open\s+|public\s+|private\s+|internal\s+)?func\s+(\w+)\s*\(",
+                lines[i],
+            )
             if func_match:
                 func_name = func_match.group(1)
 
                 # Look for documentation comments above the function
                 doc_start = i
-                while doc_start > 0 and lines[doc_start - 1].strip().startswith('///'):
+                while doc_start > 0 and lines[doc_start - 1].strip().startswith("///"):
                     doc_start -= 1
 
                 # Collect function lines starting from documentation
@@ -65,12 +73,12 @@ class MessengerAnalyzer:
                     func_lines.append(current_line)
 
                     # Track braces
-                    if '{' in current_line:
+                    if "{" in current_line:
                         function_started = True
-                        brace_count += current_line.count('{')
+                        brace_count += current_line.count("{")
 
                     if function_started:
-                        brace_count -= current_line.count('}')
+                        brace_count -= current_line.count("}")
 
                         # Function complete when braces are balanced
                         if brace_count == 0:
@@ -83,11 +91,11 @@ class MessengerAnalyzer:
                         break
 
                 functions[func_name] = {
-                    'name': func_name,
-                    'lines': func_lines,
-                    'start_line': doc_start + 1,
-                    'end_line': j + 1,
-                    'content': '\n'.join(func_lines)
+                    "name": func_name,
+                    "lines": func_lines,
+                    "start_line": doc_start + 1,
+                    "end_line": j + 1,
+                    "content": "\n".join(func_lines),
                 }
 
                 i = j + 1
@@ -107,17 +115,17 @@ class MessengerAnalyzer:
         # - .funcName(
         # - funcName(
         patterns = [
-            rf'\.\s*{func_name}\s*\(',
-            rf'\b{func_name}\s*\(',
-            rf'messenger\s*\.\s*{func_name}\s*\(',
-            rf'msg\s*\.\s*{func_name}\s*\('
+            rf"\.\s*{func_name}\s*\(",
+            rf"\b{func_name}\s*\(",
+            rf"messenger\s*\.\s*{func_name}\s*\(",
+            rf"msg\s*\.\s*{func_name}\s*\(",
         ]
 
         # Directories to search
         search_dirs = [
             self.project_root / "Sources",
             self.project_root / "Tests",
-            self.project_root / "Executables"
+            self.project_root / "Executables",
         ]
 
         for search_dir in search_dirs:
@@ -130,15 +138,17 @@ class MessengerAnalyzer:
                     continue
 
                 try:
-                    with open(swift_file, 'r', encoding='utf-8') as f:
+                    with open(swift_file, "r", encoding="utf-8") as f:
                         content = f.read()
 
                     for pattern in patterns:
                         matches = re.finditer(pattern, content, re.MULTILINE)
                         for match in matches:
                             # Get line number
-                            line_num = content[:match.start()].count('\n') + 1
-                            usage_locations.append(f"{swift_file.relative_to(self.project_root)}:{line_num}")
+                            line_num = content[: match.start()].count("\n") + 1
+                            usage_locations.append(
+                                f"{swift_file.relative_to(self.project_root)}:{line_num}"
+                            )
 
                 except Exception as e:
                     print(f"Error reading {swift_file}: {e}")
@@ -151,7 +161,7 @@ class MessengerAnalyzer:
 
         print("Analyzing function usage...")
         for func_name in self.functions:
-            print(f"  Checking {func_name}...", end='')
+            print(f"  Checking {func_name}...", end="")
             usages = self.find_function_usage(func_name)
             if not usages:
                 unused.add(func_name)
@@ -168,15 +178,17 @@ class MessengerAnalyzer:
             self.extract_functions()
 
         # Read the original file to get the class header and other content
-        with open(self.messenger_file, 'r', encoding='utf-8') as f:
+        with open(self.messenger_file, "r", encoding="utf-8") as f:
             original_content = f.read()
 
         # Extract the class header (everything before the first function)
-        lines = original_content.split('\n')
+        lines = original_content.split("\n")
         header_lines = []
 
         for i, line in enumerate(lines):
-            if re.match(r'\s*(?:open\s+|public\s+|private\s+|internal\s+)?func\s+\w+\s*\(', line):
+            if re.match(
+                r"\s*(?:open\s+|public\s+|private\s+|internal\s+)?func\s+\w+\s*\(", line
+            ):
                 break
             header_lines.append(line)
 
@@ -198,18 +210,20 @@ class MessengerAnalyzer:
 
             # Add a blank line before each function (except the first)
             if i > 0:
-                result_lines.append('')
+                result_lines.append("")
 
-            result_lines.extend(func_data['lines'])
+            result_lines.extend(func_data["lines"])
 
         # Find and add the closing brace from the original file
         for line in reversed(lines):
-            if line.strip() == '}' and not re.match(r'\s*(?:open\s+|public\s+|private\s+|internal\s+)?func\s+', line):
-                result_lines.append('')  # Add blank line before closing brace
+            if line.strip() == "}" and not re.match(
+                r"\s*(?:open\s+|public\s+|private\s+|internal\s+)?func\s+", line
+            ):
+                result_lines.append("")  # Add blank line before closing brace
                 result_lines.append(line)
                 break
 
-        return '\n'.join(result_lines)
+        return "\n".join(result_lines)
 
     def print_summary(self):
         """Print analysis summary"""
@@ -218,7 +232,7 @@ class MessengerAnalyzer:
         used_count = total_functions - unused_count
 
         print(f"\n📊 ANALYSIS SUMMARY")
-        print(f"{'='*50}")
+        print(f"{'=' * 50}")
         print(f"Total functions: {total_functions}")
         print(f"Used functions: {used_count}")
         print(f"Unused functions: {unused_count}")
@@ -230,19 +244,28 @@ class MessengerAnalyzer:
 
     def backup_file(self) -> Path:
         """Create a backup of the original file"""
-        backup_path = self.messenger_file.with_suffix('.swift.backup')
+        backup_path = self.messenger_file.with_suffix(".swift.backup")
         import shutil
+
         shutil.copy2(self.messenger_file, backup_path)
         return backup_path
 
+
 def main():
-    parser = argparse.ArgumentParser(description='Clean up StandardMessenger.swift')
-    parser.add_argument('--remove-unused', action='store_true',
-                       help='Remove unused functions (default: keep all functions)')
-    parser.add_argument('--dry-run', action='store_true',
-                       help='Show what would be done without making changes')
-    parser.add_argument('--project-root', type=Path,
-                       help='Path to project root (default: auto-detect)')
+    parser = argparse.ArgumentParser(description="Clean up StandardMessenger.swift")
+    parser.add_argument(
+        "--remove-unused",
+        action="store_true",
+        help="Remove unused functions (default: keep all functions)",
+    )
+    parser.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="Show what would be done without making changes",
+    )
+    parser.add_argument(
+        "--project-root", type=Path, help="Path to project root (default: auto-detect)"
+    )
 
     args = parser.parse_args()
 
@@ -279,13 +302,18 @@ def main():
 
         # Generate cleaned content
         print("\n🔧 Generating cleaned file...")
-        cleaned_content = analyzer.generate_cleaned_file(remove_unused=args.remove_unused)
+        cleaned_content = analyzer.generate_cleaned_file(
+            remove_unused=args.remove_unused
+        )
 
         if args.dry_run:
             print("\n🔍 DRY RUN - No changes made")
             print("📝 Cleaned file would contain:")
-            remaining_functions = [name for name in analyzer.functions.keys()
-                                 if not args.remove_unused or name not in unused_functions]
+            remaining_functions = [
+                name
+                for name in analyzer.functions.keys()
+                if not args.remove_unused or name not in unused_functions
+            ]
             print(f"   {len(remaining_functions)} functions (alphabetically sorted)")
             if args.remove_unused and unused_functions:
                 print(f"   {len(unused_functions)} unused functions would be removed")
@@ -295,7 +323,7 @@ def main():
             print(f"💾 Backup created: {backup_path}")
 
             # Write cleaned file
-            with open(analyzer.messenger_file, 'w', encoding='utf-8') as f:
+            with open(analyzer.messenger_file, "w", encoding="utf-8") as f:
                 f.write(cleaned_content)
 
             print(f"✅ StandardMessenger.swift updated")
@@ -305,8 +333,11 @@ def main():
 
             # Format with swift-format if available
             try:
-                subprocess.run(['swift-format', '--in-place', str(analyzer.messenger_file)],
-                             check=True, capture_output=True)
+                subprocess.run(
+                    ["swift-format", "--in-place", str(analyzer.messenger_file)],
+                    check=True,
+                    capture_output=True,
+                )
                 print("🎨 Code formatted with swift-format")
             except (subprocess.CalledProcessError, FileNotFoundError):
                 print("ℹ️  swift-format not available - manual formatting may be needed")
@@ -314,6 +345,7 @@ def main():
     except Exception as e:
         print(f"❌ Error: {e}")
         sys.exit(1)
+
 
 if __name__ == "__main__":
     main()

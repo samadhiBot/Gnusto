@@ -161,7 +161,7 @@ struct SqueezeActionHandlerTests {
         let darkRoom = Location("darkRoom")
             .name("Dark Room")
             .description("A pitch black room.")
-            // Note: No .inherentlyLit property
+        // Note: No .inherentlyLit property
 
         let cushion = Item("cushion")
             .name("soft cushion")
@@ -281,7 +281,7 @@ struct SqueezeActionHandlerTests {
             Aggression is one thing; squeezing the furious necromancer is
             quite another.
 
-            No weapons between you--just the furious necromancer's
+            No weapons between you -- just the furious necromancer's
             aggression and your desperation! You collide in a tangle of
             strikes and blocks.
             """

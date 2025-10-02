@@ -1,10 +1,12 @@
 # Contributing to Gnusto
 
-Thank you for your interest in contributing to the Gnusto Interactive Fiction Engine! We welcome all kinds of contributions, from bug reports and documentation improvements to new features and example games.
+Thank you for your interest in contributing to the Gnusto Interactive Fiction Engine! We welcome all kinds of contributions, including bug reports, documentation improvements, bug fixes and new features.
+
+> The best way to contribute is to start working on a game of your own. If you find a bug in the engine, or a common action that's missing, file an [issue](https://github.com/samadhiBot/Gnusto/issues) -- or  if you're up for it, open a PR with your fix or new feature.
 
 ## Code of Conduct
 
-**Be kind, be curious.**. We're building a welcoming community where everyone can learn, contribute, and enjoy creating interactive fiction together.
+**Be curious, be kind.**. We're building a welcoming community where everyone can learn, contribute, and enjoy creating interactive fiction together.
 
 ## Getting Started
 
@@ -27,30 +29,30 @@ Thank you for your interest in contributing to the Gnusto Interactive Fiction En
 - Add examples to existing documentation
 - Write tutorials or guides
 - Improve code comments and API documentation
+- Add new articles
 
 ### ✨ Features
 - Discuss new features in issues before implementing
 - Start with small improvements to get familiar with the codebase
-- Focus on areas marked as needing improvement (combat, NPCs, etc.)
+- If you're looking for somewhere to start, focus on areas marked as needing improvement (combat, NPCs, etc.)
 - Consider backward compatibility
 
-### 🎮 Example Games
-- Port classic IF games (with appropriate licensing)
-- Create original games demonstrating engine features
-- Add test games for specific mechanics
-- Improve existing examples
+### 🎮 Games
+- Create an original game
+- Port a classic IF game
+- Create a demo game that adds or demonstrates specific mechanics
+- Contribute to the [Zork 1](https://github.com/samadhiBot/Gnusto/tree/main/Executables/Zork1)) replica
 
 ### 🧪 Testing
 - Add test coverage for untested code
 - Test on different platforms (Linux, Windows)
 - Report platform-specific issues
-- Performance testing and optimization
 
 ## Development Guidelines
 
 ### Code Style
 - Follow Swift API design guidelines
-- Use SwiftLint (may need to disable on Linux/Windows)
+- Use SwiftLint if possible (may need to disable on Linux/Windows)
 - Write comprehensive `///` documentation for public APIs
 - Organize code logically, then alphabetize within groups
 - Keep files under ~300 lines when possible
@@ -59,15 +61,14 @@ Thank you for your interest in contributing to the Gnusto Interactive Fiction En
 - **All new code must have tests** using Swift Testing framework
 - Maintain 80-90% test coverage for new features
 - Test through the full engine pipeline with `engine.execute("command")`
-- Never test action handlers in isolation
-- Use `expectNoDifference()` for exact output verification
+- Use `mockIO.expectOutput()` for exact output verification
 
 ### Architecture Principles
 - **State changes must flow through the StateChange pipeline**
 - **Use proxy objects** (`ItemProxy`, `LocationProxy`, etc.) over direct objects
-- **All player messages must go through MessageProvider**
+- **All player-facing messages must go through MessageProvider**
 - Follow SOLID principles and maintain type safety
-- Respect the existing auto-wiring system
+- Use the existing auto-wiring system
 
 ### Example Test Pattern
 ```swift
@@ -107,14 +108,12 @@ func testTakeItem() async throws {
 - [ ] Write tests for your changes
 - [ ] Run the full test suite: `swift test`
 - [ ] Update documentation as needed
-- [ ] Add yourself to contributors if this is your first PR
 
 ### PR Description
 Include:
 - **What** you changed and **why**
 - **How** to test the changes
 - Any **breaking changes** or migration notes
-- Screenshots for UI changes (when we have them)
 
 ### Review Process
 - Maintainers will review PRs and provide feedback
@@ -124,17 +123,19 @@ Include:
 
 ## Specific Areas Needing Help
 
-- **More example games** - Demonstrate different genres and mechanics
-- **NPC dialogue system** - Basic but could be much better
-- **Combat system refinement** - The melee combat needs work
+- **More example games** - Demonstrate different genres and mechanics, find bugs and missing features
+- **NPC dialogue system** - Very basic currently, could be much better
+- **Combat system refinement** - The melee combat needs refinement
 - **Platform development testing** - Especially Linux and Windows edge cases
 - **Web deployment** - WebAssembly integration
 - **Mobile runtime** - iOS/Android UI wrappers
-- **Documentation expansion** - Tutorials, best practices, API reference
+- **Desktop runtime** - Mac, Linux and Windows dedicated UI wrappers
+- **Documentation expansion** - Tutorials, best practices, articles
 
 ### Future Focus
 - **Visual debugging tools** - Game state inspector
-- **Multimedia support** - Graphics and sound architecture
+- **Multimedia support** - Graphics and sound architecture?
+- **Visual editor** - Game creation tool
 
 ## Questions?
 

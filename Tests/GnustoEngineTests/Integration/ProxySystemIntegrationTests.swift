@@ -185,7 +185,7 @@ struct ProxySystemIntegrationTests {
             .name("Dark Vault")
             .description("A pitch black vault.")
             .north("laboratory")
-            // No inherent lighting
+        // No inherent lighting
 
         let mysteriousBox = Item("mysteriousBox")
             .name("mysterious box")

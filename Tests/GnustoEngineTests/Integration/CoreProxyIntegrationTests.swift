@@ -193,7 +193,8 @@ struct CoreProxyIntegrationTests {
         #expect(inventory.contains { $0.id == ItemID("coin") })
         #expect(inventory.contains { $0.id == ItemID("key") })
 
-        await mockIO.expectOutput("""
+        await mockIO.expectOutput(
+            """
             > take coin
             Taken.
 
@@ -204,7 +205,8 @@ struct CoreProxyIntegrationTests {
             You are carrying:
             - A gold coin
             - A silver key
-            """)
+            """
+        )
     }
 
     // MARK: - Proxy Consistency Tests
@@ -287,7 +289,8 @@ struct CoreProxyIntegrationTests {
         let boxContents = await boxProxy.contents
         #expect(boxContents.isEmpty)  // Gem was taken out
 
-        await mockIO.expectOutput("""
+        await mockIO.expectOutput(
+            """
             > look in box
             In the wooden box you can see a ruby gem.
 
@@ -296,7 +299,8 @@ struct CoreProxyIntegrationTests {
 
             > take box
             Got it.
-            """)
+            """
+        )
     }
 
     // MARK: - State Change Validation Tests

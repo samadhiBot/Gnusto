@@ -62,7 +62,7 @@ CloakOfDarkness/
 
 ### Defining Static Content
 
-Your static definitions describe the initial state of the world--how things are when the adventure begins. For example, inside the Opera House in _Cloak of Darkness_, there is a cloakroom, and in that cloakroom there is a small brass hook screwed to the wall:
+Your static definitions describe the initial state of the world -- how things are when the adventure begins. For example, inside the Opera House in _Cloak of Darkness_, there is a cloakroom, and in that cloakroom there is a small brass hook screwed to the wall:
 
 ```swift
 struct OperaHouse {
@@ -74,8 +74,8 @@ struct OperaHouse {
             The walls of this small room were clearly once lined with hooks,
             though now only one remains. The exit is a door to the east.
             """
-        ),
-        .exits(.east(.foyer)),
+        )
+        .east(.foyer)
         .inherentlyLit
 
     let hook = Item(.hook)
@@ -85,7 +85,6 @@ struct OperaHouse {
         .isSurface
         .name("small brass hook")
         .synonyms("peg")
-    )
     // ...
 }
 ```
@@ -94,7 +93,7 @@ These definitions are just the starting point. Once the game begins, everything 
 
 ## The Living World: Dynamic Proxies
 
-During gameplay, you never work with static ``Item`` or ``Location`` objects directly. Instead, the engine provides **proxy objects**--``ItemProxy``, ``LocationProxy``, and ``PlayerProxy``--that represent the current, evolving state of your world.
+During gameplay, you never work with static ``Item`` or ``Location`` objects directly. Instead, the engine provides **proxy objects** -- ``ItemProxy``, ``LocationProxy``, and ``PlayerProxy`` -- that represent the current, evolving state of your world.
 
 ### Why Proxies?
 
@@ -236,7 +235,7 @@ let kitchenComputer = LocationComputer(for: .kitchen) {
 }
 ```
 
-The proxy system seamlessly integrates computed properties--when you access `kitchen.description`, the proxy checks for a computed property first, and falls back to the static definition if none exists.
+The proxy system seamlessly integrates computed properties -- when you access `kitchen.description`, the proxy checks for a computed property first, and falls back to the static definition if none exists.
 
 ## Time-Based Behaviors: Daemons
 
@@ -293,7 +292,7 @@ The power of Gnusto's architecture becomes clear when these pieces work together
 5. **Property computers** make descriptions and states contextual
 6. **Daemons and Fuses** create autonomous, time-based effects
 
-This separation keeps your code organized, maintainable, and powerful--letting you focus on crafting compelling interactive fiction rather than wrestling with infrastructure.
+This separation keeps your code organized, maintainable, and powerful -- letting you focus on crafting compelling interactive fiction rather than wrestling with infrastructure.
 
 ## Next Steps
 

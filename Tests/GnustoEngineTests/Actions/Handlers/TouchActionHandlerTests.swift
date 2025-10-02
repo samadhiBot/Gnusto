@@ -29,7 +29,7 @@ struct TouchActionHandlerTests {
         await mockIO.expectOutput(
             """
             > touch vase
-            The ceramic vase feels exactly as it looks--solidly real and
+            The ceramic vase feels exactly as it looks -- solidly real and
             utterly ordinary.
             """
         )
@@ -146,7 +146,7 @@ struct TouchActionHandlerTests {
         await mockIO.expectOutput(
             """
             > touch table
-            The wooden table feels exactly as it looks--solidly real and
+            The wooden table feels exactly as it looks -- solidly real and
             utterly ordinary.
             """
         )
@@ -178,7 +178,7 @@ struct TouchActionHandlerTests {
         await mockIO.expectOutput(
             """
             > touch coin
-            The gold coin feels exactly as it looks--solidly real and
+            The gold coin feels exactly as it looks -- solidly real and
             utterly ordinary.
             """
         )
@@ -217,7 +217,7 @@ struct TouchActionHandlerTests {
         await mockIO.expectOutput(
             """
             > touch gem
-            The sparkling gem feels exactly as it looks--solidly real and
+            The sparkling gem feels exactly as it looks -- solidly real and
             utterly ordinary.
             """
         )
@@ -284,7 +284,7 @@ struct TouchActionHandlerTests {
         await mockIO.expectOutput(
             """
             > touch wall
-            The stone wall feels exactly as it looks--solidly real and
+            The stone wall feels exactly as it looks -- solidly real and
             utterly ordinary.
 
             > feel door
@@ -322,7 +322,7 @@ struct TouchActionHandlerTests {
         await mockIO.expectOutput(
             """
             > touch orb
-            The glowing orb feels exactly as it looks--solidly real and
+            The glowing orb feels exactly as it looks -- solidly real and
             utterly ordinary.
             """
         )

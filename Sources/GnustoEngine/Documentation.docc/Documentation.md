@@ -6,13 +6,11 @@
 
 ### Welcome to the Gnusto Interactive Fiction Engine!
 
-Gnusto is a flexible and powerful framework for writing interactive fiction games. Drawing inspiration from the Infocom classics of the 1980s, it provides a modern toolkit that makes building rich, dynamic text adventures easy and enjoyable—allowing you to focus on storytelling and world-building rather than engine mechanics.
+Gnusto is a flexible and powerful framework for writing interactive fiction games. Drawing inspiration from the Infocom classics of the 1980s, it provides a modern toolkit that makes building rich, dynamic text adventures easy and enjoyable--allowing you to focus on storytelling and world-building rather than engine mechanics.
 
 Gnusto is written in cross-platform Swift, allowing you to deploy your games on Mac, Linux, Windows, iOS and Android. The framework emphasizes ergonomics and developer experience, providing type safety without boilerplate code. Built with extensibility in mind, you can customize and extend Gnusto to fit your creative vision.
 
 At its core, Gnusto uses a state change pipeline that ensures safe state management, eliminating many of the bugs that can plague interactive fiction engines. Whether you're creating your first text adventure or building a complex, multi-layered world, Gnusto provides the foundation you need while staying out of your way.
-
-<script src="https://asciinema.org/a/743893.js" id="asciicast-743893" async="true"></script>
 
 ## Building Your First Game
 
@@ -20,7 +18,7 @@ Creating a game with Gnusto begins with two main concepts: ``Location`` and ``It
 
 ### Location: Places in Your World
 
-A ``Location`` represents any place the player can visit—a room, forest clearing, or spaceship bridge. Here's a simple example:
+A ``Location`` represents any place the player can visit -- a room, forest clearing, or spaceship bridge. Here's a simple example:
 
 ```swift
 let westOfHouse = Location(.westOfHouse)
@@ -28,18 +26,15 @@ let westOfHouse = Location(.westOfHouse)
     .description(
         "You are standing in an open field west of a white house, with a boarded front door."
     ),
-    .exits(
-        .north(.northOfHouse),
-        .south(.southOfHouse),
-        .east("The door is boarded and you can't remove the boards.")
-    ),
+    .north(.northOfHouse)
+    .south(.southOfHouse)
+    .east(blocked: "The door is boarded and you can't remove the boards.")
     .inherentlyLit
-)
 ```
 
 ### Item: Objects and Characters
 
-An ``Item`` can be anything the player interacts with—objects, characters, even abstract concepts:
+An ``Item`` can be anything the player interacts with -- objects, characters, even abstract concepts:
 
 ```swift
 let cloak = Item(.cloak)
@@ -50,13 +45,12 @@ let cloak = Item(.cloak)
         spattered with raindrops. Its blackness is so deep that it
         almost seems to suck light from the room.
         """
-    ),
+    )
     .adjectives("handsome", "dark", "black", "velvet", "satin")
     .in(.player)
     .isTakable
-    .isWearable,
-    .isWorn,
-)
+    .isWearable
+    .isWorn
 ```
 
 ## Key Features
@@ -71,11 +65,34 @@ let cloak = Item(.cloak)
 
 ## Getting Started
 
+### Automatic
+
+<script src="https://asciinema.org/a/746127.js" id="asciicast-746127" async="true"></script>
+
+The easiest way to get started is by running Gnusto's [bootstrap](https://github.com/samadhiBot/Gnusto/blob/main/Scripts/bootstrap) script. It sets up a new game scaffold that you can run and test on your own machine.
+
+If you have Swift 6.2+ installed on your machine, you can get up and running and start working on a new game in less than a minute.
+
+If you're using Linux or Windows and don't have Swift 6.2+ installed, follow the instructions at [swift.org/install](https://www.swift.org/install/linux/), then follow the steps below:
+
+```bash
+# Run the script from Github:
+bash <(curl -sSL https://raw.githubusercontent.com/samadhiBot/Gnusto/blob/main/Scripts/bootstrap)
+
+# Or, clone the repo and run the script locally:
+git clone https://github.com/samadhiBot/Gnusto.git
+./Gnusto/Scripts/bootstrap
+```
+
+### Manual
+
+If you'd rather put things together manually, setting up Gnusto is still easy. Follow these steps to get started:
+
 1. **Add Gnusto to your project** and include the `GnustoAutoWiringPlugin`
     ```swift
     // Package.swift
     dependencies: [
-        .package(url: "https://github.com/samadhiBot/Gnusto", from: "0.1.0"),
+        .package(url: "https://github.com/samadhiBot/Gnusto", from: "0.2.0"),
     ],
     targets: [
         .executableTarget(
@@ -110,7 +127,7 @@ let cloak = Item(.cloak)
                 though now only one remains. The exit is a door to the east.
                 """
             ),
-            .exits(.east(.foyer)),
+            .east(.foyer)
             .inherentlyLit
 
         let hook = Item(.hook)
@@ -120,7 +137,6 @@ let cloak = Item(.cloak)
             .isSurface
             .name("small brass hook")
             .synonyms("peg")
-        )
     }
     ```
 4. **Add dynamic behavior** using ``ItemEventHandler`` and ``LocationEventHandler``, ``Daemon`` and ``Fuse``
@@ -171,7 +187,6 @@ let cloak = Item(.cloak)
     await engine.run()
     ```
 
-
 ## Learning by Example
 
 The easiest way to understand Gnusto is by looking at working examples:
@@ -185,6 +200,8 @@ The easiest way to understand Gnusto is by looking at working examples:
 Start with _Cloak of Darkness_ to see how a whole game fits together, then explore _Zork 1_ to study the more advanced patterns.
 
 ## How to Run the Example Games
+
+<script src="https://asciinema.org/a/743893.js" id="asciicast-743893" async="true"></script>
 
 To run the example games in a terminal, first clone the Gnusto repository and `cd` into the project folder, then `swift run` either `CloakOfDarkness` or `Zork1`.
 

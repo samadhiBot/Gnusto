@@ -735,7 +735,7 @@ struct GameEngineCombatTests {
             clumsy and predictable.
 
             > kill the bear
-            You're currently engaged with the dire wolf--focus!
+            You're currently engaged with the dire wolf -- focus!
 
             You strike the dire wolf with your steel sword, opening a wound
             that bleeds steadily. The wound is real but manageable.
@@ -750,7 +750,7 @@ struct GameEngineCombatTests {
             You attack with the longbow! The dire wolf dodges, more puzzled
             than threatened by your choice of weapon.
 
-            The dire wolf's answer is swift and punishing--knuckles meet
+            The dire wolf's answer is swift and punishing -- knuckles meet
             flesh with the sound of meat hitting stone. You absorb the hit,
             feeling flesh tear but knowing you can endure.
             """

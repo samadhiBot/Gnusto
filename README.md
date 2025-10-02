@@ -2,7 +2,7 @@
 
 # Gnusto: A Modern Interactive Fiction Engine
 
-Gnusto is a flexible and powerful framework for writing interactive fiction games. Drawing inspiration from the Infocom classics of the 1980s, it provides a modern toolkit that makes building rich, dynamic text adventures easy and enjoyable—allowing you to focus on storytelling and world-building rather than engine mechanics.
+Gnusto is a flexible and powerful framework for writing interactive fiction games. Drawing inspiration from the Infocom classics of the 1980s, it provides a modern toolkit that makes building rich, dynamic text adventures easy and enjoyable -- allowing you to focus on storytelling and world-building rather than engine mechanics.
 
 Gnusto is written in cross-platform Swift, allowing you to deploy your games on Mac, Linux, Windows, iOS and Android. The framework emphasizes ergonomics and developer experience, providing type safety without boilerplate code. Built with extensibility in mind, you can customize and extend Gnusto to fit your creative vision.
 
@@ -104,7 +104,7 @@ struct OperaHouse {  // Organize content into logical areas
 
 For a complete working example, see the [Cloak of Darkness](Executables/CloakOfDarkness/) implementation that demonstrates these concepts in a playable game.
 
-The `GnustoAutoWiringPlugin` automatically handles the tedious parts of game setup—it scans your code for game content patterns, generates ID constants, aggregates content from multiple files, and wires up event handlers. This lets you focus on creating your game world rather than managing boilerplate code to wire everything together.
+The `GnustoAutoWiringPlugin` automatically handles the tedious parts of game setup -- it scans your code for game content patterns, generates ID constants, aggregates content from multiple files, and wires up event handlers. This lets you focus on creating your game world rather than managing boilerplate code to wire everything together.
 
 ## Example Games
 

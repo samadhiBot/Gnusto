@@ -317,7 +317,7 @@ struct TellActionHandlerTests {
         let darkRoom = Location("darkRoom")
             .name("Dark Room")
             .description("A pitch black room.")
-            // Note: No .inherentlyLit property
+        // Note: No .inherentlyLit property
 
         let wizard = Item("wizard")
             .name("old wizard")
@@ -465,8 +465,9 @@ struct TellActionHandlerTests {
             The fierce orc dismisses your words about the steel sword with
             contemptuous silence.
 
-            No weapons between you--just the warrior's aggression and your
-            desperation! You collide in a tangle of strikes and blocks.
+            No weapons between you -- just the warrior's aggression and
+            your desperation! You collide in a tangle of strikes and
+            blocks.
 
             > tell the orc about my sword
             The subject of the steel sword cannot bridge the chasm between

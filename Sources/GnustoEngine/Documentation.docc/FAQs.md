@@ -4,9 +4,9 @@ Quick answers to common questions about the Gnusto Interactive Fiction Engine.
 
 ## What is Gnusto?
 
-**Gnusto is a modern, open-source interactive fiction engine written in Swift that provides a declarative approach to creating parser-based text adventures.**
+**Gnusto is a modern, open-source interactive fiction engine that provides a declarative approach to creating parser-based text adventures.**
 
-Rather than using a domain-specific language, Gnusto leverages Swift's type system and syntax to create a clean, intuitive DSL for defining game content. It emphasizes type safety, testability, and a structured state-change pipeline that prevents common IF programming bugs.
+You write games using an intuitive DSL (domain-specific language) that Gnusto provides—one that's easy to work with, especially with code completion, and doesn't require deep Swift knowledge to be productive. At the same time, because you're writing in Swift, and Gnusto is built as a Swift package, you have the full power and potential of a fast, safe, general-purpose language standing by whenever you need it. The engine emphasizes type safety, testability, and a structured state-change pipeline that prevents common IF programming bugs.
 
 - **Repository**: [github.com/samadhiBot/Gnusto](https://github.com/samadhiBot/Gnusto)
 - **Documentation**: <doc:GnustoEngine> and <doc:GameStructure>
@@ -181,7 +181,7 @@ let thief = Item(.thief)
         There is a suspicious-looking individual, holding a large bag,
         leaning against one wall. He is armed with a deadly stiletto.
         """
-    ),
+    )
     .characterSheet(
         CharacterSheet(
             strength: 14,
@@ -198,7 +198,6 @@ let thief = Item(.thief)
             alignment: .neutralEvil
         )
     )
-)
 ```
 
 The NPC system is functional but basic. At this stage, complex dialogue trees or sophisticated AI behaviors would need custom implementation.

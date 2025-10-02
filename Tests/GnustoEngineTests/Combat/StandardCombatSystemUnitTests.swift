@@ -59,7 +59,7 @@ struct StandardCombatSystemUnitTests {
             that shows immediately. The blow lands solidly, drawing blood. He
             feels the sting but remains strong.
 
-            The angry beast hammers back instantly--the blow lands solid,
+            The angry beast hammers back instantly -- the blow lands solid,
             driving air from lungs and thought from mind. The blow lands solidly, drawing blood. You feel the sting but remain strong.
             """
         )
@@ -83,7 +83,7 @@ struct StandardCombatSystemUnitTests {
             that shows immediately. The blow lands solidly, drawing blood. He
             feels the sting but remains strong.
 
-            The angry beast hammers back instantly--the blow lands solid,
+            The angry beast hammers back instantly -- the blow lands solid,
             driving air from lungs and thought from mind. The blow lands solidly, drawing blood. You feel the sting but remain strong.
             """
         )
@@ -440,7 +440,7 @@ struct StandardCombatSystemUnitTests {
                 * * *
 
                 Your eyes crack open to an empty scene. How long were you out? Hours? Minutes?
-                The monster is nowhere to be seen--perhaps called away by urgent matters. Whatever
+                The monster is nowhere to be seen -- perhaps called away by urgent matters. Whatever
                 the reason, this reprieve won't last. Move now or die here.
                 """,
             changes: [
@@ -455,7 +455,7 @@ struct StandardCombatSystemUnitTests {
                     message: """
                         The worst possible timing: the creature comes back to find you still present,
                         apparently fascinated by your surroundings rather than your survival.
-                        He doesn't hesitate--violence resumes immediately.
+                        He doesn't hesitate -- violence resumes immediately.
                         You had your chance to leave.
                         """,
                     turns: 2

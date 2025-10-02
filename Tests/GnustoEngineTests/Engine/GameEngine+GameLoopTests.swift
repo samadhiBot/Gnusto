@@ -211,7 +211,7 @@ struct GameEngineGameLoopTests {
     func testRunWithRestart() async throws {
         let testItem = Item("testItem")
             .name("test item")
-                .isTakable
+            .isTakable
             .in(.startRoom)
 
         let game = MinimalGame(items: testItem)
@@ -356,7 +356,7 @@ struct GameEngineGameLoopTests {
         let testItem = Item("coin")
             .name("gold coin")
             .description("A shiny gold coin.")
-                .isTakable
+            .isTakable
             .in(.startRoom)
 
         let game = MinimalGame(items: testItem)
@@ -418,7 +418,7 @@ struct GameEngineGameLoopTests {
     func testGameLoopStateConsistency() async throws {
         let testItem = Item("testItem")
             .name("test item")
-                .isTakable
+            .isTakable
             .in(.startRoom)
 
         let game = MinimalGame(items: testItem)

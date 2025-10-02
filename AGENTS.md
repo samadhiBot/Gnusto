@@ -148,13 +148,6 @@ Diff legend:
   - lines are actual output from the game engine
   + lines are the output expected by the test
 
-You are blind to the difference between the following two lines. The first uses a curly apostrophe, and the second uses a straight apostrophe. If there is a failing test with an apostrophe or quote, and you cannot see the difference, leave the test for me and I will fix it.
-
-```diff
-− This item cannot be taken - it’s cursed!
-+ This item cannot be taken - it's cursed!
-```
-
 ## Development Guidelines
 
 ### Code Organization
@@ -172,9 +165,9 @@ You are blind to the difference between the following two lines. The first uses 
 - Use modern Swift optional binding: `if let character, let topic` instead of `if let character = character, let topic = topic`
 
 ### Localization and Messaging
-- **ALL player-facing text MUST go through `MessageProvider`** (Core/MessageProvider.swift)
-- Never use hardcoded strings like `"You don't see any \(noun) here."`
-- Always use `engine.messenger.itemNotInScope(noun)` instead
+- **ALL player-facing text MUST go through `StandardMessenger`** (Messengers/StandardMessenger.swift)
+- Never use hardcoded strings like `"You don't see any \(noun) here."` in engine code
+- Always use `context.msg.itemNotInScope(noun)` instead
 - This enables easy localization and customization for downstream game developers
 - Action handlers should use `context.msg` for all player messages
 
@@ -225,9 +218,8 @@ let lamp = Item("lamp")
     .description("A shiny brass lamp.")
     .isTakable
     .isLightSource
-    .isDevice,  // Required for TurnOnActionHandler!
+    .isDevice
     .in(.startRoom)
-)
 
 // Basic takeable item
 let gem = Item("gem")
@@ -235,15 +227,13 @@ let gem = Item("gem")
     .description("A beautiful gem.")
     .isTakable
     .in(.startRoom)
-)
 
 // Fixed scenery item
 let statue = Item("statue")
     .name("stone statue")
     .description("A heavy statue.")
-    // No .isTakable - makes it untakeable
     .in(.startRoom)
-)
+    // No .isTakable - makes it un-takeable
 ```
 
 ### Location Setup
@@ -253,7 +243,6 @@ let room = Location(.startRoom)
     .name("Test Room")
     .description("A laboratory in which strange experiments are being conducted.")
     .inherentlyLit  // Most tests need this
-)
 
 // Dark room (for darkness mechanics)
 let darkRoom = Location("darkRoom")
@@ -282,8 +271,6 @@ let isVerboseMode = await engine.hasFlag(.isVerboseMode)
 
 ## Important Notes
 
-- This is currently on the `proxy` branch - a major architectural refactor
-- Many integration tests are temporarily excluded during the proxy migration
 - The project includes extensive historical IF references in `References/` for authenticity
 - Focus on player-facing experience that honors classic IF traditions
 - All state mutations MUST flow through the StateChange pipeline

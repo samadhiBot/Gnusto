@@ -174,11 +174,11 @@ struct StandardCombatSystemIntegrationTests {
             lands but doesn't slow you. Not yet.
 
             > attack the guard
-            A disastrous miss--your variable sword cuts through empty air
+            A disastrous miss -- your variable sword cuts through empty air
             and the brute effortlessly evades your mistimed attack.
 
             The brute surges back instantly, fist cracking against your
-            ribs--more warning than wound. The wound is light but
+            ribs -- more warning than wound. The wound is light but
             unwelcome, your body protesting the accumulation.
 
             > attack the guard
@@ -249,8 +249,8 @@ struct StandardCombatSystemIntegrationTests {
             flowing around the violence like water around stone.
 
             > attack enemy
-            Your armed advantage proves decisive--your sharp sword ends it!
-            The test enemy crumples, having fought barehanded and lost.
+            Your armed advantage proves decisive -- your sharp sword ends
+            it! The test enemy crumples, having fought barehanded and lost.
 
             > attack enemy
             Your sharp sword cuts through air toward the test enemy who has
@@ -283,7 +283,7 @@ struct StandardCombatSystemIntegrationTests {
             the test enemy meets you barehanded, flesh against steel in the
             oldest gamble.
 
-            You're too late--the test enemy is already deceased.
+            You're too late -- the test enemy is already deceased.
 
             > attack enemy
             You press forward with your sharp sword leading the way toward
@@ -582,14 +582,14 @@ struct StandardCombatSystemIntegrationTests {
             who has no steel to answer yours, only the speed of
             desperation.
 
-            You're too late--the skilled enemy is already deceased.
+            You're too late -- the skilled enemy is already deceased.
 
             > attack enemy
             You drive forward with your masterwork sword seeking its
             purpose as the skilled enemy meets you barehanded, flesh
             against steel in the oldest gamble.
 
-            You're too late--the skilled enemy is already deceased.
+            You're too late -- the skilled enemy is already deceased.
 
             > attack enemy
             You press forward with your masterwork sword leading the way
@@ -843,7 +843,7 @@ struct StandardCombatSystemIntegrationTests {
             Fighting the armored knight bare-handed seems inadvisable. Find
             a proper weapon first.
 
-            No weapons between you--just the armored knight's aggression
+            No weapons between you -- just the armored knight's aggression
             and your desperation! You collide in a tangle of strikes and
             blocks.
             """
@@ -896,7 +896,7 @@ struct StandardCombatSystemIntegrationTests {
             Got it.
 
             The fierce warrior surges back instantly, fist cracking against
-            your ribs--more warning than wound. The wound is trivial
+            your ribs -- more warning than wound. The wound is trivial
             against your battle fury.
             """
         )

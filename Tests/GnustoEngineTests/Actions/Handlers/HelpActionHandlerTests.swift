@@ -32,7 +32,7 @@ struct HelpActionHandlerTests {
         You can use multiple objects with some commands (TAKE ALL, DROP
         SWORD AND SHIELD).
 
-        Try different things--experimentation is part of the fun!
+        Try different things -- experimentation is part of the fun!
         """
 
     @Test("HELP syntax works")
@@ -56,7 +56,7 @@ struct HelpActionHandlerTests {
         let darkRoom = Location("darkRoom")
             .name("Dark Room")
             .description("A pitch black room.")
-            // Note: No .inherentlyLit property
+        // Note: No .inherentlyLit property
 
         let game = MinimalGame(
             player: Player(in: "darkRoom"),

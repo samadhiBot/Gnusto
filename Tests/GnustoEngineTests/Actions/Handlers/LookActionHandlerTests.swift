@@ -303,7 +303,7 @@ struct LookActionHandlerTests {
         let darkRoom = Location("darkRoom")
             .name("Dark Room")
             .description("A pitch black room.")
-            // Note: No .inherentlyLit property
+        // Note: No .inherentlyLit property
 
         let game = MinimalGame(
             player: Player(in: "darkRoom"),
@@ -554,7 +554,7 @@ struct LookActionHandlerTests {
         let darkRoom = Location("darkRoom")
             .name("Dark Room")
             .description("A room that needs artificial light.")
-            // Note: No .inherentlyLit property
+        // Note: No .inherentlyLit property
 
         let lamp = Item("lamp")
             .name("brass lamp")
@@ -592,7 +592,7 @@ struct LookActionHandlerTests {
         let darkRoom = Location("darkRoom")
             .name("Dark Room")
             .description("A room illuminated by artificial light.")
-            // Note: No .inherentlyLit property
+        // Note: No .inherentlyLit property
 
         let torch = Item("torch")
             .name("burning torch")

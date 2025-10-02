@@ -190,7 +190,7 @@ struct GameEnginePronounTests {
             """
             > examine copper coin and silver coin
             - Copper coin: The copper coin reveals itself to be exactly
-              what it appears--nothing more, nothing less.
+              what it appears -- nothing more, nothing less.
             - Silver coin: The silver coin stubbornly remains ordinary
               despite your thorough examination.
 
@@ -300,8 +300,8 @@ struct GameEnginePronounTests {
         await mockIO.expectOutput(
             """
             > examine lamp
-            The lamp reveals itself to be exactly what it appears--nothing
-            more, nothing less.
+            The lamp reveals itself to be exactly what it appears --
+            nothing more, nothing less.
 
             > examine copper coin and silver coin
             - Copper coin: The copper coin stubbornly remains ordinary
@@ -352,8 +352,8 @@ struct GameEnginePronounTests {
         await mockIO.expectOutput(
             """
             > examine test item
-            The test item reveals itself to be exactly what it
-            appears--nothing more, nothing less.
+            The test item reveals itself to be exactly what it appears --
+            nothing more, nothing less.
 
             > look
             --- Laboratory ---
@@ -711,8 +711,8 @@ struct GameEnginePronounTests {
             Which do you mean: the blue book or the red book?
 
             > the red book
-            The red book reveals itself to be exactly what it
-            appears--nothing more, nothing less.
+            The red book reveals itself to be exactly what it appears --
+            nothing more, nothing less.
 
             > take it
             Got it.

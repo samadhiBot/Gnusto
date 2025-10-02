@@ -18,10 +18,12 @@ import Foundation
 ///
 /// // Execute commands and verify output
 /// try await engine.execute("take lamp")
-/// await mockIO.expectOutput("""
-///    > take lamp
-///    Taken.
-///    """)
+/// await mockIO.expectOutput(
+///     """
+///     > take lamp
+///     Taken.
+///     """
+/// )
 /// ```
 ///
 /// ## Advanced Input Simulation
@@ -316,10 +318,12 @@ extension MockIOHandler {
     /// ## Usage
     /// ```swift
     /// try await engine.execute("take lamp")
-    /// try await mockIO.expectOutput("""
+    /// try await mockIO.expectOutput(
+    ///     """
     ///     > take lamp
     ///     Taken.
-    ///     """)
+    ///     """
+    /// )
     /// ```
     ///
     /// - Parameters:

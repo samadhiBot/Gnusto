@@ -219,7 +219,7 @@ struct TasteActionHandlerTests {
             Tasting the furious necromancer ranks among history's worst
             battle strategies.
 
-            No weapons between you--just the furious necromancer's
+            No weapons between you -- just the furious necromancer's
             aggression and your desperation! You collide in a tangle of
             strikes and blocks.
 
