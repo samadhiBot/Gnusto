@@ -13,7 +13,7 @@ struct ItemProxyMovementTests {
             .inherentlyLit
             .north("library")  // Normal open exit
             .south("kitchen", via: "kitchenDoor")  // Exit with door
-            .east("The wall is too thick")  // Permanently blocked
+            .east(blocked: "The wall is too thick")  // Permanently blocked
             .west("garden")  // Another normal exit
 
         let library = Location("library")
@@ -50,12 +50,14 @@ struct ItemProxyMovementTests {
         let availableExits = await guardProxy.availableExits(behavior: .any)
 
         // Then: All exits should be available regardless of doors or blocked messages
-        expectNoDifference(availableExits, [
-            .north("library"),
-            .east("The wall is too thick"),
-            .south("kitchen", via: "kitchenDoor"),
-            .west("garden"),
-        ])
+        expectNoDifference(
+            availableExits,
+            [
+                .north("library"),
+                .east(blocked: "The wall is too thick"),
+                .south("kitchen", via: "kitchenDoor"),
+                .west("garden"),
+            ])
     }
 
     @Test("availableExits filters properly for .normal movement behavior")
@@ -67,7 +69,7 @@ struct ItemProxyMovementTests {
             .north("library")  // Normal open exit
             .south("kitchen", via: "kitchenDoor")  // Closed door
             .east("study", via: "studyDoor")  // Open door
-            .west("The wall blocks your way")  // Blocked exit
+            .west(blocked: "The wall blocks your way")  // Blocked exit
 
         let library = Location("library")
             .name("Library")
@@ -107,10 +109,12 @@ struct ItemProxyMovementTests {
         let availableExits = await merchantProxy.availableExits(behavior: .normal)
 
         // Then: Only open exits and open doors should be available
-        expectNoDifference(availableExits, [
-            .north("library"),
-            .east("study", via: "studyDoor"),
-        ])
+        expectNoDifference(
+            availableExits,
+            [
+                .north("library"),
+                .east("study", via: "studyDoor"),
+            ])
     }
 
     @Test("availableExits handles .closedDoors movement behavior")
@@ -134,7 +138,6 @@ struct ItemProxyMovementTests {
         let hall3 = Location("hall3")
             .name("Hall 3")
             .inherentlyLit
-
 
         let door1 = Item("door1")
             .name("door 1")
@@ -167,10 +170,12 @@ struct ItemProxyMovementTests {
         let availableExits = await thiefProxy.availableExits(behavior: .closedDoors)
 
         // Then: Should be able to pass through open doors and closed unlocked doors
-        expectNoDifference(availableExits, [
-            .north("hall1", via: "door1"),
-            .east("hall3", via: "door3"),
-        ])
+        expectNoDifference(
+            availableExits,
+            [
+                .north("hall1", via: "door1"),
+                .east("hall3", via: "door3"),
+            ])
     }
 
     @Test("availableExits handles .lockedDoorsUnlockedByKeys movement behavior")
@@ -221,9 +226,11 @@ struct ItemProxyMovementTests {
         )
 
         // Then: Should only be able to pass through vault door
-        expectNoDifference(availableExitsWithVaultKey, [
-            .north("vault", via: "vaultDoor"),
-        ])
+        expectNoDifference(
+            availableExitsWithVaultKey,
+            [
+                .north("vault", via: "vaultDoor")
+            ])
 
         // When: Getting available exits with both keys
         let availableExitsWithBothKeys = await burglarProxy.availableExits(
@@ -231,10 +238,12 @@ struct ItemProxyMovementTests {
         )
 
         // Then: Should be able to pass through all doors
-        expectNoDifference(availableExitsWithBothKeys, [
-            .north("vault", via: "vaultDoor"),
-            .south("safe", via: "safeDoor"),
-        ])
+        expectNoDifference(
+            availableExitsWithBothKeys,
+            [
+                .north("vault", via: "vaultDoor"),
+                .south("safe", via: "safeDoor"),
+            ])
     }
 
     @Test("availableExits returns empty array for NPC with no location")
@@ -270,7 +279,7 @@ struct ItemProxyMovementTests {
         let trap = Location("trap")
             .name("Trap Room")
             .inherentlyLit
-            // No exits defined
+        // No exits defined
 
         let npc = Item("prisoner")
             .name("prisoner")

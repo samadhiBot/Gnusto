@@ -32,7 +32,7 @@ enum InsideHouse {
             """
         )
         .east(.kitchen)
-        .west("The door is nailed shut.")
+        .west(blocked: "The door is nailed shut.")
         .down(.cellar, via: .trapDoor)
         .inherentlyLit
         .localGlobals(.stairs)
@@ -366,13 +366,13 @@ extension InsideHouse {
             let isOn = await context.item.hasFlag(.isOn)
 
             let statusMessage =
-            if isBurnedOut {
-                "has burned out."
-            } else if isOn {
-                "is on."
-            } else {
-                "is turned off."
-            }
+                if isBurnedOut {
+                    "has burned out."
+                } else if isOn {
+                    "is on."
+                } else {
+                    "is turned off."
+                }
 
             return ActionResult("The lamp \(statusMessage)")
         }

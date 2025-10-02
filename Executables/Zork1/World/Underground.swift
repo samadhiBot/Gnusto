@@ -38,7 +38,7 @@ enum Underground {
         )
         .north(.cellar)
         .east(.gallery)
-        .down("The chasm probably leads straight to the infernal regions.")
+        .down(blocked: "The chasm probably leads straight to the infernal regions.")
 
     /*
      <ROUTINE CHASM-PSEUDO ()

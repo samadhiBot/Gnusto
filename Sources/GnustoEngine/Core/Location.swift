@@ -412,7 +412,7 @@ extension Location {
     /// Creates a permanently blocked exit leading north.
     /// - Parameter blocked: The custom message to display when the player attempts this exit.
     /// - Returns: A blocked `Exit` configured for northward movement.
-    public func north(_ blocked: String) -> Location {
+    public func north(blocked: String) -> Location {
         assigning(
             direction: .north,
             blockedMessage: blocked
@@ -422,7 +422,7 @@ extension Location {
     /// Creates a permanently blocked exit leading south.
     /// - Parameter blocked: The custom message to display when the player attempts this exit.
     /// - Returns: A blocked `Exit` configured for southward movement.
-    public func south(_ blocked: String) -> Location {
+    public func south(blocked: String) -> Location {
         assigning(
             direction: .south,
             blockedMessage: blocked
@@ -432,7 +432,7 @@ extension Location {
     /// Creates a permanently blocked exit leading east.
     /// - Parameter blocked: The custom message to display when the player attempts this exit.
     /// - Returns: A blocked `Exit` configured for eastward movement.
-    public func east(_ blocked: String) -> Location {
+    public func east(blocked: String) -> Location {
         assigning(
             direction: .east,
             blockedMessage: blocked
@@ -442,7 +442,7 @@ extension Location {
     /// Creates a permanently blocked exit leading west.
     /// - Parameter blocked: The custom message to display when the player attempts this exit.
     /// - Returns: A blocked `Exit` configured for westward movement.
-    public func west(_ blocked: String) -> Location {
+    public func west(blocked: String) -> Location {
         assigning(
             direction: .west,
             blockedMessage: blocked
@@ -452,7 +452,7 @@ extension Location {
     /// Creates a permanently blocked exit leading up.
     /// - Parameter blocked: The custom message to display when the player attempts this exit.
     /// - Returns: A blocked `Exit` configured for upward movement.
-    public func up(_ blocked: String) -> Location {
+    public func up(blocked: String) -> Location {
         assigning(
             direction: .up,
             blockedMessage: blocked
@@ -462,7 +462,7 @@ extension Location {
     /// Creates a permanently blocked exit leading down.
     /// - Parameter blocked: The custom message to display when the player attempts this exit.
     /// - Returns: A blocked `Exit` configured for downward movement.
-    public func down(_ blocked: String) -> Location {
+    public func down(blocked: String) -> Location {
         assigning(
             direction: .down,
             blockedMessage: blocked
@@ -472,7 +472,7 @@ extension Location {
     /// Creates a permanently blocked exit leading inside.
     /// - Parameter blocked: The custom message to display when the player attempts this exit.
     /// - Returns: A blocked `Exit` configured for movement inside.
-    public func inside(_ blocked: String) -> Location {
+    public func inside(blocked: String) -> Location {
         assigning(
             direction: .inside,
             blockedMessage: blocked
@@ -482,7 +482,7 @@ extension Location {
     /// Creates a permanently blocked exit leading outside.
     /// - Parameter blocked: The custom message to display when the player attempts this exit.
     /// - Returns: A blocked `Exit` configured for movement outside.
-    public func outside(_ blocked: String) -> Location {
+    public func outside(blocked: String) -> Location {
         assigning(
             direction: .outside,
             blockedMessage: blocked

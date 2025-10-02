@@ -32,7 +32,7 @@ enum Forest {
         .north(.northClearing)
         .east(.forestPath)
         .south(.forest3)
-    // Note: UP and WEST exits have custom messages
+        // Note: UP and WEST exits have custom messages
         .inherentlyLit
         .localGlobals(.songbird, .whiteHouse, .forest)
 
@@ -46,7 +46,7 @@ enum Forest {
         .east(.mountains)
         .south(.eastClearing)
         .west(.forestPath)
-    // Note: UP and NORTH exits have custom messages
+        // Note: UP and NORTH exits have custom messages
         .inherentlyLit
         .localGlobals(.songbird, .whiteHouse, .forest)
 
@@ -60,7 +60,7 @@ enum Forest {
         .north(.eastClearing)
         .west(.forest1)
         .northwest(.southOfHouse)
-    // Note: UP, EAST, and SOUTH exits have custom messages
+        // Note: UP, EAST, and SOUTH exits have custom messages
         .inherentlyLit
         .localGlobals(.songbird, .whiteHouse, .forest)
 
@@ -86,18 +86,18 @@ enum Forest {
         .east(.forest2)
         .west(.forest1)
         .south(.forestPath)
-        .north("The forest becomes impenetrable to the north.")
-    // Note: DOWN exit has special condition handling via GRATING-EXIT
+        .north(blocked: "The forest becomes impenetrable to the north.")
+        // Note: DOWN exit has special condition handling via GRATING-EXIT
         .inherentlyLit
         .localGlobals(.whiteHouse, .forest, .grate)
 
     static let mountains = Location(.mountains)
         .name("Forest")
         .description("The forest thins out, revealing impassable mountains.")
-        .east("The mountains are impassable.")
+        .east(blocked: "The mountains are impassable.")
         .north(.forest2)
         .south(.forest2)
-        .up("The mountains are impassable.")
+        .up(blocked: "The mountains are impassable.")
         .west(.forest2)
         .inherentlyLit
         .localGlobals(.whiteHouse)
@@ -111,7 +111,7 @@ enum Forest {
             """
         )
         .down(.forestPath)
-    // Note: UP exit has custom message
+        // Note: UP exit has custom message
         .inherentlyLit
         .localGlobals(.forest, .songbird, .whiteHouse)
 
@@ -204,7 +204,7 @@ extension Forest {
                 """
                 You are in a clearing, with a forest surrounding you on all sides.
                 A path leads south.
-                """,
+                """
             ]
             if await !grate.hasFlag(.isInvisible) {
                 if await grate.isOpen {
@@ -245,11 +245,11 @@ extension Forest {
             let leaves = await context.item(.pileOfLeaves)
 
             let message =
-            if isGrateInvisible {
-                "In disturbing the pile of leaves, a grating is revealed."
-            } else {
-                "Done."
-            }
+                if isGrateInvisible {
+                    "In disturbing the pile of leaves, a grating is revealed."
+                } else {
+                    "Done."
+                }
 
             return await ActionResult(
                 message,
@@ -296,8 +296,8 @@ extension Forest {
 
         before(.open) { context, command in
             if let indirectObject = command.indirectObject,
-               case .item(let keys) = indirectObject,
-               keys.id == .keys
+                case .item(let keys) = indirectObject,
+                keys.id == .keys
             {
                 // OPEN GRATE WITH KEYS -> handle as unlock
                 let currentLocation = await context.player.location
@@ -326,11 +326,11 @@ extension Forest {
                 let isOpen = await context.item(.grate).hasFlag(.isOpen)
                 if !isOpen {
                     let message =
-                    if currentLocation.id == .northClearing {
-                        "The grating opens."
-                    } else {
-                        "The grating opens to reveal trees above you."
-                    }
+                        if currentLocation.id == .northClearing {
+                            "The grating opens."
+                        } else {
+                            "The grating opens to reveal trees above you."
+                        }
                     return ActionResult(
                         message,
                         await context.item(.grate).setFlag(.isOpen)
@@ -344,8 +344,9 @@ extension Forest {
         }
 
         before(.unlock) { context, command in
-            guard let indirectObject = command.indirectObject,
-                  case .item(let keys) = indirectObject
+            guard
+                let indirectObject = command.indirectObject,
+                case .item(let keys) = indirectObject
             else {
                 if let indirectObject = command.indirectObject {
                     return ActionResult("Can you unlock a grating with that?")

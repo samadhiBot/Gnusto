@@ -28,7 +28,7 @@ struct GameEngineActionResponseTests {
     func testDirectionIsBlocked() async throws {
         let testRoom = Location(.startRoom)
             .name("Test Room")
-            .north("The path is blocked by fallen rocks.")
+            .north(blocked: "The path is blocked by fallen rocks.")
             .inherentlyLit
 
         let game = MinimalGame(locations: testRoom)
@@ -51,7 +51,7 @@ struct GameEngineActionResponseTests {
         let pebble = Item("pebble")
             .name("pebble")
             .in(.startRoom)
-            // No .isTakable flag
+        // No .isTakable flag
 
         let game = MinimalGame(items: pebble)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
@@ -124,7 +124,7 @@ struct GameEngineActionResponseTests {
             .name("ankle bracelet")
             .in(.player)
             .omitDescription
-            // No .isTakable flag makes it not droppable
+        // No .isTakable flag makes it not droppable
 
         let game = MinimalGame(
             items: ankleBracelet
@@ -156,7 +156,7 @@ struct GameEngineActionResponseTests {
             .in(.startRoom)
             .isContainer
             .isOpenable
-            // No .isOpen flag - defaults to closed
+        // No .isOpen flag - defaults to closed
 
         let game = MinimalGame(
             items: key, box
@@ -281,7 +281,7 @@ struct GameEngineActionResponseTests {
             .in(.startRoom)
             .isContainer
             .isOpenable
-            // No .isOpen flag - defaults to closed
+        // No .isOpen flag - defaults to closed
 
         let game = MinimalGame(
             items: box
@@ -332,7 +332,7 @@ struct GameEngineActionResponseTests {
             .isWearable
             .isWorn
             .omitDescription
-            // No .isTakable flag makes it not removable
+        // No .isTakable flag makes it not removable
 
         let game = MinimalGame(
             items: amulet
@@ -361,7 +361,7 @@ struct GameEngineActionResponseTests {
             .isContainer
             .isLockable
             .lockKey("key1")
-            // No .isLocked flag - defaults to unlocked
+        // No .isLocked flag - defaults to unlocked
 
         let key = Item("key1")
             .name("key")
@@ -422,7 +422,7 @@ struct GameEngineActionResponseTests {
         let darkRoom = Location("darkRoom")
             .name("Dark Room")
             .description("A dark, dark room.")
-            // No .inherentlyLit flag - defaults to dark
+        // No .inherentlyLit flag - defaults to dark
 
         let shadow = Item("shadow")
             .name("shadow")
@@ -590,7 +590,7 @@ struct GameEngineActionResponseTests {
             .isLightSource
             .isDevice
             .isTakable
-            // No .isOn flag - defaults to off
+        // No .isOn flag - defaults to off
 
         let game = MinimalGame(
             items: lamp
@@ -784,7 +784,7 @@ struct GameEngineActionResponseTests {
             .in(.startRoom)
             .isContainer
             .isOpenable
-            // No .isOpen - defaults to closed
+        // No .isOpen - defaults to closed
 
         let key = Item("key")
             .name("tiny key")
@@ -814,7 +814,7 @@ struct GameEngineActionResponseTests {
         let darkRoom = Location("darkRoom")
             .name("Dark Room")
             .description("A pitch black room.")
-            // No .inherentlyLit - defaults to dark
+        // No .inherentlyLit - defaults to dark
 
         let lockedChest = Item("chest")
             .name("locked chest")

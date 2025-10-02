@@ -29,7 +29,7 @@ enum OutsideHouse {
         .west(.westOfHouse)
         .east(.eastOfHouse)
         .north(.forestPath)
-        .south("The windows are all boarded.")
+        .south(blocked: "The windows are all boarded.")
         .inherentlyLit
         .localGlobals(.boardedWindow, .board, .whiteHouse, .forest)
 
@@ -46,7 +46,7 @@ enum OutsideHouse {
         .northeast(.eastOfHouse)
         .northwest(.westOfHouse)
         .south(.forest3)
-        .north("The windows are all boarded.")
+        .north(blocked: "The windows are all boarded.")
         .inherentlyLit
         .localGlobals(.boardedWindow, .board, .whiteHouse, .forest)
 
@@ -73,8 +73,8 @@ enum OutsideHouse {
         .northeast(.northOfHouse)
         .southeast(.southOfHouse)
         .west(.forest1)
-    // Note: SW and IN exits to Stone Barrow conditional on WON-FLAG
-        .east("The door is boarded and you can't remove the boards.")
+        // Note: SW and IN exits to Stone Barrow conditional on WON-FLAG
+        .east(blocked: "The door is boarded and you can't remove the boards.")
         .inherentlyLit
         .localGlobals(.whiteHouse, .board, .forest)
 }
@@ -122,7 +122,7 @@ extension OutsideHouse {
 
         .omitDescription
         .in(.westOfHouse)
-    // Note: Has action handler FRONT-DOOR-FCN
+        // Note: Has action handler FRONT-DOOR-FCN
 
     static let kitchenWindow = Item(.kitchenWindow)
         .name("kitchen window")
@@ -168,8 +168,8 @@ extension OutsideHouse {
     static let kitchenWindowComputer = ItemComputer(for: .kitchenWindow) {
         itemProperty(ItemPropertyID.description) { context in
             await context.item.hasFlag(.isOpen)
-            ? "The window is now open wide enough to allow entry."
-            : "The window is slightly ajar, but not enough to allow entry."
+                ? "The window is now open wide enough to allow entry."
+                : "The window is slightly ajar, but not enough to allow entry."
         }
     }
 }

@@ -37,7 +37,7 @@ struct GoActionHandlerTests {
             """
             > go north
             --- North Room ---
-            
+
             A room to the north.
             """
         )
@@ -74,7 +74,7 @@ struct GoActionHandlerTests {
             """
             > walk south
             --- South Room ---
-            
+
             A room to the south.
             """
         )
@@ -111,7 +111,7 @@ struct GoActionHandlerTests {
             """
             > run east
             --- East Room ---
-            
+
             A room to the east.
             """
         )
@@ -150,7 +150,7 @@ struct GoActionHandlerTests {
             """
             > north
             --- North Room ---
-            
+
             A room to the north.
             """
         )
@@ -187,7 +187,7 @@ struct GoActionHandlerTests {
             """
             > n
             --- North Room ---
-            
+
             A room to the north.
             """
         )
@@ -267,33 +267,33 @@ struct GoActionHandlerTests {
             """
             > north
             --- North Room ---
-            
+
             A room to the north.
-            
+
             > south
             --- Center Room ---
-            
+
             A room in the center.
-            
+
             > south
             --- South Room ---
-            
+
             A room to the south.
-            
+
             > north
             --- Center Room ---
-            
+
             > east
             --- East Room ---
-            
+
             A room to the east.
-            
+
             > west
             --- Center Room ---
-            
+
             > west
             --- West Room ---
-            
+
             A room to the west.
             """
         )
@@ -360,7 +360,7 @@ struct GoActionHandlerTests {
         let roundRoom = Location("roundRoom")
             .name("Round Room")
             .inherentlyLit
-            .north("The way north is permanently blocked by rubble.")
+            .north(blocked: "The way north is permanently blocked by rubble.")
 
         let game = MinimalGame(
             player: Player(in: "roundRoom"),
@@ -428,7 +428,7 @@ struct GoActionHandlerTests {
             .name("wooden door")
             .description("A sturdy wooden door.")
             .isOpenable
-        // Note: Not open
+            // Note: Not open
             .in("roundRoom")
 
         let game = MinimalGame(
@@ -528,7 +528,7 @@ struct GoActionHandlerTests {
             """
             > north
             --- North Room ---
-            
+
             A room beyond the door.
             """
         )
@@ -572,7 +572,7 @@ struct GoActionHandlerTests {
             """
             > up
             --- Upper Room ---
-            
+
             A room upstairs.
             """
         )
@@ -618,7 +618,7 @@ struct GoActionHandlerTests {
             """
             > north
             --- End Room ---
-            
+
             The destination room.
             """
         )
@@ -653,7 +653,7 @@ struct GoActionHandlerTests {
             """
             > south
             --- Lit Room ---
-            
+
             A well-lit room.
             """
         )
@@ -691,7 +691,7 @@ struct GoActionHandlerTests {
             """
             > north
             Darkness rushes in like a living thing.
-            
+
             This is the kind of dark that swallows shapes and edges,
             leaving only breath and heartbeat to prove you exist.
             """
@@ -743,7 +743,7 @@ struct GoActionHandlerTests {
             """
             > north
             --- Dark Room ---
-            
+
             A room that needs artificial light.
             """
         )
@@ -787,12 +787,12 @@ struct GoActionHandlerTests {
             """
             > east
             --- Room B ---
-            
+
             The second room.
-            
+
             > west
             --- Room A ---
-            
+
             The first room.
             """
         )
