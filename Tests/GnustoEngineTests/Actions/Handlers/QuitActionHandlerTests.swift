@@ -60,12 +60,10 @@ struct QuitActionHandlerTests {
     @Test("Quit does not require light")
     func testQuitDoesNotRequireLight() async throws {
         // Given: Dark room
-        let darkRoom = Location(
-            id: "darkRoom",
-            .name("Dark Room"),
+        let darkRoom = Location("darkRoom")
+            .name("Dark Room")
             .description("A pitch black room.")
             // Note: No .inherentlyLit property
-        )
 
         let game = MinimalGame(
             player: Player(in: "darkRoom"),

@@ -11,12 +11,10 @@ struct BlowActionHandlerTests {
     @Test("BLOW DIRECTOBJECT syntax works")
     func testBlowDirectObjectSyntax() async throws {
         // Given
-        let feather = Item(
-            id: "feather",
-            .name("fluffy feather"),
-            .description("A fluffy feather."),
+        let feather = Item("feather")
+            .name("fluffy feather")
+            .description("A fluffy feather.")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: feather
@@ -45,18 +43,14 @@ struct BlowActionHandlerTests {
     @Test("Cannot blow on item not in scope")
     func testCannotBlowOnItemNotInScope() async throws {
         // Given
-        let anotherRoom = Location(
-            id: "anotherRoom",
-            .name("Another Room"),
+        let anotherRoom = Location("anotherRoom")
+            .name("Another Room")
             .inherentlyLit
-        )
 
-        let remoteFeather = Item(
-            id: "remoteFeather",
-            .name("remote feather"),
-            .description("A feather in another room."),
+        let remoteFeather = Item("remoteFeather")
+            .name("remote feather")
+            .description("A feather in another room.")
             .in("anotherRoom")
-        )
 
         let game = MinimalGame(
             locations: anotherRoom,
@@ -80,18 +74,14 @@ struct BlowActionHandlerTests {
     @Test("Requires light to blow on items")
     func testRequiresLight() async throws {
         // Given: Dark room with an item
-        let darkRoom = Location(
-            id: "darkRoom",
-            .name("Dark Room"),
+        let darkRoom = Location("darkRoom")
+            .name("Dark Room")
             .description("A pitch black room.")
-        )
 
-        let feather = Item(
-            id: "feather",
-            .name("fluffy feather"),
-            .description("A fluffy feather."),
+        let feather = Item("feather")
+            .name("fluffy feather")
+            .description("A fluffy feather.")
             .in("darkRoom")
-        )
 
         let game = MinimalGame(
             player: Player(in: "darkRoom"),

@@ -11,11 +11,9 @@ struct ProxyReferenceTests {
     @Test("ProxyReference creation from EntityReference")
     func testProxyReferenceCreationFromEntityReference() async throws {
         // Given
-        let testItem = Item(
-            id: "testItem",
-            .name("test item"),
+        let testItem = Item("testItem")
+            .name("test item")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(items: testItem)
         let (engine, _) = await GameEngine.test(blueprint: game)
@@ -61,17 +59,13 @@ struct ProxyReferenceTests {
     @Test("ProxyReference proxy extraction methods")
     func testProxyReferenceProxyExtraction() async throws {
         // Given
-        let startRoom = Location(
-            id: "library",
-            .name("Grand Library"),
+        let startRoom = Location("library")
+            .name("Grand Library")
             .inherentlyLit
-        )
 
-        let book = Item(
-            id: "book",
-            .name("ancient tome"),
+        let book = Item("book")
+            .name("ancient tome")
             .in("library")
-        )
 
         let game = MinimalGame(
             player: Player(in: "library"),
@@ -120,11 +114,9 @@ struct ProxyReferenceTests {
     @Test("ProxyReference entityReference property")
     func testProxyReferenceEntityReferenceProperty() async throws {
         // Given
-        let testItem = Item(
-            id: "testItem",
-            .name("test item"),
+        let testItem = Item("testItem")
+            .name("test item")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(items: testItem)
         let (engine, _) = await GameEngine.test(blueprint: game)
@@ -176,23 +168,17 @@ struct ProxyReferenceTests {
     @Test("ProxyReference equality comparisons")
     func testProxyReferenceEquality() async throws {
         // Given
-        let otherRoom = Location(
-            id: "otherRoom",
-            .name("Other Room"),
+        let otherRoom = Location("otherRoom")
+            .name("Other Room")
             .inherentlyLit
-        )
 
-        let item1 = Item(
-            id: "item1",
-            .name("first item"),
+        let item1 = Item("item1")
+            .name("first item")
             .in(.startRoom)
-        )
 
-        let item2 = Item(
-            id: "item2",
-            .name("second item"),
+        let item2 = Item("item2")
+            .name("second item")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             locations: otherRoom,
@@ -245,11 +231,9 @@ struct ProxyReferenceTests {
     @Test("ProxyReference hashing")
     func testProxyReferenceHashing() async throws {
         // Given
-        let testItem = Item(
-            id: "testItem",
-            .name("test item"),
+        let testItem = Item("testItem")
+            .name("test item")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(items: testItem)
         let (engine, _) = await GameEngine.test(blueprint: game)
@@ -280,17 +264,13 @@ struct ProxyReferenceTests {
     @Test("ProxyReference comparison")
     func testProxyReferenceComparison() async throws {
         // Given
-        let itemA = Item(
-            id: "itemA",
-            .name("item A"),
+        let itemA = Item("itemA")
+            .name("item A")
             .in(.startRoom)
-        )
 
-        let itemB = Item(
-            id: "itemB",
-            .name("item B"),
+        let itemB = Item("itemB")
+            .name("item B")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: itemA, itemB
@@ -317,11 +297,9 @@ struct ProxyReferenceTests {
     @Test("ProxyReference description")
     func testProxyReferenceDescription() async throws {
         // Given
-        let testItem = Item(
-            id: "testItem",
-            .name("test item"),
+        let testItem = Item("testItem")
+            .name("test item")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(items: testItem)
         let (engine, _) = await GameEngine.test(blueprint: game)
@@ -345,24 +323,18 @@ struct ProxyReferenceTests {
     @Test("ProxyReference withDefiniteArticle")
     func testProxyReferenceWithDefiniteArticle() async throws {
         // Given
-        let startRoom = Location(
-            id: "library",
-            .name("Grand Library"),
+        let startRoom = Location("library")
+            .name("Grand Library")
             .inherentlyLit
-        )
 
-        let book = Item(
-            id: "book",
-            .name("ancient tome"),
+        let book = Item("book")
+            .name("ancient tome")
             .in("library")
-        )
 
-        let waterItem = Item(
-            id: "water",
-            .name("water"),
-            .omitArticle,
+        let waterItem = Item("water")
+            .name("water")
+            .omitArticle
             .in("library")
-        )
 
         let game = MinimalGame(
             player: Player(in: "library"),
@@ -402,17 +374,13 @@ struct ProxyReferenceTests {
     @Test("ProxyReference in collections")
     func testProxyReferenceInCollections() async throws {
         // Given
-        let item1 = Item(
-            id: "item1",
-            .name("first item"),
+        let item1 = Item("item1")
+            .name("first item")
             .in(.startRoom)
-        )
 
-        let item2 = Item(
-            id: "item2",
-            .name("second item"),
+        let item2 = Item("item2")
+            .name("second item")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: item1, item2
@@ -451,12 +419,10 @@ struct ProxyReferenceTests {
     @Test("ProxyReference consistency across operations")
     func testProxyReferenceConsistencyAcrossOperations() async throws {
         // Given
-        let coin = Item(
-            id: "coin",
-            .name("gold coin"),
-            .isTakable,
+        let coin = Item("coin")
+            .name("gold coin")
+            .isTakable
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: coin
@@ -486,11 +452,9 @@ struct ProxyReferenceTests {
     @Test("ProxyReference type safety")
     func testProxyReferenceTypeSafety() async throws {
         // Given
-        let testItem = Item(
-            id: "testItem",
-            .name("test item"),
+        let testItem = Item("testItem")
+            .name("test item")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(items: testItem)
         let (engine, _) = await GameEngine.test(blueprint: game)

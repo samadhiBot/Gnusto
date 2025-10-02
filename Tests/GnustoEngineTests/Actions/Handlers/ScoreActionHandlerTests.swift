@@ -31,11 +31,9 @@ struct ScoreActionHandlerTests {
     @Test("Score works in dark room")
     func testScoreInDarkRoom() async throws {
         // Given: Dark room
-        let darkRoom = Location(
-            id: "darkRoom",
-            .name("Dark Room"),
+        let darkRoom = Location("darkRoom")
+            .name("Dark Room")
             .description("A pitch black room.")
-        )
 
         let game = MinimalGame(
             player: Player(in: "darkRoom"),

@@ -67,12 +67,10 @@ struct ActionHandlerScoringTests {
 
     @Test("scoreHandlerForCommand - basic verb + DO match")
     func testBasicVerbMatch() async throws {
-        let testItem = Item(
-            id: "testItem",
-            .name("test item"),
-            .isTakable,
+        let testItem = Item("testItem")
+            .name("test item")
+            .isTakable
             .in(.startRoom)
-        )
 
         let game = MinimalGame(items: testItem)
         let (engine, _) = await GameEngine.test(blueprint: game)
@@ -90,12 +88,10 @@ struct ActionHandlerScoringTests {
 
     @Test("scoreHandlerForCommand - specific verb beats generic")
     func testSpecificVerbBeatsGeneric() async throws {
-        let testItem = Item(
-            id: "testItem",
-            .name("test item"),
-            .isTakable,
+        let testItem = Item("testItem")
+            .name("test item")
+            .isTakable
             .in(.startRoom)
-        )
 
         let game = MinimalGame(items: testItem)
         let (engine, _) = await GameEngine.test(blueprint: game)
@@ -123,19 +119,15 @@ struct ActionHandlerScoringTests {
 
     @Test("scoreHandlerForCommand - particle matching bonus")
     func testParticleMatchingBonus() async throws {
-        let box = Item(
-            id: "box",
-            .name("box"),
-            .isContainer,
+        let box = Item("box")
+            .name("box")
+            .isContainer
             .in(.startRoom)
-        )
 
-        let key = Item(
-            id: "key",
-            .name("key"),
-            .isTakable,
+        let key = Item("key")
+            .name("key")
+            .isTakable
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: box, key
@@ -158,19 +150,15 @@ struct ActionHandlerScoringTests {
 
     @Test("scoreHandlerForCommand - missing required particle fails")
     func testMissingRequiredParticleFails() async throws {
-        let box = Item(
-            id: "box",
-            .name("box"),
-            .isContainer,
+        let box = Item("box")
+            .name("box")
+            .isContainer
             .in(.startRoom)
-        )
 
-        let key = Item(
-            id: "key",
-            .name("key"),
-            .isTakable,
+        let key = Item("key")
+            .name("key")
+            .isTakable
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: box, key
@@ -192,19 +180,15 @@ struct ActionHandlerScoringTests {
 
     @Test("scoreHandlerForCommand - wrong particle fails")
     func testWrongParticleFails() async throws {
-        let box = Item(
-            id: "box",
-            .name("box"),
-            .isContainer,
+        let box = Item("box")
+            .name("box")
+            .isContainer
             .in(.startRoom)
-        )
 
-        let key = Item(
-            id: "key",
-            .name("key"),
-            .isTakable,
+        let key = Item("key")
+            .name("key")
+            .isTakable
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: box, key
@@ -241,12 +225,10 @@ struct ActionHandlerScoringTests {
 
     @Test("scoreHandlerForCommand - verb mismatch fails")
     func testVerbMismatchFails() async throws {
-        let testItem = Item(
-            id: "testItem",
-            .name("test item"),
-            .isTakable,
+        let testItem = Item("testItem")
+            .name("test item")
+            .isTakable
             .in(.startRoom)
-        )
 
         let game = MinimalGame(items: testItem)
         let (engine, _) = await GameEngine.test(blueprint: game)
@@ -266,13 +248,11 @@ struct ActionHandlerScoringTests {
 
     @Test("scoreHandlerForCommand - best rule wins")
     func testBestRuleWins() async throws {
-        let lamp = Item(
-            id: "lamp",
-            .name("lamp"),
-            .isDevice,
-            .isTakable,
+        let lamp = Item("lamp")
+            .name("lamp")
+            .isDevice
+            .isTakable
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: lamp
@@ -295,13 +275,11 @@ struct ActionHandlerScoringTests {
 
     @Test("scoreHandlerForCommand - fallback to lower scoring rule")
     func testFallbackToLowerScoringRule() async throws {
-        let lamp = Item(
-            id: "lamp",
-            .name("lamp"),
-            .isDevice,
-            .isTakable,
+        let lamp = Item("lamp")
+            .name("lamp")
+            .isDevice
+            .isTakable
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: lamp
@@ -326,12 +304,10 @@ struct ActionHandlerScoringTests {
 
     @Test("scoreSyntaxRuleForCommand - specific verb rule")
     func testScoreSyntaxRuleSpecificVerb() async throws {
-        let testItem = Item(
-            id: "testItem",
-            .name("test item"),
-            .isTakable,
+        let testItem = Item("testItem")
+            .name("test item")
+            .isTakable
             .in(.startRoom)
-        )
 
         let game = MinimalGame(items: testItem)
         let (engine, _) = await GameEngine.test(blueprint: game)
@@ -349,12 +325,10 @@ struct ActionHandlerScoringTests {
 
     @Test("scoreSyntaxRuleForCommand - generic verb rule")
     func testScoreSyntaxRuleGenericVerb() async throws {
-        let testItem = Item(
-            id: "testItem",
-            .name("test item"),
-            .isTakable,
+        let testItem = Item("testItem")
+            .name("test item")
+            .isTakable
             .in(.startRoom)
-        )
 
         let game = MinimalGame(items: testItem)
         let (engine, _) = await GameEngine.test(blueprint: game)
@@ -372,19 +346,15 @@ struct ActionHandlerScoringTests {
 
     @Test("scoreSyntaxRuleForCommand - particle rule")
     func testScoreSyntaxRuleParticle() async throws {
-        let box = Item(
-            id: "box",
-            .name("box"),
-            .isContainer,
+        let box = Item("box")
+            .name("box")
+            .isContainer
             .in(.startRoom)
-        )
 
-        let key = Item(
-            id: "key",
-            .name("key"),
-            .isTakable,
+        let key = Item("key")
+            .name("key")
+            .isTakable
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: box, key
@@ -409,12 +379,10 @@ struct ActionHandlerScoringTests {
 
     @Test("scoreSyntaxRuleForCommand - wrong specific verb fails")
     func testScoreSyntaxRuleWrongSpecificVerbFails() async throws {
-        let testItem = Item(
-            id: "testItem",
-            .name("test item"),
-            .isTakable,
+        let testItem = Item("testItem")
+            .name("test item")
+            .isTakable
             .in(.startRoom)
-        )
 
         let game = MinimalGame(items: testItem)
         let (engine, _) = await GameEngine.test(blueprint: game)
@@ -435,12 +403,10 @@ struct ActionHandlerScoringTests {
 
     @Test("findActionHandler - selects highest scoring handler")
     func testFindActionHandlerSelectsHighestScoring() async throws {
-        let testItem = Item(
-            id: "testItem",
-            .name("test item"),
-            .isTakable,
+        let testItem = Item("testItem")
+            .name("test item")
+            .isTakable
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: testItem,
@@ -464,12 +430,10 @@ struct ActionHandlerScoringTests {
 
     @Test("findActionHandler - returns nil when no handlers match")
     func testFindActionHandlerReturnsNilWhenNoMatch() async throws {
-        let testItem = Item(
-            id: "testItem",
-            .name("test item"),
-            .isTakable,
+        let testItem = Item("testItem")
+            .name("test item")
+            .isTakable
             .in(.startRoom)
-        )
 
         let game = MinimalGame(items: testItem)
         let (engine, _) = await GameEngine.test(blueprint: game)
@@ -488,12 +452,10 @@ struct ActionHandlerScoringTests {
 
     @Test("couldHandlerMatchCommand - positive case")
     func testCouldHandlerMatchCommandPositive() async throws {
-        let testItem = Item(
-            id: "testItem",
-            .name("test item"),
-            .isTakable,
+        let testItem = Item("testItem")
+            .name("test item")
+            .isTakable
             .in(.startRoom)
-        )
 
         let game = MinimalGame(items: testItem)
         let (engine, _) = await GameEngine.test(blueprint: game)
@@ -511,12 +473,10 @@ struct ActionHandlerScoringTests {
 
     @Test("couldHandlerMatchCommand - negative case")
     func testCouldHandlerMatchCommandNegative() async throws {
-        let testItem = Item(
-            id: "testItem",
-            .name("test item"),
-            .isTakable,
+        let testItem = Item("testItem")
+            .name("test item")
+            .isTakable
             .in(.startRoom)
-        )
 
         let game = MinimalGame(items: testItem)
         let (engine, _) = await GameEngine.test(blueprint: game)
@@ -536,12 +496,10 @@ struct ActionHandlerScoringTests {
 
     @Test("ClimbActionHandler vs ClimbOnActionHandler scoring")
     func testClimbHandlerScoring() async throws {
-        let table = Item(
-            id: "table",
-            .name("wooden table"),
-            .description("A sturdy wooden table."),
+        let table = Item("table")
+            .name("wooden table")
+            .description("A sturdy wooden table.")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: table
@@ -613,19 +571,15 @@ struct ActionHandlerScoringTests {
 
     @Test("scoreHandlerForCommand - case insensitive particle matching")
     func testCaseInsensitiveParticleMatching() async throws {
-        let box = Item(
-            id: "box",
-            .name("box"),
-            .isContainer,
+        let box = Item("box")
+            .name("box")
+            .isContainer
             .in(.startRoom)
-        )
 
-        let key = Item(
-            id: "key",
-            .name("key"),
-            .isTakable,
+        let key = Item("key")
+            .name("key")
+            .isTakable
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: box, key

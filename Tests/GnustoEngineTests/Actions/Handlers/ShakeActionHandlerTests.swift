@@ -11,13 +11,11 @@ struct ShakeActionHandlerTests {
     @Test("SHAKE DIRECTOBJECT syntax works")
     func testShakeDirectObjectSyntax() async throws {
         // Given
-        let bottle = Item(
-            id: "bottle",
-            .name("empty bottle"),
-            .description("A glass bottle."),
-            .isTakable,
+        let bottle = Item("bottle")
+            .name("empty bottle")
+            .description("A glass bottle.")
+            .isTakable
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: bottle
@@ -64,18 +62,14 @@ struct ShakeActionHandlerTests {
     @Test("Cannot shake target not in scope")
     func testCannotShakeTargetNotInScope() async throws {
         // Given
-        let anotherRoom = Location(
-            id: "anotherRoom",
-            .name("Another Room"),
+        let anotherRoom = Location("anotherRoom")
+            .name("Another Room")
             .inherentlyLit
-        )
 
-        let remoteItem = Item(
-            id: "remoteItem",
-            .name("remote item"),
-            .description("An item in another room."),
+        let remoteItem = Item("remoteItem")
+            .name("remote item")
+            .description("An item in another room.")
             .in("anotherRoom")
-        )
 
         let game = MinimalGame(
             locations: anotherRoom,
@@ -99,18 +93,14 @@ struct ShakeActionHandlerTests {
     @Test("Requires light to shake")
     func testRequiresLight() async throws {
         // Given: Dark room with an object to shake
-        let darkRoom = Location(
-            id: "darkRoom",
-            .name("Dark Room"),
+        let darkRoom = Location("darkRoom")
+            .name("Dark Room")
             .description("A pitch black room.")
-        )
 
-        let jar = Item(
-            id: "jar",
-            .name("glass jar"),
-            .description("A large glass jar."),
+        let jar = Item("jar")
+            .name("glass jar")
+            .description("A large glass jar.")
             .in("darkRoom")
-        )
 
         let game = MinimalGame(
             player: Player(in: "darkRoom"),
@@ -138,13 +128,11 @@ struct ShakeActionHandlerTests {
     @Test("Shake character")
     func testShakeCharacter() async throws {
         // Given
-        let wizard = Item(
-            id: "wizard",
-            .name("old wizard"),
-            .description("A wise old wizard with a long beard."),
-            .characterSheet(.wise),
+        let wizard = Item("wizard")
+            .name("old wizard")
+            .description("A wise old wizard with a long beard.")
+            .characterSheet(.wise)
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: wizard
@@ -208,13 +196,11 @@ struct ShakeActionHandlerTests {
     @Test("Shaking sets isTouched flag")
     func testShakingSetsTouchedFlag() async throws {
         // Given
-        let bell = Item(
-            id: "bell",
-            .name("small bell"),
-            .description("A tiny bronze bell."),
-            .isTakable,
+        let bell = Item("bell")
+            .name("small bell")
+            .description("A tiny bronze bell.")
+            .isTakable
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: bell
@@ -237,21 +223,17 @@ struct ShakeActionHandlerTests {
     @Test("Shake multiple objects in sequence")
     func testShakeMultipleObjects() async throws {
         // Given
-        let box1 = Item(
-            id: "box1",
-            .name("small box"),
-            .description("A small wooden box."),
-            .isTakable,
+        let box1 = Item("box1")
+            .name("small box")
+            .description("A small wooden box.")
+            .isTakable
             .in(.startRoom)
-        )
 
-        let box2 = Item(
-            id: "box2",
-            .name("large box"),
-            .description("A large cardboard box."),
-            .isTakable,
+        let box2 = Item("box2")
+            .name("large box")
+            .description("A large cardboard box.")
+            .isTakable
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: box1, box2

@@ -11,18 +11,16 @@ struct StandardCombatSystemUnitTests {
 
     /// Creates a minimal test game with combat setup
     private func createTestGame(randomSeed: UInt64 = 71) async -> (GameEngine, MockIOHandler) {
-        let entrance = Location(
-            id: "entrance",
-            .description("Entrance to the combat arena."),
-            .exits(.north(.startRoom)),
+        let entrance = Location("entrance")
+            .description("Entrance to the combat arena.")
+            .north(.startRoom)
             .inherentlyLit
-        )
-        let startRoom = Location(
-            id: .startRoom,
-            .name("Combat Arena"),
-            .description("A circular arena for testing combat."),
+
+        let startRoom = Location(.startRoom)
+            .name("Combat Arena")
+            .description("A circular arena for testing combat.")
             .inherentlyLit
-        )
+
         let game = MinimalGame(
             player: Player(in: .startRoom),
             locations: entrance, startRoom,
@@ -473,12 +471,10 @@ struct StandardCombatSystemUnitTests {
 
     @Test("getEnemyWeapon finds enemy weapon")
     func testGetEnemyWeapon() async throws {
-        let club = Item(
-            id: "club",
-            .name("wooden club"),
-            .isWeapon,
+        let club = Item("club")
+            .name("wooden club")
+            .isWeapon
             .in(.item("troll"))
-        )
 
         let game = MinimalGame(
             player: Player(in: .startRoom),
@@ -715,55 +711,47 @@ struct StandardCombatSystemUnitTests {
     @Test("Combat conditions affect subsequent attacks")
     func testCombatConditionsAffectAttacks() async throws {
         // Given: A combat scenario with staggered enemy
-        let staggeredTroll = Item(
-            id: "staggeredTroll",
-            .name("staggered troll"),
+        let staggeredTroll = Item("staggeredTroll")
+            .name("staggered troll")
             .characterSheet(
                 CharacterSheet(
                     strength: 16,
                     constitution: 14,
                     combatCondition: .offBalance  // -2 AC, -1 attack
                 )
-            ),
+            )
             .in("combatRoom")
-        )
 
-        let vulnerableTroll = Item(
-            id: "vulnerableTroll",
-            .name("vulnerable troll"),
+        let vulnerableTroll = Item("vulnerableTroll")
+            .name("vulnerable troll")
             .characterSheet(
                 CharacterSheet(
                     strength: 16,
                     constitution: 14,
                     combatCondition: .vulnerable  // -3 AC, no attack penalty
                 )
-            ),
+            )
             .in("combatRoom")
-        )
 
-        let normalTroll = Item(
-            id: "normalTroll",
-            .name("normal troll"),
+        let normalTroll = Item("normalTroll")
+            .name("normal troll")
             .characterSheet(
                 CharacterSheet(
                     strength: 16,
                     constitution: 14,
                     combatCondition: .normal  // No penalties
                 )
-            ),
+            )
             .in("combatRoom")
-        )
 
         let player = Player(
             in: "combatRoom",
             characterSheet: CharacterSheet(strength: 14, dexterity: 12)
         )
 
-        let testRoom = Location(
-            id: "combatRoom",
-            .name("Combat Room"),
+        let testRoom = Location("combatRoom")
+            .name("Combat Room")
             .inherentlyLit
-        )
 
         let game = MinimalGame(
             player: player,

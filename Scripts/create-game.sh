@@ -129,7 +129,7 @@ let package = Package(
                 .product(name: "GnustoEngine", package: "Gnusto"),
             ],
             plugins: [
-                .plugin(name: "GnustoAutoWiringPlugin", package: "Gnusto"),
+                .plu.in(name: "GnustoAutoWiringPlugin", package: "Gnusto")
             ]
         ),
         .testTarget(
@@ -149,7 +149,7 @@ EOF
 import GnustoEngine
 
 let engine = await GameEngine(
-    blueprint: $game_name(),
+    blueprint: $game.name()
     parser: StandardParser(),
     ioHandler: ConsoleIOHandler(
         markdownParser: MarkdownParser(columns: 64)
@@ -209,23 +209,20 @@ EOF
 import GnustoEngine
 
 struct CustodialSingularity {
-    let broomCloset = Location(
-        id: .broomCloset,
-        .name("Broom Closet"),
-        .description("You are in a narrow closet that smells faintly of detergent."),
+    let broomCloset = Location(.broomCloset)
+        .name("Broom Closet")
+        .description("You are in a narrow closet that smells faintly of detergent.")
         .inherentlyLit
-    )
 
-    let screwdriver = Item(
-        id: .screwdriver,
-        .name("left-handed screwdriver"),
+    let screwdriver = Item(.screwdriver)
+        .name("left-handed screwdriver")
         .description(
             """
             It's a left-handed screwdriver. It looks it could be useful,
             provided you could find a left-handed screw.
             """
         ),
-        .isTakable,
+        .isTakable
         .in(.broomCloset)
     )
 

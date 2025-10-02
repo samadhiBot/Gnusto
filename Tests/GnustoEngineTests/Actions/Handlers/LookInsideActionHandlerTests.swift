@@ -11,22 +11,18 @@ struct LookInsideActionHandlerTests {
     @Test("LOOK IN DIRECTOBJECT syntax works")
     func testLookInDirectObjectSyntax() async throws {
         // Given
-        let box = Item(
-            id: "box",
-            .name("wooden box"),
-            .description("A wooden storage box."),
-            .isContainer,
-            .isOpenable,
-            .isOpen,
+        let box = Item("box")
+            .name("wooden box")
+            .description("A wooden storage box.")
+            .isContainer
+            .isOpenable
+            .isOpen
             .in(.startRoom)
-        )
 
-        let gem = Item(
-            id: "gem",
-            .name("sparkling gem"),
-            .description("A beautiful gem."),
+        let gem = Item("gem")
+            .name("sparkling gem")
+            .description("A beautiful gem.")
             .in(.item("box"))
-        )
 
         let game = MinimalGame(
             items: box, gem
@@ -52,15 +48,13 @@ struct LookInsideActionHandlerTests {
     @Test("LOOK INSIDE DIRECTOBJECT syntax works")
     func testLookInsideDirectObjectSyntax() async throws {
         // Given
-        let chest = Item(
-            id: "chest",
-            .name("treasure chest"),
-            .description("An ornate treasure chest."),
-            .isContainer,
-            .isOpenable,
-            .isOpen,
+        let chest = Item("chest")
+            .name("treasure chest")
+            .description("An ornate treasure chest.")
+            .isContainer
+            .isOpenable
+            .isOpen
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: chest
@@ -83,22 +77,18 @@ struct LookInsideActionHandlerTests {
     @Test("PEEK syntax works")
     func testPeekSyntax() async throws {
         // Given
-        let bag = Item(
-            id: "bag",
-            .name("leather bag"),
-            .description("A worn leather bag."),
-            .isContainer,
-            .isOpenable,
-            .isOpen,
+        let bag = Item("bag")
+            .name("leather bag")
+            .description("A worn leather bag.")
+            .isContainer
+            .isOpenable
+            .isOpen
             .in(.startRoom)
-        )
 
-        let coin = Item(
-            id: "coin",
-            .name("gold coin"),
-            .description("A shiny gold coin."),
+        let coin = Item("coin")
+            .name("gold coin")
+            .description("A shiny gold coin.")
             .in(.item("bag"))
-        )
 
         let game = MinimalGame(
             items: bag, coin
@@ -141,19 +131,15 @@ struct LookInsideActionHandlerTests {
     @Test("Cannot look inside target not in scope")
     func testCannotLookInsideTargetNotInScope() async throws {
         // Given
-        let anotherRoom = Location(
-            id: "anotherRoom",
-            .name("Another Room"),
+        let anotherRoom = Location("anotherRoom")
+            .name("Another Room")
             .inherentlyLit
-        )
 
-        let remoteContainer = Item(
-            id: "remoteContainer",
-            .name("remote container"),
-            .description("A container in another room."),
-            .isContainer,
+        let remoteContainer = Item("remoteContainer")
+            .name("remote container")
+            .description("A container in another room.")
+            .isContainer
             .in("anotherRoom")
-        )
 
         let game = MinimalGame(
             locations: anotherRoom,
@@ -177,19 +163,15 @@ struct LookInsideActionHandlerTests {
     @Test("Requires light to look inside")
     func testRequiresLight() async throws {
         // Given: Dark room with a container
-        let darkRoom = Location(
-            id: "darkRoom",
-            .name("Dark Room"),
+        let darkRoom = Location("darkRoom")
+            .name("Dark Room")
             .description("A pitch black room.")
-        )
 
-        let box = Item(
-            id: "box",
-            .name("wooden box"),
-            .description("A wooden storage box."),
-            .isContainer,
+        let box = Item("box")
+            .name("wooden box")
+            .description("A wooden storage box.")
+            .isContainer
             .in("darkRoom")
-        )
 
         let game = MinimalGame(
             player: Player(in: "darkRoom"),
@@ -217,29 +199,23 @@ struct LookInsideActionHandlerTests {
     @Test("Look inside open container with items")
     func testLookInsideOpenContainerWithItems() async throws {
         // Given
-        let suitcase = Item(
-            id: "suitcase",
-            .name("old suitcase"),
-            .description("A weathered old suitcase."),
-            .isContainer,
-            .isOpenable,
-            .isOpen,
+        let suitcase = Item("suitcase")
+            .name("old suitcase")
+            .description("A weathered old suitcase.")
+            .isContainer
+            .isOpenable
+            .isOpen
             .in(.startRoom)
-        )
 
-        let book = Item(
-            id: "book",
-            .name("red book"),
-            .description("A small red book."),
+        let book = Item("book")
+            .name("red book")
+            .description("A small red book.")
             .in(.item("suitcase"))
-        )
 
-        let pen = Item(
-            id: "pen",
-            .name("fountain pen"),
-            .description("An elegant fountain pen."),
+        let pen = Item("pen")
+            .name("fountain pen")
+            .description("An elegant fountain pen.")
             .in(.item("suitcase"))
-        )
 
         let game = MinimalGame(
             items: suitcase, book, pen
@@ -262,15 +238,13 @@ struct LookInsideActionHandlerTests {
     @Test("Look inside empty open container")
     func testLookInsideEmptyOpenContainer() async throws {
         // Given
-        let emptyBox = Item(
-            id: "emptyBox",
-            .name("empty box"),
-            .description("A completely empty box."),
-            .isContainer,
-            .isOpenable,
-            .isOpen,
+        let emptyBox = Item("emptyBox")
+            .name("empty box")
+            .description("A completely empty box.")
+            .isContainer
+            .isOpenable
+            .isOpen
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: emptyBox
@@ -293,21 +267,17 @@ struct LookInsideActionHandlerTests {
     @Test("Look inside closed container")
     func testLookInsideClosedContainer() async throws {
         // Given
-        let closedTrunk = Item(
-            id: "closedTrunk",
-            .name("closed trunk"),
-            .description("A firmly closed trunk."),
-            .isContainer,
-            .isOpenable,
+        let closedTrunk = Item("closedTrunk")
+            .name("closed trunk")
+            .description("A firmly closed trunk.")
+            .isContainer
+            .isOpenable
             .in(.startRoom)
-        )
 
-        let hiddenItem = Item(
-            id: "hiddenItem",
-            .name("hidden item"),
-            .description("An item hidden in the trunk."),
+        let hiddenItem = Item("hiddenItem")
+            .name("hidden item")
+            .description("An item hidden in the trunk.")
             .in(.item("closedTrunk"))
-        )
 
         let game = MinimalGame(
             items: closedTrunk, hiddenItem
@@ -330,12 +300,10 @@ struct LookInsideActionHandlerTests {
     @Test("Look inside non-container item")
     func testLookInsideNonContainerItem() async throws {
         // Given
-        let statue = Item(
-            id: "statue",
-            .name("marble statue"),
-            .description("A beautiful marble statue of a goddess."),
+        let statue = Item("statue")
+            .name("marble statue")
+            .description("A beautiful marble statue of a goddess.")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: statue
@@ -359,12 +327,10 @@ struct LookInsideActionHandlerTests {
     @Test("Look inside non-container with no description")
     func testLookInsideNonContainerWithNoDescription() async throws {
         // Given
-        let rock = Item(
-            id: "rock",
-            .name("small rock"),
-            .description(""),
+        let rock = Item("rock")
+            .name("small rock")
+            .description("")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: rock
@@ -388,15 +354,13 @@ struct LookInsideActionHandlerTests {
     @Test("Looking inside sets isTouched flag")
     func testLookingInsideSetsTouchedFlag() async throws {
         // Given
-        let drawer = Item(
-            id: "drawer",
-            .name("desk drawer"),
-            .description("A wooden desk drawer."),
-            .isContainer,
-            .isOpenable,
-            .isOpen,
+        let drawer = Item("drawer")
+            .name("desk drawer")
+            .description("A wooden desk drawer.")
+            .isContainer
+            .isOpenable
+            .isOpen
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: drawer
@@ -415,22 +379,18 @@ struct LookInsideActionHandlerTests {
     @Test("Look inside container with single item")
     func testLookInsideContainerWithSingleItem() async throws {
         // Given
-        let bottle = Item(
-            id: "bottle",
-            .name("glass bottle"),
-            .description("A clear glass bottle."),
-            .isContainer,
-            .isOpenable,
-            .isOpen,
+        let bottle = Item("bottle")
+            .name("glass bottle")
+            .description("A clear glass bottle.")
+            .isContainer
+            .isOpenable
+            .isOpen
             .in(.startRoom)
-        )
 
-        let note = Item(
-            id: "note",
-            .name("handwritten note"),
-            .description("A note written in flowing script."),
+        let note = Item("note")
+            .name("handwritten note")
+            .description("A note written in flowing script.")
             .in(.item("bottle"))
-        )
 
         let game = MinimalGame(
             items: bottle, note

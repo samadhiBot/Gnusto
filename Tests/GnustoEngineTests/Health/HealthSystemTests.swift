@@ -49,12 +49,10 @@ struct HealthSystemTests {
 
     @Test("Creatures have default health when not specified")
     func testCreatureDefaultHealth() async throws {
-        let creature = Item(
-            id: "testCreature",
-            .name("test creature"),
-            .in("startRoom"),
-            .characterSheet(.init(health: 50)),
-        )
+        let creature = Item("testCreature")
+            .name("test creature")
+            .in("startRoom")
+            .characterSheet(.init(health: 50))
 
         let (engine, _) = await GameEngine.test(
             blueprint: MinimalGame(
@@ -69,12 +67,10 @@ struct HealthSystemTests {
 
     @Test("Creatures can have custom health values")
     func testCreatureCustomHealth() async throws {
-        let weakCreature = Item(
-            id: "weakCreature",
-            .name("weak creature"),
-            .characterSheet(.init(health: 25)),
+        let weakCreature = Item("weakCreature")
+            .name("weak creature")
+            .characterSheet(.init(health: 25))
             .in(.startRoom)
-        )
 
         let (engine, _) = await GameEngine.test(
             blueprint: MinimalGame(
@@ -89,12 +85,10 @@ struct HealthSystemTests {
 
     @Test("Creature health can be modified through damage and healing")
     func testCreatureHealthModification() async throws {
-        let creature = Item(
-            id: "testCreature",
-            .name("test creature"),
-            .characterSheet(.init(health: 80)),
+        let creature = Item("testCreature")
+            .name("test creature")
+            .characterSheet(.init(health: 80))
             .in(.startRoom)
-        )
 
         let (engine, _) = await GameEngine.test(
             blueprint: MinimalGame(
@@ -361,12 +355,10 @@ struct HealthSystemTests {
 
     @Test("Creatures have default strength when not specified")
     func testCreatureDefaultStrength() async throws {
-        let creature = Item(
-            id: "testCreature",
-            .name("test creature"),
-            .in(.startRoom),
+        let creature = Item("testCreature")
+            .name("test creature")
+            .in(.startRoom)
             .characterSheet(.default)
-        )
 
         let (engine, _) = await GameEngine.test(
             blueprint: MinimalGame(
@@ -381,12 +373,10 @@ struct HealthSystemTests {
 
     @Test("Creatures can have custom strength values")
     func testCreatureCustomStrength() async throws {
-        let strongCreature = Item(
-            id: "strongCreature",
-            .name("strong creature"),
-            .characterSheet(.init(strength: 25)),
+        let strongCreature = Item("strongCreature")
+            .name("strong creature")
+            .characterSheet(.init(strength: 25))
             .in(.startRoom)
-        )
 
         let (engine, _) = await GameEngine.test(
             blueprint: MinimalGame(
@@ -403,12 +393,10 @@ struct HealthSystemTests {
 
     @Test("Health cannot go below zero")
     func testHealthLowerBound() async throws {
-        let creature = Item(
-            id: "testCreature",
-            .name("test creature"),
-            .characterSheet(.init(health: 10)),
+        let creature = Item("testCreature")
+            .name("test creature")
+            .characterSheet(.init(health: 10))
             .in(.startRoom)
-        )
 
         let (engine, _) = await GameEngine.test(
             blueprint: MinimalGame(
@@ -428,12 +416,10 @@ struct HealthSystemTests {
 
     @Test("Health caps at maxHealth for standard healing")
     func testHealthUpperBound() async throws {
-        let creature = Item(
-            id: "testCreature",
-            .name("test creature"),
-            .characterSheet(.init(health: 90)),
+        let creature = Item("testCreature")
+            .name("test creature")
+            .characterSheet(.init(health: 90))
             .in(.startRoom)
-        )
 
         let (engine, _) = await GameEngine.test(
             blueprint: MinimalGame(
@@ -455,20 +441,16 @@ struct HealthSystemTests {
 
     @Test("Combat with healthy participants works")
     func testBasicCombatHealthIntegration() async throws {
-        let sword = Item(
-            id: "sword",
-            .name("sword"),
-            .isWeapon,
-            .isTakable,
+        let sword = Item("sword")
+            .name("sword")
+            .isWeapon
+            .isTakable
             .in(.player)
-        )
 
-        let creature = Item(
-            id: "creature",
-            .name("creature"),
-            .characterSheet(.init(health: 50)),
+        let creature = Item("creature")
+            .name("creature")
+            .characterSheet(.init(health: 50))
             .in(.startRoom)
-        )
 
         let (engine, mockIO) = await GameEngine.test(
             blueprint: MinimalGame(

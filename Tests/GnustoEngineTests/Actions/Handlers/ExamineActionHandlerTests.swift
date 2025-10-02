@@ -11,13 +11,11 @@ struct ExamineActionHandlerTests {
     @Test("EXAMINE DIRECTOBJECT syntax works")
     func testExamineDirectObjectSyntax() async throws {
         // Given
-        let book = Item(
-            id: "book",
-            .name("leather book"),
-            .description("A worn leather-bound book with mysterious symbols."),
-            .isTakable,
+        let book = Item("book")
+            .name("leather book")
+            .description("A worn leather-bound book with mysterious symbols.")
+            .isTakable
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: book
@@ -43,13 +41,11 @@ struct ExamineActionHandlerTests {
     @Test("X syntax works")
     func testXSyntax() async throws {
         // Given
-        let gem = Item(
-            id: "gem",
-            .name("sparkling gem"),
-            .description("A beautiful gem that catches the light."),
-            .isTakable,
+        let gem = Item("gem")
+            .name("sparkling gem")
+            .description("A beautiful gem that catches the light.")
+            .isTakable
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: gem
@@ -75,13 +71,11 @@ struct ExamineActionHandlerTests {
     @Test("INSPECT syntax works")
     func testInspectSyntax() async throws {
         // Given
-        let sword = Item(
-            id: "sword",
-            .name("steel sword"),
-            .description("A sharp steel sword with intricate engravings."),
-            .isTakable,
+        let sword = Item("sword")
+            .name("steel sword")
+            .description("A sharp steel sword with intricate engravings.")
+            .isTakable
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: sword
@@ -104,13 +98,11 @@ struct ExamineActionHandlerTests {
     @Test("Describe syntax works")
     func testDescribeSyntax() async throws {
         // Given
-        let ruby = Item(
-            id: "ruby",
-            .name("sparkling ruby"),
-            .description("A beautiful ruby that catches the light."),
-            .isTakable,
+        let ruby = Item("ruby")
+            .name("sparkling ruby")
+            .description("A beautiful ruby that catches the light.")
+            .isTakable
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: ruby
@@ -136,12 +128,10 @@ struct ExamineActionHandlerTests {
     @Test("LOOK AT syntax works")
     func testLookAtSyntax() async throws {
         // Given
-        let painting = Item(
-            id: "painting",
-            .name("oil painting"),
-            .description("A masterful oil painting of a distant landscape."),
+        let painting = Item("painting")
+            .name("oil painting")
+            .description("A masterful oil painting of a distant landscape.")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: painting
@@ -164,21 +154,17 @@ struct ExamineActionHandlerTests {
     @Test("EXAMINE ALL syntax works")
     func testExamineAllSyntax() async throws {
         // Given
-        let book = Item(
-            id: "book",
-            .name("red book"),
-            .description("A red leather book."),
-            .isTakable,
+        let book = Item("book")
+            .name("red book")
+            .description("A red leather book.")
+            .isTakable
             .in(.startRoom)
-        )
 
-        let candle = Item(
-            id: "candle",
-            .name("wax candle"),
-            .description("A simple wax candle."),
-            .isTakable,
+        let candle = Item("candle")
+            .name("wax candle")
+            .description("A simple wax candle.")
+            .isTakable
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: book, candle
@@ -240,18 +226,14 @@ struct ExamineActionHandlerTests {
     @Test("Cannot examine item not in scope")
     func testCannotExamineItemNotInScope() async throws {
         // Given
-        let anotherRoom = Location(
-            id: "anotherRoom",
-            .name("Another Room"),
-            .inherentlyLit
-        )
+        let anotherRoom = Location("anotherRoom")
+            .name("Another Room")
+                .inherentlyLit
 
-        let remoteBook = Item(
-            id: "remoteBook",
-            .name("remote book"),
-            .description("A book in another room."),
+        let remoteBook = Item("remoteBook")
+            .name("remote book")
+            .description("A book in another room.")
             .in("anotherRoom")
-        )
 
         let game = MinimalGame(
             locations: anotherRoom,
@@ -275,19 +257,15 @@ struct ExamineActionHandlerTests {
     @Test("Requires light to examine items")
     func testRequiresLight() async throws {
         // Given: Dark room with item
-        let darkRoom = Location(
-            id: "darkRoom",
-            .name("Dark Room"),
+        let darkRoom = Location("darkRoom")
+            .name("Dark Room")
             .description("A pitch black room.")
             // Note: No .inherentlyLit property
-        )
 
-        let book = Item(
-            id: "book",
-            .name("leather book"),
-            .description("A worn leather book."),
+        let book = Item("book")
+            .name("leather book")
+            .description("A worn leather book.")
             .in("darkRoom")
-        )
 
         let game = MinimalGame(
             player: Player(in: "darkRoom"),
@@ -334,14 +312,12 @@ struct ExamineActionHandlerTests {
     @Test("Examine readable item")
     func testExamineReadableItem() async throws {
         // Given
-        let scroll = Item(
-            id: "scroll",
-            .name("ancient scroll"),
-            .description("An ancient parchment scroll."),
-            .isReadable,
-            .readText("The scroll contains mystical runes and arcane symbols."),
+        let scroll = Item("scroll")
+            .name("ancient scroll")
+            .description("An ancient parchment scroll.")
+            .isReadable
+            .readText("The scroll contains mystical runes and arcane symbols.")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: scroll
@@ -370,30 +346,24 @@ struct ExamineActionHandlerTests {
     @Test("Examine open container shows contents")
     func testExamineOpenContainerShowsContents() async throws {
         // Given
-        let box = Item(
-            id: "box",
-            .name("wooden box"),
-            .description("A sturdy wooden box."),
-            .isContainer,
-            .isOpen,
+        let box = Item("box")
+            .name("wooden box")
+            .description("A sturdy wooden box.")
+            .isContainer
+            .isOpen
             .in(.startRoom)
-        )
 
-        let gem = Item(
-            id: "gem",
-            .name("ruby gem"),
-            .description("A precious ruby gem."),
-            .isTakable,
+        let gem = Item("gem")
+            .name("ruby gem")
+            .description("A precious ruby gem.")
+            .isTakable
             .in(.item("box"))
-        )
 
-        let coin = Item(
-            id: "coin",
-            .name("gold coin"),
-            .description("A shiny gold coin."),
-            .isTakable,
+        let coin = Item("coin")
+            .name("gold coin")
+            .description("A shiny gold coin.")
+            .isTakable
             .in(.item("box"))
-        )
 
         let game = MinimalGame(
             items: box, gem, coin
@@ -417,22 +387,18 @@ struct ExamineActionHandlerTests {
     @Test("Examine closed container shows closed state")
     func testExamineClosedContainerShowsClosedState() async throws {
         // Given
-        let chest = Item(
-            id: "chest",
-            .name("treasure chest"),
-            .description("An ornate treasure chest."),
-            .isContainer,
+        let chest = Item("chest")
+            .name("treasure chest")
+            .description("An ornate treasure chest.")
+            .isContainer
             // Note: No .isOpen flag - container is closed
             .in(.startRoom)
-        )
 
-        let treasure = Item(
-            id: "treasure",
-            .name("golden treasure"),
-            .description("Precious golden treasure."),
-            .isTakable,
+        let treasure = Item("treasure")
+            .name("golden treasure")
+            .description("Precious golden treasure.")
+            .isTakable
             .in(.item("chest"))
-        )
 
         let game = MinimalGame(
             items: chest, treasure
@@ -455,29 +421,23 @@ struct ExamineActionHandlerTests {
     @Test("Examine surface shows items on it")
     func testExamineSurfaceShowsItemsOnIt() async throws {
         // Given
-        let table = Item(
-            id: "table",
-            .name("oak table"),
-            .description("A solid oak table."),
-            .isSurface,
+        let table = Item("table")
+            .name("oak table")
+            .description("A solid oak table.")
+            .isSurface
             .in(.startRoom)
-        )
 
-        let book = Item(
-            id: "book",
-            .name("leather book"),
-            .description("A leather-bound book."),
-            .isTakable,
+        let book = Item("book")
+            .name("leather book")
+            .description("A leather-bound book.")
+            .isTakable
             .in(.item("table"))
-        )
 
-        let candle = Item(
-            id: "candle",
-            .name("wax candle"),
-            .description("A simple wax candle."),
-            .isTakable,
+        let candle = Item("candle")
+            .name("wax candle")
+            .description("A simple wax candle.")
+            .isTakable
             .in(.item("table"))
-        )
 
         let game = MinimalGame(
             items: table, book, candle
@@ -501,14 +461,12 @@ struct ExamineActionHandlerTests {
     @Test("Examine empty container")
     func testExamineEmptyContainer() async throws {
         // Given
-        let bag = Item(
-            id: "bag",
-            .name("leather bag"),
-            .description("A worn leather bag."),
-            .isContainer,
-            .isOpen,
+        let bag = Item("bag")
+            .name("leather bag")
+            .description("A worn leather bag.")
+            .isContainer
+            .isOpen
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: bag
@@ -531,13 +489,11 @@ struct ExamineActionHandlerTests {
     @Test("Examine empty surface")
     func testExamineEmptySurface() async throws {
         // Given
-        let desk = Item(
-            id: "desk",
-            .name("wooden desk"),
-            .description("A simple wooden desk."),
-            .isSurface,
+        let desk = Item("desk")
+            .name("wooden desk")
+            .description("A simple wooden desk.")
+            .isSurface
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: desk
@@ -560,13 +516,11 @@ struct ExamineActionHandlerTests {
     @Test("Examine door shows door state")
     func testExamineDoorShowsDoorState() async throws {
         // Given
-        let door = Item(
-            id: "door",
-            .name("oak door"),
-            .description("A heavy oak door."),
-            .isOpen,
+        let door = Item("door")
+            .name("oak door")
+            .description("A heavy oak door.")
+            .isOpen
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: door
@@ -589,13 +543,11 @@ struct ExamineActionHandlerTests {
     @Test("Updates pronouns to refer to examined item")
     func testUpdatesPronounsToExaminedItem() async throws {
         // Given
-        let book = Item(
-            id: "book",
-            .name("leather book"),
-            .description("A worn leather book."),
-            .isTakable,
+        let book = Item("book")
+            .name("leather book")
+            .description("A worn leather book.")
+            .isTakable
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: book
@@ -645,22 +597,18 @@ struct ExamineActionHandlerTests {
     @Test("Examine IN preposition delegates to look inside")
     func testExamineInDelegatesToLookInside() async throws {
         // Given
-        let box = Item(
-            id: "box",
-            .name("wooden box"),
-            .description("A wooden box."),
-            .isContainer,
-            .isOpen,
+        let box = Item("box")
+            .name("wooden box")
+            .description("A wooden box.")
+            .isContainer
+            .isOpen
             .in(.startRoom)
-        )
 
-        let gem = Item(
-            id: "gem",
-            .name("ruby gem"),
-            .description("A precious ruby."),
-            .isTakable,
+        let gem = Item("gem")
+            .name("ruby gem")
+            .description("A precious ruby.")
+            .isTakable
             .in(.item("box"))
-        )
 
         let game = MinimalGame(
             items: box, gem
@@ -683,21 +631,17 @@ struct ExamineActionHandlerTests {
     @Test("Examine ON preposition delegates to look inside")
     func testExamineOnDelegatesToLookInside() async throws {
         // Given
-        let table = Item(
-            id: "table",
-            .name("wooden table"),
-            .description("A wooden table."),
-            .isSurface,
+        let table = Item("table")
+            .name("wooden table")
+            .description("A wooden table.")
+            .isSurface
             .in(.startRoom)
-        )
 
-        let book = Item(
-            id: "book",
-            .name("red book"),
-            .description("A red book."),
-            .isTakable,
+        let book = Item("book")
+            .name("red book")
+            .description("A red book.")
+            .isTakable
             .in(.item("table"))
-        )
 
         let game = MinimalGame(
             items: table, book

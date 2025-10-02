@@ -53,12 +53,10 @@ struct HelpActionHandlerTests {
     @Test("Help works in any condition")
     func testHelpWorksInAnyCondition() async throws {
         // Given: Dark room (help should still work)
-        let darkRoom = Location(
-            id: "darkRoom",
-            .name("Dark Room"),
+        let darkRoom = Location("darkRoom")
+            .name("Dark Room")
             .description("A pitch black room.")
             // Note: No .inherentlyLit property
-        )
 
         let game = MinimalGame(
             player: Player(in: "darkRoom"),

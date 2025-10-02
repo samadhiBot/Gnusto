@@ -30,12 +30,10 @@ struct DanceActionHandlerTests {
     @Test("DANCE WITH (Item) DIRECTOBJECT syntax works")
     func testDanceWithItemDirectObjectSyntax() async throws {
         // Given
-        let statue = Item(
-            id: "statue",
-            .name("stone statue"),
-            .description("A graceful marble statue."),
+        let statue = Item("statue")
+            .name("stone statue")
+            .description("A graceful marble statue.")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: statue
@@ -58,13 +56,11 @@ struct DanceActionHandlerTests {
     @Test("DANCE WITH (Character) DIRECTOBJECT syntax works")
     func testDanceWithCharacterDirectObjectSyntax() async throws {
         // Given
-        let partner = Item(
-            id: "partner",
-            .name("dance partner"),
-            .description("A graceful dance partner."),
-            .characterSheet(.default),
+        let partner = Item("partner")
+            .name("dance partner")
+            .description("A graceful dance partner.")
+            .characterSheet(.default)
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: partner
@@ -127,11 +123,9 @@ struct DanceActionHandlerTests {
     @Test("Dance works in dark rooms")
     func testDanceWorksInDarkRooms() async throws {
         // Given: Dark room (no light required for dancing)
-        let darkRoom = Location(
-            id: "darkRoom",
-            .name("Dark Room"),
+        let darkRoom = Location("darkRoom")
+            .name("Dark Room")
             .description("A pitch black room.")
-        )
 
         let game = MinimalGame(
             player: Player(in: "darkRoom"),
@@ -156,12 +150,10 @@ struct DanceActionHandlerTests {
     @Test("Dance with object still works")
     func testDanceWithObject() async throws {
         // Given
-        let chair = Item(
-            id: "chair",
-            .name("wooden chair"),
-            .description("A simple wooden chair."),
+        let chair = Item("chair")
+            .name("wooden chair")
+            .description("A simple wooden chair.")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: chair

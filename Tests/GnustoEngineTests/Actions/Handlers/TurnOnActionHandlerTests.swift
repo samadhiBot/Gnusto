@@ -11,15 +11,13 @@ struct TurnOnActionHandlerTests {
     @Test("TURN ON DIRECTOBJECT syntax works")
     func testTurnOnDirectObjectSyntax() async throws {
         // Given
-        let flashlight = Item(
-            id: "flashlight",
-            .name("silver flashlight"),
-            .description("A modern silver flashlight."),
-            .isLightSource,
-            .isDevice,
-            .isTakable,
+        let flashlight = Item("flashlight")
+            .name("silver flashlight")
+            .description("A modern silver flashlight.")
+            .isLightSource
+            .isDevice
+            .isTakable
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: flashlight
@@ -45,15 +43,13 @@ struct TurnOnActionHandlerTests {
     @Test("SWITCH ON DIRECTOBJECT syntax works")
     func testSwitchOnDirectObjectSyntax() async throws {
         // Given
-        let lantern = Item(
-            id: "lantern",
-            .name("camping lantern"),
-            .description("A portable camping lantern."),
-            .isLightSource,
-            .isDevice,
-            .isTakable,
+        let lantern = Item("lantern")
+            .name("camping lantern")
+            .description("A portable camping lantern.")
+            .isLightSource
+            .isDevice
+            .isTakable
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: lantern
@@ -79,15 +75,13 @@ struct TurnOnActionHandlerTests {
     @Test("TURN DIRECTOBJECT ON syntax works")
     func testTurnDirectObjectOnSyntax() async throws {
         // Given
-        let flashlight = Item(
-            id: "flashlight",
-            .name("silver flashlight"),
-            .description("A modern silver flashlight."),
-            .isLightSource,
-            .isDevice,
-            .isTakable,
+        let flashlight = Item("flashlight")
+            .name("silver flashlight")
+            .description("A modern silver flashlight.")
+            .isLightSource
+            .isDevice
+            .isTakable
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: flashlight
@@ -151,20 +145,16 @@ struct TurnOnActionHandlerTests {
     @Test("Cannot turn on item not in scope")
     func testCannotTurnOnItemNotInScope() async throws {
         // Given
-        let anotherRoom = Location(
-            id: "anotherRoom",
-            .name("Another Room"),
+        let anotherRoom = Location("anotherRoom")
+            .name("Another Room")
             .inherentlyLit
-        )
 
-        let remoteLamp = Item(
-            id: "remoteLamp",
-            .name("remote lamp"),
-            .description("A lamp in another room."),
-            .isLightSource,
-            .isDevice,
+        let remoteLamp = Item("remoteLamp")
+            .name("remote lamp")
+            .description("A lamp in another room.")
+            .isLightSource
+            .isDevice
             .in("anotherRoom")
-        )
 
         let game = MinimalGame(
             locations: anotherRoom,
@@ -188,12 +178,10 @@ struct TurnOnActionHandlerTests {
     @Test("Cannot turn on non-device item")
     func testCannotTurnOnNonDeviceItem() async throws {
         // Given
-        let rock = Item(
-            id: "rock",
-            .name("large rock"),
-            .description("A heavy stone."),
+        let rock = Item("rock")
+            .name("large rock")
+            .description("A heavy stone.")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: rock
@@ -216,15 +204,13 @@ struct TurnOnActionHandlerTests {
     @Test("Cannot turn on already on device")
     func testCannotTurnOnAlreadyOnDevice() async throws {
         // Given
-        let lamp = Item(
-            id: "lamp",
-            .name("brass lamp"),
-            .description("A shiny brass lamp."),
-            .isLightSource,
-            .isDevice,
-            .isTakable,
+        let lamp = Item("lamp")
+            .name("brass lamp")
+            .description("A shiny brass lamp.")
+            .isLightSource
+            .isDevice
+            .isTakable
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: lamp
@@ -252,22 +238,18 @@ struct TurnOnActionHandlerTests {
     @Test("Can turn on held light source in dark room")
     func testCanTurnOnHeldLightSourceInDarkRoom() async throws {
         // Given: Dark room with light source on floor
-        let darkRoom = Location(
-            id: "darkRoom",
-            .name("Dark Room"),
+        let darkRoom = Location("darkRoom")
+            .name("Dark Room")
             .description("A pitch black room.")
             // Note: No .inherentlyLit property
-        )
 
-        let lamp = Item(
-            id: "lamp",
-            .name("brass lamp"),
-            .description("A brass lamp sitting on the floor."),
-            .isLightSource,
-            .isDevice,
-            .isTakable,
+        let lamp = Item("lamp")
+            .name("brass lamp")
+            .description("A brass lamp sitting on the floor.")
+            .isLightSource
+            .isDevice
+            .isTakable
             .in(.player)
-        )
 
         let game = MinimalGame(
             player: Player(in: "darkRoom"),
@@ -299,22 +281,18 @@ struct TurnOnActionHandlerTests {
     @Test("Cannot turn on not held light source in dark room")
     func testCannotTurnOnNotHeldLightSourceInDarkRoom() async throws {
         // Given: Dark room with light source on floor
-        let darkRoom = Location(
-            id: "darkRoom",
-            .name("Dark Room"),
+        let darkRoom = Location("darkRoom")
+            .name("Dark Room")
             .description("A pitch black room.")
             // Note: No .inherentlyLit property
-        )
 
-        let lamp = Item(
-            id: "lamp",
-            .name("brass lamp"),
-            .description("A brass lamp sitting on the floor."),
-            .isLightSource,
-            .isDevice,
-            .isTakable,
+        let lamp = Item("lamp")
+            .name("brass lamp")
+            .description("A brass lamp sitting on the floor.")
+            .isLightSource
+            .isDevice
+            .isTakable
             .in("darkRoom")
-        )
 
         let game = MinimalGame(
             player: Player(in: "darkRoom"),
@@ -342,21 +320,17 @@ struct TurnOnActionHandlerTests {
     @Test("Requires light for non-light-source items")
     func testRequiresLightForNonLightSources() async throws {
         // Given: Dark room with non-light-source device
-        let darkRoom = Location(
-            id: "darkRoom",
-            .name("Dark Room"),
+        let darkRoom = Location("darkRoom")
+            .name("Dark Room")
             .description("A pitch black room.")
             // Note: No .inherentlyLit property
-        )
 
-        let radio = Item(
-            id: "radio",
-            .name("portable radio"),
-            .description("A small portable radio."),
-            .isDevice,
-            .isTakable,
+        let radio = Item("radio")
+            .name("portable radio")
+            .description("A small portable radio.")
+            .isDevice
+            .isTakable
             .in("darkRoom")
-        )
 
         let game = MinimalGame(
             player: Player(in: "darkRoom"),
@@ -383,15 +357,13 @@ struct TurnOnActionHandlerTests {
     @Test("Turn on device sets isOn flag")
     func testTurnOnDeviceSetsIsOnFlag() async throws {
         // Given
-        let lamp = Item(
-            id: "lamp",
-            .name("brass lamp"),
-            .description("A shiny brass lamp."),
-            .isLightSource,
-            .isDevice,
-            .isTakable,
+        let lamp = Item("lamp")
+            .name("brass lamp")
+            .description("A shiny brass lamp.")
+            .isLightSource
+            .isDevice
+            .isTakable
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: lamp
@@ -418,22 +390,18 @@ struct TurnOnActionHandlerTests {
     @Test("Turn on light source illuminates dark room")
     func testTurnOnLightSourceIlluminatesDarkRoom() async throws {
         // Given: Dark room with player holding light source
-        let darkRoom = Location(
-            id: "darkRoom",
-            .name("Dark Room"),
+        let darkRoom = Location("darkRoom")
+            .name("Dark Room")
             .description("A room that is dark without a light source.")
             // Note: No .inherentlyLit property
-        )
 
-        let torch = Item(
-            id: "torch",
-            .name("silver torch"),
-            .description("A silver torch with an unlit tip."),
-            .isLightSource,
-            .isDevice,
-            .isTakable,
+        let torch = Item("torch")
+            .name("silver torch")
+            .description("A silver torch with an unlit tip.")
+            .isLightSource
+            .isDevice
+            .isTakable
             .in(.player)
-        )
 
         let game = MinimalGame(
             player: Player(in: "darkRoom"),
@@ -477,14 +445,12 @@ struct TurnOnActionHandlerTests {
     @Test("Turn on non-light-source device")
     func testTurnOnNonLightSourceDevice() async throws {
         // Given
-        let radio = Item(
-            id: "radio",
-            .name("portable radio"),
-            .description("A small portable radio."),
-            .isDevice,
-            .isTakable,
+        let radio = Item("radio")
+            .name("portable radio")
+            .description("A small portable radio.")
+            .isDevice
+            .isTakable
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: radio
@@ -510,15 +476,13 @@ struct TurnOnActionHandlerTests {
     @Test("Updates pronouns to refer to turned on item")
     func testUpdatesPronounsToTurnedOnItem() async throws {
         // Given
-        let lamp = Item(
-            id: "lamp",
-            .name("brass lamp"),
-            .description("A shiny brass lamp."),
-            .isLightSource,
-            .isDevice,
-            .isTakable,
+        let lamp = Item("lamp")
+            .name("brass lamp")
+            .description("A shiny brass lamp.")
+            .isLightSource
+            .isDevice
+            .isTakable
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: lamp
@@ -547,22 +511,18 @@ struct TurnOnActionHandlerTests {
     @Test("Turn on inherently lit room light source doesn't show illumination message")
     func testTurnOnInInherentlyLitRoom() async throws {
         // Given: Inherently lit room
-        let litRoom = Location(
-            id: "litRoom",
-            .name("Bright Room"),
-            .description("A naturally bright room."),
+        let litRoom = Location("litRoom")
+            .name("Bright Room")
+            .description("A naturally bright room.")
             .inherentlyLit
-        )
 
-        let lamp = Item(
-            id: "lamp",
-            .name("desk lamp"),
-            .description("A small desk lamp."),
-            .isLightSource,
-            .isDevice,
-            .isTakable,
+        let lamp = Item("lamp")
+            .name("desk lamp")
+            .description("A small desk lamp.")
+            .isLightSource
+            .isDevice
+            .isTakable
             .in(.player)
-        )
 
         let game = MinimalGame(
             player: Player(in: "litRoom"),

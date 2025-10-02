@@ -9,13 +9,11 @@ struct ItemEventHandlerTests {
     // MARK: - Test Data
 
     private func createTestGame() -> MinimalGame {
-        let testItem = Item(
-            id: "testItem",
-            .name("test item"),
-            .description("A simple test item."),
-            .isTakable,
+        let testItem = Item("testItem")
+            .name("test item")
+            .description("A simple test item.")
+            .isTakable
             .in(.startRoom)
-        )
 
         return MinimalGame(items: testItem)
     }
@@ -131,7 +129,8 @@ struct ItemEventHandlerTests {
         let (engine, mockIO) = await GameEngine.test(blueprint: blueprint)
         try await engine.execute("examine test item")
 
-        await mockIO.expectOutput("""
+        await mockIO.expectOutput(
+            """
             > examine test item
             Intent matched!
             """)
@@ -180,7 +179,8 @@ struct ItemEventHandlerTests {
         let (engine, mockIO) = await GameEngine.test(blueprint: blueprint)
         try await engine.execute("take test item")
 
-        await mockIO.expectOutput("""
+        await mockIO.expectOutput(
+            """
             > take test item
             One intent matched!
             """)
@@ -336,19 +336,15 @@ struct ItemEventHandlerTests {
             }
         }
 
-        let item1 = Item(
-            id: "item1",
-            .name("first item"),
-            .isTakable,
+        let item1 = Item("item1")
+            .name("first item")
+            .isTakable
             .in(.startRoom)
-        )
 
-        let item2 = Item(
-            id: "item2",
-            .name("second item"),
-            .isTakable,
+        let item2 = Item("item2")
+            .name("second item")
+            .isTakable
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: item1, item2
@@ -491,14 +487,12 @@ struct ItemEventHandlerTests {
             return nil
         }
 
-        let magicOrb = Item(
-            id: "magicOrb",
-            .name("magic orb"),
-            .description("A mysterious orb."),
-            .isDevice,
-            .isTakable,
+        let magicOrb = Item("magicOrb")
+            .name("magic orb")
+            .description("A mysterious orb.")
+            .isDevice
+            .isTakable
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: magicOrb
@@ -638,14 +632,12 @@ struct ItemEventHandlerTests {
             }
         }
 
-        let glowItem = Item(
-            id: "glowItem",
-            .name("glowing stone"),
-            .description("A mysterious stone."),
-            .isDevice,
-            .isTakable,
+        let glowItem = Item("glowItem")
+            .name("glowing stone")
+            .description("A mysterious stone.")
+            .isDevice
+            .isTakable
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: glowItem
@@ -801,21 +793,17 @@ struct ItemEventHandlerTests {
 
     @Test("Bottle handler - throw bottle with water")
     func testBottleThrowWithWater() async throws {
-        let bottle = Item(
-            id: "bottle",
-            .name("glass bottle"),
-            .isTakable,
-            .isContainer,
-            .isOpen,
+        let bottle = Item("bottle")
+            .name("glass bottle")
+            .isTakable
+            .isContainer
+            .isOpen
             .in(.player)
-        )
 
-        let water = Item(
-            id: "water",
-            .name("quantity of water"),
-            .isTakable,
+        let water = Item("water")
+            .name("quantity of water")
+            .isTakable
             .in(.item("bottle"))
-        )
 
         let game = MinimalGame(
             items: bottle, water
@@ -850,21 +838,17 @@ struct ItemEventHandlerTests {
 
     @Test("Bottle handler - throw empty bottle")
     func testBottleThrowEmpty() async throws {
-        let bottle = Item(
-            id: "bottle",
-            .name("glass bottle"),
-            .isTakable,
-            .isContainer,
-            .isOpen,
+        let bottle = Item("bottle")
+            .name("glass bottle")
+            .isTakable
+            .isContainer
+            .isOpen
             .in(.player)
-        )
 
-        let water = Item(
-            id: "water",
-            .name("quantity of water"),
-            .isTakable,
+        let water = Item("water")
+            .name("quantity of water")
+            .isTakable
             .in(.nowhere)
-        )
 
         let game = MinimalGame(
             items: bottle, water
@@ -888,7 +872,7 @@ struct ItemEventHandlerTests {
             """
             > throw bottle
             The bottle hits the far wall and shatters.
-
+            
             > inventory
             Your hands are as empty as your pockets.
             """
@@ -901,21 +885,17 @@ struct ItemEventHandlerTests {
 
     @Test("Bottle handler - attack bottle with water")
     func testBottleAttackWithWater() async throws {
-        let bottle = Item(
-            id: "bottle",
-            .name("glass bottle"),
-            .isTakable,
-            .isContainer,
-            .isOpen,
+        let bottle = Item("bottle")
+            .name("glass bottle")
+            .isTakable
+            .isContainer
+            .isOpen
             .in(.player)
-        )
 
-        let water = Item(
-            id: "water",
-            .name("quantity of water"),
-            .isTakable,
+        let water = Item("water")
+            .name("quantity of water")
+            .isTakable
             .in(.item("bottle"))
-        )
 
         let game = MinimalGame(
             items: bottle, water
@@ -949,21 +929,17 @@ struct ItemEventHandlerTests {
 
     @Test("Bottle handler - shake open bottle with water")
     func testBottleShakeWithWater() async throws {
-        let bottle = Item(
-            id: "bottle",
-            .name("glass bottle"),
-            .isTakable,
-            .isContainer,
-            .isOpen,
+        let bottle = Item("bottle")
+            .name("glass bottle")
+            .isTakable
+            .isContainer
+            .isOpen
             .in(.player)
-        )
 
-        let water = Item(
-            id: "water",
-            .name("quantity of water"),
-            .isTakable,
+        let water = Item("water")
+            .name("quantity of water")
+            .isTakable
             .in(.item("bottle"))
-        )
 
         let game = MinimalGame(
             items: bottle, water
@@ -996,21 +972,17 @@ struct ItemEventHandlerTests {
 
     @Test("Bottle handler - shake closed bottle with water does nothing special")
     func testBottleShakeClosedWithWater() async throws {
-        let bottle = Item(
-            id: "bottle",
-            .name("glass bottle"),
-            .isTakable,
-            .isContainer,
-            // Note: not open
+        let bottle = Item("bottle")
+            .name("glass bottle")
+            .isTakable
+            .isContainer
+        // Note: not open
             .in(.player)
-        )
 
-        let water = Item(
-            id: "water",
-            .name("quantity of water"),
-            .isTakable,
+        let water = Item("water")
+            .name("quantity of water")
+            .isTakable
             .in(.item("bottle"))
-        )
 
         let game = MinimalGame(
             items: bottle, water
@@ -1027,7 +999,8 @@ struct ItemEventHandlerTests {
         try await engine.execute("shake bottle")
 
         // Then - should get default shake message since bottle is closed
-        await mockIO.expectOutput("""
+        await mockIO.expectOutput(
+            """
             > shake bottle
             Your agitation of the glass bottle produces no observable
             effect.

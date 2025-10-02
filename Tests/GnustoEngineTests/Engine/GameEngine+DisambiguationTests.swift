@@ -12,19 +12,15 @@ struct GameEngineDisambiguationTests {
     @Test("Disambiguation context is stored correctly")
     func testContextStorage() async throws {
         // Given
-        let newBook = Item(
-            id: "newBook",
-            .name("new book"),
-            .isTakable,
+        let newBook = Item("newBook")
+            .name("new book")
+                .isTakable
             .in(.player)
-        )
 
-        let oldBook = Item(
-            id: "oldBook",
-            .name("old book"),
-            .isTakable,
+        let oldBook = Item("oldBook")
+            .name("old book")
+                .isTakable
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: newBook, oldBook
@@ -74,19 +70,15 @@ struct GameEngineDisambiguationTests {
     @Test("Disambiguation response matches exact option")
     func testResponseMatching() async throws {
         // Given
-        let newBook = Item(
-            id: "newBook",
-            .name("new book"),
-            .isTakable,
+        let newBook = Item("newBook")
+            .name("new book")
+                .isTakable
             .in(.player)
-        )
 
-        let table = Item(
-            id: "table",
-            .name("table"),
-            .isSurface,
+        let table = Item("table")
+            .name("table")
+                .isSurface
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: newBook, table
@@ -124,19 +116,15 @@ struct GameEngineDisambiguationTests {
     @Test("Disambiguation response handles case insensitive matching")
     func testCaseInsensitiveMatching() async throws {
         // Given
-        let newBook = Item(
-            id: "newBook",
-            .name("new book"),
-            .isTakable,
+        let newBook = Item("newBook")
+            .name("new book")
+                .isTakable
             .in(.player)
-        )
 
-        let table = Item(
-            id: "table",
-            .name("table"),
-            .isSurface,
+        let table = Item("table")
+            .name("table")
+                .isSurface
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: newBook, table
@@ -250,26 +238,20 @@ struct GameEngineDisambiguationTests {
     @Test("End-to-end disambiguation flow works")
     func testEndToEndDisambiguation() async throws {
         // Given
-        let newBook = Item(
-            id: "newBook",
-            .name("new book"),
-            .isTakable,
+        let newBook = Item("newBook")
+            .name("new book")
+                .isTakable
             .in(.player)
-        )
 
-        let oldBook = Item(
-            id: "oldBook",
-            .name("old book"),
-            .isTakable,
+        let oldBook = Item("oldBook")
+            .name("old book")
+                .isTakable
             .in(.player)
-        )
 
-        let table = Item(
-            id: "table",
-            .name("table"),
-            .isSurface,
+        let table = Item("table")
+            .name("table")
+                .isSurface
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: newBook, oldBook, table

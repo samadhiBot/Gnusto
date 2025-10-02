@@ -40,12 +40,10 @@ struct ScriptActionHandlerTests {
     @Test("SCRIPT requires no light")
     func testScriptRequiresNoLight() async throws {
         // Given: Dark room (to verify light is not required)
-        let darkRoom = Location(
-            id: "darkRoom",
-            .name("Dark Room"),
+        let darkRoom = Location("darkRoom")
+            .name("Dark Room")
             .description("A pitch black room.")
             // Note: No .inherentlyLit property
-        )
 
         let game = MinimalGame(
             player: Player(in: "darkRoom"),
@@ -150,15 +148,13 @@ struct ScriptActionHandlerTests {
     @Test("SCRIPT works regardless of game state")
     func testScriptWorksInAnyGameState() async throws {
         // Given: Complex game state with items, flags, etc.
-        let lamp = Item(
-            id: "lamp",
-            .name("brass lamp"),
-            .description("A shiny brass lamp."),
-            .isLightSource,
-            .isDevice,
-            .isTakable,
+        let lamp = Item("lamp")
+            .name("brass lamp")
+            .description("A shiny brass lamp.")
+            .isLightSource
+            .isDevice
+            .isTakable
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: lamp
@@ -194,13 +190,11 @@ struct ScriptActionHandlerTests {
     @Test("SCRIPT preserves other game state")
     func testScriptPreservesGameState() async throws {
         // Given
-        let book = Item(
-            id: "book",
-            .name("leather book"),
-            .description("A bound leather book."),
-            .isTakable,
+        let book = Item("book")
+            .name("leather book")
+            .description("A bound leather book.")
+            .isTakable
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: book

@@ -210,38 +210,48 @@ class GameDataCollector {
 
                 // Handle stored properties with initializers
                 if let initializer = binding.initializer?.value {
-                    // Check for Location/Item initialization patterns
-                    if let functionCall = initializer.as(FunctionCallExprSyntax.self) {
-                        let functionName = functionCall.calledExpression.trimmedDescription
+                    // Try to find a function call, either directly or wrapped in ExprSyntax
+                    let functionCall: FunctionCallExprSyntax? =
+                        initializer.as(FunctionCallExprSyntax.self)
+                        ?? findBaseFunctionCall(in: initializer)
 
-                        if functionName == "Location" {
+                    if let functionCall {
+                        // For chained calls like Location(id: .x).name("Y").description("Z")
+                        // we need to find the base Location/Item call
+                        let (baseFunctionCall, baseFunctionName) = findBaseCall(functionCall)
+
+                        if baseFunctionName == "Location" {
                             extractLocationData(
-                                from: functionCall, propertyName: propertyName, isStatic: isStatic)
-                        } else if functionName == "Item" {
+                                from: baseFunctionCall, propertyName: propertyName,
+                                isStatic: isStatic)
+                        } else if baseFunctionName == "Item" {
                             extractItemData(
-                                from: functionCall, propertyName: propertyName, isStatic: isStatic)
-                        } else if functionName == "ItemEventHandler" {
+                                from: baseFunctionCall, propertyName: propertyName,
+                                isStatic: isStatic)
+                        } else if baseFunctionName == "ItemEventHandler" {
                             extractEventHandlerData(
                                 from: propertyName, type: .item, isStatic: isStatic)
-                        } else if functionName == "LocationEventHandler" {
+                        } else if baseFunctionName == "LocationEventHandler" {
                             extractEventHandlerData(
                                 from: propertyName, type: .location, isStatic: isStatic)
-                        } else if functionName == "ItemComputer" {
+                        } else if baseFunctionName == "ItemComputer" {
                             extractComputeHandlerData(
                                 from: propertyName, type: .item, isStatic: isStatic)
-                        } else if functionName == "LocationComputer" {
+                        } else if baseFunctionName == "LocationComputer" {
                             extractComputeHandlerData(
                                 from: propertyName, type: .location, isStatic: isStatic)
-                        } else if isCombatSystemType(functionName) {
+                        } else if isCombatSystemType(baseFunctionName) {
                             extractCombatSystemData(
-                                from: functionCall, propertyName: propertyName, isStatic: isStatic)
-                        } else if isCombatMessengerType(functionName) {
+                                from: baseFunctionCall, propertyName: propertyName,
+                                isStatic: isStatic)
+                        } else if isCombatMessengerType(baseFunctionName) {
                             extractCombatMessengerData(
-                                from: functionCall, propertyName: propertyName, isStatic: isStatic)
-                        } else if functionName == "Fuse" {
+                                from: baseFunctionCall, propertyName: propertyName,
+                                isStatic: isStatic)
+                        } else if baseFunctionName == "Fuse" {
                             extractFuseData(
                                 from: varDecl, propertyName: propertyName, isStatic: isStatic)
-                        } else if functionName == "Daemon" {
+                        } else if baseFunctionName == "Daemon" {
                             extractDaemonData(
                                 from: varDecl, propertyName: propertyName, isStatic: isStatic)
                         }
@@ -255,6 +265,76 @@ class GameDataCollector {
                 }
             }
         }
+    }
+
+    /// Finds the base function call in a potentially chained call expression.
+    /// For example, in `Location(id: .x).name("Y").description("Z")`,
+    /// this returns the `Location(id: .x)` call and "Location" as the function name.
+    private func findBaseCall(_ functionCall: FunctionCallExprSyntax) -> (
+        FunctionCallExprSyntax, String
+    ) {
+        // Check if this is a chained call (e.g., something.method(...))
+        if let memberAccess = functionCall.calledExpression.as(MemberAccessExprSyntax.self),
+            let base = memberAccess.base
+        {
+            // The base might be a FunctionCallExprSyntax directly, or it might be
+            // wrapped in an ExprSyntax. Try to unwrap it.
+            if let baseCall = findBaseFunctionCall(in: base) {
+                // Recursively find the base call
+                return findBaseCall(baseCall)
+            }
+        }
+
+        // This is the base call - extract just the function name
+        let functionName = extractFunctionName(from: functionCall)
+        return (functionCall, functionName)
+    }
+
+    /// Recursively searches for a FunctionCallExprSyntax within an expression.
+    /// This handles cases where Swift wraps function calls in generic ExprSyntax nodes.
+    private func findBaseFunctionCall(in expr: ExprSyntax) -> FunctionCallExprSyntax? {
+        // Try direct cast
+        if let functionCall = expr.as(FunctionCallExprSyntax.self) {
+            return functionCall
+        }
+
+        // If it's a member access, check its base
+        if let memberAccess = expr.as(MemberAccessExprSyntax.self),
+            let base = memberAccess.base
+        {
+            return findBaseFunctionCall(in: base)
+        }
+
+        // For any other expression type, try to find function calls recursively
+        // by checking all child expressions
+        for child in expr.children(viewMode: .sourceAccurate) {
+            if let childExpr = child.as(ExprSyntax.self),
+                let functionCall = findBaseFunctionCall(in: childExpr)
+            {
+                return functionCall
+            }
+        }
+
+        return nil
+    }
+
+    /// Extracts just the function name from a function call expression.
+    /// For example, "Location" from "Location(id: .x)".
+    private func extractFunctionName(from functionCall: FunctionCallExprSyntax) -> String {
+        let calledExpr = functionCall.calledExpression
+
+        // If it's a simple identifier like "Location" or "Item"
+        if let identifier = calledExpr.as(DeclReferenceExprSyntax.self) {
+            return identifier.baseName.text
+        }
+
+        // If it's a member access like "SomeType.Location"
+        if let memberAccess = calledExpr.as(MemberAccessExprSyntax.self) {
+            return memberAccess.declName.baseName.text
+        }
+
+        // Fallback to full description (shouldn't normally happen)
+        return calledExpr.trimmedDescription
     }
 
     private enum EventHandlerType {
@@ -325,22 +405,29 @@ class GameDataCollector {
         propertyName: String,
         isStatic: Bool
     ) {
-        // Look for id: .locationName pattern
-        guard let arguments = functionCall.arguments.first else { return }
+        // Look for both patterns:
+        // - Location(.locationName) ...)
+        // - Location(.locationName)
+        guard let firstArgument = functionCall.arguments.first else { return }
 
-        if let memberAccess = arguments.expression.as(MemberAccessExprSyntax.self),
-            arguments.label?.text == "id"
-        {
-            let locationID = memberAccess.declName.baseName.text
-            let lineNumber = getLineNumber(for: memberAccess)
-            gameData.locationIDs[locationID] = SourceLocation(
-                fileName: currentFileName, lineNumber: lineNumber)
-            gameData.locations.insert(propertyName)
+        // Check if this is a member access expression (e.g., .locationName)
+        if let memberAccess = firstArgument.expression.as(MemberAccessExprSyntax.self) {
+            // Accept both labeled (id:) and unlabeled parameters
+            let isLabeledCorrectly = firstArgument.label?.text == "id"
+            let isUnlabeled = firstArgument.label == nil
 
-            // Map this location property to its area type
-            if let currentAreaType {
-                gameData.locationToAreaMap[propertyName] = currentAreaType
-                gameData.propertyIsStatic[propertyName] = isStatic
+            if isLabeledCorrectly || isUnlabeled {
+                let locationID = memberAccess.declName.baseName.text
+                let lineNumber = getLineNumber(for: memberAccess)
+                gameData.locationIDs[locationID] = SourceLocation(
+                    fileName: currentFileName, lineNumber: lineNumber)
+                gameData.locations.insert(propertyName)
+
+                // Map this location property to its area type
+                if let currentAreaType {
+                    gameData.locationToAreaMap[propertyName] = currentAreaType
+                    gameData.propertyIsStatic[propertyName] = isStatic
+                }
             }
         }
     }
@@ -451,22 +538,29 @@ class GameDataCollector {
         propertyName: String,
         isStatic: Bool
     ) {
-        // Look for id: .itemName pattern
-        guard let arguments = functionCall.arguments.first else { return }
+        // Look for both patterns:
+        // - Item(.itemName) ...)
+        // - Item(.itemName)
+        guard let firstArgument = functionCall.arguments.first else { return }
 
-        if let memberAccess = arguments.expression.as(MemberAccessExprSyntax.self),
-            arguments.label?.text == "id"
-        {
-            let itemID = memberAccess.declName.baseName.text
-            let lineNumber = getLineNumber(for: memberAccess)
-            gameData.itemIDs[itemID] = SourceLocation(
-                fileName: currentFileName, lineNumber: lineNumber)
-            gameData.items.insert(propertyName)
+        // Check if this is a member access expression (e.g., .itemName)
+        if let memberAccess = firstArgument.expression.as(MemberAccessExprSyntax.self) {
+            // Accept both labeled (id:) and unlabeled parameters
+            let isLabeledCorrectly = firstArgument.label?.text == "id"
+            let isUnlabeled = firstArgument.label == nil
 
-            // Map this item property to its area type
-            if let currentAreaType {
-                gameData.itemToAreaMap[propertyName] = currentAreaType
-                gameData.propertyIsStatic[propertyName] = isStatic
+            if isLabeledCorrectly || isUnlabeled {
+                let itemID = memberAccess.declName.baseName.text
+                let lineNumber = getLineNumber(for: memberAccess)
+                gameData.itemIDs[itemID] = SourceLocation(
+                    fileName: currentFileName, lineNumber: lineNumber)
+                gameData.items.insert(propertyName)
+
+                // Map this item property to its area type
+                if let currentAreaType {
+                    gameData.itemToAreaMap[propertyName] = currentAreaType
+                    gameData.propertyIsStatic[propertyName] = isStatic
+                }
             }
         }
 

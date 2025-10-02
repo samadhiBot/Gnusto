@@ -29,12 +29,10 @@ struct BreatheActionHandlerTests {
     @Test("BREATHE ON DIRECTOBJECT syntax works")
     func testBreatheOnDirectObjectSyntax() async throws {
         // Given
-        let flower = Item(
-            id: "flower",
-            .name("red flower"),
-            .description("A beautiful red flower."),
+        let flower = Item("flower")
+            .name("red flower")
+            .description("A beautiful red flower.")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: flower
@@ -59,12 +57,10 @@ struct BreatheActionHandlerTests {
     @Test("Cannot breathe with direct object")
     func testCannotBreatheWithDirectObject() async throws {
         // Given
-        let mist = Item(
-            id: "mist",
-            .name("fresh mist"),
-            .description("The mist around you."),
+        let mist = Item("mist")
+            .name("fresh mist")
+            .description("The mist around you.")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: mist
@@ -87,12 +83,10 @@ struct BreatheActionHandlerTests {
     @Test("Cannot breathe with indirect object")
     func testCannotBreatheWithIndirectObject() async throws {
         // Given
-        let mask = Item(
-            id: "mask",
-            .name("gas mask"),
-            .description("A protective gas mask."),
+        let mask = Item("mask")
+            .name("gas mask")
+            .description("A protective gas mask.")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: mask
@@ -133,11 +127,9 @@ struct BreatheActionHandlerTests {
     @Test("Breathe works in dark rooms")
     func testBreatheWorksInDarkRooms() async throws {
         // Given: Dark room (no light required for breathing)
-        let darkRoom = Location(
-            id: "darkRoom",
-            .name("Dark Room"),
+        let darkRoom = Location("darkRoom")
+            .name("Dark Room")
             .description("A pitch black room.")
-        )
 
         let game = MinimalGame(
             player: Player(in: "darkRoom"),

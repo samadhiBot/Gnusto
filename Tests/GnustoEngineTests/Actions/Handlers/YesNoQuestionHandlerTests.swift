@@ -107,14 +107,12 @@ struct YesNoQuestionHandlerTests {
     @Test("YES with pending command question executes command")
     func testYesWithCommandQuestion() async throws {
         // Given
-        let apple = Item(
-            id: "apple",
-            .name("red apple"),
-            .description("A delicious red apple."),
-            .isTakable,
-            .isEdible,
+        let apple = Item("apple")
+            .name("red apple")
+            .description("A delicious red apple.")
+            .isTakable
+            .isEdible
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: apple
@@ -221,14 +219,12 @@ struct YesNoQuestionHandlerTests {
     @Test("askConfirmation creates proper confirmation dialog")
     func testAskConfirmation() async throws {
         // Given
-        let apple = Item(
-            id: "apple",
-            .name("red apple"),
-            .description("A delicious red apple."),
-            .isTakable,
-            .isEdible,
+        let apple = Item("apple")
+            .name("red apple")
+            .description("A delicious red apple.")
+            .isTakable
+            .isEdible
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: apple
@@ -294,13 +290,11 @@ struct YesNoQuestionHandlerTests {
     @Test("askToDisambiguate creates disambiguation dialog")
     func testAskToDisambiguate() async throws {
         // Given
-        let redApple = Item(
-            id: "redApple",
-            .name("red apple"),
-            .description("A red apple."),
-            .isTakable,
+        let redApple = Item("redApple")
+            .name("red apple")
+            .description("A red apple.")
+            .isTakable
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: redApple
@@ -340,13 +334,11 @@ struct YesNoQuestionHandlerTests {
     @Test("Full disambiguation flow with YES response")
     func testFullDisambiguationFlowYes() async throws {
         // Given
-        let redApple = Item(
-            id: "redApple",
-            .name("red apple"),
-            .description("A red apple."),
-            .isTakable,
+        let redApple = Item("redApple")
+            .name("red apple")
+            .description("A red apple.")
+            .isTakable
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: redApple
@@ -393,13 +385,11 @@ struct YesNoQuestionHandlerTests {
     @Test("Full disambiguation flow with NO response")
     func testFullDisambiguationFlowNo() async throws {
         // Given
-        let redApple = Item(
-            id: "redApple",
-            .name("red apple"),
-            .description("A red apple."),
-            .isTakable,
+        let redApple = Item("redApple")
+            .name("red apple")
+            .description("A red apple.")
+            .isTakable
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: redApple
@@ -477,12 +467,10 @@ struct YesNoQuestionHandlerTests {
     @Test("Handler processes commands with direct objects correctly")
     func testHandlerWithDirectObjects() async throws {
         // Given
-        let thing = Item(
-            id: "thing",
-            .name("thing"),
-            .description("A thing."),
+        let thing = Item("thing")
+            .name("thing")
+            .description("A thing.")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: thing

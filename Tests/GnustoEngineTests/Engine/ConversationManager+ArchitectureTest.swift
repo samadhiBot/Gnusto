@@ -10,14 +10,12 @@ struct ConversationManagerArchitectureTest {
     @Test("ConversationManager is a proper GameEngine subsystem")
     func testConversationManagerAsEngineSubsystem() async throws {
         // Given: A minimal game setup
-        let apple = Item(
-            id: "apple",
-            .name("red apple"),
-            .description("A delicious red apple."),
-            .isTakable,
-            .isEdible,
+        let apple = Item("apple")
+            .name("red apple")
+            .description("A delicious red apple.")
+            .isTakable
+            .isEdible
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: apple
@@ -39,14 +37,12 @@ struct ConversationManagerArchitectureTest {
     @Test("ConversationManager stores strongly typed data")
     func testStronglyTypedData() async throws {
         // Given: A minimal game setup with an apple
-        let apple = Item(
-            id: "apple",
-            .name("red apple"),
-            .description("A delicious red apple."),
-            .isTakable,
-            .isEdible,
+        let apple = Item("apple")
+            .name("red apple")
+            .description("A delicious red apple.")
+            .isTakable
+            .isEdible
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: apple
@@ -81,14 +77,12 @@ struct ConversationManagerArchitectureTest {
     @Test("ConversationManager provides clean API for response processing")
     func testCleanResponseProcessingAPI() async throws {
         // Given: A conversation manager with a pending yes/no question
-        let apple = Item(
-            id: "apple",
-            .name("red apple"),
-            .description("A delicious red apple."),
-            .isTakable,
-            .isEdible,
+        let apple = Item("apple")
+            .name("red apple")
+            .description("A delicious red apple.")
+            .isTakable
+            .isEdible
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: apple
@@ -191,14 +185,12 @@ struct ConversationManagerArchitectureTest {
     @Test("ConversationManager convenience methods work correctly")
     func testConvenienceMethods() async throws {
         // Given: A minimal game setup
-        let apple = Item(
-            id: "apple",
-            .name("red apple"),
-            .description("A delicious red apple."),
-            .isTakable,
-            .isEdible,
+        let apple = Item("apple")
+            .name("red apple")
+            .description("A delicious red apple.")
+            .isTakable
+            .isEdible
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: apple

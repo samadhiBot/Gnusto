@@ -39,11 +39,10 @@ struct LocationProxyStateChangesTests {
     @Test("LocationProxy setFlag returns nil when flag already set")
     func testSetFlagReturnsNilWhenAlreadySet() async throws {
         // Given
-        let testRoom = Location(
-            id: .startRoom,
-            .name("Test Room"),
+        let testRoom = Location(.startRoom)
+            .name("Test Room")
             .isVisited
-        )
+
         let game = MinimalGame(locations: testRoom)
         let (engine, _) = await GameEngine.test(blueprint: game)
         let proxy = await engine.location(.startRoom)
@@ -58,11 +57,10 @@ struct LocationProxyStateChangesTests {
     @Test("LocationProxy clearFlag creates valid StateChange")
     func testClearFlagCreatesValidStateChange() async throws {
         // Given
-        let testRoom = Location(
-            id: .startRoom,
-            .name("Test Room"),
+        let testRoom = Location(.startRoom)
+            .name("Test Room")
             .isVisited
-        )
+
         let game = MinimalGame(locations: testRoom)
         let (engine, _) = await GameEngine.test(blueprint: game)
         let proxy = await engine.location(.startRoom)
@@ -90,11 +88,9 @@ struct LocationProxyStateChangesTests {
     @Test("LocationProxy clearFlag returns nil when flag already clear")
     func testClearFlagReturnsNilWhenAlreadyClear() async throws {
         // Given
-        let testRoom = Location(
-            id: .startRoom,
-            .name("Test Room"),
+        let testRoom = Location(.startRoom)
+            .name("Test Room")
             .inherentlyLit
-        )
         let game = MinimalGame(locations: testRoom)
         let (engine, _) = await GameEngine.test(blueprint: game)
         let proxy = await engine.location(.startRoom)
@@ -111,11 +107,9 @@ struct LocationProxyStateChangesTests {
     @Test("LocationProxy clearFlag on inherently lit location")
     func testClearFlagOnInherentlyLitLocation() async throws {
         // Given
-        let testRoom = Location(
-            id: .startRoom,
-            .name("Test Room"),
+        let testRoom = Location(.startRoom)
+            .name("Test Room")
             .inherentlyLit
-        )
         let game = MinimalGame(locations: testRoom)
         let (engine, _) = await GameEngine.test(blueprint: game)
         let proxy = await engine.location(.startRoom)
@@ -170,11 +164,10 @@ struct LocationProxyStateChangesTests {
     @Test("LocationProxy setProperty returns nil when value unchanged")
     func testSetPropertyReturnsNilWhenValueUnchanged() async throws {
         // Given
-        let testRoom = Location(
-            id: .startRoom,
-            .name("Test Room"),
+        let testRoom = Location(.startRoom)
+            .name("Test Room")
             .description("Existing description")
-        )
+
         let game = MinimalGame(locations: testRoom)
         let (engine, _) = await GameEngine.test(blueprint: game)
         let proxy = await engine.location(.startRoom)
@@ -296,11 +289,9 @@ struct LocationProxyStateChangesTests {
     @Test("LocationProxy multiple flag operations")
     func testMultipleFlagOperations() async throws {
         // Given
-        let testRoom = Location(
-            id: .startRoom,
-            .name("Test Room"),
+        let testRoom = Location(.startRoom)
+            .name("Test Room")
             .inherentlyLit
-        )
         let game = MinimalGame(locations: testRoom)
         let (engine, _) = await GameEngine.test(blueprint: game)
         let proxy = await engine.location(.startRoom)

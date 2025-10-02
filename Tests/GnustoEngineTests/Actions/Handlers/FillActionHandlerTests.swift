@@ -11,23 +11,19 @@ struct FillActionHandlerTests {
     @Test("FILL DIRECTOBJECT syntax works")
     func testFillDirectObjectSyntax() async throws {
         // Given
-        let bucket = Item(
-            id: "bucket",
-            .name("metal bucket"),
-            .description("A metal bucket."),
-            .isContainer,
-            .isOpen,
-            .isTakable,
+        let bucket = Item("bucket")
+            .name("metal bucket")
+            .description("A metal bucket.")
+            .isContainer
+            .isOpen
+            .isTakable
             .in(.startRoom)
-        )
 
-        let well = Item(
-            id: "well",
-            .name("water well"),
-            .description("A deep water well."),
-            .isDrinkable,
+        let well = Item("well")
+            .name("water well")
+            .description("A deep water well.")
+            .isDrinkable
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: bucket, well
@@ -53,23 +49,19 @@ struct FillActionHandlerTests {
     @Test("FILL DIRECTOBJECT WITH INDIRECTOBJECT syntax works")
     func testFillWithSourceSyntax() async throws {
         // Given
-        let bottle = Item(
-            id: "bottle",
-            .name("glass bottle"),
-            .description("A glass bottle."),
-            .isContainer,
-            .isOpen,
-            .isTakable,
+        let bottle = Item("bottle")
+            .name("glass bottle")
+            .description("A glass bottle.")
+            .isContainer
+            .isOpen
+            .isTakable
             .in(.startRoom)
-        )
 
-        let stream = Item(
-            id: "stream",
-            .name("crystal stream"),
-            .description("A crystal clear stream."),
-            .isDrinkable,
+        let stream = Item("stream")
+            .name("crystal stream")
+            .description("A crystal clear stream.")
+            .isDrinkable
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: bottle, stream
@@ -92,23 +84,19 @@ struct FillActionHandlerTests {
     @Test("FILL DIRECTOBJECT FROM INDIRECTOBJECT syntax works")
     func testFillFromSourceSyntax() async throws {
         // Given
-        let cup = Item(
-            id: "cup",
-            .name("ceramic cup"),
-            .description("A ceramic cup."),
-            .isContainer,
-            .isOpen,
-            .isTakable,
+        let cup = Item("cup")
+            .name("ceramic cup")
+            .description("A ceramic cup.")
+            .isContainer
+            .isOpen
+            .isTakable
             .in(.startRoom)
-        )
 
-        let fountain = Item(
-            id: "fountain",
-            .name("marble fountain"),
-            .description("A marble fountain."),
-            .isDrinkable,
+        let fountain = Item("fountain")
+            .name("marble fountain")
+            .description("A marble fountain.")
+            .isDrinkable
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: cup, fountain
@@ -151,20 +139,16 @@ struct FillActionHandlerTests {
     @Test("Cannot fill target not in scope")
     func testCannotFillTargetNotInScope() async throws {
         // Given
-        let anotherRoom = Location(
-            id: "anotherRoom",
-            .name("Another Room"),
+        let anotherRoom = Location("anotherRoom")
+            .name("Another Room")
             .inherentlyLit
-        )
 
-        let remoteBucket = Item(
-            id: "remoteBucket",
-            .name("remote bucket"),
-            .description("A bucket in another room."),
-            .isContainer,
-            .isOpen,
+        let remoteBucket = Item("remoteBucket")
+            .name("remote bucket")
+            .description("A bucket in another room.")
+            .isContainer
+            .isOpen
             .in("anotherRoom")
-        )
 
         let game = MinimalGame(
             locations: anotherRoom,
@@ -188,12 +172,10 @@ struct FillActionHandlerTests {
     @Test("Cannot fill non-container")
     func testCannotFillNonContainer() async throws {
         // Given
-        let rock = Item(
-            id: "rock",
-            .name("large rock"),
-            .description("A large boulder."),
+        let rock = Item("rock")
+            .name("large rock")
+            .description("A large boulder.")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: rock
@@ -216,22 +198,18 @@ struct FillActionHandlerTests {
     @Test("Cannot fill closed container")
     func testCannotFillClosedContainer() async throws {
         // Given
-        let jar = Item(
-            id: "jar",
-            .name("sealed jar"),
-            .description("A sealed jar."),
-            .isContainer,
+        let jar = Item("jar")
+            .name("sealed jar")
+            .description("A sealed jar.")
+            .isContainer
             // Note: No .isOpen flag - container is closed
             .in(.startRoom)
-        )
 
-        let well = Item(
-            id: "well",
-            .name("water well"),
-            .description("A deep water well."),
-            .isDrinkable,
+        let well = Item("well")
+            .name("water well")
+            .description("A deep water well.")
+            .isDrinkable
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: jar, well
@@ -254,28 +232,22 @@ struct FillActionHandlerTests {
     @Test("Cannot fill from source not in scope")
     func testCannotFillFromSourceNotInScope() async throws {
         // Given
-        let anotherRoom = Location(
-            id: "anotherRoom",
-            .name("Another Room"),
+        let anotherRoom = Location("anotherRoom")
+            .name("Another Room")
             .inherentlyLit
-        )
 
-        let bucket = Item(
-            id: "bucket",
-            .name("metal bucket"),
-            .description("A metal bucket."),
-            .isContainer,
-            .isOpen,
+        let bucket = Item("bucket")
+            .name("metal bucket")
+            .description("A metal bucket.")
+            .isContainer
+            .isOpen
             .in(.startRoom)
-        )
 
-        let remoteWell = Item(
-            id: "remoteWell",
-            .name("remote well"),
-            .description("A well in another room."),
-            .isDrinkable,
+        let remoteWell = Item("remoteWell")
+            .name("remote well")
+            .description("A well in another room.")
+            .isDrinkable
             .in("anotherRoom")
-        )
 
         let game = MinimalGame(
             locations: anotherRoom,
@@ -299,21 +271,17 @@ struct FillActionHandlerTests {
     @Test("Requires light to fill")
     func testRequiresLight() async throws {
         // Given: Dark room with container
-        let darkRoom = Location(
-            id: "darkRoom",
-            .name("Dark Room"),
+        let darkRoom = Location("darkRoom")
+            .name("Dark Room")
             .description("A pitch black room.")
             // Note: No .inherentlyLit property
-        )
 
-        let bucket = Item(
-            id: "bucket",
-            .name("metal bucket"),
-            .description("A metal bucket."),
-            .isContainer,
-            .isOpen,
+        let bucket = Item("bucket")
+            .name("metal bucket")
+            .description("A metal bucket.")
+            .isContainer
+            .isOpen
             .in("darkRoom")
-        )
 
         let game = MinimalGame(
             player: Player(in: "darkRoom"),
@@ -341,24 +309,20 @@ struct FillActionHandlerTests {
     @Test("Fill container from non-liquid source fails")
     func testFillFromNonLiquidSourceFails() async throws {
         // Given
-        let bottle = Item(
-            id: "bottle",
-            .name("empty bottle"),
-            .description("An empty bottle."),
-            .isContainer,
-            .isOpen,
-            .isTakable,
+        let bottle = Item("bottle")
+            .name("empty bottle")
+            .description("An empty bottle.")
+            .isContainer
+            .isOpen
+            .isTakable
             .in(.startRoom)
-        )
 
-        let box = Item(
-            id: "box",
-            .name("wooden box"),
-            .description("A wooden box."),
-            .isContainer,
-            .isOpen,
+        let box = Item("box")
+            .name("wooden box")
+            .description("A wooden box.")
+            .isContainer
+            .isOpen
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: bottle, box
@@ -381,23 +345,19 @@ struct FillActionHandlerTests {
     @Test("Fill container held by player")
     func testFillContainerHeldByPlayer() async throws {
         // Given
-        let flask = Item(
-            id: "flask",
-            .name("silver flask"),
-            .description("A silver flask."),
-            .isContainer,
-            .isOpen,
-            .isTakable,
+        let flask = Item("flask")
+            .name("silver flask")
+            .description("A silver flask.")
+            .isContainer
+            .isOpen
+            .isTakable
             .in(.player)
-        )
 
-        let spring = Item(
-            id: "spring",
-            .name("natural spring"),
-            .description("A natural spring."),
-            .isDrinkable,
+        let spring = Item("spring")
+            .name("natural spring")
+            .description("A natural spring.")
+            .isDrinkable
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: flask, spring
@@ -424,23 +384,19 @@ struct FillActionHandlerTests {
     @Test("Fill sets touched flag on container")
     func testFillSetsTouchedFlag() async throws {
         // Given
-        let mug = Item(
-            id: "mug",
-            .name("ceramic mug"),
-            .description("A ceramic mug."),
-            .isContainer,
-            .isOpen,
-            .isTakable,
+        let mug = Item("mug")
+            .name("ceramic mug")
+            .description("A ceramic mug.")
+            .isContainer
+            .isOpen
+            .isTakable
             .in(.startRoom)
-        )
 
-        let pond = Item(
-            id: "pond",
-            .name("small pond"),
-            .description("A small pond."),
-            .isDrinkable,
+        let pond = Item("pond")
+            .name("small pond")
+            .description("A small pond.")
+            .isDrinkable
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: mug, pond
@@ -467,41 +423,33 @@ struct FillActionHandlerTests {
     @Test("Fill multiple containers from different sources")
     func testFillMultipleContainers() async throws {
         // Given
-        let bottle = Item(
-            id: "bottle",
-            .name("glass bottle"),
-            .description("A glass bottle."),
-            .isContainer,
-            .isOpen,
-            .isTakable,
+        let bottle = Item("bottle")
+            .name("glass bottle")
+            .description("A glass bottle.")
+            .isContainer
+            .isOpen
+            .isTakable
             .in(.startRoom)
-        )
 
-        let bucket = Item(
-            id: "bucket",
-            .name("metal bucket"),
-            .description("A metal bucket."),
-            .isContainer,
-            .isOpen,
-            .isTakable,
+        let bucket = Item("bucket")
+            .name("metal bucket")
+            .description("A metal bucket.")
+            .isContainer
+            .isOpen
+            .isTakable
             .in(.startRoom)
-        )
 
-        let well = Item(
-            id: "well",
-            .name("deep well"),
-            .description("A deep well."),
-            .isDrinkable,
+        let well = Item("well")
+            .name("deep well")
+            .description("A deep well.")
+            .isDrinkable
             .in(.startRoom)
-        )
 
-        let stream = Item(
-            id: "stream",
-            .name("flowing stream"),
-            .description("A flowing stream."),
-            .isDrinkable,
+        let stream = Item("stream")
+            .name("flowing stream")
+            .description("A flowing stream.")
+            .isDrinkable
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: bottle, bucket, well, stream

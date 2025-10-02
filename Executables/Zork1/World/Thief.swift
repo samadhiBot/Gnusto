@@ -17,17 +17,16 @@ import GnustoEngine
 struct Thief {
     // MARK: - Core Items
 
-    let thief = Item(
-        id: .thief,
-        .name("thief"),
-        .synonyms("thief", "robber", "man", "person"),
-        .adjectives("shady", "suspicious", "seedy", "suspicious-looking", "sneaky"),
+    let thief = Item(.thief)
+        .name("thief")
+        .synonyms("thief", "robber", "man", "person")
+        .adjectives("shady", "suspicious", "seedy", "suspicious-looking", "sneaky")
         .firstDescription(
             """
             There is a suspicious-looking individual, holding a large bag,
             leaning against one wall. He is armed with a deadly stiletto.
             """
-        ),
+        )
         .characterSheet(  // Stronger than the troll
             CharacterSheet(
                 strength: 14,
@@ -43,38 +42,33 @@ struct Thief {
                 classification: .masculine,
                 alignment: .neutralEvil
             )
-        ),
+        )
         .validLocations(
             .cellar, .damRoom, .deepCanyon, .egyptRoom, .gallery, .maze1, .maze2, .maze3, .maze4,
             .maze5, .mirrorRoomSouth, .northSouthPassage, .reservoir, .reservoirSouth, .roundRoom,
             .streamView, .tinyCave, .windingPassage,
         )
-    )
 
-    let stiletto = Item(
-        id: .stiletto,
-        .name("stiletto"),
-        .synonyms("stiletto", "knife", "blade"),
-        .adjectives("vicious", "deadly", "sharp"),
-        .isWeapon,
-        .requiresTryTake,
-        .isTakable,
-        .omitDescription,
-        .size(10),
+    let stiletto = Item(.stiletto)
+        .name("stiletto")
+        .synonyms("stiletto", "knife", "blade")
+        .adjectives("vicious", "deadly", "sharp")
+        .isWeapon
+        .requiresTryTake
+        .isTakable
+        .omitDescription
+        .size(10)
         .in(.item(.thief))
-    )
 
-    let largeBag = Item(
-        id: .largeBag,
-        .name("large bag"),
-        .synonyms("bag", "sack"),
-        .adjectives("large"),
-        .requiresTryTake,
-        .omitDescription,
-        .isContainer,
-        .capacity(1_000),  // Large capacity for stolen treasures
+    let largeBag = Item(.largeBag)
+        .name("large bag")
+        .synonyms("bag", "sack")
+        .adjectives("large")
+        .requiresTryTake
+        .omitDescription
+        .isContainer
+        .capacity(1_000)  // Large capacity for stolen treasures
         .in(.item(.thief))
-    )
 }
 
 // MARK: - Event Handlers
@@ -243,8 +237,8 @@ extension Thief {
                 for item in playerItems {
                     changes
                         .append(
-                        item.move(to: thiefLargeBag.id)
-                    )
+                            item.move(to: thiefLargeBag.id)
+                        )
                 }
                 let message =
                     if playerItems.isNotEmpty {
@@ -472,7 +466,7 @@ extension Thief {
                 carcass has disappeared.\(bootyStatus)
                 """,
             changes: changes
-//            executionFlow: treasuresDeposited ? .yield : .override
+                //            executionFlow: treasuresDeposited ? .yield : .override
         )
     }
 

@@ -29,12 +29,10 @@ struct ThinkActionHandlerTests {
     @Test("THINK ABOUT DIRECTOBJECT syntax works")
     func testThinkAboutDirectObjectSyntax() async throws {
         // Given
-        let puzzle = Item(
-            id: "puzzle",
-            .name("ancient puzzle"),
-            .description("A mysterious ancient puzzle."),
+        let puzzle = Item("puzzle")
+            .name("ancient puzzle")
+            .description("A mysterious ancient puzzle.")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: puzzle
@@ -61,12 +59,10 @@ struct ThinkActionHandlerTests {
     @Test("CONSIDER DIRECTOBJECT syntax works")
     func testConsiderDirectObjectSyntax() async throws {
         // Given
-        let gem = Item(
-            id: "gem",
-            .name("sparkling gem"),
-            .description("A beautiful sparkling gem."),
+        let gem = Item("gem")
+            .name("sparkling gem")
+            .description("A beautiful sparkling gem.")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: gem
@@ -93,12 +89,10 @@ struct ThinkActionHandlerTests {
     @Test("PONDER OVER DIRECTOBJECT syntax works")
     func testPonderOverDirectObjectSyntax() async throws {
         // Given
-        let riddle = Item(
-            id: "riddle",
-            .name("complex riddle"),
-            .description("A challenging riddle."),
+        let riddle = Item("riddle")
+            .name("complex riddle")
+            .description("A challenging riddle.")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: riddle
@@ -145,18 +139,14 @@ struct ThinkActionHandlerTests {
     @Test("Cannot think about item not in scope")
     func testCannotThinkAboutItemNotInScope() async throws {
         // Given
-        let anotherRoom = Location(
-            id: "anotherRoom",
-            .name("Another Room"),
+        let anotherRoom = Location("anotherRoom")
+            .name("Another Room")
             .inherentlyLit
-        )
 
-        let distantItem = Item(
-            id: "distantItem",
-            .name("distant object"),
-            .description("An object in another room."),
+        let distantItem = Item("distantItem")
+            .name("distant object")
+            .description("An object in another room.")
             .in("anotherRoom")
-        )
 
         let game = MinimalGame(
             locations: anotherRoom,
@@ -180,12 +170,10 @@ struct ThinkActionHandlerTests {
     @Test("Think works in dark rooms without object")
     func testThinkWorksInDarkRooms() async throws {
         // Given: Dark room (thinking doesn't require light)
-        let darkRoom = Location(
-            id: "darkRoom",
-            .name("Dark Room"),
+        let darkRoom = Location("darkRoom")
+            .name("Dark Room")
             .description("A pitch black room.")
             // Note: No .inherentlyLit property
-        )
 
         let game = MinimalGame(
             player: Player(in: "darkRoom"),
@@ -209,19 +197,15 @@ struct ThinkActionHandlerTests {
     @Test("Think about item works in dark rooms")
     func testThinkAboutItemWorksInDarkRooms() async throws {
         // Given: Dark room with item (thinking doesn't require light)
-        let darkRoom = Location(
-            id: "darkRoom",
-            .name("Dark Room"),
+        let darkRoom = Location("darkRoom")
+            .name("Dark Room")
             .description("A pitch black room.")
             // Note: No .inherentlyLit property
-        )
 
-        let stone = Item(
-            id: "stone",
-            .name("smooth stone"),
-            .description("A smooth stone."),
+        let stone = Item("stone")
+            .name("smooth stone")
+            .description("A smooth stone.")
             .in("darkRoom")
-        )
 
         let game = MinimalGame(
             player: Player(in: "darkRoom"),
@@ -249,13 +233,11 @@ struct ThinkActionHandlerTests {
     @Test("Think about character gives appropriate message")
     func testThinkAboutCharacter() async throws {
         // Given
-        let wizard = Item(
-            id: "wizard",
-            .name("old wizard"),
-            .description("A wise old wizard."),
-            .characterSheet(.default),
+        let wizard = Item("wizard")
+            .name("old wizard")
+            .description("A wise old wizard.")
+            .characterSheet(.default)
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: wizard
@@ -305,12 +287,10 @@ struct ThinkActionHandlerTests {
     @Test("Think about generic object")
     func testThinkAboutGenericObject() async throws {
         // Given
-        let box = Item(
-            id: "box",
-            .name("wooden box"),
-            .description("A simple wooden box."),
+        let box = Item("box")
+            .name("wooden box")
+            .description("A simple wooden box.")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: box

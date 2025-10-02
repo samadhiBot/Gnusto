@@ -70,24 +70,20 @@ struct AttackActionHandlerTests {
     @Test("ATTACK DIRECTOBJECT WITH INDIRECTOBJECT syntax works")
     func testAttackWithWeaponSyntax() async throws {
         // Given
-        let dragon = Item(
-            id: "dragon",
-            .name("red dragon"),
-            .adjectives("terrible", "awesome", "fierce"),
-            .synonyms("creature", "wyrm"),
-            .description("A fearsome red dragon."),
-            .characterSheet(.boss),
+        let dragon = Item("dragon")
+            .name("red dragon")
+            .adjectives("terrible", "awesome", "fierce")
+            .synonyms("creature", "wyrm")
+            .description("A fearsome red dragon.")
+            .characterSheet(.boss)
             .in(.startRoom)
-        )
 
-        let sword = Item(
-            id: "sword",
-            .name("steel sword"),
-            .description("A sharp steel sword."),
-            .isWeapon,
-            .isTakable,
+        let sword = Item("sword")
+            .name("steel sword")
+            .description("A sharp steel sword.")
+            .isWeapon
+            .isTakable
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: dragon, sword
@@ -137,13 +133,11 @@ struct AttackActionHandlerTests {
     @Test("FIGHT syntax works")
     func testFightSyntax() async throws {
         // Given
-        let orc = Item(
-            id: "orc",
-            .name("angry orc"),
-            .description("A mighty orc warrior."),
-            .characterSheet(.strong),
+        let orc = Item("orc")
+            .name("angry orc")
+            .description("A mighty orc warrior.")
+            .characterSheet(.strong)
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: orc
@@ -194,13 +188,11 @@ struct AttackActionHandlerTests {
     @Test("HIT syntax works")
     func testHitSyntax() async throws {
         // Given
-        let goblin = Item(
-            id: "goblin",
-            .name("sneaky goblin"),
-            .description("A sneaky goblin."),
-            .characterSheet(.weak),
+        let goblin = Item("goblin")
+            .name("sneaky goblin")
+            .description("A sneaky goblin.")
+            .characterSheet(.weak)
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: goblin
@@ -241,13 +233,11 @@ struct AttackActionHandlerTests {
     @Test("KILL syntax works")
     func testKillSyntax() async throws {
         // Given
-        let spider = Item(
-            id: "spider",
-            .name("giant spider"),
-            .description("A giant spider."),
-            .characterSheet(.default),
+        let spider = Item("spider")
+            .name("giant spider")
+            .description("A giant spider.")
+            .characterSheet(.default)
             .in(.startRoom)
-        )
 
         let game = MinimalGame(items: spider)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
@@ -310,19 +300,15 @@ struct AttackActionHandlerTests {
     @Test("Cannot attack target not in scope")
     func testCannotAttackTargetNotInScope() async throws {
         // Given
-        let anotherRoom = Location(
-            id: "anotherRoom",
-            .name("Another Room"),
+        let anotherRoom = Location("anotherRoom")
+            .name("Another Room")
             .inherentlyLit
-        )
 
-        let remoteTroll = Item(
-            id: "remoteTroll",
-            .name("remote troll"),
-            .description("A troll in another room."),
-            .characterSheet(.default),
+        let remoteTroll = Item("remoteTroll")
+            .name("remote troll")
+            .description("A troll in another room.")
+            .characterSheet(.default)
             .in("anotherRoom")
-        )
 
         let game = MinimalGame(
             locations: anotherRoom,
@@ -346,14 +332,12 @@ struct AttackActionHandlerTests {
     @Test("Cannot attack with weapon not held")
     func testCannotAttackWithWeaponNotHeld() async throws {
         // Given
-        let sword = Item(
-            id: "sword",
-            .name("steel sword"),
-            .description("A sharp steel sword."),
-            .isWeapon,
-            .isTakable,
+        let sword = Item("sword")
+            .name("steel sword")
+            .description("A sharp steel sword.")
+            .isWeapon
+            .isTakable
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: Lab.troll, sword
@@ -376,12 +360,10 @@ struct AttackActionHandlerTests {
     @Test("Requires light to attack")
     func testRequiresLight() async throws {
         // Given: Dark room with character
-        let darkRoom = Location(
-            id: "darkRoom",
-            .name("Dark Room"),
+        let darkRoom = Location("darkRoom")
+            .name("Dark Room")
             .description("A pitch black room.")
             // Note: No .inherentlyLit property
-        )
 
         let game = MinimalGame(
             player: Player(in: "darkRoom"),
@@ -409,12 +391,10 @@ struct AttackActionHandlerTests {
     @Test("Attack non-character gives appropriate message")
     func testAttackNonCharacter() async throws {
         // Given
-        let rock = Item(
-            id: "rock",
-            .name("large rock"),
-            .description("A large boulder."),
+        let rock = Item("rock")
+            .name("large rock")
+            .description("A large boulder.")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: rock
@@ -440,15 +420,13 @@ struct AttackActionHandlerTests {
     @Test("Attack boss character bare-handed is denied")
     func testAttackBossCharacterBareHandedDenied() async throws {
         // Given
-        let dragon = Item(
-            id: "dragon",
-            .name("red dragon"),
-            .adjectives("terrible", "awesome", "fierce"),
-            .synonyms("creature", "wyrm"),
-            .description("A fearsome red dragon."),
-            .characterSheet(.boss),
+        let dragon = Item("dragon")
+            .name("red dragon")
+            .adjectives("terrible", "awesome", "fierce")
+            .synonyms("creature", "wyrm")
+            .description("A fearsome red dragon.")
+            .characterSheet(.boss)
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: dragon
@@ -479,21 +457,17 @@ struct AttackActionHandlerTests {
     @Test("Attack character with non-weapon")
     func testAttackCharacterWithNonWeapon() async throws {
         // Given
-        let bandit = Item(
-            id: "bandit",
-            .name("dangerous bandit"),
-            .description("A dangerous bandit."),
-            .characterSheet(.default),
+        let bandit = Item("bandit")
+            .name("dangerous bandit")
+            .description("A dangerous bandit.")
+            .characterSheet(.default)
             .in(.startRoom)
-        )
 
-        let stick = Item(
-            id: "stick",
-            .name("wooden stick"),
-            .description("A simple wooden stick."),
-            .isTakable,
+        let stick = Item("stick")
+            .name("wooden stick")
+            .description("A simple wooden stick.")
+            .isTakable
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: bandit, stick
@@ -525,22 +499,18 @@ struct AttackActionHandlerTests {
     @Test("Attack character with weapon")
     func testAttackCharacterWithWeapon() async throws {
         // Given
-        let monster = Item(
-            id: "monster",
-            .name("evil monster"),
-            .description("An evil monster."),
-            .characterSheet(.agile),
+        let monster = Item("monster")
+            .name("evil monster")
+            .description("An evil monster.")
+            .characterSheet(.agile)
             .in(.startRoom)
-        )
 
-        let dagger = Item(
-            id: "dagger",
-            .name("sharp dagger"),
-            .description("A sharp dagger."),
-            .isWeapon,
-            .isTakable,
+        let dagger = Item("dagger")
+            .name("sharp dagger")
+            .description("A sharp dagger.")
+            .isWeapon
+            .isTakable
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: monster, dagger
@@ -589,22 +559,18 @@ struct AttackActionHandlerTests {
     @Test("Attack enemy with weapon")
     func testAttackEnemyWithWeapon() async throws {
         // Given
-        let monster = Item(
-            id: "monster",
-            .name("evil monster"),
-            .description("An evil monster."),
-            .characterSheet(.init(isFighting: true)),
+        let monster = Item("monster")
+            .name("evil monster")
+            .description("An evil monster.")
+            .characterSheet(.init(isFighting: true))
             .in(.startRoom)
-        )
 
-        let dagger = Item(
-            id: "dagger",
-            .name("sharp dagger"),
-            .description("A sharp dagger."),
-            .isWeapon,
-            .isTakable,
+        let dagger = Item("dagger")
+            .name("sharp dagger")
+            .description("A sharp dagger.")
+            .isWeapon
+            .isTakable
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: monster, dagger
@@ -645,22 +611,18 @@ struct AttackActionHandlerTests {
     @Test("Attack character with unspecified weapon")
     func testAttackCharacterWithUnspecifiedWeapon() async throws {
         // Given
-        let monster = Item(
-            id: "monster",
-            .name("evil monster"),
-            .description("An evil monster."),
-            .characterSheet(.agile),
+        let monster = Item("monster")
+            .name("evil monster")
+            .description("An evil monster.")
+            .characterSheet(.agile)
             .in(.startRoom)
-        )
 
-        let dagger = Item(
-            id: "dagger",
-            .name("sharp dagger"),
-            .description("A sharp dagger."),
-            .isWeapon,
-            .isTakable,
+        let dagger = Item("dagger")
+            .name("sharp dagger")
+            .description("A sharp dagger.")
+            .isWeapon
+            .isTakable
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: monster, dagger

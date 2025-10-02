@@ -11,12 +11,10 @@ struct ClimbOnActionHandlerTests {
     @Test("CLIMB ON DIRECTOBJECT syntax works")
     func testClimbOnDirectObjectSyntax() async throws {
         // Given
-        let table = Item(
-            id: "table",
-            .name("wooden table"),
-            .description("A sturdy wooden table."),
+        let table = Item("table")
+            .name("wooden table")
+            .description("A sturdy wooden table.")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: table
@@ -43,12 +41,10 @@ struct ClimbOnActionHandlerTests {
     @Test("GET ON DIRECTOBJECT syntax works")
     func testGetOnDirectObjectSyntax() async throws {
         // Given
-        let chair = Item(
-            id: "chair",
-            .name("comfortable chair"),
-            .description("A comfortable chair."),
+        let chair = Item("chair")
+            .name("comfortable chair")
+            .description("A comfortable chair.")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: chair
@@ -72,12 +68,10 @@ struct ClimbOnActionHandlerTests {
     @Test("SIT ON DIRECTOBJECT syntax works")
     func testSitOnDirectObjectSyntax() async throws {
         // Given
-        let bench = Item(
-            id: "bench",
-            .name("stone bench"),
-            .description("A cold stone bench."),
+        let bench = Item("bench")
+            .name("stone bench")
+            .description("A cold stone bench.")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: bench
@@ -100,12 +94,10 @@ struct ClimbOnActionHandlerTests {
     @Test("MOUNT DIRECTOBJECT syntax works")
     func testMountDirectObjectSyntax() async throws {
         // Given
-        let horse = Item(
-            id: "horse",
-            .name("white horse"),
-            .description("A beautiful white horse."),
+        let horse = Item("horse")
+            .name("white horse")
+            .description("A beautiful white horse.")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: horse
@@ -148,18 +140,14 @@ struct ClimbOnActionHandlerTests {
     @Test("Cannot climb on target not in scope")
     func testCannotClimbOnTargetNotInScope() async throws {
         // Given
-        let anotherRoom = Location(
-            id: "anotherRoom",
-            .name("Another Room"),
-            .inherentlyLit
-        )
+        let anotherRoom = Location("anotherRoom")
+            .name("Another Room")
+                .inherentlyLit
 
-        let remoteTable = Item(
-            id: "remoteTable",
-            .name("remote table"),
-            .description("A table in another room."),
+        let remoteTable = Item("remoteTable")
+            .name("remote table")
+            .description("A table in another room.")
             .in("anotherRoom")
-        )
 
         let game = MinimalGame(
             locations: anotherRoom,
@@ -183,19 +171,15 @@ struct ClimbOnActionHandlerTests {
     @Test("Requires light to climb on")
     func testRequiresLight() async throws {
         // Given: Dark room with item
-        let darkRoom = Location(
-            id: "darkRoom",
-            .name("Dark Room"),
+        let darkRoom = Location("darkRoom")
+            .name("Dark Room")
             .description("A pitch black room.")
             // Note: No .inherentlyLit property
-        )
 
-        let table = Item(
-            id: "table",
-            .name("wooden table"),
-            .description("A sturdy wooden table."),
+        let table = Item("table")
+            .name("wooden table")
+            .description("A sturdy wooden table.")
             .in("darkRoom")
-        )
 
         let game = MinimalGame(
             player: Player(in: "darkRoom"),
@@ -223,12 +207,10 @@ struct ClimbOnActionHandlerTests {
     @Test("Climb on item sets touched flag")
     func testClimbOnItemSetsTouchedFlag() async throws {
         // Given
-        let stool = Item(
-            id: "stool",
-            .name("wooden stool"),
-            .description("A simple wooden stool."),
+        let stool = Item("stool")
+            .name("wooden stool")
+            .description("A simple wooden stool.")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: stool
@@ -256,19 +238,15 @@ struct ClimbOnActionHandlerTests {
     @Test("Climb on different items gives appropriate messages")
     func testClimbOnDifferentItems() async throws {
         // Given
-        let rock = Item(
-            id: "rock",
-            .name("large rock"),
-            .description("A large boulder."),
+        let rock = Item("rock")
+            .name("large rock")
+            .description("A large boulder.")
             .in(.startRoom)
-        )
 
-        let tree = Item(
-            id: "tree",
-            .name("tall tree"),
-            .description("A tall oak tree."),
+        let tree = Item("tree")
+            .name("tall tree")
+            .description("A tall oak tree.")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: rock, tree
@@ -303,13 +281,11 @@ struct ClimbOnActionHandlerTests {
     @Test("Climb on item held by player")
     func testClimbOnItemHeldByPlayer() async throws {
         // Given
-        let box = Item(
-            id: "box",
-            .name("small box"),
-            .description("A small wooden box."),
-            .isTakable,
+        let box = Item("box")
+            .name("small box")
+            .description("A small wooden box.")
+            .isTakable
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: box

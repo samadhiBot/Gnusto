@@ -11,23 +11,19 @@ struct EmptyActionHandlerTests {
     @Test("EMPTY DIRECTOBJECT syntax works")
     func testEmptyDirectObjectSyntax() async throws {
         // Given
-        let box = Item(
-            id: "box",
-            .name("wooden box"),
-            .description("A wooden box."),
-            .isContainer,
-            .isOpen,
-            .isTakable,
+        let box = Item("box")
+            .name("wooden box")
+            .description("A wooden box.")
+            .isContainer
+            .isOpen
+            .isTakable
             .in(.startRoom)
-        )
 
-        let coin = Item(
-            id: "coin",
-            .name("gold coin"),
-            .description("A shiny gold coin."),
-            .isTakable,
+        let coin = Item("coin")
+            .name("gold coin")
+            .description("A shiny gold coin.")
+            .isTakable
             .in(.item("box"))
-        )
 
         let game = MinimalGame(
             items: box, coin
@@ -56,33 +52,27 @@ struct EmptyActionHandlerTests {
     @Test("EMPTY DIRECTOBJECT INTO INDIRECTOBJECT syntax works")
     func testEmptyIntoContainerSyntax() async throws {
         // Given
-        let bag = Item(
-            id: "bag",
-            .name("leather bag"),
-            .description("A leather bag."),
-            .isContainer,
-            .isOpen,
-            .isTakable,
+        let bag = Item("bag")
+            .name("leather bag")
+            .description("A leather bag.")
+            .isContainer
+            .isOpen
+            .isTakable
             .in(.startRoom)
-        )
 
-        let basket = Item(
-            id: "basket",
-            .name("wicker basket"),
-            .description("A wicker basket."),
-            .isContainer,
-            .isOpen,
-            .isTakable,
+        let basket = Item("basket")
+            .name("wicker basket")
+            .description("A wicker basket.")
+            .isContainer
+            .isOpen
+            .isTakable
             .in(.startRoom)
-        )
 
-        let gem = Item(
-            id: "gem",
-            .name("red gem"),
-            .description("A red gem."),
-            .isTakable,
+        let gem = Item("gem")
+            .name("red gem")
+            .description("A red gem.")
+            .isTakable
             .in(.item("bag"))
-        )
 
         let game = MinimalGame(
             items: bag, basket, gem
@@ -109,23 +99,19 @@ struct EmptyActionHandlerTests {
     @Test("EMPTY OUT DIRECTOBJECT syntax works")
     func testEmptyOutDirectObjectSyntax() async throws {
         // Given
-        let sack = Item(
-            id: "sack",
-            .name("burlap sack"),
-            .description("A burlap sack."),
-            .isContainer,
-            .isOpen,
-            .isTakable,
+        let sack = Item("sack")
+            .name("burlap sack")
+            .description("A burlap sack.")
+            .isContainer
+            .isOpen
+            .isTakable
             .in(.startRoom)
-        )
 
-        let key = Item(
-            id: "key",
-            .name("brass key"),
-            .description("A brass key."),
-            .isTakable,
+        let key = Item("key")
+            .name("brass key")
+            .description("A brass key.")
+            .isTakable
             .in(.item("sack"))
-        )
 
         let game = MinimalGame(
             items: sack, key
@@ -152,23 +138,19 @@ struct EmptyActionHandlerTests {
     @Test("DUMP syntax works")
     func testDumpSyntax() async throws {
         // Given
-        let bucket = Item(
-            id: "bucket",
-            .name("metal bucket"),
-            .description("A metal bucket."),
-            .isContainer,
-            .isOpen,
-            .isTakable,
+        let bucket = Item("bucket")
+            .name("metal bucket")
+            .description("A metal bucket.")
+            .isContainer
+            .isOpen
+            .isTakable
             .in(.startRoom)
-        )
 
-        let pebble = Item(
-            id: "pebble",
-            .name("small pebble"),
-            .description("A small pebble."),
-            .isTakable,
+        let pebble = Item("pebble")
+            .name("small pebble")
+            .description("A small pebble.")
+            .isTakable
             .in(.item("bucket"))
-        )
 
         let game = MinimalGame(
             items: bucket, pebble
@@ -192,23 +174,19 @@ struct EmptyActionHandlerTests {
     @Test("POUR syntax uses pour action handler")
     func testPourSyntax() async throws {
         // Given
-        let bottle = Item(
-            id: "bottle",
-            .name("glass bottle"),
-            .description("A glass bottle."),
-            .isContainer,
-            .isOpen,
-            .isTakable,
+        let bottle = Item("bottle")
+            .name("glass bottle")
+            .description("A glass bottle.")
+            .isContainer
+            .isOpen
+            .isTakable
             .in(.startRoom)
-        )
 
-        let sand = Item(
-            id: "sand",
-            .name("fine sand"),
-            .description("Fine sand."),
-            .isTakable,
+        let sand = Item("sand")
+            .name("fine sand")
+            .description("Fine sand.")
+            .isTakable
             .in(.item("bottle"))
-        )
 
         let game = MinimalGame(
             items: bottle, sand
@@ -231,23 +209,19 @@ struct EmptyActionHandlerTests {
     @Test("POUR OUT syntax works")
     func testPourOutSyntax() async throws {
         // Given
-        let bottle = Item(
-            id: "bottle",
-            .name("glass bottle"),
-            .description("A glass bottle."),
-            .isContainer,
-            .isOpen,
-            .isTakable,
+        let bottle = Item("bottle")
+            .name("glass bottle")
+            .description("A glass bottle.")
+            .isContainer
+            .isOpen
+            .isTakable
             .in(.startRoom)
-        )
 
-        let sand = Item(
-            id: "sand",
-            .name("fine sand"),
-            .description("Fine sand."),
-            .isTakable,
+        let sand = Item("sand")
+            .name("fine sand")
+            .description("Fine sand.")
+            .isTakable
             .in(.item("bottle"))
-        )
 
         let game = MinimalGame(
             items: bottle, sand
@@ -291,20 +265,16 @@ struct EmptyActionHandlerTests {
     @Test("Cannot empty target not in scope")
     func testCannotEmptyTargetNotInScope() async throws {
         // Given
-        let anotherRoom = Location(
-            id: "anotherRoom",
-            .name("Another Room"),
+        let anotherRoom = Location("anotherRoom")
+            .name("Another Room")
             .inherentlyLit
-        )
 
-        let remoteBox = Item(
-            id: "remoteBox",
-            .name("remote box"),
-            .description("A box in another room."),
-            .isContainer,
-            .isOpen,
+        let remoteBox = Item("remoteBox")
+            .name("remote box")
+            .description("A box in another room.")
+            .isContainer
+            .isOpen
             .in("anotherRoom")
-        )
 
         let game = MinimalGame(
             locations: anotherRoom,
@@ -328,12 +298,10 @@ struct EmptyActionHandlerTests {
     @Test("Cannot empty non-container")
     func testCannotEmptyNonContainer() async throws {
         // Given
-        let rock = Item(
-            id: "rock",
-            .name("large rock"),
-            .description("A large boulder."),
+        let rock = Item("rock")
+            .name("large rock")
+            .description("A large boulder.")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: rock
@@ -356,22 +324,18 @@ struct EmptyActionHandlerTests {
     @Test("Cannot empty closed container")
     func testCannotEmptyClosedContainer() async throws {
         // Given
-        let chest = Item(
-            id: "chest",
-            .name("treasure chest"),
-            .description("A locked treasure chest."),
-            .isContainer,
+        let chest = Item("chest")
+            .name("treasure chest")
+            .description("A locked treasure chest.")
+            .isContainer
             // Note: No .isOpen flag - container is closed
             .in(.startRoom)
-        )
 
-        let treasure = Item(
-            id: "treasure",
-            .name("gold treasure"),
-            .description("Gold treasure."),
-            .isTakable,
+        let treasure = Item("treasure")
+            .name("gold treasure")
+            .description("Gold treasure.")
+            .isTakable
             .in(.item("chest"))
-        )
 
         let game = MinimalGame(
             items: chest, treasure
@@ -394,21 +358,17 @@ struct EmptyActionHandlerTests {
     @Test("Requires light to empty")
     func testRequiresLight() async throws {
         // Given: Dark room with container
-        let darkRoom = Location(
-            id: "darkRoom",
-            .name("Dark Room"),
+        let darkRoom = Location("darkRoom")
+            .name("Dark Room")
             .description("A pitch black room.")
             // Note: No .inherentlyLit property
-        )
 
-        let box = Item(
-            id: "box",
-            .name("wooden box"),
-            .description("A wooden box."),
-            .isContainer,
-            .isOpen,
+        let box = Item("box")
+            .name("wooden box")
+            .description("A wooden box.")
+            .isContainer
+            .isOpen
             .in("darkRoom")
-        )
 
         let game = MinimalGame(
             player: Player(in: "darkRoom"),
@@ -436,15 +396,13 @@ struct EmptyActionHandlerTests {
     @Test("Empty already empty container")
     func testEmptyAlreadyEmptyContainer() async throws {
         // Given
-        let emptyBox = Item(
-            id: "emptyBox",
-            .name("empty box"),
-            .description("An empty box."),
-            .isContainer,
-            .isOpen,
-            .isTakable,
+        let emptyBox = Item("emptyBox")
+            .name("empty box")
+            .description("An empty box.")
+            .isContainer
+            .isOpen
+            .isTakable
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: emptyBox
@@ -467,39 +425,31 @@ struct EmptyActionHandlerTests {
     @Test("Empty container with multiple items")
     func testEmptyContainerWithMultipleItems() async throws {
         // Given
-        let bag = Item(
-            id: "bag",
-            .name("travel bag"),
-            .description("A travel bag."),
-            .isContainer,
-            .isOpen,
-            .isTakable,
+        let bag = Item("bag")
+            .name("travel bag")
+            .description("A travel bag.")
+            .isContainer
+            .isOpen
+            .isTakable
             .in(.startRoom)
-        )
 
-        let book = Item(
-            id: "book",
-            .name("old book"),
-            .description("An old book."),
-            .isTakable,
+        let book = Item("book")
+            .name("old book")
+            .description("An old book.")
+            .isTakable
             .in(.item("bag"))
-        )
 
-        let scroll = Item(
-            id: "scroll",
-            .name("ancient scroll"),
-            .description("An ancient scroll."),
-            .isTakable,
+        let scroll = Item("scroll")
+            .name("ancient scroll")
+            .description("An ancient scroll.")
+            .isTakable
             .in(.item("bag"))
-        )
 
-        let quill = Item(
-            id: "quill",
-            .name("feather quill"),
-            .description("A feather quill."),
-            .isTakable,
+        let quill = Item("quill")
+            .name("feather quill")
+            .description("A feather quill.")
+            .isTakable
             .in(.item("bag"))
-        )
 
         let game = MinimalGame(
             items: bag, book, scroll, quill
@@ -532,23 +482,19 @@ struct EmptyActionHandlerTests {
     @Test("Empty container held by player")
     func testEmptyContainerHeldByPlayer() async throws {
         // Given
-        let pouch = Item(
-            id: "pouch",
-            .name("leather pouch"),
-            .description("A leather pouch."),
-            .isContainer,
-            .isOpen,
-            .isTakable,
+        let pouch = Item("pouch")
+            .name("leather pouch")
+            .description("A leather pouch.")
+            .isContainer
+            .isOpen
+            .isTakable
             .in(.player)
-        )
 
-        let ring = Item(
-            id: "ring",
-            .name("silver ring"),
-            .description("A silver ring."),
-            .isTakable,
+        let ring = Item("ring")
+            .name("silver ring")
+            .description("A silver ring.")
+            .isTakable
             .in(.item("pouch"))
-        )
 
         let game = MinimalGame(
             items: pouch, ring
@@ -578,23 +524,19 @@ struct EmptyActionHandlerTests {
     @Test("Empty sets touched flag on container")
     func testEmptySetsTouchedFlag() async throws {
         // Given
-        let jar = Item(
-            id: "jar",
-            .name("glass jar"),
-            .description("A glass jar."),
-            .isContainer,
-            .isOpen,
-            .isTakable,
+        let jar = Item("jar")
+            .name("glass jar")
+            .description("A glass jar.")
+            .isContainer
+            .isOpen
+            .isTakable
             .in(.startRoom)
-        )
 
-        let marble = Item(
-            id: "marble",
-            .name("blue marble"),
-            .description("A blue marble."),
-            .isTakable,
+        let marble = Item("marble")
+            .name("blue marble")
+            .description("A blue marble.")
+            .isTakable
             .in(.item("jar"))
-        )
 
         let game = MinimalGame(
             items: jar, marble

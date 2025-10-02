@@ -30,12 +30,10 @@ struct ListenActionHandlerTests {
     @Test("LISTEN TO DIRECTOBJECT syntax works")
     func testListenToDirectObjectSyntax() async throws {
         // Given
-        let radio = Item(
-            id: "radio",
-            .name("old radio"),
-            .description("An antique radio."),
+        let radio = Item("radio")
+            .name("old radio")
+            .description("An antique radio.")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: radio
@@ -58,12 +56,10 @@ struct ListenActionHandlerTests {
     @Test("LISTEN FOR DIRECTOBJECT syntax works")
     func testListenForDirectObjectSyntax() async throws {
         // Given
-        let horse = Item(
-            id: "horse",
-            .name("white horse"),
-            .description("A beautiful white horse."),
+        let horse = Item("horse")
+            .name("white horse")
+            .description("A beautiful white horse.")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: horse
@@ -88,11 +84,9 @@ struct ListenActionHandlerTests {
     @Test("Listen works in dark room")
     func testListenWorksInDarkRoom() async throws {
         // Given: Dark room
-        let darkRoom = Location(
-            id: "darkRoom",
-            .name("Dark Room"),
+        let darkRoom = Location("darkRoom")
+            .name("Dark Room")
             .description("A pitch black room.")
-        )
 
         let game = MinimalGame(
             player: Player(in: "darkRoom"),
@@ -117,18 +111,14 @@ struct ListenActionHandlerTests {
     @Test("Listen to object in dark room")
     func testListenToObjectInDarkRoom() async throws {
         // Given: Dark room with an object
-        let darkRoom = Location(
-            id: "darkRoom",
-            .name("Dark Room"),
+        let darkRoom = Location("darkRoom")
+            .name("Dark Room")
             .description("A pitch black room.")
-        )
 
-        let clock = Item(
-            id: "clock",
-            .name("ticking clock"),
-            .description("A mechanical clock."),
+        let clock = Item("clock")
+            .name("ticking clock")
+            .description("A mechanical clock.")
             .in("darkRoom")
-        )
 
         let game = MinimalGame(
             player: Player(in: "darkRoom"),
@@ -155,22 +145,18 @@ struct ListenActionHandlerTests {
     @Test("Listen to object in open container")
     func testListenToObjectInOpenContainer() async throws {
         // Given
-        let box = Item(
-            id: "box",
-            .name("music box"),
-            .description("An ornate music box."),
-            .isContainer,
-            .isOpenable,
-            .isOpen,
+        let box = Item("box")
+            .name("music box")
+            .description("An ornate music box.")
+            .isContainer
+            .isOpenable
+            .isOpen
             .in(.startRoom)
-        )
 
-        let mechanism = Item(
-            id: "mechanism",
-            .name("music mechanism"),
-            .description("The mechanical parts of the music box."),
+        let mechanism = Item("mechanism")
+            .name("music mechanism")
+            .description("The mechanical parts of the music box.")
             .in(.item("box"))
-        )
 
         let game = MinimalGame(
             items: box, mechanism

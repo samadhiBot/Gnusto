@@ -26,14 +26,10 @@ struct GameEngineActionResponseTests {
 
     @Test("ActionResponse: directionIsBlocked")
     func testDirectionIsBlocked() async throws {
-        let testRoom = Location(
-            id: .startRoom,
-            .name("Test Room"),
-            .exits(
-                .north(blocked: "The path is blocked by fallen rocks.")
-            ),
+        let testRoom = Location(.startRoom)
+            .name("Test Room")
+            .north("The path is blocked by fallen rocks.")
             .inherentlyLit
-        )
 
         let game = MinimalGame(locations: testRoom)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
@@ -52,12 +48,10 @@ struct GameEngineActionResponseTests {
 
     @Test("ActionResponse: itemNotTakable")
     func testItemNotTakable() async throws {
-        let pebble = Item(
-            id: "pebble",
-            .name("pebble"),
+        let pebble = Item("pebble")
+            .name("pebble")
             .in(.startRoom)
             // No .isTakable flag
-        )
 
         let game = MinimalGame(items: pebble)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
@@ -74,11 +68,9 @@ struct GameEngineActionResponseTests {
 
     @Test("ActionResponse: itemNotHeld")
     func testItemNotHeld() async throws {
-        let pebble = Item(
-            id: "pebble",
-            .name("pebble"),
+        let pebble = Item("pebble")
+            .name("pebble")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(items: pebble)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
@@ -95,21 +87,17 @@ struct GameEngineActionResponseTests {
 
     @Test("ActionResponse: playerCannotCarryMore")
     func testPlayerCannotCarryMore() async throws {
-        let heavyItem = Item(
-            id: "sword",
-            .name("heavy sword"),
-            .in(.player),
-            .isTakable,
+        let heavyItem = Item("sword")
+            .name("heavy sword")
+            .in(.player)
+            .isTakable
             .size(20)
-        )
 
-        let shield = Item(
-            id: "shield",
-            .name("large shield"),
-            .in(.startRoom),
-            .isTakable,
+        let shield = Item("shield")
+            .name("large shield")
+            .in(.startRoom)
+            .isTakable
             .size(42)
-        )
 
         let player = Player(in: .startRoom, characterSheet: .weak)
 
@@ -132,13 +120,11 @@ struct GameEngineActionResponseTests {
 
     @Test("ActionResponse: itemNotDroppable")
     func testItemNotDroppable() async throws {
-        let ankleBracelet = Item(
-            id: "ankleBracelet",
-            .name("ankle bracelet"),
-            .in(.player),
+        let ankleBracelet = Item("ankleBracelet")
+            .name("ankle bracelet")
+            .in(.player)
             .omitDescription
             // No .isTakable flag makes it not droppable
-        )
 
         let game = MinimalGame(
             items: ankleBracelet
@@ -160,21 +146,17 @@ struct GameEngineActionResponseTests {
 
     @Test("ActionResponse: containerIsClosed")
     func testContainerIsClosed() async throws {
-        let key = Item(
-            id: "key",
-            .name("key"),
-            .in(.player),
+        let key = Item("key")
+            .name("key")
+            .in(.player)
             .isTakable
-        )
 
-        let box = Item(
-            id: "box",
-            .name("box"),
-            .in(.startRoom),
-            .isContainer,
+        let box = Item("box")
+            .name("box")
+            .in(.startRoom)
+            .isContainer
             .isOpenable
             // No .isOpen flag - defaults to closed
-        )
 
         let game = MinimalGame(
             items: key, box
@@ -194,18 +176,14 @@ struct GameEngineActionResponseTests {
 
     @Test("ActionResponse: targetIsNotAContainer")
     func testTargetIsNotAContainer() async throws {
-        let key = Item(
-            id: "key",
-            .name("key"),
-            .in(.player),
+        let key = Item("key")
+            .name("key")
+            .in(.player)
             .isTakable
-        )
 
-        let rock = Item(
-            id: "rock",
-            .name("rock"),
+        let rock = Item("rock")
+            .name("rock")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: key, rock
@@ -225,18 +203,14 @@ struct GameEngineActionResponseTests {
 
     @Test("ActionResponse: targetIsNotASurface")
     func testTargetIsNotASurface() async throws {
-        let key = Item(
-            id: "key",
-            .name("key"),
-            .in(.player),
+        let key = Item("key")
+            .name("key")
+            .in(.player)
             .isTakable
-        )
 
-        let rock = Item(
-            id: "rock",
-            .name("rock"),
+        let rock = Item("rock")
+            .name("rock")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: key, rock
@@ -258,11 +232,9 @@ struct GameEngineActionResponseTests {
 
     @Test("ActionResponse: itemNotOpenable")
     func testItemNotOpenable() async throws {
-        let rock = Item(
-            id: "rock",
-            .name("rock"),
+        let rock = Item("rock")
+            .name("rock")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: rock
@@ -282,11 +254,9 @@ struct GameEngineActionResponseTests {
 
     @Test("ActionResponse: itemNotClosable")
     func testItemNotClosable() async throws {
-        let book = Item(
-            id: "book",
-            .name("book"),
+        let book = Item("book")
+            .name("book")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: book
@@ -306,14 +276,12 @@ struct GameEngineActionResponseTests {
 
     @Test("ActionResponse: itemAlreadyClosed")
     func testItemAlreadyClosed() async throws {
-        let box = Item(
-            id: "box",
-            .name("box"),
-            .in(.startRoom),
-            .isContainer,
+        let box = Item("box")
+            .name("box")
+            .in(.startRoom)
+            .isContainer
             .isOpenable
             // No .isOpen flag - defaults to closed
-        )
 
         let game = MinimalGame(
             items: box
@@ -335,12 +303,10 @@ struct GameEngineActionResponseTests {
 
     @Test("ActionResponse: itemNotWearable")
     func testItemNotWearable() async throws {
-        let rock = Item(
-            id: "rock",
-            .name("rock"),
-            .in(.player),
+        let rock = Item("rock")
+            .name("rock")
+            .in(.player)
             .isTakable
-        )
 
         let game = MinimalGame(
             items: rock
@@ -360,15 +326,13 @@ struct GameEngineActionResponseTests {
 
     @Test("ActionResponse: itemNotRemovable")
     func testItemNotRemovable() async throws {
-        let amulet = Item(
-            id: "amulet",
-            .name("cursed amulet"),
-            .in(.player),
-            .isWearable,
-            .isWorn,
+        let amulet = Item("amulet")
+            .name("cursed amulet")
+            .in(.player)
+            .isWearable
+            .isWorn
             .omitDescription
             // No .isTakable flag makes it not removable
-        )
 
         let game = MinimalGame(
             items: amulet
@@ -391,22 +355,18 @@ struct GameEngineActionResponseTests {
 
     @Test("ActionResponse: itemIsUnlocked")
     func testItemIsUnlocked() async throws {
-        let chest = Item(
-            id: "chest",
-            .name("chest"),
-            .in(.startRoom),
-            .isContainer,
-            .isLockable,
+        let chest = Item("chest")
+            .name("chest")
+            .in(.startRoom)
+            .isContainer
+            .isLockable
             .lockKey("key1")
             // No .isLocked flag - defaults to unlocked
-        )
 
-        let key = Item(
-            id: "key1",
-            .name("key"),
-            .in(.player),
+        let key = Item("key1")
+            .name("key")
+            .in(.player)
             .isTakable
-        )
 
         let game = MinimalGame(
             items: chest, key
@@ -426,22 +386,18 @@ struct GameEngineActionResponseTests {
 
     @Test("ActionResponse: wrongKey")
     func testWrongKey() async throws {
-        let chest = Item(
-            id: "chest",
-            .name("chest"),
-            .in(.startRoom),
-            .isContainer,
-            .isLockable,
-            .isLocked,
+        let chest = Item("chest")
+            .name("chest")
+            .in(.startRoom)
+            .isContainer
+            .isLockable
+            .isLocked
             .lockKey("key1")
-        )
 
-        let wrongKey = Item(
-            id: "key2",
-            .name("wrong key"),
-            .in(.player),
+        let wrongKey = Item("key2")
+            .name("wrong key")
+            .in(.player)
             .isTakable
-        )
 
         let game = MinimalGame(
             items: chest, wrongKey
@@ -463,18 +419,14 @@ struct GameEngineActionResponseTests {
 
     @Test("ActionResponse: roomIsDark")
     func testRoomIsDark() async throws {
-        let darkRoom = Location(
-            id: "darkRoom",
-            .name("Dark Room"),
+        let darkRoom = Location("darkRoom")
+            .name("Dark Room")
             .description("A dark, dark room.")
             // No .inherentlyLit flag - defaults to dark
-        )
 
-        let shadow = Item(
-            id: "shadow",
-            .name("shadow"),
+        let shadow = Item("shadow")
+            .name("shadow")
             .in("darkRoom")
-        )
 
         let game = MinimalGame(
             player: Player(in: "darkRoom"),
@@ -499,14 +451,10 @@ struct GameEngineActionResponseTests {
 
     @Test("ActionResponse: prerequisiteNotMet")
     func testPrerequisiteNotMet() async throws {
-        let testRoom = Location(
-            id: .startRoom,
-            .name("Test Room"),
-            .exits(
-                .up(blocked: "You need something to climb on.")
-            ),
+        let testRoom = Location(.startRoom)
+            .name("Test Room")
+            .up("You need something to climb on.")
             .inherentlyLit
-        )
 
         let game = MinimalGame(locations: testRoom)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
@@ -525,14 +473,12 @@ struct GameEngineActionResponseTests {
 
     @Test("ActionResponse: itemAlreadyOpen")
     func testItemAlreadyOpen() async throws {
-        let box = Item(
-            id: "box",
-            .name("box"),
-            .in(.startRoom),
-            .isContainer,
-            .isOpenable,
+        let box = Item("box")
+            .name("box")
+            .in(.startRoom)
+            .isContainer
+            .isOpenable
             .isOpen
-        )
 
         let game = MinimalGame(
             items: box
@@ -552,16 +498,14 @@ struct GameEngineActionResponseTests {
 
     @Test("ActionResponse: itemIsLocked")
     func testItemIsLocked() async throws {
-        let chest = Item(
-            id: "chest",
-            .name("chest"),
-            .in(.startRoom),
-            .isContainer,
-            .isOpenable,
-            .isLockable,
-            .isLocked,
+        let chest = Item("chest")
+            .name("chest")
+            .in(.startRoom)
+            .isContainer
+            .isOpenable
+            .isLockable
+            .isLocked
             .lockKey("key1")
-        )
 
         let game = MinimalGame(
             items: chest
@@ -581,22 +525,18 @@ struct GameEngineActionResponseTests {
 
     @Test("ActionResponse: itemAlreadyLocked")
     func testItemAlreadyLocked() async throws {
-        let chest = Item(
-            id: "chest",
-            .name("chest"),
-            .in(.startRoom),
-            .isContainer,
-            .isLockable,
-            .isLocked,
+        let chest = Item("chest")
+            .name("chest")
+            .in(.startRoom)
+            .isContainer
+            .isLockable
+            .isLocked
             .lockKey("key1")
-        )
 
-        let key = Item(
-            id: "key1",
-            .name("key"),
-            .in(.player),
+        let key = Item("key1")
+            .name("key")
+            .in(.player)
             .isTakable
-        )
 
         let game = MinimalGame(
             items: chest, key
@@ -618,15 +558,13 @@ struct GameEngineActionResponseTests {
 
     @Test("ActionResponse: itemAlreadyOn")
     func testItemAlreadyOn() async throws {
-        let lamp = Item(
-            id: "lamp",
-            .name("lamp"),
-            .in(.player),
-            .isLightSource,
-            .isDevice,
-            .isOn,
+        let lamp = Item("lamp")
+            .name("lamp")
+            .in(.player)
+            .isLightSource
+            .isDevice
+            .isOn
             .isTakable
-        )
 
         let game = MinimalGame(
             items: lamp
@@ -646,15 +584,13 @@ struct GameEngineActionResponseTests {
 
     @Test("ActionResponse: itemAlreadyOff")
     func testItemAlreadyOff() async throws {
-        let lamp = Item(
-            id: "lamp",
-            .name("lamp"),
-            .in(.player),
-            .isLightSource,
-            .isDevice,
+        let lamp = Item("lamp")
+            .name("lamp")
+            .in(.player)
+            .isLightSource
+            .isDevice
             .isTakable
             // No .isOn flag - defaults to off
-        )
 
         let game = MinimalGame(
             items: lamp
@@ -674,11 +610,9 @@ struct GameEngineActionResponseTests {
 
     @Test("ActionResponse: itemNotADevice")
     func testItemNotADevice() async throws {
-        let rock = Item(
-            id: "rock",
-            .name("rock"),
+        let rock = Item("rock")
+            .name("rock")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: rock
@@ -700,18 +634,14 @@ struct GameEngineActionResponseTests {
 
     @Test("ActionResponse: itemNotInScope")
     func testItemNotInScope() async throws {
-        let otherRoom = Location(
-            id: "otherRoom",
-            .name("Other Room"),
+        let otherRoom = Location("otherRoom")
+            .name("Other Room")
             .inherentlyLit
-        )
 
-        let distantItem = Item(
-            id: "distantItem",
-            .name("distant item"),
-            .in("otherRoom"),
+        let distantItem = Item("distantItem")
+            .name("distant item")
+            .in("otherRoom")
             .isTakable
-        )
 
         let game = MinimalGame(
             locations: otherRoom,
@@ -749,12 +679,10 @@ struct GameEngineActionResponseTests {
 
     @Test("ActionResponse: indirectObjectRequired")
     func testIndirectObjectRequired() async throws {
-        let key = Item(
-            id: "key",
-            .name("key"),
-            .in(.player),
+        let key = Item("key")
+            .name("key")
+            .in(.player)
             .isTakable
-        )
 
         let game = MinimalGame(
             items: key
@@ -776,12 +704,10 @@ struct GameEngineActionResponseTests {
 
     @Test("ActionResponse: itemNotEdible")
     func testItemNotEdible() async throws {
-        let rock = Item(
-            id: "rock",
-            .name("rock"),
-            .in(.player),
+        let rock = Item("rock")
+            .name("rock")
+            .in(.player)
             .isTakable
-        )
 
         let game = MinimalGame(
             items: rock
@@ -821,21 +747,17 @@ struct GameEngineActionResponseTests {
 
     @Test("ActionResponse: containerIsNotEmpty")
     func testContainerIsNotEmpty() async throws {
-        let gem = Item(
-            id: "gem",
-            .name("gem"),
-            .in(.item("box")),
+        let gem = Item("gem")
+            .name("gem")
+            .in(.item("box"))
             .isTakable
-        )
 
-        let box = Item(
-            id: "box",
-            .name("box"),
-            .in(.startRoom),
-            .isContainer,
-            .isOpenable,
+        let box = Item("box")
+            .name("box")
+            .in(.startRoom)
+            .isContainer
+            .isOpenable
             .isOpen
-        )
 
         let game = MinimalGame(
             items: gem, box
@@ -857,21 +779,17 @@ struct GameEngineActionResponseTests {
 
     @Test("ActionResponse: error messages include item names correctly")
     func testErrorMessagesIncludeItemNames() async throws {
-        let fancyBox = Item(
-            id: "fancyBox",
-            .name("ornate jewelry box"),
-            .in(.startRoom),
-            .isContainer,
+        let fancyBox = Item("fancyBox")
+            .name("ornate jewelry box")
+            .in(.startRoom)
+            .isContainer
             .isOpenable
             // No .isOpen - defaults to closed
-        )
 
-        let key = Item(
-            id: "key",
-            .name("tiny key"),
-            .in(.player),
+        let key = Item("key")
+            .name("tiny key")
+            .in(.player)
             .isTakable
-        )
 
         let game = MinimalGame(
             items: fancyBox, key
@@ -893,22 +811,18 @@ struct GameEngineActionResponseTests {
 
     @Test("ActionResponse: multiple error conditions prioritization")
     func testMultipleErrorConditionsPrioritization() async throws {
-        let darkRoom = Location(
-            id: "darkRoom",
-            .name("Dark Room"),
+        let darkRoom = Location("darkRoom")
+            .name("Dark Room")
             .description("A pitch black room.")
             // No .inherentlyLit - defaults to dark
-        )
 
-        let lockedChest = Item(
-            id: "chest",
-            .name("locked chest"),
-            .in("darkRoom"),
-            .isContainer,
-            .isLockable,
-            .isLocked,
+        let lockedChest = Item("chest")
+            .name("locked chest")
+            .in("darkRoom")
+            .isContainer
+            .isLockable
+            .isLocked
             .lockKey("key1")
-        )
 
         let game = MinimalGame(
             player: Player(in: "darkRoom"),

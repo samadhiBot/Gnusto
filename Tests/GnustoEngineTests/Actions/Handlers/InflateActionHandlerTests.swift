@@ -11,14 +11,12 @@ struct InflateActionHandlerTests {
     @Test("INFLATE DIRECTOBJECT syntax works")
     func testInflateDirectObjectSyntax() async throws {
         // Given
-        let balloon = Item(
-            id: "balloon",
-            .name("red balloon"),
-            .description("A red balloon."),
-            .isInflatable,
-            .isTakable,
+        let balloon = Item("balloon")
+            .name("red balloon")
+            .description("A red balloon.")
+            .isInflatable
+            .isTakable
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: balloon
@@ -45,22 +43,18 @@ struct InflateActionHandlerTests {
     @Test("INFLATE DIRECTOBJECT WITH INDIRECTOBJECT syntax works")
     func testInflateWithObjectSyntax() async throws {
         // Given
-        let raft = Item(
-            id: "raft",
-            .name("rubber raft"),
-            .description("A rubber raft."),
-            .isInflatable,
-            .isTakable,
+        let raft = Item("raft")
+            .name("rubber raft")
+            .description("A rubber raft.")
+            .isInflatable
+            .isTakable
             .in(.startRoom)
-        )
 
-        let pump = Item(
-            id: "pump",
-            .name("air pump"),
-            .description("An air pump."),
-            .isTakable,
+        let pump = Item("pump")
+            .name("air pump")
+            .description("An air pump.")
+            .isTakable
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: raft, pump
@@ -83,14 +77,12 @@ struct InflateActionHandlerTests {
     @Test("BLOW UP DIRECTOBJECT syntax works")
     func testBlowUpDirectObjectSyntax() async throws {
         // Given
-        let mattress = Item(
-            id: "mattress",
-            .name("air mattress"),
-            .description("An inflatable air mattress."),
-            .isInflatable,
-            .isTakable,
+        let mattress = Item("mattress")
+            .name("air mattress")
+            .description("An inflatable air mattress.")
+            .isInflatable
+            .isTakable
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: mattress
@@ -113,22 +105,18 @@ struct InflateActionHandlerTests {
     @Test("BLOW UP DIRECTOBJECT WITH INDIRECTOBJECT syntax works")
     func testBlowUpWithObjectSyntax() async throws {
         // Given
-        let tire = Item(
-            id: "tire",
-            .name("bicycle tire"),
-            .description("A bicycle tire."),
-            .isInflatable,
-            .isTakable,
+        let tire = Item("tire")
+            .name("bicycle tire")
+            .description("A bicycle tire.")
+            .isInflatable
+            .isTakable
             .in(.startRoom)
-        )
 
-        let compressor = Item(
-            id: "compressor",
-            .name("air compressor"),
-            .description("An air compressor."),
-            .isTakable,
+        let compressor = Item("compressor")
+            .name("air compressor")
+            .description("An air compressor.")
+            .isTakable
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: tire, compressor
@@ -171,19 +159,15 @@ struct InflateActionHandlerTests {
     @Test("Cannot inflate target not in scope")
     func testCannotInflateTargetNotInScope() async throws {
         // Given
-        let anotherRoom = Location(
-            id: "anotherRoom",
-            .name("Another Room"),
+        let anotherRoom = Location("anotherRoom")
+            .name("Another Room")
             .inherentlyLit
-        )
 
-        let remoteBalloon = Item(
-            id: "remoteBalloon",
-            .name("remote balloon"),
-            .description("A balloon in another room."),
-            .isInflatable,
+        let remoteBalloon = Item("remoteBalloon")
+            .name("remote balloon")
+            .description("A balloon in another room.")
+            .isInflatable
             .in("anotherRoom")
-        )
 
         let game = MinimalGame(
             locations: anotherRoom,
@@ -207,12 +191,10 @@ struct InflateActionHandlerTests {
     @Test("Cannot inflate non-inflatable item")
     func testCannotInflateNonInflatableItem() async throws {
         // Given
-        let rock = Item(
-            id: "rock",
-            .name("large rock"),
-            .description("A large boulder."),
+        let rock = Item("rock")
+            .name("large rock")
+            .description("A large boulder.")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: rock
@@ -235,20 +217,16 @@ struct InflateActionHandlerTests {
     @Test("Requires light to inflate")
     func testRequiresLight() async throws {
         // Given: Dark room with inflatable item
-        let darkRoom = Location(
-            id: "darkRoom",
-            .name("Dark Room"),
+        let darkRoom = Location("darkRoom")
+            .name("Dark Room")
             .description("A pitch black room.")
             // Note: No .inherentlyLit property
-        )
 
-        let balloon = Item(
-            id: "balloon",
-            .name("red balloon"),
-            .description("A red balloon."),
-            .isInflatable,
+        let balloon = Item("balloon")
+            .name("red balloon")
+            .description("A red balloon.")
+            .isInflatable
             .in("darkRoom")
-        )
 
         let game = MinimalGame(
             player: Player(in: "darkRoom"),
@@ -276,14 +254,12 @@ struct InflateActionHandlerTests {
     @Test("Inflate deflated item succeeds")
     func testInflateDeflatedItemSucceeds() async throws {
         // Given
-        let lifeVest = Item(
-            id: "lifeVest",
-            .name("life vest"),
-            .description("An inflatable life vest."),
-            .isInflatable,
-            .isTakable,
+        let lifeVest = Item("lifeVest")
+            .name("life vest")
+            .description("An inflatable life vest.")
+            .isInflatable
+            .isTakable
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: lifeVest
@@ -312,15 +288,13 @@ struct InflateActionHandlerTests {
     @Test("Inflate already inflated item gives appropriate message")
     func testInflateAlreadyInflatedItem() async throws {
         // Given
-        let balloon = Item(
-            id: "balloon",
-            .name("blue balloon"),
-            .description("A blue balloon."),
-            .isInflatable,
-            .isInflated,
-            .isTakable,
+        let balloon = Item("balloon")
+            .name("blue balloon")
+            .description("A blue balloon.")
+            .isInflatable
+            .isInflated
+            .isTakable
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: balloon
@@ -348,14 +322,12 @@ struct InflateActionHandlerTests {
     @Test("Inflate item held by player")
     func testInflateItemHeldByPlayer() async throws {
         // Given
-        let balloon = Item(
-            id: "balloon",
-            .name("green balloon"),
-            .description("A green balloon."),
-            .isInflatable,
-            .isTakable,
+        let balloon = Item("balloon")
+            .name("green balloon")
+            .description("A green balloon.")
+            .isInflatable
+            .isTakable
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: balloon
@@ -382,21 +354,17 @@ struct InflateActionHandlerTests {
     @Test("Inflate multiple different items")
     func testInflateMultipleDifferentItems() async throws {
         // Given
-        let balloon = Item(
-            id: "balloon",
-            .name("yellow balloon"),
-            .description("A yellow balloon."),
-            .isInflatable,
+        let balloon = Item("balloon")
+            .name("yellow balloon")
+            .description("A yellow balloon.")
+            .isInflatable
             .in(.startRoom)
-        )
 
-        let raft = Item(
-            id: "raft",
-            .name("life raft"),
-            .description("An inflatable life raft."),
-            .isInflatable,
+        let raft = Item("raft")
+            .name("life raft")
+            .description("An inflatable life raft.")
+            .isInflatable
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: balloon, raft
@@ -436,14 +404,12 @@ struct InflateActionHandlerTests {
     @Test("Inflate sets touched flag on item")
     func testInflateSetsTouchedFlag() async throws {
         // Given
-        let tube = Item(
-            id: "tube",
-            .name("inner tube"),
-            .description("An inflatable inner tube."),
-            .isInflatable,
-            .isTakable,
+        let tube = Item("tube")
+            .name("inner tube")
+            .description("An inflatable inner tube.")
+            .isInflatable
+            .isTakable
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: tube
@@ -471,29 +437,23 @@ struct InflateActionHandlerTests {
     @Test("Inflate with different syntax variations")
     func testInflateWithDifferentSyntaxVariations() async throws {
         // Given
-        let balloon1 = Item(
-            id: "balloon1",
-            .name("red balloon"),
-            .description("A red balloon."),
-            .isInflatable,
+        let balloon1 = Item("balloon1")
+            .name("red balloon")
+            .description("A red balloon.")
+            .isInflatable
             .in(.startRoom)
-        )
 
-        let balloon2 = Item(
-            id: "balloon2",
-            .name("blue balloon"),
-            .description("A blue balloon."),
-            .isInflatable,
+        let balloon2 = Item("balloon2")
+            .name("blue balloon")
+            .description("A blue balloon.")
+            .isInflatable
             .in(.startRoom)
-        )
 
-        let pump = Item(
-            id: "pump",
-            .name("hand pump"),
-            .description("A hand pump."),
-            .isTakable,
+        let pump = Item("pump")
+            .name("hand pump")
+            .description("A hand pump.")
+            .isTakable
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: balloon1, balloon2, pump
@@ -533,14 +493,12 @@ struct InflateActionHandlerTests {
     @Test("Inflate twice shows already inflated message")
     func testInflateTwiceShowsAlreadyInflatedMessage() async throws {
         // Given
-        let cushion = Item(
-            id: "cushion",
-            .name("air cushion"),
-            .description("An inflatable air cushion."),
-            .isInflatable,
-            .isTakable,
+        let cushion = Item("cushion")
+            .name("air cushion")
+            .description("An inflatable air cushion.")
+            .isInflatable
+            .isTakable
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: cushion

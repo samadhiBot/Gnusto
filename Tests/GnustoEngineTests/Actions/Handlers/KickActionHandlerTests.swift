@@ -11,12 +11,10 @@ struct KickActionHandlerTests {
     @Test("KICK DIRECTOBJECT syntax works")
     func testKickDirectObjectSyntax() async throws {
         // Given
-        let rock = Item(
-            id: "rock",
-            .name("large rock"),
-            .description("A big granite boulder."),
+        let rock = Item("rock")
+            .name("large rock")
+            .description("A big granite boulder.")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: rock
@@ -63,18 +61,14 @@ struct KickActionHandlerTests {
     @Test("Cannot kick target not in scope")
     func testCannotKickTargetNotInScope() async throws {
         // Given
-        let anotherRoom = Location(
-            id: "anotherRoom",
-            .name("Another Room"),
+        let anotherRoom = Location("anotherRoom")
+            .name("Another Room")
             .inherentlyLit
-        )
 
-        let remoteRock = Item(
-            id: "remoteRock",
-            .name("remote rock"),
-            .description("A rock in another room."),
+        let remoteRock = Item("remoteRock")
+            .name("remote rock")
+            .description("A rock in another room.")
             .in("anotherRoom")
-        )
 
         let game = MinimalGame(
             locations: anotherRoom,
@@ -98,18 +92,14 @@ struct KickActionHandlerTests {
     @Test("Requires light to kick")
     func testRequiresLight() async throws {
         // Given: Dark room with an object to kick
-        let darkRoom = Location(
-            id: "darkRoom",
-            .name("Dark Room"),
+        let darkRoom = Location("darkRoom")
+            .name("Dark Room")
             .description("A pitch black room.")
-        )
 
-        let rock = Item(
-            id: "rock",
-            .name("large rock"),
-            .description("A big granite boulder."),
+        let rock = Item("rock")
+            .name("large rock")
+            .description("A big granite boulder.")
             .in("darkRoom")
-        )
 
         let game = MinimalGame(
             player: Player(in: "darkRoom"),
@@ -162,12 +152,10 @@ struct KickActionHandlerTests {
     @Test("Kick regular object gives standard message")
     func testKickRegularObject() async throws {
         // Given
-        let box = Item(
-            id: "box",
-            .name("wooden box"),
-            .description("A sturdy wooden box."),
+        let box = Item("box")
+            .name("wooden box")
+            .description("A sturdy wooden box.")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: box
@@ -194,13 +182,11 @@ struct KickActionHandlerTests {
     @Test("Kick small object")
     func testKickSmallObject() async throws {
         // Given
-        let pebble = Item(
-            id: "pebble",
-            .name("small pebble"),
-            .description("A tiny pebble."),
-            .in(.startRoom),
+        let pebble = Item("pebble")
+            .name("small pebble")
+            .description("A tiny pebble.")
+            .in(.startRoom)
             .isTakable
-        )
 
         let game = MinimalGame(
             items: pebble
@@ -223,12 +209,10 @@ struct KickActionHandlerTests {
     @Test("Kicking sets isTouched flag")
     func testKickingSetsTouchedFlag() async throws {
         // Given
-        let door = Item(
-            id: "door",
-            .name("wooden door"),
-            .description("A heavy wooden door."),
+        let door = Item("door")
+            .name("wooden door")
+            .description("A heavy wooden door.")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: door
@@ -247,19 +231,15 @@ struct KickActionHandlerTests {
     @Test("Kick multiple objects in sequence")
     func testKickMultipleObjects() async throws {
         // Given
-        let table = Item(
-            id: "table",
-            .name("oak table"),
-            .description("A solid oak table."),
+        let table = Item("table")
+            .name("oak table")
+            .description("A solid oak table.")
             .in(.startRoom)
-        )
 
-        let chair = Item(
-            id: "chair",
-            .name("wooden chair"),
-            .description("A simple wooden chair."),
+        let chair = Item("chair")
+            .name("wooden chair")
+            .description("A simple wooden chair.")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: table, chair

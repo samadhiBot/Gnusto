@@ -6,44 +6,36 @@ import Testing
 
 @Suite("ScopeResolver Tests")
 struct ScopeResolverTests {
-    let baseBox = Item(
-        id: "box",
-        .in(.player),
+    let baseBox = Item("box")
+        .in(.player)
         .isContainer
-    )
-    let baseOpenBox = Item(
-        id: "openBox",
-        .name("open box"),
-        .in(.player),
-        .isContainer,
+
+    let baseOpenBox = Item("openBox")
+        .name("open box")
+        .in(.player)
+        .isContainer
         .isOpen
-    )
-    let baseClosedBox = Item(
-        id: "closedBox",
-        .name("closed box"),
-        .in(.player),
+
+    let baseClosedBox = Item("closedBox")
+        .name("closed box")
+        .in(.player)
         .isContainer
-    )
-    let baseTransparentBox = Item(
-        id: "transBox",
-        .name("transparent box"),
-        .in(.player),
-        .isContainer,
+
+    let baseTransparentBox = Item("transBox")
+        .name("transparent box")
+        .in(.player)
+        .isContainer
         .isTransparent
-    )
-    let baseItemInBox = Item(
-        id: "itemInBox",
+
+    let baseItemInBox = Item("itemInBox")
         .in(.nowhere)
-    )
 
     @Test("Reachable includes inventory")
     func testReachableInventory() async throws {
-        let inventoryItem = Item(
-            id: "invItem",
-            .name("Inventory Item"),
-            .in(.player),
+        let inventoryItem = Item("invItem")
+            .name("Inventory Item")
+            .in(.player)
             .isTakable
-        )
         let game = MinimalGame(items: inventoryItem)
         let (engine, _) = await GameEngine.test(blueprint: game)
 
@@ -53,11 +45,9 @@ struct ScopeResolverTests {
 
     @Test("Reachable includes visible items in lit room")
     func testReachableVisibleLitRoom() async throws {
-        let locationItem = Item(
-            id: "locItem",
-            .name("Location Item"),
+        let locationItem = Item("locItem")
+            .name("Location Item")
             .in(.startRoom)
-        )
         let game = MinimalGame(items: locationItem)
         let (engine, _) = await GameEngine.test(blueprint: game)
 
@@ -67,17 +57,15 @@ struct ScopeResolverTests {
 
     @Test("Reachable excludes items in dark room")
     func testReachableDarkRoom() async throws {
-        let darkRoom = Location(
-            id: "darkRoom",
-            .name("Pitch Black Room"),
+        let darkRoom = Location("darkRoom")
+            .name("Pitch Black Room")
             .description("It's dark.")
-        )
-        let locationItem = Item(
-            id: "locItem",
-            .name("Location Item"),
-            .in(darkRoom.id),
+
+        let locationItem = Item("locItem")
+            .name("Location Item")
+            .in(darkRoom.id)
             .isInvisible
-        )
+
         let game = MinimalGame(
             player: Player(in: darkRoom.id),
             locations: darkRoom,
@@ -91,18 +79,16 @@ struct ScopeResolverTests {
 
     @Test("Reachable includes item in open container (inventory)")
     func testReachableOpenContainerInventory() async throws {
-        let openBox = Item(
-            id: "openBox",
-            .name("open box"),
-            .in(.player),
-            .isContainer,
+        let openBox = Item("openBox")
+            .name("open box")
+            .in(.player)
+            .isContainer
             .isOpen
-        )
-        let itemInBox = Item(
-            id: "itemInBox",
-            .name("item in box"),
+
+        let itemInBox = Item("itemInBox")
+            .name("item in box")
             .in(.item(openBox.id))
-        )
+
         let game = MinimalGame(items: openBox, itemInBox)
         let (engine, _) = await GameEngine.test(blueprint: game)
 
@@ -113,17 +99,15 @@ struct ScopeResolverTests {
 
     @Test("Reachable excludes item in closed container (inventory)")
     func testReachableClosedContainerInventory() async throws {
-        let closedBox = Item(
-            id: "closedBox",
-            .name("closed box"),
-            .in(.player),
+        let closedBox = Item("closedBox")
+            .name("closed box")
+            .in(.player)
             .isContainer
-        )
-        let itemInBox = Item(
-            id: "itemInBox",
-            .name("item in box"),
+
+        let itemInBox = Item("itemInBox")
+            .name("item in box")
             .in(.item(closedBox.id))
-        )
+
         let game = MinimalGame(items: closedBox, itemInBox)
         let (engine, _) = await GameEngine.test(blueprint: game)
 
@@ -134,18 +118,16 @@ struct ScopeResolverTests {
 
     @Test("Reachable includes item in transparent container (inventory)")
     func testReachableTransparentContainerInventory() async throws {
-        let transparentBox = Item(
-            id: "transBox",
-            .name("transparent box"),
-            .in(.player),
-            .isContainer,
+        let transparentBox = Item("transBox")
+            .name("transparent box")
+            .in(.player)
+            .isContainer
             .isTransparent
-        )
-        let itemInBox = Item(
-            id: "itemInBox",
-            .name("item in box"),
+
+        let itemInBox = Item("itemInBox")
+            .name("item in box")
             .in(.item(transparentBox.id))
-        )
+
         let game = MinimalGame(items: transparentBox, itemInBox)
         let (engine, _) = await GameEngine.test(blueprint: game)
 
@@ -156,18 +138,16 @@ struct ScopeResolverTests {
 
     @Test("Reachable includes item in open container (lit room)")
     func testReachableOpenContainerLitRoom() async throws {
-        let openBox = Item(
-            id: "openBox",
-            .name("open box"),
-            .in(.startRoom),
-            .isContainer,
+        let openBox = Item("openBox")
+            .name("open box")
+            .in(.startRoom)
+            .isContainer
             .isOpen
-        )
-        let itemInBox = Item(
-            id: "itemInBox",
-            .name("item in box"),
+
+        let itemInBox = Item("itemInBox")
+            .name("item in box")
             .in(.item(openBox.id))
-        )
+
         let game = MinimalGame(items: openBox, itemInBox)
         let (engine, _) = await GameEngine.test(blueprint: game)
 
@@ -178,17 +158,15 @@ struct ScopeResolverTests {
 
     @Test("Reachable excludes item in closed container (lit room)")
     func testReachableClosedContainerLitRoom() async throws {
-        let closedBox = Item(
-            id: "closedBox",
-            .name("closed box"),
-            .in(.startRoom),
+        let closedBox = Item("closedBox")
+            .name("closed box")
+            .in(.startRoom)
             .isContainer
-        )
-        let itemInBox = Item(
-            id: "itemInBox",
-            .name("item in box"),
+
+        let itemInBox = Item("itemInBox")
+            .name("item in box")
             .in(.item(closedBox.id))
-        )
+
         let game = MinimalGame(items: closedBox, itemInBox)
         let (engine, _) = await GameEngine.test(blueprint: game)
 
@@ -199,18 +177,16 @@ struct ScopeResolverTests {
 
     @Test("Reachable includes item in transparent container (lit room)")
     func testReachableTransparentContainerLitRoom() async throws {
-        let transparentBox = Item(
-            id: "transBox",
-            .name("transparent box"),
-            .in(.startRoom),
-            .isContainer,
+        let transparentBox = Item("transBox")
+            .name("transparent box")
+            .in(.startRoom)
+            .isContainer
             .isTransparent
-        )
-        let itemInBox = Item(
-            id: "itemInBox",
-            .name("item in box"),
+
+        let itemInBox = Item("itemInBox")
+            .name("item in box")
             .in(.item(transparentBox.id))
-        )
+
         let game = MinimalGame(items: transparentBox, itemInBox)
         let (engine, _) = await GameEngine.test(blueprint: game)
 
@@ -222,23 +198,20 @@ struct ScopeResolverTests {
 
     @Test("Reachable excludes container and item in dark room")
     func testReachableContainerDarkRoom() async throws {
-        let darkRoom = Location(
-            id: "darkRoom",
-            .name("Pitch Black Room"),
+        let darkRoom = Location("darkRoom")
+            .name("Pitch Black Room")
             .description("It's dark.")
-        )
-        let openBox = Item(
-            id: "openBox",
-            .name("open box"),
-            .in(darkRoom.id),
-            .isContainer,
+
+        let openBox = Item("openBox")
+            .name("open box")
+            .in(darkRoom.id)
+            .isContainer
             .isOpen
-        )
-        let itemInBox = Item(
-            id: "itemInBox",
-            .name("item in box"),
+
+        let itemInBox = Item("itemInBox")
+            .name("item in box")
             .in(.item(openBox.id))
-        )
+
         let game = MinimalGame(
             player: Player(in: darkRoom.id),
             locations: darkRoom,
@@ -252,12 +225,11 @@ struct ScopeResolverTests {
 
     @Test("Reachable includes scenery items in lit room")
     func testReachableSceneryLitRoom() async throws {
-        let sceneryItem = Item(
-            id: "window",
-            .name("Window"),
-            .in(.startRoom),
+        let sceneryItem = Item("window")
+            .name("Window")
+            .in(.startRoom)
             .omitDescription
-        )
+
         let game = MinimalGame(items: sceneryItem)
         let (engine, _) = await GameEngine.test(blueprint: game)
 

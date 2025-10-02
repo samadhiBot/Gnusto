@@ -19,12 +19,10 @@ struct GameEngineCombatTests {
 
     @Test("isInCombat returns true when combat state exists")
     func testIsInCombatTrueWhenInCombat() async throws {
-        let enemy = Item(
-            id: "goblin",
-            .name("goblin"),
-            .characterSheet(.default),
+        let enemy = Item("goblin")
+            .name("goblin")
+            .characterSheet(.default)
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: enemy
@@ -62,19 +60,15 @@ struct GameEngineCombatTests {
 
     @Test("combatState returns combat state when in combat")
     func testCombatStateReturnsStateWhenInCombat() async throws {
-        let enemy = Item(
-            id: "orc",
-            .name("orc"),
-            .characterSheet(.default),
+        let enemy = Item("orc")
+            .name("orc")
+            .characterSheet(.default)
             .in(.startRoom)
-        )
 
-        let weapon = Item(
-            id: "sword",
-            .name("sword"),
-            .isTakable,
+        let weapon = Item("sword")
+            .name("sword")
+            .isTakable
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: enemy, weapon
@@ -117,12 +111,10 @@ struct GameEngineCombatTests {
 
     @Test("enemyAttacks creates combat state and returns appropriate message")
     func testEnemyAttacksCreatesCombatState() async throws {
-        let dragon = Item(
-            id: "dragon",
-            .name("red dragon"),
-            .characterSheet(.init(isFighting: true)),
+        let dragon = Item("dragon")
+            .name("red dragon")
+            .characterSheet(.init(isFighting: true))
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: dragon
@@ -166,12 +158,10 @@ struct GameEngineCombatTests {
 
     @Test("enemyAttacks with player weapon includes weapon in combat state")
     func testEnemyAttacksWithPlayerWeapon() async throws {
-        let axe = Item(
-            id: "axe",
-            .name("battle axe"),
-            .isTakable,
+        let axe = Item("axe")
+            .name("battle axe")
+            .isTakable
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: Lab.troll.fighting, axe
@@ -213,12 +203,10 @@ struct GameEngineCombatTests {
 
     @Test("playerAttacks creates combat state and returns appropriate message")
     func testPlayerAttacksCreatesCombatState() async throws {
-        let skeleton = Item(
-            id: "skeleton",
-            .name("skeleton warrior"),
-            .characterSheet(.default),
+        let skeleton = Item("skeleton")
+            .name("skeleton warrior")
+            .characterSheet(.default)
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: skeleton
@@ -263,19 +251,15 @@ struct GameEngineCombatTests {
 
     @Test("playerAttacks with weapon includes weapon in combat state")
     func testPlayerAttacksWithWeapon() async throws {
-        let zombie = Item(
-            id: "zombie",
-            .name("shambling zombie"),
-            .characterSheet(.default),
+        let zombie = Item("zombie")
+            .name("shambling zombie")
+            .characterSheet(.default)
             .in(.startRoom)
-        )
 
-        let mace = Item(
-            id: "mace",
-            .name("iron mace"),
-            .isTakable,
+        let mace = Item("mace")
+            .name("iron mace")
+            .isTakable
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: zombie, mace
@@ -320,12 +304,10 @@ struct GameEngineCombatTests {
 
     @Test("getCombatResult uses default StandardCombatSystem when none specified")
     func testGetCombatResultUsesDefaultCombatSystem() async throws {
-        let goblin = Item(
-            id: "goblin",
-            .name("goblin"),
-            .characterSheet(.default),
+        let goblin = Item("goblin")
+            .name("goblin")
+            .characterSheet(.default)
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: goblin
@@ -435,12 +417,10 @@ struct GameEngineCombatTests {
 
     @Test("getPlayerAction converts give intent with item to useItem action")
     func testGetPlayerActionGiveIntentWithItem() async throws {
-        let potion = Item(
-            id: "potion",
-            .name("health potion"),
-            .isTakable,
+        let potion = Item("potion")
+            .name("health potion")
+            .isTakable
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: potion
@@ -483,12 +463,10 @@ struct GameEngineCombatTests {
 
     @Test("shouldEndCombat returns true when enemy is dead")
     func testShouldEndCombatWhenEnemyIsDead() async throws {
-        let deadEnemy = Item(
-            id: "deadEnemy",
-            .name("dead enemy"),
-            .characterSheet(.init(consciousness: .dead)),
+        let deadEnemy = Item("deadEnemy")
+            .name("dead enemy")
+            .characterSheet(.init(consciousness: .dead))
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: deadEnemy
@@ -503,12 +481,10 @@ struct GameEngineCombatTests {
 
     @Test("shouldEndCombat returns true when enemy is unconscious")
     func testShouldEndCombatWhenEnemyIsUnconscious() async throws {
-        let unconsciousEnemy = Item(
-            id: "unconsciousEnemy",
-            .name("unconscious enemy"),
-            .characterSheet(.init(consciousness: .unconscious)),
+        let unconsciousEnemy = Item("unconsciousEnemy")
+            .name("unconscious enemy")
+            .characterSheet(.init(consciousness: .unconscious))
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: unconsciousEnemy
@@ -523,12 +499,10 @@ struct GameEngineCombatTests {
 
     @Test("shouldEndCombat returns true when player is dead")
     func testShouldEndCombatWhenPlayerIsDead() async throws {
-        let enemy = Item(
-            id: "enemy",
-            .name("enemy"),
-            .characterSheet(.default),
+        let enemy = Item("enemy")
+            .name("enemy")
+            .characterSheet(.default)
             .in(.startRoom)
-        )
 
         let game = MinimalGame(items: enemy)
         let (engine, _) = await GameEngine.test(blueprint: game)
@@ -545,12 +519,10 @@ struct GameEngineCombatTests {
 
     @Test("shouldEndCombat returns true when player health is zero or below")
     func testShouldEndCombatWhenPlayerHealthZero() async throws {
-        let enemy = Item(
-            id: "enemy",
-            .name("enemy"),
-            .characterSheet(.default),
+        let enemy = Item("enemy")
+            .name("enemy")
+            .characterSheet(.default)
             .in(.startRoom)
-        )
 
         let deadPlayer = Player(
             in: .startRoom,
@@ -571,12 +543,10 @@ struct GameEngineCombatTests {
 
     @Test("shouldEndCombat returns true when enemy health is zero or below")
     func testShouldEndCombatWhenEnemyHealthZero() async throws {
-        let weakEnemy = Item(
-            id: "weakEnemy",
-            .name("weak enemy"),
-            .characterSheet(.init(health: 0)),
+        let weakEnemy = Item("weakEnemy")
+            .name("weak enemy")
+            .characterSheet(.init(health: 0))
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: weakEnemy
@@ -591,12 +561,10 @@ struct GameEngineCombatTests {
 
     @Test("shouldEndCombat returns false when combat should continue")
     func testShouldEndCombatReturnsFalseWhenCombatContinues() async throws {
-        let healthyEnemy = Item(
-            id: "healthyEnemy",
-            .name("healthy enemy"),
-            .characterSheet(.init(health: 100)),
+        let healthyEnemy = Item("healthyEnemy")
+            .name("healthy enemy")
+            .characterSheet(.init(health: 100))
             .in(.startRoom)
-        )
 
         let healthyPlayer = Player(
             in: .startRoom,
@@ -619,14 +587,12 @@ struct GameEngineCombatTests {
 
     @Test("complete combat flow from initiation to resolution")
     func testCompleteCombatFlow() async throws {
-        let rat = Item(
-            id: "rat",
-            .name("giant rat"),
+        let rat = Item("rat")
+            .name("giant rat")
             .characterSheet(
                 .init(health: 13)
-            ),
+            )
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: rat
@@ -666,19 +632,15 @@ struct GameEngineCombatTests {
 
     @Test("combat state persists across multiple turns")
     func testCombatStatePersistsAcrossTurns() async throws {
-        let ogre = Item(
-            id: "ogre",
-            .name("fierce ogre"),
-            .characterSheet(.init(health: 100)),
+        let ogre = Item("ogre")
+            .name("fierce ogre")
+            .characterSheet(.init(health: 100))
             .in(.startRoom)
-        )
 
-        let club = Item(
-            id: "club",
-            .name("wooden club"),
-            .isTakable,
+        let club = Item("club")
+            .name("wooden club")
+            .isTakable
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: ogre, club
@@ -725,34 +687,26 @@ struct GameEngineCombatTests {
 
     @Test("combat with multiple weapons and enemies")
     func testCombatWithMultipleWeaponsAndEnemies() async throws {
-        let wolf = Item(
-            id: "wolf",
-            .name("dire wolf"),
-            .characterSheet(.default),
+        let wolf = Item("wolf")
+            .name("dire wolf")
+            .characterSheet(.default)
             .in(.startRoom)
-        )
 
-        let bear = Item(
-            id: "bear",
-            .name("brown bear"),
-            .characterSheet(.default),
+        let bear = Item("bear")
+            .name("brown bear")
+            .characterSheet(.default)
             .in(.startRoom)
-        )
 
-        let sword = Item(
-            id: "sword",
-            .name("steel sword"),
-            .isWeapon,
-            .isTakable,
+        let sword = Item("sword")
+            .name("steel sword")
+            .isWeapon
+            .isTakable
             .in(.player)
-        )
 
-        let bow = Item(
-            id: "bow",
-            .name("longbow"),
-            .isTakable,
+        let bow = Item("bow")
+            .name("longbow")
+            .isTakable
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: wolf, bear, sword, bow

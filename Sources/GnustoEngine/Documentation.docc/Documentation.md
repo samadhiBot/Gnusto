@@ -23,16 +23,15 @@ Creating a game with Gnusto begins with two main concepts: ``Location`` and ``It
 A ``Location`` represents any place the player can visit—a room, forest clearing, or spaceship bridge. Here's a simple example:
 
 ```swift
-let westOfHouse = Location(
-    id: .westOfHouse,
-    .name("West of House"),
+let westOfHouse = Location(.westOfHouse)
+    .name("West of House")
     .description(
         "You are standing in an open field west of a white house, with a boarded front door."
     ),
     .exits(
         .north(.northOfHouse),
         .south(.southOfHouse),
-        .east(blocked: "The door is boarded and you can't remove the boards.")
+        .east("The door is boarded and you can't remove the boards.")
     ),
     .inherentlyLit
 )
@@ -43,9 +42,8 @@ let westOfHouse = Location(
 An ``Item`` can be anything the player interacts with—objects, characters, even abstract concepts:
 
 ```swift
-let cloak = Item(
-    id: .cloak,
-    .name("velvet cloak"),
+let cloak = Item(.cloak)
+    .name("velvet cloak")
     .description(
         """
         A handsome cloak, of velvet trimmed with satin, and slightly
@@ -53,9 +51,9 @@ let cloak = Item(
         almost seems to suck light from the room.
         """
     ),
-    .adjectives("handsome", "dark", "black", "velvet", "satin"),
-    .in(.player),
-    .isTakable,
+    .adjectives("handsome", "dark", "black", "velvet", "satin")
+    .in(.player)
+    .isTakable
     .isWearable,
     .isWorn,
 )
@@ -104,9 +102,8 @@ let cloak = Item(
 3. **Define your world** with ``Location`` and ``Item`` objects
     ```swift
     struct OperaHouse {
-        let cloakroom = Location(
-            id: .cloakroom,
-            .name("Cloakroom"),
+        let cloakroom = Location(.cloakroom)
+            .name("Cloakroom")
             .description(
                 """
                 The walls of this small room were clearly once lined with hooks,
@@ -115,16 +112,14 @@ let cloak = Item(
             ),
             .exits(.east(.foyer)),
             .inherentlyLit
-        )
 
-        let hook = Item(
-            id: .hook,
-            .adjectives("small", "brass"),
-            .in(.cloakroom),
-            .omitDescription,
-            .isSurface,
-            .name("small brass hook"),
-            .synonyms("peg"),
+        let hook = Item(.hook)
+            .adjectives("small", "brass")
+            .in(.cloakroom)
+            .omitDescription
+            .isSurface
+            .name("small brass hook")
+            .synonyms("peg")
         )
     }
     ```

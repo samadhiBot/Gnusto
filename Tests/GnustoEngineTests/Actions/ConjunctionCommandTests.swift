@@ -12,45 +12,35 @@ struct ConjunctionCommandTests {
     /// Creates a test engine with basic items for conjunction testing
     private func createTestEngine() async -> (GameEngine, MockIOHandler) {
         // Create items for testing
-        let sword = Item(
-            id: "sword",
-            .name("sword"),
-            .in(.player),
-            .isTakable,
+        let sword = Item("sword")
+            .name("sword")
+            .in(.player)
+            .isTakable
             .size(3)
-        )
 
-        let lantern = Item(
-            id: "lantern",
-            .name("lantern"),
-            .in(.player),
-            .isTakable,
+        let lantern = Item("lantern")
+            .name("lantern")
+            .in(.player)
+            .isTakable
             .size(2)
-        )
 
-        let book = Item(
-            id: "book",
-            .name("book"),
-            .in(.player),
-            .isTakable,
+        let book = Item("book")
+            .name("book")
+            .in(.player)
+            .isTakable
             .size(1)
-        )
 
-        let coin = Item(
-            id: "coin",
-            .name("coin"),
-            .in(.startRoom),
-            .isTakable,
+        let coin = Item("coin")
+            .name("coin")
+            .in(.startRoom)
+            .isTakable
             .size(1)
-        )
 
-        let gem = Item(
-            id: .startItem,
-            .name("gem"),
-            .in(.startRoom),
-            .isTakable,
+        let gem = Item(.startItem)
+            .name("gem")
+            .in(.startRoom)
+            .isTakable
             .size(1)
-        )
 
         let player = Player(in: .startRoom, characterSheet: .weak)
         let game = MinimalGame(
@@ -141,8 +131,16 @@ struct ConjunctionCommandTests {
     @Test("Conjunction with verb that doesn't support multiple objects fails")
     func testConjunctionWithUnsupportedVerb() async throws {
         // Create test setup directly
-        let sword = Item(id: "sword", .name("sword"), .in(.player), .isTakable)
-        let lantern = Item(id: "lantern", .name("lantern"), .in(.player), .isTakable)
+        let sword = Item("sword")
+            .name("sword")
+            .in(.player)
+            .isTakable
+
+        let lantern = Item("lantern")
+            .name("lantern")
+            .in(.player)
+            .isTakable
+
 
         let (engine, mockIO) = await GameEngine.test(
             blueprint: MinimalGame(items: sword, lantern)
@@ -163,7 +161,11 @@ struct ConjunctionCommandTests {
     @Test("Conjunction with non-existent item handles gracefully")
     func testConjunctionWithNonExistentItem() async throws {
         // Create test setup directly
-        let sword = Item(id: "sword", .name("sword"), .in(.player), .isTakable)
+        let sword = Item("sword")
+            .name("sword")
+            .in(.player)
+            .isTakable
+
 
         let (engine, mockIO) = await GameEngine.test(
             blueprint: MinimalGame(items: sword)
@@ -186,20 +188,16 @@ struct ConjunctionCommandTests {
     @Test("DROP with one held and one not held item")
     func testDropMixedHeldStatus() async throws {
         // Create items with one held and one not held
-        let sword = Item(
-            id: "sword",
-            .name("sword"),
-            .in(.player),
-            .isTakable,
+        let sword = Item("sword")
+            .name("sword")
+            .in(.player)
+            .isTakable
             .size(3)
-        )
 
-        let statue = Item(
-            id: "statue",
-            .name("statue"),
-            .in(.startRoom),
+        let statue = Item("statue")
+            .name("statue")
+            .in(.startRoom)
             .size(10)
-        )
 
         let player = Player(in: .startRoom, characterSheet: .weak)
         let game = MinimalGame(player: player, items: sword, statue)
@@ -229,8 +227,16 @@ struct ConjunctionCommandTests {
     @Test("Parser correctly parses DROP SWORD AND LANTERN")
     func testParserParsesDropSwordAndLantern() async throws {
         // Create test setup directly
-        let sword = Item(id: "sword", .name("sword"), .in(.player), .isTakable)
-        let lantern = Item(id: "lantern", .name("lantern"), .in(.player), .isTakable)
+        let sword = Item("sword")
+            .name("sword")
+            .in(.player)
+            .isTakable
+
+        let lantern = Item("lantern")
+            .name("lantern")
+            .in(.player)
+            .isTakable
+
 
         let (engine, mockIO) = await GameEngine.test(
             blueprint: MinimalGame(items: sword, lantern)
@@ -256,9 +262,21 @@ struct ConjunctionCommandTests {
     @Test("Parser correctly parses TAKE COIN, GEM AND BOOK")
     func testParserParsesTakeWithCommaAndConjunction() async throws {
         // Create test setup directly
-        let coin = Item(id: "coin", .name("coin"), .in(.startRoom), .isTakable)
-        let gem = Item(id: .startItem, .name("gem"), .in(.startRoom), .isTakable)
-        let book = Item(id: "book", .name("book"), .in(.startRoom), .isTakable)
+        let coin = Item("coin")
+            .name("coin")
+            .in(.startRoom)
+            .isTakable
+
+        let gem = Item(.startItem)
+            .name("gem")
+            .in(.startRoom)
+            .isTakable
+
+        let book = Item("book")
+            .name("book")
+            .in(.startRoom)
+            .isTakable
+
 
         let (engine, mockIO) = await GameEngine.test(
             blueprint: MinimalGame(items: coin, gem, book)

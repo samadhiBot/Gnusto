@@ -8,48 +8,34 @@ struct ItemProxyMovementTests {
     @Test("availableExits returns all exits for .any movement behavior")
     func testAvailableExitsAnyBehavior() async throws {
         // Given: A location with various types of exits
-        let hallway = Location(
-            id: "hallway",
-            .name("Hallway"),
-            .inherentlyLit,
-            .exits(
-                .north("library"),  // Normal open exit
-                .south("kitchen", via: "kitchenDoor"),  // Exit with door
-                .east(blocked: "The wall is too thick"),  // Permanently blocked
-                .west("garden")  // Another normal exit
-            )
-        )
-
-        let library = Location(
-            id: "library",
-            .name("Library"),
+        let hallway = Location("hallway")
+            .name("Hallway")
             .inherentlyLit
-        )
+            .north("library")  // Normal open exit
+            .south("kitchen", via: "kitchenDoor")  // Exit with door
+            .east("The wall is too thick")  // Permanently blocked
+            .west("garden")  // Another normal exit
 
-        let kitchen = Location(
-            id: "kitchen",
-            .name("Kitchen"),
+        let library = Location("library")
+            .name("Library")
             .inherentlyLit
-        )
 
-        let garden = Location(
-            id: "garden",
-            .name("Garden"),
+        let kitchen = Location("kitchen")
+            .name("Kitchen")
             .inherentlyLit
-        )
 
-        let kitchenDoor = Item(
-            id: "kitchenDoor",
-            .name("kitchen door"),
-            .isLocked,
+        let garden = Location("garden")
+            .name("Garden")
+            .inherentlyLit
+
+        let kitchenDoor = Item("kitchenDoor")
+            .name("kitchen door")
+            .isLocked
             .in("hallway")
-        )
 
-        let npc = Item(
-            id: "guard",
-            .name("guard"),
+        let npc = Item("guard")
+            .name("guard")
             .in("hallway")
-        )
 
         let game = MinimalGame(
             player: Player(in: "library"),
@@ -66,7 +52,7 @@ struct ItemProxyMovementTests {
         // Then: All exits should be available regardless of doors or blocked messages
         expectNoDifference(availableExits, [
             .north("library"),
-            .east(blocked: "The wall is too thick"),
+            .east("The wall is too thick"),
             .south("kitchen", via: "kitchenDoor"),
             .west("garden"),
         ])
@@ -75,40 +61,38 @@ struct ItemProxyMovementTests {
     @Test("availableExits filters properly for .normal movement behavior")
     func testAvailableExitsNormalBehavior() async throws {
         // Given: A location with doors in various states
-        let hallway = Location(
-            id: "hallway",
-            .name("Hallway"),
-            .inherentlyLit,
-            .exits(
-                .north("library"),  // Normal open exit
-                .south("kitchen", via: "kitchenDoor"),  // Closed door
-                .east("study", via: "studyDoor"),  // Open door
-                .west(blocked: "The wall blocks your way")  // Blocked exit
-            )
-        )
+        let hallway = Location("hallway")
+            .name("Hallway")
+            .inherentlyLit
+            .north("library")  // Normal open exit
+            .south("kitchen", via: "kitchenDoor")  // Closed door
+            .east("study", via: "studyDoor")  // Open door
+            .west("The wall blocks your way")  // Blocked exit
 
-        let library = Location(id: "library", .name("Library"), .inherentlyLit)
-        let kitchen = Location(id: "kitchen", .name("Kitchen"), .inherentlyLit)
-        let study = Location(id: "study", .name("Study"), .inherentlyLit)
+        let library = Location("library")
+            .name("Library")
+            .inherentlyLit
 
-        let kitchenDoor = Item(
-            id: "kitchenDoor",
-            .name("kitchen door"),
+        let kitchen = Location("kitchen")
+            .name("Kitchen")
+            .inherentlyLit
+
+        let study = Location("study")
+            .name("Study")
+            .inherentlyLit
+
+        let kitchenDoor = Item("kitchenDoor")
+            .name("kitchen door")
             .in("hallway")
-        )
 
-        let studyDoor = Item(
-            id: "studyDoor",
-            .name("study door"),
-            .isOpen,
+        let studyDoor = Item("studyDoor")
+            .name("study door")
+            .isOpen
             .in("hallway")
-        )
 
-        let npc = Item(
-            id: "merchant",
-            .name("merchant"),
+        let npc = Item("merchant")
+            .name("merchant")
             .in("hallway")
-        )
 
         let game = MinimalGame(
             player: Player(in: "library"),
@@ -132,46 +116,43 @@ struct ItemProxyMovementTests {
     @Test("availableExits handles .closedDoors movement behavior")
     func testAvailableExitsClosedDoorsBehavior() async throws {
         // Given: Doors in various locked/unlocked states
-        let room = Location(
-            id: "room",
-            .name("Room"),
-            .inherentlyLit,
-            .exits(
-                .north("hall1", via: "door1"),  // Closed, unlocked
-                .south("hall2", via: "door2"),  // Closed, locked
-                .east("hall3", via: "door3")  // Open
-            )
-        )
+        let room = Location("room")
+            .name("Room")
+            .inherentlyLit
+            .north("hall1", via: "door1")  // Closed, unlocked
+            .south("hall2", via: "door2")  // Closed, locked
+            .east("hall3", via: "door3")  // Open
 
-        let hall1 = Location(id: "hall1", .name("Hall 1"), .inherentlyLit)
-        let hall2 = Location(id: "hall2", .name("Hall 2"), .inherentlyLit)
-        let hall3 = Location(id: "hall3", .name("Hall 3"), .inherentlyLit)
+        let hall1 = Location("hall1")
+            .name("Hall 1")
+            .inherentlyLit
 
-        let door1 = Item(
-            id: "door1",
-            .name("door 1"),
+        let hall2 = Location("hall2")
+            .name("Hall 2")
+            .inherentlyLit
+
+        let hall3 = Location("hall3")
+            .name("Hall 3")
+            .inherentlyLit
+
+
+        let door1 = Item("door1")
+            .name("door 1")
             .in("room")
-        )
 
-        let door2 = Item(
-            id: "door2",
-            .name("door 2"),
-            .isLocked,  // Closed and locked
+        let door2 = Item("door2")
+            .name("door 2")
+            .isLocked  // Closed and locked
             .in("room")
-        )
 
-        let door3 = Item(
-            id: "door3",
-            .name("door 3"),
-            .isOpen,  // Open
+        let door3 = Item("door3")
+            .name("door 3")
+            .isOpen  // Open
             .in("room")
-        )
 
-        let npc = Item(
-            id: "thief",
-            .name("thief"),
+        let npc = Item("thief")
+            .name("thief")
             .in("room")
-        )
 
         let game = MinimalGame(
             player: Player(in: "hall1"),
@@ -195,40 +176,35 @@ struct ItemProxyMovementTests {
     @Test("availableExits handles .lockedDoorsUnlockedByKeys movement behavior")
     func testAvailableExitsWithKeys() async throws {
         // Given: Locked doors with specific keys
-        let room = Location(
-            id: "room",
-            .name("Room"),
-            .inherentlyLit,
-            .exits(
-                .north("vault", via: "vaultDoor"),
-                .south("safe", via: "safeDoor")
-            )
-        )
+        let room = Location("room")
+            .name("Room")
+            .inherentlyLit
+            .north("vault", via: "vaultDoor")
+            .south("safe", via: "safeDoor")
 
-        let vault = Location(id: "vault", .name("Vault"), .inherentlyLit)
-        let safe = Location(id: "safe", .name("Safe"), .inherentlyLit)
+        let vault = Location("vault")
+            .name("Vault")
+            .inherentlyLit
 
-        let vaultDoor = Item(
-            id: "vaultDoor",
-            .name("vault door"),
-            .isLocked,
-            .lockKey("vaultKey"),
+        let safe = Location("safe")
+            .name("Safe")
+            .inherentlyLit
+
+        let vaultDoor = Item("vaultDoor")
+            .name("vault door")
+            .isLocked
+            .lockKey("vaultKey")
             .in("room")
-        )
 
-        let safeDoor = Item(
-            id: "safeDoor",
-            .name("safe door"),
-            .isLocked,
-            .lockKey("safeKey"),
+        let safeDoor = Item("safeDoor")
+            .name("safe door")
+            .isLocked
+            .lockKey("safeKey")
             .in("room")
-        )
 
-        let npc = Item(
-            id: "burglar",
-            .name("burglar"),
+        let npc = Item("burglar")
+            .name("burglar")
             .in("room")
-        )
 
         let game = MinimalGame(
             player: Player(in: "vault"),
@@ -264,17 +240,13 @@ struct ItemProxyMovementTests {
     @Test("availableExits returns empty array for NPC with no location")
     func testAvailableExitsWithNoLocation() async throws {
         // Given: An NPC not in any location
-        let room = Location(
-            id: "room",
-            .name("Room"),
+        let room = Location("room")
+            .name("Room")
             .inherentlyLit
-        )
 
-        let npc = Item(
-            id: "ghost",
-            .name("ghost"),
+        let npc = Item("ghost")
+            .name("ghost")
             .in(.nowhere)  // Not in any location
-        )
 
         let game = MinimalGame(
             player: Player(in: "room"),
@@ -295,18 +267,14 @@ struct ItemProxyMovementTests {
     @Test("availableExits returns empty array for location with no exits")
     func testAvailableExitsWithNoExits() async throws {
         // Given: A location with no exits
-        let trap = Location(
-            id: "trap",
-            .name("Trap Room"),
+        let trap = Location("trap")
+            .name("Trap Room")
             .inherentlyLit
             // No exits defined
-        )
 
-        let npc = Item(
-            id: "prisoner",
-            .name("prisoner"),
+        let npc = Item("prisoner")
+            .name("prisoner")
             .in("trap")
-        )
 
         let game = MinimalGame(
             player: Player(in: "trap"),

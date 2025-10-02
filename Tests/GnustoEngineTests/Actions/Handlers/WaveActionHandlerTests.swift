@@ -8,12 +8,10 @@ struct WaveActionHandlerTests {
 
     @Test("Wave with direct object but no preposition fails")
     func testWaveDirectObjectRequiresPreposition() async throws {
-        let wand = Item(
-            id: "wand",
-            .name("magic wand"),
-            .isTakable,
+        let wand = Item("wand")
+            .name("magic wand")
+            .isTakable
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: wand
@@ -33,12 +31,10 @@ struct WaveActionHandlerTests {
 
     @Test("Wave at direct object syntax")
     func testWaveAtDirectObjectSyntax() async throws {
-        let wand = Item(
-            id: "wand",
-            .name("magic wand"),
-            .isTakable,
+        let wand = Item("wand")
+            .name("magic wand")
+            .isTakable
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: wand
@@ -59,12 +55,10 @@ struct WaveActionHandlerTests {
 
     @Test("Wave to direct object syntax")
     func testWaveToDirectObjectSyntax() async throws {
-        let wand = Item(
-            id: "wand",
-            .name("magic wand"),
-            .isTakable,
+        let wand = Item("wand")
+            .name("magic wand")
+            .isTakable
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: wand
@@ -85,12 +79,10 @@ struct WaveActionHandlerTests {
 
     @Test("Wave direct object at indirect object syntax")
     func testWaveDirectObjectAtIndirectObjectSyntax() async throws {
-        let wand = Item(
-            id: "wand",
-            .name("magic wand"),
-            .isTakable,
+        let wand = Item("wand")
+            .name("magic wand")
+            .isTakable
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: wand, Lab.troll
@@ -111,12 +103,10 @@ struct WaveActionHandlerTests {
 
     @Test("Brandish synonym works")
     func testBrandishSyntax() async throws {
-        let sword = Item(
-            id: "sword",
-            .name("steel sword"),
-            .isTakable,
+        let sword = Item("sword")
+            .name("steel sword")
+            .isTakable
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: sword
@@ -169,18 +159,14 @@ struct WaveActionHandlerTests {
 
     @Test("Cannot wave item not in reach")
     func testCannotWaveItemNotInReach() async throws {
-        let wand = Item(
-            id: "wand",
-            .name("magic wand"),
-            .isTakable,
+        let wand = Item("wand")
+            .name("magic wand")
+            .isTakable
             .in("otherRoom")
-        )
 
-        let otherRoom = Location(
-            id: "otherRoom",
-            .name("Other Room"),
+        let otherRoom = Location("otherRoom")
+            .name("Other Room")
             .inherentlyLit
-        )
 
         let game = MinimalGame(
             locations: otherRoom,
@@ -201,18 +187,14 @@ struct WaveActionHandlerTests {
 
     @Test("Requires light to wave")
     func testRequiresLight() async throws {
-        let wand = Item(
-            id: "wand",
-            .name("magic wand"),
-            .isTakable,
+        let wand = Item("wand")
+            .name("magic wand")
+            .isTakable
             .in(.player)
-        )
 
-        let darkRoom = Location(
-            id: "darkRoom",
+        let darkRoom = Location("darkRoom")
             .name("Dark Room")
             // No .inherentlyLit - makes it dark
-        )
 
         let game = MinimalGame(
             player: Player(in: "darkRoom"),
@@ -237,18 +219,14 @@ struct WaveActionHandlerTests {
 
     @Test("Wave at object gives object response")
     func testWaveAtObject() async throws {
-        let box = Item(
-            id: "box",
-            .name("wooden box"),
-            .isTakable,
+        let box = Item("box")
+            .name("wooden box")
+            .isTakable
             .in(.player)
-        )
 
-        let stone = Item(
-            id: "stone",
-            .name("stone"),
+        let stone = Item("stone")
+            .name("stone")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: box, stone
@@ -269,19 +247,15 @@ struct WaveActionHandlerTests {
 
     @Test("Wave at character gives character response")
     func testWaveAtCharacter() async throws {
-        let wand = Item(
-            id: "wand",
-            .name("magic wand"),
-            .isTakable,
+        let wand = Item("wand")
+            .name("magic wand")
+            .isTakable
             .in(.player)
-        )
 
-        let wizard = Item(
-            id: "wizard",
-            .name("old wizard"),
-            .characterSheet(.default),
+        let wizard = Item("wizard")
+            .name("old wizard")
+            .characterSheet(.default)
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: wand, wizard
@@ -302,19 +276,15 @@ struct WaveActionHandlerTests {
 
     @Test("Wave at enemy gives enemy response")
     func testWaveAtEnemy() async throws {
-        let sword = Item(
-            id: "sword",
-            .name("steel sword"),
-            .isTakable,
+        let sword = Item("sword")
+            .name("steel sword")
+            .isTakable
             .in(.player)
-        )
 
-        let dragon = Item(
-            id: "dragon",
-            .name("red dragon"),
-            .characterSheet(.default),
+        let dragon = Item("dragon")
+            .name("red dragon")
+            .characterSheet(.default)
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: sword, dragon
@@ -335,19 +305,15 @@ struct WaveActionHandlerTests {
 
     @Test("Wave multiple items sequentially")
     func testWaveMultipleItemsSequentially() async throws {
-        let wand = Item(
-            id: "wand",
-            .name("magic wand"),
-            .isTakable,
+        let wand = Item("wand")
+            .name("magic wand")
+            .isTakable
             .in(.player)
-        )
 
-        let sword = Item(
-            id: "sword",
-            .name("steel sword"),
-            .isTakable,
+        let sword = Item("sword")
+            .name("steel sword")
+            .isTakable
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: wand, sword

@@ -13,18 +13,14 @@ struct VocabularyTests {
     @Test("Vocabulary is accessible from GameEngine")
     func testVocabularyAccessibleFromEngine() async throws {
         // Given: A game with items and locations
-        let item = Item(
-            id: "lamp",
-            .name("brass lamp"),
-            .isTakable,
+        let item = Item("lamp")
+            .name("brass lamp")
+            .isTakable
             .in(.startRoom)
-        )
 
-        let location = Location(
-            id: .startRoom,
-            .name("Test Room"),
+        let location = Location(.startRoom)
+            .name("Test Room")
             .inherentlyLit
-        )
 
         let game = MinimalGame(
             locations: location,
@@ -61,22 +57,18 @@ struct VocabularyTests {
     @Test("Save files no longer contain vocabulary data")
     func testSaveFilesWithoutVocabulary() async throws {
         // Given: A game with complex vocabulary
-        let complexItem = Item(
-            id: "ornateGoldenChalice",
-            .name("ornate golden chalice"),
-            .description("A beautifully crafted golden chalice with intricate engravings."),
-            .adjectives("ornate", "golden", "beautiful", "crafted", "intricate"),
-            .synonyms("cup", "goblet", "vessel"),
-            .isTakable,
+        let complexItem = Item("ornateGoldenChalice")
+            .name("ornate golden chalice")
+            .description("A beautifully crafted golden chalice with intricate engravings.")
+            .adjectives("ornate", "golden", "beautiful", "crafted", "intricate")
+            .synonyms("cup", "goblet", "vessel")
+            .isTakable
             .in(.startRoom)
-        )
 
-        let location = Location(
-            id: .startRoom,
-            .name("Grand Hall"),
-            .description("A magnificent hall with soaring ceilings."),
+        let location = Location(.startRoom)
+            .name("Grand Hall")
+            .description("A magnificent hall with soaring ceilings.")
             .inherentlyLit
-        )
 
         let game = MinimalGame(
             locations: location,
@@ -116,18 +108,14 @@ struct VocabularyTests {
     @Test("Parser integration works with refactored vocabulary")
     func testParserIntegrationWithRefactoredVocabulary() async throws {
         // Given: A game with items that have vocabulary words
-        let lamp = Item(
-            id: "lamp",
-            .name("brass lamp"),
-            .isTakable,
+        let lamp = Item("lamp")
+            .name("brass lamp")
+            .isTakable
             .in(.startRoom)
-        )
 
-        let room = Location(
-            id: .startRoom,
-            .name("Test Room"),
+        let room = Location(.startRoom)
+            .name("Test Room")
             .inherentlyLit
-        )
 
         let game = MinimalGame(
             locations: room,
@@ -156,18 +144,14 @@ struct VocabularyTests {
     @Test("Vocabulary contains enhanced adjectives after refactor")
     func testVocabularyEnhancementStillWorks() async throws {
         // Given: An item with a multi-word name that should generate adjectives
-        let item = Item(
-            id: "silverRing",
-            .name("ancient silver ring"),
-            .isTakable,
+        let item = Item("silverRing")
+            .name("ancient silver ring")
+            .isTakable
             .in(.startRoom)
-        )
 
-        let room = Location(
-            id: .startRoom,
-            .name("Test Room"),
+        let room = Location(.startRoom)
+            .name("Test Room")
             .inherentlyLit
-        )
 
         let game = MinimalGame(
             locations: room,

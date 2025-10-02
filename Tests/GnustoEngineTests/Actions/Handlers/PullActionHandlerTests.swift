@@ -11,12 +11,10 @@ struct PullActionHandlerTests {
     @Test("PULL DIRECTOBJECT syntax works")
     func testPullDirectObjectSyntax() async throws {
         // Given
-        let rope = Item(
-            id: "rope",
-            .name("thick rope"),
-            .description("A thick hemp rope."),
+        let rope = Item("rope")
+            .name("thick rope")
+            .description("A thick hemp rope.")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: rope
@@ -42,13 +40,11 @@ struct PullActionHandlerTests {
     @Test("PULL CHARACTER syntax works")
     func testPullCharacterSyntax() async throws {
         // Given
-        let towerGuard = Item(
-            id: "guard",
-            .name("surly guard"),
-            .description("A surly tower guard."),
-            .in(.startRoom),
-            .characterSheet(.init())
-        )
+        let towerGuard = Item("guard")
+            .name("surly guard")
+            .description("A surly tower guard.")
+            .in(.startRoom)
+            .characterSheet(.default)
 
         let game = MinimalGame(
             items: towerGuard
@@ -119,18 +115,14 @@ struct PullActionHandlerTests {
     @Test("Cannot pull target not in scope")
     func testCannotPullTargetNotInScope() async throws {
         // Given
-        let anotherRoom = Location(
-            id: "anotherRoom",
-            .name("Another Room"),
+        let anotherRoom = Location("anotherRoom")
+            .name("Another Room")
             .inherentlyLit
-        )
 
-        let remoteLever = Item(
-            id: "remoteLever",
-            .name("remote lever"),
-            .description("A lever in another room."),
+        let remoteLever = Item("remoteLever")
+            .name("remote lever")
+            .description("A lever in another room.")
             .in("anotherRoom")
-        )
 
         let game = MinimalGame(
             locations: anotherRoom,
@@ -154,18 +146,14 @@ struct PullActionHandlerTests {
     @Test("Requires light to pull")
     func testRequiresLight() async throws {
         // Given: Dark room with an object to pull
-        let darkRoom = Location(
-            id: "darkRoom",
-            .name("Dark Room"),
+        let darkRoom = Location("darkRoom")
+            .name("Dark Room")
             .description("A pitch black room.")
-        )
 
-        let chain = Item(
-            id: "chain",
-            .name("metal chain"),
-            .description("A heavy metal chain."),
+        let chain = Item("chain")
+            .name("metal chain")
+            .description("A heavy metal chain.")
             .in("darkRoom")
-        )
 
         let game = MinimalGame(
             player: Player(in: "darkRoom"),
@@ -193,12 +181,10 @@ struct PullActionHandlerTests {
     @Test("Pulling sets isTouched flag")
     func testPullingSetsTouchedFlag() async throws {
         // Given
-        let bell = Item(
-            id: "bell",
-            .name("church bell"),
-            .description("A large church bell with a rope."),
+        let bell = Item("bell")
+            .name("church bell")
+            .description("A large church bell with a rope.")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: bell
@@ -221,19 +207,15 @@ struct PullActionHandlerTests {
     @Test("Pull sequence of different objects")
     func testPullSequenceOfDifferentObjects() async throws {
         // Given
-        let rope1 = Item(
-            id: "rope1",
-            .name("first rope"),
-            .description("A thick rope."),
+        let rope1 = Item("rope1")
+            .name("first rope")
+            .description("A thick rope.")
             .in(.startRoom)
-        )
 
-        let rope2 = Item(
-            id: "rope2",
-            .name("second rope"),
-            .description("A thin rope."),
+        let rope2 = Item("rope2")
+            .name("second rope")
+            .description("A thin rope.")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: rope1, rope2
@@ -267,22 +249,18 @@ struct PullActionHandlerTests {
     @Test("Pull object in open container")
     func testPullObjectInOpenContainer() async throws {
         // Given
-        let box = Item(
-            id: "box",
-            .name("wooden box"),
-            .description("A wooden box with mechanisms."),
-            .isContainer,
-            .isOpenable,
-            .isOpen,
+        let box = Item("box")
+            .name("wooden box")
+            .description("A wooden box with mechanisms.")
+            .isContainer
+            .isOpenable
+            .isOpen
             .in(.startRoom)
-        )
 
-        let string = Item(
-            id: "string",
-            .name("pull string"),
-            .description("A string for pulling."),
+        let string = Item("string")
+            .name("pull string")
+            .description("A string for pulling.")
             .in(.item("box"))
-        )
 
         let game = MinimalGame(
             items: box, string

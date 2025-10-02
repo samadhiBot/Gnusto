@@ -10,31 +10,25 @@ struct NibbleActionHandlerTests {
 
     /// Creates a test engine with edible and non-edible items for nibble testing
     private func createTestEngine() async -> (GameEngine, MockIOHandler) {
-        let apple = Item(
-            id: "apple",
-            .name("red apple"),
-            .description("A delicious red apple."),
-            .isTakable,
-            .isEdible,
+        let apple = Item("apple")
+            .name("red apple")
+            .description("A delicious red apple.")
+            .isTakable
+            .isEdible
             .in(.startRoom)
-        )
 
-        let cookie = Item(
-            id: "cookie",
-            .name("chocolate cookie"),
-            .description("A sweet chocolate cookie."),
-            .isTakable,
-            .isEdible,
+        let cookie = Item("cookie")
+            .name("chocolate cookie")
+            .description("A sweet chocolate cookie.")
+            .isTakable
+            .isEdible
             .in(.player)
-        )
 
-        let rock = Item(
-            id: "rock",
-            .name("gray rock"),
-            .description("A hard gray rock."),
-            .isTakable,
+        let rock = Item("rock")
+            .name("gray rock")
+            .description("A hard gray rock.")
+            .isTakable
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: apple, cookie, rock
@@ -112,19 +106,15 @@ struct NibbleActionHandlerTests {
 
     @Test("Cannot nibble item not in scope")
     func testCannotNibbleItemNotInScope() async throws {
-        let anotherRoom = Location(
-            id: "anotherRoom",
-            .name("Another Room"),
+        let anotherRoom = Location("anotherRoom")
+            .name("Another Room")
             .inherentlyLit
-        )
 
-        let remoteCake = Item(
-            id: "remoteCake",
-            .name("distant cake"),
-            .description("A cake in another room."),
-            .isEdible,
+        let remoteCake = Item("remoteCake")
+            .name("distant cake")
+            .description("A cake in another room.")
+            .isEdible
             .in("anotherRoom")
-        )
 
         let game = MinimalGame(
             locations: anotherRoom,
@@ -173,20 +163,16 @@ struct NibbleActionHandlerTests {
     @Test("Requires light to nibble")
     func testRequiresLight() async throws {
         // Given: Dark room with edible item
-        let darkRoom = Location(
-            id: "darkRoom",
-            .name("Dark Room"),
+        let darkRoom = Location("darkRoom")
+            .name("Dark Room")
             .description("A pitch black room.")
             // Note: No .inherentlyLit property
-        )
 
-        let bread = Item(
-            id: "bread",
-            .name("fresh bread"),
-            .description("A loaf of fresh bread."),
-            .isEdible,
+        let bread = Item("bread")
+            .name("fresh bread")
+            .description("A loaf of fresh bread.")
+            .isEdible
             .in("darkRoom")
-        )
 
         let game = MinimalGame(
             player: Player(in: "darkRoom"),
@@ -416,13 +402,11 @@ struct NibbleActionHandlerTests {
         // This is a theoretical test - in practice, EatActionHandler should always be present
         // But it demonstrates how the system should handle missing handlers
 
-        let apple = Item(
-            id: "apple",
-            .name("red apple"),
-            .description("A delicious red apple."),
-            .isEdible,
+        let apple = Item("apple")
+            .name("red apple")
+            .description("A delicious red apple.")
+            .isEdible
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: apple

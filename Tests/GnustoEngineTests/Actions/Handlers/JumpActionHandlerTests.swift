@@ -29,12 +29,10 @@ struct JumpActionHandlerTests {
     @Test("JUMP DIRECTOBJECT syntax works")
     func testJumpDirectObjectSyntax() async throws {
         // Given
-        let log = Item(
-            id: "log",
-            .name("fallen log"),
-            .description("A large fallen log."),
+        let log = Item("log")
+            .name("fallen log")
+            .description("A large fallen log.")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: log
@@ -60,12 +58,10 @@ struct JumpActionHandlerTests {
     @Test("JUMP OVER DIRECTOBJECT syntax works")
     func testJumpOverDirectObjectSyntax() async throws {
         // Given
-        let stream = Item(
-            id: "stream",
-            .name("small stream"),
-            .description("A small babbling stream."),
+        let stream = Item("stream")
+            .name("small stream")
+            .description("A small babbling stream.")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: stream
@@ -90,18 +86,14 @@ struct JumpActionHandlerTests {
     @Test("Cannot jump target not in scope")
     func testCannotJumpTargetNotInScope() async throws {
         // Given
-        let anotherRoom = Location(
-            id: "anotherRoom",
-            .name("Another Room"),
+        let anotherRoom = Location("anotherRoom")
+            .name("Another Room")
             .inherentlyLit
-        )
 
-        let remoteObstacle = Item(
-            id: "remoteObstacle",
-            .name("remote obstacle"),
-            .description("An obstacle in another room."),
+        let remoteObstacle = Item("remoteObstacle")
+            .name("remote obstacle")
+            .description("An obstacle in another room.")
             .in("anotherRoom")
-        )
 
         let game = MinimalGame(
             locations: anotherRoom,
@@ -125,11 +117,9 @@ struct JumpActionHandlerTests {
     @Test("Does not require light to jump")
     func testDoesNotRequireLight() async throws {
         // Given: Dark room
-        let darkRoom = Location(
-            id: "darkRoom",
-            .name("Dark Room"),
+        let darkRoom = Location("darkRoom")
+            .name("Dark Room")
             .description("A pitch black room.")
-        )
 
         let game = MinimalGame(
             player: Player(in: "darkRoom"),
@@ -180,12 +170,10 @@ struct JumpActionHandlerTests {
     @Test("Jump with regular object gives standard message")
     func testJumpWithObject() async throws {
         // Given
-        let boulder = Item(
-            id: "boulder",
-            .name("large boulder"),
-            .description("A massive boulder."),
+        let boulder = Item("boulder")
+            .name("large boulder")
+            .description("A massive boulder.")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: boulder
@@ -211,12 +199,10 @@ struct JumpActionHandlerTests {
     @Test("Jumping with object sets isTouched flag")
     func testJumpingSetsTouchedFlag() async throws {
         // Given
-        let fence = Item(
-            id: "fence",
-            .name("wooden fence"),
-            .description("A tall wooden fence."),
+        let fence = Item("fence")
+            .name("wooden fence")
+            .description("A tall wooden fence.")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: fence
@@ -235,12 +221,10 @@ struct JumpActionHandlerTests {
     @Test("Jumping over object with OVER preposition")
     func testJumpOverWithPreposition() async throws {
         // Given
-        let puddle = Item(
-            id: "puddle",
-            .name("mud puddle"),
-            .description("A small mud puddle."),
+        let puddle = Item("puddle")
+            .name("mud puddle")
+            .description("A small mud puddle.")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: puddle

@@ -9,27 +9,23 @@ struct AllCommandTests {
     @Test("TAKE ALL with multiple takable items")
     func testTakeAllMultipleItems() async throws {
         // Arrange: Multiple takable items in the room
-        let key = Item(
-            id: .startItem,
-            .name("brass key"),
-            .in(.startRoom),
-            .isTakable,
+        let key = Item(.startItem)
+            .name("brass key")
+            .in(.startRoom)
+            .isTakable
             .size(2)
-        )
-        let coin = Item(
-            id: "coin",
-            .name("gold coin"),
-            .in(.startRoom),
-            .isTakable,
+
+        let coin = Item("coin")
+            .name("gold coin")
+            .in(.startRoom)
+            .isTakable
             .size(1)
-        )
-        let lamp = Item(
-            id: "lamp",
-            .name("brass lamp"),
-            .in(.startRoom),
-            .isTakable,
+
+        let lamp = Item("lamp")
+            .name("brass lamp")
+            .in(.startRoom)
+            .isTakable
             .size(3)
-        )
 
         let player = Player(in: .startRoom, characterSheet: .weak)
         let game = MinimalGame(player: player, items: key, coin, lamp)
@@ -59,12 +55,10 @@ struct AllCommandTests {
     @Test("TAKE ALL with no takable items")
     func testTakeAllNoItems() async throws {
         // Arrange: No takable items in the room
-        let scenery = Item(
-            id: .startItem,
-            .name("stone wall"),
+        let scenery = Item(.startItem)
+            .name("stone wall")
             .in(.startRoom)
             // No .isTakable flag
-        )
 
         let game = MinimalGame(items: scenery)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
@@ -84,26 +78,21 @@ struct AllCommandTests {
     @Test("TAKE ALL with mixed takable and non-takable items")
     func testTakeAllMixedItems() async throws {
         // Arrange: Mix of takable and non-takable items
-        let key = Item(
-            id: .startItem,
-            .name("brass key"),
-            .in(.startRoom),
-            .isTakable,
+        let key = Item(.startItem)
+            .name("brass key")
+            .in(.startRoom)
+            .isTakable
             .size(2)
-        )
-        let wall = Item(
-            id: "wall",
-            .name("stone wall"),
+
+        let wall = Item("wall")
+            .name("stone wall")
             .in(.startRoom)
             // No .isTakable flag
-        )
-        let coin = Item(
-            id: "coin",
-            .name("gold coin"),
-            .in(.startRoom),
-            .isTakable,
+        let coin = Item("coin")
+            .name("gold coin")
+            .in(.startRoom)
+            .isTakable
             .size(1)
-        )
 
         let player = Player(in: .startRoom, characterSheet: .weak)
         let game = MinimalGame(player: player, items: key, wall, coin)
@@ -133,27 +122,23 @@ struct AllCommandTests {
     @Test("TAKE ALL with capacity limit")
     func testTakeAllCapacityLimit() async throws {
         // Arrange: Items that exceed player capacity
-        let key = Item(
-            id: .startItem,
-            .name("brass key"),
-            .in(.startRoom),
-            .isTakable,
+        let key = Item(.startItem)
+            .name("brass key")
+            .in(.startRoom)
+            .isTakable
             .size(3)
-        )
-        let coin = Item(
-            id: "coin",
-            .name("gold coin"),
-            .in(.startRoom),
-            .isTakable,
+
+        let coin = Item("coin")
+            .name("gold coin")
+            .in(.startRoom)
+            .isTakable
             .size(2)
-        )
-        let boulder = Item(
-            id: "boulder",
-            .name("heavy boulder"),
-            .in(.startRoom),
-            .isTakable,
+
+        let boulder = Item("boulder")
+            .name("heavy boulder")
+            .in(.startRoom)
+            .isTakable
             .size(100)  // Too heavy
-        )
 
         let player = Player(in: .startRoom, characterSheet: .weak)  // Can only carry key + coin
         let game = MinimalGame(player: player, items: key, coin, boulder)
@@ -183,27 +168,23 @@ struct AllCommandTests {
     @Test("DROP ALL with multiple held items")
     func testDropAllMultipleItems() async throws {
         // Arrange: Multiple items held by player
-        let key = Item(
-            id: .startItem,
-            .name("brass key"),
-            .in(.player),
-            .isTakable,
+        let key = Item(.startItem)
+            .name("brass key")
+            .in(.player)
+            .isTakable
             .size(2)
-        )
-        let coin = Item(
-            id: "coin",
-            .name("gold coin"),
-            .in(.player),
-            .isTakable,
+
+        let coin = Item("coin")
+            .name("gold coin")
+            .in(.player)
+            .isTakable
             .size(1)
-        )
-        let lamp = Item(
-            id: "lamp",
-            .name("brass lamp"),
-            .in(.player),
-            .isTakable,
+
+        let lamp = Item("lamp")
+            .name("brass lamp")
+            .in(.player)
+            .isTakable
             .size(3)
-        )
 
         let game = MinimalGame(items: key, coin, lamp)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
@@ -260,13 +241,11 @@ struct AllCommandTests {
     @Test("TAKE ALL single item uses singular message")
     func testTakeAllSingleItem() async throws {
         // Arrange: Only one takable item
-        let key = Item(
-            id: .startItem,
-            .name("brass key"),
-            .in(.startRoom),
-            .isTakable,
+        let key = Item(.startItem)
+            .name("brass key")
+            .in(.startRoom)
+            .isTakable
             .size(2)
-        )
 
         let player = Player(in: .startRoom, characterSheet: .weak)
         let game = MinimalGame(player: player, items: key)
@@ -291,13 +270,11 @@ struct AllCommandTests {
     @Test("DROP ALL single item uses singular message")
     func testDropAllSingleItem() async throws {
         // Arrange: Player holding one item
-        let key = Item(
-            id: .startItem,
-            .name("brass key"),
-            .in(.player),
-            .isTakable,
+        let key = Item(.startItem)
+            .name("brass key")
+            .in(.player)
+            .isTakable
             .size(2)
-        )
 
         let game = MinimalGame(items: key)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
@@ -321,20 +298,17 @@ struct AllCommandTests {
     @Test("TAKE ALL skips items already held")
     func testTakeAllSkipsHeldItems() async throws {
         // Arrange: Mix of held and unheld items
-        let heldKey = Item(
-            id: .startItem,
-            .name("silver key"),
-            .in(.player),
-            .isTakable,
+        let heldKey = Item(.startItem)
+            .name("silver key")
+            .in(.player)
+            .isTakable
             .size(2)
-        )
-        let roomKey = Item(
-            id: "roomKey",
-            .name("brass key"),
-            .in(.startRoom),
-            .isTakable,
+
+        let roomKey = Item("roomKey")
+            .name("brass key")
+            .in(.startRoom)
+            .isTakable
             .size(2)
-        )
 
         let player = Player(in: .startRoom, characterSheet: .weak)
         let game = MinimalGame(player: player, items: heldKey, roomKey)

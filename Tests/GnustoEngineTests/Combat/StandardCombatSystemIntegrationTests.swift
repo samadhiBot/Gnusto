@@ -11,19 +11,16 @@ struct StandardCombatSystemIntegrationTests {
     @Test("Basic combat initiation and attack flow")
     func testBasicCombatFlow() async throws {
         // Given: Player and enemy in same room
-        let sword = Item(
-            id: "sword",
-            .name("steel sword"),
-            .isWeapon,
-            .isTakable,
-            .value(5),
-            .damage(12),
+        let sword = Item("sword")
+            .name("steel sword")
+            .isWeapon
+            .isTakable
+            .value(5)
+            .damage(12)
             .in(.player)
-        )
 
-        let goblin = Item(
-            id: "goblin",
-            .name("goblin warrior"),
+        let goblin = Item("goblin")
+            .name("goblin warrior")
             .characterSheet(
                 .init(
                     armorClass: 12,
@@ -31,9 +28,8 @@ struct StandardCombatSystemIntegrationTests {
                     maxHealth: 30,
                     isFighting: true
                 )
-            ),
+            )
             .in(.startRoom)
-        )
 
         let game = MinimalGame(items: goblin, sword)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
@@ -71,19 +67,16 @@ struct StandardCombatSystemIntegrationTests {
     @Test("Combat ends when enemy dies")
     func testCombatEndsOnEnemyDeath() async throws {
         // Given: Very weak enemy
-        let powerfulSword = Item(
-            id: "sword",
-            .name("legendary sword"),
-            .isWeapon,
-            .isTakable,
-            .value(20),
-            .damage(50),
+        let powerfulSword = Item("sword")
+            .name("legendary sword")
+            .isWeapon
+            .isTakable
+            .value(20)
+            .damage(50)
             .in(.player)
-        )
 
-        let weakGoblin = Item(
-            id: "goblin",
-            .name("weak goblin"),
+        let weakGoblin = Item("goblin")
+            .name("weak goblin")
             .characterSheet(
                 .init(
                     armorClass: 5,
@@ -91,9 +84,8 @@ struct StandardCombatSystemIntegrationTests {
                     maxHealth: 1,
                     isFighting: true
                 )
-            ),
+            )
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: weakGoblin, powerfulSword
@@ -136,15 +128,13 @@ struct StandardCombatSystemIntegrationTests {
     @Test("Damage categories are properly calculated")
     func testDamageCategories() async throws {
         // Given: Enemy with known health
-        let variableSword = Item(
-            id: "sword",
-            .name("variable sword"),
-            .isWeapon,
-            .isTakable,
-            .value(1),
-            .damage(25),
+        let variableSword = Item("sword")
+            .name("variable sword")
+            .isWeapon
+            .isTakable
+            .value(1)
+            .damage(25)
             .in(.player)
-        )
 
         let game = MinimalGame(items: Lab.castleGuard, variableSword)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
@@ -205,19 +195,16 @@ struct StandardCombatSystemIntegrationTests {
     @Test("Critical hits deal increased damage")
     func testCriticalHits() async throws {
         // Given: Setup to force critical hits (this is probabilistic in real game)
-        let sword = Item(
-            id: "sword",
-            .name("sharp sword"),
-            .isWeapon,
-            .isTakable,
-            .value(5),
-            .damage(10),
+        let sword = Item("sword")
+            .name("sharp sword")
+            .isWeapon
+            .isTakable
+            .value(5)
+            .damage(10)
             .in(.player)
-        )
 
-        let enemy = Item(
-            id: "enemy",
-            .name("test enemy"),
+        let enemy = Item("enemy")
+            .name("test enemy")
             .characterSheet(
                 .init(
                     armorClass: 1,  // Always hit
@@ -225,9 +212,8 @@ struct StandardCombatSystemIntegrationTests {
                     maxHealth: 100,
                     isFighting: true
                 )
-            ),
+            )
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: enemy, sword
@@ -324,19 +310,16 @@ struct StandardCombatSystemIntegrationTests {
     @Test("When player is rendered unconscious")
     func testPlayerUnconscious() async throws {
         // Given: Very weak player and very powerful enemy
-        let devastatingWeapon = Item(
-            id: "hammer",
-            .name("war hammer"),
-            .isWeapon,
-            .isTakable,
-            .value(15),
-            .damage(25),
+        let devastatingWeapon = Item("hammer")
+            .name("war hammer")
+            .isWeapon
+            .isTakable
+            .value(15)
+            .damage(25)
             .in(.startRoom)
-        )
 
-        let brutalEnemy = Item(
-            id: "giant",
-            .name("stone giant"),
+        let brutalEnemy = Item("giant")
+            .name("stone giant")
             .characterSheet(
                 .init(
                     strength: 20,  // Very high strength for massive damage
@@ -345,9 +328,8 @@ struct StandardCombatSystemIntegrationTests {
                     maxHealth: 80,
                     isFighting: true
                 )
-            ),
+            )
             .in(.startRoom)
-        )
 
         // Weaken the player significantly
         let game = MinimalGame(
@@ -396,20 +378,16 @@ struct StandardCombatSystemIntegrationTests {
     @Test("Combat intensity increases over time")
     func testCombatIntensityEscalation() async throws {
         // Given: Long-lived combat scenario
-        let sword = Item(
-            id: "sword",
-            .name("training sword"),
-            .isWeapon,
-            .isTakable,
+        let sword = Item("sword")
+            .name("training sword")
+            .isWeapon
+            .isTakable
             .in(.player)
-        )
 
-        let toughEnemy = Item(
-            id: "enemy",
-            .name("tough enemy"),
-            .characterSheet(.strong),
+        let toughEnemy = Item("enemy")
+            .name("tough enemy")
+            .characterSheet(.strong)
             .in(.startRoom)
-        )
 
         let game = MinimalGame(items: toughEnemy, sword)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
@@ -470,19 +448,16 @@ struct StandardCombatSystemIntegrationTests {
     @Test("Combat fatigue increases over time")
     func testCombatFatigueEscalation() async throws {
         // Given: Long-lived combat scenario with very low damage to show fatigue
-        let sword = Item(
-            id: "sword",
-            .name("training blade"),
-            .isWeapon,
-            .isTakable,
-            .value(1),  // Very low value for minimal damage
-            .damage(2),  // Very low damage
+        let sword = Item("sword")
+            .name("training blade")
+            .isWeapon
+            .isTakable
+            .value(1)  // Very low value for minimal damage
+            .damage(2)  // Very low damage
             .in(.player)
-        )
 
-        let resilientEnemy = Item(
-            id: "warrior",
-            .name("veteran warrior"),
+        let resilientEnemy = Item("warrior")
+            .name("veteran warrior")
             .characterSheet(
                 .init(
                     strength: 8,  // Low strength for low damage
@@ -492,9 +467,8 @@ struct StandardCombatSystemIntegrationTests {
                     maxHealth: 200,
                     isFighting: true
                 )
-            ),
+            )
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             player: Player(
@@ -552,20 +526,17 @@ struct StandardCombatSystemIntegrationTests {
     @Test("Special combat events can occur")
     func testSpecialCombatEvents() async throws {
         // Given: Combat scenario likely to produce special events
-        let sword = Item(
-            id: "sword",
-            .name("masterwork sword"),
-            .adjectives("gleaming", "razor sharp", "masterfully forged"),
-            .isWeapon,
-            .isTakable,
-            .value(8),
-            .damage(15),
+        let sword = Item("sword")
+            .name("masterwork sword")
+            .adjectives("gleaming", "razor sharp", "masterfully forged")
+            .isWeapon
+            .isTakable
+            .value(8)
+            .damage(15)
             .in(.player)
-        )
 
-        let enemy = Item(
-            id: "enemy",
-            .name("skilled enemy"),
+        let enemy = Item("enemy")
+            .name("skilled enemy")
             .characterSheet(
                 .init(
                     armorClass: 12,
@@ -573,9 +544,8 @@ struct StandardCombatSystemIntegrationTests {
                     maxHealth: 60,
                     isFighting: true
                 )
-            ),
+            )
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: enemy, sword
@@ -655,22 +625,17 @@ struct StandardCombatSystemIntegrationTests {
     @Test("Enemy flees when critically wounded")
     func testEnemyFleeing() async throws {
         // Given: Cowardly enemy with escape route
-        let northRoom = Location(
-            id: "northRoom",
-            .name("North Room"),
+        let northRoom = Location("northRoom")
+            .name("North Room")
             .inherentlyLit
-        )
 
-        let testRoomWithExit = Location(
-            id: .startRoom,
-            .name("Test Room"),
-            .inherentlyLit,
+        let testRoomWithExit = Location(.startRoom)
+            .name("Test Room")
+            .inherentlyLit
             .exits(.north("northRoom"))
-        )
 
-        let cowardlyBandit = Item(
-            id: "bandit",
-            .name("cowardly bandit"),
+        let cowardlyBandit = Item("bandit")
+            .name("cowardly bandit")
             .characterSheet(
                 .init(
                     strength: 8,
@@ -680,9 +645,8 @@ struct StandardCombatSystemIntegrationTests {
                     maxHealth: 20,
                     isFighting: true
                 )
-            ),
+            )
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             locations: testRoomWithExit, northRoom,
@@ -731,9 +695,8 @@ struct StandardCombatSystemIntegrationTests {
     @Test("Enemy surrenders when outmatched")
     func testEnemySurrender() async throws {
         // Given: Intelligent enemy likely to surrender
-        let intelligentEnemy = Item(
-            id: "scholar",
-            .name("scholar warrior"),
+        let intelligentEnemy = Item("scholar")
+            .name("scholar warrior")
             .characterSheet(
                 .init(
                     strength: 10,
@@ -745,19 +708,16 @@ struct StandardCombatSystemIntegrationTests {
                     maxHealth: 25,
                     isFighting: true
                 )
-            ),
+            )
             .in(.startRoom)
-        )
 
-        let powerfulSword = Item(
-            id: "sword",
-            .name("intimidating sword"),
-            .isWeapon,
-            .isTakable,
-            .value(10),
-            .damage(20),
+        let powerfulSword = Item("sword")
+            .name("intimidating sword")
+            .isWeapon
+            .isTakable
+            .value(10)
+            .damage(20)
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: intelligentEnemy, powerfulSword
@@ -800,9 +760,8 @@ struct StandardCombatSystemIntegrationTests {
     @Test("High charisma player can pacify suitable enemies")
     func testPacification() async throws {
         // Given: Pacifiable enemy and charismatic player
-        let confusedGuard = Item(
-            id: "guard",
-            .name("confused guard"),
+        let confusedGuard = Item("guard")
+            .name("confused guard")
             .characterSheet(
                 .init(
                     intelligence: 12,
@@ -812,9 +771,8 @@ struct StandardCombatSystemIntegrationTests {
                     maxHealth: 30,
                     isFighting: true
                 )
-            ),
+            )
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             player: Player(
@@ -857,9 +815,8 @@ struct StandardCombatSystemIntegrationTests {
     @Test("Enemy requiring weapon blocks unarmed attacks")
     func testWeaponRequirement() async throws {
         // Given: Heavily armored enemy requiring weapons
-        let armoredKnight = Item(
-            id: "knight",
-            .name("armored knight"),
+        let armoredKnight = Item("knight")
+            .name("armored knight")
             .characterSheet(
                 .init(
                     armorClass: 18,
@@ -867,9 +824,8 @@ struct StandardCombatSystemIntegrationTests {
                     maxHealth: 50,
                     isFighting: true
                 )
-            ),
+            )
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: armoredKnight
@@ -899,9 +855,8 @@ struct StandardCombatSystemIntegrationTests {
     @Test("Non-combat actions during combat give enemy advantage")
     func testDistractedPlayerVulnerability() async throws {
         // Given: Combat scenario
-        let aggressiveEnemy = Item(
-            id: "warrior",
-            .name("fierce warrior"),
+        let aggressiveEnemy = Item("warrior")
+            .name("fierce warrior")
             .characterSheet(
                 .init(
                     strength: 14,
@@ -910,19 +865,16 @@ struct StandardCombatSystemIntegrationTests {
                     maxHealth: 40,
                     isFighting: true
                 )
-            ),
+            )
             .in(.startRoom)
-        )
 
-        let sword = Item(
-            id: "sword",
-            .name("short sword"),
-            .isWeapon,
-            .isTakable,
-            .value(4),
-            .damage(8),
+        let sword = Item("sword")
+            .name("short sword")
+            .isWeapon
+            .isTakable
+            .value(4)
+            .damage(8)
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: aggressiveEnemy, sword
@@ -960,9 +912,8 @@ struct StandardCombatSystemIntegrationTests {
     @Test("Custom combat descriptions override defaults")
     func testCustomCombatDescriptions() async throws {
         // Given: Combat system with custom descriptions
-        let specialEnemy = Item(
-            id: "dragon",
-            .name("ancient dragon"),
+        let specialEnemy = Item("dragon")
+            .name("ancient dragon")
             .characterSheet(
                 .init(
                     armorClass: 20,
@@ -970,9 +921,8 @@ struct StandardCombatSystemIntegrationTests {
                     maxHealth: 100,
                     isFighting: true
                 )
-            ),
+            )
             .in(.startRoom)
-        )
 
         // Create custom combat system
         let customSystem = StandardCombatSystem(
@@ -1005,9 +955,8 @@ struct StandardCombatSystemIntegrationTests {
     @Test("Combat handles already dead enemy")
     func testAlreadyDeadEnemy() async throws {
         // Given: Dead enemy
-        let deadEnemy = Item(
-            id: "corpse",
-            .name("dead bandit"),
+        let deadEnemy = Item("corpse")
+            .name("dead bandit")
             .characterSheet(
                 .init(
                     health: 0,
@@ -1015,9 +964,8 @@ struct StandardCombatSystemIntegrationTests {
                     consciousness: .dead,
                     isFighting: false
                 )
-            ),
+            )
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: deadEnemy
@@ -1043,9 +991,8 @@ struct StandardCombatSystemIntegrationTests {
     @Test("Combat system handles missing weapon gracefully")
     func testMissingWeaponHandling() async throws {
         // Given: Combat scenario where weapon might not exist
-        let enemy = Item(
-            id: "bandit",
-            .name("highway bandit"),
+        let enemy = Item("bandit")
+            .name("highway bandit")
             .characterSheet(
                 .init(
                     armorClass: 11,
@@ -1053,9 +1000,8 @@ struct StandardCombatSystemIntegrationTests {
                     maxHealth: 25,
                     isFighting: true
                 )
-            ),
+            )
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: enemy
@@ -1082,16 +1028,13 @@ struct StandardCombatSystemIntegrationTests {
     @Test("Combat handles non-weapon items gracefully")
     func testNonWeaponItemAttack() async throws {
         // Given: Combat scenario with non-weapon item
-        let book = Item(
-            id: "book",
-            .name("heavy book"),
-            .isTakable,
+        let book = Item("book")
+            .name("heavy book")
+            .isTakable
             .in(.player)
-        )
 
-        let enemy = Item(
-            id: "thug",
-            .name("street thug"),
+        let enemy = Item("thug")
+            .name("street thug")
             .characterSheet(
                 .init(
                     armorClass: 10,
@@ -1099,9 +1042,8 @@ struct StandardCombatSystemIntegrationTests {
                     maxHealth: 20,
                     isFighting: true
                 )
-            ),
+            )
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: enemy, book

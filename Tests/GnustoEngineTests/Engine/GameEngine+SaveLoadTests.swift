@@ -79,16 +79,12 @@ struct GameEngineSaveLoadTests {
     @Test("GameEngine restores game state from filesystem")
     func testRestoreGame() async throws {
         // Given: A game engine and a saved game with modified state
-        let foyer = Location(
-            id: "foyer",
-            .name("Foyer of the Opera House"),
+        let foyer = Location("foyer")
+            .name("Foyer of the Opera House")
             .inherentlyLit
-        )
-        let westOfHouse = Location(
-            id: "westOfHouse",
-            .name("West of House"),
+        let westOfHouse = Location("westOfHouse")
+            .name("West of House")
             .inherentlyLit
-        )
         let game = MinimalGame(
             locations: foyer, westOfHouse
         )
@@ -287,12 +283,10 @@ struct GameEngineSaveLoadTests {
     func testSaveLoadCompleteState() async throws {
         // Given: A game with complex state changes
         let testHandler = TestFilesystemHandler()
-        let testItem = Item(
-            id: "testItem",
-            .name("test item"),
-            .isTakable,
+        let testItem = Item("testItem")
+            .name("test item")
+            .isTakable
             .in(.startRoom)
-        )
 
         let game = MinimalGame(items: testItem)
 

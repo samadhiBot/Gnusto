@@ -57,8 +57,8 @@ public struct ConsoleIOHandler: IOHandler {
     ///   - score: The player's current score.
     ///   - turns: The current number of turns elapsed.
     public func showStatusLine(roomName: String, score: Int, turns: Int) {
-        let width = 64
-        let scoreCol = 42
+        let width = markdownParser.columns ?? 64
+        let scoreCol = Int(0.65625 * Double(width))
 
         let maxRoomLen = scoreCol - 2
         let displayRoom =

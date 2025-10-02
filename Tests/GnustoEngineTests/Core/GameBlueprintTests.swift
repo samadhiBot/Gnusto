@@ -30,35 +30,29 @@ struct GameBlueprintTests {
         let player = Player(in: "entrance")
 
         let items = [
-            Item(
-                id: "testSword",
-                .name("magic sword"),
-                .description("A gleaming magical blade"),
-                .isTakable,
-                .in("armory")
-            ),
-            Item(
-                id: "testShield",
-                .name("steel shield"),
-                .description("A sturdy steel shield"),
-                .isTakable,
-                .in("armory")
-            ),
+            Item("testSword")
+                .name("magic sword")
+                .description("A gleaming magical blade")
+                .isTakable
+                .in("armory"),
+
+            Item("testShield")
+                .name("steel shield")
+                .description("A sturdy steel shield")
+                .isTakable
+                .in("armory"),
         ]
 
         let locations = [
-            Location(
-                id: "entrance",
-                .name("Grand Entrance"),
-                .description("A magnificent entrance hall"),
-                .inherentlyLit
-            ),
-            Location(
-                id: "armory",
-                .name("Royal Armory"),
-                .description("Weapons and armor line the walls"),
-                .inherentlyLit
-            ),
+            Location("entrance")
+                .name("Grand Entrance")
+                .description("A magnificent entrance hall")
+                .inherentlyLit,
+
+            Location("armory")
+                .name("Royal Armory")
+                .description("Weapons and armor line the walls")
+                .inherentlyLit,
         ]
 
         let customActionHandlers: [ActionHandler] = [
@@ -76,11 +70,11 @@ struct GameBlueprintTests {
         let fuses = [
             "testFuse": Fuse(
                 initialTurns: 5
-            )                { _, _ in ActionResult("Fuse triggered!") },
+            ) { _, _ in ActionResult("Fuse triggered!") },
         ]
 
         let daemons = [
-            DaemonID("testDaemon"): Daemon                { _, _ in ActionResult("Daemon running!") }
+            DaemonID("testDaemon"): Daemon { _, _ in ActionResult("Daemon running!") }
         ]
 
         let itemComputers = [

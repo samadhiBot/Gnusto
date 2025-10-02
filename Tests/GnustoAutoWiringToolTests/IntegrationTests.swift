@@ -11,22 +11,20 @@ struct IntegrationTests {
             import GnustoEngine
 
             enum TestArea {
-                static let room = Location(
-                    id: .room,
-                    .name("Test Room"),
+                static let room = Location(.room)
+                    .name("Test Room")
                     .inherentlyLit
                 )
 
-                static let chair = Item(
-                    id: .chair,
-                    .name("chair"),
+                static let chair = Item(.chair)
+                    .name("chair")
                     .in(.room)
                 )
             }
             """
 
         // Parse with Scanner
-        let scanner = Scanner(source: source)
+        let scanner = Scanner(source: source, fileName: "test.swift")
         let gameData = scanner.process()
 
         // Generate code with CodeGenerator
@@ -67,7 +65,7 @@ struct IntegrationTests {
             }
             """
 
-        let scanner = Scanner(source: source)
+        let scanner = Scanner(source: source, fileName: "test.swift")
         let gameData = scanner.process()
 
         let generator = CodeGenerator()

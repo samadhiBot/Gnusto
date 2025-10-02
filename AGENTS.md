@@ -81,8 +81,8 @@ gameState.items["raft"]?.properties[.isOn] = true
 
 #### Auto-Wiring System
 The GnustoAutoWiringPlugin automatically discovers game content patterns and generates boilerplate:
-- Scans for `Location(id: .foyer, ...)` patterns and generates `LocationID.foyer`
-- Discovers `Item(id: .cloak, ...)` patterns and generates `ItemID.cloak`
+- Scans for `Location(.foyer)` patterns and generates `LocationID.foyer`
+- Discovers `Item(.cloak)` patterns and generates `ItemID.cloak`
 - Wires up ItemEventHandlers and LocationEventHandlers
 - Creates GameBlueprint implementations
 
@@ -103,18 +103,14 @@ The GnustoAutoWiringPlugin automatically discovers game content patterns and gen
 @Test("Description of what is being tested")
 func testSomething() async throws {
     // Given: Setup complete game state
-    let testRoom = Location(
-        id: .startRoom,
-        .name("Test Room"),
+    let testRoom = Location(.startRoom)
+        .name("Test Room")
         .inherentlyLit
-    )
 
-    let testItem = Item(
-        id: "testItem",
-        .name("test item"),
-        .isTakable,
+    let testItem = Item("testItem")
+        .name("test item")
+        .isTakable
         .in(.startRoom)
-    )
 
     let game = MinimalGame(
         player: Player(in: .startRoom),
@@ -224,30 +220,27 @@ if [.attack, .hit, .kill, .fight].contains(command.verb) {...}
 ### Standard Item Setup
 ```swift
 // Light source (lamp, torch, candle)
-let lamp = Item(
-    id: "lamp",
-    .name("brass lamp"),
-    .description("A shiny brass lamp."),
-    .isTakable,
-    .isLightSource,
+let lamp = Item("lamp")
+    .name("brass lamp")
+    .description("A shiny brass lamp.")
+    .isTakable
+    .isLightSource
     .isDevice,  // Required for TurnOnActionHandler!
     .in(.startRoom)
 )
 
 // Basic takeable item
-let gem = Item(
-    id: "gem",
-    .name("sparkling gem"),
-    .description("A beautiful gem."),
-    .isTakable,
+let gem = Item("gem")
+    .name("sparkling gem")
+    .description("A beautiful gem.")
+    .isTakable
     .in(.startRoom)
 )
 
 // Fixed scenery item
-let statue = Item(
-    id: "statue",
-    .name("stone statue"),
-    .description("A heavy statue."),
+let statue = Item("statue")
+    .name("stone statue")
+    .description("A heavy statue.")
     // No .isTakable - makes it untakeable
     .in(.startRoom)
 )
@@ -256,18 +249,16 @@ let statue = Item(
 ### Location Setup
 ```swift
 // Standard lit room (most common)
-let room = Location(
-    id: .startRoom,
-    .name("Test Room"),
-    .description("A laboratory in which strange experiments are being conducted."),
+let room = Location(.startRoom)
+    .name("Test Room")
+    .description("A laboratory in which strange experiments are being conducted.")
     .inherentlyLit  // Most tests need this
 )
 
 // Dark room (for darkness mechanics)
-let darkRoom = Location(
-    id: "darkRoom",
-    .name("Dark Room"),
-    .description("Pitch black without light."),
+let darkRoom = Location("darkRoom")
+    .name("Dark Room")
+    .description("Pitch black without light.")
     // No .inherentlyLit - makes it dark
 )
 ```

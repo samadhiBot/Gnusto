@@ -13,25 +13,19 @@ struct LocationTests {
     let defaultLocationName = "Room"
 
     func createDefaultLocation() -> Location {
-        Location(
-            id: defaultLocationID,
-            .name(defaultLocationName),
+        Location(defaultLocationID)
+            .name(defaultLocationName)
             .description("A nondescript room.")
-        )
     }
 
     func createCustomLocation() -> Location {
-        Location(
-            id: "livingRoom",
-            .name("Living Room"),
-            .description("A comfortably furnished living room. There are exits west and east."),
-            .exits(
-                .west(blocked: "You head west."),
-                .east(blocked: "A solid wall blocks your path.")
-            ),
-            .inherentlyLit,
+        Location("livingRoom")
+            .name("Living Room")
+            .description("A comfortably furnished living room. There are exits west and east.")
+            .west("You head west.")
+            .east("A solid wall blocks your path.")
+            .inherentlyLit
             .localGlobals("rug", "fireplace")
-        )
     }
 
     // MARK: - Core Struct Tests
@@ -71,8 +65,8 @@ struct LocationTests {
         expectNoDifference(
             location.properties[.exits]?.toExits,
             [
-                .east(blocked: "A solid wall blocks your path."),
-                .west(blocked: "You head west."),
+                .east("A solid wall blocks your path."),
+                .west("You head west."),
             ])
         #expect(location.properties[.inherentlyLit]?.toBool == true)
         #expect(location.properties[.localGlobals]?.toItemIDs?.count == 2)
@@ -83,8 +77,8 @@ struct LocationTests {
                 .name: "Living Room",
                 .description: "A comfortably furnished living room. There are exits west and east.",
                 .exits: .exits([
-                    .west(blocked: "You head west."),
-                    .east(blocked: "A solid wall blocks your path."),
+                    .west("You head west."),
+                    .east("A solid wall blocks your path."),
                 ]),
                 .inherentlyLit: true,
                 .localGlobals: .itemIDSet(["rug", "fireplace"]),
@@ -179,13 +173,13 @@ struct LocationTests {
             decodedLocation.properties[.description] == originalLocation.properties[.description])
         #expect(
             decodedLocation.properties[.shortDescription]
-                == originalLocation.properties[.shortDescription]
+            == originalLocation.properties[.shortDescription]
         )
         expectNoDifference(
             decodedLocation.properties[.exits]?.toExits,
             [
-                .east(blocked: "A solid wall blocks your path."),
-                .west(blocked: "You head west."),
+                .east("A solid wall blocks your path."),
+                .west("You head west."),
             ])
         #expect(decodedLocation.properties == originalLocation.properties)
         #expect(
@@ -209,7 +203,7 @@ struct LocationTests {
         // Assert that the original (location1) is unchanged
         #expect(location1.properties[.name]?.toString == originalName)  // Check against captured default
         #expect(location1.properties[.isVisited] == nil)  // Not set, so nil
-        // Check original dynamic value
+                                                          // Check original dynamic value
         #expect(location1.properties[.description] == originalDescValue)
 
         // Assert that location2 has the changes
@@ -244,7 +238,7 @@ struct LocationTests {
         let descriptionValue = await proxy.property(.description)
         #expect(
             descriptionValue?.toString
-                == "A comfortably furnished living room. There are exits west and east.")
+            == "A comfortably furnished living room. There are exits west and east.")
 
         let inherentlyLitValue = await proxy.property(.inherentlyLit)
         #expect(inherentlyLitValue?.toBool == true)
@@ -252,9 +246,17 @@ struct LocationTests {
 
     @Test("LocationProxy equality and hashing")
     func testLocationProxyEqualityAndHashing() async throws {
-        let location1 = Location(id: "room1", .name("First Room"), .description("First room."))
-        let location2 = Location(id: "room2", .name("Second Room"), .description("Second room."))
-        let location1Copy = Location(id: "room1", .name("First Room"), .description("First room."))
+        let location1 = Location("room1")
+            .name("First Room")
+            .description("First room.")
+
+        let location2 = Location("room2")
+            .name("Second Room")
+            .description("Second room.")
+
+        let location1Copy = Location("room1")
+            .name("First Room")
+            .description("First room.")
 
         let game = MinimalGame(
             player: Player(in: "room1"),
@@ -286,7 +288,9 @@ struct LocationTests {
 
     @Test("LocationProxy handles missing properties gracefully")
     func testLocationProxyMissingProperties() async throws {
-        let location = Location(id: "minimal", .name("Minimal Room"))
+        let location = Location("minimal")
+            .name("Minimal Room")
+
         let game = MinimalGame(
             player: Player(in: "minimal"),
             locations: location
@@ -323,8 +327,8 @@ struct LocationTests {
         expectNoDifference(
             exits,
             [
-                .east(blocked: "A solid wall blocks your path."),
-                .west(blocked: "You head west."),
+                .east("A solid wall blocks your path."),
+                .west("You head west."),
             ])
     }
 

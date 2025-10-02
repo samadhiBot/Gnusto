@@ -9,19 +9,16 @@ struct QuickCombatTest {
     @Test("Basic combat can be initiated and processed")
     func testBasicCombat() async throws {
         // Given: Simple combat setup
-        let sword = Item(
-            id: "sword",
-            .name("iron sword"),
-            .isWeapon,
-            .isTakable,
+        let sword = Item("sword")
+            .name("iron sword")
+            .isWeapon
+            .isTakable
             .value(5),
-            .damage(8),
+            .damage(8)
             .in(.player)
-        )
 
-        let goblin = Item(
-            id: "goblin",
-            .name("goblin"),
+        let goblin = Item("goblin")
+            .name("goblin")
             .characterSheet(
                 .init(
                     armorClass: 12,
@@ -29,9 +26,8 @@ struct QuickCombatTest {
                     maxHealth: 20,
                     isFighting: true
                 )
-            ),
+            )
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: goblin, sword
@@ -59,9 +55,8 @@ struct QuickCombatTest {
     @Test("Combat state is tracked correctly")
     func testCombatStateTracking() async throws {
         // Given: Combat scenario
-        let enemy = Item(
-            id: "orc",
-            .name("orc warrior"),
+        let enemy = Item("orc")
+            .name("orc warrior")
             .characterSheet(
                 .init(
                     armorClass: 14,
@@ -69,9 +64,8 @@ struct QuickCombatTest {
                     maxHealth: 30,
                     isFighting: true
                 )
-            ),
+            )
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: enemy
@@ -94,19 +88,16 @@ struct QuickCombatTest {
     @Test("Weapons affect combat")
     func testWeaponEffects() async throws {
         // Given: Player with weapon vs without weapon scenarios
-        let powerfulSword = Item(
-            id: "sword",
-            .name("great sword"),
-            .isWeapon,
-            .isTakable,
+        let powerfulSword = Item("sword")
+            .name("great sword")
+            .isWeapon
+            .isTakable
             .value(15),
-            .damage(20),
+            .damage(20)
             .in(.player)
-        )
 
-        let weakEnemy = Item(
-            id: "rat",
-            .name("giant rat"),
+        let weakEnemy = Item("rat")
+            .name("giant rat")
             .characterSheet(
                 .init(
                     armorClass: 8,
@@ -114,9 +105,8 @@ struct QuickCombatTest {
                     maxHealth: 5,
                     isFighting: true
                 )
-            ),
+            )
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: weakEnemy, powerfulSword

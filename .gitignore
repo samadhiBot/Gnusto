@@ -49,5 +49,6 @@ docs
 Scripts/__pycache__
 
 Cloak
-FrobozzMagicDemoKit
 Zork1
+!Executables/Cloak
+!Executables/Zork1

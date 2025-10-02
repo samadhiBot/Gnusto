@@ -11,29 +11,23 @@ struct ItemProxyRelativeValueTests {
     @Test("relativeValue calculates correctly with varied item values")
     func testRelativeValueCalculation() async throws {
         // Given: Items with varied values
-        let lowValueItem = Item(
-            id: "lowItem",
-            .name("low value item"),
-            .isTakable,
-            .value(5),
+        let lowValueItem = Item("lowItem")
+            .name("low value item")
+            .isTakable
+            .value(5)
             .in(.startRoom)
-        )
 
-        let mediumValueItem = Item(
-            id: "mediumItem",
-            .name("medium value item"),
-            .isTakable,
-            .value(50),
+        let mediumValueItem = Item("mediumItem")
+            .name("medium value item")
+            .isTakable
+            .value(50)
             .in(.startRoom)
-        )
 
-        let highValueItem = Item(
-            id: "highItem",
-            .name("high value item"),
-            .isTakable,
-            .value(100),
+        let highValueItem = Item("highItem")
+            .name("high value item")
+            .isTakable
+            .value(100)
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: lowValueItem, mediumValueItem, highValueItem
@@ -75,29 +69,23 @@ struct ItemProxyRelativeValueTests {
     @Test("relativeValue handles items with identical values")
     func testRelativeValueWithIdenticalValues() async throws {
         // Given: Multiple items with same value
-        let item1 = Item(
-            id: "item1",
-            .name("first item"),
-            .isTakable,
-            .value(25),
+        let item1 = Item("item1")
+            .name("first item")
+            .isTakable
+            .value(25)
             .in(.startRoom)
-        )
 
-        let item2 = Item(
-            id: "item2",
-            .name("second item"),
-            .isTakable,
-            .value(25),
+        let item2 = Item("item2")
+            .name("second item")
+            .isTakable
+            .value(25)
             .in(.startRoom)
-        )
 
-        let item3 = Item(
-            id: "item3",
-            .name("third item"),
-            .isTakable,
-            .value(25),
+        let item3 = Item("item3")
+            .name("third item")
+            .isTakable
+            .value(25)
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: item1, item2, item3
@@ -116,61 +104,47 @@ struct ItemProxyRelativeValueTests {
     @Test("relativeValue filters out extreme outliers")
     func testRelativeValueWithOutliers() async throws {
         // Given: Items with normal range plus extreme outliers
-        let item1 = Item(
-            id: "normal1",
-            .name("normal item 1"),
-            .isTakable,
-            .value(10),
+        let item1 = Item("normal1")
+            .name("normal item 1")
+            .isTakable
+            .value(10)
             .in(.startRoom)
-        )
 
-        let item2 = Item(
-            id: "normal2",
-            .name("normal item 2"),
-            .isTakable,
-            .value(20),
+        let item2 = Item("normal2")
+            .name("normal item 2")
+            .isTakable
+            .value(20)
             .in(.startRoom)
-        )
 
-        let item3 = Item(
-            id: "normal3",
-            .name("normal item 3"),
-            .isTakable,
-            .value(30),
+        let item3 = Item("normal3")
+            .name("normal item 3")
+            .isTakable
+            .value(30)
             .in(.startRoom)
-        )
 
-        let item4 = Item(
-            id: "normal4",
-            .name("normal item 4"),
-            .isTakable,
-            .value(40),
+        let item4 = Item("normal4")
+            .name("normal item 4")
+            .isTakable
+            .value(40)
             .in(.startRoom)
-        )
 
-        let item5 = Item(
-            id: "normal5",
-            .name("normal item 5"),
-            .isTakable,
-            .value(50),
+        let item5 = Item("normal5")
+            .name("normal item 5")
+            .isTakable
+            .value(50)
             .in(.startRoom)
-        )
 
-        let extremeOutlier = Item(
-            id: "outlier",
-            .name("extreme outlier"),
-            .isTakable,
-            .value(1_000_000),  // Extreme outlier
+        let extremeOutlier = Item("outlier")
+            .name("extreme outlier")
+            .isTakable
+            .value(1_000_000)  // Extreme outlier
             .in(.startRoom)
-        )
 
-        let testItem = Item(
-            id: "testItem",
-            .name("test item"),
-            .isTakable,
-            .value(25),  // Should be low-medium in normal range
+        let testItem = Item("testItem")
+            .name("test item")
+            .isTakable
+            .value(25)  // Should be low-medium in normal range
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: item1, item2, item3, item4, item5, extremeOutlier, testItem
@@ -192,32 +166,26 @@ struct ItemProxyRelativeValueTests {
     @Test("relativeWeaponDamage calculates correctly with varied damage values")
     func testRelativeWeaponDamageCalculation() async throws {
         // Given: Items with varied weapon damage
-        let weakWeapon = Item(
-            id: "weakWeapon",
-            .name("weak dagger"),
-            .isTakable,
-            .isWeapon,
-            .damage(2),
+        let weakWeapon = Item("weakWeapon")
+            .name("weak dagger")
+            .isTakable
+            .isWeapon
+            .damage(2)
             .in(.startRoom)
-        )
 
-        let mediumWeapon = Item(
-            id: "mediumWeapon",
-            .name("standard sword"),
-            .isTakable,
-            .isWeapon,
-            .damage(10),
+        let mediumWeapon = Item("mediumWeapon")
+            .name("standard sword")
+            .isTakable
+            .isWeapon
+            .damage(10)
             .in(.startRoom)
-        )
 
-        let strongWeapon = Item(
-            id: "strongWeapon",
-            .name("mighty axe"),
-            .isTakable,
-            .isWeapon,
-            .damage(20),
+        let strongWeapon = Item("strongWeapon")
+            .name("mighty axe")
+            .isTakable
+            .isWeapon
+            .damage(20)
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: weakWeapon, mediumWeapon, strongWeapon
@@ -244,22 +212,18 @@ struct ItemProxyRelativeValueTests {
     @Test("relativeWeaponDamage handles non-weapon items")
     func testRelativeWeaponDamageWithNonWeapons() async throws {
         // Given: Mix of weapons and non-weapons
-        let weapon = Item(
-            id: "weapon",
-            .name("sword"),
-            .isTakable,
-            .isWeapon,
-            .damage(15),
+        let weapon = Item("weapon")
+            .name("sword")
+            .isTakable
+            .isWeapon
+            .damage(15)
             .in(.startRoom)
-        )
 
-        let nonWeapon = Item(
-            id: "nonWeapon",
-            .name("book"),
-            .isTakable,
+        let nonWeapon = Item("nonWeapon")
+            .name("book")
+            .isTakable
             // No damage property - defaults to 0
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: weapon, nonWeapon
@@ -285,69 +249,51 @@ struct ItemProxyRelativeValueTests {
     func testRelativeValueWithWideDistribution() async throws {
         // Given: Items with a wide distribution of values
         // Create 9 items with values from 0 to 80 (step of 10)
-        let item0 = Item(
-            id: "item0",
-            .name("item 0"),
-            .isTakable,
-            .value(0),
+        let item0 = Item("item0")
+            .name("item 0")
+            .isTakable
+            .value(0)
             .in(.startRoom)
-        )
-        let item1 = Item(
-            id: "item1",
-            .name("item 1"),
-            .isTakable,
-            .value(10),
+        let item1 = Item("item1")
+            .name("item 1")
+            .isTakable
+            .value(10)
             .in(.startRoom)
-        )
-        let item2 = Item(
-            id: "item2",
-            .name("item 2"),
-            .isTakable,
-            .value(20),
+        let item2 = Item("item2")
+            .name("item 2")
+            .isTakable
+            .value(20)
             .in(.startRoom)
-        )
-        let item3 = Item(
-            id: "item3",
-            .name("item 3"),
-            .isTakable,
-            .value(30),
+        let item3 = Item("item3")
+            .name("item 3")
+            .isTakable
+            .value(30)
             .in(.startRoom)
-        )
-        let item4 = Item(
-            id: "item4",
-            .name("item 4"),
-            .isTakable,
-            .value(40),
+        let item4 = Item("item4")
+            .name("item 4")
+            .isTakable
+            .value(40)
             .in(.startRoom)
-        )
-        let item5 = Item(
-            id: "item5",
-            .name("item 5"),
-            .isTakable,
-            .value(50),
+        let item5 = Item("item5")
+            .name("item 5")
+            .isTakable
+            .value(50)
             .in(.startRoom)
-        )
-        let item6 = Item(
-            id: "item6",
-            .name("item 6"),
-            .isTakable,
-            .value(60),
+        let item6 = Item("item6")
+            .name("item 6")
+            .isTakable
+            .value(60)
             .in(.startRoom)
-        )
-        let item7 = Item(
-            id: "item7",
-            .name("item 7"),
-            .isTakable,
-            .value(70),
+        let item7 = Item("item7")
+            .name("item 7")
+            .isTakable
+            .value(70)
             .in(.startRoom)
-        )
-        let item8 = Item(
-            id: "item8",
-            .name("item 8"),
-            .isTakable,
-            .value(80),
+        let item8 = Item("item8")
+            .name("item 8")
+            .isTakable
+            .value(80)
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: item0, item1, item2, item3, item4, item5, item6, item7, item8
@@ -378,34 +324,28 @@ struct ItemProxyRelativeValueTests {
     func testRoughValueUsesHigherRelative() async throws {
         // Given: Items with different value vs damage profiles
         // High value, low damage item
-        let valuableItem = Item(
-            id: "valuableItem",
-            .name("golden goblet"),
-            .isTakable,
-            .value(100),
-            .damage(20),
+        let valuableItem = Item("valuableItem")
+            .name("golden goblet")
+            .isTakable
+            .value(100)
+            .damage(20)
             .in(.startRoom)
-        )
 
         // Low value, high damage item
-        let weaponItem = Item(
-            id: "weaponItem",
-            .name("rusty sword"),
-            .isTakable,
-            .value(5),
-            .damage(30),
+        let weaponItem = Item("weaponItem")
+            .name("rusty sword")
+            .isTakable
+            .value(5)
+            .damage(30)
             .in(.startRoom)
-        )
 
         // Medium value, medium damage item
-        let balancedItem = Item(
-            id: "startItem",
-            .name("balanced item"),
-            .isTakable,
-            .value(25),
-            .damage(25),
+        let balancedItem = Item("startItem")
+            .name("balanced item")
+            .isTakable
+            .value(25)
+            .damage(25)
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: valuableItem, weaponItem, balancedItem
@@ -434,14 +374,12 @@ struct ItemProxyRelativeValueTests {
     @Test("roughValue handles edge cases correctly")
     func testRoughValueEdgeCases() async throws {
         // Given: Single item
-        let singleItem = Item(
-            id: "startItem",
-            .name("only item"),
-            .isTakable,
-            .value(42),
-            .damage(10),
+        let singleItem = Item("startItem")
+            .name("only item")
+            .isTakable
+            .value(42)
+            .damage(10)
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: singleItem
@@ -462,29 +400,23 @@ struct ItemProxyRelativeValueTests {
     @Test("relativeValueCategory returns correct categories")
     func testRelativeValueCategory() async throws {
         // Given: Items with varied values
-        let lowValueItem = Item(
-            id: "lowItem",
-            .name("low value item"),
-            .isTakable,
-            .value(5),
+        let lowValueItem = Item("lowItem")
+            .name("low value item")
+            .isTakable
+            .value(5)
             .in(.startRoom)
-        )
 
-        let mediumValueItem = Item(
-            id: "mediumItem",
-            .name("medium value item"),
-            .isTakable,
-            .value(50),
+        let mediumValueItem = Item("mediumItem")
+            .name("medium value item")
+            .isTakable
+            .value(50)
             .in(.startRoom)
-        )
 
-        let highValueItem = Item(
-            id: "highItem",
-            .name("high value item"),
-            .isTakable,
-            .value(100),
+        let highValueItem = Item("highItem")
+            .name("high value item")
+            .isTakable
+            .value(100)
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: lowValueItem, mediumValueItem, highValueItem
@@ -511,32 +443,26 @@ struct ItemProxyRelativeValueTests {
     @Test("relativeWeaponDamageCategory returns correct categories")
     func testRelativeWeaponDamageCategory() async throws {
         // Given: Items with varied weapon damage
-        let weakWeapon = Item(
-            id: "weakWeapon",
-            .name("weak dagger"),
-            .isTakable,
-            .isWeapon,
-            .damage(2),
+        let weakWeapon = Item("weakWeapon")
+            .name("weak dagger")
+            .isTakable
+            .isWeapon
+            .damage(2)
             .in(.startRoom)
-        )
 
-        let mediumWeapon = Item(
-            id: "mediumWeapon",
-            .name("standard sword"),
-            .isTakable,
-            .isWeapon,
-            .damage(10),
+        let mediumWeapon = Item("mediumWeapon")
+            .name("standard sword")
+            .isTakable
+            .isWeapon
+            .damage(10)
             .in(.startRoom)
-        )
 
-        let strongWeapon = Item(
-            id: "strongWeapon",
-            .name("mighty axe"),
-            .isTakable,
-            .isWeapon,
-            .damage(20),
+        let strongWeapon = Item("strongWeapon")
+            .name("mighty axe")
+            .isTakable
+            .isWeapon
+            .damage(20)
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: weakWeapon, mediumWeapon, strongWeapon
@@ -649,21 +575,17 @@ struct ItemProxyRelativeValueTests {
             .in(.startRoom))
 
         // Test items with different value/damage profiles
-        let worthlessItem = Item(
-            id: "worthlessTest",
-            .name("worthless test item"),
-            .value(2),  // Very low value
-            .damage(1),  // Very low damage
+        let worthlessItem = Item("worthlessTest")
+            .name("worthless test item")
+            .value(2)  // Very low value
+            .damage(1)  // Very low damage
             .in(.startRoom)
-        )
 
-        let pricelessItem = Item(
-            id: "pricelessTest",
-            .name("priceless test item"),
-            .value(100),  // Very high value
-            .damage(50),  // Very high damage
+        let pricelessItem = Item("pricelessTest")
+            .name("priceless test item")
+            .value(100)  // Very high value
+            .damage(50)  // Very high damage
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: base1, base2, base3, base4, base5, base6, base7, worthlessItem, pricelessItem

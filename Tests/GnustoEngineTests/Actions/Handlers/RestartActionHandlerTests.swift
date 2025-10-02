@@ -12,13 +12,11 @@ struct RestartActionHandlerTests {
     @Test("RESTART syntax works with YES confirmation")
     func testRestartSyntaxWithYes() async throws {
         // Given
-        let sword = Item(
-            id: "sword",
-            .name("magic sword"),
-            .description("A gleaming magic sword."),
-            .isTakable,
+        let sword = Item("sword")
+            .name("magic sword")
+            .description("A gleaming magic sword.")
+            .isTakable
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: sword
@@ -57,13 +55,11 @@ struct RestartActionHandlerTests {
     @Test("RESTART syntax works with NO cancellation")
     func testRestartSyntaxWithNo() async throws {
         // Given
-        let sword = Item(
-            id: "sword",
-            .name("magic sword"),
-            .description("A gleaming magic sword."),
-            .isTakable,
+        let sword = Item("sword")
+            .name("magic sword")
+            .description("A gleaming magic sword.")
+            .isTakable
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: sword
@@ -133,12 +129,10 @@ struct RestartActionHandlerTests {
     @Test("RESTART requires no validation")
     func testRestartRequiresNoValidation() async throws {
         // Given: Dark room (to verify light is not required)
-        let darkRoom = Location(
-            id: "darkRoom",
-            .name("Dark Room"),
+        let darkRoom = Location("darkRoom")
+            .name("Dark Room")
             .description("A pitch black room.")
             // Note: No .inherentlyLit property
-        )
 
         let game = MinimalGame(
             player: Player(in: "darkRoom"),

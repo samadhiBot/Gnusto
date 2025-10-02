@@ -11,12 +11,10 @@ struct LocationProxyTests {
     @Test("LocationProxy basic creation and identity")
     func testLocationProxyBasics() async throws {
         // Given
-        let testRoom = Location(
-            id: .startRoom,
-            .name("Test Room"),
-            .description("A room for testing location proxies."),
+        let testRoom = Location(.startRoom)
+            .name("Test Room")
+            .description("A room for testing location proxies.")
             .inherentlyLit
-        )
 
         let game = MinimalGame(locations: testRoom)
         let (engine, _) = await GameEngine.test(blueprint: game)
@@ -31,13 +29,11 @@ struct LocationProxyTests {
     @Test("LocationProxy property access")
     func testLocationProxyPropertyAccess() async throws {
         // Given
-        let testRoom = Location(
-            id: .startRoom,
-            .name("Test Room"),
-            .description("A room for testing."),
-            .inherentlyLit,
+        let testRoom = Location(.startRoom)
+            .name("Test Room")
+            .description("A room for testing.")
+            .inherentlyLit
             .localGlobals("globalItem1", "globalItem2")
-        )
 
         let game = MinimalGame(locations: testRoom)
         let (engine, _) = await GameEngine.test(blueprint: game)
@@ -57,17 +53,13 @@ struct LocationProxyTests {
     @Test("LocationProxy equality and hashing")
     func testLocationProxyEquality() async throws {
         // Given
-        let room1 = Location(
-            id: "room1",
-            .name("First Room"),
+        let room1 = Location("room1")
+            .name("First Room")
             .inherentlyLit
-        )
 
-        let room2 = Location(
-            id: "room2",
-            .name("Second Room"),
+        let room2 = Location("room2")
+            .name("Second Room")
             .inherentlyLit
-        )
 
         let game = MinimalGame(
             player: Player(in: "room1"),
@@ -92,18 +84,14 @@ struct LocationProxyTests {
     @Test("LocationProxy name and description accessors")
     func testNameAndDescriptionAccessors() async throws {
         // Given
-        let roomWithDescription = Location(
-            id: "library",
-            .name("Grand Library"),
-            .description("A vast library filled with ancient tomes."),
+        let roomWithDescription = Location("library")
+            .name("Grand Library")
+            .description("A vast library filled with ancient tomes.")
             .inherentlyLit
-        )
 
-        let roomWithoutDescription = Location(
-            id: "emptyRoom",
-            .name("Empty Room"),
+        let roomWithoutDescription = Location("emptyRoom")
+            .name("Empty Room")
             .inherentlyLit
-        )
 
         let game = MinimalGame(
             player: Player(in: "library"),
@@ -128,24 +116,18 @@ struct LocationProxyTests {
     @Test("LocationProxy flag checking methods")
     func testFlagCheckingMethods() async throws {
         // Given
-        let litRoom = Location(
-            id: "litRoom",
-            .name("Lit Room"),
+        let litRoom = Location("litRoom")
+            .name("Lit Room")
             .inherentlyLit
-        )
 
-        let darkRoom = Location(
-            id: "darkRoom",
+        let darkRoom = Location("darkRoom")
             .name("Dark Room")
-            // No inherentlyLit flag
-        )
+        // No inherentlyLit flag
 
-        let specialRoom = Location(
-            id: "specialRoom",
-            .name("Special Room"),
-            .inherentlyLit,
+        let specialRoom = Location("specialRoom")
+            .name("Special Room")
+            .inherentlyLit
             .omitArticle
-        )
 
         let game = MinimalGame(
             player: Player(in: "litRoom"),
@@ -171,43 +153,33 @@ struct LocationProxyTests {
     @Test("LocationProxy lighting calculations")
     func testLightingCalculations() async throws {
         // Given
-        let litRoom = Location(
-            id: "litRoom",
-            .name("Lit Room"),
+        let litRoom = Location("litRoom")
+            .name("Lit Room")
             .inherentlyLit
-        )
 
-        let darkRoom = Location(
-            id: "darkRoom",
+        let darkRoom = Location("darkRoom")
             .name("Dark Room")
-        )
 
-        let lamp = Item(
-            id: "lamp",
-            .name("brass lamp"),
-            .isLightSource,
-            .isDevice,
-            .isOn,
-            .isTakable,
+        let lamp = Item("lamp")
+            .name("brass lamp")
+            .isLightSource
+            .isDevice
+            .isOn
+            .isTakable
             .in(.player)
-        )
 
-        let unlit_lamp = Item(
-            id: "unlitLamp",
-            .name("unlit lamp"),
-            .isLightSource,
-            .isDevice,
-            .isTakable,
+        let unlit_lamp = Item("unlitLamp")
+            .name("unlit lamp")
+            .isLightSource
+            .isDevice
+            .isTakable
             .in("darkRoom")
-        )
 
-        let torch = Item(
-            id: "torch",
-            .name("burning torch"),
-            .isLightSource,
-            .isBurning,
+        let torch = Item("torch")
+            .name("burning torch")
+            .isLightSource
+            .isBurning
             .in("darkRoom")
-        )
 
         let game = MinimalGame(
             player: Player(in: "litRoom"),
@@ -235,53 +207,39 @@ struct LocationProxyTests {
     @Test("LocationProxy items and contents")
     func testItemsAndContents() async throws {
         // Given
-        let visibleItem = Item(
-            id: "book",
-            .name("leather book"),
-            .description("A worn book."),
+        let visibleItem = Item("book")
+            .name("leather book")
+            .description("A worn book.")
             .in(.startRoom)
-        )
 
-        let invisibleItem = Item(
-            id: "hiddenKey",
-            .name("hidden key"),
-            .isInvisible,
+        let invisibleItem = Item("hiddenKey")
+            .name("hidden key")
+            .isInvisible
             .in(.startRoom)
-        )
 
-        let omittedItem = Item(
-            id: "air",
-            .name("air"),
-            .omitDescription,
+        let omittedItem = Item("air")
+            .name("air")
+            .omitDescription
             .in(.startRoom)
-        )
 
-        let openContainer = Item(
-            id: "openBox",
-            .name("open box"),
-            .isContainer,
-            .isOpen,
+        let openContainer = Item("openBox")
+            .name("open box")
+            .isContainer
+            .isOpen
             .in(.startRoom)
-        )
 
-        let itemInContainer = Item(
-            id: "gem",
-            .name("sparkling gem"),
+        let itemInContainer = Item("gem")
+            .name("sparkling gem")
             .in(.item("openBox"))
-        )
 
-        let closedContainer = Item(
-            id: "closedBox",
-            .name("closed box"),
-            .isContainer,
+        let closedContainer = Item("closedBox")
+            .name("closed box")
+            .isContainer
             .in(.startRoom)
-        )
 
-        let itemInClosedContainer = Item(
-            id: "coin",
-            .name("gold coin"),
+        let itemInClosedContainer = Item("coin")
+            .name("gold coin")
             .in(.item("closedBox"))
-        )
 
         let game = MinimalGame(
             items: visibleItem, invisibleItem, omittedItem, openContainer,
@@ -305,33 +263,21 @@ struct LocationProxyTests {
     @Test("LocationProxy exits handling")
     func testExitsHandling() async throws {
         // Given
-        let room1 = Location(
-            id: "room1",
-            .name("First Room"),
-            .inherentlyLit,
-            .exits(
-                .north("room2"),
-                .south("room3")
-            )
-        )
+        let room1 = Location("room1")
+            .name("First Room")
+            .inherentlyLit
+            .north("room2")
+            .south("room3")
 
-        let room2 = Location(
-            id: "room2",
-            .name("Second Room"),
-            .inherentlyLit,
-            .exits(
-                .south("room1")
-            )
-        )
+        let room2 = Location("room2")
+            .name("Second Room")
+            .inherentlyLit
+            .south("room1")
 
-        let room3 = Location(
-            id: "room3",
-            .name("Third Room"),
-            .inherentlyLit,
-            .exits(
-                .north("room1")
-            )
-        )
+        let room3 = Location("room3")
+            .name("Third Room")
+            .inherentlyLit
+            .north("room1")
 
         let game = MinimalGame(
             player: Player(in: "room1"),
@@ -354,12 +300,10 @@ struct LocationProxyTests {
     @Test("LocationProxy local globals")
     func testLocalGlobals() async throws {
         // Given
-        let testRoom = Location(
-            id: .startRoom,
-            .name("Test Room"),
-            .inherentlyLit,
+        let testRoom = Location(.startRoom)
+            .name("Test Room")
+            .inherentlyLit
             .localGlobals("globalItem1", "globalItem2", "globalItem3")
-        )
 
         let game = MinimalGame(locations: testRoom)
         let (engine, _) = await GameEngine.test(blueprint: game)
@@ -376,18 +320,14 @@ struct LocationProxyTests {
     @Test("LocationProxy article methods")
     func testArticleMethods() async throws {
         // Given
-        let regularRoom = Location(
-            id: "library",
-            .name("Grand Library"),
+        let regularRoom = Location("library")
+            .name("Grand Library")
             .inherentlyLit
-        )
 
-        let noArticleRoom = Location(
-            id: "nowhere",
-            .name("Nowhere"),
-            .omitArticle,
+        let noArticleRoom = Location("nowhere")
+            .name("Nowhere")
+            .omitArticle
             .inherentlyLit
-        )
 
         let game = MinimalGame(
             player: Player(in: "library"),
@@ -449,12 +389,10 @@ struct LocationProxyTests {
     @Test("LocationProxy property setting methods")
     func testPropertySettingMethods() async throws {
         // Given
-        let testRoom = Location(
-            id: .startRoom,
-            .name("Test Room"),
-            .description("Original description"),
+        let testRoom = Location(.startRoom)
+            .name("Test Room")
+            .description("Original description")
             .inherentlyLit
-        )
 
         let game = MinimalGame(locations: testRoom)
         let (engine, _) = await GameEngine.test(blueprint: game)
@@ -482,27 +420,21 @@ struct LocationProxyTests {
     @Test("LocationProxy complex lighting scenarios")
     func testComplexLightingScenarios() async throws {
         // Given
-        let darkRoom = Location(
-            id: "darkRoom",
+        let darkRoom = Location("darkRoom")
             .name("Dark Cave")
-        )
 
-        let lamp = Item(
-            id: "lamp",
-            .name("oil lamp"),
-            .isLightSource,
-            .isDevice,
-            .isTakable,
+        let lamp = Item("lamp")
+            .name("oil lamp")
+            .isLightSource
+            .isDevice
+            .isTakable
             .in(.player)
-        )
 
-        let candle = Item(
-            id: "candle",
-            .name("wax candle"),
-            .isLightSource,
-            .isBurning,
+        let candle = Item("candle")
+            .name("wax candle")
+            .isLightSource
+            .isBurning
             .in("darkRoom")
-        )
 
         let game = MinimalGame(
             player: Player(in: "darkRoom"),
@@ -530,32 +462,24 @@ struct LocationProxyTests {
     @Test("LocationProxy item visibility with containers")
     func testItemVisibilityWithContainers() async throws {
         // Given
-        let transparentBox = Item(
-            id: "glassBox",
-            .name("glass box"),
-            .isContainer,
-            .isTransparent,
+        let transparentBox = Item("glassBox")
+            .name("glass box")
+            .isContainer
+            .isTransparent
             .in(.startRoom)
-        )
 
-        let visibleThroughGlass = Item(
-            id: "gem",
-            .name("ruby gem"),
+        let visibleThroughGlass = Item("gem")
+            .name("ruby gem")
             .in(.item("glassBox"))
-        )
 
-        let surface = Item(
-            id: "table",
-            .name("wooden table"),
-            .isSurface,
+        let surface = Item("table")
+            .name("wooden table")
+            .isSurface
             .in(.startRoom)
-        )
 
-        let itemOnSurface = Item(
-            id: "book",
-            .name("old book"),
+        let itemOnSurface = Item("book")
+            .name("old book")
             .in(.item("table"))
-        )
 
         let game = MinimalGame(
             items: transparentBox, visibleThroughGlass, surface, itemOnSurface

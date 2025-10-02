@@ -330,18 +330,14 @@ Test every supported pattern and verify unsupported patterns fail:
 ```swift
 @Test("TAKE syntax works")
 func testTakeSyntax() async throws {
-    let testRoom = Location(
-        id: .startRoom,
-        .name("Test Room"),
+    let testRoom = Location(.startRoom)
+        .name("Test Room")
         .inherentlyLit
-    )
 
-    let testItem = Item(
-        id: "lamp",
-        .name("brass lamp"),
-        .isTakable,
+    let testItem = Item("lamp")
+        .name("brass lamp")
+        .isTakable
         .in(.startRoom)
-    )
 
     let game = MinimalGame(
         player: Player(in: .startRoom),
@@ -413,18 +409,14 @@ try await handler.process(context: ActionContext(command: command, engine: engin
 @Test("Test description")
 func testSomething() async throws {
     // Given: Complete game setup
-    let testRoom = Location(
-        id: "testRoom",
-        .name("Test Room"),
+    let testRoom = Location("testRoom")
+        .name("Test Room")
         .inherentlyLit
-    )
 
-    let testItem = Item(
-        id: "testItem",
-        .name("test item"),
-        .isTakable,
+    let testItem = Item("testItem")
+        .name("test item")
+        .isTakable
         .in(.startRoom)
-    )
 
     let game = MinimalGame(
         player: Player(in: .startRoom),

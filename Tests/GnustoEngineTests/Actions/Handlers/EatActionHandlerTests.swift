@@ -11,14 +11,12 @@ struct EatActionHandlerTests {
     @Test("EAT DIRECTOBJECT syntax works")
     func testEatDirectObjectSyntax() async throws {
         // Given
-        let apple = Item(
-            id: "apple",
-            .name("red apple"),
-            .description("A crisp red apple."),
-            .isEdible,
-            .isTakable,
+        let apple = Item("apple")
+            .name("red apple")
+            .description("A crisp red apple.")
+            .isEdible
+            .isTakable
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: apple
@@ -45,14 +43,12 @@ struct EatActionHandlerTests {
     @Test("CONSUME syntax works")
     func testConsumeSyntax() async throws {
         // Given
-        let bread = Item(
-            id: "bread",
-            .name("piece of bread"),
-            .description("A piece of fresh bread."),
-            .isEdible,
-            .isTakable,
+        let bread = Item("bread")
+            .name("piece of bread")
+            .description("A piece of fresh bread.")
+            .isEdible
+            .isTakable
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: bread
@@ -76,14 +72,12 @@ struct EatActionHandlerTests {
     @Test("DEVOUR syntax works")
     func testDevourSyntax() async throws {
         // Given
-        let cake = Item(
-            id: "cake",
-            .name("chocolate cake"),
-            .description("A delicious chocolate cake."),
-            .isEdible,
-            .isTakable,
+        let cake = Item("cake")
+            .name("chocolate cake")
+            .description("A delicious chocolate cake.")
+            .isEdible
+            .isTakable
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: cake
@@ -145,14 +139,12 @@ struct EatActionHandlerTests {
     @Test("Eating item not held takes it first")
     func testCannotEatItemNotHeld() async throws {
         // Given
-        let apple = Item(
-            id: "apple",
-            .name("red apple"),
-            .description("A crisp red apple."),
-            .isEdible,
-            .isTakable,
+        let apple = Item("apple")
+            .name("red apple")
+            .description("A crisp red apple.")
+            .isEdible
+            .isTakable
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: apple
@@ -178,13 +170,11 @@ struct EatActionHandlerTests {
     @Test("Cannot eat non-edible item")
     func testCannotEatNonEdibleItem() async throws {
         // Given
-        let rock = Item(
-            id: "rock",
-            .name("large rock"),
-            .description("A heavy stone."),
-            .isTakable,
+        let rock = Item("rock")
+            .name("large rock")
+            .description("A heavy stone.")
+            .isTakable
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: rock
@@ -208,21 +198,17 @@ struct EatActionHandlerTests {
     @Test("Requires light to eat items")
     func testRequiresLight() async throws {
         // Given: Dark room with edible item
-        let darkRoom = Location(
-            id: "darkRoom",
-            .name("Dark Room"),
+        let darkRoom = Location("darkRoom")
+            .name("Dark Room")
             .description("A pitch black room.")
             // Note: No .inherentlyLit property
-        )
 
-        let apple = Item(
-            id: "apple",
-            .name("red apple"),
-            .description("A crisp red apple."),
-            .isEdible,
-            .isTakable,
+        let apple = Item("apple")
+            .name("red apple")
+            .description("A crisp red apple.")
+            .isEdible
+            .isTakable
             .in(.player)
-        )
 
         let game = MinimalGame(
             player: Player(in: "darkRoom"),
@@ -250,14 +236,12 @@ struct EatActionHandlerTests {
     @Test("Eat edible item removes it from game")
     func testEatEdibleItemRemovesIt() async throws {
         // Given
-        let orange = Item(
-            id: "orange",
-            .name("juicy orange"),
-            .description("A sweet, juicy orange."),
-            .isEdible,
-            .isTakable,
+        let orange = Item("orange")
+            .name("juicy orange")
+            .description("A sweet, juicy orange.")
+            .isEdible
+            .isTakable
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: orange
@@ -284,15 +268,12 @@ struct EatActionHandlerTests {
     @Test("Eat item with custom eat text")
     func testEatItemWithCustomEatText() async throws {
         // Given
-        let cookie = Item(
-            id: "cookie",
-            .name("chocolate cookie"),
-            .description("A delicious chocolate chip cookie."),
-            .isEdible,
-            //            .eatText("The cookie is absolutely delicious! You feel satisfied."),
-            .isTakable,
+        let cookie = Item("cookie")
+            .name("chocolate cookie")
+            .description("A delicious chocolate chip cookie.")
+            .isEdible
+            .isTakable
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: cookie
@@ -316,23 +297,19 @@ struct EatActionHandlerTests {
     @Test("Updates pronouns to refer to eaten item")
     func testUpdatesPronounsToEatenItem() async throws {
         // Given
-        let banana = Item(
-            id: "banana",
-            .name("yellow banana"),
-            .description("A ripe yellow banana."),
-            .isEdible,
-            .isTakable,
+        let banana = Item("banana")
+            .name("yellow banana")
+            .description("A ripe yellow banana.")
+            .isEdible
+            .isTakable
             .in(.player)
-        )
 
-        let apple = Item(
-            id: "apple",
-            .name("red apple"),
-            .description("A crisp red apple."),
-            .isEdible,
-            .isTakable,
+        let apple = Item("apple")
+            .name("red apple")
+            .description("A crisp red apple.")
+            .isEdible
+            .isTakable
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: banana, apple
@@ -364,25 +341,21 @@ struct EatActionHandlerTests {
     @Test("Eat container with edible contents")
     func testEatContainerWithEdibleContents() async throws {
         // Given
-        let box = Item(
-            id: "box",
-            .name("lunch box"),
-            .description("A small lunch box."),
-            .isContainer,
-            .isOpen,
-            .isEdible,
-            .isTakable,
+        let box = Item("box")
+            .name("lunch box")
+            .description("A small lunch box.")
+            .isContainer
+            .isOpen
+            .isEdible
+            .isTakable
             .in(.player)
-        )
 
-        let sandwich = Item(
-            id: "sandwich",
-            .name("ham sandwich"),
-            .description("A tasty ham sandwich."),
-            .isEdible,
-            .isTakable,
+        let sandwich = Item("sandwich")
+            .name("ham sandwich")
+            .description("A tasty ham sandwich.")
+            .isEdible
+            .isTakable
             .in(.item("box"))
-        )
 
         let game = MinimalGame(
             items: box, sandwich
@@ -410,15 +383,13 @@ struct EatActionHandlerTests {
     @Test("Eat drinkable item")
     func testEatDrinkableItem() async throws {
         // Given
-        let soup = Item(
-            id: "soup",
-            .name("hot soup"),
-            .description("A bowl of hot soup."),
-            .isEdible,
-            .isDrinkable,
-            .isTakable,
+        let soup = Item("soup")
+            .name("hot soup")
+            .description("A bowl of hot soup.")
+            .isEdible
+            .isDrinkable
+            .isTakable
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: soup

@@ -10,14 +10,12 @@ struct DigActionHandlerTests {
 
     @Test("DIG syntax works")
     func testDigSyntax() async throws {
-        let shovel = Item(
-            id: "shovel",
-            .name("shovel"),
-            .description("A sturdy shovel."),
-            .isTakable,
-            .isTool,
+        let shovel = Item("shovel")
+            .name("shovel")
+            .description("A sturdy shovel.")
+            .isTakable
+            .isTool
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: shovel
@@ -37,12 +35,10 @@ struct DigActionHandlerTests {
 
     @Test("DIG OBJECT syntax works")
     func testDigObjectSyntax() async throws {
-        let mound = Item(
-            id: "mound",
-            .name("dirt mound"),
-            .description("A small mound of dirt."),
+        let mound = Item("mound")
+            .name("dirt mound")
+            .description("A small mound of dirt.")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: mound
@@ -62,12 +58,10 @@ struct DigActionHandlerTests {
 
     @Test("DIG IN OBJECT syntax works")
     func testDigInObjectSyntax() async throws {
-        let sand = Item(
-            id: "sand",
-            .name("sand pile"),
-            .description("A small pile of sand."),
+        let sand = Item("sand")
+            .name("sand pile")
+            .description("A small pile of sand.")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: sand
@@ -87,21 +81,17 @@ struct DigActionHandlerTests {
 
     @Test("DIG OBJECT WITH TOOL syntax works")
     func testDigObjectWithToolSyntax() async throws {
-        let mound = Item(
-            id: "mound",
-            .name("dirt mound"),
-            .description("A small mound of dirt."),
+        let mound = Item("mound")
+            .name("dirt mound")
+            .description("A small mound of dirt.")
             .in(.startRoom)
-        )
 
-        let shovel = Item(
-            id: "shovel",
-            .name("shovel"),
-            .description("A sturdy shovel."),
-            .isTakable,
-            .isTool,
+        let shovel = Item("shovel")
+            .name("shovel")
+            .description("A sturdy shovel.")
+            .isTakable
+            .isTool
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: mound, shovel
@@ -121,14 +111,12 @@ struct DigActionHandlerTests {
 
     @Test("DIG WITH TOOL syntax works")
     func testDigWithToolSyntax() async throws {
-        let shovel = Item(
-            id: "shovel",
-            .name("shovel"),
-            .description("A sturdy shovel."),
-            .isTakable,
-            .isTool,
+        let shovel = Item("shovel")
+            .name("shovel")
+            .description("A sturdy shovel.")
+            .isTakable
+            .isTool
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: shovel
@@ -148,14 +136,12 @@ struct DigActionHandlerTests {
 
     @Test("EXCAVATE syntax works")
     func testExcavateSyntax() async throws {
-        let shovel = Item(
-            id: "shovel",
-            .name("shovel"),
-            .description("A sturdy shovel."),
-            .isTakable,
-            .isTool,
+        let shovel = Item("shovel")
+            .name("shovel")
+            .description("A sturdy shovel.")
+            .isTakable
+            .isTool
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: shovel
@@ -177,11 +163,9 @@ struct DigActionHandlerTests {
 
     @Test("Requires light to dig")
     func testRequiresLight() async throws {
-        let darkRoom = Location(
-            id: "darkRoom",
-            .name("Dark Room"),
+        let darkRoom = Location("darkRoom")
+            .name("Dark Room")
             .description("A pitch black room.")
-        )
 
         let game = MinimalGame(
             player: Player(in: "darkRoom"),
@@ -203,18 +187,14 @@ struct DigActionHandlerTests {
 
     @Test("Cannot dig item not in scope")
     func testCannotDigItemNotInScope() async throws {
-        let otherRoom = Location(
-            id: "otherRoom",
-            .name("Other Room"),
+        let otherRoom = Location("otherRoom")
+            .name("Other Room")
             .inherentlyLit
-        )
 
-        let mound = Item(
-            id: "mound",
-            .name("dirt mound"),
-            .description("A small mound of dirt."),
+        let mound = Item("mound")
+            .name("dirt mound")
+            .description("A small mound of dirt.")
             .in("otherRoom")
-        )
 
         let game = MinimalGame(
             locations: otherRoom,
@@ -235,21 +215,17 @@ struct DigActionHandlerTests {
 
     @Test("Cannot dig with tool not held")
     func testCannotDigWithToolNotHeld() async throws {
-        let mound = Item(
-            id: "mound",
-            .name("dirt mound"),
-            .description("A small mound of dirt."),
+        let mound = Item("mound")
+            .name("dirt mound")
+            .description("A small mound of dirt.")
             .in(.startRoom)
-        )
 
-        let shovel = Item(
-            id: "shovel",
-            .name("shovel"),
-            .description("A sturdy shovel."),
-            .isTakable,
-            .isTool,
+        let shovel = Item("shovel")
+            .name("shovel")
+            .description("A sturdy shovel.")
+            .isTakable
+            .isTool
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: mound, shovel
@@ -269,13 +245,11 @@ struct DigActionHandlerTests {
 
     @Test("Cannot dig takable items")
     func testCannotDigTakableItems() async throws {
-        let coin = Item(
-            id: "coin",
-            .name("gold coin"),
-            .description("A shiny gold coin."),
-            .isTakable,
+        let coin = Item("coin")
+            .name("gold coin")
+            .description("A shiny gold coin.")
+            .isTakable
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: coin
@@ -297,12 +271,10 @@ struct DigActionHandlerTests {
 
     @Test("Dig item with no tool and no tools in inventory")
     func testDigItemWithNoToolAndNoTools() async throws {
-        let mound = Item(
-            id: "mound",
-            .name("dirt mound"),
-            .description("A small mound of dirt."),
+        let mound = Item("mound")
+            .name("dirt mound")
+            .description("A small mound of dirt.")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: mound
@@ -326,21 +298,17 @@ struct DigActionHandlerTests {
 
     @Test("Dig item with no tool but tools in inventory")
     func testDigItemWithNoToolButToolsInInventory() async throws {
-        let mound = Item(
-            id: "mound",
-            .name("dirt mound"),
-            .description("A small mound of dirt."),
+        let mound = Item("mound")
+            .name("dirt mound")
+            .description("A small mound of dirt.")
             .in(.startRoom)
-        )
 
-        let shovel = Item(
-            id: "shovel",
-            .name("shovel"),
-            .description("A sturdy shovel."),
-            .isTakable,
-            .isTool,
+        let shovel = Item("shovel")
+            .name("shovel")
+            .description("A sturdy shovel.")
+            .isTakable
+            .isTool
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: mound, shovel
@@ -364,21 +332,17 @@ struct DigActionHandlerTests {
 
     @Test("Dig item with tool")
     func testDigItemWithTool() async throws {
-        let mound = Item(
-            id: "mound",
-            .name("dirt mound"),
-            .description("A small mound of dirt."),
+        let mound = Item("mound")
+            .name("dirt mound")
+            .description("A small mound of dirt.")
             .in(.startRoom)
-        )
 
-        let shovel = Item(
-            id: "shovel",
-            .name("shovel"),
-            .description("A sturdy shovel."),
-            .isTakable,
-            .isTool,
+        let shovel = Item("shovel")
+            .name("shovel")
+            .description("A sturdy shovel.")
+            .isTakable
+            .isTool
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: mound, shovel
@@ -419,12 +383,10 @@ struct DigActionHandlerTests {
 
     @Test("Cannot dig with universal object as tool")
     func testCannotDigWithUniversalAsTool() async throws {
-        let mound = Item(
-            id: "mound",
-            .name("dirt mound"),
-            .description("A small mound of dirt."),
+        let mound = Item("mound")
+            .name("dirt mound")
+            .description("A small mound of dirt.")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: mound
@@ -461,21 +423,17 @@ struct DigActionHandlerTests {
 
     @Test("Digging item sets touched flag and updates pronouns")
     func testDiggingItemSetsStateChanges() async throws {
-        let mound = Item(
-            id: "mound",
-            .name("dirt mound"),
-            .description("A small mound of dirt."),
+        let mound = Item("mound")
+            .name("dirt mound")
+            .description("A small mound of dirt.")
             .in(.startRoom)
-        )
 
-        let shovel = Item(
-            id: "shovel",
-            .name("shovel"),
-            .description("A sturdy shovel."),
-            .isTakable,
-            .isTool,
+        let shovel = Item("shovel")
+            .name("shovel")
+            .description("A sturdy shovel.")
+            .isTakable
+            .isTool
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: mound, shovel

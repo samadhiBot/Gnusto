@@ -11,20 +11,16 @@ struct PourActionHandlerTests {
     @Test("POUR syntax works")
     func testPourSyntax() async throws {
         // Given
-        let bottle = Item(
-            id: "bottle",
-            .name("water bottle"),
-            .description("A bottle filled with water."),
-            .isTakable,
+        let bottle = Item("bottle")
+            .name("water bottle")
+            .description("A bottle filled with water.")
+            .isTakable
             .in(.player)
-        )
 
-        let plant = Item(
-            id: "plant",
-            .name("small plant"),
-            .description("A small potted plant."),
+        let plant = Item("plant")
+            .name("small plant")
+            .description("A small potted plant.")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: bottle, plant
@@ -52,13 +48,11 @@ struct PourActionHandlerTests {
     @Test("POUR DIRECTOBJECT syntax works")
     func testPourDirectObjectSyntax() async throws {
         // Given
-        let water = Item(
-            id: "water",
-            .name("glass of water"),
-            .description("A glass filled with water."),
-            .isTakable,
+        let water = Item("water")
+            .name("glass of water")
+            .description("A glass filled with water.")
+            .isTakable
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: water
@@ -81,20 +75,16 @@ struct PourActionHandlerTests {
     @Test("SPILL syntax works")
     func testSpillSyntax() async throws {
         // Given
-        let milk = Item(
-            id: "milk",
-            .name("glass of milk"),
-            .description("A glass of fresh milk."),
-            .isTakable,
+        let milk = Item("milk")
+            .name("glass of milk")
+            .description("A glass of fresh milk.")
+            .isTakable
             .in(.player)
-        )
 
-        let table = Item(
-            id: "table",
-            .name("wooden table"),
-            .description("A sturdy wooden table."),
+        let table = Item("table")
+            .name("wooden table")
+            .description("A sturdy wooden table.")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: milk, table
@@ -137,13 +127,11 @@ struct PourActionHandlerTests {
     @Test("Cannot pour without specifying on what")
     func testCannotPourWithoutOnWhat() async throws {
         // Given
-        let juice = Item(
-            id: "juice",
-            .name("orange juice"),
-            .description("A glass of orange juice."),
-            .isTakable,
+        let juice = Item("juice")
+            .name("orange juice")
+            .description("A glass of orange juice.")
+            .isTakable
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: juice
@@ -166,12 +154,10 @@ struct PourActionHandlerTests {
     @Test("Cannot pour non-existent item")
     func testCannotPourNonExistentItem() async throws {
         // Given
-        let plant = Item(
-            id: "plant",
-            .name("small plant"),
-            .description("A small potted plant."),
+        let plant = Item("plant")
+            .name("small plant")
+            .description("A small potted plant.")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: plant
@@ -194,13 +180,11 @@ struct PourActionHandlerTests {
     @Test("Cannot pour on non-existent target")
     func testCannotPourOnNonExistentTarget() async throws {
         // Given
-        let water = Item(
-            id: "water",
-            .name("glass of water"),
-            .description("A glass filled with water."),
-            .isTakable,
+        let water = Item("water")
+            .name("glass of water")
+            .description("A glass filled with water.")
+            .isTakable
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: water
@@ -223,26 +207,20 @@ struct PourActionHandlerTests {
     @Test("Cannot pour item not in scope")
     func testCannotPourItemNotInScope() async throws {
         // Given
-        let anotherRoom = Location(
-            id: "anotherRoom",
-            .name("Another Room"),
+        let anotherRoom = Location("anotherRoom")
+            .name("Another Room")
             .inherentlyLit
-        )
 
-        let remoteWater = Item(
-            id: "remoteWater",
-            .name("remote water"),
-            .description("Water in another room."),
-            .isTakable,
+        let remoteWater = Item("remoteWater")
+            .name("remote water")
+            .description("Water in another room.")
+            .isTakable
             .in("anotherRoom")
-        )
 
-        let plant = Item(
-            id: "plant",
-            .name("small plant"),
-            .description("A small potted plant."),
+        let plant = Item("plant")
+            .name("small plant")
+            .description("A small potted plant.")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             locations: anotherRoom,
@@ -266,26 +244,20 @@ struct PourActionHandlerTests {
     @Test("Cannot pour on target not in scope")
     func testCannotPourOnTargetNotInScope() async throws {
         // Given
-        let anotherRoom = Location(
-            id: "anotherRoom",
-            .name("Another Room"),
+        let anotherRoom = Location("anotherRoom")
+            .name("Another Room")
             .inherentlyLit
-        )
 
-        let water = Item(
-            id: "water",
-            .name("glass of water"),
-            .description("A glass filled with water."),
-            .isTakable,
+        let water = Item("water")
+            .name("glass of water")
+            .description("A glass filled with water.")
+            .isTakable
             .in(.player)
-        )
 
-        let remotePlant = Item(
-            id: "remotePlant",
-            .name("remote plant"),
-            .description("A plant in another room."),
+        let remotePlant = Item("remotePlant")
+            .name("remote plant")
+            .description("A plant in another room.")
             .in("anotherRoom")
-        )
 
         let game = MinimalGame(
             locations: anotherRoom,
@@ -309,12 +281,10 @@ struct PourActionHandlerTests {
     @Test("Cannot pour location")
     func testCannotPourLocation() async throws {
         // Given
-        let plant = Item(
-            id: "plant",
-            .name("small plant"),
-            .description("A small potted plant."),
+        let plant = Item("plant")
+            .name("small plant")
+            .description("A small potted plant.")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: plant
@@ -337,13 +307,11 @@ struct PourActionHandlerTests {
     @Test("Cannot pour on location")
     func testCannotPourOnLocation() async throws {
         // Given
-        let water = Item(
-            id: "water",
-            .name("glass of water"),
-            .description("A glass filled with water."),
-            .isTakable,
+        let water = Item("water")
+            .name("glass of water")
+            .description("A glass filled with water.")
+            .isTakable
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: water
@@ -366,12 +334,10 @@ struct PourActionHandlerTests {
     @Test("Cannot pour player")
     func testCannotPourPlayer() async throws {
         // Given
-        let plant = Item(
-            id: "plant",
-            .name("small plant"),
-            .description("A small potted plant."),
+        let plant = Item("plant")
+            .name("small plant")
+            .description("A small potted plant.")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: plant
@@ -394,13 +360,11 @@ struct PourActionHandlerTests {
     @Test("Cannot pour on player")
     func testCannotPourOnPlayer() async throws {
         // Given
-        let water = Item(
-            id: "water",
-            .name("glass of water"),
-            .description("A glass filled with water."),
-            .isTakable,
+        let water = Item("water")
+            .name("glass of water")
+            .description("A glass filled with water.")
+            .isTakable
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: water
@@ -423,27 +387,21 @@ struct PourActionHandlerTests {
     @Test("Requires light to pour")
     func testRequiresLight() async throws {
         // Given: Dark room with items
-        let darkRoom = Location(
-            id: "darkRoom",
-            .name("Dark Room"),
+        let darkRoom = Location("darkRoom")
+            .name("Dark Room")
             .description("A pitch black room.")
             // Note: No .inherentlyLit property
-        )
 
-        let water = Item(
-            id: "water",
-            .name("glass of water"),
-            .description("A glass filled with water."),
-            .isTakable,
+        let water = Item("water")
+            .name("glass of water")
+            .description("A glass filled with water.")
+            .isTakable
             .in(.player)
-        )
 
-        let plant = Item(
-            id: "plant",
-            .name("small plant"),
-            .description("A small potted plant."),
+        let plant = Item("plant")
+            .name("small plant")
+            .description("A small potted plant.")
             .in("darkRoom")
-        )
 
         let game = MinimalGame(
             player: Player(in: "darkRoom"),
@@ -471,21 +429,17 @@ struct PourActionHandlerTests {
     @Test("Pour item on another item sets touched flags")
     func testPourItemSetsTouchedFlags() async throws {
         // Given
-        let oil = Item(
-            id: "oil",
-            .name("bottle of oil"),
-            .description("A bottle filled with oil."),
-            .isTakable,
+        let oil = Item("oil")
+            .name("bottle of oil")
+            .description("A bottle filled with oil.")
+            .isTakable
             .in(.player)
-        )
 
-        let lamp = Item(
-            id: "lamp",
-            .name("oil lamp"),
-            .description("An antique oil lamp."),
-            .isLightSource,
+        let lamp = Item("lamp")
+            .name("oil lamp")
+            .description("An antique oil lamp.")
+            .isLightSource
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: oil, lamp
@@ -519,27 +473,21 @@ struct PourActionHandlerTests {
     @Test("Pour item updates pronouns")
     func testPourItemUpdatesPronouns() async throws {
         // Given
-        let water = Item(
-            id: "water",
-            .name("glass of water"),
-            .description("A glass filled with water."),
-            .isTakable,
+        let water = Item("water")
+            .name("glass of water")
+            .description("A glass filled with water.")
+            .isTakable
             .in(.player)
-        )
 
-        let flower = Item(
-            id: "flower",
-            .name("wilted flower"),
-            .description("A wilted flower that needs water."),
+        let flower = Item("flower")
+            .name("wilted flower")
+            .description("A wilted flower that needs water.")
             .in(.startRoom)
-        )
 
-        let book = Item(
-            id: "book",
-            .name("old book"),
-            .description("An old leather book."),
+        let book = Item("book")
+            .name("old book")
+            .description("An old leather book.")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: water, flower, book
@@ -572,13 +520,11 @@ struct PourActionHandlerTests {
     @Test("Cannot pour item on itself")
     func testCannotPourItemOnItself() async throws {
         // Given
-        let water = Item(
-            id: "water",
-            .name("glass of water"),
-            .description("A glass filled with water."),
-            .isTakable,
+        let water = Item("water")
+            .name("glass of water")
+            .description("A glass filled with water.")
+            .isTakable
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: water
@@ -601,28 +547,22 @@ struct PourActionHandlerTests {
     @Test("Pour different liquid types")
     func testPourDifferentLiquidTypes() async throws {
         // Given
-        let wine = Item(
-            id: "wine",
-            .name("bottle of wine"),
-            .description("A bottle of red wine."),
-            .isTakable,
+        let wine = Item("wine")
+            .name("bottle of wine")
+            .description("A bottle of red wine.")
+            .isTakable
             .in(.player)
-        )
 
-        let coffee = Item(
-            id: "coffee",
-            .name("cup of coffee"),
-            .description("A steaming cup of coffee."),
-            .isTakable,
+        let coffee = Item("coffee")
+            .name("cup of coffee")
+            .description("A steaming cup of coffee.")
+            .isTakable
             .in(.player)
-        )
 
-        let table = Item(
-            id: "table",
-            .name("marble table"),
-            .description("An elegant marble table."),
+        let table = Item("table")
+            .name("marble table")
+            .description("An elegant marble table.")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: wine, coffee, table
@@ -650,27 +590,21 @@ struct PourActionHandlerTests {
     @Test("Pour on different surface types")
     func testPourOnDifferentSurfaceTypes() async throws {
         // Given
-        let water = Item(
-            id: "water",
-            .name("glass of water"),
-            .description("A glass filled with water."),
-            .isTakable,
+        let water = Item("water")
+            .name("glass of water")
+            .description("A glass filled with water.")
+            .isTakable
             .in(.player)
-        )
 
-        let floor = Item(
-            id: "floor",
-            .name("wooden floor"),
-            .description("Polished wooden flooring."),
+        let floor = Item("floor")
+            .name("wooden floor")
+            .description("Polished wooden flooring.")
             .in(.startRoom)
-        )
 
-        let carpet = Item(
-            id: "carpet",
-            .name("persian carpet"),
-            .description("An expensive persian carpet."),
+        let carpet = Item("carpet")
+            .name("persian carpet")
+            .description("An expensive persian carpet.")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: water, floor, carpet

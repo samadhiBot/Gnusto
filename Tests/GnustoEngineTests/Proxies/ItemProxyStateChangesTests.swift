@@ -12,11 +12,10 @@ struct ItemProxyStateChangesTests {
     @Test("ItemProxy setFlag creates valid StateChange")
     func testSetFlagCreatesValidStateChange() async throws {
         // Given
-        let testItem = Item(
-            id: "testItem",
-            .name("test item"),
+        let testItem = Item("testItem")
+            .name("test item")
             .in(.startRoom)
-        )
+
         let game = MinimalGame(items: testItem)
         let (engine, _) = await GameEngine.test(blueprint: game)
         let proxy = await engine.item("testItem")
@@ -44,12 +43,10 @@ struct ItemProxyStateChangesTests {
     @Test("ItemProxy setFlag returns nil when flag already set")
     func testSetFlagReturnsNilWhenAlreadySet() async throws {
         // Given
-        let testItem = Item(
-            id: "testItem",
-            .name("test item"),
-            .isTouched,
+        let testItem = Item("testItem")
+            .name("test item")
+            .isTouched
             .in(.startRoom)
-        )
         let game = MinimalGame(items: testItem)
         let (engine, _) = await GameEngine.test(blueprint: game)
         let proxy = await engine.item("testItem")
@@ -64,12 +61,10 @@ struct ItemProxyStateChangesTests {
     @Test("ItemProxy clearFlag creates valid StateChange")
     func testClearFlagCreatesValidStateChange() async throws {
         // Given
-        let testItem = Item(
-            id: "testItem",
-            .name("test item"),
-            .isTouched,
+        let testItem = Item("testItem")
+            .name("test item")
+            .isTouched
             .in(.startRoom)
-        )
         let game = MinimalGame(items: testItem)
         let (engine, _) = await GameEngine.test(blueprint: game)
         let proxy = await engine.item("testItem")
@@ -97,11 +92,9 @@ struct ItemProxyStateChangesTests {
     @Test("ItemProxy clearFlag returns nil when flag not set")
     func testClearFlagReturnsNilWhenNotSet() async throws {
         // Given
-        let testItem = Item(
-            id: "testItem",
-            .name("test item"),
+        let testItem = Item("testItem")
+            .name("test item")
             .in(.startRoom)
-        )
         let game = MinimalGame(items: testItem)
         let (engine, _) = await GameEngine.test(blueprint: game)
         let proxy = await engine.item("testItem")
@@ -118,11 +111,9 @@ struct ItemProxyStateChangesTests {
     @Test("ItemProxy move creates valid StateChange")
     func testMoveCreatesValidStateChange() async throws {
         // Given
-        let testItem = Item(
-            id: "testItem",
-            .name("test item"),
+        let testItem = Item("testItem")
+            .name("test item")
             .in(.startRoom)
-        )
         let game = MinimalGame(items: testItem)
         let (engine, _) = await GameEngine.test(blueprint: game)
         let proxy = await engine.item("testItem")
@@ -142,11 +133,9 @@ struct ItemProxyStateChangesTests {
     @Test("ItemProxy remove creates valid StateChange")
     func testRemoveCreatesValidStateChange() async throws {
         // Given
-        let testItem = Item(
-            id: "testItem",
-            .name("test item"),
+        let testItem = Item("testItem")
+            .name("test item")
             .in(.player)
-        )
         let game = MinimalGame(items: testItem)
         let (engine, _) = await GameEngine.test(blueprint: game)
         let proxy = await engine.item("testItem")
@@ -168,11 +157,9 @@ struct ItemProxyStateChangesTests {
     @Test("ItemProxy setProperty StateValue creates valid StateChange")
     func testSetPropertyStateValueCreatesValidStateChange() async throws {
         // Given
-        let testItem = Item(
-            id: "testItem",
-            .name("test item"),
+        let testItem = Item("testItem")
+            .name("test item")
             .in(.startRoom)
-        )
         let game = MinimalGame(items: testItem)
         let (engine, _) = await GameEngine.test(blueprint: game)
         let proxy = await engine.item("testItem")
@@ -220,11 +207,9 @@ struct ItemProxyStateChangesTests {
     @Test("ItemProxy setProperty Bool creates valid StateChange")
     func testSetPropertyBoolCreatesValidStateChange() async throws {
         // Given
-        let testItem = Item(
-            id: "testItem",
-            .name("test item"),
+        let testItem = Item("testItem")
+            .name("test item")
             .in(.startRoom)
-        )
         let game = MinimalGame(items: testItem)
         let (engine, _) = await GameEngine.test(blueprint: game)
         let proxy = await engine.item("testItem")
@@ -252,11 +237,9 @@ struct ItemProxyStateChangesTests {
     @Test("ItemProxy setProperty Int creates valid StateChange")
     func testSetPropertyIntCreatesValidStateChange() async throws {
         // Given
-        let testItem = Item(
-            id: "testItem",
-            .name("test item"),
+        let testItem = Item("testItem")
+            .name("test item")
             .in(.startRoom)
-        )
         let game = MinimalGame(items: testItem)
         let (engine, _) = await GameEngine.test(blueprint: game)
         let proxy = await engine.item("testItem")
@@ -284,11 +267,9 @@ struct ItemProxyStateChangesTests {
     @Test("ItemProxy setProperty String creates valid StateChange")
     func testSetPropertyStringCreatesValidStateChange() async throws {
         // Given
-        let testItem = Item(
-            id: "testItem",
-            .name("test item"),
+        let testItem = Item("testItem")
+            .name("test item")
             .in(.startRoom)
-        )
         let game = MinimalGame(items: testItem)
         let (engine, _) = await GameEngine.test(blueprint: game)
         let proxy = await engine.item("testItem")
@@ -318,11 +299,9 @@ struct ItemProxyStateChangesTests {
     @Test("ItemProxy setDescription creates valid StateChange")
     func testSetDescriptionCreatesValidStateChange() async throws {
         // Given
-        let testItem = Item(
-            id: "testItem",
-            .name("test item"),
+        let testItem = Item("testItem")
+            .name("test item")
             .in(.startRoom)
-        )
         let game = MinimalGame(items: testItem)
         let (engine, _) = await GameEngine.test(blueprint: game)
         let proxy = await engine.item("testItem")
@@ -350,12 +329,10 @@ struct ItemProxyStateChangesTests {
     @Test("ItemProxy setDescription returns nil when no change")
     func testSetDescriptionReturnsNilWhenNoChange() async throws {
         // Given
-        let testItem = Item(
-            id: "testItem",
-            .name("test item"),
-            .description("A newly described item."),
+        let testItem = Item("testItem")
+            .name("test item")
+            .description("A newly described item.")
             .in(.startRoom)
-        )
         let game = MinimalGame(items: testItem)
         let (engine, _) = await GameEngine.test(blueprint: game)
         let proxy = await engine.item("testItem")
@@ -372,11 +349,9 @@ struct ItemProxyStateChangesTests {
     @Test("ItemProxy multiple flag operations")
     func testMultipleFlagOperations() async throws {
         // Given
-        let testItem = Item(
-            id: "testItem",
-            .name("test item"),
+        let testItem = Item("testItem")
+            .name("test item")
             .in(.startRoom)
-        )
         let game = MinimalGame(items: testItem)
         let (engine, _) = await GameEngine.test(blueprint: game)
         let proxy = await engine.item("testItem")
@@ -414,11 +389,9 @@ struct ItemProxyStateChangesTests {
     @Test("ItemProxy StateValue property operations")
     func testStateValuePropertyOperations() async throws {
         // Given
-        let testItem = Item(
-            id: "testItem",
-            .name("test item"),
+        let testItem = Item("testItem")
+            .name("test item")
             .in(.startRoom)
-        )
         let game = MinimalGame(items: testItem)
         let (engine, _) = await GameEngine.test(blueprint: game)
         let proxy = await engine.item("testItem")
@@ -468,11 +441,9 @@ struct ItemProxyStateChangesTests {
     @Test("ItemProxy changes are applied in order")
     func testChangesAreAppliedInOrder() async throws {
         // Given
-        let testItem = Item(
-            id: "testItem",
-            .name("test item"),
+        let testItem = Item("testItem")
+            .name("test item")
             .in(.startRoom)
-        )
         let game = MinimalGame(items: testItem)
         let (engine, _) = await GameEngine.test(blueprint: game)
         let proxy = await engine.item("testItem")

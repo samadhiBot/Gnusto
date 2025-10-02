@@ -11,12 +11,10 @@ struct KnockActionHandlerTests {
     @Test("KNOCK syntax works")
     func testKnockSyntax() async throws {
         // Given
-        let door = Item(
-            id: "door",
-            .name("wooden door"),
-            .description("A sturdy wooden door."),
+        let door = Item("door")
+            .name("wooden door")
+            .description("A sturdy wooden door.")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: door
@@ -39,12 +37,10 @@ struct KnockActionHandlerTests {
     @Test("TAP DIRECTOBJECT syntax works")
     func testTapDirectObjectSyntax() async throws {
         // Given
-        let table = Item(
-            id: "table",
-            .name("wooden table"),
-            .description("A wooden table."),
+        let table = Item("table")
+            .name("wooden table")
+            .description("A wooden table.")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: table
@@ -70,12 +66,10 @@ struct KnockActionHandlerTests {
     @Test("KNOCK ON DIRECTOBJECT syntax works")
     func testKnockOnDirectObjectSyntax() async throws {
         // Given
-        let door = Item(
-            id: "door",
-            .name("front door"),
-            .description("The front door."),
+        let door = Item("door")
+            .name("front door")
+            .description("The front door.")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: door
@@ -98,12 +92,10 @@ struct KnockActionHandlerTests {
     @Test("RAP syntax works")
     func testRapSyntax() async throws {
         // Given
-        let window = Item(
-            id: "window",
-            .name("glass window"),
-            .description("A glass window."),
+        let window = Item("window")
+            .name("glass window")
+            .description("A glass window.")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: window
@@ -146,18 +138,14 @@ struct KnockActionHandlerTests {
     @Test("Cannot knock on target not in scope")
     func testCannotKnockOnTargetNotInScope() async throws {
         // Given
-        let anotherRoom = Location(
-            id: "anotherRoom",
-            .name("Another Room"),
+        let anotherRoom = Location("anotherRoom")
+            .name("Another Room")
             .inherentlyLit
-        )
 
-        let remoteDoor = Item(
-            id: "remoteDoor",
-            .name("distant door"),
-            .description("A door in another room."),
+        let remoteDoor = Item("remoteDoor")
+            .name("distant door")
+            .description("A door in another room.")
             .in("anotherRoom")
-        )
 
         let game = MinimalGame(
             locations: anotherRoom,
@@ -181,19 +169,15 @@ struct KnockActionHandlerTests {
     @Test("Requires light to knock")
     func testRequiresLight() async throws {
         // Given: Dark room with door
-        let darkRoom = Location(
-            id: "darkRoom",
-            .name("Dark Room"),
+        let darkRoom = Location("darkRoom")
+            .name("Dark Room")
             .description("A pitch black room.")
             // Note: No .inherentlyLit property
-        )
 
-        let door = Item(
-            id: "door",
-            .name("mysterious door"),
-            .description("A mysterious door."),
+        let door = Item("door")
+            .name("mysterious door")
+            .description("A mysterious door.")
             .in("darkRoom")
-        )
 
         let game = MinimalGame(
             player: Player(in: "darkRoom"),
@@ -221,13 +205,11 @@ struct KnockActionHandlerTests {
     @Test("Knock on empty container")
     func testKnockOnEmptyContainer() async throws {
         // Given
-        let chest = Item(
-            id: "chest",
-            .name("treasure chest"),
-            .description("A treasure chest."),
-            .isContainer,
+        let chest = Item("chest")
+            .name("treasure chest")
+            .description("A treasure chest.")
+            .isContainer
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: chest
@@ -253,12 +235,10 @@ struct KnockActionHandlerTests {
     @Test("Knock on generic object")
     func testKnockOnGenericObject() async throws {
         // Given
-        let wall = Item(
-            id: "wall",
-            .name("stone wall"),
-            .description("A stone wall."),
+        let wall = Item("wall")
+            .name("stone wall")
+            .description("A stone wall.")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: wall
@@ -281,12 +261,10 @@ struct KnockActionHandlerTests {
     @Test("Knock sets touched flag on target")
     func testKnockSetsTouchedFlagOnTarget() async throws {
         // Given
-        let post = Item(
-            id: "post",
-            .name("wooden post"),
-            .description("A wooden post."),
+        let post = Item("post")
+            .name("wooden post")
+            .description("A wooden post.")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: post
@@ -313,27 +291,21 @@ struct KnockActionHandlerTests {
     @Test("Knock on multiple different objects")
     func testKnockOnMultipleDifferentObjects() async throws {
         // Given
-        let door = Item(
-            id: "door",
-            .name("blue door"),
-            .description("A blue door."),
+        let door = Item("door")
+            .name("blue door")
+            .description("A blue door.")
             .in(.startRoom)
-        )
 
-        let box = Item(
-            id: "box",
-            .name("wooden box"),
-            .description("A wooden box."),
-            .isContainer,
+        let box = Item("box")
+            .name("wooden box")
+            .description("A wooden box.")
+            .isContainer
             .in(.startRoom)
-        )
 
-        let barrel = Item(
-            id: "barrel",
-            .name("oak barrel"),
-            .description("An oak barrel."),
+        let barrel = Item("barrel")
+            .name("oak barrel")
+            .description("An oak barrel.")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: door, box, barrel
@@ -374,26 +346,20 @@ struct KnockActionHandlerTests {
     @Test("Knock using different verb synonyms")
     func testKnockUsingDifferentVerbSynonyms() async throws {
         // Given
-        let door1 = Item(
-            id: "door1",
-            .name("red door"),
-            .description("A red door."),
+        let door1 = Item("door1")
+            .name("red door")
+            .description("A red door.")
             .in(.startRoom)
-        )
 
-        let door2 = Item(
-            id: "door2",
-            .name("green door"),
-            .description("A green door."),
+        let door2 = Item("door2")
+            .name("green door")
+            .description("A green door.")
             .in(.startRoom)
-        )
 
-        let door3 = Item(
-            id: "door3",
-            .name("yellow door"),
-            .description("A yellow door."),
+        let door3 = Item("door3")
+            .name("yellow door")
+            .description("A yellow door.")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: door1, door2, door3
@@ -427,28 +393,22 @@ struct KnockActionHandlerTests {
     func testKnockOnDoorsWithDifferentStates() async throws {
         // Given
         // Set up the test state with doors in different states
-        let openDoor = Item(
-            id: "openDoor",
-            .name("open door"),
-            .description("An open door."),
-            .isOpen,
+        let openDoor = Item("openDoor")
+            .name("open door")
+            .description("An open door.")
+            .isOpen
             .in(.startRoom)
-        )
 
-        let closedDoor = Item(
-            id: "closedDoor",
-            .name("closed door"),
-            .description("A closed door."),
+        let closedDoor = Item("closedDoor")
+            .name("closed door")
+            .description("A closed door.")
             .in(.startRoom)
-        )
 
-        let lockedDoor = Item(
-            id: "lockedDoor",
-            .name("locked door"),
-            .description("A locked door."),
-            .isLocked,
+        let lockedDoor = Item("lockedDoor")
+            .name("locked door")
+            .description("A locked door.")
+            .isLocked
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: openDoor, closedDoor, lockedDoor

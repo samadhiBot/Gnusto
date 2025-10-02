@@ -53,41 +53,39 @@ Here's how simple it is to create an interactive world with Gnusto:
 import GnustoEngine
 
 struct OperaHouse {  // Organize content into logical areas
-    let foyer = Location(
-        id: .foyer,  // Plugin auto-generates LocationID.foyer
-        .name("Foyer of the Opera House"),
-        .description("""
+    let foyer = Location(.foyer)  // Plugin auto-generates LocationID.foyer
+        .name("Foyer of the Opera House")
+        .description(
+            """
             You are standing in a spacious hall, splendidly decorated in red
             and gold, with glittering chandeliers overhead. The entrance from
             the street is to the north, and there are doorways south and west.
             """
-        ),
-        .exits(
-            .south(.bar),
-            .west(.cloakroom),
-            .north(blocked: """
-                You've only just arrived, and besides, the weather outside
-                seems to be getting worse.
-                """)
-        ),
+        )
+        .south(.bar),
+        .west(.cloakroom)
+        .north(
+            """
+            You've only just arrived, and besides, the weather outside
+            seems to be getting worse.
+            """
+        )
         .inherentlyLit
-    )
 
-    let cloak = Item(
-        id: .cloak,  // Plugin auto-generates ItemID.cloak
-        .name("velvet cloak"),
-        .description("""
+    let cloak = Item(.cloak)  // Plugin auto-generates ItemID.cloak
+        .name("velvet cloak")
+        .description(
+            """
             A handsome cloak, of velvet trimmed with satin, and slightly
             spattered with raindrops. Its blackness is so deep that it
             almost seems to suck light from the room.
             """
-        ),
-        .adjectives("handsome", "dark", "black", "velvet", "satin"),
-        .in(.player),
-        .isTakable,
-        .isWearable,
-        .isWorn,
-    )
+        )
+        .adjectives("handsome", "dark", "black", "velvet", "satin")
+        .in(.player)
+        .isTakable
+        .isWearable
+        .isWorn
 
     // Custom behavior for examining items
     let hookHandler = ItemEventHandler(for: .hook) {

@@ -11,12 +11,10 @@ public enum Lab {
     ///
     /// This location is inherently lit and contains various test items and NPCs,
     /// making it ideal for testing game mechanics without worrying about darkness.
-    public static let laboratory = Location(
-        id: .startRoom,
-        .name("Laboratory"),
-        .description("A laboratory in which strange experiments are being conducted."),
+    public static let laboratory = Location(.startRoom)
+        .name("Laboratory")
+        .description("A laboratory in which strange experiments are being conducted.")
         .inherentlyLit
-    )
 }
 
 // MARK: - Items
@@ -27,83 +25,71 @@ extension Lab {
     /// This item demonstrates weapon mechanics and the `requiresTryTake` flag,
     /// making it more challenging to obtain. It has multiple synonyms and adjectives
     /// for testing vocabulary parsing.
-    public static let axe = Item(
-        id: .axe,
-        .name("bloody axe"),
-        .synonyms("axe", "ax"),
-        .adjectives("bloody", "rusty", "nicked", "gruesome"),
-        .isWeapon,
-        .requiresTryTake,
-        .isTakable,
-        .omitDescription,
-        .size(25),
+    public static let axe = Item(.axe)
+        .name("bloody axe")
+        .synonyms("axe", "ax")
+        .adjectives("bloody", "rusty", "nicked", "gruesome")
+        .isWeapon
+        .requiresTryTake
+        .isTakable
+        .omitDescription
+        .size(25)
         .in(.item(.troll))
-    )
 
     /// A bunch of purple grapes for testing plural item handling.
     ///
     /// This item tests the plural flag functionality and provides a simple
     /// takeable food item for testing consumption mechanics.
-    public static let grapes = Item(
-        id: "grapes",
-        .name("grapes"),
-        .description("A bunch of purple grapes."),
-        .isPlural,
-        .isTakable,
+    public static let grapes = Item("grapes")
+        .name("grapes")
+        .description("A bunch of purple grapes.")
+        .isPlural
+        .isTakable
         .in(.startRoom)
-    )
 
     /// An iron sword weapon that starts in the player's inventory.
     ///
     /// This weapon provides a baseline for combat testing and demonstrates
     /// items that begin in the player's possession.
-    public static let ironSword = Item(
-        id: "sword",
-        .name("iron sword"),
-        .description("A sharp iron sword."),
-        .isTakable,
-        .isWeapon,
+    public static let ironSword = Item("sword")
+        .name("iron sword")
+        .description("A sharp iron sword.")
+        .isTakable
+        .isWeapon
         .in(.player)
-    )
 
     /// A wooden match that can ignite itself or other items.
     ///
     /// This item tests the self-ignitable flag and fire mechanics,
     /// starting in the player's inventory for immediate use.
-    public static let matchStick = Item(
-        id: "match",
-        .name("wooden match"),
-        .description("A wooden match."),
-        .isSelfIgnitable,
-        .isTakable,
+    public static let matchStick = Item("match")
+        .name("wooden match")
+        .description("A wooden match.")
+        .isSelfIgnitable
+        .isTakable
         .in(.player)
-    )
 
     /// A simple pebble that serves as a basic test item.
     ///
     /// This unremarkable item provides a neutral test object for basic
     /// item manipulation without special properties or complications.
-    public static let pebble = Item(
-        id: .startItem,
-        .name("pebble"),
-        .description("A wholly unremarkable pebble."),
-        .in(.startRoom),
+    public static let pebble = Item(.startItem)
+        .name("pebble")
+        .description("A wholly unremarkable pebble.")
+        .in(.startRoom)
         .isTakable
-    )
 
     /// A burning torch that provides light.
     ///
     /// This item tests light source mechanics, flammability, and burning states.
     /// It starts in the player's inventory as an active light source.
-    public static let torch = Item(
-        id: "torch",
-        .name("flaming torch"),
-        .description("A wooden torch with a bright flame."),
-        .isFlammable,
-        .isBurning,
-        .isLightSource,
+    public static let torch = Item("torch")
+        .name("flaming torch")
+        .description("A wooden torch with a bright flame.")
+        .isFlammable
+        .isBurning
+        .isLightSource
         .in(.player)
-    )
 }
 
 // MARK: - NPC's
@@ -114,12 +100,11 @@ extension Lab {
     /// This NPC demonstrates character sheet mechanics, taunts system,
     /// and represents a lawful neutral authority figure with combat capabilities.
     /// The guard is drunk and drowsy, affecting their performance.
-    public static let castleGuard = Item(
-        id: "guard",
-        .name("castle guard"),
-        .description("A stern castle guard."),
-        .synonyms("brute", "guard", "bully"),
-        .adjectives("surly", "drunken", "bitter"),
+    public static let castleGuard = Item("guard")
+        .name("castle guard")
+        .description("A stern castle guard.")
+        .synonyms("brute", "guard", "bully")
+        .adjectives("surly", "drunken", "bitter")
         .characterSheet(
             CharacterSheet(
                 strength: 13,
@@ -146,19 +131,17 @@ extension Lab {
                     #""I'm the one in charge!", bellows the castle guard."#,
                 ]
             )
-        ),
+        )
         .in(.startRoom)
-    )
 
     /// A powerful dragon representing the ultimate combat challenge.
     ///
     /// This NPC serves as a high-level boss enemy with maximum stats across
     /// most categories. It demonstrates neutral evil alignment and represents
     /// the most dangerous combat encounter in the test suite.
-    public static let dragon = Item(
-        id: "dragon",
-        .name("terrible dragon"),
-        .description("A terrible dragon."),
+    public static let dragon = Item("dragon")
+        .name("terrible dragon")
+        .description("A terrible dragon.")
         .characterSheet(
             CharacterSheet(
                 strength: 20,
@@ -179,19 +162,17 @@ extension Lab {
                 health: 400,
                 maxHealth: 400
             )
-        ),
+        )
         .in(.startRoom)
-    )
 
     /// A helpful woodland fairy with high magical abilities.
     ///
     /// This NPC represents a chaotic good character with exceptional dexterity,
     /// luck, and stealth. The fairy demonstrates low physical strength but
     /// high mental attributes, providing a contrast to combat-focused NPCs.
-    public static let fairy = Item(
-        id: "fairy",
-        .name("woodland fairy"),
-        .description("A woodland fairy."),
+    public static let fairy = Item("fairy")
+        .name("woodland fairy")
+        .description("A woodland fairy.")
         .characterSheet(
             CharacterSheet(
                 strength: 8,
@@ -214,19 +195,17 @@ extension Lab {
                 health: 16,
                 maxHealth: 16
             )
-        ),
+        )
         .in(.startRoom)
-    )
 
     /// A noble knight representing lawful good heroic archetype.
     ///
     /// This NPC demonstrates a well-balanced heroic character with high physical
     /// and social stats. The knight has combat taunts and represents traditional
     /// chivalric values in the game world.
-    public static let knight = Item(
-        id: "knight",
-        .name("knight"),
-        .description("A noble knight."),
+    public static let knight = Item("knight")
+        .name("knight")
+        .description("A noble knight.")
         .characterSheet(
             CharacterSheet(
                 strength: 17,
@@ -251,31 +230,27 @@ extension Lab {
                     #""Cease, you... rapscallion!", cries the good sir knight."#,
                 ]
             )
-        ),
+        )
         .in(.startRoom)
-    )
 
     /// A traveling merchant with default character stats.
     ///
     /// This NPC provides a baseline character for testing trade mechanics
     /// and demonstrates the use of default character sheet values.
-    public static let merchant = Item(
-        id: "merchant",
-        .name("traveling merchant"),
-        .description("A traveling merchant."),
-        .characterSheet(.default),
+    public static let merchant = Item("merchant")
+        .name("traveling merchant")
+        .description("A traveling merchant.")
+        .characterSheet(.default)
         .in(.startRoom)
-    )
 
     /// A beautiful princess with high social and mental attributes.
     ///
     /// This NPC represents a lawful neutral royal character with exceptional
     /// charisma and luck. She demonstrates high intelligence and wisdom
     /// while maintaining moderate physical capabilities.
-    public static let princess = Item(
-        id: "princess",
-        .name("princess"),
-        .description("A beautiful princess."),
+    public static let princess = Item("princess")
+        .name("princess")
+        .description("A beautiful princess.")
         .characterSheet(
             CharacterSheet(
                 dexterity: 14,
@@ -288,21 +263,19 @@ extension Lab {
                 classification: .feminine,
                 alignment: .lawfulNeutral
             )
-        ),
+        )
         .in(.startRoom)
-    )
 
     /// A fierce troll that blocks the player's path.
     ///
     /// This NPC serves as a classic IF obstacle with multiple synonyms and adjectives.
     /// The troll carries an axe and has taunting behavior. It's transparent and
     /// requires special handling to take, making it ideal for testing complex interactions.
-    public static let troll = Item(
-        id: .troll,
-        .name("fierce troll"),
-        .adjectives("angry", "fearsome", "terrible", "grotesque"),
-        .synonyms("beast", "monster", "creature"),
-        .description("A fierce troll blocking your way."),
+    public static let troll = Item(.troll)
+        .name("fierce troll")
+        .adjectives("angry", "fearsome", "terrible", "grotesque")
+        .synonyms("beast", "monster", "creature")
+        .description("A fierce troll blocking your way.")
         .characterSheet(
             CharacterSheet(
                 strength: 14,
@@ -334,26 +307,23 @@ extension Lab {
                     """,
                 ]
             )
-        ),
-        .isTransparent,
-        .requiresTryTake,
+        )
+        .isTransparent
+        .requiresTryTake
         .in(.startRoom)
-    )
 
     /// Spandalf the wizard, a wise magical character.
     ///
     /// This NPC demonstrates the wise character sheet preset and provides
     /// multiple synonyms for testing vocabulary recognition. The wizard
     /// represents a classic IF mentor figure.
-    public static let wizard = Item(
-        id: "wizard",
-        .name("Spandalf"),
-        .synonyms("wizard", "mage"),
-        .adjectives("clever", "wise"),
-        .description("A wise old wizard."),
-        .characterSheet(.wise),
+    public static let wizard = Item("wizard")
+        .name("Spandalf")
+        .synonyms("wizard", "mage")
+        .adjectives("clever", "wise")
+        .description("A wise old wizard.")
+        .characterSheet(.wise)
         .in(.startRoom)
-    )
 }
 
 // MARK: - Item helpers

@@ -11,13 +11,11 @@ struct ThrowActionHandlerTests {
     @Test("THROW DIRECTOBJECT syntax works")
     func testThrowDirectObjectSyntax() async throws {
         // Given
-        let ball = Item(
-            id: "ball",
-            .name("rubber ball"),
-            .description("A bouncy rubber ball."),
-            .isTakable,
+        let ball = Item("ball")
+            .name("rubber ball")
+            .description("A bouncy rubber ball.")
+            .isTakable
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: ball
@@ -46,20 +44,16 @@ struct ThrowActionHandlerTests {
     @Test("THROW DIRECTOBJECT AT INDIRECTOBJECT syntax works")
     func testThrowAtIndirectObjectSyntax() async throws {
         // Given
-        let rock = Item(
-            id: "rock",
-            .name("small rock"),
-            .description("A small throwing rock."),
-            .isTakable,
+        let rock = Item("rock")
+            .name("small rock")
+            .description("A small throwing rock.")
+            .isTakable
             .in(.player)
-        )
 
-        let target = Item(
-            id: "target",
-            .name("wooden target"),
-            .description("A wooden archery target."),
+        let target = Item("target")
+            .name("wooden target")
+            .description("A wooden archery target.")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: rock, target
@@ -91,21 +85,17 @@ struct ThrowActionHandlerTests {
     @Test("THROW DIRECTOBJECT TO INDIRECTOBJECT syntax works")
     func testThrowToIndirectObjectSyntax() async throws {
         // Given
-        let key = Item(
-            id: "key",
-            .name("brass key"),
-            .description("A shiny brass key."),
-            .isTakable,
+        let key = Item("key")
+            .name("brass key")
+            .description("A shiny brass key.")
+            .isTakable
             .in(.player)
-        )
 
-        let castleGuard = Item(
-            id: "guard",
-            .name("castle guard"),
-            .description("A stern castle guard."),
-            .characterSheet(.default),
+        let castleGuard = Item("guard")
+            .name("castle guard")
+            .description("A stern castle guard.")
+            .characterSheet(.default)
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: key, castleGuard
@@ -135,13 +125,11 @@ struct ThrowActionHandlerTests {
     @Test("HURL syntax works")
     func testHurlSyntax() async throws {
         // Given
-        let spear = Item(
-            id: "spear",
-            .name("wooden spear"),
-            .description("A sharp wooden spear."),
-            .isTakable,
+        let spear = Item("spear")
+            .name("wooden spear")
+            .description("A sharp wooden spear.")
+            .isTakable
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: spear
@@ -165,13 +153,11 @@ struct ThrowActionHandlerTests {
     @Test("TOSS syntax works")
     func testTossSyntax() async throws {
         // Given
-        let coin = Item(
-            id: "coin",
-            .name("gold coin"),
-            .description("A shiny gold coin."),
-            .isTakable,
+        let coin = Item("coin")
+            .name("gold coin")
+            .description("A shiny gold coin.")
+            .isTakable
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: coin
@@ -195,13 +181,11 @@ struct ThrowActionHandlerTests {
     @Test("CHUCK syntax works")
     func testChuckSyntax() async throws {
         // Given
-        let stone = Item(
-            id: "stone",
-            .name("heavy stone"),
-            .description("A heavy throwing stone."),
-            .isTakable,
+        let stone = Item("stone")
+            .name("heavy stone")
+            .description("A heavy throwing stone.")
+            .isTakable
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: stone
@@ -245,13 +229,11 @@ struct ThrowActionHandlerTests {
     @Test("Cannot throw item not held")
     func testCannotThrowItemNotHeld() async throws {
         // Given
-        let ball = Item(
-            id: "ball",
-            .name("rubber ball"),
-            .description("A bouncy rubber ball."),
-            .isTakable,
+        let ball = Item("ball")
+            .name("rubber ball")
+            .description("A bouncy rubber ball.")
+            .isTakable
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: ball
@@ -292,13 +274,11 @@ struct ThrowActionHandlerTests {
     @Test("Cannot throw at non-existent target")
     func testCannotThrowAtNonExistentTarget() async throws {
         // Given
-        let ball = Item(
-            id: "ball",
-            .name("rubber ball"),
-            .description("A bouncy rubber ball."),
-            .isTakable,
+        let ball = Item("ball")
+            .name("rubber ball")
+            .description("A bouncy rubber ball.")
+            .isTakable
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: ball
@@ -321,26 +301,20 @@ struct ThrowActionHandlerTests {
     @Test("Cannot throw at target not in reach")
     func testCannotThrowAtTargetNotInReach() async throws {
         // Given
-        let anotherRoom = Location(
-            id: "anotherRoom",
-            .name("Another Room"),
+        let anotherRoom = Location("anotherRoom")
+            .name("Another Room")
             .inherentlyLit
-        )
 
-        let ball = Item(
-            id: "ball",
-            .name("rubber ball"),
-            .description("A bouncy rubber ball."),
-            .isTakable,
+        let ball = Item("ball")
+            .name("rubber ball")
+            .description("A bouncy rubber ball.")
+            .isTakable
             .in(.player)
-        )
 
-        let distantTarget = Item(
-            id: "distantTarget",
-            .name("distant target"),
-            .description("A target in another room."),
+        let distantTarget = Item("distantTarget")
+            .name("distant target")
+            .description("A target in another room.")
             .in("anotherRoom")
-        )
 
         let game = MinimalGame(
             locations: anotherRoom,
@@ -364,20 +338,16 @@ struct ThrowActionHandlerTests {
     @Test("Requires light to throw")
     func testRequiresLight() async throws {
         // Given: Dark room with item
-        let darkRoom = Location(
-            id: "darkRoom",
-            .name("Dark Room"),
+        let darkRoom = Location("darkRoom")
+            .name("Dark Room")
             .description("A pitch black room.")
             // Note: No .inherentlyLit property
-        )
 
-        let ball = Item(
-            id: "ball",
-            .name("rubber ball"),
-            .description("A bouncy rubber ball."),
-            .isTakable,
+        let ball = Item("ball")
+            .name("rubber ball")
+            .description("A bouncy rubber ball.")
+            .isTakable
             .in(.player)
-        )
 
         let game = MinimalGame(
             player: Player(in: "darkRoom"),
@@ -405,13 +375,11 @@ struct ThrowActionHandlerTests {
     @Test("Throw item generally")
     func testThrowItemGenerally() async throws {
         // Given
-        let bottle = Item(
-            id: "bottle",
-            .name("glass bottle"),
-            .description("A fragile glass bottle."),
-            .isTakable,
+        let bottle = Item("bottle")
+            .name("glass bottle")
+            .description("A fragile glass bottle.")
+            .isTakable
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: bottle
@@ -445,21 +413,17 @@ struct ThrowActionHandlerTests {
     @Test("Throw item at character")
     func testThrowItemAtCharacter() async throws {
         // Given
-        let apple = Item(
-            id: "apple",
-            .name("red apple"),
-            .description("A juicy red apple."),
-            .isTakable,
+        let apple = Item("apple")
+            .name("red apple")
+            .description("A juicy red apple.")
+            .isTakable
             .in(.player)
-        )
 
-        let wizard = Item(
-            id: "wizard",
-            .name("old wizard"),
-            .description("A wise old wizard."),
-            .characterSheet(.default),
+        let wizard = Item("wizard")
+            .name("old wizard")
+            .description("A wise old wizard.")
+            .characterSheet(.default)
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: apple, wizard
@@ -496,21 +460,17 @@ struct ThrowActionHandlerTests {
     @Test("Throw item at enemy")
     func testThrowItemAtEnemy() async throws {
         // Given
-        let apple = Item(
-            id: "apple",
-            .name("red apple"),
-            .description("A juicy red apple."),
-            .isTakable,
+        let apple = Item("apple")
+            .name("red apple")
+            .description("A juicy red apple.")
+            .isTakable
             .in(.player)
-        )
 
-        let wizard = Item(
-            id: "wizard",
-            .name("old wizard"),
-            .description("A wise old wizard."),
-            .characterSheet(.init(isFighting: true)),
+        let wizard = Item("wizard")
+            .name("old wizard")
+            .description("A wise old wizard.")
+            .characterSheet(.init(isFighting: true))
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: apple, wizard
@@ -554,20 +514,16 @@ struct ThrowActionHandlerTests {
     @Test("Throw item at object")
     func testThrowItemAtObject() async throws {
         // Given
-        let dart = Item(
-            id: "dart",
-            .name("sharp dart"),
-            .description("A sharp throwing dart."),
-            .isTakable,
+        let dart = Item("dart")
+            .name("sharp dart")
+            .description("A sharp throwing dart.")
+            .isTakable
             .in(.player)
-        )
 
-        let board = Item(
-            id: "board",
-            .name("dartboard"),
-            .description("A standard dartboard."),
+        let board = Item("board")
+            .name("dartboard")
+            .description("A standard dartboard.")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: dart, board
@@ -603,21 +559,17 @@ struct ThrowActionHandlerTests {
     @Test("Throw item to character")
     func testThrowItemToCharacter() async throws {
         // Given
-        let coin = Item(
-            id: "coin",
-            .name("gold coin"),
-            .description("A shiny gold coin."),
-            .isTakable,
+        let coin = Item("coin")
+            .name("gold coin")
+            .description("A shiny gold coin.")
+            .isTakable
             .in(.player)
-        )
 
-        let merchant = Item(
-            id: "merchant",
-            .name("traveling merchant"),
-            .description("A friendly traveling merchant."),
-            .characterSheet(.default),
+        let merchant = Item("merchant")
+            .name("traveling merchant")
+            .description("A friendly traveling merchant.")
+            .characterSheet(.default)
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: coin, merchant
@@ -651,21 +603,17 @@ struct ThrowActionHandlerTests {
     @Test("Throw item to enemy")
     func testThrowItemToEnemy() async throws {
         // Given
-        let coin = Item(
-            id: "coin",
-            .name("gold coin"),
-            .description("A shiny gold coin."),
-            .isTakable,
+        let coin = Item("coin")
+            .name("gold coin")
+            .description("A shiny gold coin.")
+            .isTakable
             .in(.player)
-        )
 
-        let merchant = Item(
-            id: "merchant",
-            .name("traveling merchant"),
-            .description("A friendly traveling merchant."),
-            .characterSheet(.default),
+        let merchant = Item("merchant")
+            .name("traveling merchant")
+            .description("A friendly traveling merchant.")
+            .characterSheet(.default)
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: coin, merchant
@@ -699,20 +647,16 @@ struct ThrowActionHandlerTests {
     @Test("Throw item to object")
     func testThrowItemToObject() async throws {
         // Given
-        let ball = Item(
-            id: "ball",
-            .name("tennis ball"),
-            .description("A bright yellow tennis ball."),
-            .isTakable,
+        let ball = Item("ball")
+            .name("tennis ball")
+            .description("A bright yellow tennis ball.")
+            .isTakable
             .in(.player)
-        )
 
-        let basket = Item(
-            id: "basket",
-            .name("wicker basket"),
-            .description("A large wicker basket."),
+        let basket = Item("basket")
+            .name("wicker basket")
+            .description("A large wicker basket.")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: ball, basket
@@ -749,21 +693,17 @@ struct ThrowActionHandlerTests {
     @Test("Throw multiple items")
     func testThrowMultipleItems() async throws {
         // Given
-        let ball1 = Item(
-            id: "ball1",
-            .name("red ball"),
-            .description("A red rubber ball."),
-            .isTakable,
+        let ball1 = Item("ball1")
+            .name("red ball")
+            .description("A red rubber ball.")
+            .isTakable
             .in(.player)
-        )
 
-        let ball2 = Item(
-            id: "ball2",
-            .name("blue ball"),
-            .description("A blue rubber ball."),
-            .isTakable,
+        let ball2 = Item("ball2")
+            .name("blue ball")
+            .description("A blue rubber ball.")
+            .isTakable
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: ball1, ball2

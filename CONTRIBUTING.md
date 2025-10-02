@@ -73,12 +73,10 @@ Thank you for your interest in contributing to the Gnusto Interactive Fiction En
 ```swift
 @Test("Player can take an item")
 func testTakeItem() async throws {
-    let testItem = Item(
-        id: "gem",
-        .name("sparkling gem"),
-        .isTakable,
+    let testItem = Item("gem")
+        .name("sparkling gem")
+        .isTakable
         .in(.startRoom)
-    )
     
     let game = MinimalGame(
         player: Player(in: .startRoom),

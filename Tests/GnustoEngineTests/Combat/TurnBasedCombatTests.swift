@@ -11,23 +11,19 @@ struct TurnBasedCombatTests {
     @Test("Basic attack with character properties")
     func testBasicAttackWithProperties() async throws {
         // Given: A room with a goblin that has weak properties
-        let goblin = Item(
-            id: "goblin",
-            .name("goblin"),
-            .description("A small, weak goblin."),
-            .characterSheet(.weak),  // Weak character properties
+        let goblin = Item("goblin")
+            .name("goblin")
+            .description("A small, weak goblin.")
+            .characterSheet(.weak)  // Weak character properties
             .in(.startRoom)
-        )
 
-        let sword = Item(
-            id: "sword",
-            .name("sword"),
-            .description("A sharp sword."),
-            .isTakable,
-            .isWeapon,
-            .value(5),  // +5 damage bonus
+        let sword = Item("sword")
+            .name("sword")
+            .description("A sharp sword.")
+            .isTakable
+            .isWeapon
+            .value(5)  // +5 damage bonus
             .in(.player)
-        )
 
         let game = MinimalGame(
             player: Player(
@@ -64,13 +60,11 @@ struct TurnBasedCombatTests {
     @Test("Combat without required weapon")
     func testCombatRequiresWeapon() async throws {
         // Given: A knight that requires weapons to fight
-        let knight = Item(
-            id: "knight",
-            .name("knight"),
-            .description("An armored knight."),
-            .characterSheet(.strong),
+        let knight = Item("knight")
+            .name("knight")
+            .description("An armored knight.")
+            .characterSheet(.strong)
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: knight,
@@ -102,16 +96,14 @@ struct TurnBasedCombatTests {
     @Test("Attack with non-weapon item")
     func testAttackWithNonWeapon() async throws {
         // Given: A troll and a non-weapon item
-        let lamp = Item(
-            id: "lamp",
-            .name("lamp"),
-            .description("A brass lamp."),
-            .isTakable,
-            .isDevice,
-            .isLightSource,
+        let lamp = Item("lamp")
+            .name("lamp")
+            .description("A brass lamp.")
+            .isTakable
+            .isDevice
+            .isLightSource
             // Note: NOT marked as .isWeapon
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: Lab.troll, lamp
@@ -144,23 +136,19 @@ struct TurnBasedCombatTests {
     @Test("Strong vs weak character combat")
     func testPropertyBasedCombat() async throws {
         // Given: A weak player vs strong enemy
-        let ogre = Item(
-            id: "ogre",
-            .name("ogre"),
-            .description("A massive ogre."),
-            .characterSheet(.strong),  // Strong properties
+        let ogre = Item("ogre")
+            .name("ogre")
+            .description("A massive ogre.")
+            .characterSheet(.strong)  // Strong properties
             .in(.startRoom)
-        )
 
-        let dagger = Item(
-            id: "dagger",
-            .name("dagger"),
-            .description("A small dagger."),
-            .isTakable,
-            .isWeapon,
-            .damage(2),  // Low damage
+        let dagger = Item("dagger")
+            .name("dagger")
+            .description("A small dagger.")
+            .isTakable
+            .isWeapon
+            .damage(2)  // Low damage
             .in(.player)
-        )
 
         let game = MinimalGame(
             player: Player(
@@ -197,10 +185,9 @@ struct TurnBasedCombatTests {
     @Test("Enemy that can be pacified through dialogue")
     func testPacifyThroughDialogue() async throws {
         // Given: A bandit that can be pacified
-        let bandit = Item(
-            id: "bandit",
-            .name("bandit"),
-            .description("A rough-looking bandit."),
+        let bandit = Item("bandit")
+            .name("bandit")
+            .description("A rough-looking bandit.")
 
             .characterSheet(
                 .init(
@@ -209,9 +196,8 @@ struct TurnBasedCombatTests {
                     charisma: 8,
                     alignment: .chaoticGood  // Easier to pacify
                 )
-            ),
+            )
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             player: Player(
@@ -265,13 +251,11 @@ struct TurnBasedCombatTests {
     @Test("Attack non-character object")
     func testAttackNonCharacter() async throws {
         // Given: A regular object (not a character)
-        let statue = Item(
-            id: "statue",
-            .name("statue"),
-            .description("A stone statue."),
+        let statue = Item("statue")
+            .name("statue")
+            .description("A stone statue.")
             // Note: NOT marked as a character (no .characterSheet)
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: statue
@@ -294,13 +278,11 @@ struct TurnBasedCombatTests {
     @Test("Combat with already dead enemy")
     func testAttackDeadEnemy() async throws {
         // Given: A dead enemy
-        let corpse = Item(
-            id: "zombie",
-            .name("zombie"),
-            .description("A defeated zombie."),
-            .characterSheet(.init(health: 0, consciousness: .dead)),  // Already dead
+        let corpse = Item("zombie")
+            .name("zombie")
+            .description("A defeated zombie.")
+            .characterSheet(.init(health: 0, consciousness: .dead))  // Already dead
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: corpse
@@ -328,23 +310,19 @@ struct TurnBasedCombatTests {
     @Test("Combat state changes are properly applied")
     func testCombatStateChanges() async throws {
         // Given: A simple enemy
-        let rat = Item(
-            id: "rat",
-            .name("rat"),
-            .description("A large rat."),
-            .characterSheet(.weak),  // Very low health
+        let rat = Item("rat")
+            .name("rat")
+            .description("A large rat.")
+            .characterSheet(.weak)  // Very low health
             .in(.startRoom)
-        )
 
-        let sword = Item(
-            id: "sword",
-            .name("sword"),
-            .description("A sharp sword."),
-            .isTakable,
-            .isWeapon,
-            .value(10),  // High damage
+        let sword = Item("sword")
+            .name("sword")
+            .description("A sharp sword.")
+            .isTakable
+            .isWeapon
+            .value(10)  // High damage
             .in(.player)
-        )
 
         let game = MinimalGame(
             player: Player(

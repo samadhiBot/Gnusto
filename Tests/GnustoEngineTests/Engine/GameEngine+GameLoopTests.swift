@@ -209,12 +209,10 @@ struct GameEngineGameLoopTests {
 
     @Test("run method handles restart")
     func testRunWithRestart() async throws {
-        let testItem = Item(
-            id: "testItem",
-            .name("test item"),
-            .isTakable,
+        let testItem = Item("testItem")
+            .name("test item")
+                .isTakable
             .in(.startRoom)
-        )
 
         let game = MinimalGame(items: testItem)
 
@@ -355,13 +353,11 @@ struct GameEngineGameLoopTests {
 
     @Test("complete game session with multiple commands")
     func testCompleteGameSession() async throws {
-        let testItem = Item(
-            id: "coin",
-            .name("gold coin"),
-            .description("A shiny gold coin."),
-            .isTakable,
+        let testItem = Item("coin")
+            .name("gold coin")
+            .description("A shiny gold coin.")
+                .isTakable
             .in(.startRoom)
-        )
 
         let game = MinimalGame(items: testItem)
 
@@ -420,12 +416,10 @@ struct GameEngineGameLoopTests {
 
     @Test("game loop maintains state consistency")
     func testGameLoopStateConsistency() async throws {
-        let testItem = Item(
-            id: "testItem",
-            .name("test item"),
-            .isTakable,
+        let testItem = Item("testItem")
+            .name("test item")
+                .isTakable
             .in(.startRoom)
-        )
 
         let game = MinimalGame(items: testItem)
 

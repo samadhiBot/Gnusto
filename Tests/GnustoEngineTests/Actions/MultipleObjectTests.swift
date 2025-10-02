@@ -10,18 +10,15 @@ struct MultipleObjectTests {
 
     @Test("EXAMINE ALL works correctly")
     func testExamineAll() async throws {
-        let sword = Item(
-            id: "sword",
-            .name("sword"),
-            .in(.startRoom),
+        let sword = Item("sword")
+            .name("sword")
+            .in(.startRoom)
             .description("A sharp blade.")
-        )
-        let lantern = Item(
-            id: "lantern",
-            .name("lantern"),
-            .in(.startRoom),
+
+        let lantern = Item("lantern")
+            .name("lantern")
+            .in(.startRoom)
             .description("A bright light.")
-        )
 
         let game = MinimalGame(items: sword, lantern)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
@@ -41,18 +38,15 @@ struct MultipleObjectTests {
 
     @Test("EXAMINE SWORD AND LANTERN works correctly")
     func testExamineSwordAndLantern() async throws {
-        let sword = Item(
-            id: "sword",
-            .name("sword"),
-            .in(.startRoom),
+        let sword = Item("sword")
+            .name("sword")
+            .in(.startRoom)
             .description("A sharp blade.")
-        )
-        let lantern = Item(
-            id: "lantern",
-            .name("lantern"),
-            .in(.startRoom),
+
+        let lantern = Item("lantern")
+            .name("lantern")
+            .in(.startRoom)
             .description("A bright light.")
-        )
 
         let game = MinimalGame(items: sword, lantern)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
@@ -74,22 +68,18 @@ struct MultipleObjectTests {
 
     @Test("GIVE ALL TO MERCHANT works correctly")
     func testGiveAllToMerchant() async throws {
-        let coin = Item(
-            id: "coin",
-            .name("coin"),
+        let coin = Item("coin")
+            .name("coin")
             .in(.player)
-        )
-        let gem = Item(
-            id: "gem",
-            .name("gem"),
+
+        let gem = Item("gem")
+            .name("gem")
             .in(.player)
-        )
-        let merchant = Item(
-            id: "merchant",
-            .name("merchant"),
-            .in(.startRoom),
+
+        let merchant = Item("merchant")
+            .name("merchant")
+            .in(.startRoom)
             .characterSheet(.default)
-        )
 
         let game = MinimalGame(
             items: coin, gem, merchant
@@ -116,22 +106,16 @@ struct MultipleObjectTests {
 
     @Test("GIVE COIN AND GEM TO MERCHANT works correctly")
     func testGiveCoinAndGemToMerchant() async throws {
-        let coin = Item(
-            id: "coin",
-            .name("coin"),
+        let coin = Item("coin")
+            .name("coin")
             .in(.player)
-        )
-        let gem = Item(
-            id: "gem",
-            .name("gem"),
+        let gem = Item("gem")
+            .name("gem")
             .in(.player)
-        )
-        let merchant = Item(
-            id: "merchant",
-            .name("merchant"),
-            .in(.startRoom),
-            .characterSheet(.init())
-        )
+        let merchant = Item("merchant")
+            .name("merchant")
+            .in(.startRoom)
+            .characterSheet(.default)
 
         let game = MinimalGame(
             items: coin, gem, merchant
@@ -160,23 +144,17 @@ struct MultipleObjectTests {
 
     @Test("PUT ALL IN BOX works correctly")
     func testPutAllInBox() async throws {
-        let coin = Item(
-            id: "coin",
-            .name("coin"),
+        let coin = Item("coin")
+            .name("coin")
             .in(.player)
-        )
-        let gem = Item(
-            id: "gem",
-            .name("gem"),
+        let gem = Item("gem")
+            .name("gem")
             .in(.player)
-        )
-        let box = Item(
-            id: "box",
-            .name("box"),
-            .in(.startRoom),
-            .isContainer,
+        let box = Item("box")
+            .name("box")
+            .in(.startRoom)
+            .isContainer
             .isOpen
-        )
 
         let game = MinimalGame(items: coin, gem, box)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
@@ -201,23 +179,17 @@ struct MultipleObjectTests {
 
     @Test("PUT COIN AND GEM IN BOX works correctly")
     func testPutCoinAndGemInBox() async throws {
-        let coin = Item(
-            id: "coin",
-            .name("coin"),
+        let coin = Item("coin")
+            .name("coin")
             .in(.player)
-        )
-        let gem = Item(
-            id: "gem",
-            .name("gem"),
+        let gem = Item("gem")
+            .name("gem")
             .in(.player)
-        )
-        let box = Item(
-            id: "box",
-            .name("box"),
-            .in(.startRoom),
-            .isContainer,
+        let box = Item("box")
+            .name("box")
+            .in(.startRoom)
+            .isContainer
             .isOpen
-        )
 
         let game = MinimalGame(items: coin, gem, box)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
@@ -244,18 +216,14 @@ struct MultipleObjectTests {
 
     @Test("TAKE ALL works correctly")
     func testTakeAll() async throws {
-        let goblet = Item(
-            id: "goblet",
-            .name("goblet"),
-            .in(.startRoom),
+        let goblet = Item("goblet")
+            .name("goblet")
+            .in(.startRoom)
             .isTakable
-        )
-        let scepter = Item(
-            id: "scepter",
-            .name("scepter"),
-            .in(.startRoom),
+        let scepter = Item("scepter")
+            .name("scepter")
+            .in(.startRoom)
             .isTakable
-        )
 
         let game = MinimalGame(
             items: goblet, scepter
@@ -276,18 +244,14 @@ struct MultipleObjectTests {
 
     @Test("TAKE BUTTON AND LEVER works correctly")
     func testTakeButtonAndLever() async throws {
-        let goblet = Item(
-            id: "goblet",
-            .name("goblet"),
-            .in(.startRoom),
+        let goblet = Item("goblet")
+            .name("goblet")
+            .in(.startRoom)
             .isTakable
-        )
-        let scepter = Item(
-            id: "scepter",
-            .name("scepter"),
-            .in(.startRoom),
+        let scepter = Item("scepter")
+            .name("scepter")
+            .in(.startRoom)
             .isTakable
-        )
 
         let game = MinimalGame(
             items: goblet, scepter
@@ -310,16 +274,12 @@ struct MultipleObjectTests {
 
     @Test("Multiple objects with unsupported verb fails gracefully")
     func testMultipleObjectsWithUnsupportedVerb() async throws {
-        let sword = Item(
-            id: "sword",
-            .name("sword"),
+        let sword = Item("sword")
+            .name("sword")
             .in(.startRoom)
-        )
-        let lantern = Item(
-            id: "lantern",
-            .name("lantern"),
+        let lantern = Item("lantern")
+            .name("lantern")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(items: sword, lantern)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
@@ -338,11 +298,9 @@ struct MultipleObjectTests {
 
     @Test("ALL with no applicable items handles gracefully")
     func testAllWithNoApplicableItems() async throws {
-        let fountain = Item(
-            id: .startItem,
-            .name("fountain"),
+        let fountain = Item(.startItem)
+            .name("fountain")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(items: fountain)
 

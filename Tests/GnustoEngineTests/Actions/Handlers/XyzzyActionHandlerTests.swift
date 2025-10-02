@@ -31,12 +31,10 @@ struct XyzzyActionHandlerTests {
     @Test("XYZZY works in dark rooms")
     func testXyzzyWorksInDarkRooms() async throws {
         // Given: Dark room (to verify light is not required)
-        let darkRoom = Location(
-            id: "darkRoom",
-            .name("Dark Room"),
+        let darkRoom = Location("darkRoom")
+            .name("Dark Room")
             .description("A pitch black room.")
             // Note: No .inherentlyLit property
-        )
 
         let game = MinimalGame(
             player: Player(in: "darkRoom"),
@@ -60,15 +58,13 @@ struct XyzzyActionHandlerTests {
     @Test("XYZZY doesn't modify game state")
     func testXyzzyNoStateChanges() async throws {
         // Given
-        let lamp = Item(
-            id: "lamp",
-            .name("brass lamp"),
-            .description("A shiny brass lamp."),
-            .isLightSource,
-            .isDevice,
-            .isTakable,
+        let lamp = Item("lamp")
+            .name("brass lamp")
+            .description("A shiny brass lamp.")
+            .isLightSource
+            .isDevice
+            .isTakable
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: lamp

@@ -3,298 +3,250 @@ import GnustoEngine
 // MARK: - Inside the House
 
 enum InsideHouse {
-    static let attic = Location(
-        id: .attic,
-        .name("Attic"),
+    static let attic = Location(.attic)
+        .name("Attic")
         .description(
             """
             This is the attic. The only exit is a stairway leading down.
             """
-        ),
-        .exits(
-            .down(.kitchen, via: .stairs)
-        ),
+        )
+        .down(.kitchen, via: .stairs)
         .localGlobals(.stairs)
-    )
 
-    static let kitchen = Location(
-        id: .kitchen,
-        .name("Kitchen"),
-        .exits(
-            .west(.livingRoom),
-            .up(.attic, via: .stairs)
-            // Note: EAST and OUT exits to east-of-house conditional on kitchen window being open
-            // Note: DOWN exit to studio conditional on FALSE-FLAG
-        ),
-        .inherentlyLit,
+    static let kitchen = Location(.kitchen)
+        .name("Kitchen")
+        .west(.livingRoom)
+        .up(.attic, via: .stairs)
+        // Note: EAST and OUT exits to east-of-house conditional on kitchen window being open
+        // Note: DOWN exit to studio conditional on FALSE-FLAG
+        .inherentlyLit
         .localGlobals(.kitchenWindow, .chimney, .stairs)
-    )
 
-    static let livingRoom = Location(
-        id: .livingRoom,
-        .name("Living Room"),
+    static let livingRoom = Location(.livingRoom)
+        .name("Living Room")
         .description(
             """
             You are in the living room. There is a doorway to the east, a wooden door with
             strange gothic lettering to the west, which appears to be nailed shut, a trophy case,
             and a large oriental rug in the center of the room.
             """
-        ),
-        .exits(
-            .east(.kitchen),
-            .west(blocked: "The door is nailed shut."),
-            .down(.cellar, via: .trapDoor)
-        ),
-        .inherentlyLit,
+        )
+        .east(.kitchen)
+        .west("The door is nailed shut.")
+        .down(.cellar, via: .trapDoor)
+        .inherentlyLit
         .localGlobals(.stairs)
-    )
 }
 
 // MARK: - Items
 
 extension InsideHouse {
-    static let atticTable = Item(
-        id: .atticTable,
-        .name("table"),
-        .synonyms("table"),
-        .omitDescription,
-        .isContainer,
-        .isOpen,
-        .isSurface,
-        .capacity(40),
+    static let atticTable = Item(.atticTable)
+        .name("table")
+        .synonyms("table")
+        .omitDescription
+        .isContainer
+        .isOpen
+        .isSurface
+        .capacity(40)
         .in(.attic)
-    )
 
-    static let bottle = Item(
-        id: .bottle,
-        .name("glass bottle"),
-        .synonyms("bottle", "container"),
-        .adjectives("clear", "glass"),
-        .isTakable,
-        .isTransparent,
-        .isContainer,
-        .isOpenable,
-        .firstDescription("A bottle is sitting on the table."),
-        .capacity(4),
+    static let bottle = Item(.bottle)
+        .name("glass bottle")
+        .synonyms("bottle", "container")
+        .adjectives("clear", "glass")
+        .isTakable
+        .isTransparent
+        .isContainer
+        .isOpenable
+        .firstDescription("A bottle is sitting on the table.")
+        .capacity(4)
         .in(.item(.kitchenTable))
-        // Note: Has action handler BOTTLE-FUNCTION
-    )
+    // Note: Has action handler BOTTLE-FUNCTION
 
-    static let chimney = Item(
-        id: .chimney,
-        .name("chimney"),
-        .description("The chimney leads upward, and looks climbable."),
-        .adjectives("dark", "narrow"),
-        .synonyms("chimney"),
-        .in(.kitchen),
-        .omitDescription,
-        .isClimbable
-    )
-
-    static let garlic = Item(
-        id: .garlic,
-        .name("clove of garlic"),
-        .synonyms("garlic", "clove"),
-        .isTakable,
-        .isEdible,
-        .size(4),
-        .in(.item(.sandwichBag))
-        // Note: Has action handler GARLIC-F
-    )
-
-    static let kitchenTable = Item(
-        id: .kitchenTable,
-        .name("kitchen table"),
-        .synonyms("table"),
-        .adjectives("kitchen"),
-        .omitDescription,
-        .isContainer,
-        .isOpen,
-        .isSurface,
-        .capacity(50),
+    static let chimney = Item(.chimney)
+        .name("chimney")
+        .description("The chimney leads upward, and looks climbable.")
+        .adjectives("dark", "narrow")
+        .synonyms("chimney")
         .in(.kitchen)
-    )
+        .omitDescription
+        .isClimbable
 
-    static let knife = Item(
-        id: .knife,
-        .name("nasty knife"),
-        .synonyms("knives", "knife", "blade"),
-        .adjectives("nasty", "unrusty"),
-        .isTakable,
-        .isWeapon,
-        .requiresTryTake,
-        .firstDescription("On a table is a nasty-looking knife."),
+    static let garlic = Item(.garlic)
+        .name("clove of garlic")
+        .synonyms("garlic", "clove")
+        .isTakable
+        .isEdible
+        .size(4)
+        .in(.item(.sandwichBag))
+    // Note: Has action handler GARLIC-F
+
+    static let kitchenTable = Item(.kitchenTable)
+        .name("kitchen table")
+        .synonyms("table")
+        .adjectives("kitchen")
+        .omitDescription
+        .isContainer
+        .isOpen
+        .isSurface
+        .capacity(50)
+        .in(.kitchen)
+
+    static let knife = Item(.knife)
+        .name("nasty knife")
+        .synonyms("knives", "knife", "blade")
+        .adjectives("nasty", "unrusty")
+        .isTakable
+        .isWeapon
+        .requiresTryTake
+        .firstDescription("On a table is a nasty-looking knife.")
         .in(.item(.atticTable))
         // Note: Has action handler KNIFE-F
-    )
 
-    static let lamp = Item(
-        id: .lamp,
-        .name("brass lantern"),
-        .synonyms("lamp", "lantern", "light"),
-        .adjectives("brass"),
-        .isTakable,
-        .isLightSource,
-        .isDevice,
-        .isSelfIgnitable,
-        .firstDescription("A battery-powered brass lantern is on the trophy case."),
-        .description("There is a brass lantern (battery-powered) here."),
-        .size(15),
+    static let lamp = Item(.lamp)
+        .name("brass lantern")
+        .synonyms("lamp", "lantern", "light")
+        .adjectives("brass")
+        .isTakable
+        .isLightSource
+        .isDevice
+        .isSelfIgnitable
+        .firstDescription("A battery-powered brass lantern is on the trophy case.")
+        .description("There is a brass lantern (battery-powered) here.")
+        .size(15)
         .in(.livingRoom)
         // Note: Has action handler LANTERN
-    )
 
-    static let lunch = Item(
-        id: .lunch,
-        .name("lunch"),
-        .synonyms("food", "sandwich", "lunch", "dinner"),
-        .adjectives("hot", "pepper"),
-        .isTakable,
-        .isEdible,
-        .description("A hot pepper sandwich is here."),
+    static let lunch = Item(.lunch)
+        .name("lunch")
+        .synonyms("food", "sandwich", "lunch", "dinner")
+        .adjectives("hot", "pepper")
+        .isTakable
+        .isEdible
+        .description("A hot pepper sandwich is here.")
         .in(.item(.sandwichBag))
-    )
 
-    static let map = Item(
-        id: .map,
-        .name("ancient map"),
-        .synonyms("parchment", "map"),
-        .adjectives("antique", "old", "ancient"),
-        .isInvisible,
-        .isReadable,
-        .isTakable,
-        .firstDescription("In the trophy case is an ancient parchment which appears to be a map."),
+    static let map = Item(.map)
+        .name("ancient map")
+        .synonyms("parchment", "map")
+        .adjectives("antique", "old", "ancient")
+        .isInvisible
+        .isReadable
+        .isTakable
+        .firstDescription("In the trophy case is an ancient parchment which appears to be a map.")
         .readText(
             """
             The map shows a forest with three clearings. The largest clearing contains
             a house. Three paths leave the large clearing. One of these paths, leading
             southwest, is marked "To Stone Barrow".
             """
-        ),
+        )
         .size(2)
-        // https://www.perplexity.ai/search/in-the-zork-1-source-code-at-h-cK9jApwqSb6EZONmBAkFqg
-        // In the historicalsource/zork1 source code, the map is in the trophy case from the start
-        // of the game. However in the final release, it only appears in the trophy case after all
-        // of the treasures have been found and deposited.
-        // .in(.item(.trophyCase))
-    )
+    // https://www.perplexity.ai/search/in-the-zork-1-source-code-at-h-cK9jApwqSb6EZONmBAkFqg
+    // In the historicalsource/zork1 source code, the map is in the trophy case from the start
+    // of the game. However in the final release, it only appears in the trophy case after all
+    // of the treasures have been found and deposited.
+    // .in(.item(.trophyCase))
 
-    static let rope = Item(
-        id: .rope,
-        .name("rope"),
-        .synonyms("rope", "hemp", "coil"),
-        .adjectives("large"),
-        .isTakable,
-        .requiresTryTake,
-        .firstDescription("A large coil of rope is lying in the corner."),
-        .size(10),
-        .in(.attic),
+    static let rope = Item(.rope)
+        .name("rope")
+        .synonyms("rope", "hemp", "coil")
+        .adjectives("large")
+        .isTakable
+        .requiresTryTake
+        .firstDescription("A large coil of rope is lying in the corner.")
+        .size(10)
+        .in(.attic)
         .isSacred
         // Note: Has action handler ROPE-FUNCTION, SACREDBIT
-    )
 
-    static let rug = Item(
-        id: .rug,
-        .name("carpet"),
-        .synonyms("rug", "carpet"),
-        .adjectives("large", "oriental"),
-        .omitDescription,
-        .requiresTryTake,
+    static let rug = Item(.rug)
+        .name("carpet")
+        .synonyms("rug", "carpet")
+        .adjectives("large", "oriental")
+        .omitDescription
+        .requiresTryTake
         .in(.livingRoom)
         // Note: Has action handler RUG-FCN
-    )
 
-    static let sandwichBag = Item(
-        id: .sandwichBag,
-        .name("brown sack"),
-        .synonyms("bag", "sack"),
-        .adjectives("brown", "elongated", "smelly"),
-        .isTakable,
-        .isContainer,
-        .isOpenable,
-        .isFlammable,
-        .firstDescription("On the table is an elongated brown sack, smelling of hot peppers."),
-        .capacity(9),
-        .size(9),
+    static let sandwichBag = Item(.sandwichBag)
+        .name("brown sack")
+        .synonyms("bag", "sack")
+        .adjectives("brown", "elongated", "smelly")
+        .isTakable
+        .isContainer
+        .isOpenable
+        .isFlammable
+        .firstDescription("On the table is an elongated brown sack, smelling of hot peppers.")
+        .capacity(9)
+        .size(9)
         .in(.item(.kitchenTable))
         // Note: Has action handler SANDWICH-BAG-FCN
-    )
 
-    static let sword = Item(
-        id: .sword,
-        .name("sword"),
-        .synonyms("sword", "orcrist", "glamdring", "blade"),
-        .adjectives("elvish", "ancient", "antique"),
-        .isTakable,
-        .isWeapon,
-        .requiresTryTake,
-        .firstDescription("Above the trophy case hangs an elvish sword of great antiquity."),
-        .size(30),
+    static let sword = Item(.sword)
+        .name("sword")
+        .synonyms("sword", "orcrist", "glamdring", "blade")
+        .adjectives("elvish", "ancient", "antique")
+        .isTakable
+        .isWeapon
+        .requiresTryTake
+        .firstDescription("Above the trophy case hangs an elvish sword of great antiquity.")
+        .size(30)
         .in(.livingRoom)
         // Note: Has action handler SWORD-FCN, TVALUE 0
-    )
 
-    static let trapDoor = Item(
-        id: .trapDoor,
-        .name("trap door"),
-        .synonyms("door", "trapdoor", "trap-door", "cover"),
-        .adjectives("trap", "dusty"),
+    static let trapDoor = Item(.trapDoor)
+        .name("trap door")
+        .synonyms("door", "trapdoor", "trap-door", "cover")
+        .adjectives("trap", "dusty")
 
-        .omitDescription,
-        .isInvisible,
+        .omitDescription
+        .isInvisible
         .in(.livingRoom)
         // Note: Has action handler TRAP-DOOR-FCN
-    )
 
-    static let trophyCase = Item(
-        id: .trophyCase,
-        .name("trophy case"),
-        .synonyms("case"),
-        .adjectives("trophy"),
-        .isTransparent,
-        .isContainer,
-        .omitDescription,
-        .requiresTryTake,
-        .isSearchable,
-        .capacity(10_000),
+    static let trophyCase = Item(.trophyCase)
+        .name("trophy case")
+        .synonyms("case")
+        .adjectives("trophy")
+        .isTransparent
+        .isContainer
+        .omitDescription
+        .requiresTryTake
+        .isSearchable
+        .capacity(10_000)
         .in(.livingRoom)
         // Note: Has action handler TROPHY-CASE-FCN
-    )
 
-    static let water = Item(
-        id: .water,
-        .name("quantity of water"),
-        .description("It's just water."),
-        .synonyms("water", "h2o", "liquid"),
-        .in(.item(.bottle)),
-        .isTakable,
-        .isEdible,
+    static let water = Item(.water)
+        .name("quantity of water")
+        .description("It's just water.")
+        .synonyms("water", "h2o", "liquid")
+        .in(.item(.bottle))
+        .isTakable
+        .isEdible
         .isDrinkable
-    )
 
-    static let woodenDoor = Item(
-        id: .woodenDoor,
-        .name("wooden door"),
-        .synonyms("door", "lettering", "writing"),
-        .adjectives("wooden", "gothic", "strange", "west"),
-        .isReadable,
+    static let woodenDoor = Item(.woodenDoor)
+        .name("wooden door")
+        .synonyms("door", "lettering", "writing")
+        .adjectives("wooden", "gothic", "strange", "west")
+        .isReadable
 
-        .omitDescription,
-        .isTransparent,
-        .readText("The engravings translate to \"This space intentionally left blank.\""),
+        .omitDescription
+        .isTransparent
+        .readText("The engravings translate to \"This space intentionally left blank.\"")
         .in(.livingRoom)
         // Note: Has action handler FRONT-DOOR-FCN
-    )
 
-    static let brokenLamp = Item(
-        id: .brokenLamp,
-        .name("broken lamp"),
-        .synonyms("lamp", "lantern", "light"),
-        .adjectives("broken", "smashed"),
-        .description("There is a broken lamp here."),
-        .size(15),
+    static let brokenLamp = Item(.brokenLamp)
+        .name("broken lamp")
+        .synonyms("lamp", "lantern", "light")
+        .adjectives("broken", "smashed")
+        .description("There is a broken lamp here.")
+        .size(15)
         .in(.nowhere)
-    )
 }
 
 // MARK: - Computers
@@ -414,13 +366,13 @@ extension InsideHouse {
             let isOn = await context.item.hasFlag(.isOn)
 
             let statusMessage =
-                if isBurnedOut {
-                    "has burned out."
-                } else if isOn {
-                    "is on."
-                } else {
-                    "is turned off."
-                }
+            if isBurnedOut {
+                "has burned out."
+            } else if isOn {
+                "is on."
+            } else {
+                "is turned off."
+            }
 
             return ActionResult("The lamp \(statusMessage)")
         }

@@ -11,22 +11,18 @@ struct LockActionHandlerTests {
     @Test("LOCK DIRECTOBJECT syntax works")
     func testLockDirectObjectSyntax() async throws {
         // Given
-        let door = Item(
-            id: "door",
-            .name("wooden door"),
-            .description("A wooden door."),
-            .isLockable,
-            .lockKey("key"),
+        let door = Item("door")
+            .name("wooden door")
+            .description("A wooden door.")
+            .isLockable
+            .lockKey("key")
             .in(.startRoom)
-        )
 
-        let key = Item(
-            id: "key",
-            .name("brass key"),
-            .description("A brass key."),
-            .isTakable,
+        let key = Item("key")
+            .name("brass key")
+            .description("A brass key.")
+            .isTakable
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: door, key
@@ -49,23 +45,19 @@ struct LockActionHandlerTests {
     @Test("LOCK DIRECTOBJECT WITH INDIRECTOBJECT syntax works")
     func testLockDirectObjectWithIndirectObjectSyntax() async throws {
         // Given
-        let chest = Item(
-            id: "chest",
-            .name("treasure chest"),
-            .description("A treasure chest."),
-            .isContainer,
-            .isLockable,
-            .lockKey("key"),
+        let chest = Item("chest")
+            .name("treasure chest")
+            .description("A treasure chest.")
+            .isContainer
+            .isLockable
+            .lockKey("key")
             .in(.startRoom)
-        )
 
-        let key = Item(
-            id: "key",
-            .name("golden key"),
-            .description("A golden key."),
-            .isTakable,
+        let key = Item("key")
+            .name("golden key")
+            .description("A golden key.")
+            .isTakable
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: chest, key
@@ -114,14 +106,12 @@ struct LockActionHandlerTests {
     @Test("Cannot lock without specifying key")
     func testCannotLockWithoutSpecifyingKey() async throws {
         // Given
-        let door = Item(
-            id: "door",
-            .name("iron door"),
-            .description("An iron door."),
-            .isLockable,
-            .lockKey("key"),
+        let door = Item("door")
+            .name("iron door")
+            .description("An iron door.")
+            .isLockable
+            .lockKey("key")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: door
@@ -144,22 +134,18 @@ struct LockActionHandlerTests {
     @Test("Cannot lock with key not held")
     func testCannotLockWithKeyNotHeld() async throws {
         // Given
-        let door = Item(
-            id: "door",
-            .name("oak door"),
-            .description("An oak door."),
-            .isLockable,
-            .lockKey("key"),
+        let door = Item("door")
+            .name("oak door")
+            .description("An oak door.")
+            .isLockable
+            .lockKey("key")
             .in(.startRoom)
-        )
 
-        let key = Item(
-            id: "key",
-            .name("silver key"),
-            .description("A silver key."),
-            .isTakable,
+        let key = Item("key")
+            .name("silver key")
+            .description("A silver key.")
+            .isTakable
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: door, key
@@ -182,28 +168,22 @@ struct LockActionHandlerTests {
     @Test("Cannot lock target not in scope")
     func testCannotLockTargetNotInScope() async throws {
         // Given
-        let anotherRoom = Location(
-            id: "anotherRoom",
-            .name("Another Room"),
-            .inherentlyLit
-        )
+        let anotherRoom = Location("anotherRoom")
+            .name("Another Room")
+                .inherentlyLit
 
-        let remoteDoor = Item(
-            id: "remoteDoor",
-            .name("distant door"),
-            .description("A door in another room."),
-            .isLockable,
-            .lockKey("key"),
+        let remoteDoor = Item("remoteDoor")
+            .name("distant door")
+            .description("A door in another room.")
+            .isLockable
+            .lockKey("key")
             .in("anotherRoom")
-        )
 
-        let key = Item(
-            id: "key",
-            .name("brass key"),
-            .description("A brass key."),
-            .isTakable,
+        let key = Item("key")
+            .name("brass key")
+            .description("A brass key.")
+            .isTakable
             .in(.player)
-        )
 
         let game = MinimalGame(
             locations: anotherRoom,
@@ -227,20 +207,16 @@ struct LockActionHandlerTests {
     @Test("Cannot lock non-lockable item")
     func testCannotLockNonLockableItem() async throws {
         // Given
-        let rock = Item(
-            id: "rock",
-            .name("large rock"),
-            .description("A large boulder."),
+        let rock = Item("rock")
+            .name("large rock")
+            .description("A large boulder.")
             .in(.startRoom)
-        )
 
-        let key = Item(
-            id: "key",
-            .name("brass key"),
-            .description("A brass key."),
-            .isTakable,
+        let key = Item("key")
+            .name("brass key")
+            .description("A brass key.")
+            .isTakable
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: rock, key
@@ -263,22 +239,18 @@ struct LockActionHandlerTests {
     @Test("Cannot lock with wrong key")
     func testCannotLockWithWrongKey() async throws {
         // Given
-        let door = Item(
-            id: "door",
-            .name("secure door"),
-            .description("A secure door."),
-            .isLockable,
-            .lockKey("correctKey"),
+        let door = Item("door")
+            .name("secure door")
+            .description("A secure door.")
+            .isLockable
+            .lockKey("correctKey")
             .in(.startRoom)
-        )
 
-        let wrongKey = Item(
-            id: "wrongKey",
-            .name("wrong key"),
-            .description("A key that doesn't fit."),
-            .isTakable,
+        let wrongKey = Item("wrongKey")
+            .name("wrong key")
+            .description("A key that doesn't fit.")
+            .isTakable
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: door, wrongKey
@@ -302,29 +274,23 @@ struct LockActionHandlerTests {
     @Test("Requires light to lock")
     func testRequiresLight() async throws {
         // Given: Dark room with lockable item
-        let darkRoom = Location(
-            id: "darkRoom",
-            .name("Dark Room"),
+        let darkRoom = Location("darkRoom")
+            .name("Dark Room")
             .description("A pitch black room.")
             // Note: No .inherentlyLit property
-        )
 
-        let door = Item(
-            id: "door",
-            .name("mysterious door"),
-            .description("A mysterious door."),
-            .isLockable,
-            .lockKey("key"),
+        let door = Item("door")
+            .name("mysterious door")
+            .description("A mysterious door.")
+            .isLockable
+            .lockKey("key")
             .in("darkRoom")
-        )
 
-        let key = Item(
-            id: "key",
-            .name("glowing key"),
-            .description("A glowing key."),
-            .isTakable,
+        let key = Item("key")
+            .name("glowing key")
+            .description("A glowing key.")
+            .isTakable
             .in(.player)
-        )
 
         let game = MinimalGame(
             player: Player(in: "darkRoom"),
@@ -352,23 +318,19 @@ struct LockActionHandlerTests {
     @Test("Lock item successfully")
     func testLockItemSuccessfully() async throws {
         // Given
-        let safe = Item(
-            id: "safe",
-            .name("metal safe"),
-            .description("A metal safe."),
-            .isContainer,
-            .isLockable,
-            .lockKey("combination"),
+        let safe = Item("safe")
+            .name("metal safe")
+            .description("A metal safe.")
+            .isContainer
+            .isLockable
+            .lockKey("combination")
             .in(.startRoom)
-        )
 
-        let combination = Item(
-            id: "combination",
-            .name("combination code"),
-            .description("A piece of paper with the combination."),
-            .isTakable,
+        let combination = Item("combination")
+            .name("combination code")
+            .description("A piece of paper with the combination.")
+            .isTakable
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: safe, combination
@@ -398,23 +360,19 @@ struct LockActionHandlerTests {
     @Test("Lock already locked item gives appropriate message")
     func testLockAlreadyLockedItem() async throws {
         // Given
-        let door = Item(
-            id: "door",
-            .name("locked door"),
-            .description("A locked door."),
-            .isLockable,
-            .isLocked,
-            .lockKey("key"),
+        let door = Item("door")
+            .name("locked door")
+            .description("A locked door.")
+            .isLockable
+            .isLocked
+            .lockKey("key")
             .in(.startRoom)
-        )
 
-        let key = Item(
-            id: "key",
-            .name("brass key"),
-            .description("A brass key."),
-            .isTakable,
+        let key = Item("key")
+            .name("brass key")
+            .description("A brass key.")
+            .isTakable
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: door, key
@@ -441,23 +399,19 @@ struct LockActionHandlerTests {
     @Test("Lock sets touched flag on both items")
     func testLockSetsTouchedFlagOnBothItems() async throws {
         // Given
-        let box = Item(
-            id: "box",
-            .name("jewelry box"),
-            .description("A jewelry box."),
-            .isContainer,
-            .isLockable,
-            .lockKey("tinyKey"),
+        let box = Item("box")
+            .name("jewelry box")
+            .description("A jewelry box.")
+            .isContainer
+            .isLockable
+            .lockKey("tinyKey")
             .in(.startRoom)
-        )
 
-        let tinyKey = Item(
-            id: "tinyKey",
-            .name("tiny key"),
-            .description("A tiny key."),
-            .isTakable,
+        let tinyKey = Item("tinyKey")
+            .name("tiny key")
+            .description("A tiny key.")
+            .isTakable
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: box, tinyKey
@@ -487,40 +441,32 @@ struct LockActionHandlerTests {
     @Test("Lock multiple different items")
     func testLockMultipleDifferentItems() async throws {
         // Given
-        let door = Item(
-            id: "door",
-            .name("front door"),
-            .description("The front door."),
-            .isLockable,
-            .lockKey("doorKey"),
+        let door = Item("door")
+            .name("front door")
+            .description("The front door.")
+            .isLockable
+            .lockKey("doorKey")
             .in(.startRoom)
-        )
 
-        let chest = Item(
-            id: "chest",
-            .name("storage chest"),
-            .description("A storage chest."),
-            .isContainer,
-            .isLockable,
-            .lockKey("chestKey"),
+        let chest = Item("chest")
+            .name("storage chest")
+            .description("A storage chest.")
+            .isContainer
+            .isLockable
+            .lockKey("chestKey")
             .in(.startRoom)
-        )
 
-        let doorKey = Item(
-            id: "doorKey",
-            .name("door key"),
-            .description("A key for the door."),
-            .isTakable,
+        let doorKey = Item("doorKey")
+            .name("door key")
+            .description("A key for the door.")
+            .isTakable
             .in(.player)
-        )
 
-        let chestKey = Item(
-            id: "chestKey",
-            .name("chest key"),
-            .description("A key for the chest."),
-            .isTakable,
+        let chestKey = Item("chestKey")
+            .name("chest key")
+            .description("A key for the chest.")
+            .isTakable
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: door, chest, doorKey, chestKey
@@ -560,23 +506,19 @@ struct LockActionHandlerTests {
     @Test("Lock item with special key types")
     func testLockItemWithSpecialKeyTypes() async throws {
         // Given
-        let magicBox = Item(
-            id: "magicBox",
-            .name("magic box"),
-            .description("A magic box."),
-            .isContainer,
-            .isLockable,
-            .lockKey("crystal"),
+        let magicBox = Item("magicBox")
+            .name("magic box")
+            .description("A magic box.")
+            .isContainer
+            .isLockable
+            .lockKey("crystal")
             .in(.startRoom)
-        )
 
-        let crystal = Item(
-            id: "crystal",
-            .name("magic crystal"),
-            .description("A magic crystal that serves as a key."),
-            .isTakable,
+        let crystal = Item("crystal")
+            .name("magic crystal")
+            .description("A magic crystal that serves as a key.")
+            .isTakable
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: magicBox, crystal
@@ -602,22 +544,18 @@ struct LockActionHandlerTests {
     @Test("Lock attempts with non-key items fail")
     func testLockAttemptsWithNonKeyItemsFail() async throws {
         // Given
-        let door = Item(
-            id: "door",
-            .name("heavy door"),
-            .description("A heavy door."),
-            .isLockable,
-            .lockKey("properKey"),
+        let door = Item("door")
+            .name("heavy door")
+            .description("A heavy door.")
+            .isLockable
+            .lockKey("properKey")
             .in(.startRoom)
-        )
 
-        let stick = Item(
-            id: "stick",
-            .name("wooden stick"),
-            .description("A wooden stick."),
-            .isTakable,
+        let stick = Item("stick")
+            .name("wooden stick")
+            .description("A wooden stick.")
+            .isTakable
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: door, stick

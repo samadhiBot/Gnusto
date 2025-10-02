@@ -42,23 +42,19 @@ struct ErrorHandlingIntegrationTests {
     @Test("Parser handles ambiguous references correctly")
     func testParserAmbiguousReferences() async throws {
         // Given
-        let redBook = Item(
-            id: "redBook",
-            .name("book"),
-            .adjectives("red"),
-            .description("A red book."),
-            .isTakable,
+        let redBook = Item("redBook")
+            .name("book")
+            .adjectives("red")
+            .description("A red book.")
+            .isTakable
             .in(.startRoom)
-        )
 
-        let blueBook = Item(
-            id: "blueBook",
-            .name("book"),
-            .adjectives("blue"),
-            .description("A blue book."),
-            .isTakable,
+        let blueBook = Item("blueBook")
+            .name("book")
+            .adjectives("blue")
+            .description("A blue book.")
+            .isTakable
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: redBook, blueBook
@@ -83,24 +79,20 @@ struct ErrorHandlingIntegrationTests {
     @Test("Container interactions handle invalid operations")
     func testContainerErrorHandling() async throws {
         // Given
-        let closedBox = Item(
-            id: "closedBox",
-            .name("wooden box"),
-            .description("A sturdy wooden box."),
-            .isContainer,
-            .isOpenable,
-            .isTakable,
+        let closedBox = Item("closedBox")
+            .name("wooden box")
+            .description("A sturdy wooden box.")
+            .isContainer
+            .isOpenable
+            .isTakable
             .in(.startRoom)
             // Starts closed
-        )
 
-        let heavyRock = Item(
-            id: "heavyRock",
-            .name("heavy rock"),
-            .description("An immovable boulder."),
+        let heavyRock = Item("heavyRock")
+            .name("heavy rock")
+            .description("An immovable boulder.")
             .in(.startRoom)
             // Not takable
-        )
 
         let game = MinimalGame(
             items: closedBox, heavyRock
@@ -133,26 +125,22 @@ struct ErrorHandlingIntegrationTests {
     @Test("Capacity limits are enforced correctly")
     func testCapacityLimitErrorHandling() async throws {
         // Given
-        let smallBag = Item(
-            id: "smallBag",
-            .name("small bag"),
-            .description("A very small bag."),
-            .isContainer,
-            .isOpenable,
-            .isOpen,
-            .isTakable,
-            .capacity(2),
+        let smallBag = Item("smallBag")
+            .name("small bag")
+            .description("A very small bag.")
+            .isContainer
+            .isOpenable
+            .isOpen
+            .isTakable
+            .capacity(2)
             .in(.player)
-        )
 
-        let largeBook = Item(
-            id: "largeBook",
-            .name("large book"),
-            .description("An enormous tome."),
-            .isTakable,
-            .size(5),  // Too big for the bag
+        let largeBook = Item("largeBook")
+            .name("large book")
+            .description("An enormous tome.")
+            .isTakable
+            .size(5)  // Too big for the bag
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: smallBag, largeBook
@@ -183,14 +171,12 @@ struct ErrorHandlingIntegrationTests {
         formatter.numberStyle = .ordinal
         for i in 1...20 {
             items.append(
-                Item(
-                    id: ItemID("item\(i)"),
-                    .name("\(formatter.string(from: i as NSNumber) ?? "nth") heavy item"),
-                    .description("A heavy item."),
-                    .isTakable,
-                    .size(10),  // Large items
+                Item(ItemID("item\(i)"))
+                    .name("\(formatter.string(from: i as NSNumber) ?? "nth") heavy item")
+                    .description("A heavy item.")
+                    .isTakable
+                    .size(10)  // Large items
                     .in(.startRoom)
-                )
             )
         }
 
@@ -221,13 +207,11 @@ struct ErrorHandlingIntegrationTests {
     @Test("Movement errors are handled appropriately")
     func testMovementErrorHandling() async throws {
         // Given
-        let isolatedRoom = Location(
-            id: "isolatedRoom",
-            .name("Isolated Room"),
-            .description("A room with no exits."),
+        let isolatedRoom = Location("isolatedRoom")
+            .name("Isolated Room")
+            .description("A room with no exits.")
             .inherentlyLit
             // No exits defined
-        )
 
         let game = MinimalGame(
             player: Player(in: "isolatedRoom"),
@@ -259,20 +243,16 @@ struct ErrorHandlingIntegrationTests {
     @Test("Darkness handling works correctly")
     func testDarknessErrorHandling() async throws {
         // Given
-        let darkRoom = Location(
-            id: "darkRoom",
-            .name("Dark Room"),
+        let darkRoom = Location("darkRoom")
+            .name("Dark Room")
             .description("A pitch black room.")
             // No inherent lighting
-        )
 
-        let hiddenItem = Item(
-            id: "hiddenItem",
-            .name("hidden treasure"),
-            .description("Treasure hidden in the darkness."),
-            .isTakable,
+        let hiddenItem = Item("hiddenItem")
+            .name("hidden treasure")
+            .description("Treasure hidden in the darkness.")
+            .isTakable
             .in("darkRoom")
-        )
 
         let game = MinimalGame(
             player: Player(in: "darkRoom"),
@@ -310,14 +290,12 @@ struct ErrorHandlingIntegrationTests {
     @Test("Device operations handle invalid states")
     func testDeviceErrorHandling() async throws {
         // Given
-        let brokenDevice = Item(
-            id: "brokenDevice",
-            .name("broken machine"),
-            .description("A machine that doesn't work."),
-            .isTakable,
+        let brokenDevice = Item("brokenDevice")
+            .name("broken machine")
+            .description("A machine that doesn't work.")
+            .isTakable
             .in(.startRoom)
             // Device but cannot be turned on/off
-        )
 
         let game = MinimalGame(
             items: brokenDevice
@@ -368,13 +346,11 @@ struct ErrorHandlingIntegrationTests {
     @Test("Game maintains consistency after error conditions")
     func testStateConsistencyAfterErrors() async throws {
         // Given
-        let testItem = Item(
-            id: "testItem",
-            .name("test item"),
-            .description("A test item."),
-            .isTakable,
+        let testItem = Item("testItem")
+            .name("test item")
+            .description("A test item.")
+            .isTakable
             .in(.startRoom)
-        )
 
         let game = MinimalGame(items: testItem)
 
@@ -459,23 +435,19 @@ struct ErrorHandlingIntegrationTests {
     @Test("Game handles boundary values correctly")
     func testBoundaryValues() async throws {
         // Given
-        let zeroSizeItem = Item(
-            id: "zeroSize",
-            .name("ethereal item"),
-            .description("An item with no physical presence."),
-            .isTakable,
-            .size(0),
+        let zeroSizeItem = Item("zeroSize")
+            .name("ethereal item")
+            .description("An item with no physical presence.")
+            .isTakable
+            .size(0)
             .in(.startRoom)
-        )
 
-        let hugeSizeItem = Item(
-            id: "hugeSize",
-            .name("enormous item"),
-            .description("An impossibly large item."),
-            .isTakable,
-            .size(Int.max),
+        let hugeSizeItem = Item("hugeSize")
+            .name("enormous item")
+            .description("An impossibly large item.")
+            .isTakable
+            .size(Int.max)
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: zeroSizeItem, hugeSizeItem
@@ -510,13 +482,11 @@ struct ErrorHandlingIntegrationTests {
     @Test("Game handles rapid command sequence correctly")
     func testRapidCommandSequence() async throws {
         // Given
-        let item = Item(
-            id: "item",
-            .name("test item"),
-            .description("A test item."),
-            .isTakable,
+        let item = Item("item")
+            .name("test item")
+            .description("A test item.")
+            .isTakable
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: item

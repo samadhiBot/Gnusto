@@ -29,12 +29,10 @@ struct SingActionHandlerTests {
     @Test("SERENADE DIRECTOBJECT syntax works")
     func testSerenadeDirectObjectSyntax() async throws {
         // Given
-        let box = Item(
-            id: "box",
-            .name("wooden box"),
-            .description("A simple wooden box."),
+        let box = Item("box")
+            .name("wooden box")
+            .description("A simple wooden box.")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: box
@@ -58,13 +56,11 @@ struct SingActionHandlerTests {
     @Test("SING TO CHARACTER syntax works")
     func testSingToCharacterSyntax() async throws {
         // Given
-        let wizard = Item(
-            id: "wizard",
-            .name("old wizard"),
-            .description("A wise old wizard with a long beard."),
-            .characterSheet(.wise),
+        let wizard = Item("wizard")
+            .name("old wizard")
+            .description("A wise old wizard with a long beard.")
+            .characterSheet(.wise)
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: wizard
@@ -111,11 +107,9 @@ struct SingActionHandlerTests {
     @Test("Sing works in dark rooms")
     func testSingWorksInDarkRooms() async throws {
         // Given: Dark room (no light required for singing)
-        let darkRoom = Location(
-            id: "darkRoom",
-            .name("Dark Room"),
+        let darkRoom = Location("darkRoom")
+            .name("Dark Room")
             .description("A pitch black room.")
-        )
 
         let game = MinimalGame(
             player: Player(in: "darkRoom"),

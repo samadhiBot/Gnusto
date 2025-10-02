@@ -11,14 +11,12 @@ struct OpenActionHandlerTests {
     @Test("OPEN DIRECTOBJECT syntax works")
     func testOpenDirectObjectSyntax() async throws {
         // Given
-        let chest = Item(
-            id: "chest",
-            .name("wooden chest"),
-            .description("A large wooden chest."),
-            .isContainer,
-            .isOpenable,
+        let chest = Item("chest")
+            .name("wooden chest")
+            .description("A large wooden chest.")
+            .isContainer
+            .isOpenable
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: chest
@@ -65,19 +63,15 @@ struct OpenActionHandlerTests {
     @Test("Cannot open target not in scope")
     func testCannotOpenTargetNotInScope() async throws {
         // Given
-        let anotherRoom = Location(
-            id: "anotherRoom",
-            .name("Another Room"),
+        let anotherRoom = Location("anotherRoom")
+            .name("Another Room")
             .inherentlyLit
-        )
 
-        let remoteDoor = Item(
-            id: "remoteDoor",
-            .name("remote door"),
-            .description("A door in another room."),
-            .isOpenable,
+        let remoteDoor = Item("remoteDoor")
+            .name("remote door")
+            .description("A door in another room.")
+            .isOpenable
             .in("anotherRoom")
-        )
 
         let game = MinimalGame(
             locations: anotherRoom,
@@ -101,12 +95,10 @@ struct OpenActionHandlerTests {
     @Test("Cannot open non-openable item")
     func testCannotOpenNonOpenableItem() async throws {
         // Given
-        let rock = Item(
-            id: "rock",
-            .name("large rock"),
-            .description("A massive boulder."),
+        let rock = Item("rock")
+            .name("large rock")
+            .description("A massive boulder.")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: rock
@@ -129,14 +121,12 @@ struct OpenActionHandlerTests {
     @Test("Cannot open locked item")
     func testCannotOpenLockedItem() async throws {
         // Given
-        let lockedBox = Item(
-            id: "lockedBox",
-            .name("locked box"),
-            .description("A box with a sturdy lock."),
-            .isOpenable,
-            .isLocked,
+        let lockedBox = Item("lockedBox")
+            .name("locked box")
+            .description("A box with a sturdy lock.")
+            .isOpenable
+            .isLocked
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: lockedBox
@@ -159,19 +149,15 @@ struct OpenActionHandlerTests {
     @Test("Requires light to open")
     func testRequiresLight() async throws {
         // Given: Dark room with openable item
-        let darkRoom = Location(
-            id: "darkRoom",
-            .name("Dark Room"),
+        let darkRoom = Location("darkRoom")
+            .name("Dark Room")
             .description("A pitch black room.")
-        )
 
-        let chest = Item(
-            id: "chest",
-            .name("wooden chest"),
-            .description("A large wooden chest."),
-            .isOpenable,
+        let chest = Item("chest")
+            .name("wooden chest")
+            .description("A large wooden chest.")
+            .isOpenable
             .in("darkRoom")
-        )
 
         let game = MinimalGame(
             player: Player(in: "darkRoom"),
@@ -199,14 +185,12 @@ struct OpenActionHandlerTests {
     @Test("Open closed openable item succeeds")
     func testOpenClosedOpenableItem() async throws {
         // Given
-        let box = Item(
-            id: "box",
-            .name("cardboard box"),
-            .description("A simple cardboard box."),
-            .isContainer,
-            .isOpenable,
+        let box = Item("box")
+            .name("cardboard box")
+            .description("A simple cardboard box.")
+            .isContainer
+            .isOpenable
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: box
@@ -233,14 +217,12 @@ struct OpenActionHandlerTests {
     @Test("Open already open item gives appropriate message")
     func testOpenAlreadyOpenItem() async throws {
         // Given
-        let openChest = Item(
-            id: "openChest",
-            .name("open chest"),
-            .description("A chest that is already open."),
-            .isOpenable,
-            .isOpen,
+        let openChest = Item("openChest")
+            .name("open chest")
+            .description("A chest that is already open.")
+            .isOpenable
+            .isOpen
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: openChest
@@ -263,21 +245,17 @@ struct OpenActionHandlerTests {
     @Test("Open container with contents reveals items")
     func testOpenContainerWithContents() async throws {
         // Given
-        let mailbox = Item(
-            id: "mailbox",
-            .name("small mailbox"),
-            .description("A small metal mailbox."),
-            .isContainer,
-            .isOpenable,
+        let mailbox = Item("mailbox")
+            .name("small mailbox")
+            .description("A small metal mailbox.")
+            .isContainer
+            .isOpenable
             .in(.startRoom)
-        )
 
-        let leaflet = Item(
-            id: "leaflet",
-            .name("leaflet"),
-            .description("A promotional leaflet."),
+        let leaflet = Item("leaflet")
+            .name("leaflet")
+            .description("A promotional leaflet.")
             .in(.item("mailbox"))
-        )
 
         let game = MinimalGame(
             items: mailbox, leaflet
@@ -303,14 +281,12 @@ struct OpenActionHandlerTests {
     @Test("Open empty container gives simple message")
     func testOpenEmptyContainer() async throws {
         // Given
-        let emptyBox = Item(
-            id: "emptyBox",
-            .name("empty box"),
-            .description("An empty storage box."),
-            .isContainer,
-            .isOpenable,
+        let emptyBox = Item("emptyBox")
+            .name("empty box")
+            .description("An empty storage box.")
+            .isContainer
+            .isOpenable
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: emptyBox
@@ -333,28 +309,22 @@ struct OpenActionHandlerTests {
     @Test("Open container with multiple items lists all contents")
     func testOpenContainerWithMultipleItems() async throws {
         // Given
-        let trunk = Item(
-            id: "trunk",
-            .name("old trunk"),
-            .description("A weathered old trunk."),
-            .isContainer,
-            .isOpenable,
+        let trunk = Item("trunk")
+            .name("old trunk")
+            .description("A weathered old trunk.")
+            .isContainer
+            .isOpenable
             .in(.startRoom)
-        )
 
-        let book = Item(
-            id: "book",
-            .name("leather book"),
-            .description("A thick leather-bound book."),
+        let book = Item("book")
+            .name("leather book")
+            .description("A thick leather-bound book.")
             .in(.item("trunk"))
-        )
 
-        let candle = Item(
-            id: "candle",
-            .name("white candle"),
-            .description("A white wax candle."),
+        let candle = Item("candle")
+            .name("white candle")
+            .description("A white wax candle.")
             .in(.item("trunk"))
-        )
 
         let game = MinimalGame(
             items: trunk, book, candle
@@ -378,13 +348,11 @@ struct OpenActionHandlerTests {
     @Test("Opening sets isTouched flag")
     func testOpeningSetsTouchedFlag() async throws {
         // Given
-        let container = Item(
-            id: "container",
-            .name("metal container"),
-            .description("A metal storage container."),
-            .isOpenable,
+        let container = Item("container")
+            .name("metal container")
+            .description("A metal storage container.")
+            .isOpenable
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: container
@@ -403,13 +371,11 @@ struct OpenActionHandlerTests {
     @Test("Open non-container openable item")
     func testOpenNonContainerOpenableItem() async throws {
         // Given
-        let door = Item(
-            id: "door",
-            .name("wooden door"),
-            .description("A heavy wooden door."),
-            .isOpenable,
+        let door = Item("door")
+            .name("wooden door")
+            .description("A heavy wooden door.")
+            .isOpenable
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: door

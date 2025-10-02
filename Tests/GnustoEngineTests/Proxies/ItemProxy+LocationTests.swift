@@ -9,17 +9,13 @@ struct ItemProxyLocationTests {
     @Test("Item directly in location returns that location")
     func itemDirectlyInLocation() async throws {
         // Given: Item directly placed in a location
-        let testRoom = Location(
-            id: .testRoom,
-            .name("Test Room"),
+        let testRoom = Location(.testRoom)
+            .name("Test Room")
             .inherentlyLit
-        )
 
-        let testItem = Item(
-            id: "testItem",
-            .name("test item"),
+        let testItem = Item("testItem")
+            .name("test item")
             .in(.testRoom)
-        )
 
         let game = MinimalGame(
             player: Player(in: .testRoom),
@@ -40,24 +36,18 @@ struct ItemProxyLocationTests {
     @Test("Item in container in location returns the location")
     func itemInContainerInLocation() async throws {
         // Given: Item in a container in a location
-        let testRoom = Location(
-            id: .testRoom,
-            .name("Test Room"),
+        let testRoom = Location(.testRoom)
+            .name("Test Room")
             .inherentlyLit
-        )
 
-        let container = Item(
-            id: "container",
-            .name("container"),
-            .isContainer,
+        let container = Item("container")
+            .name("container")
+            .isContainer
             .in(.testRoom)
-        )
 
-        let testItem = Item(
-            id: "testItem",
-            .name("test item"),
+        let testItem = Item("testItem")
+            .name("test item")
             .in(.item("container"))
-        )
 
         let game = MinimalGame(
             player: Player(in: .testRoom),
@@ -78,31 +68,23 @@ struct ItemProxyLocationTests {
     @Test("Item in deeply nested containers returns ultimate location")
     func itemInDeeplyNestedContainers() async throws {
         // Given: Item in container in container in location (sandwich in bag in kitchen scenario)
-        let kitchen = Location(
-            id: .kitchen,
-            .name("Kitchen"),
+        let kitchen = Location(.kitchen)
+            .name("Kitchen")
             .inherentlyLit
-        )
 
-        let bag = Item(
-            id: "bag",
-            .name("bag"),
-            .isContainer,
+        let bag = Item("bag")
+            .name("bag")
+            .isContainer
             .in(.kitchen)
-        )
 
-        let lunchbox = Item(
-            id: "lunchbox",
-            .name("lunchbox"),
-            .isContainer,
+        let lunchbox = Item("lunchbox")
+            .name("lunchbox")
+            .isContainer
             .in(.item("bag"))
-        )
 
-        let sandwich = Item(
-            id: "sandwich",
-            .name("sandwich"),
+        let sandwich = Item("sandwich")
+            .name("sandwich")
             .in(.item("lunchbox"))
-        )
 
         let game = MinimalGame(
             player: Player(in: .kitchen),
@@ -123,18 +105,14 @@ struct ItemProxyLocationTests {
     @Test("Item held by player returns player's location")
     func itemHeldByPlayerReturnsPlayersLocation() async throws {
         // Given: Item held by player in a location
-        let testRoom = Location(
-            id: .testRoom,
-            .name("Test Room"),
+        let testRoom = Location(.testRoom)
+            .name("Test Room")
             .inherentlyLit
-        )
 
-        let testItem = Item(
-            id: "testItem",
-            .name("test item"),
-            .isTakable,
+        let testItem = Item("testItem")
+            .name("test item")
+            .isTakable
             .in(.player)
-        )
 
         let game = MinimalGame(
             player: Player(in: .testRoom),
@@ -155,25 +133,19 @@ struct ItemProxyLocationTests {
     @Test("Item in container held by player returns player's location")
     func itemInContainerHeldByPlayerReturnsPlayersLocation() async throws {
         // Given: Item in container held by player
-        let testRoom = Location(
-            id: .testRoom,
-            .name("Test Room"),
+        let testRoom = Location(.testRoom)
+            .name("Test Room")
             .inherentlyLit
-        )
 
-        let container = Item(
-            id: "container",
-            .name("container"),
-            .isContainer,
-            .isTakable,
+        let container = Item("container")
+            .name("container")
+            .isContainer
+            .isTakable
             .in(.player)
-        )
 
-        let testItem = Item(
-            id: "testItem",
-            .name("test item"),
+        let testItem = Item("testItem")
+            .name("test item")
             .in(.item("container"))
-        )
 
         let game = MinimalGame(
             player: Player(in: .testRoom),
@@ -194,17 +166,13 @@ struct ItemProxyLocationTests {
     @Test("Item with nowhere parent returns nil")
     func itemWithNowhereParentReturnsNil() async throws {
         // Given: Item with no parent (nowhere)
-        let testRoom = Location(
-            id: .testRoom,
-            .name("Test Room"),
+        let testRoom = Location(.testRoom)
+            .name("Test Room")
             .inherentlyLit
-        )
 
-        let testItem = Item(
-            id: "testItem",
+        let testItem = Item("testItem")
             .name("test item")
             // No .in() specified, defaults to nowhere
-        )
 
         let game = MinimalGame(
             player: Player(in: .testRoom),
@@ -225,55 +193,41 @@ struct ItemProxyLocationTests {
     @Test("Location computation handles mixed containment scenarios")
     func locationComputationHandlesMixedContainmentScenarios() async throws {
         // Given: Complex scenario with multiple items in different containment states
-        let livingRoom = Location(
-            id: .livingRoom,
-            .name("Living Room"),
+        let livingRoom = Location(.livingRoom)
+            .name("Living Room")
             .inherentlyLit
-        )
 
-        let kitchen = Location(
-            id: .kitchen,
-            .name("Kitchen"),
+        let kitchen = Location(.kitchen)
+            .name("Kitchen")
             .inherentlyLit
-        )
 
         // Item directly in living room
-        let lamp = Item(
-            id: "lamp",
-            .name("lamp"),
+        let lamp = Item("lamp")
+            .name("lamp")
             .in(.livingRoom)
-        )
 
         // Container in kitchen
-        let refrigerator = Item(
-            id: "refrigerator",
-            .name("refrigerator"),
-            .isContainer,
+        let refrigerator = Item("refrigerator")
+            .name("refrigerator")
+            .isContainer
             .in(.kitchen)
-        )
 
         // Item in container in kitchen
-        let milk = Item(
-            id: "milk",
-            .name("milk"),
+        let milk = Item("milk")
+            .name("milk")
             .in(.item("refrigerator"))
-        )
 
         // Portable container held by player
-        let backpack = Item(
-            id: "backpack",
-            .name("backpack"),
-            .isContainer,
-            .isTakable,
+        let backpack = Item("backpack")
+            .name("backpack")
+            .isContainer
+            .isTakable
             .in(.player)
-        )
 
         // Item in portable container held by player
-        let keys = Item(
-            id: "keys",
-            .name("keys"),
+        let keys = Item("keys")
+            .name("keys")
             .in(.item("backpack"))
-        )
 
         let game = MinimalGame(
             player: Player(in: .livingRoom),
@@ -300,26 +254,20 @@ struct ItemProxyLocationTests {
     @Test("Location computation is consistent across state changes")
     func locationComputationIsConsistentAcrossStateChanges() async throws {
         // Given: Item that will be moved between different containment states
-        let testRoom = Location(
-            id: .testRoom,
-            .name("Test Room"),
+        let testRoom = Location(.testRoom)
+            .name("Test Room")
             .inherentlyLit
-        )
 
-        let container = Item(
-            id: "container",
-            .name("container"),
-            .isContainer,
-            .isTakable,
+        let container = Item("container")
+            .name("container")
+            .isContainer
+            .isTakable
             .in(.testRoom)
-        )
 
-        let testItem = Item(
-            id: "testItem",
-            .name("test item"),
-            .isTakable,
+        let testItem = Item("testItem")
+            .name("test item")
+            .isTakable
             .in(.testRoom)
-        )
 
         let game = MinimalGame(
             player: Player(in: .testRoom),

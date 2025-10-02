@@ -11,29 +11,21 @@ struct EnterActionHandlerTests {
     @Test("ENTER DIRECTOBJECT syntax works")
     func testEnterDirectObjectSyntax() async throws {
         // Given
-        let outside = Location(
-            id: "outside",
-            .name("Outside"),
-            .description("You are outside."),
-            .inherentlyLit,
-            .exits(
-                .north("inside", via: "door")
-            )
-        )
-
-        let inside = Location(
-            id: "inside",
-            .name("Inside"),
-            .description("You are inside."),
+        let outside = Location("outside")
+            .name("Outside")
+            .description("You are outside.")
             .inherentlyLit
-        )
+            .north("inside", via: "door")
 
-        let door = Item(
-            id: "door",
-            .name("wooden door"),
-            .description("A sturdy wooden door."),
+        let inside = Location("inside")
+            .name("Inside")
+            .description("You are inside.")
+            .inherentlyLit
+
+        let door = Item("door")
+            .name("wooden door")
+            .description("A sturdy wooden door.")
             .in("outside")
-        )
 
         let game = MinimalGame(
             player: Player(in: "outside"),
@@ -51,7 +43,7 @@ struct EnterActionHandlerTests {
             """
             > enter door
             --- Inside ---
-
+            
             You are inside.
             """
         )
@@ -64,28 +56,20 @@ struct EnterActionHandlerTests {
     @Test("GET IN DIRECTOBJECT syntax works")
     func testGetInDirectObjectSyntax() async throws {
         // Given
-        let outside = Location(
-            id: "outside",
-            .name("Outside"),
-            .inherentlyLit,
-            .exits(
-                .east("inside", via: "hatch")
-            )
-        )
-
-        let inside = Location(
-            id: "inside",
-            .name("Inside"),
-            .description("You are inside."),
+        let outside = Location("outside")
+            .name("Outside")
             .inherentlyLit
-        )
+            .east("inside", via: "hatch")
 
-        let hatch = Item(
-            id: "hatch",
-            .name("escape hatch"),
-            .description("A small escape hatch."),
+        let inside = Location("inside")
+            .name("Inside")
+            .description("You are inside.")
+            .inherentlyLit
+
+        let hatch = Item("hatch")
+            .name("escape hatch")
+            .description("A small escape hatch.")
             .in("outside")
-        )
 
         let game = MinimalGame(
             player: Player(in: "outside"),
@@ -103,7 +87,7 @@ struct EnterActionHandlerTests {
             """
             > get in hatch
             --- Inside ---
-
+            
             You are inside.
             """
         )
@@ -116,28 +100,20 @@ struct EnterActionHandlerTests {
     @Test("GO IN DIRECTOBJECT syntax works")
     func testGoInDirectObjectSyntax() async throws {
         // Given
-        let outside = Location(
-            id: "outside",
-            .name("Outside"),
-            .inherentlyLit,
-            .exits(
-                .west("inside", via: "entrance")
-            )
-        )
-
-        let inside = Location(
-            id: "inside",
-            .name("Inside"),
-            .description("You are inside."),
+        let outside = Location("outside")
+            .name("Outside")
             .inherentlyLit
-        )
+            .west("inside", via: "entrance")
 
-        let entrance = Item(
-            id: "entrance",
-            .name("cave entrance"),
-            .description("A dark cave entrance."),
+        let inside = Location("inside")
+            .name("Inside")
+            .description("You are inside.")
+            .inherentlyLit
+
+        let entrance = Item("entrance")
+            .name("cave entrance")
+            .description("A dark cave entrance.")
             .in("outside")
-        )
 
         let game = MinimalGame(
             player: Player(in: "outside"),
@@ -155,7 +131,7 @@ struct EnterActionHandlerTests {
             """
             > go in entrance
             --- Inside ---
-
+            
             You are inside.
             """
         )
@@ -168,28 +144,20 @@ struct EnterActionHandlerTests {
     @Test("GO THROUGH DIRECTOBJECT syntax works")
     func testGoThroughDirectObjectSyntax() async throws {
         // Given
-        let outside = Location(
-            id: "outside",
-            .name("Outside"),
-            .inherentlyLit,
-            .exits(
-                .south("inside", via: "portal")
-            )
-        )
-
-        let inside = Location(
-            id: "inside",
-            .name("Inside"),
-            .description("You are inside."),
+        let outside = Location("outside")
+            .name("Outside")
             .inherentlyLit
-        )
+            .south("inside", via: "portal")
 
-        let portal = Item(
-            id: "portal",
-            .name("shimmering portal"),
-            .description("A magical portal."),
+        let inside = Location("inside")
+            .name("Inside")
+            .description("You are inside.")
+            .inherentlyLit
+
+        let portal = Item("portal")
+            .name("shimmering portal")
+            .description("A magical portal.")
             .in("outside")
-        )
 
         let game = MinimalGame(
             player: Player(in: "outside"),
@@ -207,7 +175,7 @@ struct EnterActionHandlerTests {
             """
             > go through portal
             --- Inside ---
-
+            
             You are inside.
             """
         )
@@ -240,28 +208,20 @@ struct EnterActionHandlerTests {
     @Test("Auto-selects single enterable door when no target specified")
     func testAutoSelectsSingleEnterableDoor() async throws {
         // Given
-        let outside = Location(
-            id: "outside",
-            .name("Outside"),
-            .inherentlyLit,
-            .exits(
-                .north("inside", via: "door")
-            )
-        )
-
-        let inside = Location(
-            id: "inside",
-            .name("Inside"),
-            .description("You are inside."),
+        let outside = Location("outside")
+            .name("Outside")
             .inherentlyLit
-        )
+            .north("inside", via: "door")
 
-        let door = Item(
-            id: "door",
-            .name("wooden door"),
-            .description("A wooden door."),
+        let inside = Location("inside")
+            .name("Inside")
+            .description("You are inside.")
+            .inherentlyLit
+
+        let door = Item("door")
+            .name("wooden door")
+            .description("A wooden door.")
             .in("outside")
-        )
 
         let game = MinimalGame(
             player: Player(in: "outside"),
@@ -279,7 +239,7 @@ struct EnterActionHandlerTests {
             """
             > enter
             --- Inside ---
-
+            
             You are inside.
             """
         )
@@ -292,43 +252,31 @@ struct EnterActionHandlerTests {
     @Test("Asks for clarification when multiple doors available")
     func testAsksForClarificationWithMultipleDoors() async throws {
         // Given
-        let courtyard = Location(
-            id: "courtyard",
-            .name("Courtyard"),
-            .inherentlyLit,
-            .exits(
-                .north("hall", via: "door1"),
-                .south("garden", via: "door2")
-            )
-        )
-
-        let hall = Location(
-            id: "hall",
-            .name("Hall"),
-            .description("You are in a hall."),
+        let courtyard = Location("courtyard")
+            .name("Courtyard")
             .inherentlyLit
-        )
+            .north("hall", via: "door1")
+            .south("garden", via: "door2")
 
-        let garden = Location(
-            id: "garden",
-            .name("Garden"),
-            .description("You are in a garden."),
+        let hall = Location("hall")
+            .name("Hall")
+            .description("You are in a hall.")
             .inherentlyLit
-        )
 
-        let door1 = Item(
-            id: "door1",
-            .name("oak door"),
-            .description("A heavy oak door."),
-            .in("courtyard")
-        )
+        let garden = Location("garden")
+            .name("Garden")
+            .description("You are in a garden.")
+            .inherentlyLit
 
-        let door2 = Item(
-            id: "door2",
-            .name("garden gate"),
-            .description("A wrought iron gate."),
+        let door1 = Item("door1")
+            .name("oak door")
+            .description("A heavy oak door.")
             .in("courtyard")
-        )
+
+        let door2 = Item("door2")
+            .name("garden gate")
+            .description("A wrought iron gate.")
+            .in("courtyard")
 
         let game = MinimalGame(
             player: Player(in: "courtyard"),
@@ -353,21 +301,15 @@ struct EnterActionHandlerTests {
     @Test("Cannot enter target not in scope")
     func testCannotEnterTargetNotInScope() async throws {
         // Given
-        let anotherRoom = Location(
-            id: "anotherRoom",
-            .name("Another Room"),
-            .inherentlyLit,
-            .exits(
-                .east("somewhere", via: "remoteDoor")
-            )
-        )
+        let anotherRoom = Location("anotherRoom")
+            .name("Another Room")
+            .inherentlyLit
+            .east("somewhere", via: "remoteDoor")
 
-        let remoteDoor = Item(
-            id: "remoteDoor",
-            .name("remote door"),
-            .description("A door in another room."),
+        let remoteDoor = Item("remoteDoor")
+            .name("remote door")
+            .description("A door in another room.")
             .in("anotherRoom")
-        )
 
         let game = MinimalGame(
             locations: anotherRoom,
@@ -391,12 +333,10 @@ struct EnterActionHandlerTests {
     @Test("Cannot enter item that is not a door")
     func testCannotEnterNonDoorItem() async throws {
         // Given
-        let rock = Item(
-            id: "rock",
-            .name("large rock"),
-            .description("A large boulder."),
+        let rock = Item("rock")
+            .name("large rock")
+            .description("A large boulder.")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: rock
@@ -419,29 +359,21 @@ struct EnterActionHandlerTests {
     @Test("Requires light to enter")
     func testRequiresLight() async throws {
         // Given: Dark room with door
-        let darkRoom = Location(
-            id: "darkRoom",
-            .name("Dark Room"),
-            .description("A pitch black room."),
-            .exits(
-                .up("attic", via: "trapdoor")
-            )
+        let darkRoom = Location("darkRoom")
+            .name("Dark Room")
+            .description("A pitch black room.")
+            .up("attic", via: "trapdoor")
             // Note: No .inherentlyLit property
-        )
 
-        let attic = Location(
-            id: "attic",
-            .name("Attic"),
-            .description("You are in an attic."),
+        let attic = Location("attic")
+            .name("Attic")
+            .description("You are in an attic.")
             .inherentlyLit
-        )
 
-        let trapdoor = Item(
-            id: "trapdoor",
-            .name("wooden trapdoor"),
-            .description("A wooden trapdoor in the ceiling."),
+        let trapdoor = Item("trapdoor")
+            .name("wooden trapdoor")
+            .description("A wooden trapdoor in the ceiling.")
             .in("darkRoom")
-        )
 
         let game = MinimalGame(
             player: Player(in: "darkRoom"),
@@ -469,28 +401,20 @@ struct EnterActionHandlerTests {
     @Test("Enter door sets touched flag and updates pronouns")
     func testEnterDoorSetsTouchedAndPronouns() async throws {
         // Given
-        let outside = Location(
-            id: "outside",
-            .name("Outside"),
-            .inherentlyLit,
-            .exits(
-                .north("inside", via: "door")
-            )
-        )
-
-        let inside = Location(
-            id: "inside",
-            .name("Inside"),
-            .description("You are inside."),
+        let outside = Location("outside")
+            .name("Outside")
             .inherentlyLit
-        )
+            .north("inside", via: "door")
 
-        let door = Item(
-            id: "door",
-            .name("wooden door"),
-            .description("A wooden door."),
+        let inside = Location("inside")
+            .name("Inside")
+            .description("You are inside.")
+            .inherentlyLit
+
+        let door = Item("door")
+            .name("wooden door")
+            .description("A wooden door.")
             .in("outside")
-        )
 
         let game = MinimalGame(
             player: Player(in: "outside"),
@@ -515,29 +439,21 @@ struct EnterActionHandlerTests {
     @Test("Enter door delegates to GO command")
     func testEnterDoorDelegatesToGoCommand() async throws {
         // Given
-        let hallway = Location(
-            id: "hallway",
-            .name("Hallway"),
-            .description("A long hallway."),
-            .inherentlyLit,
-            .exits(
-                .west("office", via: "door")
-            )
-        )
-
-        let office = Location(
-            id: "office",
-            .name("Office"),
-            .description("A small office."),
+        let hallway = Location("hallway")
+            .name("Hallway")
+            .description("A long hallway.")
             .inherentlyLit
-        )
+            .west("office", via: "door")
 
-        let door = Item(
-            id: "door",
-            .name("office door"),
-            .description("A plain office door."),
+        let office = Location("office")
+            .name("Office")
+            .description("A small office.")
+            .inherentlyLit
+
+        let door = Item("door")
+            .name("office door")
+            .description("A plain office door.")
             .in("hallway")
-        )
 
         let game = MinimalGame(
             player: Player(in: "hallway"),
@@ -555,7 +471,7 @@ struct EnterActionHandlerTests {
             """
             > enter door
             --- Office ---
-
+            
             A small office.
             """
         )
@@ -568,62 +484,44 @@ struct EnterActionHandlerTests {
     @Test("Enter works with different door types")
     func testEnterWithDifferentDoorTypes() async throws {
         // Given
-        let plaza = Location(
-            id: "plaza",
-            .name("Town Plaza"),
-            .description("You are in the town plaza."),
-            .inherentlyLit,
-            .exits(
-                .north("shop", via: "door"),
-                .south("cave", via: "entrance"),
-                .east("tower", via: "gate")
-            )
-        )
-
-        let shop = Location(
-            id: "shop",
-            .name("Shop"),
-            .description("You are in a shop."),
-            .inherentlyLit,
-            .exits(
-                .south("plaza")
-            )
-        )
-
-        let cave = Location(
-            id: "cave",
-            .name("Cave"),
-            .description("You are in a cave."),
+        let plaza = Location("plaza")
+            .name("Town Plaza")
+            .description("You are in the town plaza.")
             .inherentlyLit
-        )
+            .north("shop", via: "door")
+            .south("cave", via: "entrance")
+            .east("tower", via: "gate")
 
-        let tower = Location(
-            id: "tower",
-            .name("Tower"),
-            .description("You are in a tower."),
+        let shop = Location("shop")
+            .name("Shop")
+            .description("You are in a shop.")
             .inherentlyLit
-        )
+            .south("plaza")
 
-        let shopDoor = Item(
-            id: "door",
-            .name("shop door"),
-            .description("A wooden shop door."),
-            .in("plaza")
-        )
+        let cave = Location("cave")
+            .name("Cave")
+            .description("You are in a cave.")
+            .inherentlyLit
 
-        let caveEntrance = Item(
-            id: "entrance",
-            .name("cave entrance"),
-            .description("A dark cave entrance."),
-            .in("plaza")
-        )
+        let tower = Location("tower")
+            .name("Tower")
+            .description("You are in a tower.")
+            .inherentlyLit
 
-        let towerGate = Item(
-            id: "gate",
-            .name("tower gate"),
-            .description("An iron gate."),
+        let shopDoor = Item("door")
+            .name("shop door")
+            .description("A wooden shop door.")
             .in("plaza")
-        )
+
+        let caveEntrance = Item("entrance")
+            .name("cave entrance")
+            .description("A dark cave entrance.")
+            .in("plaza")
+
+        let towerGate = Item("gate")
+            .name("tower gate")
+            .description("An iron gate.")
+            .in("plaza")
 
         let game = MinimalGame(
             player: Player(in: "plaza"),
@@ -641,7 +539,7 @@ struct EnterActionHandlerTests {
             """
             > enter door
             --- Shop ---
-
+            
             You are in a shop.
             """
         )
@@ -659,14 +557,14 @@ struct EnterActionHandlerTests {
             """
             > south
             --- Town Plaza ---
-
+            
             You are in the town plaza.
-
+            
             There are a shop door, a cave entrance, and a tower gate here.
-
+            
             > enter entrance
             --- Cave ---
-
+            
             You are in a cave.
             """
         )
@@ -679,28 +577,20 @@ struct EnterActionHandlerTests {
     @Test("Enter door not reachable fails gracefully")
     func testEnterUnreachableDoorFails() async throws {
         // Given: Door exists but is not reachable (in different location)
-        let room1 = Location(
-            id: "room1",
-            .name("Room 1"),
+        let room1 = Location("room1")
+            .name("Room 1")
             .inherentlyLit
-        )
 
-        let room2 = Location(
-            id: "room2",
-            .name("Room 2"),
-            .description("You are in room 2."),
-            .inherentlyLit,
-            .exits(
-                .east("room3", via: "door")
-            )
-        )
+        let room2 = Location("room2")
+            .name("Room 2")
+            .description("You are in room 2.")
+            .inherentlyLit
+            .east("room3", via: "door")
 
-        let door = Item(
-            id: "door",
-            .name("wooden door"),
-            .description("A wooden door."),
+        let door = Item("door")
+            .name("wooden door")
+            .description("A wooden door.")
             .in("room2")  // Door is in room2, player is in room1
-        )
 
         let game = MinimalGame(
             player: Player(in: "room1"),

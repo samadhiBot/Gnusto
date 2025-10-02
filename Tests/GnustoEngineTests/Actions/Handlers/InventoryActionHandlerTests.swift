@@ -88,26 +88,20 @@ struct InventoryActionHandlerTests {
     @Test("Multiple items inventory")
     func testMultipleItemsInventory() async throws {
         // Given
-        let sword = Item(
-            id: "sword",
-            .name("rusty sword"),
-            .description("An old rusty sword."),
+        let sword = Item("sword")
+            .name("rusty sword")
+            .description("An old rusty sword.")
             .in(.player)
-        )
 
-        let gem = Item(
-            id: "gem",
-            .name("sparkling gem"),
-            .description("A beautiful gem."),
+        let gem = Item("gem")
+            .name("sparkling gem")
+            .description("A beautiful gem.")
             .in(.player)
-        )
 
-        let lantern = Item(
-            id: "lantern",
-            .name("brass lantern"),
-            .description("A shiny brass lantern."),
+        let lantern = Item("lantern")
+            .name("brass lantern")
+            .description("A shiny brass lantern.")
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: sword, gem, lantern
@@ -133,12 +127,10 @@ struct InventoryActionHandlerTests {
     @Test("Items being worn")
     func testItemsBeingWorn() async throws {
         // Given
-        let tiara = Item(
-            id: "tiara",
-            .name("lovely tiara"),
-            .in(.player),
+        let tiara = Item("tiara")
+            .name("lovely tiara")
+            .in(.player)
             .isWorn
-        )
 
         let game = MinimalGame(
             items: Lab.ironSword.inPlayerInventory, tiara
@@ -176,18 +168,14 @@ struct InventoryActionHandlerTests {
     @Test("Inventory works in dark room")
     func testInventoryInDarkRoom() async throws {
         // Given: Dark room with player carrying items
-        let darkRoom = Location(
-            id: "darkRoom",
-            .name("Dark Room"),
+        let darkRoom = Location("darkRoom")
+            .name("Dark Room")
             .description("A pitch black room.")
-        )
 
-        let lantern = Item(
-            id: "lantern",
-            .name("brass lantern"),
-            .description("A shiny brass lantern."),
+        let lantern = Item("lantern")
+            .name("brass lantern")
+            .description("A shiny brass lantern.")
             .in(.player)
-        )
 
         let game = MinimalGame(
             player: Player(in: "darkRoom"),
@@ -213,13 +201,11 @@ struct InventoryActionHandlerTests {
     @Test("Inventory after taking item")
     func testInventoryAfterTaking() async throws {
         // Given
-        let key = Item(
-            id: "key",
-            .name("brass key"),
-            .description("A small brass key."),
-            .isTakable,
+        let key = Item("key")
+            .name("brass key")
+            .description("A small brass key.")
+            .isTakable
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: key

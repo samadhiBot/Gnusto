@@ -3,114 +3,93 @@ import GnustoEngine
 // MARK: - Outside the White House
 
 enum OutsideHouse {
-    static let eastOfHouse = Location(
-        id: .eastOfHouse,
-        .name("Behind House"),
-        .exits(
-            .north(.northOfHouse),
-            .south(.southOfHouse),
-            .west(.kitchen, via: .kitchenWindow),
-            .northwest(.northOfHouse),
-            .southwest(.southOfHouse),
-            .east(.eastClearing),
-            .inside(.kitchen, via: .kitchenWindow)
-        ),
-        .inherentlyLit,
+    static let eastOfHouse = Location(.eastOfHouse)
+        .name("Behind House")
+        .north(.northOfHouse)
+        .south(.southOfHouse)
+        .west(.kitchen, via: .kitchenWindow)
+        .northwest(.northOfHouse)
+        .southwest(.southOfHouse)
+        .east(.eastClearing)
+        .inside(.kitchen, via: .kitchenWindow)
+        .inherentlyLit
         .localGlobals(.whiteHouse, .kitchenWindow, .forest)
-    )
 
-    static let northOfHouse = Location(
-        id: .northOfHouse,
-        .name("North of House"),
+    static let northOfHouse = Location(.northOfHouse)
+        .name("North of House")
         .description(
             """
             You are facing the north side of a white house. There is no door here,
             and all the windows are boarded up. To the north a narrow path winds
             through the trees.
             """
-        ),
-        .exits(
-            .southwest(.westOfHouse),
-            .southeast(.eastOfHouse),
-            .west(.westOfHouse),
-            .east(.eastOfHouse),
-            .north(.forestPath),
-            .south(blocked: "The windows are all boarded.")
-        ),
-        .inherentlyLit,
+        )
+        .southwest(.westOfHouse)
+        .southeast(.eastOfHouse)
+        .west(.westOfHouse)
+        .east(.eastOfHouse)
+        .north(.forestPath)
+        .south("The windows are all boarded.")
+        .inherentlyLit
         .localGlobals(.boardedWindow, .board, .whiteHouse, .forest)
-    )
 
-    static let southOfHouse = Location(
-        id: .southOfHouse,
-        .name("South of House"),
+    static let southOfHouse = Location(.southOfHouse)
+        .name("South of House")
         .description(
             """
             You are facing the south side of a white house. There is no door here,
             and all the windows are boarded.
             """
-        ),
-        .exits(
-            .west(.westOfHouse),
-            .east(.eastOfHouse),
-            .northeast(.eastOfHouse),
-            .northwest(.westOfHouse),
-            .south(.forest3),
-            .north(blocked: "The windows are all boarded.")
-        ),
-        .inherentlyLit,
+        )
+        .west(.westOfHouse)
+        .east(.eastOfHouse)
+        .northeast(.eastOfHouse)
+        .northwest(.westOfHouse)
+        .south(.forest3)
+        .north("The windows are all boarded.")
+        .inherentlyLit
         .localGlobals(.boardedWindow, .board, .whiteHouse, .forest)
-    )
 
-    static let stoneBarrow = Location(
-        id: .stoneBarrow,
-        .name("Stone Barrow"),
+    static let stoneBarrow = Location(.stoneBarrow)
+        .name("Stone Barrow")
         .description(
             """
             You are standing in front of a massive barrow of stone. In the east face
             is a huge stone door which is open. You cannot see into the dark of the tomb.
             """
-        ),
-        .exits(
-            .northeast(.westOfHouse)
-        ),
+        )
+        .northeast(.westOfHouse)
         .inherentlyLit
-    )
 
-    static let westOfHouse = Location(
-        id: .westOfHouse,
-        .name("West of House"),
+    static let westOfHouse = Location(.westOfHouse)
+        .name("West of House")
         .description(
             """
             You are standing in an open field west of a white house, with a boarded front door.
             """
-        ),
-        .exits(
-            .north(.northOfHouse),
-            .south(.southOfHouse),
-            .northeast(.northOfHouse),
-            .southeast(.southOfHouse),
-            .west(.forest1),
-            // Note: SW and IN exits to Stone Barrow conditional on WON-FLAG
-            .east(blocked: "The door is boarded and you can't remove the boards.")
-        ),
-        .inherentlyLit,
+        )
+        .north(.northOfHouse)
+        .south(.southOfHouse)
+        .northeast(.northOfHouse)
+        .southeast(.southOfHouse)
+        .west(.forest1)
+    // Note: SW and IN exits to Stone Barrow conditional on WON-FLAG
+        .east("The door is boarded and you can't remove the boards.")
+        .inherentlyLit
         .localGlobals(.whiteHouse, .board, .forest)
-    )
 }
 
 // MARK: - Items
 
 extension OutsideHouse {
-    static let advertisement = Item(
-        id: .advertisement,
-        .name("leaflet"),
-        .synonyms("advertisement", "leaflet", "booklet", "mail"),
-        .adjectives("small"),
-        .isReadable,
-        .isTakable,
-        .isFlammable,
-        .description("A small leaflet is on the ground."),
+    static let advertisement = Item(.advertisement)
+        .name("leaflet")
+        .synonyms("advertisement", "leaflet", "booklet", "mail")
+        .adjectives("small")
+        .isReadable
+        .isTakable
+        .isFlammable
+        .description("A small leaflet is on the ground.")
         .readText(
             """
             "WELCOME TO ZORK!
@@ -119,68 +98,55 @@ extension OutsideHouse {
             will explore some of the most amazing territory ever seen by mortals.
             No computer should be without one!"
             """
-        ),
-        .size(2),
+        )
+        .size(2)
         .in(.item(.mailbox))
-    )
 
-    static let boardedWindow = Item(
-        id: .boardedWindow,
-        .name("boarded window"),
-        .description("The windows are boarded up. There is no way you could enter through them."),
-        .adjectives("boarded"),
-        .synonyms("window", "windows"),
+    static let boardedWindow = Item(.boardedWindow)
+        .name("boarded window")
+        .description("The windows are boarded up. There is no way you could enter through them.")
+        .adjectives("boarded")
+        .synonyms("window", "windows")
         .in(.southOfHouse)
-    )
 
-    static let boards = Item(
-        id: .boards,
-        .name("boards"),
-        .description("The boards are securely fastened and cannot be removed."),
-        .synonyms("board"),
+    static let boards = Item(.boards)
+        .name("boards")
+        .description("The boards are securely fastened and cannot be removed.")
+        .synonyms("board")
         .omitDescription
-    )
 
-    static let frontDoor = Item(
-        id: .frontDoor,
-        .name("door"),
-        .synonyms("door"),
-        .adjectives("front", "boarded"),
+    static let frontDoor = Item(.frontDoor)
+        .name("door")
+        .synonyms("door")
+        .adjectives("front", "boarded")
 
-        .omitDescription,
+        .omitDescription
         .in(.westOfHouse)
-        // Note: Has action handler FRONT-DOOR-FCN
-    )
+    // Note: Has action handler FRONT-DOOR-FCN
 
-    static let kitchenWindow = Item(
-        id: .kitchenWindow,
-        .name("kitchen window"),
-        .adjectives("kitchen", "small"),
-        .synonyms("window"),
-        .in(.eastOfHouse),
-        .isOpenable,
+    static let kitchenWindow = Item(.kitchenWindow)
+        .name("kitchen window")
+        .adjectives("kitchen", "small")
+        .synonyms("window")
+        .in(.eastOfHouse)
+        .isOpenable
         .omitDescription
-    )
 
-    static let mailbox = Item(
-        id: .mailbox,
-        .name("small mailbox"),
-        .synonyms("mailbox", "box"),
-        .adjectives("small"),
-        .isContainer,
-        .requiresTryTake,
-        .isOpenable,
-        .capacity(10),
+    static let mailbox = Item(.mailbox)
+        .name("small mailbox")
+        .synonyms("mailbox", "box")
+        .adjectives("small")
+        .isContainer
+        .requiresTryTake
+        .isOpenable
+        .capacity(10)
         .in(.westOfHouse)
-    )
 
-    static let whiteHouse = Item(
-        id: .whiteHouse,
-        .name("white house"),
-        .adjectives("white", "beautiful", "colonial"),
-        .synonyms("house", "home", "building"),
+    static let whiteHouse = Item(.whiteHouse)
+        .name("white house")
+        .adjectives("white", "beautiful", "colonial")
+        .synonyms("house", "home", "building")
         .omitDescription
-    )
 }
 
 // MARK: - Computers
@@ -202,8 +168,8 @@ extension OutsideHouse {
     static let kitchenWindowComputer = ItemComputer(for: .kitchenWindow) {
         itemProperty(ItemPropertyID.description) { context in
             await context.item.hasFlag(.isOpen)
-                ? "The window is now open wide enough to allow entry."
-                : "The window is slightly ajar, but not enough to allow entry."
+            ? "The window is now open wide enough to allow entry."
+            : "The window is slightly ajar, but not enough to allow entry."
         }
     }
 }

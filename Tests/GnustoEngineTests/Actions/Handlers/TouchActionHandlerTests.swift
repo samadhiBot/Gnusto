@@ -11,12 +11,10 @@ struct TouchActionHandlerTests {
     @Test("TOUCH DIRECTOBJECT syntax works")
     func testTouchDirectObjectSyntax() async throws {
         // Given
-        let vase = Item(
-            id: "vase",
-            .name("ceramic vase"),
-            .description("A delicate ceramic vase."),
+        let vase = Item("vase")
+            .name("ceramic vase")
+            .description("A delicate ceramic vase.")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: vase
@@ -64,18 +62,14 @@ struct TouchActionHandlerTests {
     @Test("Cannot touch target not in scope")
     func testCannotTouchTargetNotInScope() async throws {
         // Given
-        let anotherRoom = Location(
-            id: "anotherRoom",
-            .name("Another Room"),
+        let anotherRoom = Location("anotherRoom")
+            .name("Another Room")
             .inherentlyLit
-        )
 
-        let remoteObject = Item(
-            id: "remoteObject",
-            .name("remote object"),
-            .description("An object in another room."),
+        let remoteObject = Item("remoteObject")
+            .name("remote object")
+            .description("An object in another room.")
             .in("anotherRoom")
-        )
 
         let game = MinimalGame(
             locations: anotherRoom,
@@ -99,18 +93,14 @@ struct TouchActionHandlerTests {
     @Test("Requires light to touch")
     func testRequiresLight() async throws {
         // Given: Dark room with an object to touch
-        let darkRoom = Location(
-            id: "darkRoom",
-            .name("Dark Room"),
+        let darkRoom = Location("darkRoom")
+            .name("Dark Room")
             .description("A pitch black room.")
-        )
 
-        let statue = Item(
-            id: "statue",
-            .name("marble statue"),
-            .description("A cold marble statue."),
+        let statue = Item("statue")
+            .name("marble statue")
+            .description("A cold marble statue.")
             .in("darkRoom")
-        )
 
         let game = MinimalGame(
             player: Player(in: "darkRoom"),
@@ -138,12 +128,10 @@ struct TouchActionHandlerTests {
     @Test("Touch object in room")
     func testTouchObjectInRoom() async throws {
         // Given
-        let table = Item(
-            id: "table",
-            .name("wooden table"),
-            .description("A sturdy wooden table."),
+        let table = Item("table")
+            .name("wooden table")
+            .description("A sturdy wooden table.")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: table
@@ -171,13 +159,11 @@ struct TouchActionHandlerTests {
     @Test("Touch held item")
     func testTouchHeldItem() async throws {
         // Given
-        let coin = Item(
-            id: "coin",
-            .name("gold coin"),
-            .description("A shiny gold coin."),
-            .isTakable,
+        let coin = Item("coin")
+            .name("gold coin")
+            .description("A shiny gold coin.")
+            .isTakable
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: coin
@@ -205,22 +191,18 @@ struct TouchActionHandlerTests {
     @Test("Touch object in open container")
     func testTouchObjectInOpenContainer() async throws {
         // Given
-        let box = Item(
-            id: "box",
-            .name("wooden box"),
-            .description("A wooden storage box."),
-            .isContainer,
-            .isOpenable,
-            .isOpen,
+        let box = Item("box")
+            .name("wooden box")
+            .description("A wooden storage box.")
+            .isContainer
+            .isOpenable
+            .isOpen
             .in(.startRoom)
-        )
 
-        let gem = Item(
-            id: "gem",
-            .name("sparkling gem"),
-            .description("A beautiful gem."),
+        let gem = Item("gem")
+            .name("sparkling gem")
+            .description("A beautiful gem.")
             .in(.item("box"))
-        )
 
         let game = MinimalGame(
             items: box, gem
@@ -248,12 +230,10 @@ struct TouchActionHandlerTests {
     @Test("Touching sets isTouched flag")
     func testTouchingSetsTouchedFlag() async throws {
         // Given
-        let crystal = Item(
-            id: "crystal",
-            .name("blue crystal"),
-            .description("A mysterious blue crystal."),
+        let crystal = Item("crystal")
+            .name("blue crystal")
+            .description("A mysterious blue crystal.")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: crystal
@@ -278,19 +258,15 @@ struct TouchActionHandlerTests {
     @Test("Touch multiple objects in sequence")
     func testTouchMultipleObjects() async throws {
         // Given
-        let wall = Item(
-            id: "wall",
-            .name("stone wall"),
-            .description("A rough stone wall."),
+        let wall = Item("wall")
+            .name("stone wall")
+            .description("A rough stone wall.")
             .in(.startRoom)
-        )
 
-        let door = Item(
-            id: "door",
-            .name("oak door"),
-            .description("A heavy oak door."),
+        let door = Item("door")
+            .name("oak door")
+            .description("A heavy oak door.")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: wall, door
@@ -327,13 +303,11 @@ struct TouchActionHandlerTests {
     @Test("Touch already touched object still responds")
     func testTouchAlreadyTouchedObject() async throws {
         // Given
-        let orb = Item(
-            id: "orb",
-            .name("glowing orb"),
-            .description("A mysterious glowing orb."),
-            .isTouched,  // Already touched
+        let orb = Item("orb")
+            .name("glowing orb")
+            .description("A mysterious glowing orb.")
+            .isTouched  // Already touched
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: orb
@@ -361,13 +335,11 @@ struct TouchActionHandlerTests {
     @Test("Touch character produces character response")
     func testTouchCharacter() async throws {
         // Given
-        let wizard = Item(
-            id: "wizard",
-            .name("old wizard"),
-            .description("A wise old wizard."),
-            .characterSheet(.wise),
+        let wizard = Item("wizard")
+            .name("old wizard")
+            .description("A wise old wizard.")
+            .characterSheet(.wise)
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: wizard
@@ -438,19 +410,15 @@ struct TouchActionHandlerTests {
     @Test("Cannot touch character not in scope")
     func testCannotTouchCharacterNotInScope() async throws {
         // Given
-        let anotherRoom = Location(
-            id: "anotherRoom",
-            .name("Another Room"),
+        let anotherRoom = Location("anotherRoom")
+            .name("Another Room")
             .inherentlyLit
-        )
 
-        let remoteWizard = Item(
-            id: "remoteWizard",
-            .name("remote wizard"),
-            .description("A wizard in another room."),
-            .characterSheet(.default),
+        let remoteWizard = Item("remoteWizard")
+            .name("remote wizard")
+            .description("A wizard in another room.")
+            .characterSheet(.default)
             .in("anotherRoom")
-        )
 
         let game = MinimalGame(
             locations: anotherRoom,
@@ -474,21 +442,17 @@ struct TouchActionHandlerTests {
     @Test("Cannot touch enemy not in scope")
     func testCannotTouchEnemyNotInScope() async throws {
         // Given
-        let anotherRoom = Location(
-            id: "anotherRoom",
-            .name("Another Room"),
+        let anotherRoom = Location("anotherRoom")
+            .name("Another Room")
             .inherentlyLit
-        )
 
-        let remoteTroll = Item(
-            id: "remoteTroll",
-            .name("remote troll"),
-            .description("A troll in another room."),
+        let remoteTroll = Item("remoteTroll")
+            .name("remote troll")
+            .description("A troll in another room.")
             .characterSheet(
                 CharacterSheet(isFighting: true)
-            ),
+            )
             .in("anotherRoom")
-        )
 
         let game = MinimalGame(
             locations: anotherRoom,
@@ -512,19 +476,15 @@ struct TouchActionHandlerTests {
     @Test("Touch character in dark room requires light")
     func testTouchCharacterRequiresLight() async throws {
         // Given: Dark room with character
-        let darkRoom = Location(
-            id: "darkRoom",
-            .name("Dark Room"),
+        let darkRoom = Location("darkRoom")
+            .name("Dark Room")
             .description("A pitch black room.")
-        )
 
-        let wizard = Item(
-            id: "wizard",
-            .name("old wizard"),
-            .description("A wise old wizard."),
-            .characterSheet(.wise),
+        let wizard = Item("wizard")
+            .name("old wizard")
+            .description("A wise old wizard.")
+            .characterSheet(.wise)
             .in("darkRoom")
-        )
 
         let game = MinimalGame(
             player: Player(in: "darkRoom"),
@@ -550,11 +510,9 @@ struct TouchActionHandlerTests {
     @Test("Touch enemy in dark room requires light")
     func testTouchEnemyRequiresLight() async throws {
         // Given: Dark room with enemy
-        let darkRoom = Location(
-            id: "darkRoom",
-            .name("Dark Room"),
+        let darkRoom = Location("darkRoom")
+            .name("Dark Room")
             .description("A pitch black room.")
-        )
 
         let game = MinimalGame(
             player: Player(in: "darkRoom"),
@@ -580,14 +538,12 @@ struct TouchActionHandlerTests {
     @Test("Touch character when carrying them")
     func testTouchCharacterWhenCarrying() async throws {
         // Given
-        let fairy = Item(
-            id: "fairy",
-            .name("tiny fairy"),
-            .description("A tiny magical fairy."),
-            .characterSheet(.default),
-            .isTakable,
+        let fairy = Item("fairy")
+            .name("tiny fairy")
+            .description("A tiny magical fairy.")
+            .characterSheet(.default)
+            .isTakable
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: fairy
@@ -614,20 +570,16 @@ struct TouchActionHandlerTests {
     @Test("Touch multiple character types in sequence")
     func testTouchMultipleCharacterTypes() async throws {
         // Given
-        let wizard = Item(
-            id: "wizard",
-            .name("old wizard"),
-            .description("A wise old wizard."),
-            .characterSheet(.wise),
+        let wizard = Item("wizard")
+            .name("old wizard")
+            .description("A wise old wizard.")
+            .characterSheet(.wise)
             .in(.startRoom)
-        )
 
-        let statue = Item(
-            id: "statue",
-            .name("marble statue"),
-            .description("A cold marble statue."),
+        let statue = Item("statue")
+            .name("marble statue")
+            .description("A cold marble statue.")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: wizard, Lab.troll, statue

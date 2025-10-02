@@ -31,11 +31,9 @@ struct CurseActionHandlerTests {
     @Test("Curse works in dark rooms")
     func testCurseWorksInDarkRooms() async throws {
         // Given: Dark room (no light required for cursing)
-        let darkRoom = Location(
-            id: "darkRoom",
-            .name("Dark Room"),
+        let darkRoom = Location("darkRoom")
+            .name("Dark Room")
             .description("A pitch black room.")
-        )
 
         let game = MinimalGame(
             player: Player(in: "darkRoom"),

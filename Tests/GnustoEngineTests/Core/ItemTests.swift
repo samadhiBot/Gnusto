@@ -13,31 +13,27 @@ struct ItemTests {
     let defaultItemName = "thing"
 
     func createDefaultItem() -> Item {
-        Item(
-            id: defaultItemID,
+        Item(defaultItemID)
             .name(defaultItemName)
-        )
     }
 
     func createCustomItem() -> Item {
-        Item(
-            id: "customItem",
-            .adjectives("brass", "shiny"),
-            .capacity(5),
-            .description("A sturdy brass lantern."),
-            .firstDescription("A shiny brass lantern rests here."),
-            .in(.player),
-            .isLightSource,
-            .isOn,
-            .isOpenable,
-            .isTakable,
-            .name("lantern"),
-            .readText("Engraved on the bottom: \"Property of Frobozz Magic Lantern Co.\""),
-            .readWhileHeldText("It feels warm."),
-            .shortDescription("The brass lantern is here."),
-            .size(10),
+        Item("customItem")
+            .adjectives("brass", "shiny")
+            .capacity(5)
+            .description("A sturdy brass lantern.")
+            .firstDescription("A shiny brass lantern rests here.")
+            .in(.player)
+            .isLightSource
+            .isOn
+            .isOpenable
+            .isTakable
+            .name("lantern")
+            .readText("Engraved on the bottom: \"Property of Frobozz Magic Lantern Co.\"")
+            .readWhileHeldText("It feels warm.")
+            .shortDescription("The brass lantern is here.")
+            .size(10)
             .synonyms("lamp", "light")
-        )
     }
 
     // MARK: - Core Struct Tests
@@ -218,8 +214,11 @@ struct ItemTests {
 
     @Test("ItemProxy equality and hashing")
     func testItemProxyEqualityAndHashing() async throws {
-        let item1 = Item(id: "item1", .name("First Item"))
-        let item2 = Item(id: "item2", .name("Second Item"))
+        let item1 = Item("item1")
+            .name("First Item")
+
+        let item2 = Item("item2")
+            .name("Second Item")
 
         let game = MinimalGame(items: item1, item2)
         let (engine, _) = await GameEngine.test(blueprint: game)
@@ -248,7 +247,9 @@ struct ItemTests {
 
     @Test("ItemProxy handles missing properties gracefully")
     func testItemProxyMissingProperties() async throws {
-        let item = Item(id: "minimal", .name("Minimal Item"))
+        let item = Item("minimal")
+            .name("Minimal Item")
+
         let game = MinimalGame(items: item)
         let (engine, _) = await GameEngine.test(blueprint: game)
 
@@ -267,9 +268,14 @@ struct ItemTests {
 
     @Test("ItemProxy comparison and sorting")
     func testItemProxyComparison() async throws {
-        let itemA = Item(id: "apple", .name("Apple"))
-        let itemB = Item(id: "banana", .name("Banana"))
-        let itemC = Item(id: "cherry", .name("Cherry"))
+        let itemA = Item("apple")
+            .name("Apple")
+
+        let itemB = Item("banana")
+            .name("Banana")
+
+        let itemC = Item("cherry")
+            .name("Cherry")
 
         let game = MinimalGame(items: itemA, itemB, itemC)
         let (engine, _) = await GameEngine.test(blueprint: game)

@@ -12,19 +12,15 @@ struct LocationEventHandlerTests {
     private func createTestGame(
         locationEventHandlers: [LocationID: LocationEventHandler] = [:]
     ) -> MinimalGame {
-        let startRoom = Location(
-            id: .startRoom,
-            .name("Starting Room"),
-            .inherentlyLit,
-            .exits(.north("anotherRoom"))
-        )
-
-        let anotherRoom = Location(
-            id: "anotherRoom",
-            .name("Another Room"),
-            .description("Another room for testing."),
+        let startRoom = Location(.startRoom)
+            .name("Starting Room")
             .inherentlyLit
-        )
+            .north("anotherRoom")
+
+        let anotherRoom = Location("anotherRoom")
+            .name("Another Room")
+            .description("Another room for testing.")
+            .inherentlyLit
 
         return MinimalGame(
             locations: startRoom, anotherRoom,
@@ -167,14 +163,11 @@ struct LocationEventHandlerTests {
             return nil
         }
 
-        let anotherRoom = Location(
-            id: "anotherRoom",
-            .name("Another Room"),
-            .description("Another room."),
-            .inherentlyLit,
-            .exits(.north(.startRoom))
-        )
-
+        let anotherRoom = Location("anotherRoom")
+            .name("Another Room")
+            .description("Another room.")
+            .inherentlyLit
+            .north(.startRoom)
         let game = MinimalGame(
             player: Player(in: "anotherRoom"),
             locations: anotherRoom,
@@ -265,22 +258,17 @@ struct LocationEventHandlerTests {
             return nil
         }
 
-        let startRoom = Location(
-            id: .startRoom,
-            .name("Test Room"),
-            .description("A room for testing."),
-            .inherentlyLit,
-            .exits(.south("destination"))
-        )
+        let startRoom = Location(.startRoom)
+            .name("Test Room")
+            .description("A room for testing.")
+            .inherentlyLit
+            .south("destination")
 
-        let destination = Location(
-            id: "destination",
-            .name("Destination Room"),
-            .description("The destination location."),
-            .inherentlyLit,
-            .exits(.north(.startRoom))
-        )
-
+        let destination = Location("destination")
+            .name("Destination Room")
+            .description("The destination location.")
+            .inherentlyLit
+            .north(.startRoom)
         let game = MinimalGame(
             locations: startRoom, destination,
             locationEventHandlers: ["destination": handler]
@@ -363,21 +351,17 @@ struct LocationEventHandlerTests {
             return nil
         }
 
-        let room1 = Location(
-            id: "room1",
-            .name("Room 1"),
-            .description("First room."),
-            .inherentlyLit,
-            .exits(.east("room2"))
-        )
+        let room1 = Location("room1")
+            .name("Room 1")
+            .description("First room.")
+            .inherentlyLit
+            .east("room2")
 
-        let room2 = Location(
-            id: "room2",
-            .name("Room 2"),
-            .description("Second room."),
-            .inherentlyLit,
-            .exits(.west("room1"))
-        )
+        let room2 = Location("room2")
+            .name("Room 2")
+            .description("Second room.")
+            .inherentlyLit
+            .west("room1")
 
         let game = MinimalGame(
             player: Player(in: "room1"),
@@ -449,12 +433,10 @@ struct LocationEventHandlerTests {
             return nil
         }
 
-        let testItem = Item(
-            id: "testItem",
-            .name("test item"),
-            .isTakable,
+        let testItem = Item("testItem")
+            .name("test item")
+            .isTakable
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             locations: createTestGame().locations[0],
@@ -481,21 +463,17 @@ struct LocationEventHandlerTests {
             return nil
         }
 
-        let startRoom = Location(
-            id: .startRoom,
-            .name("Test Room"),
-            .description("A room for testing."),
-            .inherentlyLit,
-            .exits(.south("destinationRoom"))
-        )
+        let startRoom = Location(.startRoom)
+            .name("Test Room")
+            .description("A room for testing.")
+            .inherentlyLit
+            .south("destinationRoom")
 
-        let destinationRoom = Location(
-            id: "destinationRoom",
-            .name("Destination Room"),
-            .description("Destination location."),
-            .inherentlyLit,
-            .exits(.north("startRoom"))
-        )
+        let destinationRoom = Location("destinationRoom")
+            .name("Destination Room")
+            .description("Destination location.")
+            .inherentlyLit
+            .north("startRoom")
 
         let game = MinimalGame(
             locations: startRoom, destinationRoom,
@@ -654,21 +632,17 @@ struct LocationEventHandlerTests {
             }
         }
 
-        let testRoom = Location(
-            id: .startRoom,
-            .name("Test Room"),
-            .description("A test room that can be lit or dark."),
-            .exits(.north("otherRoom"))
+        let testRoom = Location(.startRoom)
+            .name("Test Room")
+            .description("A test room that can be lit or dark.")
+            .north("otherRoom")
             // Note: no .inherentlyLit - starts dark
-        )
 
-        let otherRoom = Location(
-            id: "otherRoom",
-            .name("Other Room"),
-            .description("Another room."),
-            .inherentlyLit,
-            .exits(.south(.startRoom))
-        )
+        let otherRoom = Location("otherRoom")
+            .name("Other Room")
+            .description("Another room.")
+            .inherentlyLit
+            .south(.startRoom)
 
         let game = MinimalGame(
             player: Player(in: .startRoom),
@@ -699,13 +673,11 @@ struct LocationEventHandlerTests {
         )
 
         // Now test with a lit room by creating a new engine with lit room
-        let litTestRoom = Location(
-            id: .startRoom,
-            .name("Test Room"),
-            .description("A test room that can be lit or dark."),
-            .inherentlyLit,  // This room starts lit
-            .exits(.north("otherRoom"))
-        )
+        let litTestRoom = Location(.startRoom)
+            .name("Test Room")
+            .description("A test room that can be lit or dark.")
+            .inherentlyLit  // This room starts lit
+            .north("otherRoom")
 
         let litGame = MinimalGame(
             locations: litTestRoom, otherRoom,

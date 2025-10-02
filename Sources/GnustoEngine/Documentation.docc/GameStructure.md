@@ -62,14 +62,13 @@ CloakOfDarkness/
 
 ### Defining Static Content
 
-Your static definitions describe the initial state of the world--how things are when the adventure begins. For example, inside the Opera House in _Cloak of Darkness_, there is a cloakroom, and in that cloakroom there is a small brass hook screwed to the wall: 
+Your static definitions describe the initial state of the world--how things are when the adventure begins. For example, inside the Opera House in _Cloak of Darkness_, there is a cloakroom, and in that cloakroom there is a small brass hook screwed to the wall:
 
 ```swift
 struct OperaHouse {
     // ...
-    let cloakroom = Location(
-        id: .cloakroom,
-        .name("Cloakroom"),
+    let cloakroom = Location(.cloakroom)
+        .name("Cloakroom")
         .description(
             """
             The walls of this small room were clearly once lined with hooks,
@@ -78,16 +77,14 @@ struct OperaHouse {
         ),
         .exits(.east(.foyer)),
         .inherentlyLit
-    )
 
-    let hook = Item(
-        id: .hook,
-        .adjectives("small", "brass"),
-        .in(.cloakroom),
-        .omitDescription,
-        .isSurface,
-        .name("small brass hook"),
-        .synonyms("peg"),
+    let hook = Item(.hook)
+        .adjectives("small", "brass")
+        .in(.cloakroom)
+        .omitDescription
+        .isSurface
+        .name("small brass hook")
+        .synonyms("peg")
     )
     // ...
 }
@@ -304,4 +301,3 @@ This separation keeps your code organized, maintainable, and powerful--letting y
 - **Advanced Event Handling**: Complex command interception patterns
 - **Custom Properties**: Extending the proxy system with your own computations
 - **Combat Systems**: Building interactive combat with proxies and handlers
-

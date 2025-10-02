@@ -11,15 +11,13 @@ struct ProxySystemIntegrationTests {
     @Test("ItemProxy integrates correctly with state changes through engine")
     func testItemProxyStateChangeIntegration() async throws {
         // Given
-        let lamp = Item(
-            id: "lamp",
-            .name("brass lamp"),
-            .description("A shiny brass lamp."),
-            .isLightSource,
-            .isDevice,
-            .isTakable,
+        let lamp = Item("lamp")
+            .name("brass lamp")
+            .description("A shiny brass lamp.")
+            .isLightSource
+            .isDevice
+            .isTakable
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: lamp
@@ -58,30 +56,24 @@ struct ProxySystemIntegrationTests {
     @Test("LocationProxy integrates with dynamic lighting calculations")
     func testLocationProxyLightingIntegration() async throws {
         // Given
-        let darkRoom = Location(
-            id: "darkRoom",
-            .name("Dark Room"),
+        let darkRoom = Location("darkRoom")
+            .name("Dark Room")
             .description("A pitch black room.")
-            // No .inherentlyLit - room starts dark
-        )
+        // No .inherentlyLit - room starts dark
 
-        let brightRoom = Location(
-            id: "brightRoom",
-            .name("Bright Room"),
-            .description("A well-lit room."),
+        let brightRoom = Location("brightRoom")
+            .name("Bright Room")
+            .description("A well-lit room.")
             .inherentlyLit
-        )
 
-        let torch = Item(
-            id: "torch",
-            .name("wooden torch"),
-            .description("A burning wooden torch."),
-            .isLightSource,
-            .isDevice,
-            .isOn,
-            .isTakable,
+        let torch = Item("torch")
+            .name("wooden torch")
+            .description("A burning wooden torch.")
+            .isLightSource
+            .isDevice
+            .isOn
+            .isTakable
             .in(.player)
-        )
 
         let game = MinimalGame(
             player: Player(in: "darkRoom"),
@@ -120,31 +112,21 @@ struct ProxySystemIntegrationTests {
     @Test("PlayerProxy integrates with movement and inventory changes")
     func testPlayerProxyMovementIntegration() async throws {
         // Given
-        let room1 = Location(
-            id: "room1",
-            .name("Room One"),
-            .inherentlyLit,
-            .exits(
-                .east("room2")
-            )
-        )
+        let room1 = Location("room1")
+            .name("Room One")
+            .inherentlyLit
+            .east("room2")
 
-        let room2 = Location(
-            id: "room2",
-            .name("Room Two"),
-            .inherentlyLit,
-            .exits(
-                .west("room1")
-            )
-        )
+        let room2 = Location("room2")
+            .name("Room Two")
+            .inherentlyLit
+            .west("room1")
 
-        let coin = Item(
-            id: "coin",
-            .name("gold coin"),
-            .description("A shiny gold coin."),
-            .isTakable,
+        let coin = Item("coin")
+            .name("gold coin")
+            .description("A shiny gold coin.")
+            .isTakable
             .in("room1")
-        )
 
         let game = MinimalGame(
             player: Player(in: "room1"),
@@ -193,45 +175,33 @@ struct ProxySystemIntegrationTests {
     @Test("Complex scenario with multiple interacting proxies")
     func testComplexMultiProxyScenario() async throws {
         // Given
-        let laboratory = Location(
-            id: "laboratory",
-            .name("Mad Scientist's Laboratory"),
-            .description("A cluttered laboratory filled with strange equipment."),
-            .inherentlyLit,
-            .exits(
-                .south("darkVault")
-            )
-        )
+        let laboratory = Location("laboratory")
+            .name("Mad Scientist's Laboratory")
+            .description("A cluttered laboratory filled with strange equipment.")
+            .inherentlyLit
+            .south("darkVault")
 
-        let darkVault = Location(
-            id: "darkVault",
-            .name("Dark Vault"),
-            .description("A pitch black vault."),
-            .exits(
-                .north("laboratory")
-            )
+        let darkVault = Location("darkVault")
+            .name("Dark Vault")
+            .description("A pitch black vault.")
+            .north("laboratory")
             // No inherent lighting
-        )
 
-        let mysteriousBox = Item(
-            id: "mysteriousBox",
-            .name("mysterious box"),
-            .description("A strange box with glowing runes."),
-            .isContainer,
-            .isOpenable,
-            .isTakable,
+        let mysteriousBox = Item("mysteriousBox")
+            .name("mysterious box")
+            .description("A strange box with glowing runes.")
+            .isContainer
+            .isOpenable
+            .isTakable
             .in("laboratory")
-        )
 
-        let crystalOrb = Item(
-            id: "crystalOrb",
-            .name("crystal orb"),
-            .description("A glowing crystal orb."),
-            .isLightSource,
-            .isOn,
-            .isTakable,
+        let crystalOrb = Item("crystalOrb")
+            .name("crystal orb")
+            .description("A glowing crystal orb.")
+            .isLightSource
+            .isOn
+            .isTakable
             .in(.item("mysteriousBox"))
-        )
 
         let game = MinimalGame(
             player: Player(in: "laboratory"),
@@ -315,13 +285,12 @@ struct ProxySystemIntegrationTests {
         var items: [Item] = []
         for i in 1...5 {
             items.append(
-                Item(
-                    id: ItemID("item\(i)"),
-                    .name("test item \(i)"),
-                    .description("Test item number \(i)."),
-                    .isTakable,
+                Item(ItemID("item\(i)"))
+                    .name("test item \(i)")
+                    .description("Test item number \(i).")
+                    .isTakable
                     .in(.startRoom)
-                ))
+            )
         }
 
         let game = MinimalGame(
@@ -358,42 +327,34 @@ struct ProxySystemIntegrationTests {
     @Test("Proxy computed properties work correctly in complex scenarios")
     func testProxyComputedPropertiesIntegration() async throws {
         // Given
-        let workshop = Location(
-            id: "workshop",
-            .name("Inventor's Workshop"),
-            .description("A workshop filled with mechanical contraptions."),
+        let workshop = Location("workshop")
+            .name("Inventor's Workshop")
+            .description("A workshop filled with mechanical contraptions.")
             .inherentlyLit
-        )
 
-        let mechanicalDevice = Item(
-            id: "mechanicalDevice",
-            .name("mechanical device"),
-            .description("A complex mechanical device with gears and springs."),
-            .isDevice,
-            .isContainer,
-            .isOpenable,
-            .isTakable,
-            .capacity(3),
+        let mechanicalDevice = Item("mechanicalDevice")
+            .name("mechanical device")
+            .description("A complex mechanical device with gears and springs.")
+            .isDevice
+            .isContainer
+            .isOpenable
+            .isTakable
+            .capacity(3)
             .in("workshop")
-        )
 
-        let gear1 = Item(
-            id: "gear1",
-            .name("bronze gear"),
-            .description("A small bronze gear."),
-            .isTakable,
-            .size(1),
+        let gear1 = Item("gear1")
+            .name("bronze gear")
+            .description("A small bronze gear.")
+            .isTakable
+            .size(1)
             .in(.item("mechanicalDevice"))
-        )
 
-        let gear2 = Item(
-            id: "gear2",
-            .name("silver gear"),
-            .description("A medium silver gear."),
-            .isTakable,
-            .size(2),
+        let gear2 = Item("gear2")
+            .name("silver gear")
+            .description("A medium silver gear.")
+            .isTakable
+            .size(2)
             .in(.item("mechanicalDevice"))
-        )
 
         let game = MinimalGame(
             player: Player(in: "workshop"),
@@ -443,29 +404,22 @@ struct ProxySystemIntegrationTests {
     @Test("Proxies correctly communicate changes across the system")
     func testCrossProxyCommunication() async throws {
         // Given
-        let magicShop = Location(
-            id: "magicShop",
-            .name("Magic Shop"),
-            .description("A mystical shop filled with enchanted items."),
+        let magicShop = Location("magicShop")
+            .name("Magic Shop")
+            .description("A mystical shop filled with enchanted items.")
             .inherentlyLit
-        )
 
-        let enchantedMirror = Item(
-            id: "enchantedMirror",
-            .name("enchanted mirror"),
-            .description("A mirror that reflects magical auras."),
-            .in("magicShop")
-        )
+        let enchantedMirror = Item("enchantedMirror")
+            .name("enchanted mirror")
+            .description("A mirror that reflects magical auras.")
 
-        let magicWand = Item(
-            id: "magicWand",
-            .name("magic wand"),
-            .description("A wand crackling with arcane energy."),
-            .isLightSource,
-            .isDevice,
-            .isTakable,
+        let magicWand = Item("magicWand")
+            .name("magic wand")
+            .description("A wand crackling with arcane energy.")
+            .isLightSource
+            .isDevice
+            .isTakable
             .in("magicShop")
-        )
 
         let game = MinimalGame(
             player: Player(in: "magicShop"),

@@ -40,12 +40,10 @@ struct UnscriptActionHandlerTests {
     @Test("UNSCRIPT requires no light")
     func testUnscriptRequiresNoLight() async throws {
         // Given: Dark room (to verify light is not required)
-        let darkRoom = Location(
-            id: "darkRoom",
-            .name("Dark Room"),
+        let darkRoom = Location("darkRoom")
+            .name("Dark Room")
             .description("A pitch black room.")
             // Note: No .inherentlyLit property
-        )
 
         let game = MinimalGame(
             player: Player(in: "darkRoom"),
@@ -98,15 +96,13 @@ struct UnscriptActionHandlerTests {
     @Test("UNSCRIPT works with complex game state")
     func testUnscriptWorksWithComplexState() async throws {
         // Given: Complex game state
-        let lamp = Item(
-            id: "lamp",
-            .name("brass lamp"),
-            .description("A shiny brass lamp."),
-            .isLightSource,
-            .isDevice,
-            .isTakable,
+        let lamp = Item("lamp")
+            .name("brass lamp")
+            .description("A shiny brass lamp.")
+            .isLightSource
+            .isDevice
+            .isTakable
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: lamp
@@ -177,13 +173,11 @@ struct UnscriptActionHandlerTests {
     @Test("UNSCRIPT preserves other game state")
     func testUnscriptPreservesGameState() async throws {
         // Given
-        let book = Item(
-            id: "book",
-            .name("leather book"),
-            .description("A bound leather book."),
-            .isTakable,
+        let book = Item("book")
+            .name("leather book")
+            .description("A bound leather book.")
+            .isTakable
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: book
@@ -396,13 +390,11 @@ struct UnscriptActionHandlerTests {
     @Test("UNSCRIPT with other game activities")
     func testUnscriptWithOtherActivities() async throws {
         // Given
-        let coin = Item(
-            id: "coin",
-            .name("gold coin"),
-            .description("A shiny gold coin."),
-            .isTakable,
+        let coin = Item("coin")
+            .name("gold coin")
+            .description("A shiny gold coin.")
+            .isTakable
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: coin

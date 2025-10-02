@@ -11,13 +11,11 @@ struct CoreProxyIntegrationTests {
     @Test("ItemProxy basic functionality works correctly")
     func testItemProxyBasicFunctionality() async throws {
         // Given
-        let testItem = Item(
-            id: "testItem",
-            .name("test item"),
-            .description("A simple test item."),
-            .isTakable,
+        let testItem = Item("testItem")
+            .name("test item")
+            .description("A simple test item.")
+            .isTakable
             .in(.startRoom)
-        )
 
         let game = MinimalGame(items: testItem)
 
@@ -47,15 +45,13 @@ struct CoreProxyIntegrationTests {
     @Test("ItemProxy state changes work through engine")
     func testItemProxyStateChanges() async throws {
         // Given
-        let lamp = Item(
-            id: "lamp",
-            .name("brass lamp"),
-            .description("A shiny brass lamp."),
-            .isLightSource,
-            .isDevice,
-            .isTakable,
+        let lamp = Item("lamp")
+            .name("brass lamp")
+            .description("A shiny brass lamp.")
+            .isLightSource
+            .isDevice
+            .isTakable
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: lamp
@@ -80,19 +76,15 @@ struct CoreProxyIntegrationTests {
     @Test("LocationProxy basic functionality works correctly")
     func testLocationProxyBasicFunctionality() async throws {
         // Given
-        let brightRoom = Location(
-            id: "brightRoom",
-            .name("Bright Room"),
-            .description("A well-lit room."),
+        let brightRoom = Location("brightRoom")
+            .name("Bright Room")
+            .description("A well-lit room.")
             .inherentlyLit
-        )
 
-        let darkRoom = Location(
-            id: "darkRoom",
-            .name("Dark Room"),
+        let darkRoom = Location("darkRoom")
+            .name("Dark Room")
             .description("A dark room.")
             // No inherent lighting
-        )
 
         let game = MinimalGame(
             player: Player(in: "brightRoom"),
@@ -115,21 +107,17 @@ struct CoreProxyIntegrationTests {
     @Test("LocationProxy shows correct items")
     func testLocationProxyItems() async throws {
         // Given
-        let coin = Item(
-            id: "coin",
-            .name("gold coin"),
-            .description("A shiny gold coin."),
-            .isTakable,
+        let coin = Item("coin")
+            .name("gold coin")
+            .description("A shiny gold coin.")
+            .isTakable
             .in(.startRoom)
-        )
 
-        let statue = Item(
-            id: "statue",
-            .name("stone statue"),
-            .description("A heavy stone statue."),
+        let statue = Item("statue")
+            .name("stone statue")
+            .description("A heavy stone statue.")
             .in(.startRoom)
             // Not takable
-        )
 
         let game = MinimalGame(
             items: coin, statue
@@ -152,13 +140,11 @@ struct CoreProxyIntegrationTests {
     @Test("PlayerProxy basic functionality works correctly")
     func testPlayerProxyBasicFunctionality() async throws {
         // Given
-        let testItem = Item(
-            id: "testItem",
-            .name("test item"),
-            .description("A test item."),
-            .isTakable,
+        let testItem = Item("testItem")
+            .name("test item")
+            .description("A test item.")
+            .isTakable
             .in(.startRoom)
-        )
 
         let game = MinimalGame(items: testItem)
         let (engine, _) = await GameEngine.test(blueprint: game)
@@ -179,19 +165,15 @@ struct CoreProxyIntegrationTests {
     @Test("PlayerProxy inventory management works correctly")
     func testPlayerProxyInventoryManagement() async throws {
         // Given
-        let coin = Item(
-            id: "coin",
-            .name("gold coin"),
-            .isTakable,
+        let coin = Item("coin")
+            .name("gold coin")
+            .isTakable
             .in(.startRoom)
-        )
 
-        let key = Item(
-            id: "key",
-            .name("silver key"),
-            .isTakable,
+        let key = Item("key")
+            .name("silver key")
+            .isTakable
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: coin, key
@@ -230,13 +212,11 @@ struct CoreProxyIntegrationTests {
     @Test("Proxy system maintains consistency across operations")
     func testProxyConsistency() async throws {
         // Given
-        let testItem = Item(
-            id: "testItem",
-            .name("test item"),
-            .description("A test item."),
-            .isTakable,
+        let testItem = Item("testItem")
+            .name("test item")
+            .description("A test item.")
+            .isTakable
             .in(.startRoom)
-        )
 
         let game = MinimalGame(items: testItem)
         let (engine, _) = await GameEngine.test(blueprint: game)
@@ -270,24 +250,20 @@ struct CoreProxyIntegrationTests {
     @Test("Container proxies work correctly")
     func testContainerProxyIntegration() async throws {
         // Given
-        let box = Item(
-            id: "box",
-            .name("wooden box"),
-            .description("A sturdy wooden box."),
-            .isContainer,
-            .isOpenable,
-            .isOpen,
-            .isTakable,
+        let box = Item("box")
+            .name("wooden box")
+            .description("A sturdy wooden box.")
+            .isContainer
+            .isOpenable
+            .isOpen
+            .isTakable
             .in(.startRoom)
-        )
 
-        let gem = Item(
-            id: "gem",
-            .name("ruby gem"),
-            .description("A precious ruby gem."),
-            .isTakable,
+        let gem = Item("gem")
+            .name("ruby gem")
+            .description("A precious ruby gem.")
+            .isTakable
             .in(.item("box"))
-        )
 
         let game = MinimalGame(
             items: box, gem
@@ -328,13 +304,11 @@ struct CoreProxyIntegrationTests {
     @Test("State changes through proxies are properly validated")
     func testStateChangeValidation() async throws {
         // Given
-        let heavyItem = Item(
-            id: "heavyItem",
-            .name("heavy rock"),
-            .description("An immovable boulder."),
+        let heavyItem = Item("heavyItem")
+            .name("heavy rock")
+            .description("An immovable boulder.")
             .in(.startRoom)
             // Not takable
-        )
 
         let game = MinimalGame(
             items: heavyItem

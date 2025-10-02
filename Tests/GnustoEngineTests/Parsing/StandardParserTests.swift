@@ -120,13 +120,11 @@ struct StandardParserTests {
     @Test("Parse Verb + Direct Object")
     func testParseVerbDirectObject() async throws {
         // Given
-        let lamp = Item(
-            id: "lamp",
-            .name("brass lamp"),
-            .adjectives("brass"),
-            .in(.startRoom),
+        let lamp = Item("lamp")
+            .name("brass lamp")
+            .adjectives("brass")
+            .in(.startRoom)
             .isTakable
-        )
 
         let game = MinimalGame(
             items: lamp
@@ -152,21 +150,17 @@ struct StandardParserTests {
     @Test("Parse Verb + Direct Object + Modifiers")
     func testParseVerbDirectObjectMods() async throws {
         // Given
-        let lamp1 = Item(
-            id: "lamp1",
-            .name("brass lamp"),
-            .adjectives("brass"),
-            .in(.startRoom),
+        let lamp1 = Item("lamp1")
+            .name("brass lamp")
+            .adjectives("brass")
+            .in(.startRoom)
             .isTakable
-        )
 
-        let lamp2 = Item(
-            id: "lamp2",
-            .name("silver lamp"),
-            .adjectives("silver"),
-            .in(.startRoom),
+        let lamp2 = Item("lamp2")
+            .name("silver lamp")
+            .adjectives("silver")
+            .in(.startRoom)
             .isTakable
-        )
 
         let game = MinimalGame(
             items: lamp1, lamp2
@@ -197,21 +191,17 @@ struct StandardParserTests {
     @Test("Parse Verb + Direct + Preposition + Indirect")
     func testParseVerbDirectPrepIndirect() async throws {
         // Given
-        let key = Item(
-            id: "key",
-            .name("small key"),
-            .adjectives("small"),
-            .in(.player),
+        let key = Item("key")
+            .name("small key")
+            .adjectives("small")
+            .in(.player)
             .isTakable
-        )
 
-        let box = Item(
-            id: "box",
-            .name("wooden box"),
-            .adjectives("wooden"),
-            .in(.startRoom),
+        let box = Item("box")
+            .name("wooden box")
+            .adjectives("wooden")
+            .in(.startRoom)
             .isContainer
-        )
 
         let game = MinimalGame(
             items: key, box
@@ -239,12 +229,10 @@ struct StandardParserTests {
     @Test("Parse Object Not In Scope")
     func testParseObjectNotInScope() async throws {
         // Given
-        let hiddenItem = Item(
-            id: "hidden",
-            .name("hidden item"),
-            .in(.nowhere),
+        let hiddenItem = Item("hidden")
+            .name("hidden item")
+            .in(.nowhere)
             .isTakable
-        )
 
         let game = MinimalGame(
             items: hiddenItem
@@ -270,21 +258,17 @@ struct StandardParserTests {
     @Test("Parse Ambiguous Object Reference")
     func testParseAmbiguousObjectReference() async throws {
         // Given
-        let lamp1 = Item(
-            id: "lamp1",
-            .name("brass lamp"),
-            .adjectives("brass"),
-            .in(.startRoom),
+        let lamp1 = Item("lamp1")
+            .name("brass lamp")
+            .adjectives("brass")
+            .in(.startRoom)
             .isTakable
-        )
 
-        let lamp2 = Item(
-            id: "lamp2",
-            .name("silver lamp"),
-            .adjectives("silver"),
-            .in(.startRoom),
+        let lamp2 = Item("lamp2")
+            .name("silver lamp")
+            .adjectives("silver")
+            .in(.startRoom)
             .isTakable
-        )
 
         let game = MinimalGame(
             items: lamp1, lamp2

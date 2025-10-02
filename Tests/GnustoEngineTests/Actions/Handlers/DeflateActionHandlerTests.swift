@@ -11,15 +11,13 @@ struct DeflateActionHandlerTests {
     @Test("DEFLATE DIRECTOBJECT syntax works")
     func testDeflateDirectObjectSyntax() async throws {
         // Given
-        let balloon = Item(
-            id: "balloon",
-            .name("red balloon"),
-            .description("A red balloon."),
-            .isInflatable,
-            .isInflated,
-            .isTakable,
+        let balloon = Item("balloon")
+            .name("red balloon")
+            .description("A red balloon.")
+            .isInflatable
+            .isInflated
+            .isTakable
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: balloon
@@ -66,20 +64,16 @@ struct DeflateActionHandlerTests {
     @Test("Cannot deflate target not in scope")
     func testCannotDeflateTargetNotInScope() async throws {
         // Given
-        let anotherRoom = Location(
-            id: "anotherRoom",
-            .name("Another Room"),
+        let anotherRoom = Location("anotherRoom")
+            .name("Another Room")
             .inherentlyLit
-        )
 
-        let remoteBalloon = Item(
-            id: "remoteBalloon",
-            .name("remote balloon"),
-            .description("A balloon in another room."),
-            .isInflatable,
-            .isInflated,
+        let remoteBalloon = Item("remoteBalloon")
+            .name("remote balloon")
+            .description("A balloon in another room.")
+            .isInflatable
+            .isInflated
             .in("anotherRoom")
-        )
 
         let game = MinimalGame(
             locations: anotherRoom,
@@ -103,12 +97,10 @@ struct DeflateActionHandlerTests {
     @Test("Cannot deflate non-inflatable item")
     func testCannotDeflateNonInflatableItem() async throws {
         // Given
-        let rock = Item(
-            id: "rock",
-            .name("large rock"),
-            .description("A large boulder."),
+        let rock = Item("rock")
+            .name("large rock")
+            .description("A large boulder.")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: rock
@@ -131,21 +123,17 @@ struct DeflateActionHandlerTests {
     @Test("Requires light to deflate")
     func testRequiresLight() async throws {
         // Given: Dark room with inflatable item
-        let darkRoom = Location(
-            id: "darkRoom",
-            .name("Dark Room"),
+        let darkRoom = Location("darkRoom")
+            .name("Dark Room")
             .description("A pitch black room.")
             // Note: No .inherentlyLit property
-        )
 
-        let balloon = Item(
-            id: "balloon",
-            .name("red balloon"),
-            .description("A red balloon."),
-            .isInflatable,
-            .isInflated,
+        let balloon = Item("balloon")
+            .name("red balloon")
+            .description("A red balloon.")
+            .isInflatable
+            .isInflated
             .in("darkRoom")
-        )
 
         let game = MinimalGame(
             player: Player(in: "darkRoom"),
@@ -173,15 +161,13 @@ struct DeflateActionHandlerTests {
     @Test("Deflate inflated item succeeds")
     func testDeflateInflatedItemSucceeds() async throws {
         // Given
-        let raft = Item(
-            id: "raft",
-            .name("rubber raft"),
-            .description("A rubber raft."),
-            .isInflatable,
-            .isInflated,
-            .isTakable,
+        let raft = Item("raft")
+            .name("rubber raft")
+            .description("A rubber raft.")
+            .isInflatable
+            .isInflated
+            .isTakable
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: raft
@@ -210,15 +196,13 @@ struct DeflateActionHandlerTests {
     @Test("Deflate already deflated item gives appropriate message")
     func testDeflateAlreadyDeflatedItem() async throws {
         // Given
-        let balloon = Item(
-            id: "balloon",
-            .name("blue balloon"),
-            .description("A blue balloon."),
-            .isInflatable,
-            .isTakable,
+        let balloon = Item("balloon")
+            .name("blue balloon")
+            .description("A blue balloon.")
+            .isInflatable
+            .isTakable
             .in(.startRoom)
             // Note: No .isInflated flag - it's already deflated
-        )
 
         let game = MinimalGame(
             items: balloon
@@ -246,15 +230,13 @@ struct DeflateActionHandlerTests {
     @Test("Deflate item held by player")
     func testDeflateItemHeldByPlayer() async throws {
         // Given
-        let balloon = Item(
-            id: "balloon",
-            .name("green balloon"),
-            .description("A green balloon."),
-            .isInflatable,
-            .isInflated,
-            .isTakable,
+        let balloon = Item("balloon")
+            .name("green balloon")
+            .description("A green balloon.")
+            .isInflatable
+            .isInflated
+            .isTakable
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: balloon
@@ -281,23 +263,19 @@ struct DeflateActionHandlerTests {
     @Test("Deflate multiple different items")
     func testDeflateMultipleDifferentItems() async throws {
         // Given
-        let balloon = Item(
-            id: "balloon",
-            .name("yellow balloon"),
-            .description("A yellow balloon."),
-            .isInflatable,
-            .isInflated,
+        let balloon = Item("balloon")
+            .name("yellow balloon")
+            .description("A yellow balloon.")
+            .isInflatable
+            .isInflated
             .in(.startRoom)
-        )
 
-        let mattress = Item(
-            id: "mattress",
-            .name("air mattress"),
-            .description("An inflatable air mattress."),
-            .isInflatable,
-            .isInflated,
+        let mattress = Item("mattress")
+            .name("air mattress")
+            .description("An inflatable air mattress.")
+            .isInflatable
+            .isInflated
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: balloon, mattress

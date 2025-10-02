@@ -33,9 +33,8 @@ Here's a minimal example:
 
 ```swift
 // Define a location
-let foyer = Location(
-    id: .foyer,
-    .name("Foyer of the Opera House"),
+let foyer = Location(.foyer)
+    .name("Foyer of the Opera House")
     .description(
         """
         You are standing in a spacious hall, splendidly decorated in red
@@ -57,9 +56,8 @@ let foyer = Location(
 )
 
 // Define an item
-let cloak = Item(
-    id: .cloak,
-    .name("velvet cloak"),
+let cloak = Item(.cloak)
+    .name("velvet cloak")
     .description(
         """
         A handsome cloak, of velvet trimmed with satin, and slightly
@@ -67,9 +65,9 @@ let cloak = Item(
         almost seems to suck light from the room.
         """
     ),
-    .adjectives("handsome", "dark", "black", "velvet", "satin"),
-    .in(.player),
-    .isTakable,
+    .adjectives("handsome", "dark", "black", "velvet", "satin")
+    .in(.player)
+    .isTakable
     .isWearable,
     .isWorn,
 )
@@ -174,11 +172,10 @@ The architecture is designed to support multimedia extensions in the future, but
 **Gnusto provides basic NPC support through the ``CharacterSheet`` system. Conversation handling is on the roadmap.**
 
 ```swift
-let thief = Item(
-    id: .thief,
-    .name("thief"),
-    .synonyms("thief", "robber", "man", "person"),
-    .adjectives("shady", "suspicious", "seedy", "suspicious-looking", "sneaky"),
+let thief = Item(.thief)
+    .name("thief")
+    .synonyms("thief", "robber", "man", "person")
+    .adjectives("shady", "suspicious", "seedy", "suspicious-looking", "sneaky")
     .firstDescription(
         """
         There is a suspicious-looking individual, holding a large bag,

@@ -11,12 +11,10 @@ struct PushActionHandlerTests {
     @Test("PUSH DIRECTOBJECT syntax works")
     func testPushDirectObjectSyntax() async throws {
         // Given
-        let button = Item(
-            id: "button",
-            .name("red button"),
-            .description("A large red button."),
+        let button = Item("button")
+            .name("red button")
+            .description("A large red button.")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: button
@@ -42,13 +40,11 @@ struct PushActionHandlerTests {
     @Test("PUSH CHARACTER syntax works")
     func testPushCharacterSyntax() async throws {
         // Given
-        let towerGuard = Item(
-            id: "guard",
-            .name("surly guard"),
-            .description("A surly tower guard."),
-            .in(.startRoom),
-            .characterSheet(.init())
-        )
+        let towerGuard = Item("guard")
+            .name("surly guard")
+            .description("A surly tower guard.")
+            .in(.startRoom)
+            .characterSheet(.default)
 
         let game = MinimalGame(
             items: towerGuard
@@ -100,12 +96,10 @@ struct PushActionHandlerTests {
     @Test("PRESS DIRECTOBJECT syntax works")
     func testPressDirectObjectSyntax() async throws {
         // Given
-        let button = Item(
-            id: "button",
-            .name("red button"),
-            .description("A large red button."),
+        let button = Item("button")
+            .name("red button")
+            .description("A large red button.")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: button
@@ -131,12 +125,10 @@ struct PushActionHandlerTests {
     @Test("DEPRESS syntax works")
     func testDepressSyntax() async throws {
         // Given
-        let lightSwitch = Item(
-            id: "lightSwitch",
-            .name("light switch"),
-            .description("A standard light switch."),
+        let lightSwitch = Item("lightSwitch")
+            .name("light switch")
+            .description("A standard light switch.")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: lightSwitch
@@ -159,12 +151,10 @@ struct PushActionHandlerTests {
     @Test("SHOVE syntax works")
     func testShoveSyntax() async throws {
         // Given
-        let crate = Item(
-            id: "crate",
-            .name("wooden crate"),
-            .description("A heavy wooden crate."),
+        let crate = Item("crate")
+            .name("wooden crate")
+            .description("A heavy wooden crate.")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: crate
@@ -187,19 +177,15 @@ struct PushActionHandlerTests {
     @Test("PUSH ALL syntax works")
     func testPushAllSyntax() async throws {
         // Given
-        let button1 = Item(
-            id: "button1",
-            .name("first button"),
-            .description("A red button."),
+        let button1 = Item("button1")
+            .name("first button")
+            .description("A red button.")
             .in(.startRoom)
-        )
 
-        let button2 = Item(
-            id: "button2",
-            .name("second button"),
-            .description("A blue button."),
+        let button2 = Item("button2")
+            .name("second button")
+            .description("A blue button.")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: button1, button2
@@ -260,18 +246,14 @@ struct PushActionHandlerTests {
     @Test("Cannot push target not in scope")
     func testCannotPushTargetNotInScope() async throws {
         // Given
-        let anotherRoom = Location(
-            id: "anotherRoom",
-            .name("Another Room"),
+        let anotherRoom = Location("anotherRoom")
+            .name("Another Room")
             .inherentlyLit
-        )
 
-        let remoteButton = Item(
-            id: "remoteButton",
-            .name("remote button"),
-            .description("A button in another room."),
+        let remoteButton = Item("remoteButton")
+            .name("remote button")
+            .description("A button in another room.")
             .in("anotherRoom")
-        )
 
         let game = MinimalGame(
             locations: anotherRoom,
@@ -295,18 +277,14 @@ struct PushActionHandlerTests {
     @Test("Requires light to push")
     func testRequiresLight() async throws {
         // Given: Dark room with an object to push
-        let darkRoom = Location(
-            id: "darkRoom",
-            .name("Dark Room"),
+        let darkRoom = Location("darkRoom")
+            .name("Dark Room")
             .description("A pitch black room.")
-        )
 
-        let lever = Item(
-            id: "lever",
-            .name("metal lever"),
-            .description("A heavy metal lever."),
+        let lever = Item("lever")
+            .name("metal lever")
+            .description("A heavy metal lever.")
             .in("darkRoom")
-        )
 
         let game = MinimalGame(
             player: Player(in: "darkRoom"),
@@ -370,12 +348,10 @@ struct PushActionHandlerTests {
     @Test("Push object in room")
     func testPushObjectInRoom() async throws {
         // Given
-        let lightSwitch = Item(
-            id: "lightSwitch",
-            .name("light switch"),
-            .description("A simple light switch."),
+        let lightSwitch = Item("lightSwitch")
+            .name("light switch")
+            .description("A simple light switch.")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: lightSwitch
@@ -401,13 +377,11 @@ struct PushActionHandlerTests {
     @Test("Push held item")
     func testPushHeldItem() async throws {
         // Given
-        let device = Item(
-            id: "device",
-            .name("electronic device"),
-            .description("A small electronic device."),
-            .isTakable,
+        let device = Item("device")
+            .name("electronic device")
+            .description("A small electronic device.")
+            .isTakable
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: device
@@ -431,26 +405,20 @@ struct PushActionHandlerTests {
     @Test("Push multiple objects")
     func testPushMultipleObjects() async throws {
         // Given
-        let button1 = Item(
-            id: "button1",
-            .name("red button"),
-            .description("A red button."),
+        let button1 = Item("button1")
+            .name("red button")
+            .description("A red button.")
             .in(.startRoom)
-        )
 
-        let button2 = Item(
-            id: "button2",
-            .name("blue button"),
-            .description("A blue button."),
+        let button2 = Item("button2")
+            .name("blue button")
+            .description("A blue button.")
             .in(.startRoom)
-        )
 
-        let button3 = Item(
-            id: "button3",
-            .name("green button"),
-            .description("A green button."),
+        let button3 = Item("button3")
+            .name("green button")
+            .description("A green button.")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: button1, button2, button3
@@ -473,12 +441,10 @@ struct PushActionHandlerTests {
     @Test("Pushing sets isTouched flag")
     func testPushingSetsTouchedFlag() async throws {
         // Given
-        let doorbell = Item(
-            id: "doorbell",
-            .name("doorbell"),
-            .description("A brass doorbell button."),
+        let doorbell = Item("doorbell")
+            .name("doorbell")
+            .description("A brass doorbell button.")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: doorbell
@@ -501,22 +467,18 @@ struct PushActionHandlerTests {
     @Test("Push object in open container")
     func testPushObjectInOpenContainer() async throws {
         // Given
-        let box = Item(
-            id: "box",
-            .name("control box"),
-            .description("A control box with buttons."),
-            .isContainer,
-            .isOpenable,
-            .isOpen,
+        let box = Item("box")
+            .name("control box")
+            .description("A control box with buttons.")
+            .isContainer
+            .isOpenable
+            .isOpen
             .in(.startRoom)
-        )
 
-        let button = Item(
-            id: "button",
-            .name("emergency button"),
-            .description("A red emergency button."),
+        let button = Item("button")
+            .name("emergency button")
+            .description("A red emergency button.")
             .in(.item("box"))
-        )
 
         let game = MinimalGame(
             items: box, button
@@ -557,19 +519,15 @@ struct PushActionHandlerTests {
     @Test("Push sequence of different objects")
     func testPushSequenceOfDifferentObjects() async throws {
         // Given
-        let lever = Item(
-            id: "lever",
-            .name("wooden lever"),
-            .description("A wooden lever mechanism."),
+        let lever = Item("lever")
+            .name("wooden lever")
+            .description("A wooden lever mechanism.")
             .in(.startRoom)
-        )
 
-        let dial = Item(
-            id: "dial",
-            .name("brass dial"),
-            .description("A brass control dial."),
+        let dial = Item("dial")
+            .name("brass dial")
+            .description("A brass control dial.")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: lever, dial

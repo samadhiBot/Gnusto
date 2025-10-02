@@ -11,13 +11,11 @@ struct TellActionHandlerTests {
     @Test("TELL DIRECTOBJECT syntax works")
     func testTellDirectObjectSyntax() async throws {
         // Given
-        let wizard = Item(
-            id: "wizard",
-            .name("old wizard"),
-            .description("A wise old wizard."),
-            .characterSheet(.wise),
+        let wizard = Item("wizard")
+            .name("old wizard")
+            .description("A wise old wizard.")
+            .characterSheet(.wise)
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: wizard
@@ -43,20 +41,16 @@ struct TellActionHandlerTests {
     @Test("TELL DIRECTOBJECT ABOUT INDIRECTOBJECT syntax works")
     func testTellAboutSyntax() async throws {
         // Given
-        let sage = Item(
-            id: "sage",
-            .name("wise sage"),
-            .description("A knowledgeable sage."),
-            .characterSheet(.default),
+        let sage = Item("sage")
+            .name("wise sage")
+            .description("A knowledgeable sage.")
+            .characterSheet(.default)
             .in(.startRoom)
-        )
 
-        let crystal = Item(
-            id: "crystal",
-            .name("magic crystal"),
-            .description("A glowing crystal."),
+        let crystal = Item("crystal")
+            .name("magic crystal")
+            .description("A glowing crystal.")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: sage, crystal
@@ -83,20 +77,16 @@ struct TellActionHandlerTests {
     @Test("SPEAK TO DIRECTOBJECT ABOUT INDIRECTOBJECT syntax works")
     func testSpeakToAboutSyntax() async throws {
         // Given
-        let palaceGuard = Item(
-            id: "guard",
-            .name("palace guard"),
-            .description("A stern palace guard."),
-            .characterSheet(.default),
+        let palaceGuard = Item("guard")
+            .name("palace guard")
+            .description("A stern palace guard.")
+            .characterSheet(.default)
             .in(.startRoom)
-        )
 
-        let key = Item(
-            id: "key",
-            .name("silver key"),
-            .description("A small silver key."),
+        let key = Item("key")
+            .name("silver key")
+            .description("A small silver key.")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: palaceGuard, key
@@ -120,20 +110,16 @@ struct TellActionHandlerTests {
     @Test("TALK TO DIRECTOBJECT ABOUT INDIRECTOBJECT syntax works")
     func testTalkToAboutSyntax() async throws {
         // Given
-        let merchant = Item(
-            id: "merchant",
-            .name("traveling merchant"),
-            .description("A traveling merchant."),
-            .characterSheet(.default),
+        let merchant = Item("merchant")
+            .name("traveling merchant")
+            .description("A traveling merchant.")
+            .characterSheet(.default)
             .in(.startRoom)
-        )
 
-        let treasure = Item(
-            id: "treasure",
-            .name("ancient treasure"),
-            .description("A chest of ancient treasure."),
+        let treasure = Item("treasure")
+            .name("ancient treasure")
+            .description("A chest of ancient treasure.")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: merchant, treasure
@@ -157,20 +143,16 @@ struct TellActionHandlerTests {
     @Test("SAY INDIRECTOBJECT TO DIRECTOBJECT syntax works")
     func testSaySyntax() async throws {
         // Given
-        let priest = Item(
-            id: "priest",
-            .name("village priest"),
-            .description("A kindly village priest."),
-            .characterSheet(.default),
+        let priest = Item("priest")
+            .name("village priest")
+            .description("A kindly village priest.")
+            .characterSheet(.default)
             .in(.startRoom)
-        )
 
-        let blessing = Item(
-            id: "blessing",
-            .name("prayer blessing"),
-            .description("A sacred blessing."),
+        let blessing = Item("blessing")
+            .name("prayer blessing")
+            .description("A sacred blessing.")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: priest, blessing
@@ -194,20 +176,16 @@ struct TellActionHandlerTests {
     @Test("INFORM syntax works")
     func testInformSyntax() async throws {
         // Given
-        let scholar = Item(
-            id: "scholar",
-            .name("learned scholar"),
-            .description("A learned scholar."),
-            .characterSheet(.default),
+        let scholar = Item("scholar")
+            .name("learned scholar")
+            .description("A learned scholar.")
+            .characterSheet(.default)
             .in(.startRoom)
-        )
 
-        let book = Item(
-            id: "book",
-            .name("ancient book"),
-            .description("An ancient tome."),
+        let book = Item("book")
+            .name("ancient book")
+            .description("An ancient tome.")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: scholar, book
@@ -233,12 +211,10 @@ struct TellActionHandlerTests {
     @Test("Cannot tell without specifying who")
     func testCannotTellWithoutWho() async throws {
         // Given
-        let treasure = Item(
-            id: "treasure",
-            .name("gold treasure"),
-            .description("A pile of gold."),
+        let treasure = Item("treasure")
+            .name("gold treasure")
+            .description("A pile of gold.")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: treasure
@@ -279,19 +255,15 @@ struct TellActionHandlerTests {
     @Test("Cannot tell character not in scope")
     func testCannotTellCharacterNotInScope() async throws {
         // Given
-        let anotherRoom = Location(
-            id: "anotherRoom",
-            .name("Another Room"),
+        let anotherRoom = Location("anotherRoom")
+            .name("Another Room")
             .inherentlyLit
-        )
 
-        let distantWizard = Item(
-            id: "wizard",
-            .name("distant wizard"),
-            .description("A wizard in another room."),
-            .characterSheet(.default),
+        let distantWizard = Item("wizard")
+            .name("distant wizard")
+            .description("A wizard in another room.")
+            .characterSheet(.default)
             .in("anotherRoom")
-        )
 
         let game = MinimalGame(
             locations: anotherRoom,
@@ -315,12 +287,10 @@ struct TellActionHandlerTests {
     @Test("Cannot tell self about something")
     func testCannotTellSelf() async throws {
         // Given
-        let crystal = Item(
-            id: "crystal",
-            .name("magic crystal"),
-            .description("A glowing crystal."),
+        let crystal = Item("crystal")
+            .name("magic crystal")
+            .description("A glowing crystal.")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: crystal
@@ -344,20 +314,16 @@ struct TellActionHandlerTests {
     @Test("Requires light to tell")
     func testRequiresLight() async throws {
         // Given: Dark room with character
-        let darkRoom = Location(
-            id: "darkRoom",
-            .name("Dark Room"),
+        let darkRoom = Location("darkRoom")
+            .name("Dark Room")
             .description("A pitch black room.")
             // Note: No .inherentlyLit property
-        )
 
-        let wizard = Item(
-            id: "wizard",
-            .name("old wizard"),
-            .description("A wise old wizard."),
-            .characterSheet(.default),
+        let wizard = Item("wizard")
+            .name("old wizard")
+            .description("A wise old wizard.")
+            .characterSheet(.default)
             .in("darkRoom")
-        )
 
         let game = MinimalGame(
             player: Player(in: "darkRoom"),
@@ -385,13 +351,11 @@ struct TellActionHandlerTests {
     @Test("Tell character gives variety of responses")
     func testTellCharacterVariety() async throws {
         // Given
-        let wizard = Item(
-            id: "wizard",
-            .name("old wizard"),
-            .description("A wise old wizard."),
-            .characterSheet(.default),
+        let wizard = Item("wizard")
+            .name("old wizard")
+            .description("A wise old wizard.")
+            .characterSheet(.default)
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: wizard
@@ -417,20 +381,16 @@ struct TellActionHandlerTests {
     @Test("Tell character about topic gives variety of responses")
     func testTellCharacterAboutTopicVariety() async throws {
         // Given
-        let sage = Item(
-            id: "sage",
-            .name("wise sage"),
-            .description("A knowledgeable sage."),
-            .characterSheet(.default),
+        let sage = Item("sage")
+            .name("wise sage")
+            .description("A knowledgeable sage.")
+            .characterSheet(.default)
             .in(.startRoom)
-        )
 
-        let crystal = Item(
-            id: "crystal",
-            .name("magic crystal"),
-            .description("A glowing crystal."),
+        let crystal = Item("crystal")
+            .name("magic crystal")
+            .description("A glowing crystal.")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: sage, crystal
@@ -478,20 +438,16 @@ struct TellActionHandlerTests {
     @Test("Tell enemy about topic gives appropriate responses")
     func testTellEnemyAboutTopic() async throws {
         // Given
-        let orc = Item(
-            id: "orc",
-            .name("fierce orc"),
-            .description("A fierce orc warrior."),
-            .characterSheet(.init(isFighting: true)),
+        let orc = Item("orc")
+            .name("fierce orc")
+            .description("A fierce orc warrior.")
+            .characterSheet(.init(isFighting: true))
             .in(.startRoom)
-        )
 
-        let sword = Item(
-            id: "sword",
-            .name("steel sword"),
-            .description("A sharp steel sword."),
+        let sword = Item("sword")
+            .name("steel sword")
+            .description("A sharp steel sword.")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: orc, sword
@@ -528,12 +484,10 @@ struct TellActionHandlerTests {
     @Test("Tell non-character object")
     func testTellObject() async throws {
         // Given
-        let statue = Item(
-            id: "statue",
-            .name("marble statue"),
-            .description("A beautiful marble statue."),
+        let statue = Item("statue")
+            .name("marble statue")
+            .description("A beautiful marble statue.")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: statue
@@ -560,19 +514,15 @@ struct TellActionHandlerTests {
     @Test("Tell object about topic")
     func testTellObjectAboutTopic() async throws {
         // Given
-        let mirror = Item(
-            id: "mirror",
-            .name("silver mirror"),
-            .description("A polished silver mirror."),
+        let mirror = Item("mirror")
+            .name("silver mirror")
+            .description("A polished silver mirror.")
             .in(.startRoom)
-        )
 
-        let secret = Item(
-            id: "secret",
-            .name("dark secret"),
-            .description("A mysterious secret."),
+        let secret = Item("secret")
+            .name("dark secret")
+            .description("A mysterious secret.")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: mirror, secret
@@ -596,13 +546,11 @@ struct TellActionHandlerTests {
     @Test("Tell about non-existent topic")
     func testTellAboutNonExistentTopic() async throws {
         // Given
-        let wizard = Item(
-            id: "wizard",
-            .name("old wizard"),
-            .description("A wise old wizard."),
-            .characterSheet(.default),
+        let wizard = Item("wizard")
+            .name("old wizard")
+            .description("A wise old wizard.")
+            .characterSheet(.default)
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: wizard

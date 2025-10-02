@@ -43,11 +43,11 @@ struct ExitTests {
         let destination: LocationID = "inside"
         let keyID: ItemID = "ironKey"
         let exit: Exit = .north(destination, via: "jailCellDoor")
-        let door = Item(
-            id: "jailCellDoor",
-            .name("Jail cell door"),
+
+        let door = Item("jailCellDoor")
+            .name("Jail cell door")
             .lockKey(keyID)
-        )
+
         #expect(exit.destinationID == destination)
         #expect(exit.doorID == "jailCellDoor")
         #expect(exit.blockedMessage == nil)

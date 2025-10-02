@@ -11,15 +11,13 @@ struct TurnOffActionHandlerTests {
     @Test("TURN OFF syntax works")
     func testTurnOffSyntax() async throws {
         // Given
-        let lamp = Item(
-            id: "lamp",
-            .name("brass lamp"),
-            .description("A shiny brass lamp."),
-            .isLightSource,
-            .isDevice,
-            .isTakable,
+        let lamp = Item("lamp")
+            .name("brass lamp")
+            .description("A shiny brass lamp.")
+            .isLightSource
+            .isDevice
+            .isTakable
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: lamp
@@ -51,15 +49,13 @@ struct TurnOffActionHandlerTests {
     @Test("SWITCH OFF syntax works")
     func testSwitchOffSyntax() async throws {
         // Given
-        let flashlight = Item(
-            id: "flashlight",
-            .name("small flashlight"),
-            .description("A compact flashlight."),
-            .isLightSource,
-            .isDevice,
-            .isTakable,
+        let flashlight = Item("flashlight")
+            .name("small flashlight")
+            .description("A compact flashlight.")
+            .isLightSource
+            .isDevice
+            .isTakable
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: flashlight
@@ -129,20 +125,16 @@ struct TurnOffActionHandlerTests {
     @Test("Cannot turn off item not in scope")
     func testCannotTurnOffItemNotInScope() async throws {
         // Given
-        let otherRoom = Location(
-            id: "otherRoom",
-            .name("Other Room"),
-            .inherentlyLit
-        )
+        let otherRoom = Location("otherRoom")
+            .name("Other Room")
+                .inherentlyLit
 
-        let lamp = Item(
-            id: "lamp",
-            .name("brass lamp"),
-            .description("A shiny brass lamp."),
-            .isLightSource,
-            .isDevice,
+        let lamp = Item("lamp")
+            .name("brass lamp")
+            .description("A shiny brass lamp.")
+            .isLightSource
+            .isDevice
             .in("otherRoom")
-        )
 
         let game = MinimalGame(
             locations: otherRoom,
@@ -166,13 +158,11 @@ struct TurnOffActionHandlerTests {
     @Test("Cannot turn off non-device item")
     func testCannotTurnOffNonDeviceItem() async throws {
         // Given
-        let book = Item(
-            id: "book",
-            .name("leather book"),
-            .description("A worn leather-bound book."),
-            .isTakable,
+        let book = Item("book")
+            .name("leather book")
+            .description("A worn leather-bound book.")
+            .isTakable
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: book
@@ -195,14 +185,12 @@ struct TurnOffActionHandlerTests {
     @Test("Cannot turn off already off device")
     func testCannotTurnOffAlreadyOffDevice() async throws {
         // Given
-        let radio = Item(
-            id: "radio",
-            .name("portable radio"),
-            .description("A small battery-powered radio."),
-            .isDevice,
-            .isTakable,
+        let radio = Item("radio")
+            .name("portable radio")
+            .description("A small battery-powered radio.")
+            .isDevice
+            .isTakable
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: radio
@@ -227,14 +215,12 @@ struct TurnOffActionHandlerTests {
     @Test("Turn off device clears isOn flag")
     func testTurnOffDeviceClearsIsOnFlag() async throws {
         // Given
-        let computer = Item(
-            id: "computer",
-            .name("laptop computer"),
-            .description("A sleek laptop computer."),
-            .isDevice,
-            .isTakable,
+        let computer = Item("computer")
+            .name("laptop computer")
+            .description("A sleek laptop computer.")
+            .isDevice
+            .isTakable
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: computer
@@ -266,21 +252,17 @@ struct TurnOffActionHandlerTests {
     @Test("Turn off light source in dark room shows darkness message")
     func testTurnOffLightSourceInDarkRoomShowsDarknessMessage() async throws {
         // Given
-        let darkRoom = Location(
-            id: "darkRoom",
-            .name("Dark Room"),
+        let darkRoom = Location("darkRoom")
+            .name("Dark Room")
             .description("A room that is pitch black without light.")
-        )
 
-        let lantern = Item(
-            id: "lantern",
-            .name("electric lantern"),
-            .description("A bright electric lantern."),
-            .isLightSource,
-            .isDevice,
-            .isTakable,
+        let lantern = Item("lantern")
+            .name("electric lantern")
+            .description("A bright electric lantern.")
+            .isLightSource
+            .isDevice
+            .isTakable
             .in(.player)
-        )
 
         let game = MinimalGame(
             player: Player(in: "darkRoom"),
@@ -315,31 +297,25 @@ struct TurnOffActionHandlerTests {
     @Test("Turn off light source with other light sources present")
     func testTurnOffLightSourceWithOtherLightSourcesPresent() async throws {
         // Given
-        let darkRoom = Location(
-            id: "darkRoom",
-            .name("Dark Room"),
+        let darkRoom = Location("darkRoom")
+            .name("Dark Room")
             .description("A room that is pitch black without light.")
-        )
 
-        let lantern = Item(
-            id: "lantern",
-            .name("electric lantern"),
-            .description("A bright electric lantern."),
-            .isLightSource,
-            .isDevice,
-            .isTakable,
+        let lantern = Item("lantern")
+            .name("electric lantern")
+            .description("A bright electric lantern.")
+            .isLightSource
+            .isDevice
+            .isTakable
             .in(.player)
-        )
 
-        let flashlight = Item(
-            id: "flashlight",
-            .name("small flashlight"),
-            .description("A compact flashlight."),
-            .isLightSource,
-            .isDevice,
-            .isTakable,
+        let flashlight = Item("flashlight")
+            .name("small flashlight")
+            .description("A compact flashlight.")
+            .isLightSource
+            .isDevice
+            .isTakable
             .in(.player)
-        )
 
         let game = MinimalGame(
             player: Player(in: "darkRoom"),
@@ -374,15 +350,13 @@ struct TurnOffActionHandlerTests {
     @Test("Turn off light source in inherently lit room")
     func testTurnOffLightSourceInInherentlyLitRoom() async throws {
         // Given
-        let lamp = Item(
-            id: "lamp",
-            .name("desk lamp"),
-            .description("A modern desk lamp."),
-            .isLightSource,
-            .isDevice,
-            .isTakable,
+        let lamp = Item("lamp")
+            .name("desk lamp")
+            .description("A modern desk lamp.")
+            .isLightSource
+            .isDevice
+            .isTakable
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: lamp
@@ -414,14 +388,12 @@ struct TurnOffActionHandlerTests {
     @Test("Turn off non-light-source device")
     func testTurnOffNonLightSourceDevice() async throws {
         // Given
-        let fan = Item(
-            id: "fan",
-            .name("electric fan"),
-            .description("A small electric fan."),
-            .isDevice,
-            .isTakable,
+        let fan = Item("fan")
+            .name("electric fan")
+            .description("A small electric fan.")
+            .isDevice
+            .isTakable
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: fan
@@ -453,14 +425,12 @@ struct TurnOffActionHandlerTests {
     @Test("Touched flag always set on successful turn off")
     func testTouchedFlagAlwaysSet() async throws {
         // Given
-        let device = Item(
-            id: "device",
-            .name("small device"),
-            .description("A small electronic device."),
-            .isDevice,
-            .isTakable,
+        let device = Item("device")
+            .name("small device")
+            .description("A small electronic device.")
+            .isDevice
+            .isTakable
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: device
@@ -518,14 +488,12 @@ struct TurnOffActionHandlerTests {
     @Test("All synonyms work")
     func testAllSynonyms() async throws {
         // Given
-        let device = Item(
-            id: "device",
-            .name("test device"),
-            .description("A device for testing."),
-            .isDevice,
-            .isTakable,
+        let device = Item("device")
+            .name("test device")
+            .description("A device for testing.")
+            .isDevice
+            .isTakable
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: device
