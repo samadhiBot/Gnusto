@@ -29,7 +29,7 @@ struct UnlockActionHandlerTests {
         try await engine.execute("unlock chest")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > unlock chest
             Unlock the wooden chest with what?
@@ -64,7 +64,7 @@ struct UnlockActionHandlerTests {
         try await engine.execute("unlock door with key")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > unlock door with key
             The oak door is now unlocked.
@@ -90,7 +90,7 @@ struct UnlockActionHandlerTests {
         try await engine.execute("unlock")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > unlock
             Unlock what?
@@ -119,7 +119,7 @@ struct UnlockActionHandlerTests {
         try await engine.execute("unlock safe")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > unlock safe
             Unlock the metal safe with what?
@@ -154,7 +154,7 @@ struct UnlockActionHandlerTests {
         try await engine.execute("unlock box with key")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > unlock box with key
             You aren't holding the silver key.
@@ -193,7 +193,7 @@ struct UnlockActionHandlerTests {
         try await engine.execute("unlock door with key")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > unlock door with key
             Any such thing lurks beyond your reach.
@@ -225,7 +225,7 @@ struct UnlockActionHandlerTests {
         try await engine.execute("unlock table with key")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > unlock table with key
             That's not something you can unlock.
@@ -260,7 +260,7 @@ struct UnlockActionHandlerTests {
         try await engine.execute("unlock cabinet with key")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > unlock cabinet with key
             The glass cabinet is already unlocked.
@@ -295,7 +295,7 @@ struct UnlockActionHandlerTests {
         try await engine.execute("unlock strongbox with key")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > unlock strongbox with key
             The copper key and the iron strongbox were never meant to be
@@ -338,7 +338,7 @@ struct UnlockActionHandlerTests {
         try await engine.execute("unlock chest with key")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > unlock chest with key
             The darkness here is absolute, consuming all light and hope of
@@ -384,7 +384,7 @@ struct UnlockActionHandlerTests {
         #expect(await finalKey.hasFlag(.isTouched) == true)
 
         // Verify message
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > unlock lockbox with key
             The steel lockbox is now unlocked.
@@ -433,7 +433,7 @@ struct UnlockActionHandlerTests {
         try await engine.execute("unlock door with door key")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > unlock door with door key
             The wooden door is now unlocked.
@@ -444,7 +444,7 @@ struct UnlockActionHandlerTests {
         try await engine.execute("unlock chest with chest key")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > unlock chest with chest key
             The small chest is now unlocked.
@@ -494,7 +494,7 @@ struct UnlockActionHandlerTests {
         #expect(await finalContainer.hasFlag(.isLockable) == true)
         #expect(await finalContainer.isOpenable == true)
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > unlock container with key
             The magic container is now unlocked.

@@ -37,7 +37,7 @@ struct ItemMechanicsTests {
             """
         )
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > west
             --- Living Room ---
@@ -125,7 +125,7 @@ struct ItemMechanicsTests {
             """
         )
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > examine table
             A bottle is sitting on the table. The glass bottle contains a
@@ -199,7 +199,7 @@ struct ItemMechanicsTests {
             """
         )
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > west
             --- Living Room ---

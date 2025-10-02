@@ -45,7 +45,7 @@ struct HelpActionHandlerTests {
         try await engine.execute("help")
 
         // Then
-        await mockIO.expectOutput(helpResponse)
+        await mockIO.expect(helpResponse)
     }
 
     // MARK: - Validation Testing
@@ -69,7 +69,7 @@ struct HelpActionHandlerTests {
         try await engine.execute("help")
 
         // Then
-        await mockIO.expectOutput(helpResponse)
+        await mockIO.expect(helpResponse)
     }
 
     // MARK: - Intent Testing

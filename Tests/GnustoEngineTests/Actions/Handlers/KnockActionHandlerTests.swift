@@ -26,7 +26,7 @@ struct KnockActionHandlerTests {
         try await engine.execute("knock")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > knock
             Knock what?
@@ -52,7 +52,7 @@ struct KnockActionHandlerTests {
         try await engine.execute("tap table")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > tap table
             You tap the wooden table.
@@ -81,7 +81,7 @@ struct KnockActionHandlerTests {
         try await engine.execute("knock on door")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > knock on door
             You knock on the front door.
@@ -107,7 +107,7 @@ struct KnockActionHandlerTests {
         try await engine.execute("rap on window")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > rap on window
             You rap on the glass window.
@@ -127,7 +127,7 @@ struct KnockActionHandlerTests {
         try await engine.execute("knock on")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > knock on
             Knock on what?
@@ -158,7 +158,7 @@ struct KnockActionHandlerTests {
         try await engine.execute("knock on door")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > knock on door
             Any such thing lurks beyond your reach.
@@ -191,7 +191,7 @@ struct KnockActionHandlerTests {
         try await engine.execute("knock on door")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > knock on door
             The darkness here is absolute, consuming all light and hope of
@@ -221,7 +221,7 @@ struct KnockActionHandlerTests {
         try await engine.execute("knock on chest")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > knock on chest
             You knock on the treasure chest.
@@ -250,7 +250,7 @@ struct KnockActionHandlerTests {
         try await engine.execute("knock on wall")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > knock on wall
             You knock on the stone wall.
@@ -280,7 +280,7 @@ struct KnockActionHandlerTests {
         #expect(await finalState.hasFlag(.isTouched))
 
         // Verify message
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > tap post
             You tap the wooden post.
@@ -321,7 +321,7 @@ struct KnockActionHandlerTests {
         )
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > knock on door
             You knock on the blue door.
@@ -375,7 +375,7 @@ struct KnockActionHandlerTests {
         )
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > knock on red door
             You knock on the red door.
@@ -424,7 +424,7 @@ struct KnockActionHandlerTests {
         )
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > knock on the open door
             You knock on the open door.

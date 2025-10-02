@@ -25,7 +25,7 @@ struct DigActionHandlerTests {
 
         try await engine.execute("dig")
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > dig
             The ground here resists your archaeological ambitions.
@@ -48,7 +48,7 @@ struct DigActionHandlerTests {
 
         try await engine.execute("dig mound")
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > dig mound
             The ground here resists your archaeological ambitions.
@@ -71,7 +71,7 @@ struct DigActionHandlerTests {
 
         try await engine.execute("dig in the sand")
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > dig in the sand
             The ground here resists your archaeological ambitions.
@@ -101,7 +101,7 @@ struct DigActionHandlerTests {
 
         try await engine.execute("dig mound with shovel")
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > dig mound with shovel
             The ground here resists your archaeological ambitions.
@@ -126,7 +126,7 @@ struct DigActionHandlerTests {
 
         try await engine.execute("dig with shovel")
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > dig with shovel
             The ground here resists your archaeological ambitions.
@@ -151,7 +151,7 @@ struct DigActionHandlerTests {
 
         try await engine.execute("excavate with shovel")
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > excavate with shovel
             The ground here resists your archaeological ambitions.
@@ -176,7 +176,7 @@ struct DigActionHandlerTests {
 
         try await engine.execute("dig")
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > dig
             The darkness here is absolute, consuming all light and hope of
@@ -205,7 +205,7 @@ struct DigActionHandlerTests {
 
         try await engine.execute("dig mound")
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > dig mound
             Any such thing lurks beyond your reach.
@@ -235,7 +235,7 @@ struct DigActionHandlerTests {
 
         try await engine.execute("dig mound with shovel")
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > dig mound with shovel
             You aren't holding the shovel.
@@ -259,7 +259,7 @@ struct DigActionHandlerTests {
 
         try await engine.execute("dig coin")
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > dig coin
             The ground here resists your archaeological ambitions.
@@ -284,7 +284,7 @@ struct DigActionHandlerTests {
 
         try await engine.execute("dig mound")
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > dig mound
             The ground here resists your archaeological ambitions.
@@ -318,7 +318,7 @@ struct DigActionHandlerTests {
 
         try await engine.execute("dig mound")
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > dig mound
             The ground here resists your archaeological ambitions.
@@ -352,7 +352,7 @@ struct DigActionHandlerTests {
 
         try await engine.execute("dig mound with shovel")
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > dig mound with shovel
             The ground here resists your archaeological ambitions.
@@ -373,7 +373,7 @@ struct DigActionHandlerTests {
 
         try await engine.execute("dig ground")
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > dig ground
             The ground here resists your archaeological ambitions.
@@ -396,7 +396,7 @@ struct DigActionHandlerTests {
 
         try await engine.execute("dig mound with ground")
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > dig mound with ground
             You can't dig the dirt mound with that.
@@ -411,7 +411,7 @@ struct DigActionHandlerTests {
 
         try await engine.execute("dig ceiling")
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > dig ceiling
             That defies the fundamental laws of digging.
@@ -447,7 +447,7 @@ struct DigActionHandlerTests {
             "examine it"
         )
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > dig mound with shovel
             The ground here resists your archaeological ambitions.
@@ -471,7 +471,7 @@ struct DigActionHandlerTests {
 
         try await engine.execute("dig")
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > dig
             The ground here resists your archaeological ambitions.
@@ -503,7 +503,7 @@ struct DigActionHandlerTests {
         try await engine.execute("dig the ground")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > dig the ground
             The ground here resists your archaeological ambitions.

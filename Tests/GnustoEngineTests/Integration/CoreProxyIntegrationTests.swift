@@ -31,7 +31,7 @@ struct CoreProxyIntegrationTests {
         #expect(await itemProxy.hasFlag(ItemPropertyID.isTouched) == true)
         #expect(await itemProxy.name == "test item")
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > take test item
             Taken.
@@ -193,7 +193,7 @@ struct CoreProxyIntegrationTests {
         #expect(inventory.contains { $0.id == ItemID("coin") })
         #expect(inventory.contains { $0.id == ItemID("key") })
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > take coin
             Taken.
@@ -289,7 +289,7 @@ struct CoreProxyIntegrationTests {
         let boxContents = await boxProxy.contents
         #expect(boxContents.isEmpty)  // Gem was taken out
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > look in box
             In the wooden box you can see a ruby gem.
@@ -331,7 +331,7 @@ struct CoreProxyIntegrationTests {
             #expect(parentLocation.id == .startRoom)
         }
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > take heavy rock
             The heavy rock stubbornly resists your attempts to take it.

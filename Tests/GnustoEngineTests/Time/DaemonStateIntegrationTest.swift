@@ -52,7 +52,7 @@ struct DaemonStateIntegrationTest {
         try await engine.execute("wait")  // turn 2 - daemon should run
 
         // Then: Daemon should have executed once
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > wait
             Time flows onward, indifferent to your concerns.
@@ -78,7 +78,7 @@ struct DaemonStateIntegrationTest {
         try await engine.execute("wait")  // turn 4 - daemon should run again
 
         // Then: Daemon should have executed twice with updated state
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > wait
             Moments slip away like sand through fingers.
@@ -123,7 +123,7 @@ struct DaemonStateIntegrationTest {
         try await engine.execute("wait")  // turn 1 - daemon should run
 
         // Then: Execution tracking should still work even without payload changes
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > wait
             Time flows onward, indifferent to your concerns.
@@ -142,7 +142,7 @@ struct DaemonStateIntegrationTest {
         try await engine.execute("wait")  // turn 2 - daemon should run again
 
         // Then: Execution tracking should increment
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > wait
             The universe's clock ticks inexorably forward.

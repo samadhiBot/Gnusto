@@ -37,7 +37,7 @@ struct CloakOfDarknessWalkthroughTests {
             """
         )
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > inventory
             You are carrying:
@@ -130,7 +130,7 @@ struct CloakOfDarknessWalkthroughTests {
             """
         )
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > go north
             You've only just arrived, and besides, the weather outside

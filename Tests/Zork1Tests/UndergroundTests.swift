@@ -25,7 +25,7 @@
 ////        )
 ////        await engine.run()
 //
-//        await mockIO.expectOutput(
+//        await mockIO.expect(
 //            """
 //            > north
 //            --- Troll Room ---
@@ -64,7 +64,7 @@
 ////        )
 ////        await engine.run()
 //
-//        await mockIO.expectOutput(
+//        await mockIO.expect(
 //            """
 //            > north
 //            --- Troll Room ---

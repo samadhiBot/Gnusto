@@ -27,7 +27,7 @@ struct ExamineActionHandlerTests {
         try await engine.execute("examine book")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > examine book
             A worn leather-bound book with mysterious symbols.
@@ -57,7 +57,7 @@ struct ExamineActionHandlerTests {
         try await engine.execute("x gem")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > x gem
             A beautiful gem that catches the light.
@@ -87,7 +87,7 @@ struct ExamineActionHandlerTests {
         try await engine.execute("inspect sword")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > inspect sword
             A sharp steel sword with intricate engravings.
@@ -114,7 +114,7 @@ struct ExamineActionHandlerTests {
         try await engine.execute("describe the ruby")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > describe the ruby
             A beautiful ruby that catches the light.
@@ -143,7 +143,7 @@ struct ExamineActionHandlerTests {
         try await engine.execute("look at painting")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > look at painting
             A masterful oil painting of a distant landscape.
@@ -176,7 +176,7 @@ struct ExamineActionHandlerTests {
         try await engine.execute("examine all")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > examine all
             - Red book: A red leather book.
@@ -197,7 +197,7 @@ struct ExamineActionHandlerTests {
         try await engine.execute("examine")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > examine
             Examine what?
@@ -215,7 +215,7 @@ struct ExamineActionHandlerTests {
         try await engine.execute("examine nonexistent")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > examine nonexistent
             Any such thing lurks beyond your reach.
@@ -246,7 +246,7 @@ struct ExamineActionHandlerTests {
         try await engine.execute("examine book")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > examine book
             Any such thing lurks beyond your reach.
@@ -279,7 +279,7 @@ struct ExamineActionHandlerTests {
         try await engine.execute("examine book")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > examine book
             The darkness here is absolute, consuming all light and hope of
@@ -300,7 +300,7 @@ struct ExamineActionHandlerTests {
         try await engine.execute("examine me")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > examine me
             As good-looking as ever, which is to say, adequately
@@ -332,7 +332,7 @@ struct ExamineActionHandlerTests {
         )
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > examine scroll
             An ancient parchment scroll.
@@ -375,7 +375,7 @@ struct ExamineActionHandlerTests {
         try await engine.execute("examine box")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > examine box
             A sturdy wooden box. In the wooden box you can see a gold coin
@@ -410,7 +410,7 @@ struct ExamineActionHandlerTests {
         try await engine.execute("examine chest")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > examine chest
             An ornate treasure chest. The treasure chest is closed.
@@ -449,7 +449,7 @@ struct ExamineActionHandlerTests {
         try await engine.execute("examine table")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > examine table
             A solid oak table. On the oak table you can see a leather book
@@ -478,7 +478,7 @@ struct ExamineActionHandlerTests {
         try await engine.execute("examine bag")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > examine bag
             A worn leather bag. The leather bag is empty.
@@ -505,7 +505,7 @@ struct ExamineActionHandlerTests {
         try await engine.execute("examine desk")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > examine desk
             A simple wooden desk.
@@ -532,7 +532,7 @@ struct ExamineActionHandlerTests {
         try await engine.execute("examine door")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > examine door
             A heavy oak door. The oak door is open.
@@ -562,7 +562,7 @@ struct ExamineActionHandlerTests {
         )
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > examine book
             A worn leather book.
@@ -586,7 +586,7 @@ struct ExamineActionHandlerTests {
         try await engine.execute("examine all")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > examine all
             There is nothing here to examine.
@@ -620,7 +620,7 @@ struct ExamineActionHandlerTests {
         try await engine.execute("look in box")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > look in box
             In the wooden box you can see a ruby gem.
@@ -653,7 +653,7 @@ struct ExamineActionHandlerTests {
         try await engine.execute("look on table")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > look on table
             A wooden table. On the wooden table you can see a red book.

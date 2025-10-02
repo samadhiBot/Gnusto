@@ -26,7 +26,7 @@ struct LookUnderActionHandlerTests {
         try await engine.execute("look under table")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > look under table
             Beneath the wooden table lurks only disappointment and possibly
@@ -56,7 +56,7 @@ struct LookUnderActionHandlerTests {
         try await engine.execute("look beneath rock")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > look beneath rock
             Beneath the large rock lurks only disappointment and possibly
@@ -83,7 +83,7 @@ struct LookUnderActionHandlerTests {
         try await engine.execute("look below bridge")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > look below bridge
             Beneath the stone bridge lurks only disappointment and possibly
@@ -110,7 +110,7 @@ struct LookUnderActionHandlerTests {
         try await engine.execute("peek under bed")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > peek under bed
             Beneath the old bed lurks only disappointment and possibly
@@ -131,7 +131,7 @@ struct LookUnderActionHandlerTests {
         try await engine.execute("look under")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > look under
             Look under what?
@@ -149,7 +149,7 @@ struct LookUnderActionHandlerTests {
         try await engine.execute("look under nonexistent")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > look under nonexistent
             Any such thing lurks beyond your reach.
@@ -180,7 +180,7 @@ struct LookUnderActionHandlerTests {
         try await engine.execute("look under table")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > look under table
             Any such thing lurks beyond your reach.
@@ -198,7 +198,7 @@ struct LookUnderActionHandlerTests {
         try await engine.execute("look under testRoom")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > look under testRoom
             Any such thing lurks beyond your reach.
@@ -216,7 +216,7 @@ struct LookUnderActionHandlerTests {
         try await engine.execute("look under me")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > look under me
             The logistics of looking oneself prove insurmountable.
@@ -249,7 +249,7 @@ struct LookUnderActionHandlerTests {
         try await engine.execute("look under table")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > look under table
             The darkness here is absolute, consuming all light and hope of
@@ -285,7 +285,7 @@ struct LookUnderActionHandlerTests {
         let finalState = await engine.item("chest")
         #expect(await finalState.hasFlag(.isTouched) == true)
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > look under chest
             Beneath the treasure chest lurks only disappointment and
@@ -322,7 +322,7 @@ struct LookUnderActionHandlerTests {
         // Then - "examine it" should now refer to the table
         try await engine.execute("examine it")
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > examine book
             An old leather book.
@@ -356,7 +356,7 @@ struct LookUnderActionHandlerTests {
         try await engine.execute("look under box")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > look under box
             Beneath the small box lurks only disappointment and possibly
@@ -395,7 +395,7 @@ struct LookUnderActionHandlerTests {
         try await engine.execute("look under coin")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > look under coin
             Beneath the gold coin lurks only disappointment and possibly
@@ -436,7 +436,7 @@ struct LookUnderActionHandlerTests {
         // When - Look under rug
         try await engine.execute("look under rug")
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > look under rug
             Beneath the persian rug lurks only disappointment and possibly
@@ -447,7 +447,7 @@ struct LookUnderActionHandlerTests {
         // When - Look under character
         try await engine.execute("look under man")
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > look under man
             The space beneath the old man harbors no secrets worth
@@ -458,7 +458,7 @@ struct LookUnderActionHandlerTests {
         // When - Look under device
         try await engine.execute("look under device")
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > look under device
             Your investigation under the strange device reveals a profound

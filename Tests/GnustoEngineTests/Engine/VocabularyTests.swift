@@ -129,7 +129,7 @@ struct VocabularyTests {
         try await engine.execute("examine lamp")
 
         // Then: Commands should work correctly
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > take brass lamp
             Taken.

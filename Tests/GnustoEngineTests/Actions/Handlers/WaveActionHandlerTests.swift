@@ -21,7 +21,7 @@ struct WaveActionHandlerTests {
 
         try await engine.execute("wave wand")
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > wave wand
             You brandish the magic wand with theatrical enthusiasm.
@@ -44,7 +44,7 @@ struct WaveActionHandlerTests {
 
         try await engine.execute("wave at wand")
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > wave at wand
             The magic wand remains unimpressed by your enthusiastic
@@ -68,7 +68,7 @@ struct WaveActionHandlerTests {
 
         try await engine.execute("wave to wand")
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > wave to wand
             The magic wand remains unimpressed by your enthusiastic
@@ -92,7 +92,7 @@ struct WaveActionHandlerTests {
 
         try await engine.execute("wave wand at troll")
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > wave wand at troll
             You flourish the magic wand in the general direction of the
@@ -116,7 +116,7 @@ struct WaveActionHandlerTests {
 
         try await engine.execute("brandish at sword")
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > brandish at sword
             The steel sword remains unimpressed by your enthusiastic
@@ -134,7 +134,7 @@ struct WaveActionHandlerTests {
 
         try await engine.execute("wave")
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > wave
             You wave your hands with theatrical flourish.
@@ -149,7 +149,7 @@ struct WaveActionHandlerTests {
 
         try await engine.execute("wave at wand")
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > wave at wand
             Any such thing lurks beyond your reach.
@@ -177,7 +177,7 @@ struct WaveActionHandlerTests {
 
         try await engine.execute("wave at wand")
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > wave at wand
             Any such thing lurks beyond your reach.
@@ -206,7 +206,7 @@ struct WaveActionHandlerTests {
 
         try await engine.execute("wave at wand")
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > wave at wand
             The darkness here is absolute, consuming all light and hope of
@@ -236,7 +236,7 @@ struct WaveActionHandlerTests {
 
         try await engine.execute("wave box at stone")
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > wave box at stone
             You flourish the wooden box in the general direction of the
@@ -265,7 +265,7 @@ struct WaveActionHandlerTests {
 
         try await engine.execute("wave wand at wizard")
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > wave wand at wizard
             You flourish the magic wand in the general direction of the old
@@ -294,7 +294,7 @@ struct WaveActionHandlerTests {
 
         try await engine.execute("wave sword at dragon")
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > wave sword at dragon
             You flourish the steel sword in the general direction of the
@@ -326,7 +326,7 @@ struct WaveActionHandlerTests {
             "wave at sword"
         )
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > wave at wand
             The magic wand remains unimpressed by your enthusiastic

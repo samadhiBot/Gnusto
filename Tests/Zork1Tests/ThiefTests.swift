@@ -50,7 +50,7 @@ struct ThiefTests {
             """
         )
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > go east
             --- Round Room ---
@@ -109,7 +109,7 @@ struct ThiefTests {
         )
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > go east
             --- Round Room ---
@@ -156,7 +156,7 @@ struct ThiefTests {
         )
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > go east
             --- Round Room ---
@@ -214,7 +214,7 @@ struct ThiefTests {
         )
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > go east
             --- Round Room ---
@@ -260,7 +260,7 @@ struct ThiefTests {
         )
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > go east
             --- Round Room ---
@@ -330,7 +330,7 @@ struct ThiefTests {
         )
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > go east
             --- Round Room ---
@@ -366,7 +366,7 @@ struct ThiefTests {
         )
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > go east
             --- Round Room ---
@@ -402,7 +402,7 @@ struct ThiefTests {
         )
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > go east
             --- Round Room ---
@@ -439,7 +439,7 @@ struct ThiefTests {
         )
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > go east
             --- Round Room ---
@@ -477,7 +477,7 @@ struct ThiefTests {
         )
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > go east
             --- Round Room ---
@@ -530,7 +530,7 @@ struct ThiefTests {
         )
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > go east
             --- Round Room ---
@@ -633,7 +633,7 @@ struct ThiefTests {
         )
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > go east
             --- Round Room ---
@@ -759,7 +759,7 @@ struct ThiefTests {
     //        // Execute a wait command and trigger daemon processing
     //        try await engine.execute("wait", times: 4)
     //
-    //        await mockIO.expectOutput(
+    //        await mockIO.expect(
     //            """
     //            > go east
     //            --- Round Room ---
@@ -809,7 +809,7 @@ struct ThiefTests {
     //            kill the thief
     //            """
     //        )
-    //        await mockIO.expectOutput(
+    //        await mockIO.expect(
     //            """
     //            > go east
     //            --- Round Room ---

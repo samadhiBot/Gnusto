@@ -18,7 +18,7 @@ struct CryActionHandlerTests {
         try await engine.execute("cry")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > cry
             A moment of melancholy overtakes you.
@@ -46,7 +46,7 @@ struct CryActionHandlerTests {
         try await engine.execute("cry")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > cry
             A moment of melancholy overtakes you.

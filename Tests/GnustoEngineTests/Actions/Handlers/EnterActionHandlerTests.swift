@@ -39,7 +39,7 @@ struct EnterActionHandlerTests {
         try await engine.execute("enter door")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > enter door
             --- Inside ---
@@ -83,7 +83,7 @@ struct EnterActionHandlerTests {
         try await engine.execute("get in hatch")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > get in hatch
             --- Inside ---
@@ -127,7 +127,7 @@ struct EnterActionHandlerTests {
         try await engine.execute("go in entrance")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > go in entrance
             --- Inside ---
@@ -171,7 +171,7 @@ struct EnterActionHandlerTests {
         try await engine.execute("go through portal")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > go through portal
             --- Inside ---
@@ -197,7 +197,7 @@ struct EnterActionHandlerTests {
         try await engine.execute("enter")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > enter
             Multiple entrances present themselves. Which calls to you?
@@ -235,7 +235,7 @@ struct EnterActionHandlerTests {
         try await engine.execute("enter")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > enter
             --- Inside ---
@@ -290,7 +290,7 @@ struct EnterActionHandlerTests {
         try await engine.execute("enter")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > enter
             Multiple entrances present themselves. Which calls to you?
@@ -322,7 +322,7 @@ struct EnterActionHandlerTests {
         try await engine.execute("enter door")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > enter door
             Any such thing lurks beyond your reach.
@@ -348,7 +348,7 @@ struct EnterActionHandlerTests {
         try await engine.execute("enter rock")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > enter rock
             The large rock stubbornly resists your attempts to enter it.
@@ -387,7 +387,7 @@ struct EnterActionHandlerTests {
         try await engine.execute("enter trapdoor")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > enter trapdoor
             The darkness here is absolute, consuming all light and hope of
@@ -467,7 +467,7 @@ struct EnterActionHandlerTests {
         try await engine.execute("enter door")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > enter door
             --- Office ---
@@ -535,7 +535,7 @@ struct EnterActionHandlerTests {
         try await engine.execute("enter door")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > enter door
             --- Shop ---
@@ -553,7 +553,7 @@ struct EnterActionHandlerTests {
         try await engine.execute("enter entrance")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > south
             --- Town Plaza ---
@@ -604,7 +604,7 @@ struct EnterActionHandlerTests {
         try await engine.execute("enter door")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > enter door
             Any such thing lurks beyond your reach.

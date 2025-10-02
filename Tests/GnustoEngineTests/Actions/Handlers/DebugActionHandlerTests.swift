@@ -30,7 +30,7 @@ struct DebugActionHandlerTests {
         try await engine.execute("debug lamp")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > debug lamp
             ```
@@ -63,7 +63,7 @@ struct DebugActionHandlerTests {
         try await engine.execute("debug")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > debug
             DEBUG requires a direct object to examine.
@@ -81,7 +81,7 @@ struct DebugActionHandlerTests {
         try await engine.execute("debug nonexistent")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > debug nonexistent
             ```
@@ -123,7 +123,7 @@ struct DebugActionHandlerTests {
         try await engine.execute("debug lamp")
 
         // Then - Debug should work even in darkness
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > debug lamp
             ```
@@ -167,7 +167,7 @@ struct DebugActionHandlerTests {
         try await engine.execute("debug sword")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > debug sword
             ```
@@ -197,7 +197,7 @@ struct DebugActionHandlerTests {
         try await engine.execute("debug startRoom")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > debug startRoom
             ```
@@ -224,7 +224,7 @@ struct DebugActionHandlerTests {
         try await engine.execute("debug me")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > debug me
             ```
@@ -276,7 +276,7 @@ struct DebugActionHandlerTests {
         try await engine.execute("debug self")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > debug self
             ```
@@ -346,7 +346,7 @@ struct DebugActionHandlerTests {
         try await engine.execute("debug lamp")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > debug lamp
             ```
@@ -393,7 +393,7 @@ struct DebugActionHandlerTests {
         try await engine.execute("debug remoteItem")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > debug remoteItem
             ```

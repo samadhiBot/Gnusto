@@ -27,7 +27,7 @@ struct FindActionHandlerTests {
         try await engine.execute("find book")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > find book
             It stands before you in all its mundane glory!
@@ -54,7 +54,7 @@ struct FindActionHandlerTests {
         try await engine.execute("search for key")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > search for key
             It rests securely in your possession.
@@ -81,7 +81,7 @@ struct FindActionHandlerTests {
         try await engine.execute("locate coin")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > locate coin
             It stands before you in all its mundane glory!
@@ -101,7 +101,7 @@ struct FindActionHandlerTests {
         try await engine.execute("find")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > find
             Find what?
@@ -135,7 +135,7 @@ struct FindActionHandlerTests {
         try await engine.execute("find gem")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > find gem
             The darkness here is absolute, consuming all light and hope of
@@ -165,7 +165,7 @@ struct FindActionHandlerTests {
         try await engine.execute("find sword")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > find sword
             It rests securely in your possession.
@@ -191,7 +191,7 @@ struct FindActionHandlerTests {
         try await engine.execute("find table")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > find table
             It stands before you in all its mundane glory!
@@ -225,7 +225,7 @@ struct FindActionHandlerTests {
         try await engine.execute("find ring")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > find ring
             It stands before you in all its mundane glory!
@@ -257,7 +257,7 @@ struct FindActionHandlerTests {
         try await engine.execute("find treasure")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > find treasure
             Any such thing lurks beyond your reach.
@@ -275,7 +275,7 @@ struct FindActionHandlerTests {
         try await engine.execute("find dragon")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > find dragon
             Any such thing lurks beyond your reach.
@@ -309,7 +309,7 @@ struct FindActionHandlerTests {
         try await engine.execute("find jewelry")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > find jewelry
             Any such thing lurks beyond your reach.
@@ -341,7 +341,7 @@ struct FindActionHandlerTests {
         try await engine.execute("find lamp")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > find lamp
             It rests securely in your possession.
@@ -352,7 +352,7 @@ struct FindActionHandlerTests {
         try await engine.execute("find statue")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > find statue
             Your powers of observation are truly remarkable -- it's right
@@ -386,7 +386,7 @@ struct FindActionHandlerTests {
         try await engine.execute("find paper")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > find paper
             It stands before you in all its mundane glory!
@@ -413,7 +413,7 @@ struct FindActionHandlerTests {
         try await engine.execute("find crystal")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > find crystal
             It stands before you in all its mundane glory!
@@ -424,7 +424,7 @@ struct FindActionHandlerTests {
         try await engine.execute("locate crystal")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > locate crystal
             Your powers of observation are truly remarkable -- it's right

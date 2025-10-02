@@ -28,7 +28,7 @@ struct InflateActionHandlerTests {
         try await engine.execute("inflate balloon")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > inflate balloon
             You inflate the red balloon.
@@ -66,7 +66,7 @@ struct InflateActionHandlerTests {
         try await engine.execute("inflate raft with pump")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > inflate raft with pump
             You inflate the rubber raft.
@@ -94,7 +94,7 @@ struct InflateActionHandlerTests {
         try await engine.execute("blow up mattress")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > blow up mattress
             You inflate the air mattress.
@@ -128,7 +128,7 @@ struct InflateActionHandlerTests {
         try await engine.execute("blow up tire with compressor")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > blow up tire with compressor
             You inflate the bicycle tire.
@@ -148,7 +148,7 @@ struct InflateActionHandlerTests {
         try await engine.execute("inflate")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > inflate
             Inflate what?
@@ -180,7 +180,7 @@ struct InflateActionHandlerTests {
         try await engine.execute("inflate balloon")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > inflate balloon
             Any such thing lurks beyond your reach.
@@ -206,7 +206,7 @@ struct InflateActionHandlerTests {
         try await engine.execute("inflate rock")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > inflate rock
             The large rock stubbornly resists your attempts to inflate it.
@@ -240,7 +240,7 @@ struct InflateActionHandlerTests {
         try await engine.execute("inflate balloon")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > inflate balloon
             The darkness here is absolute, consuming all light and hope of
@@ -277,7 +277,7 @@ struct InflateActionHandlerTests {
         #expect(await finalState.hasFlag(.isInflatable))  // Still inflatable
 
         // Verify message
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > inflate vest
             You inflate the life vest.
@@ -306,7 +306,7 @@ struct InflateActionHandlerTests {
         try await engine.execute("inflate balloon")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > inflate balloon
             The blue balloon is already inflated.
@@ -339,7 +339,7 @@ struct InflateActionHandlerTests {
         try await engine.execute("inflate balloon")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > inflate balloon
             You inflate the green balloon.
@@ -376,7 +376,7 @@ struct InflateActionHandlerTests {
         try await engine.execute("inflate balloon")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > inflate balloon
             You inflate the yellow balloon.
@@ -387,7 +387,7 @@ struct InflateActionHandlerTests {
         try await engine.execute("blow up raft")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > blow up raft
             You inflate the life raft.
@@ -426,7 +426,7 @@ struct InflateActionHandlerTests {
         #expect(await finalState.hasFlag(.isInflated))
 
         // Verify message
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > inflate tube
             You inflate the inner tube.
@@ -465,7 +465,7 @@ struct InflateActionHandlerTests {
         try await engine.execute("inflate red balloon")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > inflate red balloon
             You inflate the red balloon.
@@ -476,7 +476,7 @@ struct InflateActionHandlerTests {
         try await engine.execute("blow up blue balloon with pump")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > blow up blue balloon with pump
             You inflate the blue balloon.
@@ -510,7 +510,7 @@ struct InflateActionHandlerTests {
         try await engine.execute("inflate cushion")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > inflate cushion
             You inflate the air cushion.
@@ -521,7 +521,7 @@ struct InflateActionHandlerTests {
         try await engine.execute("inflate cushion")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > inflate cushion
             The air cushion is already inflated.

@@ -26,7 +26,7 @@ struct TouchActionHandlerTests {
         try await engine.execute("touch vase")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > touch vase
             The ceramic vase feels exactly as it looks -- solidly real and
@@ -51,7 +51,7 @@ struct TouchActionHandlerTests {
         try await engine.execute("touch")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > touch
             Touch what?
@@ -82,7 +82,7 @@ struct TouchActionHandlerTests {
         try await engine.execute("touch object")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > touch object
             Any such thing remains frustratingly inaccessible.
@@ -114,7 +114,7 @@ struct TouchActionHandlerTests {
         try await engine.execute("touch statue")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > touch statue
             The darkness here is absolute, consuming all light and hope of
@@ -143,7 +143,7 @@ struct TouchActionHandlerTests {
         try await engine.execute("touch table")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > touch table
             The wooden table feels exactly as it looks -- solidly real and
@@ -175,7 +175,7 @@ struct TouchActionHandlerTests {
         try await engine.execute("touch coin")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > touch coin
             The gold coin feels exactly as it looks -- solidly real and
@@ -214,7 +214,7 @@ struct TouchActionHandlerTests {
         try await engine.execute("touch gem")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > touch gem
             The sparkling gem feels exactly as it looks -- solidly real and
@@ -281,7 +281,7 @@ struct TouchActionHandlerTests {
         )
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > touch wall
             The stone wall feels exactly as it looks -- solidly real and
@@ -319,7 +319,7 @@ struct TouchActionHandlerTests {
         try await engine.execute("touch orb")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > touch orb
             The glowing orb feels exactly as it looks -- solidly real and
@@ -351,7 +351,7 @@ struct TouchActionHandlerTests {
         try await engine.execute("touch wizard")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > touch wizard
             The old wizard has not invited your touch.
@@ -376,7 +376,7 @@ struct TouchActionHandlerTests {
         try await engine.execute("feel troll")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > feel troll
             The fierce troll has not invited your touch.
@@ -398,7 +398,7 @@ struct TouchActionHandlerTests {
         try await engine.execute("touch me")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > touch me
             You confirm your continued corporeal existence with a
@@ -431,7 +431,7 @@ struct TouchActionHandlerTests {
         try await engine.execute("touch wizard")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > touch wizard
             Any such thing remains frustratingly inaccessible.
@@ -465,7 +465,7 @@ struct TouchActionHandlerTests {
         try await engine.execute("feel troll")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > feel troll
             Any such thing remains frustratingly inaccessible.
@@ -498,7 +498,7 @@ struct TouchActionHandlerTests {
         try await engine.execute("touch wizard")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > touch wizard
             The darkness here is absolute, consuming all light and hope of
@@ -526,7 +526,7 @@ struct TouchActionHandlerTests {
         try await engine.execute("feel troll")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > feel troll
             The darkness here is absolute, consuming all light and hope of
@@ -555,7 +555,7 @@ struct TouchActionHandlerTests {
         try await engine.execute("touch fairy")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > touch fairy
             The tiny fairy has not invited your touch.
@@ -595,7 +595,7 @@ struct TouchActionHandlerTests {
         )
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > touch wizard
             The old wizard has not invited your touch.

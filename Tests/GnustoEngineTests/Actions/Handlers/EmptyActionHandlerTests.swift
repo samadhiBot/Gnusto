@@ -35,7 +35,7 @@ struct EmptyActionHandlerTests {
         try await engine.execute("empty box")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > empty box
             You empty the wooden box, and a gold coin falls to the ground.
@@ -84,7 +84,7 @@ struct EmptyActionHandlerTests {
         try await engine.execute("empty bag into basket")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > empty bag into basket
             You empty a red gem from the leather bag into the wicker
@@ -123,7 +123,7 @@ struct EmptyActionHandlerTests {
         try await engine.execute("empty out the sack")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > empty out the sack
             You empty the burlap sack, and a brass key falls to the ground.
@@ -162,7 +162,7 @@ struct EmptyActionHandlerTests {
         try await engine.execute("dump bucket")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > dump bucket
             You empty the metal bucket, and a small pebble falls to the
@@ -198,7 +198,7 @@ struct EmptyActionHandlerTests {
         try await engine.execute("pour bottle")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > pour bottle
             Pour the glass bottle on what?
@@ -233,7 +233,7 @@ struct EmptyActionHandlerTests {
         try await engine.execute("pour out bottle")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > pour out bottle
             You empty the glass bottle, and a fine sand falls to the
@@ -254,7 +254,7 @@ struct EmptyActionHandlerTests {
         try await engine.execute("empty")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > empty
             Empty what?
@@ -287,7 +287,7 @@ struct EmptyActionHandlerTests {
         try await engine.execute("empty box")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > empty box
             Any such thing lurks beyond your reach.
@@ -313,7 +313,7 @@ struct EmptyActionHandlerTests {
         try await engine.execute("empty rock")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > empty rock
             You can't put things in the large rock.
@@ -347,7 +347,7 @@ struct EmptyActionHandlerTests {
         try await engine.execute("empty chest")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > empty chest
             The treasure chest is closed.
@@ -382,7 +382,7 @@ struct EmptyActionHandlerTests {
         try await engine.execute("empty box")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > empty box
             The darkness here is absolute, consuming all light and hope of
@@ -414,7 +414,7 @@ struct EmptyActionHandlerTests {
         try await engine.execute("empty box")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > empty box
             The empty box is already empty.
@@ -461,7 +461,7 @@ struct EmptyActionHandlerTests {
         try await engine.execute("empty bag")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > empty bag
             You empty the travel bag, and an old book, a feather quill, and
@@ -506,7 +506,7 @@ struct EmptyActionHandlerTests {
         try await engine.execute("empty pouch")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > empty pouch
             You empty the leather pouch, and a silver ring falls to the
@@ -555,7 +555,7 @@ struct EmptyActionHandlerTests {
         #expect(await finalMarbleState.parent == .location(startRoom))
 
         // Verify message
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > empty jar
             You empty the glass jar, and a blue marble falls to the ground.

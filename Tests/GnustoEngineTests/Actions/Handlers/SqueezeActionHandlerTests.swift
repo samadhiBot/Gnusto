@@ -27,7 +27,7 @@ struct SqueezeActionHandlerTests {
         try await engine.execute("squeeze sponge")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > squeeze sponge
             You give the wet sponge a firm squeezing. It yields little and
@@ -58,7 +58,7 @@ struct SqueezeActionHandlerTests {
         try await engine.execute("compress bellows")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > compress bellows
             You give the leather bellows a firm compressing. It yields
@@ -79,7 +79,7 @@ struct SqueezeActionHandlerTests {
         try await engine.execute("squeeze")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > squeeze
             Squeeze what?
@@ -97,7 +97,7 @@ struct SqueezeActionHandlerTests {
         try await engine.execute("squeeze nonexistent")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > squeeze nonexistent
             You cannot reach any such thing from here.
@@ -129,7 +129,7 @@ struct SqueezeActionHandlerTests {
         try await engine.execute("squeeze pillow")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > squeeze pillow
             You cannot reach any such thing from here.
@@ -147,7 +147,7 @@ struct SqueezeActionHandlerTests {
         try await engine.execute("squeeze the ocean")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > squeeze the ocean
             You cannot squeeze that, despite your best intentions.
@@ -181,7 +181,7 @@ struct SqueezeActionHandlerTests {
         try await engine.execute("squeeze cushion")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > squeeze cushion
             The darkness here is absolute, consuming all light and hope of
@@ -211,7 +211,7 @@ struct SqueezeActionHandlerTests {
         try await engine.execute("squeeze the rubber ball")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > squeeze the rubber ball
             You give the rubber ball a firm squeezing. It yields little and
@@ -242,7 +242,7 @@ struct SqueezeActionHandlerTests {
         try await engine.execute("squeeze the cat")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > squeeze the cat
             You reach toward the fluffy cat and pause. This is not the
@@ -275,7 +275,7 @@ struct SqueezeActionHandlerTests {
         try await engine.execute("squeeze the necromancer")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > squeeze the necromancer
             Aggression is one thing; squeezing the furious necromancer is
@@ -301,7 +301,7 @@ struct SqueezeActionHandlerTests {
         try await engine.execute("squeeze myself")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > squeeze myself
             You embrace yourself in a moment of self-comfort.
@@ -337,7 +337,7 @@ struct SqueezeActionHandlerTests {
         )
 
         // Then - verify second pillow was squeezed
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > squeeze red pillow
             You give the red pillow a firm squeezing. It yields little and

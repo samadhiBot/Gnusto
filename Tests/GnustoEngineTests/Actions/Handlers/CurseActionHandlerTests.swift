@@ -18,7 +18,7 @@ struct CurseActionHandlerTests {
         try await engine.execute("curse")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > curse
             You unleash a cascade of inventive profanity.
@@ -46,7 +46,7 @@ struct CurseActionHandlerTests {
         try await engine.execute("curse")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > curse
             You unleash a cascade of inventive profanity.

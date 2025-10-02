@@ -27,7 +27,7 @@ struct ChompActionHandlerTests {
         try await engine.execute("chomp apple")
 
         // Then: Should ask whether to eat it
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > chomp apple
             Do you mean you want to eat the red apple?
@@ -58,7 +58,7 @@ struct ChompActionHandlerTests {
         try await engine.execute("chomp apple", "yes")
 
         // Then: Should eat the apple (delegate to EatActionHandler)
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > chomp apple
             Do you mean you want to eat the red apple?
@@ -95,7 +95,7 @@ struct ChompActionHandlerTests {
         try await engine.execute("chomp apple", "no")
 
         // Then: Should just decline
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > chomp apple
             Do you mean you want to eat the red apple?
@@ -130,7 +130,7 @@ struct ChompActionHandlerTests {
         try await engine.execute("bite bread")
 
         // Then: Should ask for disambiguation
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > bite bread
             Do you mean you want to eat the piece of bread?
@@ -148,7 +148,7 @@ struct ChompActionHandlerTests {
         try await engine.execute("chew")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > chew
             Your teeth clack together in a display of purposeless
@@ -183,7 +183,7 @@ struct ChompActionHandlerTests {
         try await engine.execute("chomp apple")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > chomp apple
             Any such thing lurks beyond your reach.
@@ -216,7 +216,7 @@ struct ChompActionHandlerTests {
         try await engine.execute("chomp apple")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > chomp apple
             The darkness here is absolute, consuming all light and hope of
@@ -237,7 +237,7 @@ struct ChompActionHandlerTests {
         try await engine.execute("chomp")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > chomp
             Your teeth clack together in a display of purposeless
@@ -265,7 +265,7 @@ struct ChompActionHandlerTests {
         try await engine.execute("chomp cookie")
 
         // Then: Should ask for disambiguation
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > chomp cookie
             Do you mean you want to eat the chocolate cookie?
@@ -296,7 +296,7 @@ struct ChompActionHandlerTests {
         try await engine.execute("chomp guard")
 
         // Then: Should give humorous response directly (no disambiguation)
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > chomp guard
             Your dental assault on the castle guard would likely end your
@@ -326,7 +326,7 @@ struct ChompActionHandlerTests {
         try await engine.execute("chomp rock")
 
         // Then: Should give humorous response directly (no disambiguation)
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > chomp rock
             Your teeth are no match for the smooth rock.
@@ -356,7 +356,7 @@ struct ChompActionHandlerTests {
         try await engine.execute("chomp apple", "look")
 
         // Then: Question should be automatically cleared
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > chomp apple
             Do you mean you want to eat the red apple?

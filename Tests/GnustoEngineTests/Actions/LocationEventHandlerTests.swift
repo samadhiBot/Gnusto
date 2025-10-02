@@ -133,7 +133,7 @@ struct LocationEventHandlerTests {
             north
             """
         )
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > look
             --- Starting Room ---
@@ -216,7 +216,7 @@ struct LocationEventHandlerTests {
 
         try await engine.execute("look")
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > look
             Custom look behavior!
@@ -289,7 +289,7 @@ struct LocationEventHandlerTests {
                 "Entered the test room!"
             ])
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > look
             --- Test Room ---
@@ -321,7 +321,7 @@ struct LocationEventHandlerTests {
         try await engine.execute("look")
 
         // Should still get normal look output despite handler error
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > look
             --- Starting Room ---
@@ -410,7 +410,7 @@ struct LocationEventHandlerTests {
 
         try await engine.execute("look")
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > look
             You are not allowed to look here!
@@ -507,7 +507,7 @@ struct LocationEventHandlerTests {
         let finalCount = await enterCounter.value()
         #expect(finalCount == 1)
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > look
             --- Test Room ---
@@ -566,7 +566,7 @@ struct LocationEventHandlerTests {
         let finalFlag = await engine.hasFlag(.isVerboseMode)
         #expect(finalFlag == true)
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > look
             You sense something mystical about this place...
@@ -602,7 +602,7 @@ struct LocationEventHandlerTests {
                 "Context handler called for location: .startRoom"
             ])
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > look
             Custom look message from context handler.
@@ -657,7 +657,7 @@ struct LocationEventHandlerTests {
         // Test 1: When room is dark, handler should block actions
         try await engine.execute("look")
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > look
             Too dark to do that!
@@ -667,7 +667,7 @@ struct LocationEventHandlerTests {
         // Test 2: When room is dark, handler should block movement
         try await engine.execute("north")
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > north
             You stumble in the darkness!
@@ -690,7 +690,7 @@ struct LocationEventHandlerTests {
         // Test 3: When room is lit, handler should yield and allow normal processing
         try await litEngine.execute("look")
 
-        await litMockIO.expectOutput(
+        await litMockIO.expect(
             """
             > look
             --- Test Room ---
@@ -702,7 +702,7 @@ struct LocationEventHandlerTests {
         // Test 4: Verify movement works when lit (handler yields)
         try await litEngine.execute("north")
 
-        await litMockIO.expectOutput(
+        await litMockIO.expect(
             """
             > north
             --- Other Room ---

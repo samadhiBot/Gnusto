@@ -16,7 +16,7 @@ struct GameEngineActionResponseTests {
 
         try await engine.execute("go xyzzy")
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > go xyzzy
             Which direction?
@@ -36,7 +36,7 @@ struct GameEngineActionResponseTests {
 
         try await engine.execute("go north")
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > go north
             The path is blocked by fallen rocks.
@@ -58,7 +58,7 @@ struct GameEngineActionResponseTests {
 
         try await engine.execute("take pebble")
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > take pebble
             The pebble stubbornly resists your attempts to take it.
@@ -77,7 +77,7 @@ struct GameEngineActionResponseTests {
 
         try await engine.execute("wear pebble")
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > wear pebble
             You aren't holding the pebble.
@@ -110,7 +110,7 @@ struct GameEngineActionResponseTests {
 
         try await engine.execute("take shield")
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > take shield
             Your burden has reached its practical limit.
@@ -134,7 +134,7 @@ struct GameEngineActionResponseTests {
 
         try await engine.execute("drop my ankle bracelet")
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > drop my ankle bracelet
             The ankle bracelet stubbornly resists your attempts to drop it.
@@ -166,7 +166,7 @@ struct GameEngineActionResponseTests {
 
         try await engine.execute("put key in box")
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > put key in box
             The box is closed.
@@ -193,7 +193,7 @@ struct GameEngineActionResponseTests {
 
         try await engine.execute("put key in rock")
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > put key in rock
             You can't put things in the rock.
@@ -220,7 +220,7 @@ struct GameEngineActionResponseTests {
 
         try await engine.execute("put key on rock")
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > put key on rock
             You can't put things on the rock.
@@ -244,7 +244,7 @@ struct GameEngineActionResponseTests {
 
         try await engine.execute("open rock")
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > open rock
             The rock stubbornly resists your attempts to open it.
@@ -266,7 +266,7 @@ struct GameEngineActionResponseTests {
 
         try await engine.execute("close book")
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > close book
             The book stubbornly resists your attempts to close it.
@@ -291,7 +291,7 @@ struct GameEngineActionResponseTests {
 
         try await engine.execute("close box")
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > close box
             The box is already closed.
@@ -316,7 +316,7 @@ struct GameEngineActionResponseTests {
 
         try await engine.execute("wear rock")
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > wear rock
             The rock stubbornly resists your attempts to wear it.
@@ -342,7 +342,7 @@ struct GameEngineActionResponseTests {
 
         try await engine.execute("remove amulet")
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > remove amulet
             The cursed amulet stubbornly resists your attempts to remove
@@ -376,7 +376,7 @@ struct GameEngineActionResponseTests {
 
         try await engine.execute("unlock chest with key")
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > unlock chest with key
             The chest is already unlocked.
@@ -407,7 +407,7 @@ struct GameEngineActionResponseTests {
 
         try await engine.execute("unlock chest with wrong key")
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > unlock chest with wrong key
             The wrong key and the chest were never meant to be together.
@@ -438,7 +438,7 @@ struct GameEngineActionResponseTests {
 
         try await engine.execute("examine shadow")
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > examine shadow
             The darkness here is absolute, consuming all light and hope of
@@ -461,7 +461,7 @@ struct GameEngineActionResponseTests {
 
         try await engine.execute("go up")
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > go up
             You need something to climb on.
@@ -488,7 +488,7 @@ struct GameEngineActionResponseTests {
 
         try await engine.execute("open box")
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > open box
             The box is already open.
@@ -515,7 +515,7 @@ struct GameEngineActionResponseTests {
 
         try await engine.execute("open chest")
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > open chest
             The chest is locked.
@@ -546,7 +546,7 @@ struct GameEngineActionResponseTests {
 
         try await engine.execute("lock chest with key")
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > lock chest with key
             The chest is already locked.
@@ -574,7 +574,7 @@ struct GameEngineActionResponseTests {
 
         try await engine.execute("turn on lamp")
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > turn on lamp
             It's already on.
@@ -600,7 +600,7 @@ struct GameEngineActionResponseTests {
 
         try await engine.execute("turn off lamp")
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > turn off lamp
             It's already off.
@@ -622,7 +622,7 @@ struct GameEngineActionResponseTests {
 
         try await engine.execute("turn on rock")
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > turn on rock
             It remains stubbornly inert despite your ministrations.
@@ -652,7 +652,7 @@ struct GameEngineActionResponseTests {
 
         try await engine.execute("take distant item")
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > take distant item
             Any such thing lurks beyond your reach.
@@ -669,7 +669,7 @@ struct GameEngineActionResponseTests {
 
         try await engine.execute("take")
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > take
             Take what?
@@ -692,7 +692,7 @@ struct GameEngineActionResponseTests {
 
         try await engine.execute("unlock key")
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > unlock key
             That's not something you can unlock.
@@ -717,7 +717,7 @@ struct GameEngineActionResponseTests {
 
         try await engine.execute("eat rock")
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > eat rock
             The rock falls well outside the realm of culinary possibility.
@@ -735,7 +735,7 @@ struct GameEngineActionResponseTests {
         // Use a verb that likely doesn't have a handler
         try await engine.execute("teleport")
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > teleport
             The art of teleport-ing remains a mystery to me.
@@ -767,7 +767,7 @@ struct GameEngineActionResponseTests {
 
         try await engine.execute("close box")
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > close box
             Firmly closed.
@@ -799,7 +799,7 @@ struct GameEngineActionResponseTests {
 
         try await engine.execute("put tiny key in ornate jewelry box")
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > put tiny key in ornate jewelry box
             The ornate jewelry box is closed.
@@ -835,7 +835,7 @@ struct GameEngineActionResponseTests {
         // Try to examine something in a dark room - darkness should take precedence
         try await engine.execute("examine chest")
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > examine chest
             The darkness here is absolute, consuming all light and hope of

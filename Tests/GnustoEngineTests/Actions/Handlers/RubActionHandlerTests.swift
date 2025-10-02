@@ -28,7 +28,7 @@ struct RubActionHandlerTests {
         try await engine.execute("rub lamp")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > rub lamp
             The brass lamp endures your rubbing without transformation or
@@ -64,7 +64,7 @@ struct RubActionHandlerTests {
         try await engine.execute("rub table with cloth")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > rub table with cloth
             The wooden table endures your rubbing without transformation or
@@ -95,7 +95,7 @@ struct RubActionHandlerTests {
         try await engine.execute("polish mirror")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > polish mirror
             The silver mirror endures your rubbing without transformation
@@ -122,7 +122,7 @@ struct RubActionHandlerTests {
         try await engine.execute("clean window")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > clean window
             The dirty window endures your rubbing without transformation or
@@ -143,7 +143,7 @@ struct RubActionHandlerTests {
         try await engine.execute("rub")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > rub
             Rub what?
@@ -161,7 +161,7 @@ struct RubActionHandlerTests {
         try await engine.execute("rub nonexistent")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > rub nonexistent
             You cannot reach any such thing from here.
@@ -192,7 +192,7 @@ struct RubActionHandlerTests {
         try await engine.execute("rub statue")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > rub statue
             You cannot reach any such thing from here.
@@ -210,7 +210,7 @@ struct RubActionHandlerTests {
         try await engine.execute("rub me")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > rub me
             You rub yourself vigorously, achieving little beyond mild
@@ -244,7 +244,7 @@ struct RubActionHandlerTests {
         try await engine.execute("rub statue")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > rub statue
             The darkness here is absolute, consuming all light and hope of
@@ -274,7 +274,7 @@ struct RubActionHandlerTests {
         try await engine.execute("rub the wizard")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > rub the wizard
             I don't think the old wizard would appreciate that.
@@ -306,7 +306,7 @@ struct RubActionHandlerTests {
         try await engine.execute("rub the necromancer")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > rub the necromancer
             That would be quite inappropriate.
@@ -339,7 +339,7 @@ struct RubActionHandlerTests {
         try await engine.execute("rub the wall")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > rub the wall
             The stone wall endures your rubbing without transformation or
@@ -376,7 +376,7 @@ struct RubActionHandlerTests {
         try await engine.execute("rub vase with rag")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > rub vase with rag
             The ceramic vase endures your rubbing without transformation or

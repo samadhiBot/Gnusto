@@ -61,7 +61,7 @@ Thank you for your interest in contributing to the Gnusto Interactive Fiction En
 - **All new code must have tests** using Swift Testing framework
 - Maintain 80-90% test coverage for new features
 - Test through the full engine pipeline with `engine.execute("command")`
-- Use `mockIO.expectOutput()` for exact output verification
+- Use `mockIO.expect()` for exact output verification
 
 ### Architecture Principles
 - **State changes must flow through the StateChange pipeline**
@@ -89,7 +89,7 @@ func testTakeItem() async throws {
     
     try await engine.execute("take gem")
     
-    await mockIO.expectOutput(
+    await mockIO.expect(
         """
         > take gem
         Taken.

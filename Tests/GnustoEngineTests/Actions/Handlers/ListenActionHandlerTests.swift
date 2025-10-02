@@ -18,7 +18,7 @@ struct ListenActionHandlerTests {
         try await engine.execute("listen")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > listen
             The world holds its breath as you listen, revealing nothing of
@@ -45,7 +45,7 @@ struct ListenActionHandlerTests {
         try await engine.execute("listen to radio")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > listen to radio
             You listen to the old radio. You hear nothing unusual.
@@ -71,7 +71,7 @@ struct ListenActionHandlerTests {
         try await engine.execute("listen for the horse")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > listen for the horse
             You listen for the white horse but hear nothing.
@@ -99,7 +99,7 @@ struct ListenActionHandlerTests {
         try await engine.execute("listen")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > listen
             The world holds its breath as you listen, revealing nothing of
@@ -132,7 +132,7 @@ struct ListenActionHandlerTests {
         try await engine.execute("listen to the clock")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > listen to the clock
             You strain your ears in the darkness but hear nothing unusual.
@@ -168,7 +168,7 @@ struct ListenActionHandlerTests {
         try await engine.execute("listen to mechanism")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > listen to mechanism
             You listen to the music mechanism. You hear nothing unusual.

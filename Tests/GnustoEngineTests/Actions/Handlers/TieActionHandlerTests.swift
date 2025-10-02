@@ -27,7 +27,7 @@ struct TieActionHandlerTests {
         try await engine.execute("tie rope")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > tie rope
             You can't tie the thick rope.
@@ -62,7 +62,7 @@ struct TieActionHandlerTests {
         try await engine.execute("tie rope to post")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > tie rope to post
             You can't tie the wooden post to the wooden post.
@@ -100,7 +100,7 @@ struct TieActionHandlerTests {
         try await engine.execute("tie box with string")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > tie box with string
             You can't tie the cardboard box with the ball of string.
@@ -127,7 +127,7 @@ struct TieActionHandlerTests {
         try await engine.execute("fasten belt")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > fasten belt
             You can't tie the leather belt.
@@ -154,7 +154,7 @@ struct TieActionHandlerTests {
         try await engine.execute("bind package")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > bind package
             You can't tie the small package.
@@ -181,7 +181,7 @@ struct TieActionHandlerTests {
         try await engine.execute("tie up rope")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > tie up rope
             You can't tie the heavy rope.
@@ -214,7 +214,7 @@ struct TieActionHandlerTests {
         try await engine.execute("tie up package with ribbon")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > tie up package with ribbon
             You can't tie the gift package with the silk ribbon.
@@ -234,7 +234,7 @@ struct TieActionHandlerTests {
         try await engine.execute("tie")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > tie
             Tie what?
@@ -265,7 +265,7 @@ struct TieActionHandlerTests {
         try await engine.execute("tie rope")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > tie rope
             Any such thing lurks beyond your reach.
@@ -301,7 +301,7 @@ struct TieActionHandlerTests {
         try await engine.execute("tie rope to post")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > tie rope to post
             Any such thing lurks beyond your reach.
@@ -334,7 +334,7 @@ struct TieActionHandlerTests {
         try await engine.execute("tie rope")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > tie rope
             The darkness here is absolute, consuming all light and hope of
@@ -364,7 +364,7 @@ struct TieActionHandlerTests {
         try await engine.execute("tie wizard")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > tie wizard
             Binding the old wizard would transform you from adventurer to
@@ -391,7 +391,7 @@ struct TieActionHandlerTests {
         try await engine.execute("tie troll")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > tie troll
             Binding the fierce troll would transform you from adventurer to
@@ -427,7 +427,7 @@ struct TieActionHandlerTests {
         try await engine.execute("tie guard to post")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > tie guard to post
             You can't tie the wooden post to the wooden post.
@@ -467,7 +467,7 @@ struct TieActionHandlerTests {
         try await engine.execute("tie orc with rope")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > tie orc with rope
             The angry orc would resist binding with extreme prejudice.
@@ -509,7 +509,7 @@ struct TieActionHandlerTests {
         try await engine.execute("tie up merchant with rope")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > tie up merchant with rope
             Binding the traveling merchant would transform you from
@@ -542,7 +542,7 @@ struct TieActionHandlerTests {
         try await engine.execute("tie wizard to wizard")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > tie wizard to wizard
             You can't tie the old wizard to itself.
@@ -563,7 +563,7 @@ struct TieActionHandlerTests {
         try await engine.execute("tie troll to troll")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > tie troll to troll
             You can't tie the fierce troll to itself.
@@ -590,7 +590,7 @@ struct TieActionHandlerTests {
         try await engine.execute("tie guard with guard")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > tie guard with guard
             You can't tie the castle guard with itself.
@@ -619,7 +619,7 @@ struct TieActionHandlerTests {
         try await engine.execute("tie orc with orc")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > tie orc with orc
             You can't tie the angry orc with itself.
@@ -655,7 +655,7 @@ struct TieActionHandlerTests {
         try await engine.execute("tie wizard")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > tie wizard
             Any such thing lurks beyond your reach.
@@ -689,7 +689,7 @@ struct TieActionHandlerTests {
         try await engine.execute("tie troll")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > tie troll
             Any such thing lurks beyond your reach.
@@ -722,7 +722,7 @@ struct TieActionHandlerTests {
         try await engine.execute("tie wizard to guard")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > tie wizard to guard
             Binding the castle guard would transform you from adventurer to

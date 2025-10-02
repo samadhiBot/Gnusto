@@ -32,7 +32,7 @@ struct ForestTests {
             """
         )
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > north
             --- North of House ---

@@ -361,7 +361,7 @@ struct PlayerProxyTests {
         #expect(await bookProxy.playerIsHolding == true)
 
         // Verify game output
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > take book
             Taken.

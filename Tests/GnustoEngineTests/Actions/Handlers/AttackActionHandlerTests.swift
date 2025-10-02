@@ -21,7 +21,7 @@ struct AttackActionHandlerTests {
         try await engine.execute("attack the troll", times: 5)
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > attack the troll
             With nothing but rage you rush the fearsome beast as his
@@ -95,7 +95,7 @@ struct AttackActionHandlerTests {
         try await engine.execute("attack dragon with sword", times: 3)
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > attack dragon with sword
             You drive forward with your steel sword seeking its purpose as
@@ -149,7 +149,7 @@ struct AttackActionHandlerTests {
         try await engine.execute("fight the orc", times: 3)
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > fight the orc
             You close the distance fast with fists ready as the angry
@@ -204,7 +204,7 @@ struct AttackActionHandlerTests {
         try await engine.execute("hit the goblin", times: 3)
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > hit the goblin
             No weapons needed as you attack with pure violence while the
@@ -246,7 +246,7 @@ struct AttackActionHandlerTests {
         try await engine.execute("kill the giant spider", times: 3)
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > kill the giant spider
             No weapons needed as you attack with pure violence while the
@@ -289,7 +289,7 @@ struct AttackActionHandlerTests {
         try await engine.execute("attack")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > attack
             Attack what?
@@ -321,7 +321,7 @@ struct AttackActionHandlerTests {
         try await engine.execute("attack troll")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > attack troll
             You cannot reach any such thing from here.
@@ -349,7 +349,7 @@ struct AttackActionHandlerTests {
         try await engine.execute("attack troll with sword")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > attack troll with sword
             You aren't holding the steel sword.
@@ -377,7 +377,7 @@ struct AttackActionHandlerTests {
         try await engine.execute("attack troll")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > attack troll
             The darkness here is absolute, consuming all light and hope of
@@ -406,7 +406,7 @@ struct AttackActionHandlerTests {
         try await engine.execute("attack rock")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > attack rock
             The large rock is immune to your hostility.
@@ -438,7 +438,7 @@ struct AttackActionHandlerTests {
         try await engine.execute("attack the dragon")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > attack the dragon
             You attack with nothing but will and bone as the fierce
@@ -479,7 +479,7 @@ struct AttackActionHandlerTests {
         try await engine.execute("attack the bandit with a stick")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > attack the bandit with a stick
             Your wooden stick cuts through air toward the dangerous bandit
@@ -522,7 +522,7 @@ struct AttackActionHandlerTests {
         try await engine.execute("attack the monster with my dagger", times: 3)
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > attack the monster with my dagger
             Armed and hungry for violence, you strike with your sharp
@@ -585,7 +585,7 @@ struct AttackActionHandlerTests {
         )
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > look
             --- Laboratory ---
@@ -634,7 +634,7 @@ struct AttackActionHandlerTests {
         try await engine.execute("stab the monster", times: 3)
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > stab the monster
             Armed and hungry for violence, you strike with your sharp

@@ -18,7 +18,7 @@ struct ThinkActionHandlerTests {
         try await engine.execute("think")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > think
             Deep cogitation yields no immediate revelations.
@@ -44,7 +44,7 @@ struct ThinkActionHandlerTests {
         try await engine.execute("think about puzzle")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > think about puzzle
             The ancient puzzle occupies your mental landscape for a
@@ -74,7 +74,7 @@ struct ThinkActionHandlerTests {
         try await engine.execute("consider gem")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > consider gem
             The sparkling gem occupies your mental landscape for a
@@ -104,7 +104,7 @@ struct ThinkActionHandlerTests {
         try await engine.execute("ponder over riddle")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > ponder over riddle
             The complex riddle occupies your mental landscape for a
@@ -128,7 +128,7 @@ struct ThinkActionHandlerTests {
         try await engine.execute("think about nonexistent")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > think about nonexistent
             You cannot reach any such thing from here.
@@ -159,7 +159,7 @@ struct ThinkActionHandlerTests {
         try await engine.execute("think about object")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > think about object
             You cannot reach any such thing from here.
@@ -186,7 +186,7 @@ struct ThinkActionHandlerTests {
         try await engine.execute("think")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > think
             Deep cogitation yields no immediate revelations.
@@ -219,7 +219,7 @@ struct ThinkActionHandlerTests {
         try await engine.execute("think about stone")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > think about stone
             The smooth stone occupies your mental landscape for a
@@ -249,7 +249,7 @@ struct ThinkActionHandlerTests {
         try await engine.execute("think about wizard")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > think about wizard
             You think about the old wizard.
@@ -273,7 +273,7 @@ struct ThinkActionHandlerTests {
         try await engine.execute("think about troll")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > think about troll
             You think about the fierce troll.
@@ -302,7 +302,7 @@ struct ThinkActionHandlerTests {
         try await engine.execute("think about box")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > think about box
             The wooden box occupies your mental landscape for a thoughtful
@@ -324,7 +324,7 @@ struct ThinkActionHandlerTests {
         try await engine.execute("think about myself")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > think about myself
             You turn your thoughts inward, finding the usual mixture of
@@ -343,7 +343,7 @@ struct ThinkActionHandlerTests {
         try await engine.execute("think about the test room")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > think about the test room
             You cannot reach any such thing from here.
@@ -361,7 +361,7 @@ struct ThinkActionHandlerTests {
         try await engine.execute("think about silence")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > think about silence
             The nature of the silence occupies your philosophical
@@ -380,7 +380,7 @@ struct ThinkActionHandlerTests {
         try await engine.execute("think")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > think
             Deep cogitation yields no immediate revelations.

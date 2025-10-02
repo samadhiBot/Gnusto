@@ -33,7 +33,7 @@ struct GoActionHandlerTests {
         try await engine.execute("go north")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > go north
             --- North Room ---
@@ -70,7 +70,7 @@ struct GoActionHandlerTests {
         try await engine.execute("walk south")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > walk south
             --- South Room ---
@@ -107,7 +107,7 @@ struct GoActionHandlerTests {
         try await engine.execute("run east")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > run east
             --- East Room ---
@@ -146,7 +146,7 @@ struct GoActionHandlerTests {
         try await engine.execute("north")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > north
             --- North Room ---
@@ -183,7 +183,7 @@ struct GoActionHandlerTests {
         try await engine.execute("n")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > n
             --- North Room ---
@@ -263,7 +263,7 @@ struct GoActionHandlerTests {
         #expect(playerLocation == "westRoom")
 
         // Clear output
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > north
             --- North Room ---
@@ -319,7 +319,7 @@ struct GoActionHandlerTests {
         try await engine.execute("go")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > go
             The compass awaits your decision.
@@ -346,7 +346,7 @@ struct GoActionHandlerTests {
         try await engine.execute("north")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > north
             That way lies only disappointment.
@@ -373,7 +373,7 @@ struct GoActionHandlerTests {
         try await engine.execute("north")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > north
             The way north is permanently blocked by rubble.
@@ -404,7 +404,7 @@ struct GoActionHandlerTests {
         try await engine.execute("south")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > south
             A magical barrier blocks your way south.
@@ -443,7 +443,7 @@ struct GoActionHandlerTests {
         try await engine.execute("east")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > east
             The wooden door is closed.
@@ -484,7 +484,7 @@ struct GoActionHandlerTests {
         try await engine.execute("west")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > west
             The iron door is locked.
@@ -524,7 +524,7 @@ struct GoActionHandlerTests {
         try await engine.execute("north")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > north
             --- North Room ---
@@ -568,7 +568,7 @@ struct GoActionHandlerTests {
         try await engine.execute("up")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > up
             --- Upper Room ---
@@ -614,7 +614,7 @@ struct GoActionHandlerTests {
         playerLocation = await engine.player.location.id
         #expect(playerLocation == "endRoom")
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > north
             --- End Room ---
@@ -649,7 +649,7 @@ struct GoActionHandlerTests {
         try await engine.execute("south")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > south
             --- Lit Room ---
@@ -687,7 +687,7 @@ struct GoActionHandlerTests {
         try await engine.execute("north")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > north
             Darkness rushes in like a living thing.
@@ -739,7 +739,7 @@ struct GoActionHandlerTests {
         try await engine.execute("north")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > north
             --- Dark Room ---
@@ -783,7 +783,7 @@ struct GoActionHandlerTests {
         playerLocation = await engine.player.location.id
         #expect(playerLocation == "roomA")
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > east
             --- Room B ---

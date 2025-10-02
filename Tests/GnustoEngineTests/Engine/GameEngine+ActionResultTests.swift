@@ -310,7 +310,7 @@ struct GameEngineActionResultTests {
         try await engine.execute("activate device")
 
         // Then: All aspects of ActionResult should be processed
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > activate device
             The mysterious device hums to life with complex activation!
@@ -441,7 +441,7 @@ struct GameEngineActionResultTests {
         try await engine.execute("sequence")
 
         // Then: Final message should be displayed
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > sequence
             First action completed.
@@ -478,7 +478,7 @@ struct GameEngineActionResultTests {
         #expect(pronoun != nil)
 
         // And: Command should work normally
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > examine test item
             A simple test item.
@@ -666,7 +666,7 @@ struct GameEngineActionResultTests {
         try await engine.execute("take gold coin")
 
         // Then: ActionResult should be processed correctly
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > take gold coin
             Taken.
@@ -705,7 +705,7 @@ struct GameEngineActionResultTests {
         )
 
         // Then: Both ActionResults should be processed
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > take lamp
             Taken.
@@ -740,7 +740,7 @@ struct GameEngineActionResultTests {
 
         try await engine.processActionResult(multilineResult)
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             This is a complex message that spans multiple lines and
             contains various formatting.
@@ -814,7 +814,7 @@ struct GameEngineActionResultTests {
         // Trigger the fuse by advancing time
         try await engine.execute("wait")
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > wait
             Time flows onward, indifferent to your concerns.
@@ -865,7 +865,7 @@ struct GameEngineActionResultTests {
         // Trigger the fuse
         try await engine.execute("wait")
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > wait
             Time flows onward, indifferent to your concerns.

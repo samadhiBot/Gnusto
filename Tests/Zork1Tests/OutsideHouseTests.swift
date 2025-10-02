@@ -31,7 +31,7 @@ struct OutsideHouseTests {
             """
         )
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > take the mailbox
             It is securely anchored.
@@ -83,7 +83,7 @@ struct OutsideHouseTests {
             """
         )
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > examine table
             A bottle is sitting on the table. The glass bottle contains a
@@ -125,7 +125,7 @@ struct OutsideHouseTests {
             """
         )
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > examine the boards
             The boards are securely fastened.
@@ -196,7 +196,7 @@ struct OutsideHouseTests {
             """
         )
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > west
             --- Living Room ---
@@ -288,7 +288,7 @@ struct OutsideHouseTests {
             """
         )
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > examine table
             A bottle is sitting on the table. The glass bottle contains a

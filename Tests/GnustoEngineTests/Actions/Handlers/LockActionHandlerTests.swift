@@ -34,7 +34,7 @@ struct LockActionHandlerTests {
         try await engine.execute("lock door")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > lock door
             Lock the wooden door with what?
@@ -69,7 +69,7 @@ struct LockActionHandlerTests {
         try await engine.execute("lock chest with key")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > lock chest with key
             The treasure chest is now locked.
@@ -95,7 +95,7 @@ struct LockActionHandlerTests {
         try await engine.execute("lock")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > lock
             Lock what?
@@ -123,7 +123,7 @@ struct LockActionHandlerTests {
         try await engine.execute("lock door")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > lock door
             Lock the iron door with what?
@@ -157,7 +157,7 @@ struct LockActionHandlerTests {
         try await engine.execute("lock door with key")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > lock door with key
             You aren't holding the silver key.
@@ -196,7 +196,7 @@ struct LockActionHandlerTests {
         try await engine.execute("lock door with key")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > lock door with key
             Any such thing lurks beyond your reach.
@@ -228,7 +228,7 @@ struct LockActionHandlerTests {
         try await engine.execute("lock rock with key")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > lock rock with key
             The large rock stubbornly resists your attempts to lock it.
@@ -262,7 +262,7 @@ struct LockActionHandlerTests {
         try await engine.execute("lock door with key")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > lock door with key
             The wrong key and the secure door were never meant to be
@@ -304,7 +304,7 @@ struct LockActionHandlerTests {
         try await engine.execute("lock door with key")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > lock door with key
             The darkness here is absolute, consuming all light and hope of
@@ -349,7 +349,7 @@ struct LockActionHandlerTests {
         #expect(await finalCombinationState.hasFlag(.isTouched))
 
         // Verify message
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > lock safe with combination
             The metal safe is now locked.
@@ -384,7 +384,7 @@ struct LockActionHandlerTests {
         try await engine.execute("lock door with key")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > lock door with key
             The locked door is already locked.
@@ -430,7 +430,7 @@ struct LockActionHandlerTests {
         #expect(await finalKeyState.hasFlag(.isTouched))
 
         // Verify message
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > lock box with key
             The jewelry box is now locked.
@@ -478,7 +478,7 @@ struct LockActionHandlerTests {
         try await engine.execute("lock door with door key")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > lock door with door key
             The front door is now locked.
@@ -489,7 +489,7 @@ struct LockActionHandlerTests {
         try await engine.execute("lock chest with chest key")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > lock chest with chest key
             The storage chest is now locked.
@@ -530,7 +530,7 @@ struct LockActionHandlerTests {
         try await engine.execute("lock box with crystal")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > lock box with crystal
             The magic box is now locked.
@@ -567,7 +567,7 @@ struct LockActionHandlerTests {
         try await engine.execute("lock door with stick")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > lock door with stick
             The wooden stick and the heavy door were never meant to be

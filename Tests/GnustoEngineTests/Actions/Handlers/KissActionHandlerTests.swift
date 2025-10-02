@@ -27,7 +27,7 @@ struct KissActionHandlerTests {
         try await engine.execute("kiss princess")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > kiss princess
             The moment for kissing the beautiful princess has neither
@@ -51,7 +51,7 @@ struct KissActionHandlerTests {
         try await engine.execute("kiss")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > kiss
             Kiss what?
@@ -83,7 +83,7 @@ struct KissActionHandlerTests {
         try await engine.execute("kiss princess")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > kiss princess
             You cannot reach any such thing from here.
@@ -117,7 +117,7 @@ struct KissActionHandlerTests {
         try await engine.execute("kiss stranger")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > kiss stranger
             The darkness here is absolute, consuming all light and hope of
@@ -138,7 +138,7 @@ struct KissActionHandlerTests {
         try await engine.execute("kiss me")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > kiss me
             Your flexibility, while admirable, has limits.
@@ -165,7 +165,7 @@ struct KissActionHandlerTests {
         try await engine.execute("kiss friend")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > kiss friend
             The moment for kissing the old friend has neither arrived nor
@@ -196,7 +196,7 @@ struct KissActionHandlerTests {
         try await engine.execute("kiss troll")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > kiss troll
             That's an unusual combat strategy, and the angry troll seems
@@ -229,7 +229,7 @@ struct KissActionHandlerTests {
         try await engine.execute("kiss statue")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > kiss statue
             Your lips and the marble statue are destined never to meet.
@@ -263,7 +263,7 @@ struct KissActionHandlerTests {
         #expect(await finalState.hasFlag(.isTouched))
 
         // Verify message
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > kiss cat
             The moment for kissing the fluffy cat has neither arrived nor
@@ -299,7 +299,7 @@ struct KissActionHandlerTests {
         )
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > kiss knight
             The moment for kissing the brave knight has neither arrived nor
@@ -336,7 +336,7 @@ struct KissActionHandlerTests {
         try await engine.execute("kiss locket")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > kiss locket
             Your lips and the golden locket are destined never to meet.
@@ -365,7 +365,7 @@ struct KissActionHandlerTests {
         )
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > kiss merchant
             The moment for kissing the traveling merchant has neither
@@ -428,7 +428,7 @@ struct KissActionHandlerTests {
         )
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > kiss mirror
             Your lips and the magic mirror are destined never to meet.

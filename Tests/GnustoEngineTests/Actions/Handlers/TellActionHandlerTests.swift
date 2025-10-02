@@ -27,7 +27,7 @@ struct TellActionHandlerTests {
         try await engine.execute("tell wizard")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > tell wizard
             The old wizard awaits the subject of your discourse.
@@ -62,7 +62,7 @@ struct TellActionHandlerTests {
         try await engine.execute("tell sage about crystal")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > tell sage about crystal
             The wise sage absorbs your words about the magic crystal with
@@ -98,7 +98,7 @@ struct TellActionHandlerTests {
         try await engine.execute("speak to guard about key")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > speak to guard about key
             The palace guard absorbs your words about the silver key with
@@ -131,7 +131,7 @@ struct TellActionHandlerTests {
         try await engine.execute("talk to merchant about treasure")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > talk to merchant about treasure
             The traveling merchant absorbs your words about the ancient
@@ -164,7 +164,7 @@ struct TellActionHandlerTests {
         try await engine.execute("say blessing to priest")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > say blessing to priest
             The village priest absorbs your words about the prayer blessing
@@ -197,7 +197,7 @@ struct TellActionHandlerTests {
         try await engine.execute("inform scholar about book")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > inform scholar about book
             The learned scholar absorbs your words about the ancient book
@@ -226,7 +226,7 @@ struct TellActionHandlerTests {
         try await engine.execute("tell about treasure")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > tell about treasure
             Your voice trails off, seeking an audience.
@@ -244,7 +244,7 @@ struct TellActionHandlerTests {
         try await engine.execute("tell wizard about magic")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > tell wizard about magic
             Any such thing remains frustratingly inaccessible.
@@ -276,7 +276,7 @@ struct TellActionHandlerTests {
         try await engine.execute("tell wizard about magic")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > tell wizard about magic
             Any such thing remains frustratingly inaccessible.
@@ -302,7 +302,7 @@ struct TellActionHandlerTests {
         try await engine.execute("tell me about crystal")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > tell me about crystal
             You engage in a spirited internal dialogue about the magic
@@ -337,7 +337,7 @@ struct TellActionHandlerTests {
         try await engine.execute("tell wizard about magic")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > tell wizard about magic
             The darkness here is absolute, consuming all light and hope of
@@ -367,7 +367,7 @@ struct TellActionHandlerTests {
         try await engine.execute("tell wizard")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > tell wizard
             The old wizard awaits the subject of your discourse.
@@ -402,7 +402,7 @@ struct TellActionHandlerTests {
         try await engine.execute("tell sage about crystal")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > tell sage about crystal
             The wise sage absorbs your words about the magic crystal with
@@ -424,7 +424,7 @@ struct TellActionHandlerTests {
         try await engine.execute("tell troll")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > tell troll
             The fierce troll awaits the subject of your discourse.
@@ -459,7 +459,7 @@ struct TellActionHandlerTests {
         try await engine.execute("tell the orc about my sword", times: 2)
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > tell the orc about my sword
             The fierce orc dismisses your words about the steel sword with
@@ -500,7 +500,7 @@ struct TellActionHandlerTests {
         try await engine.execute("tell statue")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > tell statue
             Your words bounce off the marble statue without effect or
@@ -535,7 +535,7 @@ struct TellActionHandlerTests {
         try await engine.execute("tell mirror about secret")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > tell mirror about secret
             Your eloquent exposition on the dark secret is wasted on the
@@ -563,7 +563,7 @@ struct TellActionHandlerTests {
         try await engine.execute("tell wizard about dragons")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > tell wizard about dragons
             The old wizard absorbs your words about the dragons with

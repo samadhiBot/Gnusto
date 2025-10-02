@@ -33,7 +33,7 @@ struct CutActionHandlerTests {
         try await engine.execute("cut rope")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > cut rope
             The thick rope resists division with stubborn integrity.
@@ -69,7 +69,7 @@ struct CutActionHandlerTests {
         try await engine.execute("cut paper with scissors")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > cut paper with scissors
             The piece of paper resists division with stubborn integrity.
@@ -102,7 +102,7 @@ struct CutActionHandlerTests {
         try await engine.execute("slice bread")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > slice bread
             The loaf of bread resists division with stubborn integrity.
@@ -135,7 +135,7 @@ struct CutActionHandlerTests {
         try await engine.execute("chop wood")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > chop wood
             The piece of wood resists division with stubborn integrity.
@@ -155,7 +155,7 @@ struct CutActionHandlerTests {
         try await engine.execute("cut")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > cut
             Cut what?
@@ -186,7 +186,7 @@ struct CutActionHandlerTests {
         try await engine.execute("cut rope")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > cut rope
             Any such thing lurks beyond your reach.
@@ -218,7 +218,7 @@ struct CutActionHandlerTests {
         try await engine.execute("cut rope")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > cut rope
             The darkness here is absolute, consuming all light and hope of
@@ -254,7 +254,7 @@ struct CutActionHandlerTests {
         try await engine.execute("cut the fabric with the sword")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > cut the fabric with the sword
             The piece of fabric resists division with stubborn integrity.
@@ -289,7 +289,7 @@ struct CutActionHandlerTests {
         try await engine.execute("cut myself")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > cut myself
             Self-harm is not the solution to your problems.

@@ -18,7 +18,7 @@ struct YellActionHandlerTests {
         try await engine.execute("yell")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > yell
             Your voice tears through the silence like a blade.
@@ -46,7 +46,7 @@ struct YellActionHandlerTests {
         try await engine.execute("yell")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > yell
             Your voice tears through the silence like a blade.

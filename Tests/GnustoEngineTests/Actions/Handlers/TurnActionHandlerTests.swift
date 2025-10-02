@@ -26,7 +26,7 @@ struct TurnActionHandlerTests {
         try await engine.execute("turn dial")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > turn dial
             The brass dial remains fixed in its orientation, defying
@@ -56,7 +56,7 @@ struct TurnActionHandlerTests {
         try await engine.execute("rotate wheel")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > rotate wheel
             The steering wheel remains fixed in its orientation, defying
@@ -83,7 +83,7 @@ struct TurnActionHandlerTests {
         try await engine.execute("twist knob")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > twist knob
             The door knob remains fixed in its orientation, defying
@@ -104,7 +104,7 @@ struct TurnActionHandlerTests {
         try await engine.execute("turn")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > turn
             Turn what?
@@ -135,7 +135,7 @@ struct TurnActionHandlerTests {
         try await engine.execute("turn dial")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > turn dial
             Any such thing lurks beyond your reach.
@@ -167,7 +167,7 @@ struct TurnActionHandlerTests {
         try await engine.execute("turn handle")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > turn handle
             The darkness here is absolute, consuming all light and hope of
@@ -197,7 +197,7 @@ struct TurnActionHandlerTests {
         try await engine.execute("turn guard")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > turn guard
             The palace guard is not a crank to be turned at your whim.
@@ -224,7 +224,7 @@ struct TurnActionHandlerTests {
         try await engine.execute("turn cube")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > turn cube
             You rotate the puzzle cube experimentally. Nothing of
@@ -251,7 +251,7 @@ struct TurnActionHandlerTests {
         try await engine.execute("turn statue")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > turn statue
             The marble statue remains fixed in its orientation, defying
@@ -270,7 +270,7 @@ struct TurnActionHandlerTests {
         try await engine.execute("turn Test Room")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > turn Test Room
             Any such thing lurks beyond your reach.
@@ -328,7 +328,7 @@ struct TurnActionHandlerTests {
         try await engine.execute("rotate second dial")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > turn first dial
             The first dial remains fixed in its orientation, defying

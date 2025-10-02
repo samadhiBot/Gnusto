@@ -18,7 +18,7 @@ import Foundation
 ///
 /// // Execute commands and verify output
 /// try await engine.execute("take lamp")
-/// await mockIO.expectOutput(
+/// await mockIO.expect(
 ///     """
 ///     > take lamp
 ///     Taken.
@@ -318,7 +318,7 @@ extension MockIOHandler {
     /// ## Usage
     /// ```swift
     /// try await engine.execute("take lamp")
-    /// try await mockIO.expectOutput(
+    /// try await mockIO.expect(
     ///     """
     ///     > take lamp
     ///     Taken.
@@ -334,7 +334,7 @@ extension MockIOHandler {
     ///   - line: Source line number for test failure reporting.
     ///   - column: Source column number for test failure reporting.
     /// - Throws: Test failure if the actual output doesn't match expectations.
-    public func expectOutput(
+    public func expect(
         _ output: @autoclosure () -> String,
         _ message: @autoclosure () -> String? = nil,
         fileID: StaticString = #fileID,

@@ -129,7 +129,7 @@ struct ItemEventHandlerTests {
         let (engine, mockIO) = await GameEngine.test(blueprint: blueprint)
         try await engine.execute("examine test item")
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > examine test item
             Intent matched!
@@ -180,7 +180,7 @@ struct ItemEventHandlerTests {
         let (engine, mockIO) = await GameEngine.test(blueprint: blueprint)
         try await engine.execute("take test item")
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > take test item
             One intent matched!
@@ -263,7 +263,7 @@ struct ItemEventHandlerTests {
 
         try await engine.execute("examine test item")
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > examine test item
             This item has a special examination behavior!
@@ -391,7 +391,7 @@ struct ItemEventHandlerTests {
 
         try await engine.execute("take test item")
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > take test item
             This item cannot be taken – it's cursed!
@@ -465,7 +465,7 @@ struct ItemEventHandlerTests {
         let finalFlag = await engine.hasFlag(.isVerboseMode)
         #expect(finalFlag == true)
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > examine test item
             You feel a strange energy emanating from the item...
@@ -510,7 +510,7 @@ struct ItemEventHandlerTests {
         // Test with orb off (default)
         try await engine.execute("examine magic orb")
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > examine magic orb
             The orb lies dormant.
@@ -523,7 +523,7 @@ struct ItemEventHandlerTests {
 
         try await engine.execute("examine magic orb")
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > examine magic orb
             The orb glows with mystical energy!
@@ -611,7 +611,7 @@ struct ItemEventHandlerTests {
 
         try await engine.execute("take test item")
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > take test item
             The item is magically protected from being taken!
@@ -664,7 +664,7 @@ struct ItemEventHandlerTests {
         let finallyOn = await finalState.hasFlag(.isOn)
         #expect(finallyOn == false)  // Handler doesn't actually change state in simplified version
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > examine glowing stone
             As you examine the item, it begins to glow!
@@ -726,7 +726,7 @@ struct ItemEventHandlerTests {
         let (engine, mockIO) = await GameEngine.test(blueprint: blueprint)
 
         try await engine.execute("examine test item")
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > examine test item
             You examine the item closely.
@@ -734,7 +734,7 @@ struct ItemEventHandlerTests {
         )
 
         try await engine.execute("touch test item")
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > touch test item
             You touch the item gently.
@@ -742,7 +742,7 @@ struct ItemEventHandlerTests {
         )
 
         try await engine.execute("take test item")
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > take test item
             You pick up the item.
@@ -785,7 +785,7 @@ struct ItemEventHandlerTests {
             ["Context handler called for item: .testItem"]
         )
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > examine test item
             Custom examine message from context handler.
@@ -823,7 +823,7 @@ struct ItemEventHandlerTests {
         try await engine.execute("throw bottle")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > throw bottle
             The bottle hits the far wall and shatters. The water spills to
@@ -870,7 +870,7 @@ struct ItemEventHandlerTests {
         )
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > throw bottle
             The bottle hits the far wall and shatters.
@@ -914,7 +914,7 @@ struct ItemEventHandlerTests {
         try await engine.execute("attack bottle")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > attack bottle
             A brilliant maneuver destroys the bottle. The water spills to
@@ -958,7 +958,7 @@ struct ItemEventHandlerTests {
         try await engine.execute("shake bottle")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > shake bottle
             The water spills to the floor and evaporates.
@@ -1001,7 +1001,7 @@ struct ItemEventHandlerTests {
         try await engine.execute("shake bottle")
 
         // Then - should get default shake message since bottle is closed
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > shake bottle
             Your agitation of the glass bottle produces no observable

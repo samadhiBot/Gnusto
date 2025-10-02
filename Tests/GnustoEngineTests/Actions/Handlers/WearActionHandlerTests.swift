@@ -28,7 +28,7 @@ struct WearActionHandlerTests {
         try await engine.execute("wear hat")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > wear hat
             You don the red hat with practiced ease.
@@ -60,7 +60,7 @@ struct WearActionHandlerTests {
         try await engine.execute("put on jacket")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > put on jacket
             You don the leather jacket with practiced ease.
@@ -91,7 +91,7 @@ struct WearActionHandlerTests {
         try await engine.execute("don cloak")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > don cloak
             You don the dark cloak with practiced ease.
@@ -126,7 +126,7 @@ struct WearActionHandlerTests {
         try await engine.execute("wear all")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > wear all
             You don the wool gloves and the blue hat with practiced ease.
@@ -151,7 +151,7 @@ struct WearActionHandlerTests {
         try await engine.execute("wear")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > wear
             Wear what?
@@ -179,7 +179,7 @@ struct WearActionHandlerTests {
         try await engine.execute("wear hat")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > wear hat
             You aren't holding the fancy hat.
@@ -206,7 +206,7 @@ struct WearActionHandlerTests {
         try await engine.execute("wear rock")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > wear rock
             The heavy rock stubbornly resists your attempts to wear it.
@@ -239,7 +239,7 @@ struct WearActionHandlerTests {
         try await engine.execute("wear boots")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > wear boots
             You are already wearing the hiking boots.
@@ -274,7 +274,7 @@ struct WearActionHandlerTests {
         try await engine.execute("wear scarf")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > wear scarf
             The darkness here is absolute, consuming all light and hope of
@@ -310,7 +310,7 @@ struct WearActionHandlerTests {
         #expect(await finalState.hasFlag(.isTouched) == true)
 
         // Verify message
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > wear ring
             You don the gold ring with practiced ease.
@@ -350,7 +350,7 @@ struct WearActionHandlerTests {
         #expect(await finalShoes.hasFlag(.isWorn) == true)
         #expect(await finalSocks.hasFlag(.isWorn) == true)
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > wear shoes and socks
             You don the running shoes and the cotton socks with practiced
@@ -400,7 +400,7 @@ struct WearActionHandlerTests {
         #expect(await finalBook.hasFlag(.isWorn) == false)
         #expect(await finalTie.hasFlag(.isWorn) == true)
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > wear all
             You don the white shirt and the silk tie with practiced ease.
@@ -433,7 +433,7 @@ struct WearActionHandlerTests {
         try await engine.execute("wear all")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > wear all
             There is nothing here to wear.
@@ -479,7 +479,7 @@ struct WearActionHandlerTests {
         #expect(await finalHat.hasFlag(.isWorn) == true)
         #expect(await finalMittens.hasFlag(.isWorn) == true)
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > wear all
             You don the wool mittens with practiced ease.

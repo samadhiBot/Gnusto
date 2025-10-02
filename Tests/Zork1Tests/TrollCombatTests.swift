@@ -29,7 +29,7 @@
 //        try await engine.execute("go east")
 //
 //        // Then
-//        await mockIO.expectOutput(
+//        await mockIO.expect(
 //            """
 //            > go east
 //            The troll fends you off with a menacing gesture.
@@ -107,7 +107,7 @@
 //        try await engine.execute("give sword to troll")
 //
 //        // Then - should get a combat-related response
-//        await mockIO.expectOutput(
+//        await mockIO.expect(
 //            """
 //            > give sword to troll
 //            The troll, who is not overly proud, graciously accepts the gift
@@ -130,7 +130,7 @@
 //        try await engine.execute("attack the troll with my sword", times: 3)
 //
 //        // Then - should get a response related to troll combat
-//        await mockIO.expectOutput(
+//        await mockIO.expect(
 //            """
 //            > attack the troll with my sword
 //            Your blood sings as your sword cuts toward the nasty troll who

@@ -349,7 +349,7 @@ func testTakeSyntax() async throws {
 
     try await engine.execute("take lamp")
 
-    await mockIO.expectOutput(
+    await mockIO.expect(
         """
         > take lamp
         Taken.
@@ -432,7 +432,7 @@ func testSomething() async throws {
     try await engine.execute("take test item")
 
     // Then: Verify results
-    await mockIO.expectOutput(
+    await mockIO.expect(
         """
         > take test item
         Taken.
@@ -510,7 +510,7 @@ for directObjectRef in context.command.directObjects {
 
 ```swift
 // ✅ RIGHT: Exact message matching with command echo
-await mockIO.expectOutput(
+await mockIO.expect(
     """
     > take lamp
     Taken.

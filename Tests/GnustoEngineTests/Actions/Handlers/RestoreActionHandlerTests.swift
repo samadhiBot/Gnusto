@@ -43,7 +43,7 @@ struct RestoreActionHandlerTests {
         try await engine.execute("restore")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > save
             Game saved.
@@ -98,7 +98,7 @@ struct RestoreActionHandlerTests {
         try await engine.execute("load")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > save
             Game saved.
@@ -148,7 +148,7 @@ struct RestoreActionHandlerTests {
         try await engine.execute("restore")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > restore
             If you restore your saved game now you will lose any unsaved
@@ -175,7 +175,7 @@ struct RestoreActionHandlerTests {
         try await engine.execute("restore")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > restore
             If you restore your saved game now you will lose any unsaved
@@ -210,7 +210,7 @@ struct RestoreActionHandlerTests {
         try await engine.execute("restore")
 
         // Then: Should succeed even without light
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > restore
             If you restore your saved game now you will lose any unsaved

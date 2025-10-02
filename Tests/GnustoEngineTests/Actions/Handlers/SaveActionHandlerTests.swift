@@ -18,7 +18,7 @@ struct SaveActionHandlerTests {
         try await engine.execute("save")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > save
             Game saved.
@@ -47,7 +47,7 @@ struct SaveActionHandlerTests {
         try await engine.execute("save")
 
         // Then: Should succeed even without light
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > save
             Game saved.
@@ -65,7 +65,7 @@ struct SaveActionHandlerTests {
         try await engine.execute("save")
 
         // Then: Should always succeed
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > save
             Game saved.
@@ -102,7 +102,7 @@ struct SaveActionHandlerTests {
         try await engine.execute("save")
 
         // Then: Should succeed regardless of state
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > save
             Game saved.
@@ -120,7 +120,7 @@ struct SaveActionHandlerTests {
         try await engine.execute("save")
 
         // Then: Should work each time
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > save
             Game saved.
@@ -161,7 +161,7 @@ struct SaveActionHandlerTests {
         #expect(finalScore == initialScore)
         #expect(finalTurnCount == initialTurnCount)
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > save
             Game saved.
@@ -195,7 +195,7 @@ struct SaveActionHandlerTests {
         try await engine.execute("save")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > save
             Game saved.
@@ -277,7 +277,7 @@ struct SaveActionHandlerTests {
         try await engine.execute("save")
 
         // Then: Should still provide feedback
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > save
             Game saved.

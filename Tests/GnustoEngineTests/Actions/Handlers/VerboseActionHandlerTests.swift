@@ -18,7 +18,7 @@ struct VerboseActionHandlerTests {
         try await engine.execute("verbose")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > verbose
             Maximum verbosity. Full location descriptions will be shown
@@ -44,7 +44,7 @@ struct VerboseActionHandlerTests {
         try await engine.execute("verbose")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > verbose
             Maximum verbosity. Full location descriptions will be shown
@@ -95,7 +95,7 @@ struct VerboseActionHandlerTests {
         try await engine.execute("verbose")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > verbose
             Maximum verbosity. Full location descriptions will be shown

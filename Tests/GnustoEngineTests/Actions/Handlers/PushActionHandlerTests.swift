@@ -26,7 +26,7 @@ struct PushActionHandlerTests {
         try await engine.execute("push button")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > push button
             The red button meets your push with immovable resistance.
@@ -56,7 +56,7 @@ struct PushActionHandlerTests {
         try await engine.execute("push the guard")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > push the guard
             Shoving the surly guard would cross lines better left
@@ -81,7 +81,7 @@ struct PushActionHandlerTests {
         try await engine.execute("push the troll")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > push the troll
             Shoving the fierce troll would cross lines better left
@@ -111,7 +111,7 @@ struct PushActionHandlerTests {
         try await engine.execute("press button")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > press button
             The red button meets your push with immovable resistance.
@@ -140,7 +140,7 @@ struct PushActionHandlerTests {
         try await engine.execute("depress switch")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > depress switch
             The light switch meets your push with immovable resistance.
@@ -166,7 +166,7 @@ struct PushActionHandlerTests {
         try await engine.execute("shove crate")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > shove crate
             The wooden crate meets your push with immovable resistance.
@@ -197,7 +197,7 @@ struct PushActionHandlerTests {
         try await engine.execute("push all")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > push all
             The verb 'push' doesn't support multiple objects.
@@ -217,7 +217,7 @@ struct PushActionHandlerTests {
         try await engine.execute("push")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > push
             Push what?
@@ -235,7 +235,7 @@ struct PushActionHandlerTests {
         try await engine.execute("press nonexistent")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > press nonexistent
             Any such thing lurks beyond your reach.
@@ -266,7 +266,7 @@ struct PushActionHandlerTests {
         try await engine.execute("push button")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > push button
             Any such thing lurks beyond your reach.
@@ -298,7 +298,7 @@ struct PushActionHandlerTests {
         try await engine.execute("push lever")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > push lever
             The darkness here is absolute, consuming all light and hope of
@@ -317,7 +317,7 @@ struct PushActionHandlerTests {
         try await engine.execute("press testRoom")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > press testRoom
             Any such thing lurks beyond your reach.
@@ -335,7 +335,7 @@ struct PushActionHandlerTests {
         try await engine.execute("press me")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > press me
             The logistics of pressing oneself prove insurmountable.
@@ -363,7 +363,7 @@ struct PushActionHandlerTests {
         try await engine.execute("push switch")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > push switch
             The light switch meets your push with immovable resistance.
@@ -393,7 +393,7 @@ struct PushActionHandlerTests {
         try await engine.execute("push device")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > push device
             The electronic device meets your push with immovable
@@ -430,7 +430,7 @@ struct PushActionHandlerTests {
         try await engine.execute("push red button and blue button")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > push red button and blue button
             The verb 'push' doesn't support multiple objects.
@@ -490,7 +490,7 @@ struct PushActionHandlerTests {
         try await engine.execute("push button")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > push button
             The emergency button meets your push with immovable resistance.
@@ -508,7 +508,7 @@ struct PushActionHandlerTests {
         try await engine.execute("push all")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > push all
             The verb 'push' doesn't support multiple objects.
@@ -542,7 +542,7 @@ struct PushActionHandlerTests {
         )
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > push lever
             The wooden lever meets your push with immovable resistance.

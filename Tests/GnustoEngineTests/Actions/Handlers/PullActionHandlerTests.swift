@@ -26,7 +26,7 @@ struct PullActionHandlerTests {
         try await engine.execute("pull rope")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > pull rope
             The thick rope resists your tugging with stoic determination.
@@ -56,7 +56,7 @@ struct PullActionHandlerTests {
         try await engine.execute("pull guard")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > pull guard
             The surly guard is not a rope to be tugged at your convenience.
@@ -80,7 +80,7 @@ struct PullActionHandlerTests {
         try await engine.execute("pull troll")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > pull troll
             The fierce troll is not a rope to be tugged at your
@@ -104,7 +104,7 @@ struct PullActionHandlerTests {
         try await engine.execute("pull")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > pull
             Pull what?
@@ -135,7 +135,7 @@ struct PullActionHandlerTests {
         try await engine.execute("pull lever")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > pull lever
             Any such thing lurks beyond your reach.
@@ -167,7 +167,7 @@ struct PullActionHandlerTests {
         try await engine.execute("pull chain")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > pull chain
             The darkness here is absolute, consuming all light and hope of
@@ -230,7 +230,7 @@ struct PullActionHandlerTests {
         )
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > pull first rope
             The first rope resists your tugging with stoic determination.
@@ -272,7 +272,7 @@ struct PullActionHandlerTests {
         try await engine.execute("pull string")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > pull string
             The pull string resists your tugging with stoic determination.

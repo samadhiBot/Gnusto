@@ -33,7 +33,7 @@ struct GameEngineCombatTests {
         // Initiate combat
         try await engine.execute("slay the goblin")
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > slay the goblin
             No weapons needed as you attack with pure violence while the
@@ -79,7 +79,7 @@ struct GameEngineCombatTests {
         // Initiate combat with weapon
         try await engine.execute("slay the orc with my sword")
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > slay the orc with my sword
             Armed and hungry for violence, you strike with your sword as
@@ -125,7 +125,7 @@ struct GameEngineCombatTests {
         // When: Enemy attacks
         try await engine.execute("look")
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > look
             --- Laboratory ---
@@ -172,7 +172,7 @@ struct GameEngineCombatTests {
         // When: Enemy attacks while player has weapon
         try await engine.execute("look")
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > look
             --- Laboratory ---
@@ -217,7 +217,7 @@ struct GameEngineCombatTests {
         // When: Player attacks
         try await engine.execute("attack the skeleton warrior")
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > attack the skeleton warrior
             No weapons needed as you attack with pure violence while the
@@ -270,7 +270,7 @@ struct GameEngineCombatTests {
         // When: Player attacks with weapon
         try await engine.execute("slay the shambling zombie")
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > slay the shambling zombie
             Armed and hungry for violence, you strike with your iron mace
@@ -318,7 +318,7 @@ struct GameEngineCombatTests {
         // Initiate combat
         try await engine.execute("kill the goblin")
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > kill the goblin
             No weapons needed as you attack with pure violence while the
@@ -603,7 +603,7 @@ struct GameEngineCombatTests {
         // When: Initiate combat
         try await engine.execute("kill the rat")
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > kill the rat
             No weapons needed as you attack with pure violence while the
@@ -651,7 +651,7 @@ struct GameEngineCombatTests {
         // When: Initiate combat
         try await engine.execute("attack the ogre")
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > attack the ogre
             Armed and hungry for violence, you strike with your wooden club
@@ -721,7 +721,7 @@ struct GameEngineCombatTests {
             "kill the bear with the bow",
         )
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > slay the wolf with the sword
             Armed and hungry for violence, you strike with your steel sword

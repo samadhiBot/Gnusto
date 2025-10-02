@@ -18,7 +18,7 @@ struct LaughActionHandlerTests {
         try await engine.execute("laugh")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > laugh
             Laughter bubbles up from somewhere deep within.
@@ -46,7 +46,7 @@ struct LaughActionHandlerTests {
         try await engine.execute("laugh")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > laugh
             Laughter bubbles up from somewhere deep within.

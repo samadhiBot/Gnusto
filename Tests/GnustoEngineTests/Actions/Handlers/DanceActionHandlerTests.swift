@@ -18,7 +18,7 @@ struct DanceActionHandlerTests {
         try await engine.execute("dance")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > dance
             You execute a series of movements that could generously be
@@ -45,7 +45,7 @@ struct DanceActionHandlerTests {
         try await engine.execute("dance with statue")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > dance with statue
             The stone statue proves a disappointingly rigid dance partner.
@@ -72,7 +72,7 @@ struct DanceActionHandlerTests {
         try await engine.execute("dance with partner")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > dance with partner
             You and the dance partner move together in unexpected harmony,
@@ -102,7 +102,7 @@ struct DanceActionHandlerTests {
         )
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > look
             --- Laboratory ---
@@ -138,7 +138,7 @@ struct DanceActionHandlerTests {
         try await engine.execute("dance")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > dance
             You execute a series of movements that could generously be
@@ -165,7 +165,7 @@ struct DanceActionHandlerTests {
         try await engine.execute("dance with chair")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > dance with chair
             The wooden chair proves a disappointingly rigid dance partner.

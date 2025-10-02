@@ -33,7 +33,7 @@ struct RemoveActionHandlerTests {
         try await engine.execute("remove hat")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > remove hat
             You remove the blue hat.
@@ -71,7 +71,7 @@ struct RemoveActionHandlerTests {
         try await engine.execute("doff cloak")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > doff cloak
             You doff the woolen cloak.
@@ -107,7 +107,7 @@ struct RemoveActionHandlerTests {
         try await engine.execute("take off shoes")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > take off shoes
             You take off the leather shoes.
@@ -151,7 +151,7 @@ struct RemoveActionHandlerTests {
         try await engine.execute("remove all")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > remove all
             You remove the silk gloves and the red hat.
@@ -176,7 +176,7 @@ struct RemoveActionHandlerTests {
         try await engine.execute("remove")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > remove
             Remove what?
@@ -204,7 +204,7 @@ struct RemoveActionHandlerTests {
         try await engine.execute("remove hat")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > remove hat
             You aren't wearing the blue hat.
@@ -222,7 +222,7 @@ struct RemoveActionHandlerTests {
         try await engine.execute("remove nonexistent")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > remove nonexistent
             Any such thing lurks beyond your reach.
@@ -255,7 +255,7 @@ struct RemoveActionHandlerTests {
         try await engine.execute("remove robe")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > remove robe
             The ceremonial robe stubbornly resists your attempts to remove
@@ -274,7 +274,7 @@ struct RemoveActionHandlerTests {
         try await engine.execute("remove me")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > remove me
             That's not something you can remove.
@@ -309,7 +309,7 @@ struct RemoveActionHandlerTests {
         try await engine.execute("remove jacket")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > remove jacket
             You remove the leather jacket.
@@ -364,7 +364,7 @@ struct RemoveActionHandlerTests {
         try await engine.execute("remove coat and scarf and mittens")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > remove coat and scarf and mittens
             You remove the winter coat, the thick mittens, and the woolen
@@ -427,7 +427,7 @@ struct RemoveActionHandlerTests {
         try await engine.execute("remove all")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > remove all
             You remove the blue pants, the cotton shirt, and the gold
@@ -465,7 +465,7 @@ struct RemoveActionHandlerTests {
         try await engine.execute("remove all")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > remove all
             You remove everything you're wearing.
@@ -506,7 +506,7 @@ struct RemoveActionHandlerTests {
         try await engine.execute("remove all")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > remove all
             You remove the baseball cap.

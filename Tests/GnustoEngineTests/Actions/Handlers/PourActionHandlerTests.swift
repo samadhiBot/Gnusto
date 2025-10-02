@@ -32,7 +32,7 @@ struct PourActionHandlerTests {
         try await engine.execute("pour bottle on plant")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > pour bottle on plant
             You pour the water bottle on the small plant.
@@ -64,7 +64,7 @@ struct PourActionHandlerTests {
         try await engine.execute("pour water")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > pour water
             Pour the glass of water on what?
@@ -96,7 +96,7 @@ struct PourActionHandlerTests {
         try await engine.execute("spill milk on table")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > spill milk on table
             You pour the glass of milk on the wooden table.
@@ -116,7 +116,7 @@ struct PourActionHandlerTests {
         try await engine.execute("pour")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > pour
             Pour what?
@@ -143,7 +143,7 @@ struct PourActionHandlerTests {
         try await engine.execute("pour juice")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > pour juice
             Pour the orange juice on what?
@@ -169,7 +169,7 @@ struct PourActionHandlerTests {
         try await engine.execute("pour nonexistent on plant")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > pour nonexistent on plant
             You cannot reach any such thing from here.
@@ -196,7 +196,7 @@ struct PourActionHandlerTests {
         try await engine.execute("pour water on nonexistent")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > pour water on nonexistent
             You cannot reach any such thing from here.
@@ -233,7 +233,7 @@ struct PourActionHandlerTests {
         try await engine.execute("pour water on plant")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > pour water on plant
             You cannot reach any such thing from here.
@@ -270,7 +270,7 @@ struct PourActionHandlerTests {
         try await engine.execute("pour water on plant")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > pour water on plant
             You cannot reach any such thing from here.
@@ -296,7 +296,7 @@ struct PourActionHandlerTests {
         try await engine.execute("pour testRoom on plant")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > pour testRoom on plant
             You cannot reach any such thing from here.
@@ -323,7 +323,7 @@ struct PourActionHandlerTests {
         try await engine.execute("pour water on testRoom")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > pour water on testRoom
             You cannot reach any such thing from here.
@@ -349,7 +349,7 @@ struct PourActionHandlerTests {
         try await engine.execute("pour me on plant")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > pour me on plant
             That lacks the necessary fluidity for pouring.
@@ -376,7 +376,7 @@ struct PourActionHandlerTests {
         try await engine.execute("pour water on me")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > pour water on me
             You pour the glass of water on yourself. How refreshing.
@@ -415,7 +415,7 @@ struct PourActionHandlerTests {
         try await engine.execute("pour water on plant")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > pour water on plant
             The darkness here is absolute, consuming all light and hope of
@@ -462,7 +462,7 @@ struct PourActionHandlerTests {
         #expect(await finalOil.hasFlag(.isTouched) == true)
         #expect(await finalLamp.hasFlag(.isTouched) == true)
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > pour oil on lamp
             You pour the bottle of oil on the oil lamp.
@@ -503,7 +503,7 @@ struct PourActionHandlerTests {
         )
 
         // The "it" should refer to either the water or the flower
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > examine book
             An old leather book.
@@ -536,7 +536,7 @@ struct PourActionHandlerTests {
         try await engine.execute("pour water on water")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > pour water on water
             You cannot pour something onto itself without breaking reality.
@@ -576,7 +576,7 @@ struct PourActionHandlerTests {
             "pour coffee on table"
         )
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > pour wine on table
             You pour the bottle of wine on the marble table.
@@ -618,7 +618,7 @@ struct PourActionHandlerTests {
             "pour water on carpet"
         )
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > pour water on floor
             You pour the glass of water on the wooden floor.

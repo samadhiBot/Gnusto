@@ -280,7 +280,7 @@ struct ${game_name}Tests {
         try await engine.execute("look")
 
         // Then: Should see the room description
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > look
             --- Broom Closet ---
@@ -299,7 +299,7 @@ struct ${game_name}Tests {
         try await engine.execute("take the screwdriver")
 
         // Then: Item should be taken successfully
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > take the screwdriver
             Taken.
@@ -323,7 +323,7 @@ struct ${game_name}Tests {
         )
 
         // Then: Item should be taken successfully
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > inventory
             Your hands are as empty as your pockets.
@@ -344,7 +344,7 @@ struct ${game_name}Tests {
         try await engine.execute("help")
 
         // Then: Should show command information
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > help
             This is an interactive fiction game. You control the story by

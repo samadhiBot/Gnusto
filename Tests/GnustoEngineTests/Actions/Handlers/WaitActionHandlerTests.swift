@@ -18,7 +18,7 @@ struct WaitActionHandlerTests {
         try await engine.execute("wait")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > wait
             Time flows onward, indifferent to your concerns.
@@ -46,7 +46,7 @@ struct WaitActionHandlerTests {
         try await engine.execute("wait")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > wait
             Time flows onward, indifferent to your concerns.

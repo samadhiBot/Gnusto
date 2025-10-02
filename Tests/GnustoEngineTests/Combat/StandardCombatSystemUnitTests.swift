@@ -406,7 +406,7 @@ struct StandardCombatSystemUnitTests {
             troll.setCharacterAttributes(isFighting: true)
         )
         try await engine.execute("north")
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > north
             --- Combat Arena ---

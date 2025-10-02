@@ -27,7 +27,7 @@ struct MultipleObjectTests {
         try await engine.execute("examine all")
 
         // Assert: Should examine both items
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > examine all
             - Lantern: A bright light.
@@ -55,7 +55,7 @@ struct MultipleObjectTests {
         try await engine.execute("examine sword and lantern")
 
         // Assert: Should examine both items
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > examine sword and lantern
             - Lantern: A bright light.
@@ -90,7 +90,7 @@ struct MultipleObjectTests {
         try await engine.execute("give all to merchant")
 
         // Assert: Should give both items
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > give all to merchant
             You give the coin and the gem to the merchant.
@@ -126,7 +126,7 @@ struct MultipleObjectTests {
         try await engine.execute("give coin and gem to merchant")
 
         // Assert: Should give both items
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > give coin and gem to merchant
             You give the coin and the gem to the merchant.
@@ -163,7 +163,7 @@ struct MultipleObjectTests {
         try await engine.execute("put all in box")
 
         // Assert: Should put both items in box
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > put all in box
             You carefully place the coin and the gem within the box.
@@ -198,7 +198,7 @@ struct MultipleObjectTests {
         try await engine.execute("put coin and gem in box")
 
         // Assert: Should put both items in box
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > put coin and gem in box
             You carefully place the coin and the gem within the box.
@@ -234,7 +234,7 @@ struct MultipleObjectTests {
         try await engine.execute("take all")
 
         // Assert: Should take both items
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > take all
             You take the goblet and the scepter.
@@ -262,7 +262,7 @@ struct MultipleObjectTests {
         try await engine.execute("take goblet and scepter")
 
         // Assert: Should take both items
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > take goblet and scepter
             You take the goblet and the scepter.
@@ -288,7 +288,7 @@ struct MultipleObjectTests {
         try await engine.execute("open sword and lantern")
 
         // Assert: Should get an error about multiple objects not being supported
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > open sword and lantern
             The verb 'open' doesn't support multiple objects.
@@ -310,7 +310,7 @@ struct MultipleObjectTests {
         try await engine.execute("take all")
 
         // Assert: Should get appropriate message
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > take all
             Take what?

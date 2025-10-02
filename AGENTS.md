@@ -124,7 +124,7 @@ func testSomething() async throws {
     try await engine.execute("take test item")
 
     // Then: Verify results
-    await mockIO.expectOutput(
+    await mockIO.expect(
         """
         > take test item
         Taken.

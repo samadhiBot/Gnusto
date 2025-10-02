@@ -67,7 +67,7 @@ struct ConjunctionCommandTests {
         #expect(await lanternItem.parent == .location(engine.location(.startRoom)))
 
         // Assert: Appropriate message
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > drop sword and lantern
             You drop the lantern and the sword.
@@ -92,7 +92,7 @@ struct ConjunctionCommandTests {
         #expect(await bookItem.parent == .location(engine.location(.startRoom)))
 
         // Assert: Appropriate message
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > drop sword, lantern and book
             You drop the book, the lantern, and the sword.
@@ -118,7 +118,7 @@ struct ConjunctionCommandTests {
         #expect(await gemItem.playerIsHolding)
 
         // Assert: Appropriate message
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > take coin and gem
             You take the coin and the gem.
@@ -150,7 +150,7 @@ struct ConjunctionCommandTests {
         try await engine.execute("open sword and lantern")
 
         // Assert: Should get an error about multiple objects not being supported
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > open sword and lantern
             The verb 'open' doesn't support multiple objects.
@@ -175,7 +175,7 @@ struct ConjunctionCommandTests {
         try await engine.execute("drop sword and nonexistent")
 
         // Assert: Should get a parse error about the non-existent item
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > drop sword and nonexistent
             You drop the sword.
@@ -214,7 +214,7 @@ struct ConjunctionCommandTests {
         #expect(await statueItem.parent == .location(engine.location(.startRoom)))  // Should remain in location
 
         // Check output for appropriate error or success message
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > drop sword and statue
             You drop the sword.
@@ -251,7 +251,7 @@ struct ConjunctionCommandTests {
         #expect(await swordItem.parent == .location(engine.location(.startRoom)))
         #expect(await lanternItem.parent == .location(engine.location(.startRoom)))
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > drop sword and lantern
             You drop the lantern and the sword.
@@ -293,7 +293,7 @@ struct ConjunctionCommandTests {
         #expect(await gemItem.playerIsHolding)
         #expect(await bookItem.playerIsHolding)
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > take coin, gem and book
             You take the book, the coin, and the gem.

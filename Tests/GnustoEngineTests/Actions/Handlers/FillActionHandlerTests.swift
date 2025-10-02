@@ -35,7 +35,7 @@ struct FillActionHandlerTests {
         try await engine.execute("fill bucket")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > fill bucket
             Fill the metal bucket with what?
@@ -73,7 +73,7 @@ struct FillActionHandlerTests {
         try await engine.execute("fill bottle with stream")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > fill bottle with stream
             You fill the glass bottle from the crystal stream.
@@ -108,7 +108,7 @@ struct FillActionHandlerTests {
         try await engine.execute("fill cup from fountain")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > fill cup from fountain
             You fill the ceramic cup from the marble fountain.
@@ -128,7 +128,7 @@ struct FillActionHandlerTests {
         try await engine.execute("fill")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > fill
             Fill what?
@@ -161,7 +161,7 @@ struct FillActionHandlerTests {
         try await engine.execute("fill bucket")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > fill bucket
             Any such thing lurks beyond your reach.
@@ -187,7 +187,7 @@ struct FillActionHandlerTests {
         try await engine.execute("fill rock")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > fill rock
             You can't put things in the large rock.
@@ -221,7 +221,7 @@ struct FillActionHandlerTests {
         try await engine.execute("fill jar")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > fill jar
             The sealed jar is closed.
@@ -260,7 +260,7 @@ struct FillActionHandlerTests {
         try await engine.execute("fill bucket from well")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > fill bucket from well
             Any such thing lurks beyond your reach.
@@ -295,7 +295,7 @@ struct FillActionHandlerTests {
         try await engine.execute("fill bucket")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > fill bucket
             The darkness here is absolute, consuming all light and hope of
@@ -334,7 +334,7 @@ struct FillActionHandlerTests {
         try await engine.execute("fill bottle from box")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > fill bottle from box
             You fill the empty bottle from the wooden box.
@@ -369,7 +369,7 @@ struct FillActionHandlerTests {
         try await engine.execute("fill flask")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > fill flask
             Fill the silver flask with what?
@@ -412,7 +412,7 @@ struct FillActionHandlerTests {
         #expect(await finalState.hasFlag(.isTouched) == true)
 
         // Verify message
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > fill mug with pond
             You fill the ceramic mug from the small pond.
@@ -461,7 +461,7 @@ struct FillActionHandlerTests {
         try await engine.execute("fill bottle from well")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > fill bottle from well
             You fill the glass bottle from the deep well.
@@ -472,7 +472,7 @@ struct FillActionHandlerTests {
         try await engine.execute("fill bucket with stream")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > fill bucket with stream
             You fill the metal bucket from the flowing stream.

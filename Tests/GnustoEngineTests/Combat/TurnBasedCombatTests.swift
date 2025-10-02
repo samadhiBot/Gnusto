@@ -44,7 +44,7 @@ struct TurnBasedCombatTests {
         try await engine.execute("attack goblin with sword")
 
         // Then: Verify combat occurred with proper turn structure
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > attack goblin with sword
             Armed and hungry for violence, you strike with your sword as
@@ -79,7 +79,7 @@ struct TurnBasedCombatTests {
         try await engine.execute("attack knight")
 
         // Then: Attack should be denied
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > attack knight
             No weapons needed as you attack with pure violence while the
@@ -115,7 +115,7 @@ struct TurnBasedCombatTests {
         try await engine.execute("attack troll with lamp")
 
         // Then: Attack should note the lamp is ineffective
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > attack troll with lamp
             You drive forward with your lamp seeking its purpose as the
@@ -164,7 +164,7 @@ struct TurnBasedCombatTests {
         try await engine.execute("attack ogre")
 
         // Then: Combat should occur (results will vary due to dice rolls)
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > attack ogre
             Armed and hungry for violence, you strike with your dagger as
@@ -222,7 +222,7 @@ struct TurnBasedCombatTests {
         )
 
         // Then: Might surrender (depends on dice roll with high charisma)
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > attack bandit
             No weapons needed as you attack with pure violence while the
@@ -267,7 +267,7 @@ struct TurnBasedCombatTests {
         try await engine.execute("attack statue")
 
         // Then: Should get message about fighting inanimate objects
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > attack statue
             The statue is immune to your hostility.
@@ -294,7 +294,7 @@ struct TurnBasedCombatTests {
         try await engine.execute("attack zombie")
 
         // Then: Should indicate it's already dead
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > attack zombie
             No weapons needed as you attack with pure violence while the
@@ -341,7 +341,7 @@ struct TurnBasedCombatTests {
         try await engine.execute("attack rat with sword")
 
         // Then: Check combat occurred
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > attack rat with sword
             Armed and hungry for violence, you strike with your sword as

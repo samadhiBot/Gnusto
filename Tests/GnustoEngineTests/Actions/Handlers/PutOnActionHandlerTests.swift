@@ -33,7 +33,7 @@ struct PutOnActionHandlerTests {
         try await engine.execute("put book on table")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > put book on table
             The red book comes to rest upon the wooden table.
@@ -72,7 +72,7 @@ struct PutOnActionHandlerTests {
         try await engine.execute("place cup on desk")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > place cup on desk
             The coffee cup comes to rest upon the office desk.
@@ -105,7 +105,7 @@ struct PutOnActionHandlerTests {
         try await engine.execute("set vase on shelf")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > set vase on shelf
             The crystal vase comes to rest upon the wooden shelf.
@@ -138,7 +138,7 @@ struct PutOnActionHandlerTests {
         try await engine.execute("balance ball on post")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > balance ball on post
             The rubber ball comes to rest upon the fence post.
@@ -171,7 +171,7 @@ struct PutOnActionHandlerTests {
         try await engine.execute("hang coat on hook")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > hang coat on hook
             The winter coat comes to rest upon the coat hook.
@@ -200,7 +200,7 @@ struct PutOnActionHandlerTests {
         try await engine.execute("put book")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > put book
             Put the red book on what?
@@ -218,7 +218,7 @@ struct PutOnActionHandlerTests {
         try await engine.execute("put")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > put
             Put what?
@@ -245,7 +245,7 @@ struct PutOnActionHandlerTests {
         try await engine.execute("put nonexistent on table")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > put nonexistent on table
             You cannot reach any such thing from here.
@@ -272,7 +272,7 @@ struct PutOnActionHandlerTests {
         try await engine.execute("put book on nonexistent")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > put book on nonexistent
             Any such thing remains frustratingly inaccessible.
@@ -305,7 +305,7 @@ struct PutOnActionHandlerTests {
         try await engine.execute("put book on table")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > put book on table
             You aren't holding the red book.
@@ -343,7 +343,7 @@ struct PutOnActionHandlerTests {
         try await engine.execute("put book on table")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > put book on table
             Any such thing remains frustratingly inaccessible.
@@ -370,7 +370,7 @@ struct PutOnActionHandlerTests {
         try await engine.execute("put testRoom on table")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > put testRoom on table
             You cannot reach any such thing from here.
@@ -397,7 +397,7 @@ struct PutOnActionHandlerTests {
         try await engine.execute("put me on table")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > put me on table
             You are not an object to be placed upon things.
@@ -424,7 +424,7 @@ struct PutOnActionHandlerTests {
         try await engine.execute("put book on testRoom")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > put book on testRoom
             Any such thing remains frustratingly inaccessible.
@@ -451,7 +451,7 @@ struct PutOnActionHandlerTests {
         try await engine.execute("put book on me")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > put book on me
             You cannot balance the red book there, physics be damned.
@@ -479,7 +479,7 @@ struct PutOnActionHandlerTests {
         try await engine.execute("put table on table")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > put table on table
             The wooden table cannot rest upon itself -- that way lies
@@ -512,7 +512,7 @@ struct PutOnActionHandlerTests {
         try await engine.execute("put book on rock")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > put book on rock
             You can't put things on the large rock.
@@ -548,7 +548,7 @@ struct PutOnActionHandlerTests {
         try await engine.execute("put box on plate")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > put box on plate
             You can't put the wooden box on the dinner plate because the
@@ -584,7 +584,7 @@ struct PutOnActionHandlerTests {
         try await engine.execute("put tray on coaster")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > put tray on coaster
             You can't put the serving tray on the drink coaster because the
@@ -625,7 +625,7 @@ struct PutOnActionHandlerTests {
         try await engine.execute("put book on table")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > put book on table
             The darkness here is absolute, consuming all light and hope of
@@ -668,7 +668,7 @@ struct PutOnActionHandlerTests {
         let finalCoin = await engine.item("coin")
         #expect(await finalCoin.parent == .item(counter.proxy(engine)))
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > put coin on counter
             The gold coin comes to rest upon the kitchen counter.
@@ -712,7 +712,7 @@ struct PutOnActionHandlerTests {
         #expect(await finalKey.hasFlag(.isTouched) == true)
         #expect(await finalShelf.hasFlag(.isTouched) == true)
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > put key on shelf
             The brass key comes to rest upon the wooden shelf.
@@ -753,7 +753,7 @@ struct PutOnActionHandlerTests {
             "examine it"
         )
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > examine book
             An old leather book.
@@ -800,7 +800,7 @@ struct PutOnActionHandlerTests {
             "put pencil on desk"
         )
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > put pen on desk
             The blue pen comes to rest upon the office desk.
@@ -848,7 +848,7 @@ struct PutOnActionHandlerTests {
         try await engine.execute("put book on bookshelf")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > put book on bookshelf
             The new book comes to rest upon the wooden bookshelf.
@@ -895,7 +895,7 @@ struct PutOnActionHandlerTests {
         )
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > put book on bookshelf
             Which do you mean: the new book or the old book?
@@ -950,7 +950,7 @@ struct PutOnActionHandlerTests {
         // When - Put food
         try await engine.execute("put sandwich on workbench")
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > put sandwich on workbench
             The sandwich comes to rest upon the wooden workbench.
@@ -960,7 +960,7 @@ struct PutOnActionHandlerTests {
         // When - Put tool
         try await engine.execute("put hammer on workbench")
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > put hammer on workbench
             You successfully put the hammer on the wooden workbench.
@@ -970,7 +970,7 @@ struct PutOnActionHandlerTests {
         // When - Put weapon
         try await engine.execute("put dagger on workbench")
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > put dagger on workbench
             You successfully put the dagger on the wooden workbench.
@@ -1014,7 +1014,7 @@ struct PutOnActionHandlerTests {
         // When - Put on altar
         try await engine.execute("put coin on altar")
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > put coin on altar
             The gold coin comes to rest upon the stone altar.
@@ -1029,7 +1029,7 @@ struct PutOnActionHandlerTests {
         // When - Put on pedestal
         try await engine.execute("put coin on pedestal")
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > put coin on pedestal
             You successfully put the gold coin on the marble pedestal.
@@ -1044,7 +1044,7 @@ struct PutOnActionHandlerTests {
         // When - Put on mantle
         try await engine.execute("put coin on mantle")
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > put coin on mantle
             You successfully put the gold coin on the fireplace mantle.

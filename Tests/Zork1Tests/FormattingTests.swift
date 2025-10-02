@@ -22,7 +22,7 @@ struct FormattingTests {
         await engine.run()
 
         // Check that there's no double line break between introduction and location
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             Zork I: The Great Underground Empire
 
@@ -54,7 +54,7 @@ struct FormattingTests {
         )
 
         // Check that visited locations show brief output (just name)
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > north
             --- North of House ---

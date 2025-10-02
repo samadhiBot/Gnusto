@@ -25,7 +25,7 @@ struct ErrorHandlingIntegrationTests {
         )
 
         // Then: Should handle gracefully with appropriate messages
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             I beg your pardon?
 
@@ -66,7 +66,7 @@ struct ErrorHandlingIntegrationTests {
         try await engine.execute("take book")
 
         // Then: Should request clarification
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > take book
             Which do you mean, the blue book or the red book?
@@ -108,7 +108,7 @@ struct ErrorHandlingIntegrationTests {
         )
 
         // Then: Should provide appropriate error messages
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > look in wooden box
             The wooden box is closed.
@@ -152,7 +152,7 @@ struct ErrorHandlingIntegrationTests {
         try await engine.execute("put large book in small bag")
 
         // Then: Should reject with capacity message
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > put large book in small bag
             The large book won't fit in the small bag.
@@ -193,7 +193,7 @@ struct ErrorHandlingIntegrationTests {
         try await engine.execute("take all")
 
         // Then: Should eventually hit capacity limits
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > take all
             You take the 1st heavy item, the 10th heavy item, the 11th
@@ -226,7 +226,7 @@ struct ErrorHandlingIntegrationTests {
         try await engine.execute("go to nowhere")
 
         // Then: Should provide appropriate error messages
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > go north
             That way lies only disappointment.
@@ -270,7 +270,7 @@ struct ErrorHandlingIntegrationTests {
         try await engine.execute("examine hidden treasure")
 
         // Then: Should indicate darkness prevents actions
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > look
             The darkness here is absolute, consuming all light and hope of
@@ -312,7 +312,7 @@ struct ErrorHandlingIntegrationTests {
         )
 
         // Then: Should indicate device doesn't respond
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > turn on broken machine
             It remains stubbornly inert despite your ministrations.
@@ -335,7 +335,7 @@ struct ErrorHandlingIntegrationTests {
         try await engine.execute("take the bewilderingly and unbelievably long named item")
 
         // Then: Should handle without crashing
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > take the bewilderingly and unbelievably long named item
             Take what?
@@ -367,7 +367,7 @@ struct ErrorHandlingIntegrationTests {
         )
 
         // Then: Valid commands should still work after errors
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > invalid command
             The art of invalid-ing remains a mystery to me.
@@ -464,7 +464,7 @@ struct ErrorHandlingIntegrationTests {
         )
 
         // Then: Should handle boundary values appropriately
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > take ethereal item
             Taken.
@@ -506,7 +506,7 @@ struct ErrorHandlingIntegrationTests {
         )
 
         // Then: All commands should execute in order correctly
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > take test item
             Taken.

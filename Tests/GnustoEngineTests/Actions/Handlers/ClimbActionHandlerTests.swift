@@ -18,7 +18,7 @@ struct ClimbActionHandlerTests {
         try await engine.execute("climb")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > climb
             Climb what?
@@ -45,7 +45,7 @@ struct ClimbActionHandlerTests {
         try await engine.execute("climb tree")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > climb tree
             You climb the tall tree.
@@ -75,7 +75,7 @@ struct ClimbActionHandlerTests {
         try await engine.execute("ascend ladder")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > ascend ladder
             You climb the wooden ladder.
@@ -109,7 +109,7 @@ struct ClimbActionHandlerTests {
         try await engine.execute("climb tree")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > climb tree
             Any such thing lurks beyond your reach.
@@ -127,7 +127,7 @@ struct ClimbActionHandlerTests {
         try await engine.execute("climb me")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > climb me
             The logistics of climbing oneself prove insurmountable.
@@ -160,7 +160,7 @@ struct ClimbActionHandlerTests {
         try await engine.execute("climb tree")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > climb tree
             The darkness here is absolute, consuming all light and hope of
@@ -190,7 +190,7 @@ struct ClimbActionHandlerTests {
         try await engine.execute("climb rope")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > climb rope
             You climb the thick rope.
@@ -219,7 +219,7 @@ struct ClimbActionHandlerTests {
         try await engine.execute("climb table")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > climb table
             The heavy table stubbornly resists your attempts to climb it.
@@ -269,7 +269,7 @@ struct ClimbActionHandlerTests {
         )
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > look
             --- Round Room ---

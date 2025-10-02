@@ -18,7 +18,7 @@ struct JumpActionHandlerTests {
         try await engine.execute("jump")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > jump
             You spring upward with temporary defiance of gravity.
@@ -44,7 +44,7 @@ struct JumpActionHandlerTests {
         try await engine.execute("jump log")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > jump log
             You can't jump over the fallen log.
@@ -73,7 +73,7 @@ struct JumpActionHandlerTests {
         try await engine.execute("jump over stream")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > jump over stream
             You can't jump over the small stream.
@@ -106,7 +106,7 @@ struct JumpActionHandlerTests {
         try await engine.execute("jump obstacle")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > jump obstacle
             Any such thing lurks beyond your reach.
@@ -132,7 +132,7 @@ struct JumpActionHandlerTests {
         try await engine.execute("jump")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > jump
             You spring upward with temporary defiance of gravity.
@@ -155,7 +155,7 @@ struct JumpActionHandlerTests {
         try await engine.execute("jump troll")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > jump troll
             Leaping upon the fierce troll would be an extraordinary breach
@@ -185,7 +185,7 @@ struct JumpActionHandlerTests {
         try await engine.execute("jump boulder")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > jump boulder
             You can't jump over the large boulder.
@@ -236,7 +236,7 @@ struct JumpActionHandlerTests {
         try await engine.execute("jump over puddle")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > jump over puddle
             You can't jump over the mud puddle.

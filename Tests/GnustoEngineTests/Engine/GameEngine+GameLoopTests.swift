@@ -20,7 +20,7 @@ struct GameEngineGameLoopTests {
 
         try await engine.processTurn()
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > look
             --- Laboratory ---
@@ -61,7 +61,7 @@ struct GameEngineGameLoopTests {
 
         #expect(await engine.shouldQuit == true)
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             >
             Farewell, brave soul!
@@ -80,7 +80,7 @@ struct GameEngineGameLoopTests {
 
         try await engine.processTurn()
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > xyzzy nonexistent very complex invalid syntax
             The phrase 'nonexistent very complex invalid syntax' eludes my
@@ -189,7 +189,7 @@ struct GameEngineGameLoopTests {
 
         await engine.run()
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             Minimal Game
 
@@ -223,7 +223,7 @@ struct GameEngineGameLoopTests {
 
         await engine.run()
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             Minimal Game
 
@@ -257,7 +257,7 @@ struct GameEngineGameLoopTests {
 
         await engine.run()
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             Minimal Game
 
@@ -290,7 +290,7 @@ struct GameEngineGameLoopTests {
         // Should not throw - errors should be caught and logged
         try await engine.processTurn()
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > examine nonexistent very complex item with multiple words
             The phrase 'with multiple words' eludes my comprehension.
@@ -377,7 +377,7 @@ struct GameEngineGameLoopTests {
 
         await engine.run()
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             Minimal Game
 
@@ -438,7 +438,7 @@ struct GameEngineGameLoopTests {
         let playerLocation = await engine.player.location
         #expect(playerLocation.id == .startRoom)
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > take test item
             Taken.

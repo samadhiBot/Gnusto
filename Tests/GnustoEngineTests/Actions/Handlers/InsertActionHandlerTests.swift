@@ -34,7 +34,7 @@ struct InsertActionHandlerTests {
         try await engine.execute("insert coin in box")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > insert coin in box
             You carefully place the gold coin within the wooden box.
@@ -74,7 +74,7 @@ struct InsertActionHandlerTests {
         try await engine.execute("insert gem inside pouch")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > insert gem inside pouch
             You carefully place the red gem within the leather pouch.
@@ -108,7 +108,7 @@ struct InsertActionHandlerTests {
         try await engine.execute("insert key into chest")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > insert key into chest
             You carefully place the brass key within the treasure chest.
@@ -142,7 +142,7 @@ struct InsertActionHandlerTests {
         try await engine.execute("put book in bag")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > put book in bag
             You carefully place the old book within the travel bag.
@@ -176,7 +176,7 @@ struct InsertActionHandlerTests {
         try await engine.execute("place scroll in satchel")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > place scroll in satchel
             You carefully place the ancient scroll within the leather
@@ -207,7 +207,7 @@ struct InsertActionHandlerTests {
         try await engine.execute("insert")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > insert
             Insert what?
@@ -234,7 +234,7 @@ struct InsertActionHandlerTests {
         try await engine.execute("insert coin")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > insert coin
             Insert the gold coin where?
@@ -268,7 +268,7 @@ struct InsertActionHandlerTests {
         try await engine.execute("insert gem in box")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > insert gem in box
             You aren't holding the precious gem.
@@ -300,7 +300,7 @@ struct InsertActionHandlerTests {
         try await engine.execute("insert coin in rock")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > insert coin in rock
             You can't put things in the large rock.
@@ -334,7 +334,7 @@ struct InsertActionHandlerTests {
         try await engine.execute("insert key in chest")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > insert key in chest
             The treasure chest is closed.
@@ -373,7 +373,7 @@ struct InsertActionHandlerTests {
         try await engine.execute("insert coin in box")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > insert coin in box
             Any such thing lurks beyond your reach.
@@ -402,7 +402,7 @@ struct InsertActionHandlerTests {
         try await engine.execute("insert bag in bag")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > insert bag in bag
             The universe politely but firmly prevents such recursive
@@ -440,7 +440,7 @@ struct InsertActionHandlerTests {
         try await engine.execute("insert bag in box")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > insert bag in box
             The laws of physics sternly forbid putting the travel bag
@@ -482,7 +482,7 @@ struct InsertActionHandlerTests {
         try await engine.execute("insert coin in box")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > insert coin in box
             The darkness here is absolute, consuming all light and hope of
@@ -526,7 +526,7 @@ struct InsertActionHandlerTests {
         #expect(await finalBoxState.hasFlag(.isTouched))
 
         // Verify message
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > insert ring in box
             You carefully place the silver ring within the jewelry box.
@@ -566,7 +566,7 @@ struct InsertActionHandlerTests {
         try await engine.execute("insert gold coin and silver coin in purse")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > insert gold coin and silver coin in purse
             You carefully place the gold coin and the silver coin within
@@ -613,7 +613,7 @@ struct InsertActionHandlerTests {
         try await engine.execute("insert all in satchel")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > insert all in satchel
             You carefully place the leather book and the ancient scroll
@@ -648,7 +648,7 @@ struct InsertActionHandlerTests {
         try await engine.execute("insert all in box")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > insert all in box
             Your possessions offer nothing suitable for placement in the
@@ -690,7 +690,7 @@ struct InsertActionHandlerTests {
         #expect(await finalCrystalState.parent == .item(pouch.proxy(engine)))
 
         // Verify message
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > insert crystal in pouch
             You carefully place the magic crystal within the velvet pouch.
@@ -730,7 +730,7 @@ struct InsertActionHandlerTests {
         try await engine.execute("insert copper coin in wallet")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > insert copper coin in wallet
             You carefully place the copper coin within the leather wallet.
@@ -782,7 +782,7 @@ struct InsertActionHandlerTests {
         try await engine.execute("insert red gem in box")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > insert red gem in box
             You carefully place the red gem within the gem box.
@@ -793,7 +793,7 @@ struct InsertActionHandlerTests {
         try await engine.execute("put blue gem in box")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > put blue gem in box
             With practiced ease, you deposit the blue gem in the gem box.
@@ -804,7 +804,7 @@ struct InsertActionHandlerTests {
         try await engine.execute("place green gem in box")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > place green gem in box
             The green gem finds a new home inside the gem box.

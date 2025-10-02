@@ -18,7 +18,7 @@ struct BreatheActionHandlerTests {
         try await engine.execute("breathe")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > breathe
             You draw in a deep, contemplative breath.
@@ -44,7 +44,7 @@ struct BreatheActionHandlerTests {
         try await engine.execute("breathe on flower")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > breathe on flower
             You breathe on the red flower. Nothing happens.
@@ -72,7 +72,7 @@ struct BreatheActionHandlerTests {
         try await engine.execute("breathe mist")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > breathe mist
             That defies the fundamental laws of breathing.
@@ -98,7 +98,7 @@ struct BreatheActionHandlerTests {
         try await engine.execute("breathe with mask")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > breathe with mask
             The phrase 'with mask' eludes my comprehension.
@@ -116,7 +116,7 @@ struct BreatheActionHandlerTests {
         try await engine.execute("breathe on air")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > breathe on air
             You draw in a deep, contemplative breath.
@@ -142,7 +142,7 @@ struct BreatheActionHandlerTests {
         try await engine.execute("breathe")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > breathe
             You draw in a deep, contemplative breath.
@@ -173,7 +173,7 @@ struct BreatheActionHandlerTests {
         try await engine.execute("breathe the air")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > breathe the air
             You draw in a deep, contemplative breath.

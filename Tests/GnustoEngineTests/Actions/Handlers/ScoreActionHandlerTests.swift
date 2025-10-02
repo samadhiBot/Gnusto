@@ -18,7 +18,7 @@ struct ScoreActionHandlerTests {
         try await engine.execute("score")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > score
             Your score is 0 (total of 10 points), in 0 moves.
@@ -46,7 +46,7 @@ struct ScoreActionHandlerTests {
         try await engine.execute("score")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > score
             Your score is 0 (total of 10 points), in 0 moves.
@@ -68,7 +68,7 @@ struct ScoreActionHandlerTests {
         )
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > wait
             Time flows onward, indifferent to your concerns.
@@ -92,7 +92,7 @@ struct ScoreActionHandlerTests {
         try await engine.execute("score")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > score
             Your score is 0 (total of 10 points), in 0 moves.

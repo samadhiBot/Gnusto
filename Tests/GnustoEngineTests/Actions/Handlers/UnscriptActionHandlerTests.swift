@@ -85,7 +85,7 @@ struct UnscriptActionHandlerTests {
         try await engine.execute("unscript")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > unscript
             Scripting is not currently on.
@@ -376,7 +376,7 @@ struct UnscriptActionHandlerTests {
         )
 
         // Then: Should fail each time
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > unscript
             Scripting is not currently on.

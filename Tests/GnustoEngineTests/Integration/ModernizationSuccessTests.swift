@@ -18,7 +18,7 @@ struct ModernizationSuccessTests {
         try await engine.execute("look")
 
         // Then: Modern expectation syntax works
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > look
             --- Laboratory ---
@@ -62,7 +62,7 @@ struct ModernizationSuccessTests {
             #expect(Bool(false), "Item should be with player")
         }
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > take modern item
             Taken.

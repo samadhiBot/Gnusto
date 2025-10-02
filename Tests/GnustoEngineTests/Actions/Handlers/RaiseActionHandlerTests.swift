@@ -26,7 +26,7 @@ struct RaiseActionHandlerTests {
         try await engine.execute("raise box")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > raise box
             You consider whether to raise the wooden box, then decide
@@ -56,7 +56,7 @@ struct RaiseActionHandlerTests {
         try await engine.execute("lift stone")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > lift stone
             You consider whether to lift the heavy stone, then decide
@@ -83,7 +83,7 @@ struct RaiseActionHandlerTests {
         try await engine.execute("hoist beam")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > hoist beam
             You consider whether to hoist the steel beam, then decide
@@ -104,7 +104,7 @@ struct RaiseActionHandlerTests {
         try await engine.execute("raise")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > raise
             Raise what?
@@ -122,7 +122,7 @@ struct RaiseActionHandlerTests {
         try await engine.execute("raise nonexistent")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > raise nonexistent
             Any such thing lurks beyond your reach.
@@ -153,7 +153,7 @@ struct RaiseActionHandlerTests {
         try await engine.execute("raise box")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > raise box
             Any such thing lurks beyond your reach.
@@ -171,7 +171,7 @@ struct RaiseActionHandlerTests {
         try await engine.execute("raise testRoom")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > raise testRoom
             Any such thing lurks beyond your reach.
@@ -189,7 +189,7 @@ struct RaiseActionHandlerTests {
         try await engine.execute("raise me")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > raise me
             The logistics of raising oneself prove insurmountable.
@@ -222,7 +222,7 @@ struct RaiseActionHandlerTests {
         try await engine.execute("raise box")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > raise box
             The darkness here is absolute, consuming all light and hope of
@@ -258,7 +258,7 @@ struct RaiseActionHandlerTests {
         let finalState = await engine.item("crate")
         #expect(await finalState.hasFlag(.isTouched) == true)
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > raise crate
             You consider whether to raise the wooden crate, then decide
@@ -295,7 +295,7 @@ struct RaiseActionHandlerTests {
         // Then - "examine it" should now refer to the table
         try await engine.execute("examine it")
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > examine book
             An old leather book.
@@ -329,7 +329,7 @@ struct RaiseActionHandlerTests {
         try await engine.execute("raise weight")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > raise weight
             You consider whether to raise the iron weight, then decide
@@ -366,7 +366,7 @@ struct RaiseActionHandlerTests {
         try await engine.execute("raise anvil")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > raise anvil
             You consider whether to raise the iron anvil, then decide
@@ -411,7 +411,7 @@ struct RaiseActionHandlerTests {
             "raise machine"
         )
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > raise chair
             You consider whether to raise the wooden chair, then decide
@@ -450,7 +450,7 @@ struct RaiseActionHandlerTests {
         // When - Raise small item
         try await engine.execute("raise feather")
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > raise feather
             You consider whether to raise the small feather, then decide
@@ -461,7 +461,7 @@ struct RaiseActionHandlerTests {
         // When - Raise large item
         try await engine.execute("raise boulder")
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > raise boulder
             You start to raise the massive boulder but stop yourself at the
@@ -492,7 +492,7 @@ struct RaiseActionHandlerTests {
             "lift barrel",
             "hoist barrel"
         )
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > raise barrel
             You consider whether to raise the oak barrel, then decide

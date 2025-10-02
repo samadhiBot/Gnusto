@@ -26,7 +26,7 @@ struct KickActionHandlerTests {
         try await engine.execute("kick rock")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > kick rock
             Your foot meets the large rock in an unequal contest. Your foot
@@ -50,7 +50,7 @@ struct KickActionHandlerTests {
         try await engine.execute("kick")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > kick
             Kick what?
@@ -81,7 +81,7 @@ struct KickActionHandlerTests {
         try await engine.execute("kick rock")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > kick rock
             Any such thing lurks beyond your reach.
@@ -113,7 +113,7 @@ struct KickActionHandlerTests {
         try await engine.execute("kick rock")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > kick rock
             The darkness here is absolute, consuming all light and hope of
@@ -137,7 +137,7 @@ struct KickActionHandlerTests {
         try await engine.execute("kick troll")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > kick troll
             Kicking the fierce troll would irreparably damage your
@@ -167,7 +167,7 @@ struct KickActionHandlerTests {
         try await engine.execute("kick box")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > kick box
             Your foot meets the wooden box in an unequal contest. Your foot
@@ -198,7 +198,7 @@ struct KickActionHandlerTests {
         try await engine.execute("kick pebble")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > kick pebble
             You nudge the small pebble with your foot. The universe yawns.
@@ -251,7 +251,7 @@ struct KickActionHandlerTests {
         try await engine.execute("kick table", "kick chair")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > kick table
             Your foot meets the oak table in an unequal contest. Your foot

@@ -33,7 +33,7 @@ struct ProxySystemIntegrationTests {
         )
 
         // Then: All operations should work correctly
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > take lamp
             Taken.
@@ -152,7 +152,7 @@ struct ProxySystemIntegrationTests {
         #expect(playerItems.count == 1)
         #expect(playerItems.first?.id == ItemID("coin"))
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > take coin
             Taken.
@@ -246,7 +246,7 @@ struct ProxySystemIntegrationTests {
         let playerLocation = await playerProxy.location
         #expect(playerLocation.id == LocationID("darkVault"))
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > examine mysterious box
             A strange box with glowing runes. The mysterious box is closed.
@@ -313,7 +313,7 @@ struct ProxySystemIntegrationTests {
         let playerItems = await playerProxy.inventory
         #expect(playerItems.count == 5)
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > take all
             You take the test item 1, the test item 2, the test item 3, the
@@ -386,7 +386,7 @@ struct ProxySystemIntegrationTests {
         }
         #expect(totalSize == 3)
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > open mechanical device
             As the mechanical device opens, it reveals a bronze gear and a
@@ -461,7 +461,7 @@ struct ProxySystemIntegrationTests {
             #expect(loc.id == LocationID("magicShop"))
         }
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > take magic wand
             Taken.

@@ -266,7 +266,7 @@ struct GameEngineDisambiguationTests {
         )
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > put book on table
             Which do you mean: the new book or the old book?

@@ -18,7 +18,7 @@ struct BriefActionHandlerTests {
         try await engine.execute("brief")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > brief
             Brief mode is now on. Full location descriptions will be shown
@@ -44,7 +44,7 @@ struct BriefActionHandlerTests {
         try await engine.execute("brief")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > brief
             Brief mode is now on. Full location descriptions will be shown
@@ -97,7 +97,7 @@ struct BriefActionHandlerTests {
         try await engine.execute("brief")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > brief
             Brief mode is now on. Full location descriptions will be shown

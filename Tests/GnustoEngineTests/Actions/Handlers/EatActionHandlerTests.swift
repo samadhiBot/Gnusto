@@ -28,7 +28,7 @@ struct EatActionHandlerTests {
         try await engine.execute("eat apple")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > eat apple
             Your appetite for the red apple must wait for better
@@ -60,7 +60,7 @@ struct EatActionHandlerTests {
         try await engine.execute("consume bread")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > consume bread
             Your appetite for the piece of bread must wait for better
@@ -89,7 +89,7 @@ struct EatActionHandlerTests {
         try await engine.execute("devour cake")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > devour cake
             Your appetite for the chocolate cake must wait for better
@@ -110,7 +110,7 @@ struct EatActionHandlerTests {
         try await engine.execute("eat")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > eat
             Eat what?
@@ -128,7 +128,7 @@ struct EatActionHandlerTests {
         try await engine.execute("eat nonexistent")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > eat nonexistent
             Any such thing lurks beyond your reach.
@@ -156,7 +156,7 @@ struct EatActionHandlerTests {
         try await engine.execute("eat apple")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > eat apple
             Taken.
@@ -186,7 +186,7 @@ struct EatActionHandlerTests {
         try await engine.execute("eat rock")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > eat rock
             The large rock falls well outside the realm of culinary
@@ -222,7 +222,7 @@ struct EatActionHandlerTests {
         try await engine.execute("eat apple")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > eat apple
             The darkness here is absolute, consuming all light and hope of
@@ -256,7 +256,7 @@ struct EatActionHandlerTests {
         let finalState = await engine.item("orange")
         #expect(await finalState.hasFlag(.isTouched) == true)
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > eat orange
             Your appetite for the juicy orange must wait for better
@@ -285,7 +285,7 @@ struct EatActionHandlerTests {
         try await engine.execute("eat cookie")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > eat cookie
             Your appetite for the chocolate cookie must wait for better
@@ -323,7 +323,7 @@ struct EatActionHandlerTests {
         try await engine.execute("eat it")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > eat banana
             Your appetite for the yellow banana must wait for better
@@ -367,7 +367,7 @@ struct EatActionHandlerTests {
         try await engine.execute("eat box")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > eat box
             Your appetite for the lunch box must wait for better
@@ -401,7 +401,7 @@ struct EatActionHandlerTests {
         try await engine.execute("eat soup")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > eat soup
             Your appetite for the hot soup must wait for better

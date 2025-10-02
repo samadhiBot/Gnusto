@@ -34,7 +34,7 @@ struct GameEnginePronounTests {
             #expect(Bool(false), "Expected .it pronoun, got \(String(describing: pronoun))")
         }
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > examine test item
             A simple test item.
@@ -68,7 +68,7 @@ struct GameEnginePronounTests {
             #expect(Bool(false), "Expected .it pronoun, got \(String(describing: pronoun))")
         }
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > take gold coin
             Taken.
@@ -108,7 +108,7 @@ struct GameEnginePronounTests {
             #expect(Bool(false), "Expected .them pronoun, got \(String(describing: pronoun))")
         }
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > take copper coin and silver coin
             You take the copper coin and the silver coin.
@@ -142,7 +142,7 @@ struct GameEnginePronounTests {
         )
 
         // Then: All commands should work correctly
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > examine brass lamp
             A shiny brass lamp.
@@ -186,7 +186,7 @@ struct GameEnginePronounTests {
         )
 
         // Then: Both commands should work
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > examine copper coin and silver coin
             - Copper coin: The copper coin reveals itself to be exactly
@@ -236,7 +236,7 @@ struct GameEnginePronounTests {
         )  // Should take the coin
 
         // Then: "it" should refer to the most recently examined item
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > examine lamp
             A lamp.
@@ -297,7 +297,7 @@ struct GameEnginePronounTests {
         )
 
         // Then: Commands should work correctly
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > examine lamp
             The lamp reveals itself to be exactly what it appears --
@@ -349,7 +349,7 @@ struct GameEnginePronounTests {
         let pronounAfterLook = await engine.gameState.pronoun
         #expect(pronounAfterLook == nil)
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > examine test item
             The test item reveals itself to be exactly what it appears --
@@ -383,7 +383,7 @@ struct GameEnginePronounTests {
             #expect(Bool(false), "Expected .her pronoun, got \(String(describing: pronoun))")
         }
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > examine princess
             A beautiful princess.
@@ -407,7 +407,7 @@ struct GameEnginePronounTests {
             #expect(Bool(false), "Expected .him pronoun, got \(String(describing: pronoun))")
         }
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > examine knight
             A noble knight.
@@ -440,7 +440,7 @@ struct GameEnginePronounTests {
             #expect(Bool(false), "Expected .it pronoun, got \(String(describing: pronoun))")
         }
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > examine stone golem
             A massive stone construct.
@@ -473,7 +473,7 @@ struct GameEnginePronounTests {
             #expect(Bool(false), "Expected .them pronoun, got \(String(describing: pronoun))")
         }
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > examine bee swarm
             A buzzing swarm of bees.
@@ -520,7 +520,7 @@ struct GameEnginePronounTests {
             #expect(Bool(false), "Expected .it pronoun referring to lamp")
         }
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > examine princess
             A beautiful princess.
@@ -560,7 +560,7 @@ struct GameEnginePronounTests {
             #expect(Bool(false), "Expected .them pronoun, got \(String(describing: pronoun))")
         }
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > examine grapes
             A bunch of purple grapes.
@@ -600,7 +600,7 @@ struct GameEnginePronounTests {
         )  // Should take the gem
 
         // Then: Commands should work correctly
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > examine box
             A sturdy wooden box. In the wooden box you can see a red gem.
@@ -647,7 +647,7 @@ struct GameEnginePronounTests {
         try await engine.execute("read it")  // Uses pronoun again
 
         // Then: All commands should work
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > examine ancient book
             An old leather-bound book.
@@ -705,7 +705,7 @@ struct GameEnginePronounTests {
         try await engine.execute("take it")  // Should take the red book
 
         // Then: Disambiguation and pronoun resolution should work
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > examine book
             Which do you mean: the blue book or the red book?
@@ -743,7 +743,7 @@ struct GameEnginePronounTests {
         try await engine.execute("take it")
 
         // Then: Should show appropriate error
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > take it
             I don't know what 'it' refers to.
@@ -783,7 +783,7 @@ struct GameEnginePronounTests {
         try await engine.execute("take it")  // Try to use pronoun
 
         // Then: Should show appropriate error since item is no longer in scope
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > examine test item
             A test item.
@@ -837,7 +837,7 @@ struct GameEnginePronounTests {
         try await engine.execute("examine it")  // Examines lamp
 
         // Then: All commands should work correctly
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > examine lamp
             A polished brass lamp.

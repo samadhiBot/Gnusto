@@ -27,7 +27,7 @@ struct DropActionHandlerTests {
         try await engine.execute("drop book")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > drop book
             Dropped.
@@ -59,7 +59,7 @@ struct DropActionHandlerTests {
         try await engine.execute("discard paper")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > discard paper
             Dropped.
@@ -92,7 +92,7 @@ struct DropActionHandlerTests {
         try await engine.execute("drop all")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > drop all
             You drop the leather book and the gold coin.
@@ -118,7 +118,7 @@ struct DropActionHandlerTests {
         try await engine.execute("drop")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > drop
             Drop what?
@@ -145,7 +145,7 @@ struct DropActionHandlerTests {
         try await engine.execute("drop book")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > drop book
             You aren't holding the leather book.
@@ -172,7 +172,7 @@ struct DropActionHandlerTests {
         try await engine.execute("drop ring")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > drop ring
             The cursed ring stubbornly resists your attempts to drop it.
@@ -205,7 +205,7 @@ struct DropActionHandlerTests {
         try await engine.execute("drop book")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > drop book
             The darkness here is absolute, consuming all light and hope of
@@ -235,7 +235,7 @@ struct DropActionHandlerTests {
         try await engine.execute("drop sword")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > drop sword
             Dropped.
@@ -279,7 +279,7 @@ struct DropActionHandlerTests {
         try await engine.execute("drop lamp and key and rope")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > drop lamp and key and rope
             You drop the rusty key, the brass lamp, and the thick rope.
@@ -305,7 +305,7 @@ struct DropActionHandlerTests {
         try await engine.execute("drop all")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > drop all
             Your hands are as empty as your pockets.
@@ -387,7 +387,7 @@ struct DropActionHandlerTests {
         try await engine.execute("drop all")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > drop all
             You drop the normal book.

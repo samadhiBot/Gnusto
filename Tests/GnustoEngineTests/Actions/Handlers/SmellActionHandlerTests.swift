@@ -28,7 +28,7 @@ struct SmellActionHandlerTests {
         try await engine.execute("smell lamp")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > smell lamp
             The brass lamp smells exactly as you'd expect, which is to say,
@@ -52,7 +52,7 @@ struct SmellActionHandlerTests {
         try await engine.execute("smell nonexistent")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > smell nonexistent
             Any such thing remains frustratingly inaccessible.
@@ -83,7 +83,7 @@ struct SmellActionHandlerTests {
         try await engine.execute("smell statue")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > smell statue
             Any such thing remains frustratingly inaccessible.
@@ -101,7 +101,7 @@ struct SmellActionHandlerTests {
         try await engine.execute("smell the sky")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > smell the sky
             You detect no olfactory surprises.
@@ -134,7 +134,7 @@ struct SmellActionHandlerTests {
         try await engine.execute("smell the dark room")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > smell the dark room
             You detect no olfactory surprises.
@@ -163,7 +163,7 @@ struct SmellActionHandlerTests {
         try await engine.execute("smell the wizard")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > smell the wizard
             The old wizard's personal aroma remains their private business.
@@ -195,7 +195,7 @@ struct SmellActionHandlerTests {
         try await engine.execute("smell the necromancer")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > smell the necromancer
             You detect nothing unusual about the furious necromancer's
@@ -221,7 +221,7 @@ struct SmellActionHandlerTests {
         try await engine.execute("sniff")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > sniff
             Nothing remarkable greets your nostrils.
@@ -239,7 +239,7 @@ struct SmellActionHandlerTests {
         try await engine.execute("sniff myself")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > sniff myself
             Your personal aroma falls within acceptable parameters.

@@ -38,7 +38,7 @@ struct StandardCombatSystemIntegrationTests {
         try await engine.execute("attack goblin with sword")
 
         // Then: Combat should initiate and process turn
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > attack goblin with sword
             Armed and hungry for violence, you strike with your steel sword
@@ -97,7 +97,7 @@ struct StandardCombatSystemIntegrationTests {
         try await engine.execute("attack goblin with sword", times: 2)
 
         // Then: Goblin should die and combat should end
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > attack goblin with sword
             Armed and hungry for violence, you strike with your legendary
@@ -143,7 +143,7 @@ struct StandardCombatSystemIntegrationTests {
         try await engine.execute("attack the guard", times: 5)
 
         // Then: Should see various damage descriptions
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > attack the guard
             You drive forward with your variable sword seeking its purpose
@@ -225,7 +225,7 @@ struct StandardCombatSystemIntegrationTests {
         try await engine.execute("attack enemy", times: 10)
 
         // Then: Should eventually see critical hit language (probabilistic)
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > attack enemy
             Armed and hungry for violence, you strike with your sharp sword
@@ -395,7 +395,7 @@ struct StandardCombatSystemIntegrationTests {
         // When: Engage in extended combat
         try await engine.execute("attack enemy", times: 4)
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > attack enemy
             Armed and hungry for violence, you strike with your training
@@ -557,7 +557,7 @@ struct StandardCombatSystemIntegrationTests {
         try await engine.execute("attack enemy", times: 7)
 
         // Then: Should potentially see special events (probabilistic)
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > attack enemy
             Your masterwork sword cuts through air toward the skilled enemy
@@ -665,7 +665,7 @@ struct StandardCombatSystemIntegrationTests {
         try await engine.execute("attack bandit", times: 3)
 
         // Then: Bandit should eventually flee (probabilistic)
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > attack bandit
             No weapons needed as you attack with pure violence while the
@@ -735,7 +735,7 @@ struct StandardCombatSystemIntegrationTests {
         try await engine.execute("attack scholar", times: 2)
 
         // Then: May surrender (probabilistic based on intelligence/wisdom)
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > attack scholar
             Armed and hungry for violence, you strike with your
@@ -793,7 +793,7 @@ struct StandardCombatSystemIntegrationTests {
         try await engine.execute("talk to guard")
 
         // Then: May result in pacification (probabilistic)
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > talk to guard
             The confused guard responds to your overture with hostile
@@ -837,7 +837,7 @@ struct StandardCombatSystemIntegrationTests {
         try await engine.execute("attack knight")
 
         // Then: Should be warned about needing weapons
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > attack knight
             Fighting the armored knight bare-handed seems inadvisable. Find
@@ -890,7 +890,7 @@ struct StandardCombatSystemIntegrationTests {
         try await engine.execute("take sword")
 
         // Then: Enemy should get buffed attack
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > take sword
             Got it.
@@ -977,7 +977,7 @@ struct StandardCombatSystemIntegrationTests {
         try await engine.execute("attack corpse")
 
         // Then: Should indicate enemy is already dead
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > attack corpse
             Barehanded, you commit to the assault as the corpse accepts the
@@ -1013,7 +1013,7 @@ struct StandardCombatSystemIntegrationTests {
         try await engine.execute("attack bandit with nonexistent")
 
         // Then: Should handle gracefully
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > attack bandit with nonexistent
             You cannot reach any such thing from here.
@@ -1055,7 +1055,7 @@ struct StandardCombatSystemIntegrationTests {
         try await engine.execute("attack thug with book")
 
         // Then: Should handle non-weapon attack appropriately
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > attack thug with book
             Armed and hungry for violence, you strike with your heavy book

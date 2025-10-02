@@ -27,7 +27,7 @@ struct TakeActionHandlerTests {
         try await engine.execute("take book")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > take book
             Taken.
@@ -58,7 +58,7 @@ struct TakeActionHandlerTests {
         try await engine.execute("get coin")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > get coin
             Taken.
@@ -88,7 +88,7 @@ struct TakeActionHandlerTests {
         try await engine.execute("grab key")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > grab key
             Taken.
@@ -118,7 +118,7 @@ struct TakeActionHandlerTests {
         try await engine.execute("steal gem")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > steal gem
             Taken.
@@ -148,7 +148,7 @@ struct TakeActionHandlerTests {
         try await engine.execute("pick up feather")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > pick up feather
             Taken.
@@ -185,7 +185,7 @@ struct TakeActionHandlerTests {
         try await engine.execute("take ring from box")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > take ring from box
             Taken.
@@ -221,7 +221,7 @@ struct TakeActionHandlerTests {
         try await engine.execute("take all")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > take all
             You take the red book and the gold coin.
@@ -246,7 +246,7 @@ struct TakeActionHandlerTests {
         try await engine.execute("take")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > take
             Take what?
@@ -264,7 +264,7 @@ struct TakeActionHandlerTests {
         try await engine.execute("take nonexistent")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > take nonexistent
             Any such thing lurks beyond your reach.
@@ -296,7 +296,7 @@ struct TakeActionHandlerTests {
         try await engine.execute("take book")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > take book
             Any such thing lurks beyond your reach.
@@ -323,7 +323,7 @@ struct TakeActionHandlerTests {
         try await engine.execute("take statue")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > take statue
             The stone statue stubbornly resists your attempts to take it.
@@ -350,7 +350,7 @@ struct TakeActionHandlerTests {
         try await engine.execute("take book")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > take book
             That already resides among your possessions.
@@ -384,7 +384,7 @@ struct TakeActionHandlerTests {
         try await engine.execute("take treasure")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > take treasure
             Any such thing lurks beyond your reach.
@@ -420,7 +420,7 @@ struct TakeActionHandlerTests {
         try await engine.execute("take marble")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > take marble
             The glass jar is closed.
@@ -453,7 +453,7 @@ struct TakeActionHandlerTests {
         try await engine.execute("take coin")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > take coin
             Taken.
@@ -494,7 +494,7 @@ struct TakeActionHandlerTests {
         try await engine.execute("take ring from bag")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > take ring from bag
             The silver ring is not in the leather bag.
@@ -528,7 +528,7 @@ struct TakeActionHandlerTests {
         try await engine.execute("take book")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > take book
             The darkness here is absolute, consuming all light and hope of
@@ -565,7 +565,7 @@ struct TakeActionHandlerTests {
         try await engine.execute("take vase")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > take vase
             Taken.
@@ -602,7 +602,7 @@ struct TakeActionHandlerTests {
         try await engine.execute("take candle")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > take candle
             Taken.
@@ -644,7 +644,7 @@ struct TakeActionHandlerTests {
         try await engine.execute("take all")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > take all
             You take the red book and the blue pen.
@@ -680,7 +680,7 @@ struct TakeActionHandlerTests {
         try await engine.execute("take all")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > take all
             Take what?
@@ -713,7 +713,7 @@ struct TakeActionHandlerTests {
         try await engine.execute("take all")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > take all
             You take the blue pen.
@@ -744,7 +744,7 @@ struct TakeActionHandlerTests {
         try await engine.execute("examine it")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > take book
             Taken.

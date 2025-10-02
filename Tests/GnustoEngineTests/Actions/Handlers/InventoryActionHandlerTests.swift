@@ -18,7 +18,7 @@ struct InventoryActionHandlerTests {
         try await engine.execute("inventory")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > inventory
             Your hands are as empty as your pockets.
@@ -36,7 +36,7 @@ struct InventoryActionHandlerTests {
         try await engine.execute("i")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > i
             Your hands are as empty as your pockets.
@@ -56,7 +56,7 @@ struct InventoryActionHandlerTests {
         try await engine.execute("inventory")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > inventory
             Your hands are as empty as your pockets.
@@ -76,7 +76,7 @@ struct InventoryActionHandlerTests {
         try await engine.execute("inventory")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > inventory
             You are carrying:
@@ -113,7 +113,7 @@ struct InventoryActionHandlerTests {
         try await engine.execute("inventory")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > inventory
             You are carrying:
@@ -147,7 +147,7 @@ struct InventoryActionHandlerTests {
         )
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > inventory
             You are carrying:
@@ -189,7 +189,7 @@ struct InventoryActionHandlerTests {
         try await engine.execute("inventory")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > inventory
             You are carrying:
@@ -218,7 +218,7 @@ struct InventoryActionHandlerTests {
         try await engine.execute("inventory")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > take key
             Taken.

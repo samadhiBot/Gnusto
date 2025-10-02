@@ -18,7 +18,7 @@ struct LookActionHandlerTests {
         try await engine.execute("look")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > look
             --- Laboratory ---
@@ -38,7 +38,7 @@ struct LookActionHandlerTests {
         try await engine.execute("l")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > l
             --- Laboratory ---
@@ -66,7 +66,7 @@ struct LookActionHandlerTests {
         try await engine.execute("look at book")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > look at book
             A worn leather-bound book.
@@ -103,7 +103,7 @@ struct LookActionHandlerTests {
         try await engine.execute("look in the box")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > look in the box
             In the wooden box you can see a ruby gem.
@@ -137,7 +137,7 @@ struct LookActionHandlerTests {
         try await engine.execute("look inside cabinet")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > look inside cabinet
             In the oak cabinet you can see a ceramic vase.
@@ -163,7 +163,7 @@ struct LookActionHandlerTests {
         try await engine.execute("look through window")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > look through window
             A clear glass window showing the outside world.
@@ -197,7 +197,7 @@ struct LookActionHandlerTests {
         try await engine.execute("look with telescope")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > look with telescope
             In the brass telescope you can see a crystal lens.
@@ -217,7 +217,7 @@ struct LookActionHandlerTests {
         try await engine.execute("look")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > look
             --- Laboratory ---
@@ -237,7 +237,7 @@ struct LookActionHandlerTests {
         try await engine.execute("look at nonexistent")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > look at nonexistent
             Any such thing lurks beyond your reach.
@@ -268,7 +268,7 @@ struct LookActionHandlerTests {
         try await engine.execute("look at book")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > look at book
             Any such thing lurks beyond your reach.
@@ -286,7 +286,7 @@ struct LookActionHandlerTests {
         try await engine.execute("look at me")
 
         // Then - This should work since "me" refers to player, but let's test with room
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > look at me
             As good-looking as ever, which is to say, adequately
@@ -316,7 +316,7 @@ struct LookActionHandlerTests {
         try await engine.execute("look")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > look
             The darkness here is absolute, consuming all light and hope of
@@ -335,7 +335,7 @@ struct LookActionHandlerTests {
         try await engine.execute("look")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > look
             --- Laboratory ---
@@ -369,7 +369,7 @@ struct LookActionHandlerTests {
         try await engine.execute("look")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > look
             --- Laboratory ---
@@ -412,7 +412,7 @@ struct LookActionHandlerTests {
         try await engine.execute("look")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > look
             --- Laboratory ---
@@ -457,7 +457,7 @@ struct LookActionHandlerTests {
         try await engine.execute("look")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > look
             --- Laboratory ---
@@ -497,7 +497,7 @@ struct LookActionHandlerTests {
         try await engine.execute("look")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > look
             --- Laboratory ---
@@ -536,7 +536,7 @@ struct LookActionHandlerTests {
         try await engine.execute("look")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > look
             --- Laboratory ---
@@ -577,7 +577,7 @@ struct LookActionHandlerTests {
         try await engine.execute("look")
 
         // Then - should show darkness message
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > look
             The darkness here is absolute, consuming all light and hope of
@@ -619,7 +619,7 @@ struct LookActionHandlerTests {
         try await engine.execute("look")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > look
             --- Dark Room ---
@@ -656,7 +656,7 @@ struct LookActionHandlerTests {
         try await engine.execute("look")
 
         // Then - should show first description
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > look
             --- Laboratory ---
@@ -696,7 +696,7 @@ struct LookActionHandlerTests {
         try await engine.execute("look")
 
         // Then - should show regular description, not first description
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > look
             --- Laboratory ---
@@ -719,7 +719,7 @@ struct LookActionHandlerTests {
         try await engine.execute("look")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > look
             --- Laboratory ---
@@ -797,7 +797,7 @@ struct LookActionHandlerTests {
         try await engine.execute("look")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > look
             --- Laboratory ---
@@ -875,7 +875,7 @@ struct LookActionHandlerTests {
         try await engine.execute("look")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > look
             --- Laboratory ---
@@ -951,7 +951,7 @@ struct LookActionHandlerTests {
         try await engine.execute("look")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > look
             --- Laboratory ---
@@ -1006,7 +1006,7 @@ struct LookActionHandlerTests {
         try await engine.execute("look")
 
         // Then - empty containers/surfaces should not generate content listings
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > look
             --- Laboratory ---

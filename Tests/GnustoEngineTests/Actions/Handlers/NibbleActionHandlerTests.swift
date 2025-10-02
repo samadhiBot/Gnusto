@@ -47,7 +47,7 @@ struct NibbleActionHandlerTests {
         try await engine.execute("nibble apple")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > nibble apple
             Do you mean you want to eat the red apple?
@@ -70,7 +70,7 @@ struct NibbleActionHandlerTests {
         try await engine.execute("bite cookie")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > bite cookie
             Do you mean you want to eat the chocolate cookie?
@@ -92,7 +92,7 @@ struct NibbleActionHandlerTests {
         try await engine.execute("nibble")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > nibble
             Nibble what?
@@ -127,7 +127,7 @@ struct NibbleActionHandlerTests {
         try await engine.execute("nibble cake")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > nibble cake
             Any such thing lurks beyond your reach.
@@ -147,7 +147,7 @@ struct NibbleActionHandlerTests {
         try await engine.execute("nibble rock")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > nibble rock
             The gray rock falls well outside the realm of culinary
@@ -186,7 +186,7 @@ struct NibbleActionHandlerTests {
         try await engine.execute("nibble bread")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > nibble bread
             The darkness here is absolute, consuming all light and hope of
@@ -216,7 +216,7 @@ struct NibbleActionHandlerTests {
         try await engine.execute("yes")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > nibble cookie
             Do you mean you want to eat the chocolate cookie?
@@ -243,7 +243,7 @@ struct NibbleActionHandlerTests {
         )
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > nibble apple
             Do you mean you want to eat the red apple?
@@ -278,7 +278,7 @@ struct NibbleActionHandlerTests {
         try await engine.execute("inventory")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > nibble apple
             Do you mean you want to eat the red apple?
@@ -309,7 +309,7 @@ struct NibbleActionHandlerTests {
         try await engine.execute("nibble apple")
 
         // Then: Should create a yes/no question
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > nibble apple
             Do you mean you want to eat the red apple?
@@ -333,7 +333,7 @@ struct NibbleActionHandlerTests {
             // Execute the command
             try await engine.execute("\(verb) apple")
 
-            await mockIO.expectOutput(
+            await mockIO.expect(
                 """
                 > \(verb) apple
                 Do you mean you want to eat the red apple?
@@ -422,7 +422,7 @@ struct NibbleActionHandlerTests {
         // YES response should handle missing EAT handler gracefully
         try await engine.execute("yes")
 
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > nibble apple
             Do you mean you want to eat the red apple?

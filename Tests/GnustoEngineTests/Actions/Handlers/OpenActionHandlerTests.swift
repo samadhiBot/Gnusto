@@ -28,7 +28,7 @@ struct OpenActionHandlerTests {
         try await engine.execute("open chest")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > open chest
             You open the wooden chest with a satisfying sense of purpose.
@@ -52,7 +52,7 @@ struct OpenActionHandlerTests {
         try await engine.execute("open")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > open
             Open what?
@@ -84,7 +84,7 @@ struct OpenActionHandlerTests {
         try await engine.execute("open door")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > open door
             Any such thing lurks beyond your reach.
@@ -110,7 +110,7 @@ struct OpenActionHandlerTests {
         try await engine.execute("open rock")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > open rock
             The large rock stubbornly resists your attempts to open it.
@@ -138,7 +138,7 @@ struct OpenActionHandlerTests {
         try await engine.execute("open box")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > open box
             The locked box is locked.
@@ -171,7 +171,7 @@ struct OpenActionHandlerTests {
         try await engine.execute("open chest")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > open chest
             The darkness here is absolute, consuming all light and hope of
@@ -202,7 +202,7 @@ struct OpenActionHandlerTests {
         try await engine.execute("open box")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > open box
             You open the cardboard box with a satisfying sense of purpose.
@@ -234,7 +234,7 @@ struct OpenActionHandlerTests {
         try await engine.execute("open chest")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > open chest
             The open chest is already open.
@@ -267,7 +267,7 @@ struct OpenActionHandlerTests {
         try await engine.execute("open mailbox")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > open mailbox
             As the small mailbox opens, it reveals a leaflet within.
@@ -298,7 +298,7 @@ struct OpenActionHandlerTests {
         try await engine.execute("open box")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > open box
             You open the empty box with a satisfying sense of purpose.
@@ -336,7 +336,7 @@ struct OpenActionHandlerTests {
         try await engine.execute("open trunk")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > open trunk
             As the old trunk opens, it reveals a leather book and a white
@@ -387,7 +387,7 @@ struct OpenActionHandlerTests {
         try await engine.execute("open door")
 
         // Then
-        await mockIO.expectOutput(
+        await mockIO.expect(
             """
             > open door
             You open the wooden door with a satisfying sense of purpose.
