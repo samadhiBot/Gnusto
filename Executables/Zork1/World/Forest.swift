@@ -204,7 +204,7 @@ extension Forest {
                 """
                 You are in a clearing, with a forest surrounding you on all sides.
                 A path leads south.
-                """
+                """,
             ]
             if await !grate.hasFlag(.isInvisible) {
                 if await grate.isOpen {

@@ -55,7 +55,7 @@ struct ThiefTests {
             --- Round Room ---
 
             This is a circular stone room with passages in all directions.
-            Several of them have unfortunate endings.
+            Several of them have unfortunately been blocked by cave-ins.
 
             > inventory
             You are carrying:
@@ -113,7 +113,7 @@ struct ThiefTests {
             --- Round Room ---
 
             This is a circular stone room with passages in all directions.
-            Several of them have unfortunate endings.
+            Several of them have unfortunately been blocked by cave-ins.
 
             > look at the floor
             The floor stubbornly remains ordinary despite your thorough
@@ -160,7 +160,7 @@ struct ThiefTests {
             --- Round Room ---
 
             This is a circular stone room with passages in all directions.
-            Several of them have unfortunate endings.
+            Several of them have unfortunately been blocked by cave-ins.
 
             > inventory
             You are carrying:
@@ -217,7 +217,7 @@ struct ThiefTests {
             --- Round Room ---
 
             This is a circular stone room with passages in all directions.
-            Several of them have unfortunate endings.
+            Several of them have unfortunately been blocked by cave-ins.
 
             > wait
             The universe's clock ticks inexorably forward.
@@ -262,7 +262,7 @@ struct ThiefTests {
             --- Round Room ---
 
             This is a circular stone room with passages in all directions.
-            Several of them have unfortunate endings.
+            Several of them have unfortunately been blocked by cave-ins.
 
             > wait
             The universe's clock ticks inexorably forward.
@@ -275,46 +275,37 @@ struct ThiefTests {
             aspect that the bag will be taken only over his dead body.
 
             > attack the thief
-            You explode into motion with your orcrist hunting flesh as the
-            robber meets your charge with his vicious stiletto, the dance
-            of death begun.
+            You explode into motion with your blade hunting flesh as the
+            person meets your charge with his stiletto, the dance of death
+            begun.
 
-            The suspicious-looking thief uses his vicious stiletto to
-            expertly block and nullify your glamdring, leaving you open.
+            The impact sends the man reeling! He clutches his knife
+            desperately while fighting to stay upright.
 
-            The retaliation is vicious. His stiletto carves a crimson arc
-            across your body, your blood soaking cloth, then dripping
-            steady to the ground. First blood draws a gasp. You touch the
-            wound, fingers coming away red.
+            Then his deadly blade bites back hard, wielded with desperate
+            fury. The weapon tears rather than cuts, leaving wounds with
+            ragged, weeping edges. You reel from the unexpected wound. The
+            reality of violence arrives.
 
-            The thief strikes at your wrist, and suddenly your grip is
-            slippery with blood.
+            The thief strikes like a snake! The resulting wound is serious.
 
             > stab the thief with my sword
-            Your strike with your orcrist merely brushes the robber's flesh
-            as he parries with his vicious stiletto. The graze is utterly
-            trivial. He barely registers that it happened.
+            The man blocks and turns your elvish orcrist aside with his
+            knife, denying your strike completely.
 
-            Then the thief's skillful counter with his stiletto disrupts
-            your stance completely, leaving you vulnerable as an overturned
-            turtle.
+            The robber retaliates with finality as his deadly stiletto
+            finds the last soft place in you and opens it to let the life
+            pour out.
 
-            > slay the thief
-            The suspicious man blocks and turns your orcrist aside with his
-            stiletto, denying your strike completely.
-
-            The sneaky man ends the exchange with his stiletto buried deep,
-            and you understand with perfect clarity that you will not rise
-            again.
-
-            Finishing you off, the thief inserts his blade into your heart.
+            The thief comes in from the side, feints, and inserts the blade
+            into your ribs.
 
             ****  You have died  ****
 
-            The curtain falls on this particular act of your existence. But
-            all good stories deserve another telling...
+            Death, that most permanent of inconveniences, has claimed you.
+            Yet in these tales, even death offers second chances.
 
-            You scored 0 out of a possible 350 points, in 5 moves.
+            You scored 0 out of a possible 350 points, in 4 moves.
 
             Would you like to RESTART, RESTORE a saved game, or QUIT?
 
@@ -340,7 +331,7 @@ struct ThiefTests {
             --- Round Room ---
 
             This is a circular stone room with passages in all directions.
-            Several of them have unfortunate endings.
+            Several of them have unfortunately been blocked by cave-ins.
 
             > wait
             The universe's clock ticks inexorably forward.
@@ -375,7 +366,7 @@ struct ThiefTests {
             --- Round Room ---
 
             This is a circular stone room with passages in all directions.
-            Several of them have unfortunate endings.
+            Several of them have unfortunately been blocked by cave-ins.
 
             > wait
             The universe's clock ticks inexorably forward.
@@ -410,7 +401,7 @@ struct ThiefTests {
             --- Round Room ---
 
             This is a circular stone room with passages in all directions.
-            Several of them have unfortunate endings.
+            Several of them have unfortunately been blocked by cave-ins.
 
             > wait
             The universe's clock ticks inexorably forward.
@@ -446,7 +437,7 @@ struct ThiefTests {
             --- Round Room ---
 
             This is a circular stone room with passages in all directions.
-            Several of them have unfortunate endings.
+            Several of them have unfortunately been blocked by cave-ins.
 
             > wait
             The universe's clock ticks inexorably forward.
@@ -483,7 +474,7 @@ struct ThiefTests {
             --- Round Room ---
 
             This is a circular stone room with passages in all directions.
-            Several of them have unfortunate endings.
+            Several of them have unfortunately been blocked by cave-ins.
 
             > wait
             The universe's clock ticks inexorably forward.
@@ -536,7 +527,7 @@ struct ThiefTests {
             --- Round Room ---
 
             This is a circular stone room with passages in all directions.
-            Several of them have unfortunate endings.
+            Several of them have unfortunately been blocked by cave-ins.
 
             > inventory
             You are carrying:
@@ -630,7 +621,6 @@ struct ThiefTests {
             wait
             stab the thief with my sword
             slay the thief
-            kill the thief
             look
             """
         )
@@ -642,7 +632,7 @@ struct ThiefTests {
             --- Round Room ---
 
             This is a circular stone room with passages in all directions.
-            Several of them have unfortunate endings.
+            Several of them have unfortunately been blocked by cave-ins.
 
             > wait
             The universe's clock ticks inexorably forward.
@@ -655,35 +645,22 @@ struct ThiefTests {
             aspect that the bag will be taken only over his dead body.
 
             > stab the thief with my sword
-            You explode into motion with your orcrist hunting flesh as the
-            robber meets your charge with his vicious stiletto, the dance
-            of death begun.
+            You explode into motion with your blade hunting flesh as the
+            person meets your charge with his stiletto, the dance of death
+            begun.
 
-            The thief uses his stiletto to expertly block and nullify your
-            antique blade, leaving you open.
+            The impact sends the man reeling! He clutches his knife
+            desperately while fighting to stay upright.
 
-            The robber pivots and his vicious stiletto bites quick, a
-            serpent's kiss that draws blood but finds no vein. The cut
-            registers dimly. Blood, but not enough to matter.
-
-            The thief slowly approaches, strikes like a snake, and leaves
-            you wounded.
+            Suddenly the shady robber slips past your guard. His blade
+            opens a wound that will mark you, and your blood flows out
+            steady and sure. First blood to them. The wound is real but
+            manageable.
 
             > slay the thief
-            The robber deflects your attack, his stiletto guiding your
-            antique blade away from its intended target.
-
-            Then the thief finds the gap, and his stiletto punches through
-            skin and muscle, grating against the bone. Your body betrays
-            you with a scream. First blood draws a gasp. You touch the
-            wound, fingers coming away red.
-
-            The stiletto touches your forehead, and the blood obscures your
-            vision.
-
-            > kill the thief
-            Your armed advantage proves decisive--your glamdring ends it!
-            The person crumples, having fought barehanded and lost.
+            Your armed advantage proves decisive--your antique glamdring
+            ends it! The robber crumples, having fought barehanded and
+            lost.
 
             Almost as soon as the thief breathes his last breath, a cloud
             of sinister black fog envelops him, and when the fog lifts, the
@@ -693,9 +670,9 @@ struct ThiefTests {
             --- Round Room ---
 
             This is a circular stone room with passages in all directions.
-            Several of them have unfortunate endings.
+            Several of them have unfortunately been blocked by cave-ins.
 
-            There is a huge diamond here.
+            You can see a huge diamond here.
             """
         )
 
@@ -781,7 +758,7 @@ struct ThiefTests {
     //            --- Round Room ---
     //
     //            This is a circular stone room with passages in all directions.
-    //            Several of them have unfortunate endings.
+    //            Several of them have unfortunately been blocked by cave-ins.
     //
     //            > wait
     //            The universe's clock ticks inexorably forward.
@@ -831,7 +808,7 @@ struct ThiefTests {
     //            --- Round Room ---
     //
     //            This is a circular stone room with passages in all directions.
-    //            Several of them have unfortunate endings.
+    //            Several of them have unfortunately been blocked by cave-ins.
     //
     //            > wait
     //            The universe's clock ticks inexorably forward.

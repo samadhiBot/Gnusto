@@ -42,6 +42,12 @@ public struct RemoveActionHandler: ActionHandler {
                         throw ActionResponse.itemNotAccessible(item)
                     }
 
+                    // If item is not held, hand off to TakeActionHandler
+                    guard await context.player.isHolding(item.id) else {
+                        let takeHandler = TakeActionHandler()
+                        return try await takeHandler.process(context: context)
+                    }
+
                     // Check if item is currently worn
                     guard await item.hasFlag(.isWorn) else {
                         throw await ActionResponse.feedback(

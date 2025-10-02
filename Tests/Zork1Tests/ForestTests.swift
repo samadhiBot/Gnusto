@@ -80,8 +80,7 @@ struct ForestTests {
             On the ground is a pile of leaves.
 
             > examine grating
-            The grating stubbornly remains ordinary despite your thorough
-            examination.
+            The grating is closed.
             """
         )
     }

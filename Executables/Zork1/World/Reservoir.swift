@@ -1,7 +1,7 @@
 import GnustoEngine
 
-enum Reservoir {
-    static let inStream = Location(.inStream)
+struct Reservoir {
+    let inStream = Location(.inStream)
         .name("Stream")
         .description(
             """
@@ -17,7 +17,7 @@ enum Reservoir {
         // Note: This is NONLANDBIT in ZIL
         .localGlobals(.globalWater)
 
-    static let reservoir = Location(.reservoir)
+    let reservoir = Location(.reservoir)
         .name("Reservoir")
         .description(
             """
@@ -32,7 +32,7 @@ enum Reservoir {
         // Note: This is NONLANDBIT in ZIL
         .localGlobals(.globalWater)
 
-    static let reservoirNorth = Location(.reservoirNorth)
+    let reservoirNorth = Location(.reservoirNorth)
         .name("Reservoir North")
         .description(
             """
@@ -43,7 +43,7 @@ enum Reservoir {
         // Note: SOUTH exit to reservoir conditional on LOW-TIDE
         .localGlobals(.globalWater, .stairs)
 
-    static let reservoirSouth = Location(.reservoirSouth)
+    let reservoirSouth = Location(.reservoirSouth)
         .name("Reservoir South")
         .description(
             """
@@ -57,7 +57,7 @@ enum Reservoir {
         // Note: NORTH exit to reservoir conditional on LOW-TIDE
         .localGlobals(.globalWater)
 
-    static let streamView = Location(.streamView)
+    let streamView = Location(.streamView)
         .name("Stream View")
         .description(
             """
@@ -68,12 +68,14 @@ enum Reservoir {
         .east(.reservoirSouth)
         // Note: WEST exit has custom message about stream being too small
         .localGlobals(.globalWater)
-}
 
-// MARK: - Items
+    // MARK: - Items
 
-extension Reservoir {
-    static let pump = Item(.pump)
+    let globalWater = Item(
+        id: .globalWater
+    )
+
+    let pump = Item(.pump)
         .name("hand-held air pump")
         .synonyms("pump", "air-pump", "tool", "tools")
         .adjectives("small", "hand-held")
@@ -81,7 +83,7 @@ extension Reservoir {
         .isTool
         .in(.reservoirNorth)
 
-    static let trunk = Item(.trunk)
+    let trunk = Item(.trunk)
         .name("trunk of jewels")
         .synonyms("trunk", "chest", "jewels", "treasure")
         .adjectives("old")

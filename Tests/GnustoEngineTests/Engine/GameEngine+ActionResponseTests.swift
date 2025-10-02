@@ -453,7 +453,7 @@ struct GameEngineActionResponseTests {
     func testPrerequisiteNotMet() async throws {
         let testRoom = Location(.startRoom)
             .name("Test Room")
-            .up("You need something to climb on.")
+            .up(blocked: "You need something to climb on.")
             .inherentlyLit
 
         let game = MinimalGame(locations: testRoom)

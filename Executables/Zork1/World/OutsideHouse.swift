@@ -2,8 +2,8 @@ import GnustoEngine
 
 // MARK: - Outside the White House
 
-enum OutsideHouse {
-    static let eastOfHouse = Location(.eastOfHouse)
+struct OutsideHouse {
+    let eastOfHouse = Location(.eastOfHouse)
         .name("Behind House")
         .north(.northOfHouse)
         .south(.southOfHouse)
@@ -15,7 +15,7 @@ enum OutsideHouse {
         .inherentlyLit
         .localGlobals(.whiteHouse, .kitchenWindow, .forest)
 
-    static let northOfHouse = Location(.northOfHouse)
+    let northOfHouse = Location(.northOfHouse)
         .name("North of House")
         .description(
             """
@@ -31,9 +31,9 @@ enum OutsideHouse {
         .north(.forestPath)
         .south(blocked: "The windows are all boarded.")
         .inherentlyLit
-        .localGlobals(.boardedWindow, .board, .whiteHouse, .forest)
+        .localGlobals(.boardedWindow, .boards, .whiteHouse, .forest)
 
-    static let southOfHouse = Location(.southOfHouse)
+    let southOfHouse = Location(.southOfHouse)
         .name("South of House")
         .description(
             """
@@ -48,9 +48,9 @@ enum OutsideHouse {
         .south(.forest3)
         .north(blocked: "The windows are all boarded.")
         .inherentlyLit
-        .localGlobals(.boardedWindow, .board, .whiteHouse, .forest)
+        .localGlobals(.boardedWindow, .boards, .whiteHouse, .forest)
 
-    static let stoneBarrow = Location(.stoneBarrow)
+    let stoneBarrow = Location(.stoneBarrow)
         .name("Stone Barrow")
         .description(
             """
@@ -61,7 +61,7 @@ enum OutsideHouse {
         .northeast(.westOfHouse)
         .inherentlyLit
 
-    static let westOfHouse = Location(.westOfHouse)
+    let westOfHouse = Location(.westOfHouse)
         .name("West of House")
         .description(
             """
@@ -76,13 +76,11 @@ enum OutsideHouse {
         // Note: SW and IN exits to Stone Barrow conditional on WON-FLAG
         .east(blocked: "The door is boarded and you can't remove the boards.")
         .inherentlyLit
-        .localGlobals(.whiteHouse, .board, .forest)
-}
+        .localGlobals(.whiteHouse, .boards, .forest)
 
-// MARK: - Items
+    // MARK: - Items
 
-extension OutsideHouse {
-    static let advertisement = Item(.advertisement)
+    let advertisement = Item(.advertisement)
         .name("leaflet")
         .synonyms("advertisement", "leaflet", "booklet", "mail")
         .adjectives("small")
@@ -102,20 +100,20 @@ extension OutsideHouse {
         .size(2)
         .in(.item(.mailbox))
 
-    static let boardedWindow = Item(.boardedWindow)
+    let boardedWindow = Item(.boardedWindow)
         .name("boarded window")
         .description("The windows are boarded up. There is no way you could enter through them.")
         .adjectives("boarded")
         .synonyms("window", "windows")
         .in(.southOfHouse)
 
-    static let boards = Item(.boards)
+    let boards = Item(.boards)
         .name("boards")
-        .description("The boards are securely fastened and cannot be removed.")
+        .description("The boards are securely fastened.")
         .synonyms("board")
         .omitDescription
 
-    static let frontDoor = Item(.frontDoor)
+    let frontDoor = Item(.frontDoor)
         .name("door")
         .synonyms("door")
         .adjectives("front", "boarded")
@@ -124,7 +122,7 @@ extension OutsideHouse {
         .in(.westOfHouse)
         // Note: Has action handler FRONT-DOOR-FCN
 
-    static let kitchenWindow = Item(.kitchenWindow)
+    let kitchenWindow = Item(.kitchenWindow)
         .name("kitchen window")
         .adjectives("kitchen", "small")
         .synonyms("window")
@@ -132,7 +130,7 @@ extension OutsideHouse {
         .isOpenable
         .omitDescription
 
-    static let mailbox = Item(.mailbox)
+    let mailbox = Item(.mailbox)
         .name("small mailbox")
         .synonyms("mailbox", "box")
         .adjectives("small")
@@ -142,17 +140,15 @@ extension OutsideHouse {
         .capacity(10)
         .in(.westOfHouse)
 
-    static let whiteHouse = Item(.whiteHouse)
+    let whiteHouse = Item(.whiteHouse)
         .name("white house")
         .adjectives("white", "beautiful", "colonial")
         .synonyms("house", "home", "building")
         .omitDescription
-}
 
-// MARK: - Computers
+    // MARK: - Computers
 
-extension OutsideHouse {
-    static let eastOfHouseComputer = LocationComputer(for: .eastOfHouse) {
+    let eastOfHouseComputer = LocationComputer(for: .eastOfHouse) {
         locationProperty(.description) { context in
             let kitchenWindow = await context.item(.kitchenWindow)
             let windowState = await kitchenWindow.isOpen ? "open" : "slightly ajar"
@@ -165,25 +161,23 @@ extension OutsideHouse {
         }
     }
 
-    static let kitchenWindowComputer = ItemComputer(for: .kitchenWindow) {
+    let kitchenWindowComputer = ItemComputer(for: .kitchenWindow) {
         itemProperty(ItemPropertyID.description) { context in
             await context.item.hasFlag(.isOpen)
                 ? "The window is now open wide enough to allow entry."
                 : "The window is slightly ajar, but not enough to allow entry."
         }
     }
-}
 
-// MARK: - Event handlers
+    // MARK: - Event handlers
 
-extension OutsideHouse {
-    static let boardsHandler = ItemEventHandler(for: .boards) {
+    let boardsHandler = ItemEventHandler(for: .boards) {
         before(.take) { _, _ in
             ActionResult("The boards are securely fastened.")
         }
     }
 
-    static let kitchenWindowHandler = ItemEventHandler(for: .kitchenWindow) {
+    let kitchenWindowHandler = ItemEventHandler(for: .kitchenWindow) {
         before(.open) { context, _ in
             if await context.item.hasFlag(.isOpen) {
                 return ActionResult("Too late for that, the window is already open.")
@@ -206,13 +200,13 @@ extension OutsideHouse {
         }
     }
 
-    static let mailboxHandler = ItemEventHandler(for: .mailbox) {
+    let mailboxHandler = ItemEventHandler(for: .mailbox) {
         before(.take) { _, _ in
             ActionResult("It is securely anchored.")
         }
     }
 
-    static let whiteHouseHandler = ItemEventHandler(for: .whiteHouse) {
+    let whiteHouseHandler = ItemEventHandler(for: .whiteHouse) {
         //        before(.find) { context, command in
         //            let currentLocation = await context.player.location.id
         //

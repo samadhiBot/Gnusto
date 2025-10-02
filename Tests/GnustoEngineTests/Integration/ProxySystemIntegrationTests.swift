@@ -412,6 +412,7 @@ struct ProxySystemIntegrationTests {
         let enchantedMirror = Item("enchantedMirror")
             .name("enchanted mirror")
             .description("A mirror that reflects magical auras.")
+            .in("magicShop")
 
         let magicWand = Item("magicWand")
             .name("magic wand")

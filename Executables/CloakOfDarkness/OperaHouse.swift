@@ -21,10 +21,10 @@ struct OperaHouse {
         .south(.bar)
         .west(.cloakroom)
         .north(
-            """
-            You've only just arrived, and besides, the weather outside
-            seems to be getting worse.
-            """
+            blocked: """
+                You've only just arrived, and besides, the weather outside
+                seems to be getting worse.
+                """
         )
         .inherentlyLit
 

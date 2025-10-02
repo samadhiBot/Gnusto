@@ -387,7 +387,7 @@ struct GoActionHandlerTests {
         let roundRoom = Location("roundRoom")
             .name("Round Room")
             .inherentlyLit
-            .south("A magical barrier blocks your way south.")
+            .south(blocked: "A magical barrier blocks your way south.")
 
         let southRoom = Location("southRoom")
             .name("South Room")

@@ -25,7 +25,8 @@ struct OutsideHouseTests {
             read the leaflet
             east
             open door
-            take boards
+            examine the boards
+            take the boards
             look at the house
             """
         )
@@ -53,12 +54,15 @@ struct OutsideHouseTests {
             > open door
             You cannot open the door, much as you might wish otherwise.
 
-            > take boards
-            The universe denies your request to take the board.
+            > examine the boards
+            The boards are securely fastened.
+
+            > take the boards
+            The boards are securely fastened.
 
             > look at the house
-            The white house stubbornly remains ordinary despite your
-            thorough examination.
+            The house is a beautiful colonial house which is painted white.
+            It is clear that the owners must have been extremely wealthy.
             """
         )
     }
@@ -108,22 +112,26 @@ struct OutsideHouseTests {
     func testBoards() async throws {
         try await engine.execute(
             """
-            take the boards
+            examine the boards
+            remove the boards
             north
-            take the boards
+            remove the boards
             east
             examine the window
             look through the window
             take the window
             south
-            take the boards
+            remove the boards
             """
         )
 
         await mockIO.expectOutput(
             """
-            > take the boards
-            The board stubbornly resists your attempts to take it.
+            > examine the boards
+            The boards are securely fastened.
+
+            > remove the boards
+            The boards are securely fastened.
 
             > north
             --- North of House ---
@@ -132,8 +140,8 @@ struct OutsideHouseTests {
             door here, and all the windows are boarded up. To the north a
             narrow path winds through the trees.
 
-            > take the boards
-            You cannot take the board, much as you might wish otherwise.
+            > remove the boards
+            The boards are securely fastened.
 
             > east
             --- Behind House ---
@@ -150,7 +158,7 @@ struct OutsideHouseTests {
             You can see what appears to be a kitchen.
 
             > take the window
-            The universe denies your request to take the kitchen window.
+            The kitchen window stubbornly resists your attempts to take it.
 
             > south
             --- South of House ---
@@ -158,8 +166,10 @@ struct OutsideHouseTests {
             You are facing the south side of a white house. There is no
             door here, and all the windows are boarded.
 
-            > take the boards
-            You cannot take the board, much as you might wish otherwise.
+            Present in this location is a boarded window.
+
+            > remove the boards
+            The boards are securely fastened.
             """
         )
     }

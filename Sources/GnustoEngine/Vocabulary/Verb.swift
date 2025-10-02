@@ -870,10 +870,10 @@ extension Verb {
         intents: .read
     )
 
-    /// Remove something (often clothing or accessories).
+    /// Remove or take something (often clothing or accessories if worn).
     public static let remove = Verb(
         id: "remove",
-        intents: .remove
+        intents: .remove, .take
     )
 
     /// Restart the game from the beginning.

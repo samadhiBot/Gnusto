@@ -1,7 +1,7 @@
 import GnustoEngine
 
-enum Hades {
-    static let entranceToHades = Location(.entranceToHades)
+struct Hades {
+    let entranceToHades = Location(.entranceToHades)
         .name("Entrance to Hades")
         .description(
             """
@@ -15,7 +15,7 @@ enum Hades {
         .inherentlyLit
         .localGlobals(.bodies)
 
-    static let landOfLivingDead = Location(.landOfLivingDead)
+    let landOfLivingDead = Location(.landOfLivingDead)
         .name("Land of the Dead")
         .description(
             """
@@ -29,13 +29,18 @@ enum Hades {
         .north(.entranceToHades)
         .inherentlyLit
         .localGlobals(.bodies)
-}
 
-// MARK: - Items
+    // MARK: - Items
 
-extension Hades {
+    let bodies = Item(.bodies)
+        .name("pile of bodies")
+        .synonyms("bodies", "body", "remains", "pile")
+        .adjectives("mangled")
+        .omitDescription
+        .requiresTryTake
+        // Note: Has action handler BODY-FUNCTION
 
-    static let ghosts = Item(.ghosts)
+    let ghosts = Item(.ghosts)
         .name("number of ghosts")
         .synonyms("ghosts", "spirits", "fiends", "force")
         .adjectives("invisible", "evil")
@@ -43,7 +48,7 @@ extension Hades {
         .in(.entranceToHades)
         // Note: Has action handler GHOSTS-F
 
-    static let skull = Item(.skull)
+    let skull = Item(.skull)
         .name("crystal skull")
         .synonyms("skull", "head", "treasure")
         .adjectives("crystal")

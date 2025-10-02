@@ -184,6 +184,13 @@ extension InsideHouse {
         .in(.item(.kitchenTable))
         // Note: Has action handler SANDWICH-BAG-FCN
 
+    static let stairs = Item(.stairs)
+        .name("stairs")
+        .synonyms("steps", "staircase", "stairway")
+        .adjectives("stone", "dark", "marble", "forbidding", "steep")
+        .omitDescription
+        .isClimbable
+
     static let sword = Item(.sword)
         .name("sword")
         .synonyms("sword", "orcrist", "glamdring", "blade")
@@ -200,7 +207,6 @@ extension InsideHouse {
         .name("trap door")
         .synonyms("door", "trapdoor", "trap-door", "cover")
         .adjectives("trap", "dusty")
-
         .omitDescription
         .isInvisible
         .in(.livingRoom)
