@@ -20,36 +20,28 @@ struct CircularDependencyIntegrationTests {
 
     // MARK: - Test Data
 
-    let testRoom = Location(
-        id: .startRoom,
-        .name("Test Room"),
-        .description("A room for testing circular dependencies."),
+    let testRoom = Location(.startRoom)
+        .name("Test Room")
+        .description("A room for testing circular dependencies.")
         .inherentlyLit
-    )
 
-    let lamp = Item(
-        id: "lamp",
-        .name("magical lamp"),
-        .description("A lamp whose brightness depends on nearby reflections."),
-        .isTakable,
-        .isLightSource,
+    let lamp = Item("lamp")
+        .name("magical lamp")
+        .description("A lamp whose brightness depends on nearby reflections.")
+        .isTakable
+        .isLightSource
         .in(.startRoom)
-    )
 
-    let mirror = Item(
-        id: "mirror",
-        .name("enchanted mirror"),
-        .description("A mirror that reflects magical light."),
-        .isTakable,
+    let mirror = Item("mirror")
+        .name("enchanted mirror")
+        .description("A mirror that reflects magical light.")
+        .isTakable
         .in(.startRoom)
-    )
 
-    let crystalCave = Location(
-        id: "crystalCave",
-        .name("Crystal Cave"),
-        .description("A cave whose illumination depends on magical items."),
+    let crystalCave = Location("crystalCave")
+        .name("Crystal Cave")
+        .description("A cave whose illumination depends on magical items.")
         .inherentlyLit
-    )
 
     // MARK: - Computer Definitions
 

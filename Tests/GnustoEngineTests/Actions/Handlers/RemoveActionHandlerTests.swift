@@ -11,14 +11,12 @@ struct RemoveActionHandlerTests {
     @Test("REMOVE DIRECTOBJECT syntax works")
     func testRemoveDirectObjectSyntax() async throws {
         // Given
-        let hat = Item(
-            id: "hat",
-            .name("blue hat"),
-            .description("A stylish blue hat."),
-            .isTakable,
-            .isWearable,
+        let hat = Item("hat")
+            .name("blue hat")
+            .description("A stylish blue hat.")
+            .isTakable
+            .isWearable
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: hat
@@ -35,9 +33,7 @@ struct RemoveActionHandlerTests {
         try await engine.execute("remove hat")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > remove hat
             You remove the blue hat.
@@ -53,14 +49,12 @@ struct RemoveActionHandlerTests {
     @Test("DOFF syntax works")
     func testDoffSyntax() async throws {
         // Given
-        let cloak = Item(
-            id: "cloak",
-            .name("woolen cloak"),
-            .description("A warm woolen cloak."),
-            .isTakable,
-            .isWearable,
+        let cloak = Item("cloak")
+            .name("woolen cloak")
+            .description("A warm woolen cloak.")
+            .isTakable
+            .isWearable
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: cloak
@@ -77,9 +71,7 @@ struct RemoveActionHandlerTests {
         try await engine.execute("doff cloak")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > doff cloak
             You doff the woolen cloak.
@@ -93,14 +85,12 @@ struct RemoveActionHandlerTests {
     @Test("TAKE OFF syntax works")
     func testTakeOffSyntax() async throws {
         // Given
-        let shoes = Item(
-            id: "shoes",
-            .name("leather shoes"),
-            .description("Comfortable leather shoes."),
-            .isTakable,
-            .isWearable,
+        let shoes = Item("shoes")
+            .name("leather shoes")
+            .description("Comfortable leather shoes.")
+            .isTakable
+            .isWearable
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: shoes
@@ -117,9 +107,7 @@ struct RemoveActionHandlerTests {
         try await engine.execute("take off shoes")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > take off shoes
             You take off the leather shoes.
@@ -133,23 +121,19 @@ struct RemoveActionHandlerTests {
     @Test("REMOVE ALL syntax works")
     func testRemoveAllSyntax() async throws {
         // Given
-        let hat = Item(
-            id: "hat",
-            .name("red hat"),
-            .description("A bright red hat."),
-            .isTakable,
-            .isWearable,
+        let hat = Item("hat")
+            .name("red hat")
+            .description("A bright red hat.")
+            .isTakable
+            .isWearable
             .in(.player)
-        )
 
-        let gloves = Item(
-            id: "gloves",
-            .name("silk gloves"),
-            .description("Elegant silk gloves."),
-            .isTakable,
-            .isWearable,
+        let gloves = Item("gloves")
+            .name("silk gloves")
+            .description("Elegant silk gloves.")
+            .isTakable
+            .isWearable
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: hat, gloves
@@ -167,9 +151,7 @@ struct RemoveActionHandlerTests {
         try await engine.execute("remove all")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > remove all
             You remove the silk gloves and the red hat.
@@ -194,9 +176,7 @@ struct RemoveActionHandlerTests {
         try await engine.execute("remove")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > remove
             Remove what?
@@ -207,14 +187,12 @@ struct RemoveActionHandlerTests {
     @Test("Cannot remove item not worn")
     func testCannotRemoveItemNotWorn() async throws {
         // Given
-        let hat = Item(
-            id: "hat",
-            .name("blue hat"),
-            .description("A stylish blue hat."),
-            .isTakable,
-            .isWearable,
+        let hat = Item("hat")
+            .name("blue hat")
+            .description("A stylish blue hat.")
+            .isTakable
+            .isWearable
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: hat
@@ -226,9 +204,7 @@ struct RemoveActionHandlerTests {
         try await engine.execute("remove hat")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > remove hat
             You aren't wearing the blue hat.
@@ -246,9 +222,7 @@ struct RemoveActionHandlerTests {
         try await engine.execute("remove nonexistent")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > remove nonexistent
             Any such thing lurks beyond your reach.
@@ -259,14 +233,12 @@ struct RemoveActionHandlerTests {
     @Test("Cannot remove fixed scenery")
     func testCannotRemoveFixedScenery() async throws {
         // Given
-        let fixedItem = Item(
-            id: "fixedItem",
-            .name("ceremonial robe"),
-            .description("A ceremonial robe that cannot be removed."),
-            .isWearable,
-            .omitDescription,
+        let fixedItem = Item("fixedItem")
+            .name("ceremonial robe")
+            .description("A ceremonial robe that cannot be removed.")
+            .isWearable
+            .omitDescription
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: fixedItem
@@ -283,9 +255,7 @@ struct RemoveActionHandlerTests {
         try await engine.execute("remove robe")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > remove robe
             The ceremonial robe stubbornly resists your attempts to remove
@@ -304,9 +274,7 @@ struct RemoveActionHandlerTests {
         try await engine.execute("remove me")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > remove me
             That's not something you can remove.
@@ -319,14 +287,12 @@ struct RemoveActionHandlerTests {
     @Test("Remove single worn item")
     func testRemoveSingleWornItem() async throws {
         // Given
-        let jacket = Item(
-            id: "jacket",
-            .name("leather jacket"),
-            .description("A tough leather jacket."),
-            .isTakable,
-            .isWearable,
+        let jacket = Item("jacket")
+            .name("leather jacket")
+            .description("A tough leather jacket.")
+            .isTakable
+            .isWearable
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: jacket
@@ -343,9 +309,7 @@ struct RemoveActionHandlerTests {
         try await engine.execute("remove jacket")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > remove jacket
             You remove the leather jacket.
@@ -362,32 +326,26 @@ struct RemoveActionHandlerTests {
     @Test("Remove multiple worn items")
     func testRemoveMultipleWornItems() async throws {
         // Given
-        let coat = Item(
-            id: "coat",
-            .name("winter coat"),
-            .description("A warm winter coat."),
-            .isTakable,
-            .isWearable,
+        let coat = Item("coat")
+            .name("winter coat")
+            .description("A warm winter coat.")
+            .isTakable
+            .isWearable
             .in(.player)
-        )
 
-        let scarf = Item(
-            id: "scarf",
-            .name("woolen scarf"),
-            .description("A cozy woolen scarf."),
-            .isTakable,
-            .isWearable,
+        let scarf = Item("scarf")
+            .name("woolen scarf")
+            .description("A cozy woolen scarf.")
+            .isTakable
+            .isWearable
             .in(.player)
-        )
 
-        let mittens = Item(
-            id: "mittens",
-            .name("thick mittens"),
-            .description("Thick winter mittens."),
-            .isTakable,
-            .isWearable,
+        let mittens = Item("mittens")
+            .name("thick mittens")
+            .description("Thick winter mittens.")
+            .isTakable
+            .isWearable
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: coat, scarf, mittens
@@ -406,9 +364,7 @@ struct RemoveActionHandlerTests {
         try await engine.execute("remove coat and scarf and mittens")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > remove coat and scarf and mittens
             You remove the winter coat, the thick mittens, and the woolen
@@ -433,32 +389,26 @@ struct RemoveActionHandlerTests {
     @Test("Remove all when wearing multiple items")
     func testRemoveAllWithMultipleWornItems() async throws {
         // Given
-        let shirt = Item(
-            id: "shirt",
-            .name("cotton shirt"),
-            .description("A comfortable cotton shirt."),
-            .isTakable,
-            .isWearable,
+        let shirt = Item("shirt")
+            .name("cotton shirt")
+            .description("A comfortable cotton shirt.")
+            .isTakable
+            .isWearable
             .in(.player)
-        )
 
-        let pants = Item(
-            id: "pants",
-            .name("blue pants"),
-            .description("Comfortable blue pants."),
-            .isTakable,
-            .isWearable,
+        let pants = Item("pants")
+            .name("blue pants")
+            .description("Comfortable blue pants.")
+            .isTakable
+            .isWearable
             .in(.player)
-        )
 
-        let watch = Item(
-            id: "watch",
-            .name("gold watch"),
-            .description("An expensive gold watch."),
-            .isTakable,
-            .isWearable,
+        let watch = Item("watch")
+            .name("gold watch")
+            .description("An expensive gold watch.")
+            .isTakable
+            .isWearable
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: shirt, pants, watch
@@ -477,9 +427,7 @@ struct RemoveActionHandlerTests {
         try await engine.execute("remove all")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > remove all
             You remove the blue pants, the cotton shirt, and the gold
@@ -500,14 +448,12 @@ struct RemoveActionHandlerTests {
     @Test("Remove all when not wearing anything")
     func testRemoveAllWhenNotWearingAnything() async throws {
         // Given
-        let hat = Item(
-            id: "hat",
-            .name("straw hat"),
-            .description("A light straw hat."),
-            .isTakable,
-            .isWearable,
+        let hat = Item("hat")
+            .name("straw hat")
+            .description("A light straw hat.")
+            .isTakable
+            .isWearable
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: hat
@@ -519,9 +465,7 @@ struct RemoveActionHandlerTests {
         try await engine.execute("remove all")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > remove all
             You remove everything you're wearing.
@@ -532,23 +476,19 @@ struct RemoveActionHandlerTests {
     @Test("Remove all skips non-removable items")
     func testRemoveAllSkipsNonRemovableItems() async throws {
         // Given
-        let removableHat = Item(
-            id: "removableHat",
-            .name("baseball cap"),
-            .description("A casual baseball cap."),
-            .isTakable,
-            .isWearable,
+        let removableHat = Item("removableHat")
+            .name("baseball cap")
+            .description("A casual baseball cap.")
+            .isTakable
+            .isWearable
             .in(.player)
-        )
 
-        let fixedRing = Item(
-            id: "fixedRing",
-            .name("cursed ring"),
-            .description("A ring that cannot be removed."),
-            .isWearable,
-            .omitDescription,
+        let fixedRing = Item("fixedRing")
+            .name("cursed ring")
+            .description("A ring that cannot be removed.")
+            .isWearable
+            .omitDescription
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: removableHat, fixedRing
@@ -566,9 +506,7 @@ struct RemoveActionHandlerTests {
         try await engine.execute("remove all")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > remove all
             You remove the baseball cap.

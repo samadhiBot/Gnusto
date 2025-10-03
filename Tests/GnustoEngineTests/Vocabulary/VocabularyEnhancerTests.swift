@@ -10,11 +10,9 @@ struct VocabularyEnhancerTests {
     func testExtractAdjectivesFromNames() async throws {
         // Given
         let enhancer = VocabularyEnhancer()
-        let item = Item(
-            id: "sword",
-            .name("rusty iron sword"),
+        let item = Item("sword")
+            .name("rusty iron sword")
             .description("A rusty iron sword with intricate carved patterns.")
-        )
 
         // When
         let result = enhancer.extractAdjectivesAndSynonyms(from: item)
@@ -30,11 +28,9 @@ struct VocabularyEnhancerTests {
     func testExtractSynonymsFromDescriptions() async throws {
         // Given
         let enhancer = VocabularyEnhancer()
-        let item = Item(
-            id: "lamp",
-            .name("brass lantern"),
+        let item = Item("lamp")
+            .name("brass lantern")
             .description("A brass lantern that serves as a reliable light source.")
-        )
 
         // When
         let result = enhancer.extractAdjectivesAndSynonyms(from: item)
@@ -55,12 +51,10 @@ struct VocabularyEnhancerTests {
         // Given
         let config = VocabularyEnhancer.Configuration(shouldMergeWithExplicit: true)
         let enhancer = VocabularyEnhancer(configuration: config)
-        let item = Item(
-            id: "gem",
-            .name("sparkling diamond"),
-            .description("A sparkling diamond with brilliant facets."),
+        let item = Item("gem")
+            .name("sparkling diamond")
+            .description("A sparkling diamond with brilliant facets.")
             .adjectives("precious", "valuable")
-        )
 
         // When
         let result = enhancer.extractAdjectivesAndSynonyms(from: item)
@@ -79,17 +73,14 @@ struct VocabularyEnhancerTests {
         // Given
         let config = VocabularyEnhancer.Configuration(shouldMergeWithExplicit: false)
         let enhancer = VocabularyEnhancer(configuration: config)
-        let itemWithAdjectives = Item(
-            id: "gem1",
-            .name("sparkling diamond"),
-            .description("A sparkling diamond with brilliant facets."),
-            .adjectives("precious")
-        )
-        let itemWithoutAdjectives = Item(
-            id: "gem2",
-            .name("sparkling diamond"),
+        let itemWithAdjectives = Item("gem1")
+            .name("sparkling diamond")
             .description("A sparkling diamond with brilliant facets.")
-        )
+            .adjectives("precious")
+
+        let itemWithoutAdjectives = Item("gem2")
+            .name("sparkling diamond")
+            .description("A sparkling diamond with brilliant facets.")
 
         // When
         let result1 = enhancer.extractAdjectivesAndSynonyms(from: itemWithAdjectives)
@@ -119,12 +110,11 @@ struct VocabularyEnhancerTests {
             maxSynonyms: 1
         )
         let enhancer = VocabularyEnhancer(configuration: config)
-        let item = Item(
-            id: "sword",
-            .name("ancient rusty iron sword"),
+        let item = Item("sword")
+            .name("ancient rusty iron sword")
             .description(
-                "An ancient rusty iron sword with sharp edges, deadly blade, and ornate handle.")
-        )
+                "An ancient rusty iron sword with sharp edges, deadly blade, and ornate handle."
+            )
 
         // When
         let result = enhancer.extractAdjectivesAndSynonyms(from: item)
@@ -138,11 +128,9 @@ struct VocabularyEnhancerTests {
     func testVocabularyBuildIntegration() async throws {
         // Given
         let enhancer = VocabularyEnhancer()
-        let item = Item(
-            id: "sword",
-            .name("rusty sword"),
+        let item = Item("sword")
+            .name("rusty sword")
             .description("A rusty sword with a sharp blade.")
-        )
 
         // When
         let vocabulary = Vocabulary.build(
@@ -162,11 +150,9 @@ struct VocabularyEnhancerTests {
     func testCompleteItemIDAndNameExtraction() async throws {
         // Given: Your exact example
         let enhancer = VocabularyEnhancer()
-        let lamp = Item(
-            id: "lamp",
-            .name("brass lantern"),
+        let lamp = Item("lamp")
+            .name("brass lantern")
             .description("A brass lantern that serves as a reliable light source.")
-        )
 
         // When
         let result = enhancer.extractAdjectivesAndSynonyms(from: lamp)

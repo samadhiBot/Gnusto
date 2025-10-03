@@ -32,14 +32,12 @@ struct ConversationManagerTests {
     @Test("askYesNo with command executes command on yes")
     func testAskYesNoWithCommand() async throws {
         // Given
-        let apple = Item(
-            id: "apple",
-            .name("red apple"),
-            .description("A delicious red apple."),
-            .isTakable,
-            .isEdible,
+        let apple = Item("apple")
+            .name("red apple")
+            .description("A delicious red apple.")
+            .isTakable
+            .isEdible
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: apple
@@ -176,12 +174,10 @@ struct ConversationManagerTests {
     @Test("askForTopic creates topic question")
     func testAskForTopic() async throws {
         // Given
-        let wizard = Item(
-            id: "wizard",
-            .name("old wizard"),
-            .description("A wise old wizard."),
+        let wizard = Item("wizard")
+            .name("old wizard")
+            .description("A wise old wizard.")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: wizard
@@ -210,19 +206,15 @@ struct ConversationManagerTests {
     @Test("processTopicResponse creates ask command for known topics")
     func testProcessTopicResponse() async throws {
         // Given
-        let wizard = Item(
-            id: "wizard",
-            .name("old wizard"),
-            .description("A wise old wizard."),
+        let wizard = Item("wizard")
+            .name("old wizard")
+            .description("A wise old wizard.")
             .in(.startRoom)
-        )
 
-        let magic = Item(
-            id: "magic",
-            .name("magic"),
-            .description("The art of magic."),
+        let magic = Item("magic")
+            .name("magic")
+            .description("The art of magic.")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: wizard, magic
@@ -251,12 +243,10 @@ struct ConversationManagerTests {
     @Test("processTopicResponse returns nil for unknown topics")
     func testProcessTopicResponseUnknown() async throws {
         // Given
-        let wizard = Item(
-            id: "wizard",
-            .name("old wizard"),
-            .description("A wise old wizard."),
+        let wizard = Item("wizard")
+            .name("old wizard")
+            .description("A wise old wizard.")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: wizard

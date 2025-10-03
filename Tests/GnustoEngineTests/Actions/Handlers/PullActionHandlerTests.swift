@@ -11,12 +11,10 @@ struct PullActionHandlerTests {
     @Test("PULL DIRECTOBJECT syntax works")
     func testPullDirectObjectSyntax() async throws {
         // Given
-        let rope = Item(
-            id: "rope",
-            .name("thick rope"),
-            .description("A thick hemp rope."),
+        let rope = Item("rope")
+            .name("thick rope")
+            .description("A thick hemp rope.")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: rope
@@ -28,9 +26,7 @@ struct PullActionHandlerTests {
         try await engine.execute("pull rope")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > pull rope
             The thick rope resists your tugging with stoic determination.
@@ -44,13 +40,11 @@ struct PullActionHandlerTests {
     @Test("PULL CHARACTER syntax works")
     func testPullCharacterSyntax() async throws {
         // Given
-        let towerGuard = Item(
-            id: "guard",
-            .name("surly guard"),
-            .description("A surly tower guard."),
-            .in(.startRoom),
-            .characterSheet(.init())
-        )
+        let towerGuard = Item("guard")
+            .name("surly guard")
+            .description("A surly tower guard.")
+            .in(.startRoom)
+            .characterSheet(.default)
 
         let game = MinimalGame(
             items: towerGuard
@@ -62,9 +56,7 @@ struct PullActionHandlerTests {
         try await engine.execute("pull guard")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > pull guard
             The surly guard is not a rope to be tugged at your convenience.
@@ -88,9 +80,7 @@ struct PullActionHandlerTests {
         try await engine.execute("pull troll")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > pull troll
             The fierce troll is not a rope to be tugged at your
@@ -114,9 +104,7 @@ struct PullActionHandlerTests {
         try await engine.execute("pull")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > pull
             Pull what?
@@ -127,18 +115,14 @@ struct PullActionHandlerTests {
     @Test("Cannot pull target not in scope")
     func testCannotPullTargetNotInScope() async throws {
         // Given
-        let anotherRoom = Location(
-            id: "anotherRoom",
-            .name("Another Room"),
+        let anotherRoom = Location("anotherRoom")
+            .name("Another Room")
             .inherentlyLit
-        )
 
-        let remoteLever = Item(
-            id: "remoteLever",
-            .name("remote lever"),
-            .description("A lever in another room."),
+        let remoteLever = Item("remoteLever")
+            .name("remote lever")
+            .description("A lever in another room.")
             .in("anotherRoom")
-        )
 
         let game = MinimalGame(
             locations: anotherRoom,
@@ -151,9 +135,7 @@ struct PullActionHandlerTests {
         try await engine.execute("pull lever")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > pull lever
             Any such thing lurks beyond your reach.
@@ -164,18 +146,14 @@ struct PullActionHandlerTests {
     @Test("Requires light to pull")
     func testRequiresLight() async throws {
         // Given: Dark room with an object to pull
-        let darkRoom = Location(
-            id: "darkRoom",
-            .name("Dark Room"),
+        let darkRoom = Location("darkRoom")
+            .name("Dark Room")
             .description("A pitch black room.")
-        )
 
-        let chain = Item(
-            id: "chain",
-            .name("metal chain"),
-            .description("A heavy metal chain."),
+        let chain = Item("chain")
+            .name("metal chain")
+            .description("A heavy metal chain.")
             .in("darkRoom")
-        )
 
         let game = MinimalGame(
             player: Player(in: "darkRoom"),
@@ -189,9 +167,7 @@ struct PullActionHandlerTests {
         try await engine.execute("pull chain")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > pull chain
             The darkness here is absolute, consuming all light and hope of
@@ -205,12 +181,10 @@ struct PullActionHandlerTests {
     @Test("Pulling sets isTouched flag")
     func testPullingSetsTouchedFlag() async throws {
         // Given
-        let bell = Item(
-            id: "bell",
-            .name("church bell"),
-            .description("A large church bell with a rope."),
+        let bell = Item("bell")
+            .name("church bell")
+            .description("A large church bell with a rope.")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: bell
@@ -233,19 +207,15 @@ struct PullActionHandlerTests {
     @Test("Pull sequence of different objects")
     func testPullSequenceOfDifferentObjects() async throws {
         // Given
-        let rope1 = Item(
-            id: "rope1",
-            .name("first rope"),
-            .description("A thick rope."),
+        let rope1 = Item("rope1")
+            .name("first rope")
+            .description("A thick rope.")
             .in(.startRoom)
-        )
 
-        let rope2 = Item(
-            id: "rope2",
-            .name("second rope"),
-            .description("A thin rope."),
+        let rope2 = Item("rope2")
+            .name("second rope")
+            .description("A thin rope.")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: rope1, rope2
@@ -260,9 +230,7 @@ struct PullActionHandlerTests {
         )
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > pull first rope
             The first rope resists your tugging with stoic determination.
@@ -281,22 +249,18 @@ struct PullActionHandlerTests {
     @Test("Pull object in open container")
     func testPullObjectInOpenContainer() async throws {
         // Given
-        let box = Item(
-            id: "box",
-            .name("wooden box"),
-            .description("A wooden box with mechanisms."),
-            .isContainer,
-            .isOpenable,
-            .isOpen,
+        let box = Item("box")
+            .name("wooden box")
+            .description("A wooden box with mechanisms.")
+            .isContainer
+            .isOpenable
+            .isOpen
             .in(.startRoom)
-        )
 
-        let string = Item(
-            id: "string",
-            .name("pull string"),
-            .description("A string for pulling."),
+        let string = Item("string")
+            .name("pull string")
+            .description("A string for pulling.")
             .in(.item("box"))
-        )
 
         let game = MinimalGame(
             items: box, string
@@ -308,9 +272,7 @@ struct PullActionHandlerTests {
         try await engine.execute("pull string")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > pull string
             The pull string resists your tugging with stoic determination.

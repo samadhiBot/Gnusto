@@ -11,12 +11,10 @@ struct RaiseActionHandlerTests {
     @Test("RAISE DIRECTOBJECT syntax works")
     func testRaiseDirectObjectSyntax() async throws {
         // Given
-        let box = Item(
-            id: "box",
-            .name("wooden box"),
-            .description("A heavy wooden box."),
+        let box = Item("box")
+            .name("wooden box")
+            .description("A heavy wooden box.")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: box
@@ -28,9 +26,7 @@ struct RaiseActionHandlerTests {
         try await engine.execute("raise box")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > raise box
             You consider whether to raise the wooden box, then decide
@@ -45,12 +41,10 @@ struct RaiseActionHandlerTests {
     @Test("LIFT syntax works")
     func testLiftSyntax() async throws {
         // Given
-        let stone = Item(
-            id: "stone",
-            .name("heavy stone"),
-            .description("A large heavy stone."),
+        let stone = Item("stone")
+            .name("heavy stone")
+            .description("A large heavy stone.")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: stone
@@ -62,9 +56,7 @@ struct RaiseActionHandlerTests {
         try await engine.execute("lift stone")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > lift stone
             You consider whether to lift the heavy stone, then decide
@@ -76,12 +68,10 @@ struct RaiseActionHandlerTests {
     @Test("HOIST syntax works")
     func testHoistSyntax() async throws {
         // Given
-        let beam = Item(
-            id: "beam",
-            .name("steel beam"),
-            .description("A massive steel beam."),
+        let beam = Item("beam")
+            .name("steel beam")
+            .description("A massive steel beam.")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: beam
@@ -93,9 +83,7 @@ struct RaiseActionHandlerTests {
         try await engine.execute("hoist beam")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > hoist beam
             You consider whether to hoist the steel beam, then decide
@@ -116,9 +104,7 @@ struct RaiseActionHandlerTests {
         try await engine.execute("raise")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > raise
             Raise what?
@@ -136,9 +122,7 @@ struct RaiseActionHandlerTests {
         try await engine.execute("raise nonexistent")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > raise nonexistent
             Any such thing lurks beyond your reach.
@@ -149,18 +133,14 @@ struct RaiseActionHandlerTests {
     @Test("Cannot raise item not in scope")
     func testCannotRaiseItemNotInScope() async throws {
         // Given
-        let anotherRoom = Location(
-            id: "anotherRoom",
-            .name("Another Room"),
+        let anotherRoom = Location("anotherRoom")
+            .name("Another Room")
             .inherentlyLit
-        )
 
-        let remoteBox = Item(
-            id: "remoteBox",
-            .name("remote box"),
-            .description("A box in another room."),
+        let remoteBox = Item("remoteBox")
+            .name("remote box")
+            .description("A box in another room.")
             .in("anotherRoom")
-        )
 
         let game = MinimalGame(
             locations: anotherRoom,
@@ -173,9 +153,7 @@ struct RaiseActionHandlerTests {
         try await engine.execute("raise box")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > raise box
             Any such thing lurks beyond your reach.
@@ -193,9 +171,7 @@ struct RaiseActionHandlerTests {
         try await engine.execute("raise testRoom")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > raise testRoom
             Any such thing lurks beyond your reach.
@@ -213,9 +189,7 @@ struct RaiseActionHandlerTests {
         try await engine.execute("raise me")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > raise me
             The logistics of raising oneself prove insurmountable.
@@ -226,19 +200,15 @@ struct RaiseActionHandlerTests {
     @Test("Requires light to raise")
     func testRequiresLight() async throws {
         // Given: Dark room with item
-        let darkRoom = Location(
-            id: "darkRoom",
-            .name("Dark Room"),
+        let darkRoom = Location("darkRoom")
+            .name("Dark Room")
             .description("A pitch black room.")
             // Note: No .inherentlyLit property
-        )
 
-        let box = Item(
-            id: "box",
-            .name("wooden box"),
-            .description("A heavy wooden box."),
+        let box = Item("box")
+            .name("wooden box")
+            .description("A heavy wooden box.")
             .in("darkRoom")
-        )
 
         let game = MinimalGame(
             player: Player(in: "darkRoom"),
@@ -252,9 +222,7 @@ struct RaiseActionHandlerTests {
         try await engine.execute("raise box")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > raise box
             The darkness here is absolute, consuming all light and hope of
@@ -268,12 +236,10 @@ struct RaiseActionHandlerTests {
     @Test("Raise item sets touched flag")
     func testRaiseItemSetsTouchedFlag() async throws {
         // Given
-        let crate = Item(
-            id: "crate",
-            .name("wooden crate"),
-            .description("A large wooden crate."),
+        let crate = Item("crate")
+            .name("wooden crate")
+            .description("A large wooden crate.")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: crate
@@ -292,9 +258,7 @@ struct RaiseActionHandlerTests {
         let finalState = await engine.item("crate")
         #expect(await finalState.hasFlag(.isTouched) == true)
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > raise crate
             You consider whether to raise the wooden crate, then decide
@@ -306,19 +270,15 @@ struct RaiseActionHandlerTests {
     @Test("Raise item updates pronouns")
     func testRaiseItemUpdatesPronouns() async throws {
         // Given
-        let table = Item(
-            id: "table",
-            .name("heavy table"),
-            .description("A massive oak table."),
+        let table = Item("table")
+            .name("heavy table")
+            .description("A massive oak table.")
             .in(.startRoom)
-        )
 
-        let book = Item(
-            id: "book",
-            .name("old book"),
-            .description("An old leather book."),
+        let book = Item("book")
+            .name("old book")
+            .description("An old leather book.")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: table, book
@@ -335,9 +295,7 @@ struct RaiseActionHandlerTests {
         // Then - "examine it" should now refer to the table
         try await engine.execute("examine it")
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > examine book
             An old leather book.
@@ -355,13 +313,11 @@ struct RaiseActionHandlerTests {
     @Test("Raise held item works")
     func testRaiseHeldItem() async throws {
         // Given
-        let weight = Item(
-            id: "weight",
-            .name("iron weight"),
-            .description("A heavy iron weight."),
-            .isTakable,
+        let weight = Item("weight")
+            .name("iron weight")
+            .description("A heavy iron weight.")
+            .isTakable
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: weight
@@ -373,9 +329,7 @@ struct RaiseActionHandlerTests {
         try await engine.execute("raise weight")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > raise weight
             You consider whether to raise the iron weight, then decide
@@ -390,21 +344,17 @@ struct RaiseActionHandlerTests {
     @Test("Raise item in container")
     func testRaiseItemInContainer() async throws {
         // Given
-        let box = Item(
-            id: "box",
-            .name("storage box"),
-            .description("A storage box."),
-            .isContainer,
-            .isOpen,
+        let box = Item("box")
+            .name("storage box")
+            .description("A storage box.")
+            .isContainer
+            .isOpen
             .in(.startRoom)
-        )
 
-        let anvil = Item(
-            id: "anvil",
-            .name("iron anvil"),
-            .description("A heavy iron anvil."),
+        let anvil = Item("anvil")
+            .name("iron anvil")
+            .description("A heavy iron anvil.")
             .in(.item("box"))
-        )
 
         let game = MinimalGame(
             items: box, anvil
@@ -416,9 +366,7 @@ struct RaiseActionHandlerTests {
         try await engine.execute("raise anvil")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > raise anvil
             You consider whether to raise the iron anvil, then decide
@@ -433,28 +381,22 @@ struct RaiseActionHandlerTests {
     @Test("Raise different types of items")
     func testRaiseDifferentTypesOfItems() async throws {
         // Given
-        let furniture = Item(
-            id: "furniture",
-            .name("wooden chair"),
-            .description("A heavy wooden chair."),
+        let furniture = Item("furniture")
+            .name("wooden chair")
+            .description("A heavy wooden chair.")
             .in(.startRoom)
-        )
 
-        let character = Item(
-            id: "character",
-            .name("sleeping giant"),
-            .description("A sleeping giant."),
-            .characterSheet(.strong),
+        let character = Item("character")
+            .name("sleeping giant")
+            .description("A sleeping giant.")
+            .characterSheet(.strong)
             .in(.startRoom)
-        )
 
-        let device = Item(
-            id: "device",
-            .name("heavy machine"),
-            .description("A heavy industrial machine."),
-            .isDevice,
+        let device = Item("device")
+            .name("heavy machine")
+            .description("A heavy industrial machine.")
+            .isDevice
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: furniture, character, device
@@ -469,9 +411,7 @@ struct RaiseActionHandlerTests {
             "raise machine"
         )
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > raise chair
             You consider whether to raise the wooden chair, then decide
@@ -491,19 +431,15 @@ struct RaiseActionHandlerTests {
     @Test("Raise small vs large items")
     func testRaiseSmallVsLargeItems() async throws {
         // Given
-        let feather = Item(
-            id: "feather",
-            .name("small feather"),
-            .description("A tiny bird feather."),
+        let feather = Item("feather")
+            .name("small feather")
+            .description("A tiny bird feather.")
             .in(.startRoom)
-        )
 
-        let boulder = Item(
-            id: "boulder",
-            .name("massive boulder"),
-            .description("An enormous boulder."),
+        let boulder = Item("boulder")
+            .name("massive boulder")
+            .description("An enormous boulder.")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: feather, boulder
@@ -514,9 +450,7 @@ struct RaiseActionHandlerTests {
         // When - Raise small item
         try await engine.execute("raise feather")
 
-        let featherOutput = await mockIO.flush()
-        expectNoDifference(
-            featherOutput,
+        await mockIO.expect(
             """
             > raise feather
             You consider whether to raise the small feather, then decide
@@ -527,9 +461,7 @@ struct RaiseActionHandlerTests {
         // When - Raise large item
         try await engine.execute("raise boulder")
 
-        let boulderOutput = await mockIO.flush()
-        expectNoDifference(
-            boulderOutput,
+        await mockIO.expect(
             """
             > raise boulder
             You start to raise the massive boulder but stop yourself at the
@@ -541,12 +473,10 @@ struct RaiseActionHandlerTests {
     @Test("Raise with different verb synonyms")
     func testRaiseWithDifferentVerbSynonyms() async throws {
         // Given
-        let barrel = Item(
-            id: "barrel",
-            .name("oak barrel"),
-            .description("A heavy oak barrel."),
+        let barrel = Item("barrel")
+            .name("oak barrel")
+            .description("A heavy oak barrel.")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: barrel
@@ -562,9 +492,7 @@ struct RaiseActionHandlerTests {
             "lift barrel",
             "hoist barrel"
         )
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > raise barrel
             You consider whether to raise the oak barrel, then decide

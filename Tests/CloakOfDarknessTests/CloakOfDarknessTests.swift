@@ -5,9 +5,20 @@ import GnustoTestSupport
 import Testing
 
 struct CloakOfDarknessWalkthroughTests {
+    let engine: GameEngine
+    let mockIO: MockIOHandler
+
+    init() async {
+        (engine, mockIO) = await GameEngine.test(
+            blueprint: CloakOfDarkness(
+                rng: SeededRandomNumberGenerator()
+            )
+        )
+    }
+
     @Test("Basic Cloak of Darkness Walkthrough, eventually winning")
     func testBasicCloakWalkthrough() async throws {
-        let (engine, mockIO) = await GameEngine.cloakOfDarkness(
+        try await engine.execute(
             """
             inventory
             examine the cloak
@@ -25,32 +36,12 @@ struct CloakOfDarknessWalkthroughTests {
             read the message
             """
         )
-        await engine.run()
 
-        let transcript = await mockIO.flush()
-
-        expectNoDifference(
-            transcript,
+        await mockIO.expect(
             """
-            Cloak of Darkness
-
-            A basic IF demonstration.
-
-            Hurrying through the rainswept November night, you're glad to
-            see the bright lights of the Opera House. It's surprising that
-            there aren't more people about but, hey, what do you expect in
-            a cheap demo game...?
-
-            --- Foyer of the Opera House ---
-
-            You are standing in a spacious hall, splendidly decorated in
-            red and gold, with glittering chandeliers overhead. The
-            entrance from the street is to the north, and there are
-            doorways south and west.
-
             > inventory
             You are carrying:
-            - A velvet cloak
+            - A velvet cloak (worn)
 
             > examine the cloak
             A handsome cloak, of velvet trimmed with satin, and slightly
@@ -68,6 +59,11 @@ struct CloakOfDarknessWalkthroughTests {
 
             > walk north
             --- Foyer of the Opera House ---
+
+            You are standing in a spacious hall, splendidly decorated in
+            red and gold, with glittering chandeliers overhead. The
+            entrance from the street is to the north, and there are
+            doorways south and west.
 
             > go north
             You've only just arrived, and besides, the weather outside
@@ -113,7 +109,7 @@ struct CloakOfDarknessWalkthroughTests {
 
     @Test("Blundering Cloak of Darkness Walkthrough, eventually losing")
     func testBlunderingCloakWalkthroughLosing() async throws {
-        let (engine, mockIO) = await GameEngine.cloakOfDarkness(
+        try await engine.execute(
             """
             go north
             go south
@@ -133,29 +129,9 @@ struct CloakOfDarknessWalkthroughTests {
             read the message
             """
         )
-        await engine.run()
 
-        let transcript = await mockIO.flush()
-
-        expectNoDifference(
-            transcript,
+        await mockIO.expect(
             """
-            Cloak of Darkness
-
-            A basic IF demonstration.
-
-            Hurrying through the rainswept November night, you're glad to
-            see the bright lights of the Opera House. It's surprising that
-            there aren't more people about but, hey, what do you expect in
-            a cheap demo game...?
-
-            --- Foyer of the Opera House ---
-
-            You are standing in a spacious hall, splendidly decorated in
-            red and gold, with glittering chandeliers overhead. The
-            entrance from the street is to the north, and there are
-            doorways south and west.
-
             > go north
             You've only just arrived, and besides, the weather outside
             seems to be getting worse.
@@ -168,7 +144,7 @@ struct CloakOfDarknessWalkthroughTests {
 
             > inventory
             You are carrying:
-            - A velvet cloak
+            - A velvet cloak (worn)
 
             > remove the cloak
             In the dark? You could easily disturb something!
@@ -181,6 +157,11 @@ struct CloakOfDarknessWalkthroughTests {
 
             > go north
             --- Foyer of the Opera House ---
+
+            You are standing in a spacious hall, splendidly decorated in
+            red and gold, with glittering chandeliers overhead. The
+            entrance from the street is to the north, and there are
+            doorways south and west.
 
             > look
             --- Foyer of the Opera House ---
@@ -232,19 +213,6 @@ struct CloakOfDarknessWalkthroughTests {
 
             "You lose."
             """
-        )
-    }
-}
-
-// MARK: - Test setup
-
-extension GameEngine {
-    public static func cloakOfDarkness(
-        _ commands: String = ""
-    ) async -> (GameEngine, MockIOHandler) {
-        await GameEngine.test(
-            blueprint: CloakOfDarkness(rng: SeededRandomNumberGenerator()),
-            ioHandler: MockIOHandler(pre: "", commands)
         )
     }
 }

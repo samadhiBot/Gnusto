@@ -11,13 +11,11 @@ struct ItemProxyTests {
     @Test("ItemProxy basic creation and identity")
     func testItemProxyBasics() async throws {
         // Given
-        let testItem = Item(
-            id: "testItem",
-            .name("test item"),
-            .description("A test item for proxy testing."),
-            .isTakable,
+        let testItem = Item("testItem")
+            .name("test item")
+            .description("A test item for proxy testing.")
+            .isTakable
             .in(.startRoom)
-        )
 
         let game = MinimalGame(items: testItem)
         let (engine, _) = await GameEngine.test(blueprint: game)
@@ -32,15 +30,13 @@ struct ItemProxyTests {
     @Test("ItemProxy property access")
     func testItemProxyPropertyAccess() async throws {
         // Given
-        let testItem = Item(
-            id: "testItem",
-            .name("test item"),
-            .description("A test item."),
-            .synonyms("item", "object"),
-            .adjectives("test", "sample"),
-            .isTakable,
+        let testItem = Item("testItem")
+            .name("test item")
+            .description("A test item.")
+            .synonyms("item", "object")
+            .adjectives("test", "sample")
+            .isTakable
             .in(.startRoom)
-        )
 
         let game = MinimalGame(items: testItem)
         let (engine, _) = await GameEngine.test(blueprint: game)
@@ -63,17 +59,13 @@ struct ItemProxyTests {
     @Test("ItemProxy equality and hashing")
     func testItemProxyEquality() async throws {
         // Given
-        let item1 = Item(
-            id: "item1",
-            .name("first item"),
+        let item1 = Item("item1")
+            .name("first item")
             .in(.startRoom)
-        )
 
-        let item2 = Item(
-            id: "item2",
-            .name("second item"),
+        let item2 = Item("item2")
+            .name("second item")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: item1, item2

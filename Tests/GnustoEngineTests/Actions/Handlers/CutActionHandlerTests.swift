@@ -11,21 +11,17 @@ struct CutActionHandlerTests {
     @Test("CUT DIRECTOBJECT syntax works")
     func testCutDirectObjectSyntax() async throws {
         // Given
-        let rope = Item(
-            id: "rope",
-            .name("thick rope"),
-            .description("A thick rope."),
+        let rope = Item("rope")
+            .name("thick rope")
+            .description("A thick rope.")
             .in(.startRoom)
-        )
 
-        let knife = Item(
-            id: "knife",
-            .name("sharp knife"),
-            .description("A sharp kitchen knife."),
-            .isWeapon,
-            .isTakable,
+        let knife = Item("knife")
+            .name("sharp knife")
+            .description("A sharp kitchen knife.")
+            .isWeapon
+            .isTakable
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: rope, knife
@@ -37,9 +33,7 @@ struct CutActionHandlerTests {
         try await engine.execute("cut rope")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > cut rope
             The thick rope resists division with stubborn integrity.
@@ -53,21 +47,17 @@ struct CutActionHandlerTests {
     @Test("CUT DIRECTOBJECT WITH INDIRECTOBJECT syntax works")
     func testCutWithToolSyntax() async throws {
         // Given
-        let paper = Item(
-            id: "paper",
-            .name("piece of paper"),
-            .description("A piece of paper."),
+        let paper = Item("paper")
+            .name("piece of paper")
+            .description("A piece of paper.")
             .in(.startRoom)
-        )
 
-        let scissors = Item(
-            id: "scissors",
-            .name("sharp scissors"),
-            .description("A pair of sharp scissors."),
-            .isTool,
-            .isTakable,
+        let scissors = Item("scissors")
+            .name("sharp scissors")
+            .description("A pair of sharp scissors.")
+            .isTool
+            .isTakable
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: paper, scissors
@@ -79,9 +69,7 @@ struct CutActionHandlerTests {
         try await engine.execute("cut paper with scissors")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > cut paper with scissors
             The piece of paper resists division with stubborn integrity.
@@ -92,21 +80,17 @@ struct CutActionHandlerTests {
     @Test("SLICE syntax works")
     func testSliceSyntax() async throws {
         // Given
-        let bread = Item(
-            id: "bread",
-            .name("loaf of bread"),
-            .description("A fresh loaf of bread."),
+        let bread = Item("bread")
+            .name("loaf of bread")
+            .description("A fresh loaf of bread.")
             .in(.startRoom)
-        )
 
-        let knife = Item(
-            id: "knife",
-            .name("bread knife"),
-            .description("A serrated bread knife."),
-            .isWeapon,
-            .isTakable,
+        let knife = Item("knife")
+            .name("bread knife")
+            .description("A serrated bread knife.")
+            .isWeapon
+            .isTakable
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: bread, knife
@@ -118,9 +102,7 @@ struct CutActionHandlerTests {
         try await engine.execute("slice bread")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > slice bread
             The loaf of bread resists division with stubborn integrity.
@@ -131,21 +113,17 @@ struct CutActionHandlerTests {
     @Test("CHOP syntax works")
     func testChopSyntax() async throws {
         // Given
-        let wood = Item(
-            id: "wood",
-            .name("piece of wood"),
-            .description("A piece of wood."),
+        let wood = Item("wood")
+            .name("piece of wood")
+            .description("A piece of wood.")
             .in(.startRoom)
-        )
 
-        let axe = Item(
-            id: "axe",
-            .name("sharp axe"),
-            .description("A sharp woodcutting axe."),
-            .isTool,
-            .isTakable,
+        let axe = Item("axe")
+            .name("sharp axe")
+            .description("A sharp woodcutting axe.")
+            .isTool
+            .isTakable
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: wood, axe
@@ -157,9 +135,7 @@ struct CutActionHandlerTests {
         try await engine.execute("chop wood")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > chop wood
             The piece of wood resists division with stubborn integrity.
@@ -179,9 +155,7 @@ struct CutActionHandlerTests {
         try await engine.execute("cut")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > cut
             Cut what?
@@ -192,18 +166,14 @@ struct CutActionHandlerTests {
     @Test("Cannot cut target not in scope")
     func testCannotCutTargetNotInScope() async throws {
         // Given
-        let anotherRoom = Location(
-            id: "anotherRoom",
-            .name("Another Room"),
+        let anotherRoom = Location("anotherRoom")
+            .name("Another Room")
             .inherentlyLit
-        )
 
-        let remoteRope = Item(
-            id: "remoteRope",
-            .name("remote rope"),
-            .description("A rope in another room."),
+        let remoteRope = Item("remoteRope")
+            .name("remote rope")
+            .description("A rope in another room.")
             .in("anotherRoom")
-        )
 
         let game = MinimalGame(
             locations: anotherRoom,
@@ -216,9 +186,7 @@ struct CutActionHandlerTests {
         try await engine.execute("cut rope")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > cut rope
             Any such thing lurks beyond your reach.
@@ -229,18 +197,14 @@ struct CutActionHandlerTests {
     @Test("Requires light to cut")
     func testRequiresLight() async throws {
         // Given: Dark room with an item to cut
-        let darkRoom = Location(
-            id: "darkRoom",
-            .name("Dark Room"),
+        let darkRoom = Location("darkRoom")
+            .name("Dark Room")
             .description("A pitch black room.")
-        )
 
-        let rope = Item(
-            id: "rope",
-            .name("thick rope"),
-            .description("A thick rope."),
+        let rope = Item("rope")
+            .name("thick rope")
+            .description("A thick rope.")
             .in("darkRoom")
-        )
 
         let game = MinimalGame(
             player: Player(in: "darkRoom"),
@@ -254,9 +218,7 @@ struct CutActionHandlerTests {
         try await engine.execute("cut rope")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > cut rope
             The darkness here is absolute, consuming all light and hope of
@@ -270,21 +232,17 @@ struct CutActionHandlerTests {
     @Test("Cutting avoided with variations")
     func testCuttingAvoided() async throws {
         // Given
-        let fabric = Item(
-            id: "fabric",
-            .name("piece of fabric"),
-            .description("A piece of fabric."),
+        let fabric = Item("fabric")
+            .name("piece of fabric")
+            .description("A piece of fabric.")
             .in(.startRoom)
-        )
 
-        let sword = Item(
-            id: "sword",
-            .name("steel sword"),
-            .description("A sharp steel sword."),
-            .isWeapon,
-            .isTakable,
+        let sword = Item("sword")
+            .name("steel sword")
+            .description("A sharp steel sword.")
+            .isWeapon
+            .isTakable
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: fabric, sword
@@ -296,9 +254,7 @@ struct CutActionHandlerTests {
         try await engine.execute("cut the fabric with the sword")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > cut the fabric with the sword
             The piece of fabric resists division with stubborn integrity.
@@ -312,20 +268,16 @@ struct CutActionHandlerTests {
     @Test("Cut myself denied")
     func testCutMyselfDenied() async throws {
         // Given
-        let rope = Item(
-            id: "rope",
-            .name("thick rope"),
-            .description("A thick rope."),
+        let rope = Item("rope")
+            .name("thick rope")
+            .description("A thick rope.")
             .in(.startRoom)
-        )
 
-        let spoon = Item(
-            id: "spoon",
-            .name("wooden spoon"),
-            .description("A wooden spoon."),
-            .isTakable,
+        let spoon = Item("spoon")
+            .name("wooden spoon")
+            .description("A wooden spoon.")
+            .isTakable
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: rope, spoon
@@ -337,9 +289,7 @@ struct CutActionHandlerTests {
         try await engine.execute("cut myself")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > cut myself
             Self-harm is not the solution to your problems.

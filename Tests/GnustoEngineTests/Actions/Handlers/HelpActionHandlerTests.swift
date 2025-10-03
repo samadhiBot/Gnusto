@@ -32,7 +32,7 @@ struct HelpActionHandlerTests {
         You can use multiple objects with some commands (TAKE ALL, DROP
         SWORD AND SHIELD).
 
-        Try different things--experimentation is part of the fun!
+        Try different things -- experimentation is part of the fun!
         """
 
     @Test("HELP syntax works")
@@ -45,8 +45,7 @@ struct HelpActionHandlerTests {
         try await engine.execute("help")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(output, helpResponse)
+        await mockIO.expect(helpResponse)
     }
 
     // MARK: - Validation Testing
@@ -54,12 +53,10 @@ struct HelpActionHandlerTests {
     @Test("Help works in any condition")
     func testHelpWorksInAnyCondition() async throws {
         // Given: Dark room (help should still work)
-        let darkRoom = Location(
-            id: "darkRoom",
-            .name("Dark Room"),
+        let darkRoom = Location("darkRoom")
+            .name("Dark Room")
             .description("A pitch black room.")
-            // Note: No .inherentlyLit property
-        )
+        // Note: No .inherentlyLit property
 
         let game = MinimalGame(
             player: Player(in: "darkRoom"),
@@ -72,8 +69,7 @@ struct HelpActionHandlerTests {
         try await engine.execute("help")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(output, helpResponse)
+        await mockIO.expect(helpResponse)
     }
 
     // MARK: - Intent Testing

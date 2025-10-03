@@ -5,251 +5,186 @@ import GnustoEngine
 enum Forest {
     // MARK: - Locations
 
-    static let canyonView = Location(
-        id: .canyonView,
-        .name("Canyon View"),
-        .description(
-            """
-            You are in a clearing, with a forest surrounding you on all
-            sides. A path leads south.
-            """
-        ),
-        .exits(
-            .down(blocked: "GRATING PUZZLE"),
-            .east(.forest2),
-            .south(.forestPath),
-            .west(.forest1),
-        ),
-        .inherentlyLit,
-        .localGlobals(.forest)
-    )
-
-    static let clearing = Location(
-        id: .clearing,
-        .name("Clearing"),
+    static let eastClearing = Location(.eastClearing)
+        .name("Clearing")
         .description(
             """
             You are in a small clearing in a well marked forest path that
             extends to the east and west.
             """
-        ),
-        .exits(
-            .east(.canyonView),
-            .north(.forest2),
-            .south(.forest3),
-            .west(.eastOfHouse),
-            .up(blocked: "There is no tree here suitable for climbing."),
-        ),
-        .inherentlyLit,
-        .localGlobals(.songbird, .whiteHouse, .forest)
-    )
+        )
+        .east(.canyonView)
+        .north(.forest2)
+        .south(.forest3)
+        .west(.eastOfHouse)
+        .up("There is no tree here suitable for climbing.")
+        .inherentlyLit
+        .scenery(.songbird, .whiteHouse, .forest)
 
-    static let forest1 = Location(
-        id: .forest1,
-        .name("Forest"),
+    static let forest1 = Location(.forest1)
+        .name("Forest")
         .description(
             """
             This is a forest, with trees in all directions. To the east,
             there appears to be sunlight.
             """
-        ),
-        .exits(
-            .north(.gratingClearing),
-            .east(.forestPath),
-            .south(.forest3),
-            // Note: UP and WEST exits have custom messages
-        ),
-        .inherentlyLit,
-        .localGlobals(.songbird, .whiteHouse, .forest)
-    )
+        )
+        .north(.northClearing)
+        .east(.forestPath)
+        .south(.forest3)
+        // Note: UP and WEST exits have custom messages
+        .inherentlyLit
+        .scenery(.songbird, .whiteHouse, .forest)
 
-    static let forest2 = Location(
-        id: .forest2,
-        .name("Forest"),
+    static let forest2 = Location(.forest2)
+        .name("Forest")
         .description(
             """
             This is a dimly lit forest, with large trees all around.
             """
-        ),
-        .exits(
-            .east(.mountains),
-            .south(.clearing),
-            .west(.forestPath),
-            // Note: UP and NORTH exits have custom messages
-        ),
-        .inherentlyLit,
-        .localGlobals(.songbird, .whiteHouse, .forest)
-    )
+        )
+        .east(.mountains)
+        .south(.eastClearing)
+        .west(.forestPath)
+        // Note: UP and NORTH exits have custom messages
+        .inherentlyLit
+        .scenery(.songbird, .whiteHouse, .forest)
 
-    static let forest3 = Location(
-        id: .forest3,
-        .name("Forest"),
+    static let forest3 = Location(.forest3)
+        .name("Forest")
         .description(
             """
             This is a dimly lit forest, with large trees all around.
             """
-        ),
-        .exits(
-            .north(.clearing),
-            .west(.forest1),
-            .northwest(.southOfHouse),
-            // Note: UP, EAST, and SOUTH exits have custom messages
-        ),
-        .inherentlyLit,
-        .localGlobals(.songbird, .whiteHouse, .forest)
-    )
+        )
+        .north(.eastClearing)
+        .west(.forest1)
+        .northwest(.southOfHouse)
+        // Note: UP, EAST, and SOUTH exits have custom messages
+        .inherentlyLit
+        .scenery(.songbird, .whiteHouse, .forest)
 
-    static let forestPath = Location(
-        id: .forestPath,
-        .name("Forest Path"),
+    static let forestPath = Location(.forestPath)
+        .name("Forest Path")
         .description(
             """
             This is a path winding through a dimly lit forest. The path heads
             north-south here. One particularly large tree with some low branches
             stands at the edge of the path.
             """
-        ),
-        .exits(
-            .up(.upATree),
-            .north(.gratingClearing),
-            .east(.forest2),
-            .south(.northOfHouse),
-            .west(.forest1),
-        ),
-        .inherentlyLit,
-        .localGlobals(.songbird, .whiteHouse, .forest)
-    )
+        )
+        .up(.upATree)
+        .north(.northClearing)
+        .east(.forest2)
+        .south(.northOfHouse)
+        .west(.forest1)
+        .inherentlyLit
+        .scenery(.songbird, .whiteHouse, .forest)
 
-    static let gratingClearing = Location(
-        id: .gratingClearing,
-        .name("Clearing"),
-        .exits(
-            .east(.forest2),
-            .west(.forest1),
-            .south(.forestPath),
-            .north(blocked: "The forest becomes impenetrable to the north."),
-            // Note: DOWN exit has special condition handling via GRATING-EXIT
-        ),
-        .inherentlyLit,
-        .localGlobals(.whiteHouse, .forest, .grate)
-    )
+    static let northClearing = Location(.northClearing)
+        .name("Clearing")
+        .east(.forest2)
+        .west(.forest1)
+        .south(.forestPath)
+        .north(blocked: "The forest becomes impenetrable to the north.")
+        // Note: DOWN exit has special condition handling via GRATING-EXIT
+        .inherentlyLit
+        .scenery(.whiteHouse, .forest, .grate)
 
-    static let mountains = Location(
-        id: .mountains,
-        .name("Forest"),
-        .description("The forest thins out, revealing impassable mountains."),
-        .exits(
-            .east(blocked: "The mountains are impassable."),
-            .north(.forest2),
-            .south(.forest2),
-            .up(blocked: "The mountains are impassable."),
-            .west(.forest2),
-        ),
-        .inherentlyLit,
-        .localGlobals(.whiteHouse)
-    )
+    static let mountains = Location(.mountains)
+        .name("Forest")
+        .description("The forest thins out, revealing impassable mountains.")
+        .east(blocked: "The mountains are impassable.")
+        .north(.forest2)
+        .south(.forest2)
+        .up(blocked: "The mountains are impassable.")
+        .west(.forest2)
+        .inherentlyLit
+        .scenery(.whiteHouse)
 
-    static let upATree = Location(
-        id: .upATree,
-        .name("Up a Tree"),
+    static let upATree = Location(.upATree)
+        .name("Up a Tree")
         .description(
             """
             You are about 10 feet above the ground nestled among some large branches.
             The nearest branch above you is above your reach.
             """
-        ),
-        .exits(
-            .down(.forestPath),
-        ),
+        )
+        .down(.forestPath)
         // Note: UP exit has custom message
-        .inherentlyLit,
-        .localGlobals(.forest, .songbird, .whiteHouse)
-    )
+        .inherentlyLit
+        .scenery(.forest, .songbird, .whiteHouse)
 
     // MARK: - Items
 
-    static let egg = Item(
-        id: .egg,
-        .name("jewel-encrusted egg"),
+    static let egg = Item(.egg)
+        .name("jewel-encrusted egg")
         .description(
             """
             The egg is about the size of a large duck egg. It is covered with fine gold and
             inlaid with lapis lazuli and mother-of-pearl. Unlike most eggs, this one is hinged
             and can be opened and closed. The egg appears to be closed.
             """
-        ),
-        .adjectives("jewel", "encrusted", "gold", "fine"),
-        .synonyms("egg"),
-        .in(.item(.nest)),
-        .isTakable,
-        .isOpenable,
+        )
+        .adjectives("jewel", "encrusted", "gold", "fine")
+        .synonyms("egg")
+        .in(.item(.nest))
+        .isTakable
+        .isOpenable
         .isContainer
-    )
 
-    static let forest = Item(
-        id: .forest,
-        .name("forest"),
-        .description("The forest is all around you, with trees in every direction."),
-        .synonyms("trees", "pines", "hemlocks"),
+    static let forest = Item(.forest)
+        .name("forest")
+        .description("The forest is all around you, with trees in every direction.")
+        .synonyms("trees", "pines", "hemlocks")
         .omitDescription
-    )
 
-    static let grate = Item(
-        id: .grate,
-        .name("grating"),
-        .synonyms("grate", "grating"),
-        .isInvisible,
+    static let grate = Item(.grate)
+        .name("grating")
+        .synonyms("grate", "grating")
+        .isInvisible
         .omitDescription
-    )
 
-    static let nest = Item(
-        id: .nest,
-        .name("bird's nest"),
-        .synonyms("nest"),
-        .adjectives("birds"),
-        .isTakable,
-        .isFlammable,
-        .isContainer,
-        .isOpen,
-        .isSearchable,
-        .firstDescription("Beside you on the branch is a small bird's nest."),
-        .capacity(20),
+    static let nest = Item(.nest)
+        .name("bird's nest")
+        .synonyms("nest")
+        .adjectives("birds")
+        .firstDescription("Beside you on the branch is a small bird's nest.")
+        .isTakable
+        .isFlammable
+        .isContainer
+        .isOpen
+        .isSearchable
+        .capacity(20)
         .in(.upATree)
-    )
 
-    static let pileOfLeaves = Item(
-        id: .pileOfLeaves,
-        .name("pile of leaves"),
-        .synonyms("leaves", "leaf", "pile"),
-        .firstDescription("On the ground is a pile of leaves."),
-        .isTakable,
-        .isFlammable,
-        .requiresTryTake,
-        .size(25),
-        .in(.gratingClearing)
-    )
+    static let pileOfLeaves = Item(.pileOfLeaves)
+        .name("pile of leaves")
+        .synonyms("leaves", "leaf", "pile")
+        .firstDescription("On the ground is a pile of leaves.")
+        .isTakable
+        .isFlammable
+        .requiresTryTake
+        .size(25)
+        .in(.northClearing)
 
-    static let songbird = Item(
-        id: .songbird,
-        .name("songbird"),
-        .synonyms("bird", "songbird"),
-        .adjectives("song"),
+    static let songbird = Item(.songbird)
+        .name("songbird")
+        .synonyms("bird", "songbird")
+        .adjectives("song")
         .omitDescription
-        // Note: Has action handler SONGBIRD-F
-    )
+    // Note: Has action handler SONGBIRD-F
 
-    static let tree = Item(
-        id: .tree,
-        .name("tree"),
+    static let tree = Item(.tree)
+        .name("tree")
         .description(
             "The tree is large and appears to have some low branches. It might be climbable."
-        ),
-        .adjectives("large", "storm", "tossed"),
-        .synonyms("branch", "branches"),
-        .in(.forestPath),
-        .isClimbable,
+        )
+        .adjectives("large", "storm", "tossed")
+        .synonyms("branch", "branches")
+        .in(.forestPath)
+        .isClimbable
         .omitDescription
-    )
 }
 
 // MARK: - Event handlers
@@ -262,7 +197,7 @@ extension Forest {
         }
     }
 
-    static let gratingClearingComputer = LocationComputer(for: .gratingClearing) {
+    static let northClearingComputer = LocationComputer(for: .northClearing) {
         locationProperty(.description) { context in
             let grate = await context.item(.grate)
             var description = [
@@ -284,7 +219,7 @@ extension Forest {
         }
     }
 
-    static let gratingClearingHandler = LocationEventHandler(for: .gratingClearing) {
+    static let northClearingHandler = LocationEventHandler(for: .northClearing) {
         onEnter { context in
             // ZIL M-ENTER: If grate is not revealed, set it invisible
             let isGrateInvisible = await context.item(.grate).hasFlag(.isInvisible)
@@ -376,7 +311,7 @@ extension Forest {
                         "The grate is unlocked.",
                         await context.item(.grate).clearFlag(.isLocked)
                     )
-                } else if currentLocation.id == .gratingClearing {
+                } else if currentLocation.id == .northClearing {
                     return ActionResult("You can't reach the lock from here.")
                 } else {
                     return nil
@@ -391,7 +326,7 @@ extension Forest {
                 let isOpen = await context.item(.grate).hasFlag(.isOpen)
                 if !isOpen {
                     let message =
-                        if currentLocation.id == .gratingClearing {
+                        if currentLocation.id == .northClearing {
                             "The grating opens."
                         } else {
                             "The grating opens to reveal trees above you."
@@ -409,7 +344,8 @@ extension Forest {
         }
 
         before(.unlock) { context, command in
-            guard let indirectObject = command.indirectObject,
+            guard
+                let indirectObject = command.indirectObject,
                 case .item(let keys) = indirectObject
             else {
                 if let indirectObject = command.indirectObject {
@@ -429,7 +365,7 @@ extension Forest {
                     "The grate is unlocked.",
                     await context.item(.grate).clearFlag(.isLocked)
                 )
-            } else if currentLocation.id == .gratingClearing {
+            } else if currentLocation.id == .northClearing {
                 return ActionResult("You can't reach the lock from here.")
             } else {
                 return nil

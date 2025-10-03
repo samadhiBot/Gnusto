@@ -11,14 +11,12 @@ struct SmellActionHandlerTests {
     @Test("SMELL DIRECTOBJECT syntax works")
     func testSmellDirectObjectSyntax() async throws {
         // Given
-        let lamp = Item(
-            id: "lamp",
-            .name("brass lamp"),
-            .description("A shiny brass lamp."),
-            .isTakable,
-            .isLightSource,
+        let lamp = Item("lamp")
+            .name("brass lamp")
+            .description("A shiny brass lamp.")
+            .isTakable
+            .isLightSource
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: lamp
@@ -30,9 +28,7 @@ struct SmellActionHandlerTests {
         try await engine.execute("smell lamp")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > smell lamp
             The brass lamp smells exactly as you'd expect, which is to say,
@@ -56,9 +52,7 @@ struct SmellActionHandlerTests {
         try await engine.execute("smell nonexistent")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > smell nonexistent
             Any such thing remains frustratingly inaccessible.
@@ -69,18 +63,14 @@ struct SmellActionHandlerTests {
     @Test("Cannot smell item not in reach")
     func testCannotSmellItemNotInReach() async throws {
         // Given
-        let anotherRoom = Location(
-            id: "anotherRoom",
-            .name("Another Room"),
+        let anotherRoom = Location("anotherRoom")
+            .name("Another Room")
             .inherentlyLit
-        )
 
-        let distantItem = Item(
-            id: "distantItem",
-            .name("distant statue"),
-            .description("A statue in another room."),
+        let distantItem = Item("distantItem")
+            .name("distant statue")
+            .description("A statue in another room.")
             .in("anotherRoom")
-        )
 
         let game = MinimalGame(
             locations: anotherRoom,
@@ -93,9 +83,7 @@ struct SmellActionHandlerTests {
         try await engine.execute("smell statue")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > smell statue
             Any such thing remains frustratingly inaccessible.
@@ -113,9 +101,7 @@ struct SmellActionHandlerTests {
         try await engine.execute("smell the sky")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > smell the sky
             You detect no olfactory surprises.
@@ -126,19 +112,15 @@ struct SmellActionHandlerTests {
     @Test("Require no light to smell")
     func testRequiresNoLight() async throws {
         // Given: Dark room with item
-        let darkRoom = Location(
-            id: "darkRoom",
-            .name("Dark Room"),
+        let darkRoom = Location("darkRoom")
+            .name("Dark Room")
             .description("A pitch black room.")
-            // Note: No .inherentlyLit property
-        )
+        // Note: No .inherentlyLit property
 
-        let statue = Item(
-            id: "statue",
-            .name("stone statue"),
-            .description("A carved stone statue."),
+        let statue = Item("statue")
+            .name("stone statue")
+            .description("A carved stone statue.")
             .in("darkRoom")
-        )
 
         let game = MinimalGame(
             player: Player(in: "darkRoom"),
@@ -152,9 +134,7 @@ struct SmellActionHandlerTests {
         try await engine.execute("smell the dark room")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > smell the dark room
             You detect no olfactory surprises.
@@ -167,13 +147,11 @@ struct SmellActionHandlerTests {
     @Test("Smell character gives appropriate message")
     func testSmellCharacter() async throws {
         // Given
-        let wizard = Item(
-            id: "wizard",
-            .name("old wizard"),
-            .description("A wise old wizard."),
-            .characterSheet(.wise),
+        let wizard = Item("wizard")
+            .name("old wizard")
+            .description("A wise old wizard.")
+            .characterSheet(.wise)
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: wizard
@@ -185,9 +163,7 @@ struct SmellActionHandlerTests {
         try await engine.execute("smell the wizard")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > smell the wizard
             The old wizard's personal aroma remains their private business.
@@ -201,15 +177,13 @@ struct SmellActionHandlerTests {
     @Test("Smell enemy gives appropriate message")
     func testSmellEnemy() async throws {
         // Given
-        let necromancer = Item(
-            id: "necromancer",
-            .name("furious necromancer"),
-            .description("An angry old necromancer."),
+        let necromancer = Item("necromancer")
+            .name("furious necromancer")
+            .description("An angry old necromancer.")
             .characterSheet(
-                CharacterSheet(isFighting: true)
-            ),
+                .default.enemy
+            )
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: necromancer
@@ -221,15 +195,13 @@ struct SmellActionHandlerTests {
         try await engine.execute("smell the necromancer")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > smell the necromancer
             You detect nothing unusual about the furious necromancer's
             scent.
 
-            No weapons between you--just the furious necromancer's
+            No weapons between you -- just the furious necromancer's
             aggression and your desperation! You collide in a tangle of
             strikes and blocks.
             """
@@ -249,9 +221,7 @@ struct SmellActionHandlerTests {
         try await engine.execute("sniff")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > sniff
             Nothing remarkable greets your nostrils.
@@ -269,9 +239,7 @@ struct SmellActionHandlerTests {
         try await engine.execute("sniff myself")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > sniff myself
             Your personal aroma falls within acceptable parameters.

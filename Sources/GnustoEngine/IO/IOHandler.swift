@@ -16,6 +16,9 @@ public protocol IOHandler: Sendable {
     /// The current transcript recorder, if one is active.
     var transcriptRecorder: TranscriptRecorder? { get set }
 
+    /// Returns the current transcript URL if a transcript is active.
+    var transcriptURL: URL? { get }
+
     /// Sets the transcript recorder from a non-main actor context.
     mutating func setTranscriptRecorder(_ recorder: TranscriptRecorder)
 
@@ -65,24 +68,29 @@ public protocol IOHandler: Sendable {
 }
 
 // Default implementations for convenience print methods
-public extension IOHandler {
+extension IOHandler {
+    /// Default implementation that returns the transcript URL from the active recorder.
+    public var transcriptURL: URL? {
+        transcriptRecorder?.transcriptURL
+    }
+
     /// Prints a Markdown string to the output using the `.normal` style and appends a newline.
-    func print(_ markdown: String) {
+    public func print(_ markdown: String) {
         print(markdown, style: .normal, newline: true)
     }
 
     /// Prints a Markdown string to the output using the specified `style` and appends a newline.
-    func print(_ markdown: String, style: TextStyle) {
+    public func print(_ markdown: String, style: TextStyle) {
         print(markdown, style: style, newline: true)
     }
 
     /// Default implementation of setTranscriptRecorder that simply clears the property.
-    mutating func clearTranscriptRecorder() {
+    public mutating func clearTranscriptRecorder() {
         transcriptRecorder = nil
     }
 
     /// Default implementation of setTranscriptRecorder that simply sets the property.
-    mutating func setTranscriptRecorder(_ recorder: TranscriptRecorder) {
+    public mutating func setTranscriptRecorder(_ recorder: TranscriptRecorder) {
         transcriptRecorder = recorder
     }
 }

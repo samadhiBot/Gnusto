@@ -25,9 +25,7 @@ struct ErrorHandlingIntegrationTests {
         )
 
         // Then: Should handle gracefully with appropriate messages
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             I beg your pardon?
 
@@ -44,23 +42,19 @@ struct ErrorHandlingIntegrationTests {
     @Test("Parser handles ambiguous references correctly")
     func testParserAmbiguousReferences() async throws {
         // Given
-        let redBook = Item(
-            id: "redBook",
-            .name("book"),
-            .adjectives("red"),
-            .description("A red book."),
-            .isTakable,
+        let redBook = Item("redBook")
+            .name("book")
+            .adjectives("red")
+            .description("A red book.")
+            .isTakable
             .in(.startRoom)
-        )
 
-        let blueBook = Item(
-            id: "blueBook",
-            .name("book"),
-            .adjectives("blue"),
-            .description("A blue book."),
-            .isTakable,
+        let blueBook = Item("blueBook")
+            .name("book")
+            .adjectives("blue")
+            .description("A blue book.")
+            .isTakable
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: redBook, blueBook
@@ -72,9 +66,7 @@ struct ErrorHandlingIntegrationTests {
         try await engine.execute("take book")
 
         // Then: Should request clarification
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > take book
             Which do you mean, the blue book or the red book?
@@ -87,24 +79,20 @@ struct ErrorHandlingIntegrationTests {
     @Test("Container interactions handle invalid operations")
     func testContainerErrorHandling() async throws {
         // Given
-        let closedBox = Item(
-            id: "closedBox",
-            .name("wooden box"),
-            .description("A sturdy wooden box."),
-            .isContainer,
-            .isOpenable,
-            .isTakable,
+        let closedBox = Item("closedBox")
+            .name("wooden box")
+            .description("A sturdy wooden box.")
+            .isContainer
+            .isOpenable
+            .isTakable
             .in(.startRoom)
-            // Starts closed
-        )
+        // Starts closed
 
-        let heavyRock = Item(
-            id: "heavyRock",
-            .name("heavy rock"),
-            .description("An immovable boulder."),
+        let heavyRock = Item("heavyRock")
+            .name("heavy rock")
+            .description("An immovable boulder.")
             .in(.startRoom)
-            // Not takable
-        )
+        // Not takable
 
         let game = MinimalGame(
             items: closedBox, heavyRock
@@ -120,9 +108,7 @@ struct ErrorHandlingIntegrationTests {
         )
 
         // Then: Should provide appropriate error messages
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > look in wooden box
             The wooden box is closed.
@@ -139,26 +125,22 @@ struct ErrorHandlingIntegrationTests {
     @Test("Capacity limits are enforced correctly")
     func testCapacityLimitErrorHandling() async throws {
         // Given
-        let smallBag = Item(
-            id: "smallBag",
-            .name("small bag"),
-            .description("A very small bag."),
-            .isContainer,
-            .isOpenable,
-            .isOpen,
-            .isTakable,
-            .capacity(2),
+        let smallBag = Item("smallBag")
+            .name("small bag")
+            .description("A very small bag.")
+            .isContainer
+            .isOpenable
+            .isOpen
+            .isTakable
+            .capacity(2)
             .in(.player)
-        )
 
-        let largeBook = Item(
-            id: "largeBook",
-            .name("large book"),
-            .description("An enormous tome."),
-            .isTakable,
-            .size(5),  // Too big for the bag
+        let largeBook = Item("largeBook")
+            .name("large book")
+            .description("An enormous tome.")
+            .isTakable
+            .size(5)  // Too big for the bag
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: smallBag, largeBook
@@ -170,9 +152,7 @@ struct ErrorHandlingIntegrationTests {
         try await engine.execute("put large book in small bag")
 
         // Then: Should reject with capacity message
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > put large book in small bag
             The large book won't fit in the small bag.
@@ -191,14 +171,12 @@ struct ErrorHandlingIntegrationTests {
         formatter.numberStyle = .ordinal
         for i in 1...20 {
             items.append(
-                Item(
-                    id: ItemID("item\(i)"),
-                    .name("\(formatter.string(from: i as NSNumber) ?? "nth") heavy item"),
-                    .description("A heavy item."),
-                    .isTakable,
-                    .size(10),  // Large items
+                Item(ItemID("item\(i)"))
+                    .name("\(formatter.string(from: i as NSNumber) ?? "nth") heavy item")
+                    .description("A heavy item.")
+                    .isTakable
+                    .size(10)  // Large items
                     .in(.startRoom)
-                )
             )
         }
 
@@ -215,9 +193,7 @@ struct ErrorHandlingIntegrationTests {
         try await engine.execute("take all")
 
         // Then: Should eventually hit capacity limits
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > take all
             You take the 1st heavy item, the 10th heavy item, the 11th
@@ -231,13 +207,11 @@ struct ErrorHandlingIntegrationTests {
     @Test("Movement errors are handled appropriately")
     func testMovementErrorHandling() async throws {
         // Given
-        let isolatedRoom = Location(
-            id: "isolatedRoom",
-            .name("Isolated Room"),
-            .description("A room with no exits."),
+        let isolatedRoom = Location("isolatedRoom")
+            .name("Isolated Room")
+            .description("A room with no exits.")
             .inherentlyLit
-            // No exits defined
-        )
+        // No exits defined
 
         let game = MinimalGame(
             player: Player(in: "isolatedRoom"),
@@ -252,8 +226,18 @@ struct ErrorHandlingIntegrationTests {
         try await engine.execute("go to nowhere")
 
         // Then: Should provide appropriate error messages
-        let output = await mockIO.flush()
-        #expect(output.contains("can't go") || output.contains("no exit") || output.contains("way"))
+        await mockIO.expect(
+            """
+            > go north
+            That way lies only disappointment.
+
+            > go east
+            Your path does not extend in that direction.
+
+            > go to nowhere
+            Which direction?
+            """
+        )
     }
 
     // MARK: - Light Source Error Tests
@@ -261,20 +245,16 @@ struct ErrorHandlingIntegrationTests {
     @Test("Darkness handling works correctly")
     func testDarknessErrorHandling() async throws {
         // Given
-        let darkRoom = Location(
-            id: "darkRoom",
-            .name("Dark Room"),
+        let darkRoom = Location("darkRoom")
+            .name("Dark Room")
             .description("A pitch black room.")
-            // No inherent lighting
-        )
+        // No inherent lighting
 
-        let hiddenItem = Item(
-            id: "hiddenItem",
-            .name("hidden treasure"),
-            .description("Treasure hidden in the darkness."),
-            .isTakable,
+        let hiddenItem = Item("hiddenItem")
+            .name("hidden treasure")
+            .description("Treasure hidden in the darkness.")
+            .isTakable
             .in("darkRoom")
-        )
 
         let game = MinimalGame(
             player: Player(in: "darkRoom"),
@@ -290,9 +270,7 @@ struct ErrorHandlingIntegrationTests {
         try await engine.execute("examine hidden treasure")
 
         // Then: Should indicate darkness prevents actions
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > look
             The darkness here is absolute, consuming all light and hope of
@@ -314,14 +292,12 @@ struct ErrorHandlingIntegrationTests {
     @Test("Device operations handle invalid states")
     func testDeviceErrorHandling() async throws {
         // Given
-        let brokenDevice = Item(
-            id: "brokenDevice",
-            .name("broken machine"),
-            .description("A machine that doesn't work."),
-            .isTakable,
+        let brokenDevice = Item("brokenDevice")
+            .name("broken machine")
+            .description("A machine that doesn't work.")
+            .isTakable
             .in(.startRoom)
-            // Device but cannot be turned on/off
-        )
+        // Device but cannot be turned on/off
 
         let game = MinimalGame(
             items: brokenDevice
@@ -336,9 +312,7 @@ struct ErrorHandlingIntegrationTests {
         )
 
         // Then: Should indicate device doesn't respond
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > turn on broken machine
             It remains stubbornly inert despite your ministrations.
@@ -361,9 +335,7 @@ struct ErrorHandlingIntegrationTests {
         try await engine.execute("take the bewilderingly and unbelievably long named item")
 
         // Then: Should handle without crashing
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > take the bewilderingly and unbelievably long named item
             Take what?
@@ -376,13 +348,11 @@ struct ErrorHandlingIntegrationTests {
     @Test("Game maintains consistency after error conditions")
     func testStateConsistencyAfterErrors() async throws {
         // Given
-        let testItem = Item(
-            id: "testItem",
-            .name("test item"),
-            .description("A test item."),
-            .isTakable,
+        let testItem = Item("testItem")
+            .name("test item")
+            .description("A test item.")
+            .isTakable
             .in(.startRoom)
-        )
 
         let game = MinimalGame(items: testItem)
 
@@ -397,9 +367,7 @@ struct ErrorHandlingIntegrationTests {
         )
 
         // Then: Valid commands should still work after errors
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > invalid command
             The art of invalid-ing remains a mystery to me.
@@ -469,23 +437,19 @@ struct ErrorHandlingIntegrationTests {
     @Test("Game handles boundary values correctly")
     func testBoundaryValues() async throws {
         // Given
-        let zeroSizeItem = Item(
-            id: "zeroSize",
-            .name("ethereal item"),
-            .description("An item with no physical presence."),
-            .isTakable,
-            .size(0),
+        let zeroSizeItem = Item("zeroSize")
+            .name("ethereal item")
+            .description("An item with no physical presence.")
+            .isTakable
+            .size(0)
             .in(.startRoom)
-        )
 
-        let hugeSizeItem = Item(
-            id: "hugeSize",
-            .name("enormous item"),
-            .description("An impossibly large item."),
-            .isTakable,
-            .size(Int.max),
+        let hugeSizeItem = Item("hugeSize")
+            .name("enormous item")
+            .description("An impossibly large item.")
+            .isTakable
+            .size(Int.max)
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: zeroSizeItem, hugeSizeItem
@@ -500,9 +464,7 @@ struct ErrorHandlingIntegrationTests {
         )
 
         // Then: Should handle boundary values appropriately
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > take ethereal item
             Taken.
@@ -511,9 +473,6 @@ struct ErrorHandlingIntegrationTests {
             Your hands are full and your pockets protest.
             """
         )
-
-        // Zero-size item should be takeable
-        #expect(output.contains("ethereal item") && output.contains("Taken"))
 
         // Huge item might be rejected for size
         let etherealItem = await engine.item("zeroSize")
@@ -525,13 +484,11 @@ struct ErrorHandlingIntegrationTests {
     @Test("Game handles rapid command sequence correctly")
     func testRapidCommandSequence() async throws {
         // Given
-        let item = Item(
-            id: "item",
-            .name("test item"),
-            .description("A test item."),
-            .isTakable,
+        let item = Item("item")
+            .name("test item")
+            .description("A test item.")
+            .isTakable
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: item
@@ -549,9 +506,7 @@ struct ErrorHandlingIntegrationTests {
         )
 
         // Then: All commands should execute in order correctly
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > take test item
             Taken.

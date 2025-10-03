@@ -18,9 +18,7 @@ struct SaveActionHandlerTests {
         try await engine.execute("save")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > save
             Game saved.
@@ -33,12 +31,10 @@ struct SaveActionHandlerTests {
     @Test("SAVE requires no validation")
     func testSaveRequiresNoValidation() async throws {
         // Given: Dark room (to verify light is not required)
-        let darkRoom = Location(
-            id: "darkRoom",
-            .name("Dark Room"),
+        let darkRoom = Location("darkRoom")
+            .name("Dark Room")
             .description("A pitch black room.")
             // Note: No .inherentlyLit property
-        )
 
         let game = MinimalGame(
             player: Player(in: "darkRoom"),
@@ -51,9 +47,7 @@ struct SaveActionHandlerTests {
         try await engine.execute("save")
 
         // Then: Should succeed even without light
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > save
             Game saved.
@@ -71,9 +65,7 @@ struct SaveActionHandlerTests {
         try await engine.execute("save")
 
         // Then: Should always succeed
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > save
             Game saved.
@@ -86,15 +78,13 @@ struct SaveActionHandlerTests {
     @Test("SAVE works regardless of game state")
     func testSaveWorksInAnyGameState() async throws {
         // Given: Complex game state with items, flags, etc.
-        let lamp = Item(
-            id: "lamp",
-            .name("brass lamp"),
-            .description("A shiny brass lamp."),
-            .isLightSource,
-            .isDevice,
-            .isTakable,
+        let lamp = Item("lamp")
+            .name("brass lamp")
+            .description("A shiny brass lamp.")
+            .isLightSource
+            .isDevice
+            .isTakable
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: lamp
@@ -112,9 +102,7 @@ struct SaveActionHandlerTests {
         try await engine.execute("save")
 
         // Then: Should succeed regardless of state
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > save
             Game saved.
@@ -132,9 +120,7 @@ struct SaveActionHandlerTests {
         try await engine.execute("save")
 
         // Then: Should work each time
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > save
             Game saved.
@@ -145,13 +131,11 @@ struct SaveActionHandlerTests {
     @Test("SAVE doesn't modify game state")
     func testSaveNoStateChanges() async throws {
         // Given
-        let book = Item(
-            id: "book",
-            .name("leather book"),
-            .description("A bound leather book."),
-            .isTakable,
+        let book = Item("book")
+            .name("leather book")
+            .description("A bound leather book.")
+            .isTakable
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: book
@@ -177,9 +161,7 @@ struct SaveActionHandlerTests {
         #expect(finalScore == initialScore)
         #expect(finalTurnCount == initialTurnCount)
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > save
             Game saved.
@@ -190,22 +172,18 @@ struct SaveActionHandlerTests {
     @Test("SAVE with inventory items")
     func testSaveWithInventory() async throws {
         // Given
-        let sword = Item(
-            id: "sword",
-            .name("steel sword"),
-            .description("A sharp steel sword."),
-            .isWeapon,
-            .isTakable,
+        let sword = Item("sword")
+            .name("steel sword")
+            .description("A sharp steel sword.")
+            .isWeapon
+            .isTakable
             .in(.player)
-        )
 
-        let shield = Item(
-            id: "shield",
-            .name("wooden shield"),
-            .description("A sturdy wooden shield."),
-            .isTakable,
+        let shield = Item("shield")
+            .name("wooden shield")
+            .description("A sturdy wooden shield.")
+            .isTakable
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: sword, shield
@@ -217,9 +195,7 @@ struct SaveActionHandlerTests {
         try await engine.execute("save")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > save
             Game saved.
@@ -301,9 +277,7 @@ struct SaveActionHandlerTests {
         try await engine.execute("save")
 
         // Then: Should still provide feedback
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > save
             Game saved.

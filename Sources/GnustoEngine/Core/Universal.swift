@@ -199,8 +199,8 @@ extension Universal {
     /// let floor = Universal.floor
     /// let sky = Universal.sky
     ///
-    /// print(ground.matches(floor)) // true - both are floor-like surfaces
-    /// print(ground.matches(sky))   // false - unrelated concepts
+    /// #expect(ground.matches(floor)) // true - both are floor-like surfaces
+    /// #expect(ground.matches(sky))   // false - unrelated concepts
     /// ```
     public func matches(_ other: Universal) -> Bool {
         self.relatedUniversals.contains(other)

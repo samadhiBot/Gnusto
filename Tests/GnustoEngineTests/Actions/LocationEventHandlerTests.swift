@@ -12,19 +12,15 @@ struct LocationEventHandlerTests {
     private func createTestGame(
         locationEventHandlers: [LocationID: LocationEventHandler] = [:]
     ) -> MinimalGame {
-        let startRoom = Location(
-            id: .startRoom,
-            .name("Starting Room"),
-            .inherentlyLit,
-            .exits(.north("anotherRoom"))
-        )
-
-        let anotherRoom = Location(
-            id: "anotherRoom",
-            .name("Another Room"),
-            .description("Another room for testing."),
+        let startRoom = Location(.startRoom)
+            .name("Starting Room")
             .inherentlyLit
-        )
+            .north("anotherRoom")
+
+        let anotherRoom = Location("anotherRoom")
+            .name("Another Room")
+            .description("Another room for testing.")
+            .inherentlyLit
 
         return MinimalGame(
             locations: startRoom, anotherRoom,
@@ -137,10 +133,7 @@ struct LocationEventHandlerTests {
             north
             """
         )
-        let output = await mockIO.flush()
-
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > look
             --- Starting Room ---
@@ -157,56 +150,6 @@ struct LocationEventHandlerTests {
 
         let wasTriggered = await enterTrigger.wasCalled()
         #expect(wasTriggered == true)
-    }
-
-    @Test("Debug onEnter event - verify movement and handler registration")
-    func testOnEnterDebug() async throws {
-        let enterTrigger = HandlerState()
-
-        let handler = LocationEventHandler { _, event in
-            if case .onEnter = event {
-                await enterTrigger.setCalled(true)
-            }
-            return nil
-        }
-
-        let anotherRoom = Location(
-            id: "anotherRoom",
-            .name("Another Room"),
-            .description("Another room."),
-            .inherentlyLit,
-            .exits(.north(.startRoom))
-        )
-
-        let game = MinimalGame(
-            player: Player(in: "anotherRoom"),
-            locations: anotherRoom,
-            locationEventHandlers: [.startRoom: handler]
-        )
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
-
-        // Verify initial state
-        let initialLocation = await engine.player.location.id
-        #expect(initialLocation == "anotherRoom")
-
-        // Verify blueprint has the handler registered
-        let hasHandler = engine.locationEventHandlers[.startRoom] != nil
-        #expect(hasHandler == true)
-
-        // Move to the room with the handler
-        try await engine.execute("north")
-
-        // Verify movement worked
-        let finalLocation = await engine.player.location.id
-        #expect(finalLocation == .startRoom)
-
-        // Check if handler was triggered
-        let wasTriggered = await enterTrigger.wasCalled()
-        #expect(wasTriggered == true)
-
-        // Print debug info if test fails
-        let output = await mockIO.flush()
-        print("Movement output: \(output)")
     }
 
     // MARK: - Integration Tests
@@ -226,9 +169,7 @@ struct LocationEventHandlerTests {
 
         try await engine.execute("look")
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > look
             Custom look behavior!
@@ -270,22 +211,17 @@ struct LocationEventHandlerTests {
             return nil
         }
 
-        let startRoom = Location(
-            id: .startRoom,
-            .name("Test Room"),
-            .description("A room for testing."),
-            .inherentlyLit,
-            .exits(.south("destination"))
-        )
+        let startRoom = Location(.startRoom)
+            .name("Test Room")
+            .description("A room for testing.")
+            .inherentlyLit
+            .south("destination")
 
-        let destination = Location(
-            id: "destination",
-            .name("Destination Room"),
-            .description("The destination location."),
-            .inherentlyLit,
-            .exits(.north(.startRoom))
-        )
-
+        let destination = Location("destination")
+            .name("Destination Room")
+            .description("The destination location.")
+            .inherentlyLit
+            .north(.startRoom)
         let game = MinimalGame(
             locations: startRoom, destination,
             locationEventHandlers: ["destination": handler]
@@ -306,9 +242,7 @@ struct LocationEventHandlerTests {
                 "Entered the test room!"
             ])
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > look
             --- Test Room ---
@@ -340,9 +274,7 @@ struct LocationEventHandlerTests {
         try await engine.execute("look")
 
         // Should still get normal look output despite handler error
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > look
             --- Starting Room ---
@@ -372,21 +304,17 @@ struct LocationEventHandlerTests {
             return nil
         }
 
-        let room1 = Location(
-            id: "room1",
-            .name("Room 1"),
-            .description("First room."),
-            .inherentlyLit,
-            .exits(.east("room2"))
-        )
+        let room1 = Location("room1")
+            .name("Room 1")
+            .description("First room.")
+            .inherentlyLit
+            .east("room2")
 
-        let room2 = Location(
-            id: "room2",
-            .name("Room 2"),
-            .description("Second room."),
-            .inherentlyLit,
-            .exits(.west("room1"))
-        )
+        let room2 = Location("room2")
+            .name("Room 2")
+            .description("Second room.")
+            .inherentlyLit
+            .west("room1")
 
         let game = MinimalGame(
             player: Player(in: "room1"),
@@ -435,9 +363,7 @@ struct LocationEventHandlerTests {
 
         try await engine.execute("look")
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > look
             You are not allowed to look here!
@@ -460,12 +386,10 @@ struct LocationEventHandlerTests {
             return nil
         }
 
-        let testItem = Item(
-            id: "testItem",
-            .name("test item"),
-            .isTakable,
+        let testItem = Item("testItem")
+            .name("test item")
+            .isTakable
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             locations: createTestGame().locations[0],
@@ -492,21 +416,17 @@ struct LocationEventHandlerTests {
             return nil
         }
 
-        let startRoom = Location(
-            id: .startRoom,
-            .name("Test Room"),
-            .description("A room for testing."),
-            .inherentlyLit,
-            .exits(.south("destinationRoom"))
-        )
+        let startRoom = Location(.startRoom)
+            .name("Test Room")
+            .description("A room for testing.")
+            .inherentlyLit
+            .south("destinationRoom")
 
-        let destinationRoom = Location(
-            id: "destinationRoom",
-            .name("Destination Room"),
-            .description("Destination location."),
-            .inherentlyLit,
-            .exits(.north("startRoom"))
-        )
+        let destinationRoom = Location("destinationRoom")
+            .name("Destination Room")
+            .description("Destination location.")
+            .inherentlyLit
+            .north("startRoom")
 
         let game = MinimalGame(
             locations: startRoom, destinationRoom,
@@ -540,9 +460,7 @@ struct LocationEventHandlerTests {
         let finalCount = await enterCounter.value()
         #expect(finalCount == 1)
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > look
             --- Test Room ---
@@ -601,9 +519,7 @@ struct LocationEventHandlerTests {
         let finalFlag = await engine.hasFlag(.isVerboseMode)
         #expect(finalFlag == true)
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > look
             You sense something mystical about this place...
@@ -639,8 +555,12 @@ struct LocationEventHandlerTests {
                 "Context handler called for location: .startRoom"
             ])
 
-        let output = await mockIO.flush()
-        #expect(output.contains("Custom look message from context handler."))
+        await mockIO.expect(
+            """
+            > look
+            Custom look message from context handler.
+            """
+        )
     }
 
     @Test("LocationEventHandler ActionResult.yield allows normal processing to continue")
@@ -667,21 +587,17 @@ struct LocationEventHandlerTests {
             }
         }
 
-        let testRoom = Location(
-            id: .startRoom,
-            .name("Test Room"),
-            .description("A test room that can be lit or dark."),
-            .exits(.north("otherRoom"))
+        let testRoom = Location(.startRoom)
+            .name("Test Room")
+            .description("A test room that can be lit or dark.")
+            .north("otherRoom")
             // Note: no .inherentlyLit - starts dark
-        )
 
-        let otherRoom = Location(
-            id: "otherRoom",
-            .name("Other Room"),
-            .description("Another room."),
-            .inherentlyLit,
-            .exits(.south(.startRoom))
-        )
+        let otherRoom = Location("otherRoom")
+            .name("Other Room")
+            .description("Another room.")
+            .inherentlyLit
+            .south(.startRoom)
 
         let game = MinimalGame(
             player: Player(in: .startRoom),
@@ -694,9 +610,7 @@ struct LocationEventHandlerTests {
         // Test 1: When room is dark, handler should block actions
         try await engine.execute("look")
 
-        let output1 = await mockIO.flush()
-        expectNoDifference(
-            output1,
+        await mockIO.expect(
             """
             > look
             Too dark to do that!
@@ -706,9 +620,7 @@ struct LocationEventHandlerTests {
         // Test 2: When room is dark, handler should block movement
         try await engine.execute("north")
 
-        let output2 = await mockIO.flush()
-        expectNoDifference(
-            output2,
+        await mockIO.expect(
             """
             > north
             You stumble in the darkness!
@@ -716,13 +628,11 @@ struct LocationEventHandlerTests {
         )
 
         // Now test with a lit room by creating a new engine with lit room
-        let litTestRoom = Location(
-            id: .startRoom,
-            .name("Test Room"),
-            .description("A test room that can be lit or dark."),
-            .inherentlyLit,  // This room starts lit
-            .exits(.north("otherRoom"))
-        )
+        let litTestRoom = Location(.startRoom)
+            .name("Test Room")
+            .description("A test room that can be lit or dark.")
+            .inherentlyLit
+            .north("otherRoom")
 
         let litGame = MinimalGame(
             locations: litTestRoom, otherRoom,
@@ -733,18 +643,26 @@ struct LocationEventHandlerTests {
         // Test 3: When room is lit, handler should yield and allow normal processing
         try await litEngine.execute("look")
 
-        let output3 = await litMockIO.flush()
-        // Should get normal room description because handler yielded
-        #expect(output3.contains("-- Test Room --"))
-        #expect(output3.contains("A test room that can be lit or dark."))
+        await litMockIO.expect(
+            """
+            > look
+            --- Test Room ---
+
+            A test room that can be lit or dark.
+            """
+        )
 
         // Test 4: Verify movement works when lit (handler yields)
         try await litEngine.execute("north")
 
-        let output4 = await litMockIO.flush()
-        // Should successfully move to other room
-        #expect(output4.contains("-- Other Room --"))
-        #expect(output4.contains("Another room."))
+        await litMockIO.expect(
+            """
+            > north
+            --- Other Room ---
+
+            Another room.
+            """
+        )
     }
 }
 

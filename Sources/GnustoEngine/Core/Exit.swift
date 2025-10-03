@@ -9,7 +9,7 @@ import Foundation
 /// affecting traversal. If `destinationID` is `nil`, the exit is permanently blocked.
 public struct Exit: Codable, Hashable, Sendable {
     /// The cardinal or other direction to move toward or through the exit.
-    let direction: Direction
+    public let direction: Direction
 
     /// The `LocationID` of the location this exit leads to, or `nil` if the exit is permanently
     /// blocked.

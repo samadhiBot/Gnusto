@@ -11,13 +11,11 @@ struct KissActionHandlerTests {
     @Test("KISS DIRECTOBJECT syntax works")
     func testKissDirectObjectSyntax() async throws {
         // Given
-        let princess = Item(
-            id: "princess",
-            .name("beautiful princess"),
-            .description("A beautiful princess."),
-            .characterSheet(.default),
+        let princess = Item("princess")
+            .name("beautiful princess")
+            .description("A beautiful princess.")
+            .characterSheet(.default)
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: princess
@@ -29,9 +27,7 @@ struct KissActionHandlerTests {
         try await engine.execute("kiss princess")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > kiss princess
             The moment for kissing the beautiful princess has neither
@@ -55,9 +51,7 @@ struct KissActionHandlerTests {
         try await engine.execute("kiss")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > kiss
             Kiss what?
@@ -68,19 +62,15 @@ struct KissActionHandlerTests {
     @Test("Cannot kiss target not in scope")
     func testCannotKissTargetNotInScope() async throws {
         // Given
-        let anotherRoom = Location(
-            id: "anotherRoom",
-            .name("Another Room"),
+        let anotherRoom = Location("anotherRoom")
+            .name("Another Room")
             .inherentlyLit
-        )
 
-        let remotePrincess = Item(
-            id: "remotePrincess",
-            .name("distant princess"),
-            .description("A princess in another room."),
-            .characterSheet(.default),
+        let remotePrincess = Item("remotePrincess")
+            .name("distant princess")
+            .description("A princess in another room.")
+            .characterSheet(.default)
             .in("anotherRoom")
-        )
 
         let game = MinimalGame(
             locations: anotherRoom,
@@ -93,9 +83,7 @@ struct KissActionHandlerTests {
         try await engine.execute("kiss princess")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > kiss princess
             You cannot reach any such thing from here.
@@ -106,20 +94,16 @@ struct KissActionHandlerTests {
     @Test("Requires light to kiss")
     func testRequiresLight() async throws {
         // Given: Dark room with character
-        let darkRoom = Location(
-            id: "darkRoom",
-            .name("Dark Room"),
+        let darkRoom = Location("darkRoom")
+            .name("Dark Room")
             .description("A pitch black room.")
-            // Note: No .inherentlyLit property
-        )
+        // Note: No .inherentlyLit property
 
-        let stranger = Item(
-            id: "stranger",
-            .name("mysterious stranger"),
-            .description("A mysterious stranger."),
-            .characterSheet(.default),
+        let stranger = Item("stranger")
+            .name("mysterious stranger")
+            .description("A mysterious stranger.")
+            .characterSheet(.default)
             .in("darkRoom")
-        )
 
         let game = MinimalGame(
             player: Player(in: "darkRoom"),
@@ -133,9 +117,7 @@ struct KissActionHandlerTests {
         try await engine.execute("kiss stranger")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > kiss stranger
             The darkness here is absolute, consuming all light and hope of
@@ -156,9 +138,7 @@ struct KissActionHandlerTests {
         try await engine.execute("kiss me")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > kiss me
             Your flexibility, while admirable, has limits.
@@ -169,13 +149,11 @@ struct KissActionHandlerTests {
     @Test("Kiss friendly character")
     func testKissFriendlyCharacter() async throws {
         // Given
-        let friend = Item(
-            id: "friend",
-            .name("old friend"),
-            .description("A dear old friend."),
-            .characterSheet(.default),
+        let friend = Item("friend")
+            .name("old friend")
+            .description("A dear old friend.")
+            .characterSheet(.default)
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: friend
@@ -187,9 +165,7 @@ struct KissActionHandlerTests {
         try await engine.execute("kiss friend")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > kiss friend
             The moment for kissing the old friend has neither arrived nor
@@ -204,13 +180,11 @@ struct KissActionHandlerTests {
     @Test("Kiss hostile character")
     func testKissHostileCharacter() async throws {
         // Given
-        let enemy = Item(
-            id: "enemy",
-            .name("angry troll"),
-            .description("An angry troll."),
-            .characterSheet(.init(isFighting: true)),
+        let enemy = Item("enemy")
+            .name("angry troll")
+            .description("An angry troll.")
+            .characterSheet(.init(isFighting: true))
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: enemy
@@ -222,15 +196,13 @@ struct KissActionHandlerTests {
         try await engine.execute("kiss troll")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > kiss troll
             That's an unusual combat strategy, and the angry troll seems
             unlikely to reciprocate.
 
-            No weapons between you--just the enemy's aggression and your
+            No weapons between you -- just the enemy's aggression and your
             desperation! You collide in a tangle of strikes and blocks.
             """
         )
@@ -242,12 +214,10 @@ struct KissActionHandlerTests {
     @Test("Kiss inanimate object")
     func testKissInanimateObject() async throws {
         // Given
-        let statue = Item(
-            id: "statue",
-            .name("marble statue"),
-            .description("A beautiful marble statue."),
+        let statue = Item("statue")
+            .name("marble statue")
+            .description("A beautiful marble statue.")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: statue
@@ -259,9 +229,7 @@ struct KissActionHandlerTests {
         try await engine.execute("kiss statue")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > kiss statue
             Your lips and the marble statue are destined never to meet.
@@ -275,13 +243,11 @@ struct KissActionHandlerTests {
     @Test("Kiss sets touched flag on target")
     func testKissSetsTouchedFlagOnTarget() async throws {
         // Given
-        let cat = Item(
-            id: "cat",
-            .name("fluffy cat"),
-            .description("A fluffy cat."),
-            .characterSheet(.default),
+        let cat = Item("cat")
+            .name("fluffy cat")
+            .description("A fluffy cat.")
+            .characterSheet(.default)
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: cat
@@ -297,9 +263,7 @@ struct KissActionHandlerTests {
         #expect(await finalState.hasFlag(.isTouched))
 
         // Verify message
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > kiss cat
             The moment for kissing the fluffy cat has neither arrived nor
@@ -311,20 +275,16 @@ struct KissActionHandlerTests {
     @Test("Kiss multiple different targets")
     func testKissMultipleDifferentTargets() async throws {
         // Given
-        let knight = Item(
-            id: "knight",
-            .name("brave knight"),
-            .description("A brave knight."),
-            .characterSheet(.default),
+        let knight = Item("knight")
+            .name("brave knight")
+            .description("A brave knight.")
+            .characterSheet(.default)
             .in(.startRoom)
-        )
 
-        let flower = Item(
-            id: "flower",
-            .name("red rose"),
-            .description("A beautiful red rose."),
+        let flower = Item("flower")
+            .name("red rose")
+            .description("A beautiful red rose.")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: knight, flower
@@ -339,9 +299,7 @@ struct KissActionHandlerTests {
         )
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > kiss knight
             The moment for kissing the brave knight has neither arrived nor
@@ -362,13 +320,11 @@ struct KissActionHandlerTests {
     @Test("Kiss item held by player")
     func testKissItemHeldByPlayer() async throws {
         // Given
-        let locket = Item(
-            id: "locket",
-            .name("golden locket"),
-            .description("A golden locket."),
-            .isTakable,
+        let locket = Item("locket")
+            .name("golden locket")
+            .description("A golden locket.")
+            .isTakable
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: locket
@@ -380,9 +336,7 @@ struct KissActionHandlerTests {
         try await engine.execute("kiss locket")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > kiss locket
             Your lips and the golden locket are destined never to meet.
@@ -411,9 +365,7 @@ struct KissActionHandlerTests {
         )
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > kiss merchant
             The moment for kissing the traveling merchant has neither
@@ -427,15 +379,15 @@ struct KissActionHandlerTests {
             That's an unusual combat strategy, and the terrible dragon
             seems unlikely to reciprocate.
 
-            In the tangle, the terrible dragon drives an elbow home--sudden
-            pressure that blooms into dull pain. Pain flickers and dies.
-            Your body has more important work.
+            In the tangle, the terrible dragon drives an elbow home --
+            sudden pressure that blooms into dull pain. Pain flickers and
+            dies. Your body has more important work.
 
             > kiss fairy
             The moment for kissing the woodland fairy has neither arrived
             nor been invited.
 
-            The terrible dragon's answer is swift and punishing--knuckles
+            The terrible dragon's answer is swift and punishing -- knuckles
             meet flesh with the sound of meat hitting stone. You grunt from
             the impact but maintain your stance.
             """
@@ -453,19 +405,15 @@ struct KissActionHandlerTests {
     @Test("Kiss various objects gives romantic message")
     func testKissVariousObjectsGivesRomanticMessage() async throws {
         // Given
-        let mirror = Item(
-            id: "mirror",
-            .name("magic mirror"),
-            .description("A magic mirror."),
+        let mirror = Item("mirror")
+            .name("magic mirror")
+            .description("A magic mirror.")
             .in(.startRoom)
-        )
 
-        let painting = Item(
-            id: "painting",
-            .name("beautiful painting"),
-            .description("A beautiful painting."),
+        let painting = Item("painting")
+            .name("beautiful painting")
+            .description("A beautiful painting.")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: mirror, painting
@@ -480,9 +428,7 @@ struct KissActionHandlerTests {
         )
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > kiss mirror
             Your lips and the magic mirror are destined never to meet.

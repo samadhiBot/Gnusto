@@ -294,6 +294,15 @@ extension CharacterSheet {
     )
 }
 
+extension CharacterSheet {
+    /// Returns a character sheet with `.isFighting` set to true.
+    public var enemy: CharacterSheet {
+        var copy = self
+        copy.isFighting = true
+        return copy
+    }
+}
+
 // MARK: - Attribute Modifiers
 
 extension CharacterSheet {

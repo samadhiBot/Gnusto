@@ -11,22 +11,18 @@ struct InsertActionHandlerTests {
     @Test("INSERT DIRECTOBJECTS IN INDIRECTOBJECT syntax works")
     func testInsertDirectObjectsInIndirectObjectSyntax() async throws {
         // Given
-        let coin = Item(
-            id: "coin",
-            .name("gold coin"),
-            .description("A shiny gold coin."),
-            .isTakable,
+        let coin = Item("coin")
+            .name("gold coin")
+            .description("A shiny gold coin.")
+            .isTakable
             .in(.player)
-        )
 
-        let box = Item(
-            id: "box",
-            .name("wooden box"),
-            .description("A wooden box."),
-            .isContainer,
-            .isOpen,
+        let box = Item("box")
+            .name("wooden box")
+            .description("A wooden box.")
+            .isContainer
+            .isOpen
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: coin, box
@@ -38,9 +34,7 @@ struct InsertActionHandlerTests {
         try await engine.execute("insert coin in box")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > insert coin in box
             You carefully place the gold coin within the wooden box.
@@ -57,22 +51,18 @@ struct InsertActionHandlerTests {
     @Test("INSERT DIRECTOBJECTS INSIDE INDIRECTOBJECT syntax works")
     func testInsertDirectObjectsInsideIndirectObjectSyntax() async throws {
         // Given
-        let gem = Item(
-            id: "gem",
-            .name("red gem"),
-            .description("A red gem."),
-            .isTakable,
+        let gem = Item("gem")
+            .name("red gem")
+            .description("A red gem.")
+            .isTakable
             .in(.player)
-        )
 
-        let pouch = Item(
-            id: "pouch",
-            .name("leather pouch"),
-            .description("A leather pouch."),
-            .isContainer,
-            .isOpen,
+        let pouch = Item("pouch")
+            .name("leather pouch")
+            .description("A leather pouch.")
+            .isContainer
+            .isOpen
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: gem, pouch
@@ -84,9 +74,7 @@ struct InsertActionHandlerTests {
         try await engine.execute("insert gem inside pouch")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > insert gem inside pouch
             You carefully place the red gem within the leather pouch.
@@ -97,22 +85,18 @@ struct InsertActionHandlerTests {
     @Test("INSERT DIRECTOBJECTS INTO INDIRECTOBJECT syntax works")
     func testInsertDirectObjectsIntoIndirectObjectSyntax() async throws {
         // Given
-        let key = Item(
-            id: "key",
-            .name("brass key"),
-            .description("A brass key."),
-            .isTakable,
+        let key = Item("key")
+            .name("brass key")
+            .description("A brass key.")
+            .isTakable
             .in(.player)
-        )
 
-        let chest = Item(
-            id: "chest",
-            .name("treasure chest"),
-            .description("A treasure chest."),
-            .isContainer,
-            .isOpen,
+        let chest = Item("chest")
+            .name("treasure chest")
+            .description("A treasure chest.")
+            .isContainer
+            .isOpen
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: key, chest
@@ -124,9 +108,7 @@ struct InsertActionHandlerTests {
         try await engine.execute("insert key into chest")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > insert key into chest
             You carefully place the brass key within the treasure chest.
@@ -137,22 +119,18 @@ struct InsertActionHandlerTests {
     @Test("PUT syntax works")
     func testPutSyntax() async throws {
         // Given
-        let book = Item(
-            id: "book",
-            .name("old book"),
-            .description("An old book."),
-            .isTakable,
+        let book = Item("book")
+            .name("old book")
+            .description("An old book.")
+            .isTakable
             .in(.player)
-        )
 
-        let bag = Item(
-            id: "bag",
-            .name("travel bag"),
-            .description("A travel bag."),
-            .isContainer,
-            .isOpen,
+        let bag = Item("bag")
+            .name("travel bag")
+            .description("A travel bag.")
+            .isContainer
+            .isOpen
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: book, bag
@@ -164,9 +142,7 @@ struct InsertActionHandlerTests {
         try await engine.execute("put book in bag")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > put book in bag
             You carefully place the old book within the travel bag.
@@ -177,22 +153,18 @@ struct InsertActionHandlerTests {
     @Test("PLACE syntax works")
     func testPlaceSyntax() async throws {
         // Given
-        let scroll = Item(
-            id: "scroll",
-            .name("ancient scroll"),
-            .description("An ancient scroll."),
-            .isTakable,
+        let scroll = Item("scroll")
+            .name("ancient scroll")
+            .description("An ancient scroll.")
+            .isTakable
             .in(.player)
-        )
 
-        let satchel = Item(
-            id: "satchel",
-            .name("leather satchel"),
-            .description("A leather satchel."),
-            .isContainer,
-            .isOpen,
+        let satchel = Item("satchel")
+            .name("leather satchel")
+            .description("A leather satchel.")
+            .isContainer
+            .isOpen
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: scroll, satchel
@@ -204,9 +176,7 @@ struct InsertActionHandlerTests {
         try await engine.execute("place scroll in satchel")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > place scroll in satchel
             You carefully place the ancient scroll within the leather
@@ -220,14 +190,12 @@ struct InsertActionHandlerTests {
     @Test("Cannot insert without specifying what")
     func testCannotInsertWithoutSpecifyingWhat() async throws {
         // Given
-        let box = Item(
-            id: "box",
-            .name("wooden box"),
-            .description("A wooden box."),
-            .isContainer,
-            .isOpen,
+        let box = Item("box")
+            .name("wooden box")
+            .description("A wooden box.")
+            .isContainer
+            .isOpen
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: box
@@ -239,9 +207,7 @@ struct InsertActionHandlerTests {
         try await engine.execute("insert")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > insert
             Insert what?
@@ -252,13 +218,11 @@ struct InsertActionHandlerTests {
     @Test("Cannot insert without specifying where")
     func testCannotInsertWithoutSpecifyingWhere() async throws {
         // Given
-        let coin = Item(
-            id: "coin",
-            .name("gold coin"),
-            .description("A gold coin."),
-            .isTakable,
+        let coin = Item("coin")
+            .name("gold coin")
+            .description("A gold coin.")
+            .isTakable
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: coin
@@ -270,9 +234,7 @@ struct InsertActionHandlerTests {
         try await engine.execute("insert coin")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > insert coin
             Insert the gold coin where?
@@ -283,22 +245,18 @@ struct InsertActionHandlerTests {
     @Test("Cannot insert item not held")
     func testCannotInsertItemNotHeld() async throws {
         // Given
-        let gem = Item(
-            id: "gem",
-            .name("precious gem"),
-            .description("A precious gem."),
-            .isTakable,
+        let gem = Item("gem")
+            .name("precious gem")
+            .description("A precious gem.")
+            .isTakable
             .in(.startRoom)
-        )
 
-        let box = Item(
-            id: "box",
-            .name("wooden box"),
-            .description("A wooden box."),
-            .isContainer,
-            .isOpen,
+        let box = Item("box")
+            .name("wooden box")
+            .description("A wooden box.")
+            .isContainer
+            .isOpen
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: gem, box
@@ -310,9 +268,7 @@ struct InsertActionHandlerTests {
         try await engine.execute("insert gem in box")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > insert gem in box
             You aren't holding the precious gem.
@@ -323,20 +279,16 @@ struct InsertActionHandlerTests {
     @Test("Cannot insert into non-container")
     func testCannotInsertIntoNonContainer() async throws {
         // Given
-        let coin = Item(
-            id: "coin",
-            .name("gold coin"),
-            .description("A gold coin."),
-            .isTakable,
+        let coin = Item("coin")
+            .name("gold coin")
+            .description("A gold coin.")
+            .isTakable
             .in(.player)
-        )
 
-        let rock = Item(
-            id: "rock",
-            .name("large rock"),
-            .description("A large boulder."),
+        let rock = Item("rock")
+            .name("large rock")
+            .description("A large boulder.")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: coin, rock
@@ -348,9 +300,7 @@ struct InsertActionHandlerTests {
         try await engine.execute("insert coin in rock")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > insert coin in rock
             You can't put things in the large rock.
@@ -361,22 +311,18 @@ struct InsertActionHandlerTests {
     @Test("Cannot insert into closed container")
     func testCannotInsertIntoClosedContainer() async throws {
         // Given
-        let key = Item(
-            id: "key",
-            .name("brass key"),
-            .description("A brass key."),
-            .isTakable,
+        let key = Item("key")
+            .name("brass key")
+            .description("A brass key.")
+            .isTakable
             .in(.player)
-        )
 
-        let chest = Item(
-            id: "chest",
-            .name("treasure chest"),
-            .description("A treasure chest."),
-            .isContainer,
+        let chest = Item("chest")
+            .name("treasure chest")
+            .description("A treasure chest.")
+            .isContainer
             // Note: No .isOpen flag - container is closed
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: key, chest
@@ -388,9 +334,7 @@ struct InsertActionHandlerTests {
         try await engine.execute("insert key in chest")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > insert key in chest
             The treasure chest is closed.
@@ -401,28 +345,22 @@ struct InsertActionHandlerTests {
     @Test("Cannot insert container not in scope")
     func testCannotInsertContainerNotInScope() async throws {
         // Given
-        let anotherRoom = Location(
-            id: "anotherRoom",
-            .name("Another Room"),
+        let anotherRoom = Location("anotherRoom")
+            .name("Another Room")
             .inherentlyLit
-        )
 
-        let coin = Item(
-            id: "coin",
-            .name("gold coin"),
-            .description("A gold coin."),
-            .isTakable,
+        let coin = Item("coin")
+            .name("gold coin")
+            .description("A gold coin.")
+            .isTakable
             .in(.player)
-        )
 
-        let remoteBox = Item(
-            id: "remoteBox",
-            .name("remote box"),
-            .description("A box in another room."),
-            .isContainer,
-            .isOpen,
+        let remoteBox = Item("remoteBox")
+            .name("remote box")
+            .description("A box in another room.")
+            .isContainer
+            .isOpen
             .in("anotherRoom")
-        )
 
         let game = MinimalGame(
             locations: anotherRoom,
@@ -435,9 +373,7 @@ struct InsertActionHandlerTests {
         try await engine.execute("insert coin in box")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > insert coin in box
             Any such thing lurks beyond your reach.
@@ -448,15 +384,13 @@ struct InsertActionHandlerTests {
     @Test("Cannot insert item into itself")
     func testCannotInsertItemIntoItself() async throws {
         // Given
-        let bag = Item(
-            id: "bag",
-            .name("magic bag"),
-            .description("A magic bag."),
-            .isContainer,
-            .isOpen,
-            .isTakable,
+        let bag = Item("bag")
+            .name("magic bag")
+            .description("A magic bag.")
+            .isContainer
+            .isOpen
+            .isTakable
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: bag
@@ -468,9 +402,7 @@ struct InsertActionHandlerTests {
         try await engine.execute("insert bag in bag")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > insert bag in bag
             The universe politely but firmly prevents such recursive
@@ -482,25 +414,21 @@ struct InsertActionHandlerTests {
     @Test("Cannot insert container into its contents")
     func testCannotInsertContainerIntoItsContents() async throws {
         // Given
-        let bag = Item(
-            id: "bag",
-            .name("travel bag"),
-            .description("A travel bag."),
-            .isContainer,
-            .isOpen,
-            .isTakable,
+        let bag = Item("bag")
+            .name("travel bag")
+            .description("A travel bag.")
+            .isContainer
+            .isOpen
+            .isTakable
             .in(.player)
-        )
 
-        let box = Item(
-            id: "box",
-            .name("small box"),
-            .description("A small box."),
-            .isContainer,
-            .isOpen,
-            .isTakable,
+        let box = Item("box")
+            .name("small box")
+            .description("A small box.")
+            .isContainer
+            .isOpen
+            .isTakable
             .in(.item("bag"))
-        )
 
         let game = MinimalGame(
             items: bag, box
@@ -512,9 +440,7 @@ struct InsertActionHandlerTests {
         try await engine.execute("insert bag in box")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > insert bag in box
             The laws of physics sternly forbid putting the travel bag
@@ -526,29 +452,23 @@ struct InsertActionHandlerTests {
     @Test("Requires light to insert")
     func testRequiresLight() async throws {
         // Given: Dark room with items
-        let darkRoom = Location(
-            id: "darkRoom",
-            .name("Dark Room"),
+        let darkRoom = Location("darkRoom")
+            .name("Dark Room")
             .description("A pitch black room.")
             // Note: No .inherentlyLit property
-        )
 
-        let coin = Item(
-            id: "coin",
-            .name("gold coin"),
-            .description("A gold coin."),
-            .isTakable,
+        let coin = Item("coin")
+            .name("gold coin")
+            .description("A gold coin.")
+            .isTakable
             .in(.player)
-        )
 
-        let box = Item(
-            id: "box",
-            .name("wooden box"),
-            .description("A wooden box."),
-            .isContainer,
-            .isOpen,
+        let box = Item("box")
+            .name("wooden box")
+            .description("A wooden box.")
+            .isContainer
+            .isOpen
             .in("darkRoom")
-        )
 
         let game = MinimalGame(
             player: Player(in: "darkRoom"),
@@ -562,9 +482,7 @@ struct InsertActionHandlerTests {
         try await engine.execute("insert coin in box")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > insert coin in box
             The darkness here is absolute, consuming all light and hope of
@@ -578,22 +496,18 @@ struct InsertActionHandlerTests {
     @Test("Insert item successfully transfers to container")
     func testInsertItemSuccessfullyTransfersToContainer() async throws {
         // Given
-        let ring = Item(
-            id: "ring",
-            .name("silver ring"),
-            .description("A silver ring."),
-            .isTakable,
+        let ring = Item("ring")
+            .name("silver ring")
+            .description("A silver ring.")
+            .isTakable
             .in(.player)
-        )
 
-        let jewelryBox = Item(
-            id: "jewelryBox",
-            .name("jewelry box"),
-            .description("A jewelry box."),
-            .isContainer,
-            .isOpen,
+        let jewelryBox = Item("jewelryBox")
+            .name("jewelry box")
+            .description("A jewelry box.")
+            .isContainer
+            .isOpen
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: ring, jewelryBox
@@ -612,9 +526,7 @@ struct InsertActionHandlerTests {
         #expect(await finalBoxState.hasFlag(.isTouched))
 
         // Verify message
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > insert ring in box
             You carefully place the silver ring within the jewelry box.
@@ -625,30 +537,24 @@ struct InsertActionHandlerTests {
     @Test("Insert multiple items into container")
     func testInsertMultipleItemsIntoContainer() async throws {
         // Given
-        let coin1 = Item(
-            id: "coin1",
-            .name("gold coin"),
-            .description("A gold coin."),
-            .isTakable,
+        let coin1 = Item("coin1")
+            .name("gold coin")
+            .description("A gold coin.")
+            .isTakable
             .in(.player)
-        )
 
-        let coin2 = Item(
-            id: "coin2",
-            .name("silver coin"),
-            .description("A silver coin."),
-            .isTakable,
+        let coin2 = Item("coin2")
+            .name("silver coin")
+            .description("A silver coin.")
+            .isTakable
             .in(.player)
-        )
 
-        let purse = Item(
-            id: "purse",
-            .name("leather purse"),
-            .description("A leather purse."),
-            .isContainer,
-            .isOpen,
+        let purse = Item("purse")
+            .name("leather purse")
+            .description("A leather purse.")
+            .isContainer
+            .isOpen
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: coin1, coin2, purse
@@ -660,9 +566,7 @@ struct InsertActionHandlerTests {
         try await engine.execute("insert gold coin and silver coin in purse")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > insert gold coin and silver coin in purse
             You carefully place the gold coin and the silver coin within
@@ -680,30 +584,24 @@ struct InsertActionHandlerTests {
     @Test("Insert all items into container")
     func testInsertAllItemsIntoContainer() async throws {
         // Given
-        let book = Item(
-            id: "book",
-            .name("leather book"),
-            .description("A leather book."),
-            .isTakable,
+        let book = Item("book")
+            .name("leather book")
+            .description("A leather book.")
+            .isTakable
             .in(.player)
-        )
 
-        let scroll = Item(
-            id: "scroll",
-            .name("ancient scroll"),
-            .description("An ancient scroll."),
-            .isTakable,
+        let scroll = Item("scroll")
+            .name("ancient scroll")
+            .description("An ancient scroll.")
+            .isTakable
             .in(.player)
-        )
 
-        let satchel = Item(
-            id: "satchel",
-            .name("large satchel"),
-            .description("A large satchel."),
-            .isContainer,
-            .isOpen,
+        let satchel = Item("satchel")
+            .name("large satchel")
+            .description("A large satchel.")
+            .isContainer
+            .isOpen
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: book, scroll, satchel
@@ -715,9 +613,7 @@ struct InsertActionHandlerTests {
         try await engine.execute("insert all in satchel")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > insert all in satchel
             You carefully place the leather book and the ancient scroll
@@ -735,14 +631,12 @@ struct InsertActionHandlerTests {
     @Test("Insert all when player has nothing")
     func testInsertAllWhenPlayerHasNothing() async throws {
         // Given
-        let box = Item(
-            id: "box",
-            .name("empty box"),
-            .description("An empty box."),
-            .isContainer,
-            .isOpen,
+        let box = Item("box")
+            .name("empty box")
+            .description("An empty box.")
+            .isContainer
+            .isOpen
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: box
@@ -754,9 +648,7 @@ struct InsertActionHandlerTests {
         try await engine.execute("insert all in box")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > insert all in box
             Your possessions offer nothing suitable for placement in the
@@ -768,22 +660,18 @@ struct InsertActionHandlerTests {
     @Test("Insert sets touched flag on both items")
     func testInsertSetsTouchedFlagOnBothItems() async throws {
         // Given
-        let crystal = Item(
-            id: "crystal",
-            .name("magic crystal"),
-            .description("A magic crystal."),
-            .isTakable,
+        let crystal = Item("crystal")
+            .name("magic crystal")
+            .description("A magic crystal.")
+            .isTakable
             .in(.player)
-        )
 
-        let pouch = Item(
-            id: "pouch",
-            .name("velvet pouch"),
-            .description("A velvet pouch."),
-            .isContainer,
-            .isOpen,
+        let pouch = Item("pouch")
+            .name("velvet pouch")
+            .description("A velvet pouch.")
+            .isContainer
+            .isOpen
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: crystal, pouch
@@ -802,9 +690,7 @@ struct InsertActionHandlerTests {
         #expect(await finalCrystalState.parent == .item(pouch.proxy(engine)))
 
         // Verify message
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > insert crystal in pouch
             You carefully place the magic crystal within the velvet pouch.
@@ -815,30 +701,24 @@ struct InsertActionHandlerTests {
     @Test("Insert into container already containing items")
     func testInsertIntoContainerAlreadyContainingItems() async throws {
         // Given
-        let newCoin = Item(
-            id: "newCoin",
-            .name("copper coin"),
-            .description("A copper coin."),
-            .isTakable,
+        let newCoin = Item("newCoin")
+            .name("copper coin")
+            .description("A copper coin.")
+            .isTakable
             .in(.player)
-        )
 
-        let existingCoin = Item(
-            id: "existingCoin",
-            .name("gold coin"),
-            .description("A gold coin."),
-            .isTakable,
+        let existingCoin = Item("existingCoin")
+            .name("gold coin")
+            .description("A gold coin.")
+            .isTakable
             .in(.item("wallet"))
-        )
 
-        let wallet = Item(
-            id: "wallet",
-            .name("leather wallet"),
-            .description("A leather wallet."),
-            .isContainer,
-            .isOpen,
+        let wallet = Item("wallet")
+            .name("leather wallet")
+            .description("A leather wallet.")
+            .isContainer
+            .isOpen
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: newCoin, existingCoin, wallet
@@ -850,9 +730,7 @@ struct InsertActionHandlerTests {
         try await engine.execute("insert copper coin in wallet")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > insert copper coin in wallet
             You carefully place the copper coin within the leather wallet.
@@ -869,38 +747,30 @@ struct InsertActionHandlerTests {
     @Test("Insert using different verb synonyms")
     func testInsertUsingDifferentVerbSynonyms() async throws {
         // Given
-        let gem1 = Item(
-            id: "gem1",
-            .name("red gem"),
-            .description("A red gem."),
-            .isTakable,
+        let gem1 = Item("gem1")
+            .name("red gem")
+            .description("A red gem.")
+            .isTakable
             .in(.player)
-        )
 
-        let gem2 = Item(
-            id: "gem2",
-            .name("blue gem"),
-            .description("A blue gem."),
-            .isTakable,
+        let gem2 = Item("gem2")
+            .name("blue gem")
+            .description("A blue gem.")
+            .isTakable
             .in(.player)
-        )
 
-        let gem3 = Item(
-            id: "gem3",
-            .name("green gem"),
-            .description("A green gem."),
-            .isTakable,
+        let gem3 = Item("gem3")
+            .name("green gem")
+            .description("A green gem.")
+            .isTakable
             .in(.player)
-        )
 
-        let box = Item(
-            id: "box",
-            .name("gem box"),
-            .description("A gem box."),
-            .isContainer,
-            .isOpen,
+        let box = Item("box")
+            .name("gem box")
+            .description("A gem box.")
+            .isContainer
+            .isOpen
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: gem1, gem2, gem3, box
@@ -912,9 +782,7 @@ struct InsertActionHandlerTests {
         try await engine.execute("insert red gem in box")
 
         // Then
-        let output1 = await mockIO.flush()
-        expectNoDifference(
-            output1,
+        await mockIO.expect(
             """
             > insert red gem in box
             You carefully place the red gem within the gem box.
@@ -925,9 +793,7 @@ struct InsertActionHandlerTests {
         try await engine.execute("put blue gem in box")
 
         // Then
-        let output2 = await mockIO.flush()
-        expectNoDifference(
-            output2,
+        await mockIO.expect(
             """
             > put blue gem in box
             With practiced ease, you deposit the blue gem in the gem box.
@@ -938,9 +804,7 @@ struct InsertActionHandlerTests {
         try await engine.execute("place green gem in box")
 
         // Then
-        let output3 = await mockIO.flush()
-        expectNoDifference(
-            output3,
+        await mockIO.expect(
             """
             > place green gem in box
             The green gem finds a new home inside the gem box.

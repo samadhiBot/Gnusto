@@ -11,13 +11,11 @@ struct RestoreActionHandlerTests {
     @Test("RESTORE syntax works with YES confirmation")
     func testRestoreSyntaxWithYes() async throws {
         // Given
-        let sword = Item(
-            id: "sword",
-            .name("magic sword"),
-            .description("A gleaming magic sword."),
-            .isTakable,
+        let sword = Item("sword")
+            .name("magic sword")
+            .description("A gleaming magic sword.")
+            .isTakable
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: sword
@@ -45,9 +43,7 @@ struct RestoreActionHandlerTests {
         try await engine.execute("restore")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > save
             Game saved.
@@ -70,13 +66,11 @@ struct RestoreActionHandlerTests {
     @Test("LOAD syntax works with YES confirmation")
     func testLoadSyntaxWithYes() async throws {
         // Given
-        let sword = Item(
-            id: "sword",
-            .name("magic sword"),
-            .description("A gleaming magic sword."),
-            .isTakable,
+        let sword = Item("sword")
+            .name("magic sword")
+            .description("A gleaming magic sword.")
+            .isTakable
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: sword
@@ -104,9 +98,7 @@ struct RestoreActionHandlerTests {
         try await engine.execute("load")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > save
             Game saved.
@@ -129,13 +121,11 @@ struct RestoreActionHandlerTests {
     @Test("RESTORE syntax works with NO cancellation")
     func testRestoreSyntaxWithNo() async throws {
         // Given
-        let sword = Item(
-            id: "sword",
-            .name("magic sword"),
-            .description("A gleaming magic sword."),
-            .isTakable,
+        let sword = Item("sword")
+            .name("magic sword")
+            .description("A gleaming magic sword.")
+            .isTakable
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: sword
@@ -158,9 +148,7 @@ struct RestoreActionHandlerTests {
         try await engine.execute("restore")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > restore
             If you restore your saved game now you will lose any unsaved
@@ -187,9 +175,7 @@ struct RestoreActionHandlerTests {
         try await engine.execute("restore")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > restore
             If you restore your saved game now you will lose any unsaved
@@ -205,12 +191,10 @@ struct RestoreActionHandlerTests {
     @Test("RESTORE requires no validation")
     func testRestoreRequiresNoValidation() async throws {
         // Given: Dark room (to verify light is not required)
-        let darkRoom = Location(
-            id: "darkRoom",
-            .name("Dark Room"),
+        let darkRoom = Location("darkRoom")
+            .name("Dark Room")
             .description("A pitch black room.")
             // Note: No .inherentlyLit property
-        )
 
         let game = MinimalGame(
             player: Player(in: "darkRoom"),
@@ -226,9 +210,7 @@ struct RestoreActionHandlerTests {
         try await engine.execute("restore")
 
         // Then: Should succeed even without light
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > restore
             If you restore your saved game now you will lose any unsaved

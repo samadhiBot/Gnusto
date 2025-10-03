@@ -537,7 +537,8 @@ extension GameEngine {
                 \(messenger.nowDark())
 
                 \(messenger.roomIsDark())
-                """)
+                """
+            )
             shouldDescribe = false
             forceFullDescription = true
         } else if !wasLitBeforeCommand && isLitAfterCommand
@@ -598,7 +599,8 @@ extension GameEngine {
                     Failed to process side effects during processEventResult:
                        - \(error)
                        - Side Effects: \(result.effects)
-                    """)
+                    """
+                )
                 throw error
             }
         }
@@ -609,7 +611,7 @@ extension GameEngine {
         }
 
         // Return whether we should yield to engine
-        return result.shouldYieldToEngine
+        return result.executionFlow == .yield
     }
 
     /// Applies state changes from an ActionResult to the game state.

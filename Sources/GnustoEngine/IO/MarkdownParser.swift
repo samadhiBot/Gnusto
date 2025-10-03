@@ -39,7 +39,7 @@ public struct MarkdownParser {
     ///                                        double hyphens to em dashes, etc.
     public init(
         columns: Int? = nil,
-        preventOrphans: Bool = true,
+        preventOrphans: Bool = false,
         makeSmartTypographicSubstitutions: Bool = true
     ) {
         self.columns = columns

@@ -9,96 +9,82 @@ struct OperaHouse {
 
     // MARK: - Foyer of the Opera House
 
-    let foyer = Location(
-        id: .foyer,
-        .name("Foyer of the Opera House"),
+    let foyer = Location(.foyer)
+        .name("Foyer of the Opera House")
         .description(
             """
             You are standing in a spacious hall, splendidly decorated in red
             and gold, with glittering chandeliers overhead. The entrance from
             the street is to the north, and there are doorways south and west.
             """
-        ),
-        .exits(
-            .south(.bar),
-            .west(.cloakroom),
-            .north(
-                blocked: """
-                    You've only just arrived, and besides, the weather outside
-                    seems to be getting worse.
-                    """
-            )
-        ),
+        )
+        .south(.bar)
+        .west(.cloakroom)
+        .north(
+            blocked: """
+                You've only just arrived, and besides, the weather outside
+                seems to be getting worse.
+                """
+        )
         .inherentlyLit
-    )
 
     // MARK: - Cloakroom
 
-    let cloakroom = Location(
-        id: .cloakroom,
-        .name("Cloakroom"),
+    let cloakroom = Location(.cloakroom)
+        .name("Cloakroom")
         .description(
             """
             The walls of this small room were clearly once lined with hooks,
             though now only one remains. The exit is a door to the east.
             """
-        ),
-        .exits(.east(.foyer)),
+        )
+        .east(.foyer)
         .inherentlyLit
-    )
 
-    let hook = Item(
-        id: .hook,
-        .adjectives("small", "brass"),
-        .in(.cloakroom),
-        .omitDescription,
-        .isSurface,
-        .name("small brass hook"),
-        .synonyms("peg"),
-    )
+    let hook = Item(.hook)
+        .adjectives("small", "brass")
+        .in(.cloakroom)
+        .omitDescription
+        .isSurface
+        .name("small brass hook")
+        .synonyms("peg")
 
     // MARK: - Bar
 
-    let bar = Location(
-        id: .bar,
-        .name("Bar"),
+    let bar = Location(.bar)
+        .name("Bar")
         .description(
             """
             The bar, much rougher than you'd have guessed after the opulence
             of the foyer to the north, is completely empty. There seems to
             be some sort of message scrawled in the sawdust on the floor.
             """
-        ),
-        .exits(.north(.foyer))
-    )
+        )
+        .north(.foyer)
 
-    let message = Item(
-        id: .message,
-        .name("scrawled message"),
-        .in(.bar),
-        .synonyms("sawdust", "floor"),
-        .isReadable,
+    let message = Item(.message)
+        .name("scrawled message")
+        .in(.bar)
+        .synonyms("sawdust", "floor")
+        .isReadable
         .omitDescription
-    )
 
     // MARK: - Items
 
-    let cloak = Item(
-        id: .cloak,
-        .name("velvet cloak"),
+    let cloak = Item(.cloak)
+        .name("velvet cloak")
         .description(
             """
             A handsome cloak, of velvet trimmed with satin, and slightly
             spattered with raindrops. Its blackness is so deep that it
             almost seems to suck light from the room.
             """
-        ),
-        .adjectives("handsome", "dark", "black", "velvet", "satin"),
-        .in(.player),
-        .isTakable,
-        .isWearable,
-        .isWorn,
-    )
+        )
+        .adjectives("handsome", "dark", "black", "velvet", "satin")
+        .in(.player)
+        .isTakable
+        .isWearable
+        .isWorn
 
     // MARK: - Location event handlers
 

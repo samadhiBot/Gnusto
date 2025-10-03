@@ -11,15 +11,13 @@ struct ExtinguishActionHandlerTests {
     @Test("BLOW OUT syntax works")
     func testBlowOutSyntax() async throws {
         // Given
-        let candle = Item(
-            id: "candle",
-            .name("small candle"),
-            .description("A small wax candle."),
-            .isTakable,
-            .isLightSource,
-            .isBurning,
+        let candle = Item("candle")
+            .name("small candle")
+            .description("A small wax candle.")
+            .isTakable
+            .isLightSource
+            .isBurning
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: candle
@@ -31,9 +29,7 @@ struct ExtinguishActionHandlerTests {
         try await engine.execute("blow out candle")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > blow out candle
             You blow out the small candle.
@@ -48,15 +44,13 @@ struct ExtinguishActionHandlerTests {
     @Test("EXTINGUISH syntax works")
     func testExtinguishSyntax() async throws {
         // Given
-        let torch = Item(
-            id: "torch",
-            .name("wooden torch"),
-            .description("A wooden torch with a burning tip."),
-            .isTakable,
-            .isLightSource,
-            .isBurning,
+        let torch = Item("torch")
+            .name("wooden torch")
+            .description("A wooden torch with a burning tip.")
+            .isTakable
+            .isLightSource
+            .isBurning
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: torch
@@ -68,9 +62,7 @@ struct ExtinguishActionHandlerTests {
         try await engine.execute("extinguish torch")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > extinguish torch
             You extinguish the wooden torch.
@@ -85,13 +77,11 @@ struct ExtinguishActionHandlerTests {
     @Test("DOUSE synonym works")
     func testDouseSyntax() async throws {
         // Given
-        let fire = Item(
-            id: "fire",
-            .name("small fire"),
-            .description("A small crackling fire."),
-            .isBurning,
+        let fire = Item("fire")
+            .name("small fire")
+            .description("A small crackling fire.")
+            .isBurning
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: fire
@@ -103,9 +93,7 @@ struct ExtinguishActionHandlerTests {
         try await engine.execute("douse fire")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > douse fire
             You douse the small fire.
@@ -129,9 +117,7 @@ struct ExtinguishActionHandlerTests {
         try await engine.execute("extinguish")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > extinguish
             Extinguish what?
@@ -142,19 +128,15 @@ struct ExtinguishActionHandlerTests {
     @Test("Cannot extinguish target not in scope")
     func testCannotExtinguishTargetNotInScope() async throws {
         // Given
-        let otherRoom = Location(
-            id: "otherRoom",
-            .name("Other Room"),
+        let otherRoom = Location("otherRoom")
+            .name("Other Room")
             .inherentlyLit
-        )
 
-        let candle = Item(
-            id: "candle",
-            .name("small candle"),
-            .description("A small wax candle."),
-            .isBurning,
+        let candle = Item("candle")
+            .name("small candle")
+            .description("A small wax candle.")
+            .isBurning
             .in("otherRoom")
-        )
 
         let game = MinimalGame(
             locations: otherRoom,
@@ -167,9 +149,7 @@ struct ExtinguishActionHandlerTests {
         try await engine.execute("extinguish candle")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > extinguish candle
             Any such thing lurks beyond your reach.
@@ -180,19 +160,15 @@ struct ExtinguishActionHandlerTests {
     @Test("Requires light to extinguish")
     func testRequiresLight() async throws {
         // Given
-        let darkRoom = Location(
-            id: "darkRoom",
-            .name("Dark Room"),
+        let darkRoom = Location("darkRoom")
+            .name("Dark Room")
             .description("A room that is pitch black.")
-        )
 
-        let candle = Item(
-            id: "candle",
-            .name("small candle"),
-            .description("A small wax candle."),
-            .isBurning,
+        let candle = Item("candle")
+            .name("small candle")
+            .description("A small wax candle.")
+            .isBurning
             .in("darkRoom")
-        )
 
         let game = MinimalGame(
             player: Player(in: "darkRoom"),
@@ -206,9 +182,7 @@ struct ExtinguishActionHandlerTests {
         try await engine.execute("extinguish candle")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > extinguish candle
             You extinguish the small candle.
@@ -226,16 +200,14 @@ struct ExtinguishActionHandlerTests {
     @Test("Extinguish lit light source clears isOn and isBurning")
     func testExtinguishLitLightSource() async throws {
         // Given
-        let lamp = Item(
-            id: "lamp",
-            .name("oil lamp"),
-            .description("A brass oil lamp."),
-            .isTakable,
-            .isLightSource,
-            .isBurning,
-            .isOn,
+        let lamp = Item("lamp")
+            .name("oil lamp")
+            .description("A brass oil lamp.")
+            .isTakable
+            .isLightSource
+            .isBurning
+            .isOn
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: lamp
@@ -247,9 +219,7 @@ struct ExtinguishActionHandlerTests {
         try await engine.execute("extinguish lamp")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > extinguish lamp
             You extinguish the oil lamp.
@@ -265,14 +235,12 @@ struct ExtinguishActionHandlerTests {
     @Test("Extinguish light source that is not lit")
     func testExtinguishUnlitLightSource() async throws {
         // Given
-        let torch = Item(
-            id: "torch",
-            .name("wooden torch"),
-            .description("A wooden torch with an unlit tip."),
-            .isTakable,
-            .isLightSource,
+        let torch = Item("torch")
+            .name("wooden torch")
+            .description("A wooden torch with an unlit tip.")
+            .isTakable
+            .isLightSource
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: torch
@@ -284,9 +252,7 @@ struct ExtinguishActionHandlerTests {
         try await engine.execute("extinguish torch")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > extinguish torch
             The wooden torch refuses to be extinguished.
@@ -304,14 +270,12 @@ struct ExtinguishActionHandlerTests {
     @Test("Extinguish burning regular item")
     func testExtinguishBurningRegularItem() async throws {
         // Given
-        let paper = Item(
-            id: "paper",
-            .name("piece of paper"),
-            .description("A sheet of paper."),
-            .isTakable,
-            .isBurning,
+        let paper = Item("paper")
+            .name("piece of paper")
+            .description("A sheet of paper.")
+            .isTakable
+            .isBurning
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: paper
@@ -323,9 +287,7 @@ struct ExtinguishActionHandlerTests {
         try await engine.execute("extinguish paper")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > extinguish paper
             You extinguish the piece of paper.
@@ -340,13 +302,11 @@ struct ExtinguishActionHandlerTests {
     @Test("Extinguish non-burning regular item")
     func testExtinguishNonBurningRegularItem() async throws {
         // Given
-        let book = Item(
-            id: "book",
-            .name("leather book"),
-            .description("A worn leather-bound book."),
-            .isTakable,
+        let book = Item("book")
+            .name("leather book")
+            .description("A worn leather-bound book.")
+            .isTakable
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: book
@@ -358,9 +318,7 @@ struct ExtinguishActionHandlerTests {
         try await engine.execute("extinguish book")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > extinguish book
             The leather book refuses to be extinguished.
@@ -377,14 +335,12 @@ struct ExtinguishActionHandlerTests {
     @Test("Touched flag always set on successful extinguish")
     func testTouchedFlagAlwaysSet() async throws {
         // Given
-        let candle = Item(
-            id: "candle",
-            .name("wax candle"),
-            .description("A simple wax candle."),
-            .isTakable,
-            .isBurning,
+        let candle = Item("candle")
+            .name("wax candle")
+            .description("A simple wax candle.")
+            .isTakable
+            .isBurning
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: candle
@@ -409,21 +365,17 @@ struct ExtinguishActionHandlerTests {
     @Test("Extinguish specific item when multiple burning items present")
     func testExtinguishSpecificItem() async throws {
         // Given
-        let candle = Item(
-            id: "candle",
-            .name("small candle"),
-            .description("A small wax candle."),
-            .isBurning,
+        let candle = Item("candle")
+            .name("small candle")
+            .description("A small wax candle.")
+            .isBurning
             .in(.startRoom)
-        )
 
-        let torch = Item(
-            id: "torch",
-            .name("wooden torch"),
-            .description("A wooden torch."),
-            .isBurning,
+        let torch = Item("torch")
+            .name("wooden torch")
+            .description("A wooden torch.")
+            .isBurning
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: candle, torch
@@ -435,9 +387,7 @@ struct ExtinguishActionHandlerTests {
         try await engine.execute("extinguish candle")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > extinguish candle
             You extinguish the small candle.
@@ -455,28 +405,22 @@ struct ExtinguishActionHandlerTests {
     @Test("Can extinguish in dark room while holding lit light source")
     func testCanExtinguishInDarkRoomWithOtherLight() async throws {
         // Given
-        let darkRoom = Location(
-            id: "darkRoom",
-            .name("Dark Room"),
+        let darkRoom = Location("darkRoom")
+            .name("Dark Room")
             .description("A room that is pitch black.")
-        )
 
-        let heldLamp = Item(
-            id: "heldLamp",
-            .name("oil lamp"),
-            .description("A brass oil lamp."),
-            .isLightSource,
-            .isOn,
+        let heldLamp = Item("heldLamp")
+            .name("oil lamp")
+            .description("A brass oil lamp.")
+            .isLightSource
+            .isOn
             .in(.player)
-        )
 
-        let candle = Item(
-            id: "candle",
-            .name("small candle"),
-            .description("A small wax candle."),
-            .isBurning,
+        let candle = Item("candle")
+            .name("small candle")
+            .description("A small wax candle.")
+            .isBurning
             .in("darkRoom")
-        )
 
         let game = MinimalGame(
             player: Player(in: "darkRoom"),
@@ -490,9 +434,7 @@ struct ExtinguishActionHandlerTests {
         try await engine.execute("extinguish candle")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > extinguish candle
             You extinguish the small candle.
@@ -506,19 +448,15 @@ struct ExtinguishActionHandlerTests {
     @Test("Can extinguish in dark room without other light source")
     func testCanExtinguishInDarkRoom() async throws {
         // Given
-        let darkRoom = Location(
-            id: "darkRoom",
-            .name("Dark Room"),
+        let darkRoom = Location("darkRoom")
+            .name("Dark Room")
             .description("A room that is pitch black.")
-        )
 
-        let candle = Item(
-            id: "candle",
-            .name("small candle"),
-            .description("A small wax candle."),
-            .isBurning,
+        let candle = Item("candle")
+            .name("small candle")
+            .description("A small wax candle.")
+            .isBurning
             .in("darkRoom")
-        )
 
         let game = MinimalGame(
             player: Player(in: "darkRoom"),
@@ -532,9 +470,7 @@ struct ExtinguishActionHandlerTests {
         try await engine.execute("extinguish candle")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > extinguish candle
             You extinguish the small candle.
@@ -578,13 +514,11 @@ struct ExtinguishActionHandlerTests {
     @Test("All synonyms work")
     func testAllSynonyms() async throws {
         // Given
-        let candle = Item(
-            id: "candle",
-            .name("small candle"),
-            .description("A small wax candle."),
-            .isBurning,
+        let candle = Item("candle")
+            .name("small candle")
+            .description("A small wax candle.")
+            .isBurning
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: candle
@@ -606,9 +540,7 @@ struct ExtinguishActionHandlerTests {
             try await engine.execute("\(verb) candle")
         }
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > extinguish candle
             You extinguish the small candle.

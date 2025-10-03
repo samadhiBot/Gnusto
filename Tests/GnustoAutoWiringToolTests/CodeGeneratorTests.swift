@@ -9,8 +9,14 @@ struct CodeGeneratorTests {
     @Test("CodeGenerator produces basic ID extensions")
     func testBasicIDExtensions() {
         var gameData = GameData()
-        gameData.locationIDs = ["room", "hall"]
-        gameData.itemIDs = ["chair", "table"]
+        gameData.locationIDs = [
+            "room": SourceLocation(fileName: "test.swift", lineNumber: 1),
+            "hall": SourceLocation(fileName: "test.swift", lineNumber: 2),
+        ]
+        gameData.itemIDs = [
+            "chair": SourceLocation(fileName: "test.swift", lineNumber: 3),
+            "table": SourceLocation(fileName: "test.swift", lineNumber: 4),
+        ]
 
         let generator = CodeGenerator()
         let generatedCode = generator.generate(from: gameData)
@@ -61,8 +67,16 @@ struct CodeGeneratorTests {
     func testSortedOutput() {
         var gameData = GameData()
         // Add in non-alphabetical order to test sorting
-        gameData.locationIDs = ["zebra", "alpha", "beta"]
-        gameData.itemIDs = ["yankee", "xray", "zulu"]
+        gameData.locationIDs = [
+            "zebra": SourceLocation(fileName: "test.swift", lineNumber: 1),
+            "alpha": SourceLocation(fileName: "test.swift", lineNumber: 2),
+            "beta": SourceLocation(fileName: "test.swift", lineNumber: 3),
+        ]
+        gameData.itemIDs = [
+            "yankee": SourceLocation(fileName: "test.swift", lineNumber: 4),
+            "xray": SourceLocation(fileName: "test.swift", lineNumber: 5),
+            "zulu": SourceLocation(fileName: "test.swift", lineNumber: 6),
+        ]
 
         let generator = CodeGenerator()
         let generatedCode = generator.generate(from: gameData)
@@ -94,12 +108,12 @@ struct CodeGeneratorTests {
     @Test("CodeGenerator handles all ID types")
     func testAllIDTypes() {
         var gameData = GameData()
-        gameData.locationIDs = ["room"]
-        gameData.itemIDs = ["chair"]
-        gameData.globalIDs = ["score"]
-        gameData.fuseIDs = ["bomb"]
-        gameData.daemonIDs = ["timer"]
-        gameData.verbIDs = ["dance"]
+        gameData.locationIDs = ["room": SourceLocation(fileName: "test.swift", lineNumber: 1)]
+        gameData.itemIDs = ["chair": SourceLocation(fileName: "test.swift", lineNumber: 2)]
+        gameData.globalIDs = ["score": SourceLocation(fileName: "test.swift", lineNumber: 3)]
+        gameData.fuseIDs = ["bomb": SourceLocation(fileName: "test.swift", lineNumber: 4)]
+        gameData.daemonIDs = ["timer": SourceLocation(fileName: "test.swift", lineNumber: 5)]
+        gameData.verbIDs = ["dance": SourceLocation(fileName: "test.swift", lineNumber: 6)]
 
         let generator = CodeGenerator()
         let generatedCode = generator.generate(from: gameData)

@@ -41,11 +41,14 @@ xcuserdata
 References/*
 !References/Cloak of Darkness/
 !References/Zork 1/
+*.cast
+docs
 
 .vscode
 
 Scripts/__pycache__
 
 Cloak
-FrobozzMagicDemoKit
 Zork1
+!Executables/Cloak
+!Executables/Zork1

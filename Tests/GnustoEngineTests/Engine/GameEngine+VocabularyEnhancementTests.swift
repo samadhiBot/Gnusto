@@ -9,13 +9,11 @@ struct GameEngineVocabularyEnhancementTests {
     @Test("GameEngine has VocabularyEnhancer integrated")
     func testGameEngineHasVocabularyEnhancerIntegrated() async throws {
         // Given: A game with an item
-        let testItem = Item(
-            id: "item",
-            .name("test item"),
-            .description("A simple test item."),
-            .isTakable,
+        let testItem = Item("item")
+            .name("test item")
+            .description("A simple test item.")
+            .isTakable
             .in(.startRoom)
-        )
 
         let game = MinimalGame(items: testItem)
         let (engine, _) = await GameEngine.test(blueprint: game)
@@ -38,13 +36,11 @@ struct GameEngineVocabularyEnhancementTests {
     @Test("Enhanced vocabulary processes items during game initialization")
     func testEnhancedVocabularyProcessesItems() async throws {
         // Given: An item with adjectives that should be available for the enhancer
-        let testSword = Item(
-            id: "sword",
-            .name("rusty sword"),
-            .description("A rusty old sword with ancient runes."),
-            .isTakable,
+        let testSword = Item("sword")
+            .name("rusty sword")
+            .description("A rusty old sword with ancient runes.")
+            .isTakable
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: testSword
@@ -69,23 +65,19 @@ struct GameEngineVocabularyEnhancementTests {
     @Test("Enhancement optimization skips items with sufficient existing terms")
     func testEnhancementOptimizationSkipsWellDefinedItems() async throws {
         // Given: One item with sufficient adjectives (2+) and one without
-        let wellDefinedItem = Item(
-            id: "wellDefined",
-            .name("crystal orb"),
-            .description("A magical crystal orb that glows with inner light."),
-            .adjectives("magical", "glowing"),  // 2 adjectives - should skip enhancement
-            .isTakable,
+        let wellDefinedItem = Item("wellDefined")
+            .name("crystal orb")
+            .description("A magical crystal orb that glows with inner light.")
+            .adjectives("magical", "glowing")  // 2 adjectives - should skip enhancement
+            .isTakable
             .in(.startRoom)
-        )
 
-        let underDefinedItem = Item(
-            id: "underDefined",
-            .name("old book"),
-            .description("An ancient tome filled with mysterious text."),
-            .adjectives("old"),  // Only 1 adjective - should get enhanced
-            .isTakable,
+        let underDefinedItem = Item("underDefined")
+            .name("old book")
+            .description("An ancient tome filled with mysterious text.")
+            .adjectives("old")  // Only 1 adjective - should get enhanced
+            .isTakable
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: wellDefinedItem, underDefinedItem

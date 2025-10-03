@@ -114,19 +114,19 @@ extension LocationProxy {
         }
     }
 
-    /// A set of item IDs that are considered "globally" present or relevant to this location.
-    /// Corresponds to ZIL's `GLOBAL` objects scoped to rooms.
-    public var localGlobals: Set<ItemID> {
-        get async {
-            await property(.localGlobals)?.toItemIDs ?? []
-        }
-    }
-
     /// The display name of the location.
     /// Corresponds to the ZIL `DESC` or room name property.
     public var name: String {
         get async {
             await property(.name)?.toString ?? id.rawValue
+        }
+    }
+
+    /// A set of item IDs that are considered "globally" present or relevant to this location.
+    /// Corresponds to ZIL's `GLOBAL` objects scoped to rooms.
+    public var scenery: Set<ItemID> {
+        get async {
+            await property(.scenery)?.toItemIDs ?? []
         }
     }
 

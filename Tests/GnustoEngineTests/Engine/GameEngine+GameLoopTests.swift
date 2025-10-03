@@ -20,9 +20,7 @@ struct GameEngineGameLoopTests {
 
         try await engine.processTurn()
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > look
             --- Laboratory ---
@@ -63,9 +61,7 @@ struct GameEngineGameLoopTests {
 
         #expect(await engine.shouldQuit == true)
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             >
             Farewell, brave soul!
@@ -84,9 +80,7 @@ struct GameEngineGameLoopTests {
 
         try await engine.processTurn()
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > xyzzy nonexistent very complex invalid syntax
             The phrase 'nonexistent very complex invalid syntax' eludes my
@@ -195,9 +189,7 @@ struct GameEngineGameLoopTests {
 
         await engine.run()
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             Minimal Game
 
@@ -217,12 +209,10 @@ struct GameEngineGameLoopTests {
 
     @Test("run method handles restart")
     func testRunWithRestart() async throws {
-        let testItem = Item(
-            id: "testItem",
-            .name("test item"),
-            .isTakable,
+        let testItem = Item("testItem")
+            .name("test item")
+            .isTakable
             .in(.startRoom)
-        )
 
         let game = MinimalGame(items: testItem)
 
@@ -233,9 +223,7 @@ struct GameEngineGameLoopTests {
 
         await engine.run()
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             Minimal Game
 
@@ -269,9 +257,7 @@ struct GameEngineGameLoopTests {
 
         await engine.run()
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             Minimal Game
 
@@ -304,9 +290,7 @@ struct GameEngineGameLoopTests {
         // Should not throw - errors should be caught and logged
         try await engine.processTurn()
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > examine nonexistent very complex item with multiple words
             The phrase 'with multiple words' eludes my comprehension.
@@ -369,13 +353,11 @@ struct GameEngineGameLoopTests {
 
     @Test("complete game session with multiple commands")
     func testCompleteGameSession() async throws {
-        let testItem = Item(
-            id: "coin",
-            .name("gold coin"),
-            .description("A shiny gold coin."),
-            .isTakable,
+        let testItem = Item("coin")
+            .name("gold coin")
+            .description("A shiny gold coin.")
+            .isTakable
             .in(.startRoom)
-        )
 
         let game = MinimalGame(items: testItem)
 
@@ -395,9 +377,7 @@ struct GameEngineGameLoopTests {
 
         await engine.run()
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             Minimal Game
 
@@ -436,12 +416,10 @@ struct GameEngineGameLoopTests {
 
     @Test("game loop maintains state consistency")
     func testGameLoopStateConsistency() async throws {
-        let testItem = Item(
-            id: "testItem",
-            .name("test item"),
-            .isTakable,
+        let testItem = Item("testItem")
+            .name("test item")
+            .isTakable
             .in(.startRoom)
-        )
 
         let game = MinimalGame(items: testItem)
 
@@ -460,9 +438,7 @@ struct GameEngineGameLoopTests {
         let playerLocation = await engine.player.location
         #expect(playerLocation.id == .startRoom)
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > take test item
             Taken.

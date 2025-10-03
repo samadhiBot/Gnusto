@@ -1,5 +1,25 @@
 import Foundation
 
+/// Controls how an `ActionResult` should be integrated with engine processing.
+///
+/// This enum provides fine-grained control over how action results are combined
+/// with engine-generated content and whether normal engine processing should continue.
+public enum ExecutionFlow: Equatable, Sendable {
+    /// Append this result's content after any existing engine-generated content.
+    case append
+
+    /// Override any existing content entirely with this result's content.
+    /// This is the default behavior when a result has meaningful content.
+    case override
+
+    /// Prepend this result's content before any existing engine-generated content.
+    case prepend
+
+    /// Apply any changes/effects from this result but yield control back to
+    /// the engine for normal command processing.
+    case yield
+}
+
 /// Represents the outcome of an `ActionHandler`'s `process` method.
 ///
 /// An `ActionResult` encapsulates all the consequences of a successfully processed action,
@@ -27,12 +47,11 @@ public struct ActionResult: Equatable, Sendable {
     /// after the action is processed (e.g., starting a fuse, activating a daemon).
     public let effects: [SideEffect]
 
-    /// Indicates whether this result should yield control back to the engine for
-    /// normal processing.
+    /// Controls how this result should be integrated with engine processing.
     ///
-    /// When true, the engine will apply any changes/effects but then continue with
-    /// standard command processing.
-    public let shouldYieldToEngine: Bool
+    /// Determines whether to append, prepend, override existing content, or yield
+    /// control back to the engine for normal processing.
+    public let executionFlow: ExecutionFlow
 
     /// Creates a new `ActionResult` with arrays of state changes and side effects.
     ///
@@ -40,20 +59,21 @@ public struct ActionResult: Equatable, Sendable {
     ///   - message: An optional message to display to the player.
     ///   - changes: An array of `StateChange`s to be applied.
     ///   - effects: An array of `SideEffect`s to be triggered.
-    ///   - shouldYieldToEngine: Whether to yield control back to normal engine processing.
+    ///   - executionFlow: How this result should be integrated with engine processing.
     public init(
         message: String? = nil,
         changes: [StateChange?] = [],
         effects: [SideEffect?] = [],
-        shouldYieldToEngine: Bool = false
+        executionFlow: ExecutionFlow = .append
     ) {
         self.message = message?.isEmpty == false ? message : nil
         self.changes = changes.compactMap(\.self)
         self.effects = effects.compactMap(\.self)
-        let hasSomeResult = self.message?.isEmpty == false
-                         || self.changes.isNotEmpty
-                         || self.effects.isNotEmpty
-        self.shouldYieldToEngine = shouldYieldToEngine || !hasSomeResult
+        let hasSomeResult =
+            self.message?.isEmpty == false
+            || self.changes.isNotEmpty
+            || self.effects.isNotEmpty
+        self.executionFlow = hasSomeResult ? executionFlow : .yield
     }
 
     /// Creates a new `ActionResult` with a message and optional state changes.
@@ -65,21 +85,21 @@ public struct ActionResult: Equatable, Sendable {
         _ message: String,
         _ changes: StateChange?...
     ) {
-        self.init(message: message, changes: changes, shouldYieldToEngine: false)
+        self.init(message: message, changes: changes, executionFlow: .append)
     }
 
     /// Creates a new `ActionResult` with only state changes (no message).
     ///
     /// - Parameter changes: Optional `StateChange`s to be applied.
     public init(_ changes: StateChange?...) {
-        self.init(changes: changes, shouldYieldToEngine: false)
+        self.init(changes: changes, executionFlow: .append)
     }
 
     /// Creates a new `ActionResult` with only side effects (no message).
     ///
     /// - Parameter effects: Optional `SideEffect`s to be triggered.
     public init(_ effects: SideEffect?...) {
-        self.init(effects: effects, shouldYieldToEngine: false)
+        self.init(effects: effects, executionFlow: .append)
     }
 
     /// A special `ActionResult` that indicates the event handler has processed the event
@@ -87,7 +107,7 @@ public struct ActionResult: Equatable, Sendable {
     ///
     /// This is useful for event handlers that want to conditionally allow or block actions
     /// while still being part of the event handling chain.
-    public static let yield = ActionResult(shouldYieldToEngine: true)
+    public static let yield = ActionResult(executionFlow: .yield)
 
     /// Returns a new `ActionResult` that combines this result with another result.
     ///

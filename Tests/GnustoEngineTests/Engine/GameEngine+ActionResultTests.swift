@@ -27,14 +27,12 @@ struct GameEngineActionResultTests {
 
     @Test("ActionResult with state changes")
     func testActionResultWithStateChanges() async throws {
-        let lamp = Item(
-            id: "lamp",
-            .name("brass lamp"),
-            .description("A small brass lamp."),
-            .isLightSource,
-            .isDevice,
+        let lamp = Item("lamp")
+            .name("brass lamp")
+            .description("A small brass lamp.")
+            .isLightSource
+            .isDevice
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: lamp
@@ -118,13 +116,11 @@ struct GameEngineActionResultTests {
 
     @Test("ActionResult with message, changes, and effects")
     func testActionResultWithEverything() async throws {
-        let controlPanel = Item(
-            id: "panel",
-            .name("control panel"),
-            .description("A complex control panel."),
-            .isDevice,
+        let controlPanel = Item("panel")
+            .name("control panel")
+            .description("A complex control panel.")
+            .isDevice
             .in(.startRoom)
-        )
 
         let testFuse = Fuse(initialTurns: 3) { _, _ in
             ActionResult(message: "⏰ Emergency countdown started!")
@@ -292,13 +288,11 @@ struct GameEngineActionResultTests {
             }
         }
 
-        let device = Item(
-            id: "device",
-            .name("mysterious device"),
-            .description("A strange technological device."),
-            .isDevice,
+        let device = Item("device")
+            .name("mysterious device")
+            .description("A strange technological device.")
+            .isDevice
             .in(.startRoom)
-        )
 
         let activationFuse = Fuse(initialTurns: 2) { _, _ in
             ActionResult(message: "🔥 The device overloads!")
@@ -316,9 +310,7 @@ struct GameEngineActionResultTests {
         try await engine.execute("activate device")
 
         // Then: All aspects of ActionResult should be processed
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > activate device
             The mysterious device hums to life with complex activation!
@@ -337,11 +329,9 @@ struct GameEngineActionResultTests {
 
     @Test("ActionResult processing preserves change order")
     func testActionResultPreservesChangeOrder() async throws {
-        let counter = Item(
-            id: "counter",
-            .name("counter"),
+        let counter = Item("counter")
+            .name("counter")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: counter
@@ -451,9 +441,7 @@ struct GameEngineActionResultTests {
         try await engine.execute("sequence")
 
         // Then: Final message should be displayed
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > sequence
             First action completed.
@@ -473,12 +461,10 @@ struct GameEngineActionResultTests {
 
     @Test("ActionResult triggers automatic pronoun updates")
     func testActionResultTriggersAutomaticPronounUpdates() async throws {
-        let testItem = Item(
-            id: "testItem",
-            .name("test item"),
-            .description("A simple test item."),
+        let testItem = Item("testItem")
+            .name("test item")
+            .description("A simple test item.")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(items: testItem)
 
@@ -492,9 +478,7 @@ struct GameEngineActionResultTests {
         #expect(pronoun != nil)
 
         // And: Command should work normally
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > examine test item
             A simple test item.
@@ -514,7 +498,8 @@ struct GameEngineActionResultTests {
                     id: ItemID("item\(i)"),
                     .name("item \(i)"),
                     .in(.startRoom)
-                ))
+                )
+            )
         }
 
         var gameItems: [Item] = [items[0]]
@@ -605,12 +590,10 @@ struct GameEngineActionResultTests {
 
     @Test("ActionResult changes are atomic")
     func testActionResultChangesAreAtomic() async throws {
-        let device = Item(
-            id: "device",
-            .name("device"),
-            .isDevice,
+        let device = Item("device")
+            .name("device")
+            .isDevice
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: device
@@ -667,13 +650,11 @@ struct GameEngineActionResultTests {
 
     @Test("ActionResult integration with TakeActionHandler")
     func testActionResultIntegrationWithTakeActionHandler() async throws {
-        let coin = Item(
-            id: "coin",
-            .name("gold coin"),
-            .description("A shiny gold coin."),
-            .isTakable,
+        let coin = Item("coin")
+            .name("gold coin")
+            .description("A shiny gold coin.")
+            .isTakable
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: coin
@@ -685,9 +666,7 @@ struct GameEngineActionResultTests {
         try await engine.execute("take gold coin")
 
         // Then: ActionResult should be processed correctly
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > take gold coin
             Taken.
@@ -705,15 +684,13 @@ struct GameEngineActionResultTests {
 
     @Test("ActionResult integration with device handlers")
     func testActionResultIntegrationWithDeviceHandlers() async throws {
-        let lamp = Item(
-            id: "lamp",
-            .name("brass lamp"),
-            .description("A polished brass lamp."),
-            .isLightSource,
-            .isDevice,
-            .isTakable,
+        let lamp = Item("lamp")
+            .name("brass lamp")
+            .description("A polished brass lamp.")
+            .isLightSource
+            .isDevice
+            .isTakable
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: lamp
@@ -728,9 +705,7 @@ struct GameEngineActionResultTests {
         )
 
         // Then: Both ActionResults should be processed
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > take lamp
             Taken.
@@ -765,9 +740,7 @@ struct GameEngineActionResultTests {
 
         try await engine.processActionResult(multilineResult)
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             This is a complex message that spans multiple lines and
             contains various formatting.
@@ -841,9 +814,7 @@ struct GameEngineActionResultTests {
         // Trigger the fuse by advancing time
         try await engine.execute("wait")
 
-        let finalOutput = await mockIO.flush()
-        expectNoDifference(
-            finalOutput,
+        await mockIO.expect(
             """
             > wait
             Time flows onward, indifferent to your concerns.
@@ -894,9 +865,7 @@ struct GameEngineActionResultTests {
         // Trigger the fuse
         try await engine.execute("wait")
 
-        let finalOutput = await mockIO.flush()
-        expectNoDifference(
-            finalOutput,
+        await mockIO.expect(
             """
             > wait
             Time flows onward, indifferent to your concerns.

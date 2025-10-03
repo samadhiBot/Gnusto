@@ -5,7 +5,7 @@ import PackageDescription
 let package = Package(
     name: "Gnusto",
     platforms: [
-        .macOS(.v13),
+        .macOS(.v13)
     ],
     products: [
         .library(
@@ -15,10 +15,6 @@ let package = Package(
         .executable(
             name: "CloakOfDarkness",
             targets: ["CloakOfDarkness"]
-        ),
-        .executable(
-            name: "FrobozzMagicDemoKit",
-            targets: ["FrobozzMagicDemoKit"]
         ),
         .executable(
             name: "Zork1",
@@ -42,9 +38,8 @@ let package = Package(
         .package(url: "https://github.com/apple/swift-docc-plugin", from: "1.4.5"),
         .package(url: "https://github.com/apple/swift-log", from: "1.6.4"),
         .package(url: "https://github.com/pointfreeco/swift-custom-dump", from: "1.3.3"),
-        .package(url: "https://github.com/pointfreeco/xctest-dynamic-overlay", from: "1.6.1"),
         .package(url: "https://github.com/simplydanny/swiftlintplugins", from: "0.61.0"),
-        .package(url: "https://github.com/swiftlang/swift-markdown", branch: "main"),
+        .package(url: "https://github.com/swiftlang/swift-markdown", from: "0.7.1"),
         .package(url: "https://github.com/swiftlang/swift-syntax", "600.0.0"..."602.0.0"),
     ],
     targets: [
@@ -66,16 +61,6 @@ let package = Package(
             name: "CloakOfDarkness",
             dependencies: ["GnustoEngine"],
             path: "Executables/CloakOfDarkness",
-            plugins: [
-                "GnustoAutoWiringPlugin",
-                .plugin(name: "SwiftLintBuildToolPlugin", package: "SwiftLintPlugins"),
-            ]
-        ),
-        .executableTarget(
-            name: "FrobozzMagicDemoKit",
-            dependencies: ["GnustoEngine"],
-            path: "Executables/FrobozzMagicDemoKit",
-            exclude: ["README.md", "Docs/"],
             plugins: [
                 "GnustoAutoWiringPlugin",
                 .plugin(name: "SwiftLintBuildToolPlugin", package: "SwiftLintPlugins"),
@@ -109,7 +94,7 @@ let package = Package(
         .target(
             name: "GnustoTestSupport",
             dependencies: [
-                "GnustoEngine",
+                "GnustoEngine"
             ],
             plugins: [
                 .plugin(name: "SwiftLintBuildToolPlugin", package: "SwiftLintPlugins")
@@ -120,15 +105,6 @@ let package = Package(
             dependencies: [
                 "CloakOfDarkness",
                 "GnustoTestSupport",
-                .product(name: "CustomDump", package: "swift-custom-dump"),
-            ],
-        ),
-        .testTarget(
-            name: "FrobozzMagicDemoKitTests",
-            dependencies: [
-                "FrobozzMagicDemoKit",
-                "GnustoTestSupport",
-                .product(name: "CustomDump", package: "swift-custom-dump"),
             ],
         ),
         .testTarget(
@@ -136,7 +112,7 @@ let package = Package(
             dependencies: [
                 "GnustoEngine",
                 "GnustoTestSupport",
-                .product(name: "CustomDump", package: "swift-custom-dump"),
+//                .product(name: "CustomDump", package: "swift-custom-dump"),
             ],
         ),
         .testTarget(
@@ -144,7 +120,7 @@ let package = Package(
             dependencies: [
                 "GnustoEngine",
                 "GnustoAutoWiringTool",
-                .product(name: "CustomDump", package: "swift-custom-dump"),
+//                .product(name: "CustomDump", package: "swift-custom-dump"),
             ]
         ),
         .testTarget(
@@ -152,7 +128,6 @@ let package = Package(
             dependencies: [
                 "Zork1",
                 "GnustoTestSupport",
-                .product(name: "CustomDump", package: "swift-custom-dump"),
             ],
         ),
     ]

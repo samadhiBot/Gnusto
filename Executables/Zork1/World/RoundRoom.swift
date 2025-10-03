@@ -1,179 +1,123 @@
 import GnustoEngine
 
 enum RoundRoom {
-    static let chasmRoom = Location(
-        id: .chasmRoom,
-        .name("Chasm"),
+    static let chasmRoom = Location(.chasmRoom)
+        .name("Chasm")
         .description(
             """
             A chasm runs southwest to northeast and the path follows it. You are
             on the south side of the chasm, where a crack opens into a passage.
             """
-        ),
-        .exits(
-            .northeast(.reservoirSouth),
-            .southwest(.ewPassage),
-            .up(.ewPassage),
-            .south(.nsPassage)
-            // Note: DOWN exit has custom message
-        ),
-        .localGlobals(.crack, .stairs)
-    )
+        )
+        .northeast(.reservoirSouth)
+        .southwest(.ewPassage)
+        .up(.ewPassage)
+        .south(.nsPassage)
+        // Note: DOWN exit has custom message
+        .scenery(.crack, .stairs)
 
-    static let dampCave = Location(
-        id: .dampCave,
-        .name("Damp Cave"),
+    static let dampCave = Location(.dampCave)
+        .name("Damp Cave")
         .description(
             """
             This cave has exits to the west and east, and narrows to a crack toward
             the south. The earth is particularly damp here.
             """
-        ),
-        .exits(
-            .west(.loudRoom),
-            .east(.whiteCliffsNorth)
-            // Note: SOUTH exit has custom message about being too narrow
-        ),
-        .localGlobals(.crack)
-    )
+        )
+        .west(.loudRoom)
+        .east(.whiteCliffsNorth)
+        // Note: SOUTH exit has custom message about being too narrow
+        .scenery(.crack)
 
-    static let deepCanyon = Location(
-        id: .deepCanyon,
-        .name("Deep Canyon"),
+    static let deepCanyon = Location(.deepCanyon)
+        .name("Deep Canyon")
         .description(
             """
             You are on the south side of a deep canyon.
             """
-        ),
-        .exits(
-            .northwest(.reservoirSouth),
-            .east(.damRoom),
-            .southwest(.nsPassage),
-            .down(.loudRoom)
-        ),
-        .localGlobals(.stairs)
-    )
+        )
+        .northwest(.reservoirSouth)
+        .east(.damRoom)
+        .southwest(.nsPassage)
+        .down(.loudRoom)
+        .scenery(.stairs)
 
-    static let ewPassage = Location(
-        id: .ewPassage,
-        .name("East-West Passage"),
+    static let ewPassage = Location(.ewPassage)
+        .name("East-West Passage")
         .description(
             """
             This is a narrow east-west passageway. There is a narrow stairway
             leading down at the north end of the room.
             """
-        ),
-        .exits(
-            .east(.roundRoom),
-            .west(.trollRoom),
-            .down(.chasmRoom),
-            .north(.chasmRoom)
-        ),
-        .localGlobals(.stairs)
-    )
+        )
+        .east(.roundRoom)
+        .west(.trollRoom)
+        .down(.chasmRoom)
+        .north(.chasmRoom)
+        .scenery(.stairs)
 
-    static let loudRoom = Location(
-        id: .loudRoom,
-        .name("Loud Room"),
+    static let loudRoom = Location(.loudRoom)
+        .name("Loud Room")
         .description(
             """
             This is a room where every sound is amplified.
             """
-        ),
-        .exits(
-            .east(.dampCave),
-            .west(.roundRoom),
-            .up(.deepCanyon)
-        ),
-        .localGlobals(.stairs)
-    )
+        )
+        .east(.dampCave)
+        .west(.roundRoom)
+        .up(.deepCanyon)
+        .scenery(.stairs)
 
-    static let nsPassage = Location(
-        id: .nsPassage,
-        .name("North-South Passage"),
+    static let nsPassage = Location(.nsPassage)
+        .name("North-South Passage")
         .description(
             """
             This is a high north-south passage, which forks to the northeast.
             """
-        ),
-        .exits(
-            .north(.chasmRoom),
-            .northeast(.deepCanyon),
-            .south(.roundRoom)
         )
-    )
+        .north(.chasmRoom)
+        .northeast(.deepCanyon)
+        .south(.roundRoom)
 
-    static let roundRoom = Location(
-        id: .roundRoom,
-        .name("Round Room"),
+    static let roundRoom = Location(.roundRoom)
+        .name("Round Room")
         .description(
             """
             This is a circular stone room with passages in all directions. Several
             of them have unfortunately been blocked by cave-ins.
             """
-        ),
-        .exits(
-            .east(.loudRoom),
-            .west(.ewPassage),
-            .north(.nsPassage),
-            .south(.narrowPassage),
-            .southeast(.engravingsCave)
-        ),
+        )
+        .east(.loudRoom)
+        .west(.ewPassage)
+        .north(.nsPassage)
+        .south(.narrowPassage)
+        .southeast(.engravingsCave)
         .inherentlyLit
-    )
 }
 
 // MARK: - Items
 
 extension RoundRoom {
-    static let climbableCliff = Item(
-        id: .climbableCliff,
-        .name("cliff"),
-        .synonyms("wall", "cliff", "walls", "ledge"),
-        .adjectives("rocky", "sheer"),
-        .omitDescription,
-        .isClimbable
-        // Note: Has action handler CLIFF-OBJECT
-    )
-
-    static let crack = Item(
-        id: .crack,
-        .name("crack"),
-        .synonyms("crack"),
-        .adjectives("narrow"),
+    static let crack = Item(.crack)
+        .name("crack")
+        .synonyms("crack")
+        .adjectives("narrow")
         .omitDescription
         // Note: Has action handler CRACK-FCN
-    )
 
-    // Note: largeBag is now defined in Thief.swift to keep thief-related items together
+        // Note: largeBag is now defined in Thief.swift to keep thief-related items together
 
-    static let platinumBar = Item(
-        id: .platinumBar,
-        .name("platinum bar"),
-        .synonyms("bar", "platinum", "treasure"),
-        .adjectives("platinum", "large"),
-        .isTakable,
-        .description("On the ground is a large platinum bar."),
-        .size(20),
-        .in(.loudRoom),
-        .value(10),
+    static let platinumBar = Item(.platinumBar)
+        .name("platinum bar")
+        .synonyms("bar", "platinum", "treasure")
+        .adjectives("platinum", "large")
+        .isTakable
+        .description("On the ground is a large platinum bar.")
+        .size(20)
+        .in(.loudRoom)
+        .value(10)
         .isSacred
         // Note: VALUE 10, TVALUE 5, SACREDBIT
-    )
-
-    static let stiletto = Item(
-        id: .stiletto,
-        .name("stiletto"),
-        .synonyms("stiletto"),
-        .adjectives("vicious"),
-        .isWeapon,
-        .requiresTryTake,
-        .isTakable,
-        .omitDescription,
-        .size(10),
-        .in(.item(.thief))
-        // Note: Has action handler STILETTO-FUNCTION
-    )
 }
 
 extension RoundRoom {

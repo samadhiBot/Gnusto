@@ -1,4 +1,3 @@
-import CustomDump
 import GnustoEngine
 import GnustoTestSupport
 import Testing
@@ -6,43 +5,39 @@ import Testing
 @testable import Zork1
 
 struct OutsideHouseTests {
+    let engine: GameEngine
+    let mockIO: MockIOHandler
+
+    init() async {
+        (engine, mockIO) = await GameEngine.test(
+            blueprint: Zork1(
+                rng: SeededRandomNumberGenerator()
+            )
+        )
+    }
+
     @Test("Interacting with the mailbox")
     func testMailbox() async throws {
-        let (engine, mockIO) = await GameEngine.zork1(
+        try await engine.execute(
             """
             take the mailbox
             open the mailbox
             read the leaflet
             east
             open door
-            take boards
+            examine the boards
+            take the boards
             look at the house
             """
         )
-        await engine.run()
 
-        let transcript = await mockIO.flush()
-        expectNoDifference(
-            transcript,
+        await mockIO.expect(
             """
-            Zork I: The Great Underground Empire
-
-            ZORK I: The Great Underground Empire Copyright (c) 1981, 1982,
-            1983 Infocom, Inc. All rights reserved. ZORK is a registered
-            trademark of Infocom, Inc. Revision 88 / Serial number 840726
-
-            --- West of House ---
-
-            You are standing in an open field west of a white house, with a
-            boarded front door.
-
-            There is a small mailbox here.
-
             > take the mailbox
             It is securely anchored.
 
             > open the mailbox
-            Opening the small mailbox brings a leaflet into the light.
+            As the small mailbox opens, it reveals a leaflet within.
 
             > read the leaflet
             (Taken)
@@ -57,25 +52,28 @@ struct OutsideHouseTests {
             The door is boarded and you can't remove the boards.
 
             > open door
-            The universe denies your request to open the door.
+            You cannot open the door, much as you might wish otherwise.
 
-            > take boards
-            You cannot take the board, much as you might wish otherwise.
+            > examine the boards
+            The boards are securely fastened.
+
+            > take the boards
+            The boards are securely fastened.
 
             > look at the house
-            The white house stubbornly remains ordinary despite your
-            thorough examination.
-
-            >
-            May your adventures elsewhere prove fruitful!
+            The house is a beautiful colonial house which is painted white.
+            It is clear that the owners must have been extremely wealthy.
             """
         )
     }
 
     @Test("Basic house entry via kitchen window")
     func testHouseEntry() async throws {
-        let (engine, mockIO) = await GameEngine.zork1(
-            pre: .enterKitchen,
+        try await engine.apply(
+            engine.player.move(to: .kitchen)
+        )
+
+        try await engine.execute(
             """
             examine table
             open sack
@@ -84,11 +82,8 @@ struct OutsideHouseTests {
             inventory
             """
         )
-        await engine.run()
 
-        let transcript = await mockIO.flush()
-        expectNoDifference(
-            transcript,
+        await mockIO.expect(
             """
             > examine table
             A bottle is sitting on the table. The glass bottle contains a
@@ -96,11 +91,11 @@ struct OutsideHouseTests {
             smelling of hot peppers.
 
             > open sack
-            Opening the brown sack brings a clove of garlic and a lunch
-            into the light.
+            As the brown sack opens, it reveals a clove of garlic and a
+            lunch within.
 
             > inventory
-            You carry nothing but your own thoughts.
+            You are unburdened by material possessions.
 
             > take all
             You take the glass bottle and the brown sack.
@@ -109,49 +104,34 @@ struct OutsideHouseTests {
             You are carrying:
             - A glass bottle
             - A brown sack
-
-            >
-            May your adventures elsewhere prove fruitful!
             """
         )
     }
 
     @Test("Interacting with the boards on the house")
     func testBoards() async throws {
-            let (engine, mockIO) = await GameEngine.zork1(
+        try await engine.execute(
             """
-            take the boards
+            examine the boards
+            remove the boards
             north
-            take the boards
+            remove the boards
             east
             examine the window
             look through the window
             take the window
             south
-            take the boards
+            remove the boards
             """
         )
-        await engine.run()
 
-        let transcript = await mockIO.flush()
-        expectNoDifference(
-            transcript,
+        await mockIO.expect(
             """
-            Zork I: The Great Underground Empire
+            > examine the boards
+            The boards are securely fastened.
 
-            ZORK I: The Great Underground Empire Copyright (c) 1981, 1982,
-            1983 Infocom, Inc. All rights reserved. ZORK is a registered
-            trademark of Infocom, Inc. Revision 88 / Serial number 840726
-
-            --- West of House ---
-
-            You are standing in an open field west of a white house, with a
-            boarded front door.
-
-            There is a small mailbox here.
-
-            > take the boards
-            You cannot take the board, much as you might wish otherwise.
+            > remove the boards
+            The boards are securely fastened.
 
             > north
             --- North of House ---
@@ -160,8 +140,8 @@ struct OutsideHouseTests {
             door here, and all the windows are boarded up. To the north a
             narrow path winds through the trees.
 
-            > take the boards
-            The universe denies your request to take the board.
+            > remove the boards
+            The boards are securely fastened.
 
             > east
             --- Behind House ---
@@ -178,8 +158,7 @@ struct OutsideHouseTests {
             You can see what appears to be a kitchen.
 
             > take the window
-            You cannot take the kitchen window, much as you might wish
-            otherwise.
+            The kitchen window stubbornly resists your attempts to take it.
 
             > south
             --- South of House ---
@@ -187,19 +166,21 @@ struct OutsideHouseTests {
             You are facing the south side of a white house. There is no
             door here, and all the windows are boarded.
 
-            > take the boards
-            You cannot take the board, much as you might wish otherwise.
+            Present in this location is a boarded window.
 
-            >
-            May your adventures elsewhere prove fruitful!
+            > remove the boards
+            The boards are securely fastened.
             """
         )
     }
 
     @Test("Lamp and basic items collection")
     func testBasicItemCollection() async throws {
-        let (engine, mockIO) = await GameEngine.zork1(
-            pre: .enterKitchen,
+        try await engine.apply(
+            engine.player.move(to: .kitchen)
+        )
+
+        try await engine.execute(
             """
             west
             take lamp
@@ -214,11 +195,8 @@ struct OutsideHouseTests {
             inventory
             """
         )
-        await engine.run()
 
-        let transcript = await mockIO.flush()
-        expectNoDifference(
-            transcript,
+        await mockIO.expect(
             """
             > west
             --- Living Room ---
@@ -232,16 +210,16 @@ struct OutsideHouseTests {
             the trophy case hangs an elvish sword of great antiquity.
 
             > take lamp
-            Got it.
+            Taken.
 
             > take sword
-            Acquired.
+            Got it.
 
             > examine lamp
             The lamp is turned off.
 
             > turn on lamp
-            You successfully turn on the brass lantern.
+            With practiced efficiency, you turn on the brass lantern.
 
             > inventory
             You are carrying:
@@ -250,6 +228,15 @@ struct OutsideHouseTests {
 
             > east
             --- Kitchen ---
+
+            You are in the kitchen of the white house. A table seems to
+            have been used recently for the preparation of food. A passage
+            leads to the west and a dark staircase can be seen leading
+            upward. A dark chimney leads down and to the east is a small
+            window which is slightly ajar.
+
+            A bottle is sitting on the table. On the table is an elongated
+            brown sack, smelling of hot peppers.
 
             > up
             --- Attic ---
@@ -271,17 +258,17 @@ struct OutsideHouseTests {
             - A brass lantern
             - A rope
             - A sword
-
-            >
-            Until we meet again in another tale...
             """
         )
     }
 
     @Test("Container interactions (brown sack and bottle)")
     func testContainerInteractions() async throws {
-            let (engine, mockIO) = await GameEngine.zork1(
-            pre: .enterKitchen,
+        try await engine.apply(
+            engine.player.move(to: .kitchen)
+        )
+
+        try await engine.execute(
             """
             examine table
             take sack
@@ -300,11 +287,8 @@ struct OutsideHouseTests {
             inventory
             """
         )
-        await engine.run()
 
-        let transcript = await mockIO.flush()
-        expectNoDifference(
-            transcript,
+        await mockIO.expect(
             """
             > examine table
             A bottle is sitting on the table. The glass bottle contains a
@@ -312,20 +296,20 @@ struct OutsideHouseTests {
             smelling of hot peppers.
 
             > take sack
-            Got it.
+            Taken.
 
             > examine sack
             The brown sack is closed.
 
             > open sack
-            The brown sack parts to disclose a clove of garlic and a lunch,
-            previously hidden from view.
+            Opening the brown sack brings a clove of garlic and a lunch
+            into the light.
 
             > examine sack
             The brown sack contains a clove of garlic and a lunch.
 
             > take lunch
-            Got it.
+            Acquired.
 
             > take garlic
             Got it.
@@ -343,8 +327,8 @@ struct OutsideHouseTests {
             You'll have to open the glass bottle first.
 
             > open bottle
-            The glass bottle parts to disclose a quantity of water,
-            previously hidden from view.
+            Opening the glass bottle brings a quantity of water into the
+            light.
 
             > drink water
             Thank you very much. I was rather thirsty (from all this
@@ -359,9 +343,6 @@ struct OutsideHouseTests {
             - A clove of garlic
             - A lunch
             - A brown sack
-
-            >
-            Until we meet again in another tale...
             """
         )
     }

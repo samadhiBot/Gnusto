@@ -148,6 +148,7 @@ extension GameEngine {
             // Allow quit command to be processed by QuitActionHandler
             // Only exit early if shouldQuit is already set
             if shouldQuit { return }
+
             shouldConsumeTurn = try await execute(command: command)
 
             // When in combat mode, get and process the enemy response

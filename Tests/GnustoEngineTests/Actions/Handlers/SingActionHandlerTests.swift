@@ -18,9 +18,7 @@ struct SingActionHandlerTests {
         try await engine.execute("sing")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > sing
             You unleash a melodic assault upon the immediate vicinity.
@@ -31,12 +29,10 @@ struct SingActionHandlerTests {
     @Test("SERENADE DIRECTOBJECT syntax works")
     func testSerenadeDirectObjectSyntax() async throws {
         // Given
-        let box = Item(
-            id: "box",
-            .name("wooden box"),
-            .description("A simple wooden box."),
+        let box = Item("box")
+            .name("wooden box")
+            .description("A simple wooden box.")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: box
@@ -48,9 +44,7 @@ struct SingActionHandlerTests {
         try await engine.execute("serenade the wooden box")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > serenade the wooden box
             Your serenade to the wooden box falls upon deaf... Well, absent
@@ -62,13 +56,11 @@ struct SingActionHandlerTests {
     @Test("SING TO CHARACTER syntax works")
     func testSingToCharacterSyntax() async throws {
         // Given
-        let wizard = Item(
-            id: "wizard",
-            .name("old wizard"),
-            .description("A wise old wizard with a long beard."),
-            .characterSheet(.wise),
+        let wizard = Item("wizard")
+            .name("old wizard")
+            .description("A wise old wizard with a long beard.")
+            .characterSheet(.wise)
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: wizard
@@ -80,9 +72,7 @@ struct SingActionHandlerTests {
         try await engine.execute("sing to the old wizard")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > sing to the old wizard
             The old wizard endures your impromptu serenade with admirable
@@ -104,9 +94,7 @@ struct SingActionHandlerTests {
         try await engine.execute("sing to the hideous troll")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > sing to the hideous troll
             You can't see any hideous troll here.
@@ -119,11 +107,9 @@ struct SingActionHandlerTests {
     @Test("Sing works in dark rooms")
     func testSingWorksInDarkRooms() async throws {
         // Given: Dark room (no light required for singing)
-        let darkRoom = Location(
-            id: "darkRoom",
-            .name("Dark Room"),
+        let darkRoom = Location("darkRoom")
+            .name("Dark Room")
             .description("A pitch black room.")
-        )
 
         let game = MinimalGame(
             player: Player(in: "darkRoom"),
@@ -136,9 +122,7 @@ struct SingActionHandlerTests {
         try await engine.execute("sing")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > sing
             You unleash a melodic assault upon the immediate vicinity.

@@ -11,16 +11,14 @@ struct DebugActionHandlerTests {
     @Test("DEBUG syntax works")
     func testDebugSyntax() async throws {
         // Given
-        let lamp = Item(
-            id: "lamp",
-            .name("brass lamp"),
-            .description("A shiny brass lantern."),
-            .adjectives("shiny", "brass"),
-            .synonyms("lantern"),
-            .isTakable,
-            .isLightSource,
+        let lamp = Item("lamp")
+            .name("brass lamp")
+            .description("A shiny brass lantern.")
+            .adjectives("shiny", "brass")
+            .synonyms("lantern")
+            .isTakable
+            .isLightSource
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: lamp
@@ -32,9 +30,7 @@ struct DebugActionHandlerTests {
         try await engine.execute("debug lamp")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > debug lamp
             ```
@@ -67,9 +63,7 @@ struct DebugActionHandlerTests {
         try await engine.execute("debug")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > debug
             DEBUG requires a direct object to examine.
@@ -87,9 +81,7 @@ struct DebugActionHandlerTests {
         try await engine.execute("debug nonexistent")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > debug nonexistent
             ```
@@ -105,23 +97,19 @@ struct DebugActionHandlerTests {
     @Test("Does not require light to debug")
     func testDoesNotRequireLight() async throws {
         // Given: Dark room with item
-        let darkRoom = Location(
-            id: "darkRoom",
-            .name("Dark Room"),
+        let darkRoom = Location("darkRoom")
+            .name("Dark Room")
             .description("A pitch black room.")
             // Note: No .inherentlyLit property
-        )
 
-        let lamp = Item(
-            id: "lamp",
-            .name("brass lamp"),
-            .description("A shiny brass lantern."),
-            .adjectives("shiny", "brass"),
-            .synonyms("lantern"),
-            .isTakable,
-            .isLightSource,
+        let lamp = Item("lamp")
+            .name("brass lamp")
+            .description("A shiny brass lantern.")
+            .adjectives("shiny", "brass")
+            .synonyms("lantern")
+            .isTakable
+            .isLightSource
             .in("darkRoom")
-        )
 
         let game = MinimalGame(
             player: Player(in: "darkRoom"),
@@ -135,9 +123,7 @@ struct DebugActionHandlerTests {
         try await engine.execute("debug lamp")
 
         // Then - Debug should work even in darkness
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > debug lamp
             ```
@@ -163,15 +149,13 @@ struct DebugActionHandlerTests {
     @Test("Debug item shows item details")
     func testDebugItemShowsDetails() async throws {
         // Given
-        let sword = Item(
-            id: "sword",
-            .name("steel sword"),
-            .description("A sharp steel sword."),
-            .adjectives("sharp", "steel"),
-            .isTakable,
-            .isWeapon,
+        let sword = Item("sword")
+            .name("steel sword")
+            .description("A sharp steel sword.")
+            .adjectives("sharp", "steel")
+            .isTakable
+            .isWeapon
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: sword
@@ -183,9 +167,7 @@ struct DebugActionHandlerTests {
         try await engine.execute("debug sword")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > debug sword
             ```
@@ -215,9 +197,7 @@ struct DebugActionHandlerTests {
         try await engine.execute("debug startRoom")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > debug startRoom
             ```
@@ -244,9 +224,7 @@ struct DebugActionHandlerTests {
         try await engine.execute("debug me")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > debug me
             ```
@@ -298,9 +276,7 @@ struct DebugActionHandlerTests {
         try await engine.execute("debug self")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > debug self
             ```
@@ -345,17 +321,15 @@ struct DebugActionHandlerTests {
     @Test("Debug item with flags shows flag details")
     func testDebugItemWithFlagsShowsFlags() async throws {
         // Given
-        let lamp = Item(
-            id: "lamp",
-            .name("brass lamp"),
-            .description("A shiny brass lantern."),
-            .adjectives("shiny", "brass"),
-            .synonyms("lantern"),
-            .isTakable,
-            .isDevice,
-            .isLightSource,
+        let lamp = Item("lamp")
+            .name("brass lamp")
+            .description("A shiny brass lantern.")
+            .adjectives("shiny", "brass")
+            .synonyms("lantern")
+            .isTakable
+            .isDevice
+            .isLightSource
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: lamp
@@ -372,9 +346,7 @@ struct DebugActionHandlerTests {
         try await engine.execute("debug lamp")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > debug lamp
             ```
@@ -400,19 +372,15 @@ struct DebugActionHandlerTests {
     @Test("Debug item not in scope still works")
     func testDebugItemNotInScopeStillWorks() async throws {
         // Given
-        let anotherRoom = Location(
-            id: "anotherRoom",
-            .name("Another Room"),
+        let anotherRoom = Location("anotherRoom")
+            .name("Another Room")
             .inherentlyLit
-        )
 
-        let remoteItem = Item(
-            id: "remoteItem",
-            .name("remote item"),
-            .description("An item in another room."),
-            .isTakable,
+        let remoteItem = Item("remoteItem")
+            .name("remote item")
+            .description("An item in another room.")
+            .isTakable
             .in("anotherRoom")
-        )
 
         let game = MinimalGame(
             locations: anotherRoom,
@@ -425,9 +393,7 @@ struct DebugActionHandlerTests {
         try await engine.execute("debug remoteItem")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > debug remoteItem
             ```

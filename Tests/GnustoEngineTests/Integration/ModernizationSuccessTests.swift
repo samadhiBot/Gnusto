@@ -18,9 +18,7 @@ struct ModernizationSuccessTests {
         try await engine.execute("look")
 
         // Then: Modern expectation syntax works
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > look
             --- Laboratory ---
@@ -35,13 +33,11 @@ struct ModernizationSuccessTests {
     @Test("ItemProxy system works with modern async/await")
     func testItemProxyModernization() async throws {
         // Given: Modern game setup with items
-        let modernItem = Item(
-            id: "modernItem",
-            .name("modern item"),
-            .description("An item for testing modern features."),
-            .isTakable,
+        let modernItem = Item("modernItem")
+            .name("modern item")
+            .description("An item for testing modern features.")
+            .isTakable
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: modernItem
@@ -66,9 +62,7 @@ struct ModernizationSuccessTests {
             #expect(Bool(false), "Item should be with player")
         }
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > take modern item
             Taken.
@@ -82,18 +76,14 @@ struct ModernizationSuccessTests {
     @Test("LocationProxy system integrates with modern concurrency")
     func testLocationProxyModernization() async throws {
         // Given: Multiple locations for testing
-        let brightRoom = Location(
-            id: "brightRoom",
-            .name("Bright Room"),
-            .description("A modern, well-lit room."),
+        let brightRoom = Location("brightRoom")
+            .name("Bright Room")
+            .description("A modern, well-lit room.")
             .inherentlyLit
-        )
 
-        let darkRoom = Location(
-            id: "darkRoom",
-            .name("Dark Room"),
+        let darkRoom = Location("darkRoom")
+            .name("Dark Room")
             .description("A room without lighting.")
-        )
 
         let game = MinimalGame(
             player: Player(in: "brightRoom"),
@@ -116,19 +106,15 @@ struct ModernizationSuccessTests {
     @Test("PlayerProxy demonstrates modern inventory management")
     func testPlayerProxyModernization() async throws {
         // Given: Game with items for inventory testing
-        let coin = Item(
-            id: "coin",
-            .name("gold coin"),
-            .isTakable,
+        let coin = Item("coin")
+            .name("gold coin")
+            .isTakable
             .in(.startRoom)
-        )
 
-        let key = Item(
-            id: "key",
-            .name("silver key"),
-            .isTakable,
+        let key = Item("key")
+            .name("silver key")
+            .isTakable
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: coin, key
@@ -158,15 +144,13 @@ struct ModernizationSuccessTests {
     @Test("Modern state changes work atomically")
     func testModernStateChanges() async throws {
         // Given: Device for state change testing
-        let device = Item(
-            id: "device",
-            .name("test device"),
-            .description("A device for state testing."),
-            .isDevice,
-            .isLightSource,
-            .isTakable,
+        let device = Item("device")
+            .name("test device")
+            .description("A device for state testing.")
+            .isDevice
+            .isLightSource
+            .isTakable
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: device
@@ -201,31 +185,25 @@ struct ModernizationSuccessTests {
     @Test("Complete modernization integration works end-to-end")
     func testCompleteModernizationIntegration() async throws {
         // Given: Complete game scenario
-        let workshop = Location(
-            id: "workshop",
-            .name("Modern Workshop"),
-            .description("A workshop for testing modern features."),
+        let workshop = Location("workshop")
+            .name("Modern Workshop")
+            .description("A workshop for testing modern features.")
             .inherentlyLit
-        )
 
-        let toolbox = Item(
-            id: "toolbox",
-            .name("toolbox"),
-            .description("A container for tools."),
-            .isContainer,
-            .isOpenable,
-            .isOpen,
-            .isTakable,
+        let toolbox = Item("toolbox")
+            .name("toolbox")
+            .description("A container for tools.")
+            .isContainer
+            .isOpenable
+            .isOpen
+            .isTakable
             .in("workshop")
-        )
 
-        let hammer = Item(
-            id: "hammer",
-            .name("hammer"),
-            .description("A useful hammer."),
-            .isTakable,
+        let hammer = Item("hammer")
+            .name("hammer")
+            .description("A useful hammer.")
+            .isTakable
             .in(.item("toolbox"))
-        )
 
         let game = MinimalGame(
             player: Player(in: "workshop"),

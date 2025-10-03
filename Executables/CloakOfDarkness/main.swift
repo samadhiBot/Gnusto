@@ -4,7 +4,7 @@ let engine = await GameEngine(
     blueprint: CloakOfDarkness(),
     parser: StandardParser(),
     ioHandler: ConsoleIOHandler(
-        markdownParser: MarkdownParser(columns: 64)
+        markdownParser: MarkdownParser(columns: 69)
     )
 )
 

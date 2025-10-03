@@ -12,7 +12,7 @@ public struct ExamineActionHandler: ActionHandler {
         .match(.look, .through, .directObject),
     ]
 
-    public let synonyms: [Verb] = [.examine, "x", .inspect, .describe, .look, "l"]
+    public let synonyms: [Verb] = [.examine, .x, .inspect, .describe, .look, .l]
 
     public let requiresLight: Bool = true
 
@@ -58,7 +58,7 @@ public struct ExamineActionHandler: ActionHandler {
                     item.name,
                     examineItem(item)
                 )
-                await allStateChanges.append(
+                await allStateChanges.appendIfPresent(
                     item.setFlag(.isTouched)
                 )
                 examinedItems.append(item)
@@ -117,11 +117,11 @@ extension ExamineActionHandler {
         }
 
         if await targetItem.hasFlag(.isSurface) {
-            await messages.append(
+            await messages.appendIfPresent(
                 describeSurface(item: targetItem)
             )
         } else if await targetItem.isContainer {
-            await messages.append(
+            await messages.appendIfPresent(
                 describeContainer(item: targetItem)
             )
         } else if await targetItem.isDoor {

@@ -11,15 +11,13 @@ struct UnlockActionHandlerTests {
     @Test("UNLOCK DIRECTOBJECT syntax works")
     func testUnlockDirectObjectSyntax() async throws {
         // Given
-        let chest = Item(
-            id: "chest",
-            .name("wooden chest"),
-            .description("A locked wooden chest."),
-            .isLockable,
-            .isLocked,
-            .lockKey("missingKey"),
+        let chest = Item("chest")
+            .name("wooden chest")
+            .description("A locked wooden chest.")
+            .isLockable
+            .isLocked
+            .lockKey("missingKey")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: chest
@@ -31,9 +29,7 @@ struct UnlockActionHandlerTests {
         try await engine.execute("unlock chest")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > unlock chest
             Unlock the wooden chest with what?
@@ -44,23 +40,19 @@ struct UnlockActionHandlerTests {
     @Test("UNLOCK DIRECTOBJECT WITH INDIRECTOBJECT syntax works")
     func testUnlockWithSyntax() async throws {
         // Given
-        let door = Item(
-            id: "door",
-            .name("oak door"),
-            .description("A sturdy oak door with a brass lock."),
-            .isLockable,
-            .isLocked,
-            .lockKey("brassKey"),
+        let door = Item("door")
+            .name("oak door")
+            .description("A sturdy oak door with a brass lock.")
+            .isLockable
+            .isLocked
+            .lockKey("brassKey")
             .in(.startRoom)
-        )
 
-        let key = Item(
-            id: "brassKey",
-            .name("brass key"),
-            .description("A shiny brass key."),
-            .isTakable,
+        let key = Item("brassKey")
+            .name("brass key")
+            .description("A shiny brass key.")
+            .isTakable
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: door, key
@@ -72,9 +64,7 @@ struct UnlockActionHandlerTests {
         try await engine.execute("unlock door with key")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > unlock door with key
             The oak door is now unlocked.
@@ -100,9 +90,7 @@ struct UnlockActionHandlerTests {
         try await engine.execute("unlock")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > unlock
             Unlock what?
@@ -113,15 +101,13 @@ struct UnlockActionHandlerTests {
     @Test("Cannot unlock without specifying key")
     func testCannotUnlockWithoutKey() async throws {
         // Given
-        let safe = Item(
-            id: "safe",
-            .name("metal safe"),
-            .description("A heavy metal safe."),
-            .lockKey("missingKey"),
-            .isLockable,
-            .isLocked,
+        let safe = Item("safe")
+            .name("metal safe")
+            .description("A heavy metal safe.")
+            .lockKey("missingKey")
+            .isLockable
+            .isLocked
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: safe
@@ -133,9 +119,7 @@ struct UnlockActionHandlerTests {
         try await engine.execute("unlock safe")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > unlock safe
             Unlock the metal safe with what?
@@ -146,23 +130,19 @@ struct UnlockActionHandlerTests {
     @Test("Cannot unlock with key not held")
     func testCannotUnlockWithKeyNotHeld() async throws {
         // Given
-        let box = Item(
-            id: "box",
-            .name("jewelry box"),
-            .description("An ornate jewelry box."),
-            .isLockable,
-            .isLocked,
-            .lockKey("silverKey"),
+        let box = Item("box")
+            .name("jewelry box")
+            .description("An ornate jewelry box.")
+            .isLockable
+            .isLocked
+            .lockKey("silverKey")
             .in(.startRoom)
-        )
 
-        let key = Item(
-            id: "silverKey",
-            .name("silver key"),
-            .description("A delicate silver key."),
-            .isTakable,
+        let key = Item("silverKey")
+            .name("silver key")
+            .description("A delicate silver key.")
+            .isTakable
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: box, key
@@ -174,9 +154,7 @@ struct UnlockActionHandlerTests {
         try await engine.execute("unlock box with key")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > unlock box with key
             You aren't holding the silver key.
@@ -187,28 +165,22 @@ struct UnlockActionHandlerTests {
     @Test("Cannot unlock item not in scope")
     func testCannotUnlockItemNotInScope() async throws {
         // Given
-        let anotherRoom = Location(
-            id: "anotherRoom",
-            .name("Another Room"),
+        let anotherRoom = Location("anotherRoom")
+            .name("Another Room")
             .inherentlyLit
-        )
 
-        let remoteDoor = Item(
-            id: "remoteDoor",
-            .name("remote door"),
-            .description("A door in another room."),
-            .isLockable,
-            .isLocked,
+        let remoteDoor = Item("remoteDoor")
+            .name("remote door")
+            .description("A door in another room.")
+            .isLockable
+            .isLocked
             .in("anotherRoom")
-        )
 
-        let key = Item(
-            id: "key",
-            .name("master key"),
-            .description("A master key."),
-            .isTakable,
+        let key = Item("key")
+            .name("master key")
+            .description("A master key.")
+            .isTakable
             .in(.player)
-        )
 
         let game = MinimalGame(
             locations: anotherRoom,
@@ -221,9 +193,7 @@ struct UnlockActionHandlerTests {
         try await engine.execute("unlock door with key")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > unlock door with key
             Any such thing lurks beyond your reach.
@@ -234,20 +204,16 @@ struct UnlockActionHandlerTests {
     @Test("Cannot unlock non-lockable item")
     func testCannotUnlockNonLockableItem() async throws {
         // Given
-        let table = Item(
-            id: "table",
-            .name("wooden table"),
-            .description("A simple wooden table."),
+        let table = Item("table")
+            .name("wooden table")
+            .description("A simple wooden table.")
             .in(.startRoom)
-        )
 
-        let key = Item(
-            id: "key",
-            .name("old key"),
-            .description("An old key."),
-            .isTakable,
+        let key = Item("key")
+            .name("old key")
+            .description("An old key.")
+            .isTakable
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: table, key
@@ -259,9 +225,7 @@ struct UnlockActionHandlerTests {
         try await engine.execute("unlock table with key")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > unlock table with key
             That's not something you can unlock.
@@ -272,23 +236,19 @@ struct UnlockActionHandlerTests {
     @Test("Cannot unlock already unlocked item")
     func testCannotUnlockAlreadyUnlocked() async throws {
         // Given
-        let cabinet = Item(
-            id: "cabinet",
-            .name("glass cabinet"),
-            .description("A glass display cabinet."),
-            .isLockable,
-            .lockKey("cabinetKey"),
+        let cabinet = Item("cabinet")
+            .name("glass cabinet")
+            .description("A glass display cabinet.")
+            .isLockable
+            .lockKey("cabinetKey")
             .in(.startRoom)
             // Note: No .isLocked flag - already unlocked
-        )
 
-        let key = Item(
-            id: "cabinetKey",
-            .name("cabinet key"),
-            .description("A key for the cabinet."),
-            .isTakable,
+        let key = Item("cabinetKey")
+            .name("cabinet key")
+            .description("A key for the cabinet.")
+            .isTakable
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: cabinet, key
@@ -300,9 +260,7 @@ struct UnlockActionHandlerTests {
         try await engine.execute("unlock cabinet with key")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > unlock cabinet with key
             The glass cabinet is already unlocked.
@@ -313,23 +271,19 @@ struct UnlockActionHandlerTests {
     @Test("Cannot unlock with wrong key")
     func testCannotUnlockWithWrongKey() async throws {
         // Given
-        let strongbox = Item(
-            id: "strongbox",
-            .name("iron strongbox"),
-            .description("A heavy iron strongbox."),
-            .isLockable,
-            .isLocked,
-            .lockKey("ironKey"),
+        let strongbox = Item("strongbox")
+            .name("iron strongbox")
+            .description("A heavy iron strongbox.")
+            .isLockable
+            .isLocked
+            .lockKey("ironKey")
             .in(.startRoom)
-        )
 
-        let wrongKey = Item(
-            id: "copperKey",
-            .name("copper key"),
-            .description("A copper key."),
-            .isTakable,
+        let wrongKey = Item("copperKey")
+            .name("copper key")
+            .description("A copper key.")
+            .isTakable
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: strongbox, wrongKey
@@ -341,9 +295,7 @@ struct UnlockActionHandlerTests {
         try await engine.execute("unlock strongbox with key")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > unlock strongbox with key
             The copper key and the iron strongbox were never meant to be
@@ -355,30 +307,24 @@ struct UnlockActionHandlerTests {
     @Test("Requires light to unlock")
     func testRequiresLight() async throws {
         // Given: Dark room with locked item
-        let darkRoom = Location(
-            id: "darkRoom",
-            .name("Dark Room"),
+        let darkRoom = Location("darkRoom")
+            .name("Dark Room")
             .description("A pitch black room.")
             // Note: No .inherentlyLit property
-        )
 
-        let chest = Item(
-            id: "chest",
-            .name("treasure chest"),
-            .description("A locked treasure chest."),
-            .isLockable,
-            .isLocked,
-            .lockKey("treasureKey"),
+        let chest = Item("chest")
+            .name("treasure chest")
+            .description("A locked treasure chest.")
+            .isLockable
+            .isLocked
+            .lockKey("treasureKey")
             .in("darkRoom")
-        )
 
-        let key = Item(
-            id: "treasureKey",
-            .name("treasure key"),
-            .description("A key to the treasure chest."),
-            .isTakable,
+        let key = Item("treasureKey")
+            .name("treasure key")
+            .description("A key to the treasure chest.")
+            .isTakable
             .in(.player)
-        )
 
         let game = MinimalGame(
             player: Player(in: "darkRoom"),
@@ -392,9 +338,7 @@ struct UnlockActionHandlerTests {
         try await engine.execute("unlock chest with key")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > unlock chest with key
             The darkness here is absolute, consuming all light and hope of
@@ -408,23 +352,19 @@ struct UnlockActionHandlerTests {
     @Test("Unlock lockable item with correct key")
     func testUnlockWithCorrectKey() async throws {
         // Given
-        let lockbox = Item(
-            id: "lockbox",
-            .name("steel lockbox"),
-            .description("A secure steel lockbox."),
-            .isLockable,
-            .isLocked,
-            .lockKey("steelKey"),
+        let lockbox = Item("lockbox")
+            .name("steel lockbox")
+            .description("A secure steel lockbox.")
+            .isLockable
+            .isLocked
+            .lockKey("steelKey")
             .in(.startRoom)
-        )
 
-        let key = Item(
-            id: "steelKey",
-            .name("steel key"),
-            .description("A steel key."),
-            .isTakable,
+        let key = Item("steelKey")
+            .name("steel key")
+            .description("A steel key.")
+            .isTakable
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: lockbox, key
@@ -444,9 +384,7 @@ struct UnlockActionHandlerTests {
         #expect(await finalKey.hasFlag(.isTouched) == true)
 
         // Verify message
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > unlock lockbox with key
             The steel lockbox is now unlocked.
@@ -457,41 +395,33 @@ struct UnlockActionHandlerTests {
     @Test("Unlock multiple different items")
     func testUnlockMultipleItems() async throws {
         // Given
-        let door = Item(
-            id: "door",
-            .name("wooden door"),
-            .description("A wooden door."),
-            .isLockable,
-            .isLocked,
-            .lockKey("doorKey"),
+        let door = Item("door")
+            .name("wooden door")
+            .description("A wooden door.")
+            .isLockable
+            .isLocked
+            .lockKey("doorKey")
             .in(.startRoom)
-        )
 
-        let chest = Item(
-            id: "chest",
-            .name("small chest"),
-            .description("A small chest."),
-            .isLockable,
-            .isLocked,
-            .lockKey("chestKey"),
+        let chest = Item("chest")
+            .name("small chest")
+            .description("A small chest.")
+            .isLockable
+            .isLocked
+            .lockKey("chestKey")
             .in(.startRoom)
-        )
 
-        let doorKey = Item(
-            id: "doorKey",
-            .name("door key"),
-            .description("A key for the door."),
-            .isTakable,
+        let doorKey = Item("doorKey")
+            .name("door key")
+            .description("A key for the door.")
+            .isTakable
             .in(.player)
-        )
 
-        let chestKey = Item(
-            id: "chestKey",
-            .name("chest key"),
-            .description("A key for the chest."),
-            .isTakable,
+        let chestKey = Item("chestKey")
+            .name("chest key")
+            .description("A key for the chest.")
+            .isTakable
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: door, chest, doorKey, chestKey
@@ -503,9 +433,7 @@ struct UnlockActionHandlerTests {
         try await engine.execute("unlock door with door key")
 
         // Then
-        let output1 = await mockIO.flush()
-        expectNoDifference(
-            output1,
+        await mockIO.expect(
             """
             > unlock door with door key
             The wooden door is now unlocked.
@@ -516,9 +444,7 @@ struct UnlockActionHandlerTests {
         try await engine.execute("unlock chest with chest key")
 
         // Then
-        let output2 = await mockIO.flush()
-        expectNoDifference(
-            output2,
+        await mockIO.expect(
             """
             > unlock chest with chest key
             The small chest is now unlocked.
@@ -535,25 +461,21 @@ struct UnlockActionHandlerTests {
     @Test("Unlock preserves other item properties")
     func testUnlockPreservesOtherProperties() async throws {
         // Given
-        let container = Item(
-            id: "container",
-            .name("magic container"),
-            .description("A magical container."),
-            .isContainer,
-            .isLockable,
-            .isLocked,
-            .isOpenable,
-            .lockKey("magicKey"),
+        let container = Item("container")
+            .name("magic container")
+            .description("A magical container.")
+            .isContainer
+            .isLockable
+            .isLocked
+            .isOpenable
+            .lockKey("magicKey")
             .in(.startRoom)
-        )
 
-        let key = Item(
-            id: "magicKey",
-            .name("magic key"),
-            .description("A glowing magic key."),
-            .isTakable,
+        let key = Item("magicKey")
+            .name("magic key")
+            .description("A glowing magic key.")
+            .isTakable
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: container, key
@@ -572,9 +494,7 @@ struct UnlockActionHandlerTests {
         #expect(await finalContainer.hasFlag(.isLockable) == true)
         #expect(await finalContainer.isOpenable == true)
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > unlock container with key
             The magic container is now unlocked.

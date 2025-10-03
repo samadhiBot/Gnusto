@@ -18,9 +18,7 @@ struct ScoreActionHandlerTests {
         try await engine.execute("score")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > score
             Your score is 0 (total of 10 points), in 0 moves.
@@ -33,11 +31,9 @@ struct ScoreActionHandlerTests {
     @Test("Score works in dark room")
     func testScoreInDarkRoom() async throws {
         // Given: Dark room
-        let darkRoom = Location(
-            id: "darkRoom",
-            .name("Dark Room"),
+        let darkRoom = Location("darkRoom")
+            .name("Dark Room")
             .description("A pitch black room.")
-        )
 
         let game = MinimalGame(
             player: Player(in: "darkRoom"),
@@ -50,9 +46,7 @@ struct ScoreActionHandlerTests {
         try await engine.execute("score")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > score
             Your score is 0 (total of 10 points), in 0 moves.
@@ -74,9 +68,7 @@ struct ScoreActionHandlerTests {
         )
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > wait
             Time flows onward, indifferent to your concerns.
@@ -100,9 +92,7 @@ struct ScoreActionHandlerTests {
         try await engine.execute("score")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > score
             Your score is 0 (total of 10 points), in 0 moves.

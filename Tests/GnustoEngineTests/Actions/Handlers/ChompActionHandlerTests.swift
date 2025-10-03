@@ -11,13 +11,11 @@ struct ChompActionHandlerTests {
     @Test("CHOMP DIRECTOBJECT syntax works with disambiguation")
     func testChompDirectObjectSyntax() async throws {
         // Given
-        let apple = Item(
-            id: "apple",
-            .name("red apple"),
-            .description("A juicy red apple."),
-            .isEdible,
+        let apple = Item("apple")
+            .name("red apple")
+            .description("A juicy red apple.")
+            .isEdible
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: apple
@@ -29,9 +27,7 @@ struct ChompActionHandlerTests {
         try await engine.execute("chomp apple")
 
         // Then: Should ask whether to eat it
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > chomp apple
             Do you mean you want to eat the red apple?
@@ -46,13 +42,11 @@ struct ChompActionHandlerTests {
     @Test("CHOMP disambiguation - YES response eats the item")
     func testChompDisambiguationYes() async throws {
         // Given
-        let apple = Item(
-            id: "apple",
-            .name("red apple"),
-            .description("A juicy red apple."),
-            .isEdible,
+        let apple = Item("apple")
+            .name("red apple")
+            .description("A juicy red apple.")
+            .isEdible
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: apple
@@ -64,9 +58,7 @@ struct ChompActionHandlerTests {
         try await engine.execute("chomp apple", "yes")
 
         // Then: Should eat the apple (delegate to EatActionHandler)
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > chomp apple
             Do you mean you want to eat the red apple?
@@ -87,13 +79,11 @@ struct ChompActionHandlerTests {
     @Test("CHOMP disambiguation - NO response just takes a bite")
     func testChompDisambiguationNo() async throws {
         // Given
-        let apple = Item(
-            id: "apple",
-            .name("red apple"),
-            .description("A juicy red apple."),
-            .isEdible,
+        let apple = Item("apple")
+            .name("red apple")
+            .description("A juicy red apple.")
+            .isEdible
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: apple
@@ -105,9 +95,7 @@ struct ChompActionHandlerTests {
         try await engine.execute("chomp apple", "no")
 
         // Then: Should just decline
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > chomp apple
             Do you mean you want to eat the red apple?
@@ -126,13 +114,11 @@ struct ChompActionHandlerTests {
     @Test("BITE syntax works with disambiguation")
     func testBiteSyntax() async throws {
         // Given
-        let bread = Item(
-            id: "bread",
-            .name("piece of bread"),
-            .description("A piece of fresh bread."),
-            .isEdible,
+        let bread = Item("bread")
+            .name("piece of bread")
+            .description("A piece of fresh bread.")
+            .isEdible
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: bread
@@ -144,9 +130,7 @@ struct ChompActionHandlerTests {
         try await engine.execute("bite bread")
 
         // Then: Should ask for disambiguation
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > bite bread
             Do you mean you want to eat the piece of bread?
@@ -164,9 +148,7 @@ struct ChompActionHandlerTests {
         try await engine.execute("chew")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > chew
             Your teeth clack together in a display of purposeless
@@ -180,19 +162,15 @@ struct ChompActionHandlerTests {
     @Test("Cannot chomp item not in scope")
     func testCannotChompItemNotInScope() async throws {
         // Given
-        let anotherRoom = Location(
-            id: "anotherRoom",
-            .name("Another Room"),
+        let anotherRoom = Location("anotherRoom")
+            .name("Another Room")
             .inherentlyLit
-        )
 
-        let remoteApple = Item(
-            id: "remoteApple",
-            .name("remote apple"),
-            .description("An apple in another room."),
-            .isEdible,
+        let remoteApple = Item("remoteApple")
+            .name("remote apple")
+            .description("An apple in another room.")
+            .isEdible
             .in("anotherRoom")
-        )
 
         let game = MinimalGame(
             locations: anotherRoom,
@@ -205,9 +183,7 @@ struct ChompActionHandlerTests {
         try await engine.execute("chomp apple")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > chomp apple
             Any such thing lurks beyond your reach.
@@ -218,19 +194,15 @@ struct ChompActionHandlerTests {
     @Test("Requires light to chomp on items")
     func testRequiresLight() async throws {
         // Given: Dark room with an edible item
-        let darkRoom = Location(
-            id: "darkRoom",
-            .name("Dark Room"),
+        let darkRoom = Location("darkRoom")
+            .name("Dark Room")
             .description("A pitch black room.")
-        )
 
-        let apple = Item(
-            id: "apple",
-            .name("red apple"),
-            .description("A juicy red apple."),
-            .isEdible,
+        let apple = Item("apple")
+            .name("red apple")
+            .description("A juicy red apple.")
+            .isEdible
             .in("darkRoom")
-        )
 
         let game = MinimalGame(
             player: Player(in: "darkRoom"),
@@ -244,9 +216,7 @@ struct ChompActionHandlerTests {
         try await engine.execute("chomp apple")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > chomp apple
             The darkness here is absolute, consuming all light and hope of
@@ -267,9 +237,7 @@ struct ChompActionHandlerTests {
         try await engine.execute("chomp")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > chomp
             Your teeth clack together in a display of purposeless
@@ -281,13 +249,11 @@ struct ChompActionHandlerTests {
     @Test("Chomp on edible item asks for disambiguation")
     func testChompOnEdibleItem() async throws {
         // Given
-        let cookie = Item(
-            id: "cookie",
-            .name("chocolate cookie"),
-            .description("A delicious chocolate cookie."),
-            .isEdible,
+        let cookie = Item("cookie")
+            .name("chocolate cookie")
+            .description("A delicious chocolate cookie.")
+            .isEdible
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: cookie
@@ -299,9 +265,7 @@ struct ChompActionHandlerTests {
         try await engine.execute("chomp cookie")
 
         // Then: Should ask for disambiguation
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > chomp cookie
             Do you mean you want to eat the chocolate cookie?
@@ -316,13 +280,11 @@ struct ChompActionHandlerTests {
     @Test("Chomp on character gives humorous response")
     func testChompOnCharacter() async throws {
         // Given
-        let castleGuard = Item(
-            id: "castleGuard",
-            .name("castle guard"),
-            .description("A stern castle guard."),
-            .characterSheet(.strong),
+        let castleGuard = Item("castleGuard")
+            .name("castle guard")
+            .description("A stern castle guard.")
+            .characterSheet(.strong)
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: castleGuard
@@ -334,9 +296,7 @@ struct ChompActionHandlerTests {
         try await engine.execute("chomp guard")
 
         // Then: Should give humorous response directly (no disambiguation)
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > chomp guard
             Your dental assault on the castle guard would likely end your
@@ -351,12 +311,10 @@ struct ChompActionHandlerTests {
     @Test("Chomp on regular item gives humorous response")
     func testChompOnRegularItem() async throws {
         // Given
-        let rock = Item(
-            id: "rock",
-            .name("smooth rock"),
-            .description("A smooth, round rock."),
+        let rock = Item("rock")
+            .name("smooth rock")
+            .description("A smooth, round rock.")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: rock
@@ -368,9 +326,7 @@ struct ChompActionHandlerTests {
         try await engine.execute("chomp rock")
 
         // Then: Should give humorous response directly (no disambiguation)
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > chomp rock
             Your teeth are no match for the smooth rock.
@@ -384,13 +340,11 @@ struct ChompActionHandlerTests {
     @Test("Conversation recovery - non-response clears question")
     func testConversationRecovery() async throws {
         // Given
-        let apple = Item(
-            id: "apple",
-            .name("red apple"),
-            .description("A juicy red apple."),
-            .isEdible,
+        let apple = Item("apple")
+            .name("red apple")
+            .description("A juicy red apple.")
+            .isEdible
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: apple
@@ -402,9 +356,7 @@ struct ChompActionHandlerTests {
         try await engine.execute("chomp apple", "look")
 
         // Then: Question should be automatically cleared
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > chomp apple
             Do you mean you want to eat the red apple?

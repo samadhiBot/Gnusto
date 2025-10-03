@@ -1,53 +1,45 @@
 import GnustoEngine
 
 enum Troll {
-    static let troll = Item(
-        id: .troll,
-        .name("troll"),
-        .synonyms("troll"),
-        .adjectives("nasty", "pathetic"),
+    static let troll = Item(.troll)
+        .name("troll")
+        .synonyms("troll")
+        .adjectives("nasty", "pathetic")
         .characterSheet(
-            CharacterSheet(
-                strength: 12,
-                dexterity: 8,
-                constitution: 12,
-                intelligence: 6,
-                wisdom: 5,
-                charisma: 1,
-                bravery: 12,
-                perception: 8,
-                luck: 6,
-                morale: 12,
-                accuracy: 10,
-                intimidation: 12,
-                stealth: 4,
-                level: 1,
-                classification: .masculine,
-                alignment: .neutralEvil,
-                armorClass: 10
-            )
-        ),
-        .in(.trollRoom),
-        .isOpen,
-        .requiresTryTake,
-    )
+            strength: 12,
+            dexterity: 8,
+            constitution: 12,
+            intelligence: 6,
+            wisdom: 5,
+            charisma: 1,
+            bravery: 12,
+            perception: 8,
+            luck: 6,
+            morale: 12,
+            accuracy: 10,
+            intimidation: 12,
+            stealth: 4,
+            level: 1,
+            classification: .masculine,
+            alignment: .neutralEvil,
+            armorClass: 10
+        )
+        .in(.trollRoom)
+        .isOpen
+        .requiresTryTake
 
-    static let trollRoom = Location(
-        id: .trollRoom,
-        .name("Troll Room"),
+    static let trollRoom = Location(.trollRoom)
+        .name("Troll Room")
         .description(
             """
             This is a small room with passages to the east and south and a forbidding hole
             leading west. Bloodstains and deep scratches (perhaps made by an axe) mar the
             walls.
             """
-        ),
-        .exits(
-            .east(.eastWestPassage),
-            .south(.cellar),
-            .west(.maze1)
         )
-    )
+        .east(.eastWestPassage)
+        .south(.cellar)
+        .west(.maze1)
 
     // MARK: - Computers
 
@@ -155,9 +147,9 @@ enum Troll {
 
             // Troll blocks the way if here in the room, alive, and conscious
             if await context.location.items.contains(troll),
-                await troll.isAwake,
-                let direction = command.direction,
-                [.east, .west].contains(direction)
+               await troll.isAwake,
+               let direction = command.direction,
+               [.east, .west].contains(direction)
             {
                 return ActionResult("The troll fends you off with a menacing gesture.")
             }

@@ -1,3 +1,4 @@
+import CustomDump
 import Foundation
 
 @testable import GnustoEngine
@@ -17,11 +18,12 @@ import Foundation
 ///
 /// // Execute commands and verify output
 /// try await engine.execute("take lamp")
-/// let output = await mockIO.flush()
-/// expectNoDifference(output, """
-/// > take lamp
-/// Taken.
-/// """)
+/// await mockIO.expect(
+///     """
+///     > take lamp
+///     Taken.
+///     """
+/// )
 /// ```
 ///
 /// ## Advanced Input Simulation
@@ -303,6 +305,57 @@ public final class MockIOHandler: IOHandler {
             .replacing(/\n{3,}/, with: String.paragraph)
     }
 }
+
+// MARK: - Test helper
+
+extension MockIOHandler {
+    /// Flushes recorded output and verifies it matches the expected transcript.
+    ///
+    /// This convenience method combines `flush()` and `expectNoDifference()` to streamline
+    /// test verification. It captures all recorded output since the last flush, formats it
+    /// as an interactive fiction transcript, and compares it against the expected output.
+    ///
+    /// ## Usage
+    /// ```swift
+    /// try await engine.execute("take lamp")
+    /// try await mockIO.expect(
+    ///     """
+    ///     > take lamp
+    ///     Taken.
+    ///     """
+    /// )
+    /// ```
+    ///
+    /// - Parameters:
+    ///   - output: The expected transcript output to compare against.
+    ///   - message: Optional custom failure message for test diagnostics.
+    ///   - fileID: Source file identifier for test failure reporting.
+    ///   - filePath: Source file path for test failure reporting.
+    ///   - line: Source line number for test failure reporting.
+    ///   - column: Source column number for test failure reporting.
+    /// - Throws: Test failure if the actual output doesn't match expectations.
+    public func expect(
+        _ output: @autoclosure () -> String,
+        _ message: @autoclosure () -> String? = nil,
+        fileID: StaticString = #fileID,
+        filePath: StaticString = #filePath,
+        line: UInt = #line,
+        column: UInt = #column
+    ) async {
+        let actual = await flush()
+        expectNoDifference(
+            actual,
+            output(),
+            message(),
+            fileID: fileID,
+            filePath: filePath,
+            line: line,
+            column: column
+        )
+    }
+}
+
+// MARK: - RecordedStatusLine
 
 extension MockIOHandler {
     /// Represents a captured status line update during test execution.

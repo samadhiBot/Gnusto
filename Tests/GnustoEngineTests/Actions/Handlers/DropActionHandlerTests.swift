@@ -11,13 +11,11 @@ struct DropActionHandlerTests {
     @Test("DROP DIRECTOBJECTS syntax works")
     func testDropDirectObjectsSyntax() async throws {
         // Given
-        let book = Item(
-            id: "book",
-            .name("leather book"),
-            .description("A thick leather-bound book."),
-            .isTakable,
+        let book = Item("book")
+            .name("leather book")
+            .description("A thick leather-bound book.")
+            .isTakable
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: book
@@ -29,9 +27,7 @@ struct DropActionHandlerTests {
         try await engine.execute("drop book")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > drop book
             Dropped.
@@ -47,13 +43,11 @@ struct DropActionHandlerTests {
     @Test("DISCARD syntax works")
     func testDiscardSyntax() async throws {
         // Given
-        let trash = Item(
-            id: "trash",
-            .name("crumpled paper"),
-            .description("A crumpled piece of paper."),
-            .isTakable,
+        let trash = Item("trash")
+            .name("crumpled paper")
+            .description("A crumpled piece of paper.")
+            .isTakable
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: trash
@@ -65,9 +59,7 @@ struct DropActionHandlerTests {
         try await engine.execute("discard paper")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > discard paper
             Dropped.
@@ -78,21 +70,17 @@ struct DropActionHandlerTests {
     @Test("DROP ALL syntax works when player has items")
     func testDropAllSyntax() async throws {
         // Given
-        let book = Item(
-            id: "book",
-            .name("leather book"),
-            .description("A thick leather-bound book."),
-            .isTakable,
+        let book = Item("book")
+            .name("leather book")
+            .description("A thick leather-bound book.")
+            .isTakable
             .in(.player)
-        )
 
-        let coin = Item(
-            id: "coin",
-            .name("gold coin"),
-            .description("A shiny gold coin."),
-            .isTakable,
+        let coin = Item("coin")
+            .name("gold coin")
+            .description("A shiny gold coin.")
+            .isTakable
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: book, coin
@@ -104,9 +92,7 @@ struct DropActionHandlerTests {
         try await engine.execute("drop all")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > drop all
             You drop the leather book and the gold coin.
@@ -132,9 +118,7 @@ struct DropActionHandlerTests {
         try await engine.execute("drop")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > drop
             Drop what?
@@ -145,13 +129,11 @@ struct DropActionHandlerTests {
     @Test("Cannot drop item not held")
     func testCannotDropItemNotHeld() async throws {
         // Given
-        let book = Item(
-            id: "book",
-            .name("leather book"),
-            .description("A thick leather-bound book."),
-            .isTakable,
+        let book = Item("book")
+            .name("leather book")
+            .description("A thick leather-bound book.")
+            .isTakable
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: book
@@ -163,9 +145,7 @@ struct DropActionHandlerTests {
         try await engine.execute("drop book")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > drop book
             You aren't holding the leather book.
@@ -176,13 +156,11 @@ struct DropActionHandlerTests {
     @Test("Cannot drop non-droppable item")
     func testCannotDropNonDroppableItem() async throws {
         // Given
-        let cursedItem = Item(
-            id: "cursedItem",
-            .name("cursed ring"),
-            .description("A ring that won't come off."),
-            .omitDescription,  // Makes it non-droppable
+        let cursedItem = Item("cursedItem")
+            .name("cursed ring")
+            .description("A ring that won't come off.")
+            .omitDescription  // Makes it non-droppable
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: cursedItem
@@ -194,9 +172,7 @@ struct DropActionHandlerTests {
         try await engine.execute("drop ring")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > drop ring
             The cursed ring stubbornly resists your attempts to drop it.
@@ -207,19 +183,15 @@ struct DropActionHandlerTests {
     @Test("Requires light to drop")
     func testRequiresLight() async throws {
         // Given: Dark room
-        let darkRoom = Location(
-            id: "darkRoom",
-            .name("Dark Room"),
+        let darkRoom = Location("darkRoom")
+            .name("Dark Room")
             .description("A pitch black room.")
-        )
 
-        let book = Item(
-            id: "book",
-            .name("leather book"),
-            .description("A thick leather-bound book."),
-            .isTakable,
+        let book = Item("book")
+            .name("leather book")
+            .description("A thick leather-bound book.")
+            .isTakable
             .in(.player)
-        )
 
         let game = MinimalGame(
             player: Player(in: "darkRoom"),
@@ -233,9 +205,7 @@ struct DropActionHandlerTests {
         try await engine.execute("drop book")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > drop book
             The darkness here is absolute, consuming all light and hope of
@@ -249,13 +219,11 @@ struct DropActionHandlerTests {
     @Test("Drop single item successfully")
     func testDropSingleItem() async throws {
         // Given
-        let sword = Item(
-            id: "sword",
-            .name("steel sword"),
-            .description("A sharp steel sword."),
-            .isTakable,
+        let sword = Item("sword")
+            .name("steel sword")
+            .description("A sharp steel sword.")
+            .isTakable
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: sword
@@ -267,9 +235,7 @@ struct DropActionHandlerTests {
         try await engine.execute("drop sword")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > drop sword
             Dropped.
@@ -285,29 +251,23 @@ struct DropActionHandlerTests {
     @Test("Drop multiple items successfully")
     func testDropMultipleItems() async throws {
         // Given
-        let lamp = Item(
-            id: "lamp",
-            .name("brass lamp"),
-            .description("A brass oil lamp."),
-            .isTakable,
+        let lamp = Item("lamp")
+            .name("brass lamp")
+            .description("A brass oil lamp.")
+            .isTakable
             .in(.player)
-        )
 
-        let key = Item(
-            id: "key",
-            .name("rusty key"),
-            .description("An old rusty key."),
-            .isTakable,
+        let key = Item("key")
+            .name("rusty key")
+            .description("An old rusty key.")
+            .isTakable
             .in(.player)
-        )
 
-        let rope = Item(
-            id: "rope",
-            .name("thick rope"),
-            .description("A coil of thick rope."),
-            .isTakable,
+        let rope = Item("rope")
+            .name("thick rope")
+            .description("A coil of thick rope.")
+            .isTakable
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: lamp, key, rope
@@ -319,9 +279,7 @@ struct DropActionHandlerTests {
         try await engine.execute("drop lamp and key and rope")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > drop lamp and key and rope
             You drop the rusty key, the brass lamp, and the thick rope.
@@ -347,9 +305,7 @@ struct DropActionHandlerTests {
         try await engine.execute("drop all")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > drop all
             Your hands are as empty as your pockets.
@@ -360,14 +316,12 @@ struct DropActionHandlerTests {
     @Test("Drop clears worn flag")
     func testDropClearsWornFlag() async throws {
         // Given
-        let hat = Item(
-            id: "hat",
-            .name("woolen hat"),
-            .description("A warm woolen hat."),
-            .isTakable,
-            .isWorn,
+        let hat = Item("hat")
+            .name("woolen hat")
+            .description("A warm woolen hat.")
+            .isTakable
+            .isWorn
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: hat
@@ -388,13 +342,11 @@ struct DropActionHandlerTests {
     @Test("Drop sets isTouched flag")
     func testDropSetsTouchedFlag() async throws {
         // Given
-        let gem = Item(
-            id: "gem",
-            .name("sparkling gem"),
-            .description("A beautiful sparkling gem."),
-            .isTakable,
+        let gem = Item("gem")
+            .name("sparkling gem")
+            .description("A beautiful sparkling gem.")
+            .isTakable
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: gem
@@ -413,21 +365,17 @@ struct DropActionHandlerTests {
     @Test("Drop all skips non-droppable items")
     func testDropAllSkipsNonDroppableItems() async throws {
         // Given
-        let droppableItem = Item(
-            id: "droppableItem",
-            .name("normal book"),
-            .description("A normal book."),
-            .isTakable,
+        let droppableItem = Item("droppableItem")
+            .name("normal book")
+            .description("A normal book.")
+            .isTakable
             .in(.player)
-        )
 
-        let nonDroppableItem = Item(
-            id: "nonDroppableItem",
-            .name("cursed item"),
-            .description("An item that can't be dropped."),
-            .omitDescription,  // Makes it non-droppable
+        let nonDroppableItem = Item("nonDroppableItem")
+            .name("cursed item")
+            .description("An item that can't be dropped.")
+            .omitDescription  // Makes it non-droppable
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: droppableItem, nonDroppableItem
@@ -439,9 +387,7 @@ struct DropActionHandlerTests {
         try await engine.execute("drop all")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > drop all
             You drop the normal book.

@@ -11,20 +11,16 @@ struct AskActionHandlerTests {
     @Test("ASK VERB DIRECT-OBJECT syntax works")
     func testAskDirectObjectSyntax() async throws {
         // Given
-        let wizard = Item(
-            id: "wizard",
-            .name("old wizard"),
-            .description("A wise old wizard."),
-            .characterSheet(.default),
+        let wizard = Item("wizard")
+            .name("old wizard")
+            .description("A wise old wizard.")
+            .characterSheet(.default)
             .in(.startRoom)
-        )
 
-        let crystal = Item(
-            id: "crystal",
-            .name("magic crystal"),
-            .description("A glowing crystal."),
+        let crystal = Item("crystal")
+            .name("magic crystal")
+            .description("A glowing crystal.")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: wizard, crystal
@@ -36,9 +32,7 @@ struct AskActionHandlerTests {
         try await engine.execute("ask wizard about crystal")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > ask wizard about crystal
             The old wizard meets your inquiry about the magic crystal with
@@ -53,20 +47,16 @@ struct AskActionHandlerTests {
     @Test("QUESTION syntax works")
     func testQuestionSyntax() async throws {
         // Given
-        let guardItem = Item(
-            id: "guardItem",
-            .name("castle guard"),
-            .description("A stern castle guard."),
-            .characterSheet(.default),
+        let guardItem = Item("guardItem")
+            .name("castle guard")
+            .description("A stern castle guard.")
+            .characterSheet(.default)
             .in(.startRoom)
-        )
 
-        let sword = Item(
-            id: "sword",
-            .name("silver sword"),
-            .description("A gleaming silver sword."),
+        let sword = Item("sword")
+            .name("silver sword")
+            .description("A gleaming silver sword.")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: guardItem, sword
@@ -78,9 +68,7 @@ struct AskActionHandlerTests {
         try await engine.execute("question guard about sword")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > question guard about sword
             The castle guard meets your inquiry about the silver sword with
@@ -94,12 +82,10 @@ struct AskActionHandlerTests {
     @Test("Cannot ask without specifying who")
     func testCannotAskWithoutWho() async throws {
         // Given
-        let crystal = Item(
-            id: "crystal",
-            .name("magic crystal"),
-            .description("A glowing crystal."),
+        let crystal = Item("crystal")
+            .name("magic crystal")
+            .description("A glowing crystal.")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: crystal
@@ -111,9 +97,7 @@ struct AskActionHandlerTests {
         try await engine.execute("inquire about the magic crystal")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > inquire about the magic crystal
             Ask whom?
@@ -131,9 +115,7 @@ struct AskActionHandlerTests {
         try await engine.execute("ask about the emerald tablet")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > ask about the emerald tablet
             Ask whom?
@@ -144,13 +126,11 @@ struct AskActionHandlerTests {
     @Test("Ask without topic prompts for topic (two-phase asking)")
     func testAskWithoutTopicPromptsForTopic() async throws {
         // Given
-        let merchant = Item(
-            id: "merchant",
-            .name("traveling merchant"),
-            .description("A traveling merchant."),
-            .characterSheet(.default),
+        let merchant = Item("merchant")
+            .name("traveling merchant")
+            .description("A traveling merchant.")
+            .characterSheet(.default)
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: merchant
@@ -162,9 +142,7 @@ struct AskActionHandlerTests {
         try await engine.execute("ask merchant")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > ask merchant
             What do you want to ask the traveling merchant about?
@@ -182,19 +160,15 @@ struct AskActionHandlerTests {
     @Test("Cannot ask non-character")
     func testCannotAskNonCharacter() async throws {
         // Given
-        let rock = Item(
-            id: "rock",
-            .name("large rock"),
-            .description("A large boulder."),
+        let rock = Item("rock")
+            .name("large rock")
+            .description("A large boulder.")
             .in(.startRoom)
-        )
 
-        let crystal = Item(
-            id: "crystal",
-            .name("magic crystal"),
-            .description("A glowing crystal."),
+        let crystal = Item("crystal")
+            .name("magic crystal")
+            .description("A glowing crystal.")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: rock, crystal
@@ -206,9 +180,7 @@ struct AskActionHandlerTests {
         try await engine.execute("ask rock about crystal")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > ask rock about crystal
             The large rock lacks the capacity for conversation.
@@ -219,26 +191,20 @@ struct AskActionHandlerTests {
     @Test("Cannot ask character not in scope")
     func testCannotAskCharacterNotInScope() async throws {
         // Given
-        let anotherRoom = Location(
-            id: "anotherRoom",
-            .name("Another Room"),
+        let anotherRoom = Location("anotherRoom")
+            .name("Another Room")
             .inherentlyLit
-        )
 
-        let remoteWizard = Item(
-            id: "remoteWizard",
-            .name("remote wizard"),
-            .description("A wizard in another room."),
-            .characterSheet(.default),
+        let remoteWizard = Item("remoteWizard")
+            .name("remote wizard")
+            .description("A wizard in another room.")
+            .characterSheet(.default)
             .in("anotherRoom")
-        )
 
-        let crystal = Item(
-            id: "crystal",
-            .name("magic crystal"),
-            .description("A glowing crystal."),
+        let crystal = Item("crystal")
+            .name("magic crystal")
+            .description("A glowing crystal.")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             locations: anotherRoom,
@@ -251,9 +217,7 @@ struct AskActionHandlerTests {
         try await engine.execute("ask wizard about crystal")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > ask wizard about crystal
             Any such thing lurks beyond your reach.
@@ -264,27 +228,21 @@ struct AskActionHandlerTests {
     @Test("Requires light to ask")
     func testRequiresLight() async throws {
         // Given: Dark room with character
-        let darkRoom = Location(
-            id: "darkRoom",
-            .name("Dark Room"),
+        let darkRoom = Location("darkRoom")
+            .name("Dark Room")
             .description("A pitch black room.")
             // Note: No .inherentlyLit property
-        )
 
-        let wizard = Item(
-            id: "wizard",
-            .name("old wizard"),
-            .description("A wise old wizard."),
-            .characterSheet(.default),
+        let wizard = Item("wizard")
+            .name("old wizard")
+            .description("A wise old wizard.")
+            .characterSheet(.default)
             .in("darkRoom")
-        )
 
-        let crystal = Item(
-            id: "crystal",
-            .name("magic crystal"),
-            .description("A glowing crystal."),
+        let crystal = Item("crystal")
+            .name("magic crystal")
+            .description("A glowing crystal.")
             .in("darkRoom")
-        )
 
         let game = MinimalGame(
             player: Player(in: "darkRoom"),
@@ -298,9 +256,7 @@ struct AskActionHandlerTests {
         try await engine.execute("ask wizard about crystal")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > ask wizard about crystal
             The darkness here is absolute, consuming all light and hope of
@@ -314,20 +270,16 @@ struct AskActionHandlerTests {
     @Test("Ask character about item")
     func testAskCharacterAboutItem() async throws {
         // Given
-        let sage = Item(
-            id: "sage",
-            .name("wise sage"),
-            .description("A knowledgeable sage."),
-            .characterSheet(.default),
+        let sage = Item("sage")
+            .name("wise sage")
+            .description("A knowledgeable sage.")
+            .characterSheet(.default)
             .in(.startRoom)
-        )
 
-        let scroll = Item(
-            id: "scroll",
-            .name("ancient scroll"),
-            .description("An ancient scroll."),
+        let scroll = Item("scroll")
+            .name("ancient scroll")
+            .description("An ancient scroll.")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: sage, scroll
@@ -343,9 +295,7 @@ struct AskActionHandlerTests {
         #expect(await finalState.hasFlag(.isTouched) == true)
 
         // Verify message
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > ask sage about scroll
             The wise sage meets your inquiry about the ancient scroll with
@@ -357,13 +307,11 @@ struct AskActionHandlerTests {
     @Test("Ask character about player")
     func testAskCharacterAboutPlayer() async throws {
         // Given
-        let oracle = Item(
-            id: "oracle",
-            .name("mystical oracle"),
-            .description("A mystical oracle."),
-            .characterSheet(.default),
+        let oracle = Item("oracle")
+            .name("mystical oracle")
+            .description("A mystical oracle.")
+            .characterSheet(.default)
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: oracle
@@ -375,9 +323,7 @@ struct AskActionHandlerTests {
         try await engine.execute("ask oracle about me")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > ask oracle about me
             The mystical oracle meets your inquiry about yourself with
@@ -389,19 +335,15 @@ struct AskActionHandlerTests {
     @Test("Ask character about location")
     func testAskCharacterAboutLocation() async throws {
         // Given
-        let anotherRoom = Location(
-            id: "library",
-            .name("Ancient Library"),
+        let anotherRoom = Location("library")
+            .name("Ancient Library")
             .inherentlyLit
-        )
 
-        let librarian = Item(
-            id: "librarian",
-            .name("old librarian"),
-            .description("An old librarian."),
-            .characterSheet(.default),
+        let librarian = Item("librarian")
+            .name("old librarian")
+            .description("An old librarian.")
+            .characterSheet(.default)
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             locations: anotherRoom,
@@ -414,9 +356,7 @@ struct AskActionHandlerTests {
         try await engine.execute("ask librarian about library")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > ask librarian about library
             The old librarian meets your inquiry about the Ancient Library
@@ -430,21 +370,17 @@ struct AskActionHandlerTests {
     @Test("Two-phase asking completes successfully")
     func testTwoPhaseAskingCompleteFlow() async throws {
         // Given
-        let wizard = Item(
-            id: "wizard",
-            .name("old wizard"),
-            .description("A wise old wizard."),
-            .characterSheet(.default),
+        let wizard = Item("wizard")
+            .name("old wizard")
+            .description("A wise old wizard.")
+            .characterSheet(.default)
             .in(.startRoom)
-        )
 
-        let treasure = Item(
-            id: "treasure",
-            .name("golden treasure"),
-            .synonyms("treasure"),
-            .description("A chest of gold."),
+        let treasure = Item("treasure")
+            .name("golden treasure")
+            .synonyms("treasure")
+            .description("A chest of gold.")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: wizard, treasure
@@ -454,9 +390,7 @@ struct AskActionHandlerTests {
 
         // Phase 1: Ask without topic
         try await engine.execute("ask the wizard")
-        let phase1Output = await mockIO.flush()
-        expectNoDifference(
-            phase1Output,
+        await mockIO.expect(
             """
             > ask the wizard
             What do you want to ask the old wizard about?
@@ -469,9 +403,7 @@ struct AskActionHandlerTests {
 
         // Phase 2: Provide topic
         try await engine.execute("the treasure")
-        let phase2Output = await mockIO.flush()
-        expectNoDifference(
-            phase2Output,
+        await mockIO.expect(
             """
             > the treasure
             The old wizard meets your inquiry about the golden treasure
@@ -491,20 +423,16 @@ struct AskActionHandlerTests {
     @Test("Direct ask still works with both character and topic")
     func testDirectAskStillWorks() async throws {
         // Given
-        let oracle = Item(
-            id: "oracle",
-            .name("mystical oracle"),
-            .description("A mystical oracle."),
-            .characterSheet(.default),
+        let oracle = Item("oracle")
+            .name("mystical oracle")
+            .description("A mystical oracle.")
+            .characterSheet(.default)
             .in(.startRoom)
-        )
 
-        let crystal = Item(
-            id: "crystal",
-            .name("magic crystal"),
-            .description("A glowing crystal."),
+        let crystal = Item("crystal")
+            .name("magic crystal")
+            .description("A glowing crystal.")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: oracle, crystal
@@ -516,9 +444,7 @@ struct AskActionHandlerTests {
         try await engine.execute("ask oracle about crystal")
 
         // Then: Should work immediately without prompting
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > ask oracle about crystal
             The mystical oracle meets your inquiry about the magic crystal

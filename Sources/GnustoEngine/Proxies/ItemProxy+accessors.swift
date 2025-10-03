@@ -294,9 +294,11 @@ extension ItemProxy {
     /// location-based game logic. Returns `false` if either the item or player has
     /// no location, or if they're in different locations.
     ///
-    /// This check only considers direct location placement - items inside containers
-    /// that are in the player's location will return `false` unless the container
-    /// itself is being checked.
+    /// This check considers:
+    /// - Direct location placement (item's parent is the location)
+    /// - Local globals (item is listed in the location's scenery)
+    /// - Items inside containers that are in the player's location will return `false`
+    ///   unless the container itself is being checked.
     public var hasSameLocationAsPlayer: Bool {
         get async {
             if await playerIsHolding {
@@ -304,7 +306,14 @@ extension ItemProxy {
             }
             let playerLocation = await engine.player.location
             let itemLocation = await location
-            return itemLocation == playerLocation
+
+            // Check direct location match
+            if itemLocation == playerLocation {
+                return true
+            }
+
+            // Check if item is a local global of the player's location
+            return await playerLocation.scenery.contains(id)
         }
     }
 

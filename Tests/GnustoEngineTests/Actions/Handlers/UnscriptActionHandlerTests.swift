@@ -14,10 +14,9 @@ struct UnscriptActionHandlerTests {
         let game = MinimalGame()
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        // Set up: scripting is active
-        try await engine.apply(
-            engine.setFlag(.isScripting)
-        )
+        // Set up: start a transcript first
+        try await engine.execute("script")
+        _ = await mockIO.flush()  // Clear the first output
 
         // When
         try await engine.execute("unscript")
@@ -40,12 +39,10 @@ struct UnscriptActionHandlerTests {
     @Test("UNSCRIPT requires no light")
     func testUnscriptRequiresNoLight() async throws {
         // Given: Dark room (to verify light is not required)
-        let darkRoom = Location(
-            id: "darkRoom",
-            .name("Dark Room"),
+        let darkRoom = Location("darkRoom")
+            .name("Dark Room")
             .description("A pitch black room.")
             // Note: No .inherentlyLit property
-        )
 
         let game = MinimalGame(
             player: Player(in: "darkRoom"),
@@ -54,10 +51,9 @@ struct UnscriptActionHandlerTests {
 
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        // Set up: scripting is active
-        try await engine.apply(
-            engine.setFlag(.isScripting)
-        )
+        // Set up: start a transcript first
+        try await engine.execute("script")
+        _ = await mockIO.flush()  // Clear the first output
 
         // When: UNSCRIPT should work even in darkness
         try await engine.execute("unscript")
@@ -87,9 +83,7 @@ struct UnscriptActionHandlerTests {
         try await engine.execute("unscript")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > unscript
             Scripting is not currently on.
@@ -100,15 +94,13 @@ struct UnscriptActionHandlerTests {
     @Test("UNSCRIPT works with complex game state")
     func testUnscriptWorksWithComplexState() async throws {
         // Given: Complex game state
-        let lamp = Item(
-            id: "lamp",
-            .name("brass lamp"),
-            .description("A shiny brass lamp."),
-            .isLightSource,
-            .isDevice,
-            .isTakable,
+        let lamp = Item("lamp")
+            .name("brass lamp")
+            .description("A shiny brass lamp.")
+            .isLightSource
+            .isDevice
+            .isTakable
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: lamp
@@ -116,12 +108,15 @@ struct UnscriptActionHandlerTests {
 
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        // Set up complex game state including scripting
+        // Set up complex game state
         try await engine.apply(
-            engine.setFlag(.isScripting),
             await lamp.proxy(engine).setFlag(.isOn),
             engine.player.updateScore(by: 100)
         )
+
+        // Start transcript
+        try await engine.execute("script")
+        _ = await mockIO.flush()  // Clear the first output
 
         // When
         try await engine.execute("unscript")
@@ -147,10 +142,9 @@ struct UnscriptActionHandlerTests {
         let game = MinimalGame()
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        // Set up: scripting is active
-        try await engine.apply(
-            engine.setFlag(.isScripting)
-        )
+        // Set up: start a transcript first
+        try await engine.execute("script")
+        _ = await mockIO.flush()  // Clear the first output
 
         // Verify initial state
         let initialScripting = await engine.hasFlag(.isScripting)
@@ -179,13 +173,11 @@ struct UnscriptActionHandlerTests {
     @Test("UNSCRIPT preserves other game state")
     func testUnscriptPreservesGameState() async throws {
         // Given
-        let book = Item(
-            id: "book",
-            .name("leather book"),
-            .description("A bound leather book."),
-            .isTakable,
+        let book = Item("book")
+            .name("leather book")
+            .description("A bound leather book.")
+            .isTakable
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: book
@@ -193,11 +185,14 @@ struct UnscriptActionHandlerTests {
 
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        // Set up initial state including scripting
+        // Set up initial state
         try await engine.apply(
-            engine.setFlag(.isScripting),
             engine.player.updateScore(by: 50)
         )
+
+        // Start transcript
+        try await engine.execute("script")
+        _ = await mockIO.flush()  // Clear the first output
 
         // Record initial state
         let initialBook = await engine.item("book")
@@ -339,10 +334,9 @@ struct UnscriptActionHandlerTests {
         let game = MinimalGame()
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        // Set up: scripting is active
-        try await engine.apply(
-            engine.setFlag(.isScripting)
-        )
+        // Set up: start a transcript first
+        try await engine.execute("script")
+        _ = await mockIO.flush()  // Clear the first output
 
         // Verify initial state
         let initialScripting = await engine.hasFlag(.isScripting)
@@ -384,9 +378,7 @@ struct UnscriptActionHandlerTests {
         )
 
         // Then: Should fail each time
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > unscript
             Scripting is not currently on.
@@ -400,13 +392,11 @@ struct UnscriptActionHandlerTests {
     @Test("UNSCRIPT with other game activities")
     func testUnscriptWithOtherActivities() async throws {
         // Given
-        let coin = Item(
-            id: "coin",
-            .name("gold coin"),
-            .description("A shiny gold coin."),
-            .isTakable,
+        let coin = Item("coin")
+            .name("gold coin")
+            .description("A shiny gold coin.")
+            .isTakable
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: coin
@@ -414,10 +404,9 @@ struct UnscriptActionHandlerTests {
 
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        // Set up: scripting is active
-        try await engine.apply(
-            engine.setFlag(.isScripting)
-        )
+        // Set up: start a transcript first
+        try await engine.execute("script")
+        _ = await mockIO.flush()  // Clear the first output
 
         // When: Perform other actions and then unscript
         try await engine.execute("take coin")

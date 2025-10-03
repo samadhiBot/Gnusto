@@ -7,8 +7,8 @@ import PackagePlugin
 /// This plugin discovers and generates:
 ///
 /// **ID Constants:**
-/// - `Location(id: .someID, ...)` → `LocationID.someID`
-/// - `Item(id: .someID, ...)` → `ItemID.someID`
+/// - `Location(.someID) ...)` → `LocationID.someID`
+/// - `Item(.someID) ...)` → `ItemID.someID`
 /// - `GlobalID("key")` or global state patterns → `GlobalID.key`
 /// - `Fuse(id: .someID, ...)` → `FuseID.someID`
 /// - `Daemon(id: .someID, ...)` → `DaemonID.someID`

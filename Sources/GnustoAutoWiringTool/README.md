@@ -60,7 +60,7 @@ Discovery is performed via a lightweight syntax walk using `SwiftParser`/`SwiftS
 
 - **ID usage**
 
-  - `LocationID` and `ItemID` when seen in initializers like `Location(id: .foyer, ...)` and `Item(id: .lamp, ...)`.
+  - `LocationID` and `ItemID` when seen in initializers like `Location(.foyer) ...)` and `Item(.lamp) ...)`.
   - `GlobalID` when used in single‑argument engine calls such as `engine.hasFlag(.someGlobalFlag)` or `context.engine.setFlag(.someGlobalFlag)`.
   - `FuseID` and `DaemonID` via convenience calls: `.startFuse("id")`, `.stopFuse("id")`, `.runDaemon("id")`, `.stopDaemon("id")`.
   - Additional IDs referenced inside expressions like `.in(.foyer)).

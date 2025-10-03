@@ -18,9 +18,7 @@ struct BreatheActionHandlerTests {
         try await engine.execute("breathe")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > breathe
             You draw in a deep, contemplative breath.
@@ -31,12 +29,10 @@ struct BreatheActionHandlerTests {
     @Test("BREATHE ON DIRECTOBJECT syntax works")
     func testBreatheOnDirectObjectSyntax() async throws {
         // Given
-        let flower = Item(
-            id: "flower",
-            .name("red flower"),
-            .description("A beautiful red flower."),
+        let flower = Item("flower")
+            .name("red flower")
+            .description("A beautiful red flower.")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: flower
@@ -48,9 +44,7 @@ struct BreatheActionHandlerTests {
         try await engine.execute("breathe on flower")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > breathe on flower
             You breathe on the red flower. Nothing happens.
@@ -63,12 +57,10 @@ struct BreatheActionHandlerTests {
     @Test("Cannot breathe with direct object")
     func testCannotBreatheWithDirectObject() async throws {
         // Given
-        let mist = Item(
-            id: "mist",
-            .name("fresh mist"),
-            .description("The mist around you."),
+        let mist = Item("mist")
+            .name("fresh mist")
+            .description("The mist around you.")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: mist
@@ -80,9 +72,7 @@ struct BreatheActionHandlerTests {
         try await engine.execute("breathe mist")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > breathe mist
             That defies the fundamental laws of breathing.
@@ -93,12 +83,10 @@ struct BreatheActionHandlerTests {
     @Test("Cannot breathe with indirect object")
     func testCannotBreatheWithIndirectObject() async throws {
         // Given
-        let mask = Item(
-            id: "mask",
-            .name("gas mask"),
-            .description("A protective gas mask."),
+        let mask = Item("mask")
+            .name("gas mask")
+            .description("A protective gas mask.")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: mask
@@ -110,9 +98,7 @@ struct BreatheActionHandlerTests {
         try await engine.execute("breathe with mask")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > breathe with mask
             The phrase 'with mask' eludes my comprehension.
@@ -130,9 +116,7 @@ struct BreatheActionHandlerTests {
         try await engine.execute("breathe on air")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > breathe on air
             You draw in a deep, contemplative breath.
@@ -143,11 +127,9 @@ struct BreatheActionHandlerTests {
     @Test("Breathe works in dark rooms")
     func testBreatheWorksInDarkRooms() async throws {
         // Given: Dark room (no light required for breathing)
-        let darkRoom = Location(
-            id: "darkRoom",
-            .name("Dark Room"),
+        let darkRoom = Location("darkRoom")
+            .name("Dark Room")
             .description("A pitch black room.")
-        )
 
         let game = MinimalGame(
             player: Player(in: "darkRoom"),
@@ -160,9 +142,7 @@ struct BreatheActionHandlerTests {
         try await engine.execute("breathe")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > breathe
             You draw in a deep, contemplative breath.
@@ -193,9 +173,7 @@ struct BreatheActionHandlerTests {
         try await engine.execute("breathe the air")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > breathe the air
             You draw in a deep, contemplative breath.

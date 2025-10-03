@@ -18,9 +18,7 @@ struct DanceActionHandlerTests {
         try await engine.execute("dance")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > dance
             You execute a series of movements that could generously be
@@ -32,12 +30,10 @@ struct DanceActionHandlerTests {
     @Test("DANCE WITH (Item) DIRECTOBJECT syntax works")
     func testDanceWithItemDirectObjectSyntax() async throws {
         // Given
-        let statue = Item(
-            id: "statue",
-            .name("stone statue"),
-            .description("A graceful marble statue."),
+        let statue = Item("statue")
+            .name("stone statue")
+            .description("A graceful marble statue.")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: statue
@@ -49,9 +45,7 @@ struct DanceActionHandlerTests {
         try await engine.execute("dance with statue")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > dance with statue
             The stone statue proves a disappointingly rigid dance partner.
@@ -62,13 +56,11 @@ struct DanceActionHandlerTests {
     @Test("DANCE WITH (Character) DIRECTOBJECT syntax works")
     func testDanceWithCharacterDirectObjectSyntax() async throws {
         // Given
-        let partner = Item(
-            id: "partner",
-            .name("dance partner"),
-            .description("A graceful dance partner."),
-            .characterSheet(.default),
+        let partner = Item("partner")
+            .name("dance partner")
+            .description("A graceful dance partner.")
+            .characterSheet(.default)
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: partner
@@ -80,9 +72,7 @@ struct DanceActionHandlerTests {
         try await engine.execute("dance with partner")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > dance with partner
             You and the dance partner move together in unexpected harmony,
@@ -112,9 +102,7 @@ struct DanceActionHandlerTests {
         )
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > look
             --- Laboratory ---
@@ -135,11 +123,9 @@ struct DanceActionHandlerTests {
     @Test("Dance works in dark rooms")
     func testDanceWorksInDarkRooms() async throws {
         // Given: Dark room (no light required for dancing)
-        let darkRoom = Location(
-            id: "darkRoom",
-            .name("Dark Room"),
+        let darkRoom = Location("darkRoom")
+            .name("Dark Room")
             .description("A pitch black room.")
-        )
 
         let game = MinimalGame(
             player: Player(in: "darkRoom"),
@@ -152,9 +138,7 @@ struct DanceActionHandlerTests {
         try await engine.execute("dance")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > dance
             You execute a series of movements that could generously be
@@ -166,12 +150,10 @@ struct DanceActionHandlerTests {
     @Test("Dance with object still works")
     func testDanceWithObject() async throws {
         // Given
-        let chair = Item(
-            id: "chair",
-            .name("wooden chair"),
-            .description("A simple wooden chair."),
+        let chair = Item("chair")
+            .name("wooden chair")
+            .description("A simple wooden chair.")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: chair
@@ -183,9 +165,7 @@ struct DanceActionHandlerTests {
         try await engine.execute("dance with chair")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > dance with chair
             The wooden chair proves a disappointingly rigid dance partner.

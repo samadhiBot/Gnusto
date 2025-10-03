@@ -1,5 +1,8 @@
 import Foundation
-import NaturalLanguage
+
+#if canImport(NaturalLanguage)
+    import NaturalLanguage
+#endif
 
 /// Enhances vocabulary by automatically extracting adjectives and synonyms from item text
 /// using Apple's NaturalLanguage framework.
@@ -135,32 +138,37 @@ public struct VocabularyEnhancer: Sendable, Equatable {
     // MARK: - Private Implementation
 
     private func extractAdjectives(from text: String) -> Set<String> {
-        let tagger = NLTagger(tagSchemes: [.lexicalClass])
-        tagger.string = text
+        #if canImport(NaturalLanguage)
+            let tagger = NLTagger(tagSchemes: [.lexicalClass])
+            tagger.string = text
 
-        var adjectives: Set<String> = []
-        let options: NLTagger.Options = [.omitPunctuation, .omitWhitespace]
+            var adjectives: Set<String> = []
+            let options: NLTagger.Options = [.omitPunctuation, .omitWhitespace]
 
-        tagger.enumerateTags(
-            in: text.startIndex..<text.endIndex,
-            unit: .word,
-            scheme: .lexicalClass,
-            options: options
-        ) { tag, tokenRange in
-            guard tag == .adjective, adjectives.count < configuration.maxAdjectives else {
+            tagger.enumerateTags(
+                in: text.startIndex..<text.endIndex,
+                unit: .word,
+                scheme: .lexicalClass,
+                options: options
+            ) { tag, tokenRange in
+                guard tag == .adjective, adjectives.count < configuration.maxAdjectives else {
+                    return true
+                }
+
+                let word = String(text[tokenRange]).lowercased()
+
+                if isValidExtractedWord(word) {
+                    adjectives.insert(word)
+                }
+
                 return true
             }
 
-            let word = String(text[tokenRange]).lowercased()
-
-            if isValidExtractedWord(word) {
-                adjectives.insert(word)
-            }
-
-            return true
-        }
-
-        return adjectives
+            return adjectives
+        #else
+            // NaturalLanguage not available on this platform
+            return []
+        #endif
     }
 
     private func extractSynonyms(
@@ -168,50 +176,71 @@ public struct VocabularyEnhancer: Sendable, Equatable {
         itemName: String,
         itemID: String
     ) -> Set<String> {
-        let tagger = NLTagger(tagSchemes: [.lexicalClass])
-        tagger.string = text
+        #if canImport(NaturalLanguage)
+            let tagger = NLTagger(tagSchemes: [.lexicalClass])
+            tagger.string = text
 
-        var synonyms: Set<String> = []
-        let options: NLTagger.Options = [.omitPunctuation, .omitWhitespace]
-        let itemNameWords = Set(itemName.lowercased().split(separator: " ").map(String.init))
+            var synonyms: Set<String> = []
+            let options: NLTagger.Options = [.omitPunctuation, .omitWhitespace]
+            let itemNameWords = Set(itemName.lowercased().split(separator: " ").map(String.init))
 
-        // First, check if the item ID should be included as a synonym
-        // Include it if it's different from the name and not already contained in the name
-        let lowercasedItemID = itemID.lowercased()
-        let lowercasedItemName = itemName.lowercased()
-        if lowercasedItemID != lowercasedItemName
-            && !itemNameWords.contains(lowercasedItemID)
-            && isValidExtractedWord(lowercasedItemID)
-            && isValidSynonym(lowercasedItemID)
-        {
-            synonyms.insert(lowercasedItemID)
-        }
+            // First, check if the item ID should be included as a synonym
+            // Include it if it's different from the name and not already contained in the name
+            let lowercasedItemID = itemID.lowercased()
+            let lowercasedItemName = itemName.lowercased()
+            if lowercasedItemID != lowercasedItemName
+                && !itemNameWords.contains(lowercasedItemID)
+                && isValidExtractedWord(lowercasedItemID)
+                && isValidSynonym(lowercasedItemID)
+            {
+                synonyms.insert(lowercasedItemID)
+            }
 
-        // Then extract synonyms from the text using NLTagger
-        tagger.enumerateTags(
-            in: text.startIndex..<text.endIndex,
-            unit: .word,
-            scheme: .lexicalClass,
-            options: options
-        ) { tag, tokenRange in
-            guard let tag,
-                tag == .noun,
-                synonyms.count < configuration.maxSynonyms
-            else {
+            // Then extract synonyms from the text using NLTagger
+            tagger.enumerateTags(
+                in: text.startIndex..<text.endIndex,
+                unit: .word,
+                scheme: .lexicalClass,
+                options: options
+            ) { tag, tokenRange in
+                guard let tag,
+                    tag == .noun,
+                    synonyms.count < configuration.maxSynonyms
+                else {
+                    return true
+                }
+
+                let word = String(text[tokenRange]).lowercased()
+
+                // Only include nouns that aren't already in the item name and are valid
+                if !itemNameWords.contains(word) && isValidExtractedWord(word)
+                    && isValidSynonym(word)
+                {
+                    synonyms.insert(word)
+                }
+
                 return true
             }
 
-            let word = String(text[tokenRange]).lowercased()
+            return synonyms
+        #else
+            // NaturalLanguage not available on this platform
+            // Still include item ID as synonym if valid
+            var synonyms: Set<String> = []
+            let itemNameWords = Set(itemName.lowercased().split(separator: " ").map(String.init))
+            let lowercasedItemID = itemID.lowercased()
+            let lowercasedItemName = itemName.lowercased()
 
-            // Only include nouns that aren't already in the item name and are valid
-            if !itemNameWords.contains(word) && isValidExtractedWord(word) && isValidSynonym(word) {
-                synonyms.insert(word)
+            if lowercasedItemID != lowercasedItemName
+                && !itemNameWords.contains(lowercasedItemID)
+                && isValidExtractedWord(lowercasedItemID)
+                && isValidSynonym(lowercasedItemID)
+            {
+                synonyms.insert(lowercasedItemID)
             }
 
-            return true
-        }
-
-        return synonyms
+            return synonyms
+        #endif
     }
 
     private func isValidExtractedWord(_ word: String) -> Bool {

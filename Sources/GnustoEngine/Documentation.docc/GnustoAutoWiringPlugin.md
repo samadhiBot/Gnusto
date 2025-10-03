@@ -123,7 +123,7 @@ extension Zork1 {
     public var locationEventHandlers: [LocationID: LocationEventHandler] {
         [
             .cellar: Underground.cellarHandler,
-            .gratingClearing: Forest.gratingClearingHandler,
+            .northClearing: Forest.northClearingHandler,
             .roundRoom: RoundRoom.roundRoomHandler,
             .trollRoom: Troll.trollRoomHandler,
         ]
@@ -147,7 +147,7 @@ extension Zork1 {
     public var locationComputers: [LocationID: LocationComputer] {
         [
             .eastOfHouse: OutsideHouse.eastOfHouseComputer,
-            .gratingClearing: Forest.gratingClearingComputer,
+            .northClearing: Forest.northClearingComputer,
             .kitchen: InsideHouse.kitchenComputer,
         ]
     }
@@ -173,7 +173,7 @@ let package = Package(
         .executableTarget(
             name: "MyGame",
             dependencies: ["GnustoEngine"],
-            plugins: ["GnustoAutoWiringPlugin"]  // Add this line
+            plugins: ["GnustoAutoWiringPlugin"]  // <- Add this line
         ),
     ]
 )

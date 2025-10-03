@@ -18,9 +18,7 @@ struct YesNoQuestionHandlerTests {
         try await engine.execute("yes")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > yes
             Your affirmation lacks context. Yes to what, exactly?
@@ -41,9 +39,7 @@ struct YesNoQuestionHandlerTests {
         try await engine.execute("no")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > no
             No what?
@@ -70,9 +66,7 @@ struct YesNoQuestionHandlerTests {
         try await engine.execute("yes")
 
         // Then - should get the response from ConversationManager
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > yes
             Okay.
@@ -99,9 +93,7 @@ struct YesNoQuestionHandlerTests {
         try await engine.execute("no")
 
         // Then - should get the custom no message
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > no
             Okay, stopping.
@@ -115,14 +107,12 @@ struct YesNoQuestionHandlerTests {
     @Test("YES with pending command question executes command")
     func testYesWithCommandQuestion() async throws {
         // Given
-        let apple = Item(
-            id: "apple",
-            .name("red apple"),
-            .description("A delicious red apple."),
-            .isTakable,
-            .isEdible,
+        let apple = Item("apple")
+            .name("red apple")
+            .description("A delicious red apple.")
+            .isTakable
+            .isEdible
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: apple
@@ -148,9 +138,7 @@ struct YesNoQuestionHandlerTests {
         try await engine.execute("yes")
 
         // Then - should execute the eat command
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > yes
             Taken.
@@ -185,13 +173,12 @@ struct YesNoQuestionHandlerTests {
             try await engine.execute(synonym)
 
             // Then
-            let output = await mockIO.flush()
-            expectNoDifference(
-                output,
+            await mockIO.expect(
                 """
                 > \(synonym)
                 Okay.
-                """)
+                """
+            )
 
             let hasPending = await engine.conversationManager.hasPendingQuestion
             #expect(hasPending == false)
@@ -217,13 +204,12 @@ struct YesNoQuestionHandlerTests {
             try await engine.execute(synonym)
 
             // Then
-            let output = await mockIO.flush()
-            expectNoDifference(
-                output,
+            await mockIO.expect(
                 """
                 > \(synonym)
                 Custom no message.
-                """)
+                """
+            )
 
             let hasPending = await engine.conversationManager.hasPendingQuestion
             #expect(hasPending == false)
@@ -235,14 +221,12 @@ struct YesNoQuestionHandlerTests {
     @Test("askConfirmation creates proper confirmation dialog")
     func testAskConfirmation() async throws {
         // Given
-        let apple = Item(
-            id: "apple",
-            .name("red apple"),
-            .description("A delicious red apple."),
-            .isTakable,
-            .isEdible,
+        let apple = Item("apple")
+            .name("red apple")
+            .description("A delicious red apple.")
+            .isTakable
+            .isEdible
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: apple
@@ -308,13 +292,11 @@ struct YesNoQuestionHandlerTests {
     @Test("askToDisambiguate creates disambiguation dialog")
     func testAskToDisambiguate() async throws {
         // Given
-        let redApple = Item(
-            id: "redApple",
-            .name("red apple"),
-            .description("A red apple."),
-            .isTakable,
+        let redApple = Item("redApple")
+            .name("red apple")
+            .description("A red apple.")
+            .isTakable
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: redApple
@@ -354,13 +336,11 @@ struct YesNoQuestionHandlerTests {
     @Test("Full disambiguation flow with YES response")
     func testFullDisambiguationFlowYes() async throws {
         // Given
-        let redApple = Item(
-            id: "redApple",
-            .name("red apple"),
-            .description("A red apple."),
-            .isTakable,
+        let redApple = Item("redApple")
+            .name("red apple")
+            .description("A red apple.")
+            .isTakable
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: redApple
@@ -389,9 +369,7 @@ struct YesNoQuestionHandlerTests {
         try await engine.execute("yes")
 
         // Then - should execute the clarified command
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > yes
             Taken.
@@ -409,13 +387,11 @@ struct YesNoQuestionHandlerTests {
     @Test("Full disambiguation flow with NO response")
     func testFullDisambiguationFlowNo() async throws {
         // Given
-        let redApple = Item(
-            id: "redApple",
-            .name("red apple"),
-            .description("A red apple."),
-            .isTakable,
+        let redApple = Item("redApple")
+            .name("red apple")
+            .description("A red apple.")
+            .isTakable
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: redApple
@@ -444,9 +420,7 @@ struct YesNoQuestionHandlerTests {
         try await engine.execute("no")
 
         // Then - should get disambiguation cancellation message
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > no
             What would you like to do next?
@@ -480,9 +454,7 @@ struct YesNoQuestionHandlerTests {
         try await engine.execute("maybe")
 
         // Then - should get responseNotUnderstood message
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > maybe
             The art of maybe-ing remains a mystery to me.
@@ -497,12 +469,10 @@ struct YesNoQuestionHandlerTests {
     @Test("Handler processes commands with direct objects correctly")
     func testHandlerWithDirectObjects() async throws {
         // Given
-        let thing = Item(
-            id: "thing",
-            .name("thing"),
-            .description("A thing."),
+        let thing = Item("thing")
+            .name("thing")
+            .description("A thing.")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: thing
@@ -514,9 +484,7 @@ struct YesNoQuestionHandlerTests {
         try await engine.execute("yes thing")
 
         // Then - should treat as plain YES
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > yes thing
             Your affirmation lacks context. Yes to what, exactly?
@@ -548,13 +516,12 @@ struct YesNoQuestionHandlerTests {
             try await engine.execute("yes")
 
             // If we get here, the command succeeded unexpectedly
-            let output = await mockIO.flush()
-            expectNoDifference(
-                output,
+            await mockIO.expect(
                 """
                 > yes
                 Ask whom?
-                """)
+                """
+            )
 
             let hasPending = await engine.conversationManager.hasPendingQuestion
             #expect(hasPending == false)

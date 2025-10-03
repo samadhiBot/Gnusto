@@ -16,9 +16,7 @@ struct GameEngineActionResponseTests {
 
         try await engine.execute("go xyzzy")
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > go xyzzy
             Which direction?
@@ -28,23 +26,17 @@ struct GameEngineActionResponseTests {
 
     @Test("ActionResponse: directionIsBlocked")
     func testDirectionIsBlocked() async throws {
-        let testRoom = Location(
-            id: .startRoom,
-            .name("Test Room"),
-            .exits(
-                .north(blocked: "The path is blocked by fallen rocks.")
-            ),
+        let testRoom = Location(.startRoom)
+            .name("Test Room")
+            .north(blocked: "The path is blocked by fallen rocks.")
             .inherentlyLit
-        )
 
         let game = MinimalGame(locations: testRoom)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         try await engine.execute("go north")
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > go north
             The path is blocked by fallen rocks.
@@ -56,21 +48,17 @@ struct GameEngineActionResponseTests {
 
     @Test("ActionResponse: itemNotTakable")
     func testItemNotTakable() async throws {
-        let pebble = Item(
-            id: "pebble",
-            .name("pebble"),
+        let pebble = Item("pebble")
+            .name("pebble")
             .in(.startRoom)
-            // No .isTakable flag
-        )
+        // No .isTakable flag
 
         let game = MinimalGame(items: pebble)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         try await engine.execute("take pebble")
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > take pebble
             The pebble stubbornly resists your attempts to take it.
@@ -80,20 +68,16 @@ struct GameEngineActionResponseTests {
 
     @Test("ActionResponse: itemNotHeld")
     func testItemNotHeld() async throws {
-        let pebble = Item(
-            id: "pebble",
-            .name("pebble"),
+        let pebble = Item("pebble")
+            .name("pebble")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(items: pebble)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         try await engine.execute("wear pebble")
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > wear pebble
             You aren't holding the pebble.
@@ -103,21 +87,17 @@ struct GameEngineActionResponseTests {
 
     @Test("ActionResponse: playerCannotCarryMore")
     func testPlayerCannotCarryMore() async throws {
-        let heavyItem = Item(
-            id: "sword",
-            .name("heavy sword"),
-            .in(.player),
-            .isTakable,
+        let heavyItem = Item("sword")
+            .name("heavy sword")
+            .in(.player)
+            .isTakable
             .size(20)
-        )
 
-        let shield = Item(
-            id: "shield",
-            .name("large shield"),
-            .in(.startRoom),
-            .isTakable,
+        let shield = Item("shield")
+            .name("large shield")
+            .in(.startRoom)
+            .isTakable
             .size(42)
-        )
 
         let player = Player(in: .startRoom, characterSheet: .weak)
 
@@ -130,9 +110,7 @@ struct GameEngineActionResponseTests {
 
         try await engine.execute("take shield")
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > take shield
             Your burden has reached its practical limit.
@@ -142,13 +120,11 @@ struct GameEngineActionResponseTests {
 
     @Test("ActionResponse: itemNotDroppable")
     func testItemNotDroppable() async throws {
-        let ankleBracelet = Item(
-            id: "ankleBracelet",
-            .name("ankle bracelet"),
-            .in(.player),
+        let ankleBracelet = Item("ankleBracelet")
+            .name("ankle bracelet")
+            .in(.player)
             .omitDescription
-            // No .isTakable flag makes it not droppable
-        )
+        // No .isTakable flag makes it not droppable
 
         let game = MinimalGame(
             items: ankleBracelet
@@ -158,9 +134,7 @@ struct GameEngineActionResponseTests {
 
         try await engine.execute("drop my ankle bracelet")
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > drop my ankle bracelet
             The ankle bracelet stubbornly resists your attempts to drop it.
@@ -172,21 +146,17 @@ struct GameEngineActionResponseTests {
 
     @Test("ActionResponse: containerIsClosed")
     func testContainerIsClosed() async throws {
-        let key = Item(
-            id: "key",
-            .name("key"),
-            .in(.player),
+        let key = Item("key")
+            .name("key")
+            .in(.player)
             .isTakable
-        )
 
-        let box = Item(
-            id: "box",
-            .name("box"),
-            .in(.startRoom),
-            .isContainer,
+        let box = Item("box")
+            .name("box")
+            .in(.startRoom)
+            .isContainer
             .isOpenable
-            // No .isOpen flag - defaults to closed
-        )
+        // No .isOpen flag - defaults to closed
 
         let game = MinimalGame(
             items: key, box
@@ -196,9 +166,7 @@ struct GameEngineActionResponseTests {
 
         try await engine.execute("put key in box")
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > put key in box
             The box is closed.
@@ -208,18 +176,14 @@ struct GameEngineActionResponseTests {
 
     @Test("ActionResponse: targetIsNotAContainer")
     func testTargetIsNotAContainer() async throws {
-        let key = Item(
-            id: "key",
-            .name("key"),
-            .in(.player),
+        let key = Item("key")
+            .name("key")
+            .in(.player)
             .isTakable
-        )
 
-        let rock = Item(
-            id: "rock",
-            .name("rock"),
+        let rock = Item("rock")
+            .name("rock")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: key, rock
@@ -229,9 +193,7 @@ struct GameEngineActionResponseTests {
 
         try await engine.execute("put key in rock")
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > put key in rock
             You can't put things in the rock.
@@ -241,18 +203,14 @@ struct GameEngineActionResponseTests {
 
     @Test("ActionResponse: targetIsNotASurface")
     func testTargetIsNotASurface() async throws {
-        let key = Item(
-            id: "key",
-            .name("key"),
-            .in(.player),
+        let key = Item("key")
+            .name("key")
+            .in(.player)
             .isTakable
-        )
 
-        let rock = Item(
-            id: "rock",
-            .name("rock"),
+        let rock = Item("rock")
+            .name("rock")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: key, rock
@@ -262,9 +220,7 @@ struct GameEngineActionResponseTests {
 
         try await engine.execute("put key on rock")
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > put key on rock
             You can't put things on the rock.
@@ -276,11 +232,9 @@ struct GameEngineActionResponseTests {
 
     @Test("ActionResponse: itemNotOpenable")
     func testItemNotOpenable() async throws {
-        let rock = Item(
-            id: "rock",
-            .name("rock"),
+        let rock = Item("rock")
+            .name("rock")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: rock
@@ -290,9 +244,7 @@ struct GameEngineActionResponseTests {
 
         try await engine.execute("open rock")
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > open rock
             The rock stubbornly resists your attempts to open it.
@@ -302,11 +254,9 @@ struct GameEngineActionResponseTests {
 
     @Test("ActionResponse: itemNotClosable")
     func testItemNotClosable() async throws {
-        let book = Item(
-            id: "book",
-            .name("book"),
+        let book = Item("book")
+            .name("book")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: book
@@ -316,9 +266,7 @@ struct GameEngineActionResponseTests {
 
         try await engine.execute("close book")
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > close book
             The book stubbornly resists your attempts to close it.
@@ -328,14 +276,12 @@ struct GameEngineActionResponseTests {
 
     @Test("ActionResponse: itemAlreadyClosed")
     func testItemAlreadyClosed() async throws {
-        let box = Item(
-            id: "box",
-            .name("box"),
-            .in(.startRoom),
-            .isContainer,
+        let box = Item("box")
+            .name("box")
+            .in(.startRoom)
+            .isContainer
             .isOpenable
-            // No .isOpen flag - defaults to closed
-        )
+        // No .isOpen flag - defaults to closed
 
         let game = MinimalGame(
             items: box
@@ -345,9 +291,7 @@ struct GameEngineActionResponseTests {
 
         try await engine.execute("close box")
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > close box
             The box is already closed.
@@ -359,12 +303,10 @@ struct GameEngineActionResponseTests {
 
     @Test("ActionResponse: itemNotWearable")
     func testItemNotWearable() async throws {
-        let rock = Item(
-            id: "rock",
-            .name("rock"),
-            .in(.player),
+        let rock = Item("rock")
+            .name("rock")
+            .in(.player)
             .isTakable
-        )
 
         let game = MinimalGame(
             items: rock
@@ -374,9 +316,7 @@ struct GameEngineActionResponseTests {
 
         try await engine.execute("wear rock")
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > wear rock
             The rock stubbornly resists your attempts to wear it.
@@ -386,15 +326,13 @@ struct GameEngineActionResponseTests {
 
     @Test("ActionResponse: itemNotRemovable")
     func testItemNotRemovable() async throws {
-        let amulet = Item(
-            id: "amulet",
-            .name("cursed amulet"),
-            .in(.player),
-            .isWearable,
-            .isWorn,
+        let amulet = Item("amulet")
+            .name("cursed amulet")
+            .in(.player)
+            .isWearable
+            .isWorn
             .omitDescription
-            // No .isTakable flag makes it not removable
-        )
+        // No .isTakable flag makes it not removable
 
         let game = MinimalGame(
             items: amulet
@@ -404,9 +342,7 @@ struct GameEngineActionResponseTests {
 
         try await engine.execute("remove amulet")
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > remove amulet
             The cursed amulet stubbornly resists your attempts to remove
@@ -419,22 +355,18 @@ struct GameEngineActionResponseTests {
 
     @Test("ActionResponse: itemIsUnlocked")
     func testItemIsUnlocked() async throws {
-        let chest = Item(
-            id: "chest",
-            .name("chest"),
-            .in(.startRoom),
-            .isContainer,
-            .isLockable,
+        let chest = Item("chest")
+            .name("chest")
+            .in(.startRoom)
+            .isContainer
+            .isLockable
             .lockKey("key1")
-            // No .isLocked flag - defaults to unlocked
-        )
+        // No .isLocked flag - defaults to unlocked
 
-        let key = Item(
-            id: "key1",
-            .name("key"),
-            .in(.player),
+        let key = Item("key1")
+            .name("key")
+            .in(.player)
             .isTakable
-        )
 
         let game = MinimalGame(
             items: chest, key
@@ -444,9 +376,7 @@ struct GameEngineActionResponseTests {
 
         try await engine.execute("unlock chest with key")
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > unlock chest with key
             The chest is already unlocked.
@@ -456,22 +386,18 @@ struct GameEngineActionResponseTests {
 
     @Test("ActionResponse: wrongKey")
     func testWrongKey() async throws {
-        let chest = Item(
-            id: "chest",
-            .name("chest"),
-            .in(.startRoom),
-            .isContainer,
-            .isLockable,
-            .isLocked,
+        let chest = Item("chest")
+            .name("chest")
+            .in(.startRoom)
+            .isContainer
+            .isLockable
+            .isLocked
             .lockKey("key1")
-        )
 
-        let wrongKey = Item(
-            id: "key2",
-            .name("wrong key"),
-            .in(.player),
+        let wrongKey = Item("key2")
+            .name("wrong key")
+            .in(.player)
             .isTakable
-        )
 
         let game = MinimalGame(
             items: chest, wrongKey
@@ -481,9 +407,7 @@ struct GameEngineActionResponseTests {
 
         try await engine.execute("unlock chest with wrong key")
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > unlock chest with wrong key
             The wrong key and the chest were never meant to be together.
@@ -495,18 +419,14 @@ struct GameEngineActionResponseTests {
 
     @Test("ActionResponse: roomIsDark")
     func testRoomIsDark() async throws {
-        let darkRoom = Location(
-            id: "darkRoom",
-            .name("Dark Room"),
+        let darkRoom = Location("darkRoom")
+            .name("Dark Room")
             .description("A dark, dark room.")
-            // No .inherentlyLit flag - defaults to dark
-        )
+        // No .inherentlyLit flag - defaults to dark
 
-        let shadow = Item(
-            id: "shadow",
-            .name("shadow"),
+        let shadow = Item("shadow")
+            .name("shadow")
             .in("darkRoom")
-        )
 
         let game = MinimalGame(
             player: Player(in: "darkRoom"),
@@ -518,9 +438,7 @@ struct GameEngineActionResponseTests {
 
         try await engine.execute("examine shadow")
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > examine shadow
             The darkness here is absolute, consuming all light and hope of
@@ -533,23 +451,17 @@ struct GameEngineActionResponseTests {
 
     @Test("ActionResponse: prerequisiteNotMet")
     func testPrerequisiteNotMet() async throws {
-        let testRoom = Location(
-            id: .startRoom,
-            .name("Test Room"),
-            .exits(
-                .up(blocked: "You need something to climb on.")
-            ),
+        let testRoom = Location(.startRoom)
+            .name("Test Room")
+            .up(blocked: "You need something to climb on.")
             .inherentlyLit
-        )
 
         let game = MinimalGame(locations: testRoom)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         try await engine.execute("go up")
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > go up
             You need something to climb on.
@@ -561,14 +473,12 @@ struct GameEngineActionResponseTests {
 
     @Test("ActionResponse: itemAlreadyOpen")
     func testItemAlreadyOpen() async throws {
-        let box = Item(
-            id: "box",
-            .name("box"),
-            .in(.startRoom),
-            .isContainer,
-            .isOpenable,
+        let box = Item("box")
+            .name("box")
+            .in(.startRoom)
+            .isContainer
+            .isOpenable
             .isOpen
-        )
 
         let game = MinimalGame(
             items: box
@@ -578,9 +488,7 @@ struct GameEngineActionResponseTests {
 
         try await engine.execute("open box")
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > open box
             The box is already open.
@@ -590,16 +498,14 @@ struct GameEngineActionResponseTests {
 
     @Test("ActionResponse: itemIsLocked")
     func testItemIsLocked() async throws {
-        let chest = Item(
-            id: "chest",
-            .name("chest"),
-            .in(.startRoom),
-            .isContainer,
-            .isOpenable,
-            .isLockable,
-            .isLocked,
+        let chest = Item("chest")
+            .name("chest")
+            .in(.startRoom)
+            .isContainer
+            .isOpenable
+            .isLockable
+            .isLocked
             .lockKey("key1")
-        )
 
         let game = MinimalGame(
             items: chest
@@ -609,9 +515,7 @@ struct GameEngineActionResponseTests {
 
         try await engine.execute("open chest")
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > open chest
             The chest is locked.
@@ -621,22 +525,18 @@ struct GameEngineActionResponseTests {
 
     @Test("ActionResponse: itemAlreadyLocked")
     func testItemAlreadyLocked() async throws {
-        let chest = Item(
-            id: "chest",
-            .name("chest"),
-            .in(.startRoom),
-            .isContainer,
-            .isLockable,
-            .isLocked,
+        let chest = Item("chest")
+            .name("chest")
+            .in(.startRoom)
+            .isContainer
+            .isLockable
+            .isLocked
             .lockKey("key1")
-        )
 
-        let key = Item(
-            id: "key1",
-            .name("key"),
-            .in(.player),
+        let key = Item("key1")
+            .name("key")
+            .in(.player)
             .isTakable
-        )
 
         let game = MinimalGame(
             items: chest, key
@@ -646,9 +546,7 @@ struct GameEngineActionResponseTests {
 
         try await engine.execute("lock chest with key")
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > lock chest with key
             The chest is already locked.
@@ -660,15 +558,13 @@ struct GameEngineActionResponseTests {
 
     @Test("ActionResponse: itemAlreadyOn")
     func testItemAlreadyOn() async throws {
-        let lamp = Item(
-            id: "lamp",
-            .name("lamp"),
-            .in(.player),
-            .isLightSource,
-            .isDevice,
-            .isOn,
+        let lamp = Item("lamp")
+            .name("lamp")
+            .in(.player)
+            .isLightSource
+            .isDevice
+            .isOn
             .isTakable
-        )
 
         let game = MinimalGame(
             items: lamp
@@ -678,9 +574,7 @@ struct GameEngineActionResponseTests {
 
         try await engine.execute("turn on lamp")
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > turn on lamp
             It's already on.
@@ -690,15 +584,13 @@ struct GameEngineActionResponseTests {
 
     @Test("ActionResponse: itemAlreadyOff")
     func testItemAlreadyOff() async throws {
-        let lamp = Item(
-            id: "lamp",
-            .name("lamp"),
-            .in(.player),
-            .isLightSource,
-            .isDevice,
+        let lamp = Item("lamp")
+            .name("lamp")
+            .in(.player)
+            .isLightSource
+            .isDevice
             .isTakable
-            // No .isOn flag - defaults to off
-        )
+        // No .isOn flag - defaults to off
 
         let game = MinimalGame(
             items: lamp
@@ -708,9 +600,7 @@ struct GameEngineActionResponseTests {
 
         try await engine.execute("turn off lamp")
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > turn off lamp
             It's already off.
@@ -720,11 +610,9 @@ struct GameEngineActionResponseTests {
 
     @Test("ActionResponse: itemNotADevice")
     func testItemNotADevice() async throws {
-        let rock = Item(
-            id: "rock",
-            .name("rock"),
+        let rock = Item("rock")
+            .name("rock")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: rock
@@ -734,9 +622,7 @@ struct GameEngineActionResponseTests {
 
         try await engine.execute("turn on rock")
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > turn on rock
             It remains stubbornly inert despite your ministrations.
@@ -748,18 +634,14 @@ struct GameEngineActionResponseTests {
 
     @Test("ActionResponse: itemNotInScope")
     func testItemNotInScope() async throws {
-        let otherRoom = Location(
-            id: "otherRoom",
-            .name("Other Room"),
+        let otherRoom = Location("otherRoom")
+            .name("Other Room")
             .inherentlyLit
-        )
 
-        let distantItem = Item(
-            id: "distantItem",
-            .name("distant item"),
-            .in("otherRoom"),
+        let distantItem = Item("distantItem")
+            .name("distant item")
+            .in("otherRoom")
             .isTakable
-        )
 
         let game = MinimalGame(
             locations: otherRoom,
@@ -770,9 +652,7 @@ struct GameEngineActionResponseTests {
 
         try await engine.execute("take distant item")
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > take distant item
             Any such thing lurks beyond your reach.
@@ -789,9 +669,7 @@ struct GameEngineActionResponseTests {
 
         try await engine.execute("take")
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > take
             Take what?
@@ -801,12 +679,10 @@ struct GameEngineActionResponseTests {
 
     @Test("ActionResponse: indirectObjectRequired")
     func testIndirectObjectRequired() async throws {
-        let key = Item(
-            id: "key",
-            .name("key"),
-            .in(.player),
+        let key = Item("key")
+            .name("key")
+            .in(.player)
             .isTakable
-        )
 
         let game = MinimalGame(
             items: key
@@ -816,9 +692,7 @@ struct GameEngineActionResponseTests {
 
         try await engine.execute("unlock key")
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > unlock key
             That's not something you can unlock.
@@ -830,12 +704,10 @@ struct GameEngineActionResponseTests {
 
     @Test("ActionResponse: itemNotEdible")
     func testItemNotEdible() async throws {
-        let rock = Item(
-            id: "rock",
-            .name("rock"),
-            .in(.player),
+        let rock = Item("rock")
+            .name("rock")
+            .in(.player)
             .isTakable
-        )
 
         let game = MinimalGame(
             items: rock
@@ -845,9 +717,7 @@ struct GameEngineActionResponseTests {
 
         try await engine.execute("eat rock")
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > eat rock
             The rock falls well outside the realm of culinary possibility.
@@ -865,9 +735,7 @@ struct GameEngineActionResponseTests {
         // Use a verb that likely doesn't have a handler
         try await engine.execute("teleport")
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > teleport
             The art of teleport-ing remains a mystery to me.
@@ -879,21 +747,17 @@ struct GameEngineActionResponseTests {
 
     @Test("ActionResponse: containerIsNotEmpty")
     func testContainerIsNotEmpty() async throws {
-        let gem = Item(
-            id: "gem",
-            .name("gem"),
-            .in(.item("box")),
+        let gem = Item("gem")
+            .name("gem")
+            .in(.item("box"))
             .isTakable
-        )
 
-        let box = Item(
-            id: "box",
-            .name("box"),
-            .in(.startRoom),
-            .isContainer,
-            .isOpenable,
+        let box = Item("box")
+            .name("box")
+            .in(.startRoom)
+            .isContainer
+            .isOpenable
             .isOpen
-        )
 
         let game = MinimalGame(
             items: gem, box
@@ -903,9 +767,7 @@ struct GameEngineActionResponseTests {
 
         try await engine.execute("close box")
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > close box
             Firmly closed.
@@ -917,21 +779,17 @@ struct GameEngineActionResponseTests {
 
     @Test("ActionResponse: error messages include item names correctly")
     func testErrorMessagesIncludeItemNames() async throws {
-        let fancyBox = Item(
-            id: "fancyBox",
-            .name("ornate jewelry box"),
-            .in(.startRoom),
-            .isContainer,
+        let fancyBox = Item("fancyBox")
+            .name("ornate jewelry box")
+            .in(.startRoom)
+            .isContainer
             .isOpenable
-            // No .isOpen - defaults to closed
-        )
+        // No .isOpen - defaults to closed
 
-        let key = Item(
-            id: "key",
-            .name("tiny key"),
-            .in(.player),
+        let key = Item("key")
+            .name("tiny key")
+            .in(.player)
             .isTakable
-        )
 
         let game = MinimalGame(
             items: fancyBox, key
@@ -941,9 +799,7 @@ struct GameEngineActionResponseTests {
 
         try await engine.execute("put tiny key in ornate jewelry box")
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > put tiny key in ornate jewelry box
             The ornate jewelry box is closed.
@@ -955,22 +811,18 @@ struct GameEngineActionResponseTests {
 
     @Test("ActionResponse: multiple error conditions prioritization")
     func testMultipleErrorConditionsPrioritization() async throws {
-        let darkRoom = Location(
-            id: "darkRoom",
-            .name("Dark Room"),
+        let darkRoom = Location("darkRoom")
+            .name("Dark Room")
             .description("A pitch black room.")
-            // No .inherentlyLit - defaults to dark
-        )
+        // No .inherentlyLit - defaults to dark
 
-        let lockedChest = Item(
-            id: "chest",
-            .name("locked chest"),
-            .in("darkRoom"),
-            .isContainer,
-            .isLockable,
-            .isLocked,
+        let lockedChest = Item("chest")
+            .name("locked chest")
+            .in("darkRoom")
+            .isContainer
+            .isLockable
+            .isLocked
             .lockKey("key1")
-        )
 
         let game = MinimalGame(
             player: Player(in: "darkRoom"),
@@ -983,9 +835,7 @@ struct GameEngineActionResponseTests {
         // Try to examine something in a dark room - darkness should take precedence
         try await engine.execute("examine chest")
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > examine chest
             The darkness here is absolute, consuming all light and hope of

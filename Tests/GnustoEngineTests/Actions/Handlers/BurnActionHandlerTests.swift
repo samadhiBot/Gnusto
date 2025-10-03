@@ -11,13 +11,11 @@ struct BurnActionHandlerTests {
     @Test("BURN DIRECTOBJECT syntax works")
     func testBurnDirectObjectSyntax() async throws {
         // Given
-        let paper = Item(
-            id: "paper",
-            .name("piece of paper"),
-            .description("A piece of paper."),
-            .isTakable,
+        let paper = Item("paper")
+            .name("piece of paper")
+            .description("A piece of paper.")
+            .isTakable
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: paper
@@ -29,9 +27,7 @@ struct BurnActionHandlerTests {
         try await engine.execute("burn paper")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > burn paper
             The piece of paper stubbornly resists your attempts to burn it.
@@ -42,21 +38,17 @@ struct BurnActionHandlerTests {
     @Test("BURN DIRECTOBJECT WITH INDIRECTOBJECT syntax works")
     func testBurnWithSyntax() async throws {
         // Given
-        let paper = Item(
-            id: "paper",
-            .name("piece of paper"),
-            .description("A piece of paper."),
-            .isTakable,
+        let paper = Item("paper")
+            .name("piece of paper")
+            .description("A piece of paper.")
+            .isTakable
             .in(.startRoom)
-        )
 
-        let match = Item(
-            id: "match",
-            .name("wooden match"),
-            .description("A wooden match."),
-            .isTakable,
+        let match = Item("match")
+            .name("wooden match")
+            .description("A wooden match.")
+            .isTakable
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: paper, match
@@ -68,9 +60,7 @@ struct BurnActionHandlerTests {
         try await engine.execute("burn paper with match")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > burn paper with match
             You can't burn the piece of paper with the wooden match.
@@ -81,13 +71,11 @@ struct BurnActionHandlerTests {
     @Test("IGNITE syntax works")
     func testIgniteSyntax() async throws {
         // Given
-        let wood = Item(
-            id: "wood",
-            .name("dry wood"),
-            .description("Some dry wood."),
-            .isTakable,
+        let wood = Item("wood")
+            .name("dry wood")
+            .description("Some dry wood.")
+            .isTakable
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: wood
@@ -99,9 +87,7 @@ struct BurnActionHandlerTests {
         try await engine.execute("ignite wood")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > ignite wood
             The dry wood stubbornly resists your attempts to ignite it.
@@ -112,13 +98,11 @@ struct BurnActionHandlerTests {
     @Test("LIGHT syntax works")
     func testLightSyntax() async throws {
         // Given
-        let tinder = Item(
-            id: "tinder",
-            .name("dry tinder"),
-            .description("Some dry tinder."),
-            .isTakable,
+        let tinder = Item("tinder")
+            .name("dry tinder")
+            .description("Some dry tinder.")
+            .isTakable
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: tinder
@@ -130,9 +114,7 @@ struct BurnActionHandlerTests {
         try await engine.execute("light tinder")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > light tinder
             The dry tinder stubbornly resists your attempts to light it.
@@ -152,9 +134,7 @@ struct BurnActionHandlerTests {
         try await engine.execute("burn")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > burn
             Burn what?
@@ -165,19 +145,15 @@ struct BurnActionHandlerTests {
     @Test("Cannot burn target not in scope")
     func testCannotBurnTargetNotInScope() async throws {
         // Given
-        let anotherRoom = Location(
-            id: "anotherRoom",
-            .name("Another Room"),
+        let anotherRoom = Location("anotherRoom")
+            .name("Another Room")
             .inherentlyLit
-        )
 
-        let remotePaper = Item(
-            id: "remotePaper",
-            .name("remote paper"),
-            .description("Paper in another room."),
-            .isTakable,
+        let remotePaper = Item("remotePaper")
+            .name("remote paper")
+            .description("Paper in another room.")
+            .isTakable
             .in("anotherRoom")
-        )
 
         let game = MinimalGame(
             locations: anotherRoom,
@@ -190,9 +166,7 @@ struct BurnActionHandlerTests {
         try await engine.execute("burn paper")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > burn paper
             Any such thing lurks beyond your reach.
@@ -203,19 +177,15 @@ struct BurnActionHandlerTests {
     @Test("Can burn in dark room since requiresLight is false")
     func testCanBurnInDarkRoom() async throws {
         // Given: Dark room with item held by player
-        let darkRoom = Location(
-            id: "darkRoom",
-            .name("Dark Room"),
+        let darkRoom = Location("darkRoom")
+            .name("Dark Room")
             .description("A pitch black room.")
-        )
 
-        let paper = Item(
-            id: "paper",
-            .name("piece of paper"),
-            .description("A piece of paper."),
-            .isTakable,
+        let paper = Item("paper")
+            .name("piece of paper")
+            .description("A piece of paper.")
+            .isTakable
             .in(.player)
-        )
 
         let game = MinimalGame(
             player: Player(in: "darkRoom"),
@@ -229,9 +199,7 @@ struct BurnActionHandlerTests {
         try await engine.execute("burn paper")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > burn paper
             The piece of paper stubbornly resists your attempts to burn it.
@@ -242,21 +210,17 @@ struct BurnActionHandlerTests {
     @Test("Indirect object must be held by player")
     func testIndirectObjectMustBeHeld() async throws {
         // Given
-        let paper = Item(
-            id: "paper",
-            .name("piece of paper"),
-            .description("A piece of paper."),
-            .isTakable,
+        let paper = Item("paper")
+            .name("piece of paper")
+            .description("A piece of paper.")
+            .isTakable
             .in(.player)
-        )
 
-        let match = Item(
-            id: "match",
-            .name("wooden match"),
-            .description("A wooden match."),
-            .isTakable,
+        let match = Item("match")
+            .name("wooden match")
+            .description("A wooden match.")
+            .isTakable
             .in(.startRoom)  // Not held by player
-        )
 
         let game = MinimalGame(
             items: paper, match
@@ -268,9 +232,7 @@ struct BurnActionHandlerTests {
         try await engine.execute("burn paper with match")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > burn paper with match
             You aren't holding the wooden match.
@@ -283,15 +245,13 @@ struct BurnActionHandlerTests {
     @Test("Light source that is not flammable falls through to regular burn")
     func testNonFlammableLightSource() async throws {
         // Given
-        let flashlight = Item(
-            id: "flashlight",
-            .name("electric flashlight"),
-            .description("A battery-powered flashlight."),
-            .isLightSource,  // Light source but NOT flammable
-            .isDevice,
-            .isTakable,
+        let flashlight = Item("flashlight")
+            .name("electric flashlight")
+            .description("A battery-powered flashlight.")
+            .isLightSource  // Light source but NOT flammable
+            .isDevice
+            .isTakable
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: flashlight
@@ -303,9 +263,7 @@ struct BurnActionHandlerTests {
         try await engine.execute("light flashlight")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > light flashlight
             You light the electric flashlight.
@@ -320,15 +278,13 @@ struct BurnActionHandlerTests {
     @Test("Already lit light source gives appropriate message")
     func testAlreadyLitLightSource() async throws {
         // Given
-        let torch = Item(
-            id: "torch",
-            .name("wooden torch"),
-            .description("A wooden torch."),
-            .isLightSource,
-            .isFlammable,
-            .isTakable,
+        let torch = Item("torch")
+            .name("wooden torch")
+            .description("A wooden torch.")
+            .isLightSource
+            .isFlammable
+            .isTakable
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: torch
@@ -345,9 +301,7 @@ struct BurnActionHandlerTests {
         try await engine.execute("light torch")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > light torch
             The wooden torch already dances with flame.
@@ -358,16 +312,14 @@ struct BurnActionHandlerTests {
     @Test("Self-ignitable light source can be lit directly")
     func testSelfIgnitableLightSource() async throws {
         // Given
-        let candle = Item(
-            id: "candle",
-            .name("white candle"),
-            .description("A white wax candle."),
-            .isLightSource,
-            .isFlammable,
-            .isSelfIgnitable,
-            .isTakable,
+        let candle = Item("candle")
+            .name("white candle")
+            .description("A white wax candle.")
+            .isLightSource
+            .isFlammable
+            .isSelfIgnitable
+            .isTakable
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: candle
@@ -379,9 +331,7 @@ struct BurnActionHandlerTests {
         try await engine.execute("light candle")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > light candle
             You light the white candle. You can see your surroundings now.
@@ -396,16 +346,14 @@ struct BurnActionHandlerTests {
     @Test("Flammable light source requires igniter when not self-ignitable")
     func testFlammableLightSourceRequiresIgniter() async throws {
         // Given
-        let torch = Item(
-            id: "torch",
-            .name("wooden torch"),
-            .description("A wooden torch."),
-            .isLightSource,
-            .isFlammable,
+        let torch = Item("torch")
+            .name("wooden torch")
+            .description("A wooden torch.")
+            .isLightSource
+            .isFlammable
             // Note: NOT self-ignitable
-            .isTakable,
+            .isTakable
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: torch
@@ -417,9 +365,7 @@ struct BurnActionHandlerTests {
         try await engine.execute("light torch")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > light torch
             You need something to light the wooden torch with.
@@ -430,23 +376,19 @@ struct BurnActionHandlerTests {
     @Test("Light source can be ignited with burning item")
     func testLightSourceWithBurningIgniter() async throws {
         // Given
-        let torch = Item(
-            id: "torch",
-            .name("wooden torch"),
-            .description("A wooden torch."),
-            .isLightSource,
-            .isFlammable,
-            .isTakable,
+        let torch = Item("torch")
+            .name("wooden torch")
+            .description("A wooden torch.")
+            .isLightSource
+            .isFlammable
+            .isTakable
             .in(.player)
-        )
 
-        let match = Item(
-            id: "match",
-            .name("lit match"),
-            .description("A burning match."),
-            .isTakable,
+        let match = Item("match")
+            .name("lit match")
+            .description("A burning match.")
+            .isTakable
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: torch, match
@@ -463,9 +405,7 @@ struct BurnActionHandlerTests {
         try await engine.execute("light torch with match")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > light torch with match
             You light the wooden torch. You can see your surroundings now.
@@ -482,24 +422,20 @@ struct BurnActionHandlerTests {
     @Test("Light source can be ignited with self-ignitable item")
     func testLightSourceWithSelfIgnitableIgniter() async throws {
         // Given
-        let torch = Item(
-            id: "torch",
-            .name("wooden torch"),
-            .description("A wooden torch."),
-            .isLightSource,
-            .isFlammable,
-            .isTakable,
+        let torch = Item("torch")
+            .name("wooden torch")
+            .description("A wooden torch.")
+            .isLightSource
+            .isFlammable
+            .isTakable
             .in(.player)
-        )
 
-        let lighter = Item(
-            id: "lighter",
-            .name("cigarette lighter"),
-            .description("A disposable lighter."),
-            .isSelfIgnitable,
-            .isTakable,
+        let lighter = Item("lighter")
+            .name("cigarette lighter")
+            .description("A disposable lighter.")
+            .isSelfIgnitable
+            .isTakable
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: torch, lighter
@@ -511,9 +447,7 @@ struct BurnActionHandlerTests {
         try await engine.execute("light torch with lighter")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > light torch with lighter
             You light the wooden torch. You can see your surroundings now.
@@ -530,23 +464,19 @@ struct BurnActionHandlerTests {
     @Test("Invalid igniter cannot light source")
     func testInvalidIgniter() async throws {
         // Given
-        let torch = Item(
-            id: "torch",
-            .name("wooden torch"),
-            .description("A wooden torch."),
-            .isLightSource,
-            .isFlammable,
-            .isTakable,
+        let torch = Item("torch")
+            .name("wooden torch")
+            .description("A wooden torch.")
+            .isLightSource
+            .isFlammable
+            .isTakable
             .in(.player)
-        )
 
-        let rock = Item(
-            id: "rock",
-            .name("granite rock"),
-            .description("A hard granite rock."),
-            .isTakable,
+        let rock = Item("rock")
+            .name("granite rock")
+            .description("A hard granite rock.")
+            .isTakable
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: torch, rock
@@ -558,9 +488,7 @@ struct BurnActionHandlerTests {
         try await engine.execute("light torch with rock")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > light torch with rock
             You can't light the wooden torch with the granite rock.
@@ -573,13 +501,11 @@ struct BurnActionHandlerTests {
     @Test("Regular item gives generic burn message")
     func testRegularItemBurn() async throws {
         // Given
-        let book = Item(
-            id: "book",
-            .name("leather book"),
-            .description("A worn leather book."),
-            .isTakable,
+        let book = Item("book")
+            .name("leather book")
+            .description("A worn leather book.")
+            .isTakable
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: book
@@ -591,9 +517,7 @@ struct BurnActionHandlerTests {
         try await engine.execute("burn book")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > burn book
             The leather book stubbornly resists your attempts to burn it.
@@ -604,22 +528,18 @@ struct BurnActionHandlerTests {
     @Test("Regular item with held tool gives tool message")
     func testRegularItemWithHeldTool() async throws {
         // Given
-        let paper = Item(
-            id: "paper",
-            .name("piece of paper"),
-            .description("A piece of paper."),
-            .isTakable,
+        let paper = Item("paper")
+            .name("piece of paper")
+            .description("A piece of paper.")
+            .isTakable
             .in(.player)
-        )
 
-        let match = Item(
-            id: "match",
-            .name("wooden match"),
-            .description("A wooden match."),
-            .isSelfIgnitable,
-            .isTakable,
+        let match = Item("match")
+            .name("wooden match")
+            .description("A wooden match.")
+            .isSelfIgnitable
+            .isTakable
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: paper, match
@@ -631,9 +551,7 @@ struct BurnActionHandlerTests {
         try await engine.execute("burn paper with match")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > burn paper with match
             The wooden match proves woefully inadequate as an implement of
@@ -647,13 +565,11 @@ struct BurnActionHandlerTests {
     @Test("Burning character gives character-specific message")
     func testBurnCharacter() async throws {
         // Given
-        let wizard = Item(
-            id: "wizard",
-            .name("wise wizard"),
-            .description("A wise old wizard."),
-            .characterSheet(.wise),
+        let wizard = Item("wizard")
+            .name("wise wizard")
+            .description("A wise old wizard.")
+            .characterSheet(.wise)
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: wizard
@@ -665,9 +581,7 @@ struct BurnActionHandlerTests {
         try await engine.execute("burn wizard")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > burn wizard
             That would be needlessly cruel.
@@ -678,14 +592,12 @@ struct BurnActionHandlerTests {
     @Test("Burning enemy gives enemy-specific message")
     func testBurnEnemy() async throws {
         // Given
-        let torch = Item(
-            id: "torch",
-            .name("flaming torch"),
-            .isFlammable,
-            .isBurning,
-            .isLightSource,
+        let torch = Item("torch")
+            .name("flaming torch")
+            .isFlammable
+            .isBurning
+            .isLightSource
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: Lab.troll, torch
@@ -702,9 +614,7 @@ struct BurnActionHandlerTests {
         )
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > look
             --- Laboratory ---
@@ -731,7 +641,7 @@ struct BurnActionHandlerTests {
             Your flaming torch inflicts a light wound on the creature, more
             sting than damage. He registers the wound with annoyance.
 
-            The monster's answer is swift and punishing--knuckles meet
+            The monster's answer is swift and punishing -- knuckles meet
             flesh with the sound of meat hitting stone. The blow lands
             solidly, drawing blood. You feel the sting but remain strong.
             """
@@ -744,22 +654,18 @@ struct BurnActionHandlerTests {
     @Test("Burning character with tool gives tool message")
     func testBurnCharacterWithTool() async throws {
         // Given
-        let palaceGuard = Item(
-            id: "guard",
-            .name("palace guard"),
-            .description("A stern palace guard."),
-            .characterSheet(.strong),
+        let palaceGuard = Item("guard")
+            .name("palace guard")
+            .description("A stern palace guard.")
+            .characterSheet(.strong)
             .in(.startRoom)
-        )
 
-        let torch = Item(
-            id: "torch",
-            .name("burning torch"),
-            .description("A lit torch."),
-            .isBurning,
-            .isTakable,
+        let torch = Item("torch")
+            .name("burning torch")
+            .description("A lit torch.")
+            .isBurning
+            .isTakable
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: palaceGuard, torch
@@ -771,9 +677,7 @@ struct BurnActionHandlerTests {
         try await engine.execute("burn guard with torch")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > burn guard with torch
             The burning torch proves woefully inadequate as an implement of
@@ -823,13 +727,11 @@ struct BurnActionHandlerTests {
     @Test("All synonyms work correctly")
     func testAllSynonyms() async throws {
         // Given
-        let paper = Item(
-            id: "paper",
-            .name("piece of paper"),
-            .description("A piece of paper."),
-            .isTakable,
+        let paper = Item("paper")
+            .name("piece of paper")
+            .description("A piece of paper.")
+            .isTakable
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: paper
@@ -843,9 +745,7 @@ struct BurnActionHandlerTests {
         try await engine.execute("light paper")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > burn paper
             The piece of paper stubbornly resists your attempts to burn it.
@@ -863,13 +763,11 @@ struct BurnActionHandlerTests {
     @Test("Cannot burn with nonexistent tool")
     func testCannotBurnWithNonexistentTool() async throws {
         // Given
-        let paper = Item(
-            id: "paper",
-            .name("piece of paper"),
-            .description("A piece of paper."),
-            .isTakable,
+        let paper = Item("paper")
+            .name("piece of paper")
+            .description("A piece of paper.")
+            .isTakable
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: paper
@@ -881,9 +779,7 @@ struct BurnActionHandlerTests {
         try await engine.execute("burn paper with unicorn")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > burn paper with unicorn
             Any such thing lurks beyond your reach.
@@ -894,23 +790,19 @@ struct BurnActionHandlerTests {
     @Test("Light source igniting in dark room shows room description")
     func testLightSourceInDarkRoom() async throws {
         // Given - Dark room
-        let darkRoom = Location(
-            id: "darkRoom",
-            .name("Dark Room"),
+        let darkRoom = Location("darkRoom")
+            .name("Dark Room")
             .description("A room shrouded in darkness.")
-            // Note: No .inherentlyLit flag
-        )
+        // Note: No .inherentlyLit flag
 
-        let candle = Item(
-            id: "candle",
-            .name("white candle"),
-            .description("A white wax candle."),
-            .isLightSource,
-            .isFlammable,
-            .isSelfIgnitable,
-            .isTakable,
+        let candle = Item("candle")
+            .name("white candle")
+            .description("A white wax candle.")
+            .isLightSource
+            .isFlammable
+            .isSelfIgnitable
+            .isTakable
             .in(.player)
-        )
 
         let game = MinimalGame(
             player: Player(in: "darkRoom"),
@@ -924,9 +816,7 @@ struct BurnActionHandlerTests {
         try await engine.execute("light candle")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > light candle
             You light the white candle. You can see your surroundings now.

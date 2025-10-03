@@ -330,18 +330,14 @@ Test every supported pattern and verify unsupported patterns fail:
 ```swift
 @Test("TAKE syntax works")
 func testTakeSyntax() async throws {
-    let testRoom = Location(
-        id: .startRoom,
-        .name("Test Room"),
+    let testRoom = Location(.startRoom)
+        .name("Test Room")
         .inherentlyLit
-    )
 
-    let testItem = Item(
-        id: "lamp",
-        .name("brass lamp"),
-        .isTakable,
+    let testItem = Item("lamp")
+        .name("brass lamp")
+        .isTakable
         .in(.startRoom)
-    )
 
     let game = MinimalGame(
         player: Player(in: .startRoom),
@@ -353,11 +349,12 @@ func testTakeSyntax() async throws {
 
     try await engine.execute("take lamp")
 
-    let output = await mockIO.flush()
-    expectNoDifference(output, """
+    await mockIO.expect(
+        """
         > take lamp
         Taken.
-        """)
+        """
+    )
 }
 
 @Test("Invalid syntax patterns are rejected")
@@ -414,18 +411,14 @@ try await handler.process(context: ActionContext(command: command, engine: engin
 @Test("Test description")
 func testSomething() async throws {
     // Given: Complete game setup
-    let testRoom = Location(
-        id: "testRoom",
-        .name("Test Room"),
+    let testRoom = Location("testRoom")
+        .name("Test Room")
         .inherentlyLit
-    )
 
-    let testItem = Item(
-        id: "testItem",
-        .name("test item"),
-        .isTakable,
+    let testItem = Item("testItem")
+        .name("test item")
+        .isTakable
         .in(.startRoom)
-    )
 
     let game = MinimalGame(
         player: Player(in: .startRoom),
@@ -439,11 +432,12 @@ func testSomething() async throws {
     try await engine.execute("take test item")
 
     // Then: Verify results
-    let output = await mockIO.flush()
-    expectNoDifference(output, """
+    await mockIO.expect(
+        """
         > take test item
         Taken.
-        """)
+        """
+    )
 
     let finalState = await engine.item("testItem")
     #expect(await finalState.parent == .player)
@@ -516,11 +510,12 @@ for directObjectRef in context.command.directObjects {
 
 ```swift
 // ✅ RIGHT: Exact message matching with command echo
-let output = await mockIO.flush()
-expectNoDifference(output, """
+await mockIO.expect(
+    """
     > take lamp
     Taken.
-    """)
+    """
+)
 
 // ❌ WRONG: Partial matching
 #expect(output.contains("Taken"))

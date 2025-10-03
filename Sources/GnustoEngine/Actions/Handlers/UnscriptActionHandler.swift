@@ -32,13 +32,18 @@ public struct UnscriptActionHandler: ActionHandler {
             )
         }
 
-        let path = try await context.engine.transcriptURL.gnustoPath
+        // Get the transcript URL before stopping (it will be cleared)
+        guard let url = await context.engine.transcriptURL else {
+            throw ActionResponse.feedback(
+                context.msg.transcriptError("Transcript URL not available")
+            )
+        }
 
         // Stop recording transcript
         await context.engine.stopTranscript()
 
         return ActionResult(
-            context.msg.transcriptEnded(path),
+            context.msg.transcriptEnded(url.gnustoPath),
             await context.engine.clearGlobal(.isScripting)
         )
     }

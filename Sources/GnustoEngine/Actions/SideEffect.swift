@@ -222,7 +222,7 @@ extension SideEffect {
     ///
     /// - Parameters:
     ///   - itemID: The ID of the item affected by the status effect.
-    ///   - effectName: A string identifier for the specific effect to remove.
+    ///   - effect: A string identifier for the specific effect to remove.
     ///   - turns: Number of turns until the effect expires. Defaults to 5.
     /// - Returns: A configured SideEffect for the status effect expiry fuse.
     public static func startStatusEffectExpiryFuse(

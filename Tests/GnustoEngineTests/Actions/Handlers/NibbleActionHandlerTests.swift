@@ -10,31 +10,25 @@ struct NibbleActionHandlerTests {
 
     /// Creates a test engine with edible and non-edible items for nibble testing
     private func createTestEngine() async -> (GameEngine, MockIOHandler) {
-        let apple = Item(
-            id: "apple",
-            .name("red apple"),
-            .description("A delicious red apple."),
-            .isTakable,
-            .isEdible,
+        let apple = Item("apple")
+            .name("red apple")
+            .description("A delicious red apple.")
+            .isTakable
+            .isEdible
             .in(.startRoom)
-        )
 
-        let cookie = Item(
-            id: "cookie",
-            .name("chocolate cookie"),
-            .description("A sweet chocolate cookie."),
-            .isTakable,
-            .isEdible,
+        let cookie = Item("cookie")
+            .name("chocolate cookie")
+            .description("A sweet chocolate cookie.")
+            .isTakable
+            .isEdible
             .in(.player)
-        )
 
-        let rock = Item(
-            id: "rock",
-            .name("gray rock"),
-            .description("A hard gray rock."),
-            .isTakable,
+        let rock = Item("rock")
+            .name("gray rock")
+            .description("A hard gray rock.")
+            .isTakable
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: apple, cookie, rock
@@ -53,9 +47,7 @@ struct NibbleActionHandlerTests {
         try await engine.execute("nibble apple")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > nibble apple
             Do you mean you want to eat the red apple?
@@ -78,9 +70,7 @@ struct NibbleActionHandlerTests {
         try await engine.execute("bite cookie")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > bite cookie
             Do you mean you want to eat the chocolate cookie?
@@ -102,9 +92,7 @@ struct NibbleActionHandlerTests {
         try await engine.execute("nibble")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > nibble
             Nibble what?
@@ -118,19 +106,15 @@ struct NibbleActionHandlerTests {
 
     @Test("Cannot nibble item not in scope")
     func testCannotNibbleItemNotInScope() async throws {
-        let anotherRoom = Location(
-            id: "anotherRoom",
-            .name("Another Room"),
+        let anotherRoom = Location("anotherRoom")
+            .name("Another Room")
             .inherentlyLit
-        )
 
-        let remoteCake = Item(
-            id: "remoteCake",
-            .name("distant cake"),
-            .description("A cake in another room."),
-            .isEdible,
+        let remoteCake = Item("remoteCake")
+            .name("distant cake")
+            .description("A cake in another room.")
+            .isEdible
             .in("anotherRoom")
-        )
 
         let game = MinimalGame(
             locations: anotherRoom,
@@ -143,9 +127,7 @@ struct NibbleActionHandlerTests {
         try await engine.execute("nibble cake")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > nibble cake
             Any such thing lurks beyond your reach.
@@ -165,9 +147,7 @@ struct NibbleActionHandlerTests {
         try await engine.execute("nibble rock")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > nibble rock
             The gray rock falls well outside the realm of culinary
@@ -183,20 +163,16 @@ struct NibbleActionHandlerTests {
     @Test("Requires light to nibble")
     func testRequiresLight() async throws {
         // Given: Dark room with edible item
-        let darkRoom = Location(
-            id: "darkRoom",
-            .name("Dark Room"),
+        let darkRoom = Location("darkRoom")
+            .name("Dark Room")
             .description("A pitch black room.")
             // Note: No .inherentlyLit property
-        )
 
-        let bread = Item(
-            id: "bread",
-            .name("fresh bread"),
-            .description("A loaf of fresh bread."),
-            .isEdible,
+        let bread = Item("bread")
+            .name("fresh bread")
+            .description("A loaf of fresh bread.")
+            .isEdible
             .in("darkRoom")
-        )
 
         let game = MinimalGame(
             player: Player(in: "darkRoom"),
@@ -210,9 +186,7 @@ struct NibbleActionHandlerTests {
         try await engine.execute("nibble bread")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > nibble bread
             The darkness here is absolute, consuming all light and hope of
@@ -242,9 +216,7 @@ struct NibbleActionHandlerTests {
         try await engine.execute("yes")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > nibble cookie
             Do you mean you want to eat the chocolate cookie?
@@ -271,9 +243,7 @@ struct NibbleActionHandlerTests {
         )
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > nibble apple
             Do you mean you want to eat the red apple?
@@ -308,9 +278,7 @@ struct NibbleActionHandlerTests {
         try await engine.execute("inventory")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > nibble apple
             Do you mean you want to eat the red apple?
@@ -341,9 +309,7 @@ struct NibbleActionHandlerTests {
         try await engine.execute("nibble apple")
 
         // Then: Should create a yes/no question
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > nibble apple
             Do you mean you want to eat the red apple?
@@ -367,13 +333,12 @@ struct NibbleActionHandlerTests {
             // Execute the command
             try await engine.execute("\(verb) apple")
 
-            let output = await mockIO.flush()
-            expectNoDifference(
-                output,
+            await mockIO.expect(
                 """
                 > \(verb) apple
                 Do you mean you want to eat the red apple?
-                """)
+                """
+            )
 
             // Clear the question for next test
             try await engine.execute("no")
@@ -438,13 +403,11 @@ struct NibbleActionHandlerTests {
         // This is a theoretical test - in practice, EatActionHandler should always be present
         // But it demonstrates how the system should handle missing handlers
 
-        let apple = Item(
-            id: "apple",
-            .name("red apple"),
-            .description("A delicious red apple."),
-            .isEdible,
+        let apple = Item("apple")
+            .name("red apple")
+            .description("A delicious red apple.")
+            .isEdible
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: apple
@@ -459,9 +422,7 @@ struct NibbleActionHandlerTests {
         // YES response should handle missing EAT handler gracefully
         try await engine.execute("yes")
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > nibble apple
             Do you mean you want to eat the red apple?

@@ -13,15 +13,12 @@ public struct StandardCombatSystem: CombatSystem {
     /// The identifier of the enemy this combat system applies to.
     public let enemyID: ItemID
 
-    /// A closure that provides custom combat event descriptions.
-    ///
-    /// When provided, this closure allows games to override default combat messages
-    /// with custom narrative descriptions. If the closure returns `nil` for an event,
-    /// the system falls back to default descriptions.
-    public let description: @Sendable (CombatEvent, CombatMessenger) async -> String?
-
     /// Private logger for combat system messages, warnings, and errors.
     private let logger = Logger(label: "com.samadhibot.Gnusto.StandardCombatSystem")
+
+    /// A closure that provides custom combat event handling with complete control over messages
+    /// and state changes.
+    public let eventHandler: @Sendable (CombatEvent, ActionContext) async throws -> ActionResult?
 
     /// Creates a default combat system for the specified enemy.
     ///
@@ -32,13 +29,17 @@ public struct StandardCombatSystem: CombatSystem {
     ///
     /// - Parameters:
     ///   - enemyID: The identifier of the enemy this system applies to
-    ///   - descriptions: Optional closure for custom combat event descriptions
+    ///   - eventHandler: Optional closure for custom combat event handling
     public init(
         versus enemyID: ItemID,
-        descriptions: @escaping @Sendable (CombatEvent, CombatMessenger) async -> String? = { _, _ in nil }
+        eventHandler:
+            @escaping @Sendable (
+                CombatEvent,
+                ActionContext
+            ) async throws -> ActionResult? = { _, _ in nil }
     ) {
         self.enemyID = enemyID
-        self.description = descriptions
+        self.eventHandler = eventHandler
     }
 
     /// Processes a complete turn of combat including player action and enemy reaction.
@@ -128,7 +129,7 @@ public struct StandardCombatSystem: CombatSystem {
             message: result.message,
             changes: combinedChanges,
             effects: result.effects,
-            shouldYieldToEngine: result.shouldYieldToEngine
+            executionFlow: result.executionFlow
         )
     }
 
@@ -305,7 +306,7 @@ public struct StandardCombatSystem: CombatSystem {
                     return .enemyStaggers(
                         enemy: enemy,
                         playerWeapon: playerWeapon,
-                        enemyWeapon: nil
+                        enemyWeapon: enemyWeapon
                     )
                 }
             }
@@ -315,7 +316,7 @@ public struct StandardCombatSystem: CombatSystem {
                 return .playerDodged(enemy: enemy, enemyWeapon: enemyWeapon)
             }
             if case .enemy(let enemy) = defender {
-                return .enemyBlocked(enemy: enemy, playerWeapon: playerWeapon, enemyWeapon: nil)
+                return .enemyBlocked(enemy: enemy, playerWeapon: playerWeapon, enemyWeapon: enemyWeapon)
             }
         }
 
@@ -1231,12 +1232,82 @@ public struct StandardCombatSystem: CombatSystem {
         for event: CombatEvent,
         in context: ActionContext
     ) async throws -> ActionResult {
-        let description =
-            if let custom = await description(event, context.combatMsg) {
-                custom
-            } else {
-                await defaultCombatDescription(of: event, via: context.combatMsg)
+        // Check for custom event handling first
+        if let customResult = try await eventHandler(event, context) {
+            // Handle different execution flows
+            switch customResult.executionFlow {
+            case .override:
+                // Override default behavior entirely - use only custom result
+                return customResult
+
+            case .append:
+                // Append custom content after default content
+                let defaultResult = try await generateDefaultEventResult(for: event, in: context)
+                let combinedMessage: String? = {
+                    switch (defaultResult.message, customResult.message) {
+                    case (let defaultMsg?, let customMsg?):
+                        return "\(defaultMsg)\n\n\(customMsg)"
+                    case (let defaultMsg?, nil):
+                        return defaultMsg
+                    case (nil, let customMsg?):
+                        return customMsg
+                    case (nil, nil):
+                        return nil
+                    }
+                }()
+                return ActionResult(
+                    message: combinedMessage,
+                    changes: defaultResult.changes + customResult.changes,
+                    effects: defaultResult.effects + customResult.effects,
+                    executionFlow: .override
+                )
+
+            case .prepend:
+                // Prepend custom content before default content
+                let defaultResult = try await generateDefaultEventResult(for: event, in: context)
+                let combinedMessage: String? = {
+                    switch (customResult.message, defaultResult.message) {
+                    case (let customMsg?, let defaultMsg?):
+                        return "\(customMsg)\n\n\(defaultMsg)"
+                    case (let customMsg?, nil):
+                        return customMsg
+                    case (nil, let defaultMsg?):
+                        return defaultMsg
+                    case (nil, nil):
+                        return nil
+                    }
+                }()
+                return ActionResult(
+                    message: combinedMessage,
+                    changes: customResult.changes + defaultResult.changes,
+                    effects: customResult.effects + defaultResult.effects,
+                    executionFlow: .override
+                )
+
+            case .yield:
+                // Apply custom changes/effects but yield to default processing
+                let defaultResult = try await generateDefaultEventResult(for: event, in: context)
+                // Custom message takes full precedence when provided
+                let finalMessage = customResult.message ?? defaultResult.message
+                return ActionResult(
+                    message: finalMessage,
+                    changes: customResult.changes + defaultResult.changes,
+                    effects: customResult.effects + defaultResult.effects,
+                    executionFlow: .override
+                )
             }
+        }
+
+        // No custom handling - use default
+        return try await generateDefaultEventResult(for: event, in: context)
+    }
+
+    /// Generates the default combat event result with standard messaging and changes.
+    func generateDefaultEventResult(
+        for event: CombatEvent,
+        in context: ActionContext
+    ) async throws -> ActionResult {
+        let description = await defaultCombatDescription(of: event, via: context.combatMsg)
 
         switch event {
 

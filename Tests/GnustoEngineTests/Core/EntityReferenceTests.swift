@@ -24,11 +24,9 @@ struct EntityReferenceTests {
 
     @Test("EntityReference.item can be created with Item")
     func testItemCase() throws {
-        let testItem = Item(
-            id: "testItem",
-            .name("test item"),
+        let testItem = Item("testItem")
+            .name("test item")
             .in(.startRoom)
-        )
 
         let itemRef = EntityReference.item(testItem)
 
@@ -41,11 +39,9 @@ struct EntityReferenceTests {
 
     @Test("EntityReference.location can be created with Location")
     func testLocationCase() throws {
-        let testLocation = Location(
-            id: .startRoom,
-            .name("Test Room"),
+        let testLocation = Location(.startRoom)
+            .name("Test Room")
             .inherentlyLit
-        )
 
         let locationRef = EntityReference.location(testLocation)
 
@@ -71,17 +67,13 @@ struct EntityReferenceTests {
 
     @Test("Same EntityReference cases are equal")
     func testEquality() throws {
-        let testItem = Item(
-            id: "testItem",
-            .name("test item"),
+        let testItem = Item("testItem")
+            .name("test item")
             .in(.startRoom)
-        )
 
-        let testLocation = Location(
-            id: .startRoom,
-            .name("Test Room"),
+        let testLocation = Location(.startRoom)
+            .name("Test Room")
             .inherentlyLit
-        )
 
         #expect(EntityReference.player == EntityReference.player)
         #expect(EntityReference.item(testItem) == EntityReference.item(testItem))
@@ -91,17 +83,13 @@ struct EntityReferenceTests {
 
     @Test("Different EntityReference cases are not equal")
     func testInequality() throws {
-        let testItem = Item(
-            id: "testItem",
-            .name("test item"),
+        let testItem = Item("testItem")
+            .name("test item")
             .in(.startRoom)
-        )
 
-        let testLocation = Location(
-            id: .startRoom,
-            .name("Test Room"),
+        let testLocation = Location(.startRoom)
+            .name("Test Room")
             .inherentlyLit
-        )
 
         #expect(EntityReference.player != EntityReference.item(testItem))
         #expect(EntityReference.player != EntityReference.location(testLocation))
@@ -113,29 +101,21 @@ struct EntityReferenceTests {
 
     @Test("Same EntityReference with different associated values are not equal")
     func testDifferentAssociatedValues() throws {
-        let item1 = Item(
-            id: "item1",
-            .name("first item"),
+        let item1 = Item("item1")
+            .name("first item")
             .in(.startRoom)
-        )
 
-        let item2 = Item(
-            id: "item2",
-            .name("second item"),
+        let item2 = Item("item2")
+            .name("second item")
             .in(.startRoom)
-        )
 
-        let location1 = Location(
-            id: "room1",
-            .name("First Room"),
+        let location1 = Location("room1")
+            .name("First Room")
             .inherentlyLit
-        )
 
-        let location2 = Location(
-            id: "room2",
-            .name("Second Room"),
+        let location2 = Location("room2")
+            .name("Second Room")
             .inherentlyLit
-        )
 
         #expect(EntityReference.item(item1) != EntityReference.item(item2))
         #expect(EntityReference.location(location1) != EntityReference.location(location2))
@@ -146,17 +126,13 @@ struct EntityReferenceTests {
 
     @Test("EntityReference conforms to Hashable")
     func testHashable() throws {
-        let testItem = Item(
-            id: "testItem",
-            .name("test item"),
+        let testItem = Item("testItem")
+            .name("test item")
             .in(.startRoom)
-        )
 
-        let testLocation = Location(
-            id: .startRoom,
-            .name("Test Room"),
+        let testLocation = Location(.startRoom)
+            .name("Test Room")
             .inherentlyLit
-        )
 
         let references: Set<EntityReference> = [
             .player,
@@ -172,11 +148,9 @@ struct EntityReferenceTests {
 
     @Test("Same EntityReference instances have same hash value")
     func testHashConsistency() throws {
-        let testItem = Item(
-            id: "testItem",
-            .name("test item"),
+        let testItem = Item("testItem")
+            .name("test item")
             .in(.startRoom)
-        )
 
         let ref1 = EntityReference.item(testItem)
         let ref2 = EntityReference.item(testItem)
@@ -192,17 +166,13 @@ struct EntityReferenceTests {
         let encoder = JSONEncoder.sorted()
         let decoder = JSONDecoder()
 
-        let testItem = Item(
-            id: "testItem",
-            .name("test item"),
+        let testItem = Item("testItem")
+            .name("test item")
             .in(.startRoom)
-        )
 
-        let testLocation = Location(
-            id: .startRoom,
-            .name("Test Room"),
+        let testLocation = Location(.startRoom)
+            .name("Test Room")
             .inherentlyLit
-        )
 
         let testCases: [EntityReference] = [
             .player,
@@ -224,13 +194,11 @@ struct EntityReferenceTests {
         let encoder = JSONEncoder.sorted()
         let decoder = JSONDecoder()
 
-        let complexItem = Item(
-            id: "complexItem",
-            .name("complex test item"),
-            .description("A complex item for testing"),
-            .isTakable,
+        let complexItem = Item("complexItem")
+            .name("complex test item")
+            .description("A complex item for testing")
+            .isTakable
             .in("complexRoom")
-        )
 
         let complexReference = EntityReference.item(complexItem)
 
@@ -256,11 +224,9 @@ struct EntityReferenceTests {
 
     @Test("EntityReference.item description shows item ID")
     func testItemDescription() throws {
-        let testItem = Item(
-            id: "magicLamp",
-            .name("magic lamp"),
+        let testItem = Item("magicLamp")
+            .name("magic lamp")
             .in(.startRoom)
-        )
 
         let itemRef = EntityReference.item(testItem)
         #expect(itemRef.description == ".magicLamp")
@@ -268,11 +234,9 @@ struct EntityReferenceTests {
 
     @Test("EntityReference.location description shows location ID")
     func testLocationDescription() throws {
-        let testLocation = Location(
-            id: "enchantedForest",
-            .name("Enchanted Forest"),
+        let testLocation = Location("enchantedForest")
+            .name("Enchanted Forest")
             .inherentlyLit
-        )
 
         let locationRef = EntityReference.location(testLocation)
         #expect(locationRef.description == ".enchantedForest")
@@ -291,13 +255,11 @@ struct EntityReferenceTests {
 
     @Test("Item associated values work correctly")
     func testItemAssociatedValues() throws {
-        let testItem = Item(
-            id: "testSword",
-            .name("enchanted sword"),
-            .description("A magical blade"),
-            .isTakable,
+        let testItem = Item("testSword")
+            .name("enchanted sword")
+            .description("A magical blade")
+            .isTakable
             .in("armory")
-        )
 
         let itemRef = EntityReference.item(testItem)
 
@@ -310,12 +272,10 @@ struct EntityReferenceTests {
 
     @Test("Location associated values work correctly")
     func testLocationAssociatedValues() throws {
-        let testLocation = Location(
-            id: "mysticalCave",
-            .name("Mystical Cave"),
-            .description("A cave filled with ancient magic"),
+        let testLocation = Location("mysticalCave")
+            .name("Mystical Cave")
+            .description("A cave filled with ancient magic")
             .inherentlyLit
-        )
 
         let locationRef = EntityReference.location(testLocation)
 
@@ -348,17 +308,13 @@ struct EntityReferenceTests {
 
     @Test("EntityReference works in collections")
     func testInCollections() throws {
-        let testItem = Item(
-            id: "collectionItem",
-            .name("collection item"),
+        let testItem = Item("collectionItem")
+            .name("collection item")
             .in(.startRoom)
-        )
 
-        let testLocation = Location(
-            id: "collectionRoom",
-            .name("Collection Room"),
+        let testLocation = Location("collectionRoom")
+            .name("Collection Room")
             .inherentlyLit
-        )
 
         let references: [EntityReference] = [
             .player,
@@ -376,11 +332,9 @@ struct EntityReferenceTests {
 
     @Test("EntityReference pattern matching works correctly")
     func testPatternMatching() throws {
-        let testItem = Item(
-            id: "patternItem",
-            .name("pattern item"),
+        let testItem = Item("patternItem")
+            .name("pattern item")
             .in(.startRoom)
-        )
 
         let references: [EntityReference] = [
             .player,
@@ -418,8 +372,13 @@ struct EntityReferenceTests {
         // This test verifies that the enum enforces type safety at compile time
         // by ensuring we can only create valid EntityReference cases
 
-        let item = Item(id: "safetyItem", .name("safety item"), .in(.startRoom))
-        let location = Location(id: "safetyRoom", .name("Safety Room"), .inherentlyLit)
+        let item = Item("safetyItem")
+            .name("safety item")
+            .in(.startRoom)
+
+        let location = Location("safetyRoom")
+            .name("Safety Room")
+            .inherentlyLit
 
         // These should all compile and work correctly
         let validReferences: [EntityReference] = [

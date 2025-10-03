@@ -135,7 +135,7 @@ public struct InsertActionHandler: ActionHandler {
 
         // Mark container touched if any items were inserted
         if insertedItems.isNotEmpty {
-            await allStateChanges.append(
+            await allStateChanges.appendIfPresent(
                 container.setFlag(.isTouched)
             )
         }

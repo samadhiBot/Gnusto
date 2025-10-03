@@ -10,37 +10,29 @@ struct GameStateApplyTests {
     // MARK: - Test Helpers
 
     private func createTestGameState() -> GameState {
-        let testRoom = Location(
-            id: .startRoom,
-            .name("Test Room"),
-            .description("A test room for testing purposes."),
+        let testRoom = Location(.startRoom)
+            .name("Test Room")
+            .description("A test room for testing purposes.")
             .inherentlyLit
-        )
 
-        let secondRoom = Location(
-            id: "secondRoom",
-            .name("Second Room"),
-            .description("Another test room."),
+        let secondRoom = Location("secondRoom")
+            .name("Second Room")
+            .description("Another test room.")
             .inherentlyLit
-        )
 
-        let testItem = Item(
-            id: "testItem",
-            .name("test item"),
-            .description("A test item."),
-            .isTakable,
-            .size(5),
+        let testItem = Item("testItem")
+            .name("test item")
+            .description("A test item.")
+            .isTakable
+            .size(5)
             .in(.startRoom)
-        )
 
-        let containerItem = Item(
-            id: "container",
-            .name("test container"),
-            .description("A test container."),
-            .isContainer,
-            .capacity(10),
+        let containerItem = Item("container")
+            .name("test container")
+            .description("A test container.")
+            .isContainer
+            .capacity(10)
             .in(.startRoom)
-        )
 
         return GameState(
             locations: [testRoom, secondRoom],

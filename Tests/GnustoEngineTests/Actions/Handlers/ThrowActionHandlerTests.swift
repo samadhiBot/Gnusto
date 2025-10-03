@@ -11,13 +11,11 @@ struct ThrowActionHandlerTests {
     @Test("THROW DIRECTOBJECT syntax works")
     func testThrowDirectObjectSyntax() async throws {
         // Given
-        let ball = Item(
-            id: "ball",
-            .name("rubber ball"),
-            .description("A bouncy rubber ball."),
-            .isTakable,
+        let ball = Item("ball")
+            .name("rubber ball")
+            .description("A bouncy rubber ball.")
+            .isTakable
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: ball
@@ -29,9 +27,7 @@ struct ThrowActionHandlerTests {
         try await engine.execute("throw ball")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > throw ball
             You throw the rubber ball in a lazy arc. It lands nearby with
@@ -48,20 +44,16 @@ struct ThrowActionHandlerTests {
     @Test("THROW DIRECTOBJECT AT INDIRECTOBJECT syntax works")
     func testThrowAtIndirectObjectSyntax() async throws {
         // Given
-        let rock = Item(
-            id: "rock",
-            .name("small rock"),
-            .description("A small throwing rock."),
-            .isTakable,
+        let rock = Item("rock")
+            .name("small rock")
+            .description("A small throwing rock.")
+            .isTakable
             .in(.player)
-        )
 
-        let target = Item(
-            id: "target",
-            .name("wooden target"),
-            .description("A wooden archery target."),
+        let target = Item("target")
+            .name("wooden target")
+            .description("A wooden archery target.")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: rock, target
@@ -73,9 +65,7 @@ struct ThrowActionHandlerTests {
         try await engine.execute("throw rock at target")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > throw rock at target
             You throw the small rock at the wooden target. It bounces off
@@ -95,21 +85,17 @@ struct ThrowActionHandlerTests {
     @Test("THROW DIRECTOBJECT TO INDIRECTOBJECT syntax works")
     func testThrowToIndirectObjectSyntax() async throws {
         // Given
-        let key = Item(
-            id: "key",
-            .name("brass key"),
-            .description("A shiny brass key."),
-            .isTakable,
+        let key = Item("key")
+            .name("brass key")
+            .description("A shiny brass key.")
+            .isTakable
             .in(.player)
-        )
 
-        let castleGuard = Item(
-            id: "guard",
-            .name("castle guard"),
-            .description("A stern castle guard."),
-            .characterSheet(.default),
+        let castleGuard = Item("guard")
+            .name("castle guard")
+            .description("A stern castle guard.")
+            .characterSheet(.default)
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: key, castleGuard
@@ -121,9 +107,7 @@ struct ThrowActionHandlerTests {
         try await engine.execute("throw key to guard")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > throw key to guard
             You throw the brass key to the castle guard, who catches it
@@ -141,13 +125,11 @@ struct ThrowActionHandlerTests {
     @Test("HURL syntax works")
     func testHurlSyntax() async throws {
         // Given
-        let spear = Item(
-            id: "spear",
-            .name("wooden spear"),
-            .description("A sharp wooden spear."),
-            .isTakable,
+        let spear = Item("spear")
+            .name("wooden spear")
+            .description("A sharp wooden spear.")
+            .isTakable
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: spear
@@ -159,9 +141,7 @@ struct ThrowActionHandlerTests {
         try await engine.execute("hurl spear")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > hurl spear
             You hurl the wooden spear in a lazy arc. It lands nearby with
@@ -173,13 +153,11 @@ struct ThrowActionHandlerTests {
     @Test("TOSS syntax works")
     func testTossSyntax() async throws {
         // Given
-        let coin = Item(
-            id: "coin",
-            .name("gold coin"),
-            .description("A shiny gold coin."),
-            .isTakable,
+        let coin = Item("coin")
+            .name("gold coin")
+            .description("A shiny gold coin.")
+            .isTakable
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: coin
@@ -191,9 +169,7 @@ struct ThrowActionHandlerTests {
         try await engine.execute("toss coin")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > toss coin
             You toss the gold coin in a lazy arc. It lands nearby with
@@ -205,13 +181,11 @@ struct ThrowActionHandlerTests {
     @Test("CHUCK syntax works")
     func testChuckSyntax() async throws {
         // Given
-        let stone = Item(
-            id: "stone",
-            .name("heavy stone"),
-            .description("A heavy throwing stone."),
-            .isTakable,
+        let stone = Item("stone")
+            .name("heavy stone")
+            .description("A heavy throwing stone.")
+            .isTakable
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: stone
@@ -223,9 +197,7 @@ struct ThrowActionHandlerTests {
         try await engine.execute("chuck stone")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > chuck stone
             You chuck the heavy stone in a lazy arc. It lands nearby with
@@ -246,9 +218,7 @@ struct ThrowActionHandlerTests {
         try await engine.execute("throw")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > throw
             Throw what?
@@ -259,13 +229,11 @@ struct ThrowActionHandlerTests {
     @Test("Cannot throw item not held")
     func testCannotThrowItemNotHeld() async throws {
         // Given
-        let ball = Item(
-            id: "ball",
-            .name("rubber ball"),
-            .description("A bouncy rubber ball."),
-            .isTakable,
+        let ball = Item("ball")
+            .name("rubber ball")
+            .description("A bouncy rubber ball.")
+            .isTakable
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: ball
@@ -277,9 +245,7 @@ struct ThrowActionHandlerTests {
         try await engine.execute("throw ball")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > throw ball
             You aren't holding the rubber ball.
@@ -297,9 +263,7 @@ struct ThrowActionHandlerTests {
         try await engine.execute("throw nonexistent")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > throw nonexistent
             Any such thing lurks beyond your reach.
@@ -310,13 +274,11 @@ struct ThrowActionHandlerTests {
     @Test("Cannot throw at non-existent target")
     func testCannotThrowAtNonExistentTarget() async throws {
         // Given
-        let ball = Item(
-            id: "ball",
-            .name("rubber ball"),
-            .description("A bouncy rubber ball."),
-            .isTakable,
+        let ball = Item("ball")
+            .name("rubber ball")
+            .description("A bouncy rubber ball.")
+            .isTakable
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: ball
@@ -328,9 +290,7 @@ struct ThrowActionHandlerTests {
         try await engine.execute("throw ball at nonexistent")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > throw ball at nonexistent
             Any such thing lurks beyond your reach.
@@ -341,26 +301,20 @@ struct ThrowActionHandlerTests {
     @Test("Cannot throw at target not in reach")
     func testCannotThrowAtTargetNotInReach() async throws {
         // Given
-        let anotherRoom = Location(
-            id: "anotherRoom",
-            .name("Another Room"),
+        let anotherRoom = Location("anotherRoom")
+            .name("Another Room")
             .inherentlyLit
-        )
 
-        let ball = Item(
-            id: "ball",
-            .name("rubber ball"),
-            .description("A bouncy rubber ball."),
-            .isTakable,
+        let ball = Item("ball")
+            .name("rubber ball")
+            .description("A bouncy rubber ball.")
+            .isTakable
             .in(.player)
-        )
 
-        let distantTarget = Item(
-            id: "distantTarget",
-            .name("distant target"),
-            .description("A target in another room."),
+        let distantTarget = Item("distantTarget")
+            .name("distant target")
+            .description("A target in another room.")
             .in("anotherRoom")
-        )
 
         let game = MinimalGame(
             locations: anotherRoom,
@@ -373,9 +327,7 @@ struct ThrowActionHandlerTests {
         try await engine.execute("throw ball at target")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > throw ball at target
             Any such thing lurks beyond your reach.
@@ -386,20 +338,16 @@ struct ThrowActionHandlerTests {
     @Test("Requires light to throw")
     func testRequiresLight() async throws {
         // Given: Dark room with item
-        let darkRoom = Location(
-            id: "darkRoom",
-            .name("Dark Room"),
+        let darkRoom = Location("darkRoom")
+            .name("Dark Room")
             .description("A pitch black room.")
-            // Note: No .inherentlyLit property
-        )
+        // Note: No .inherentlyLit property
 
-        let ball = Item(
-            id: "ball",
-            .name("rubber ball"),
-            .description("A bouncy rubber ball."),
-            .isTakable,
+        let ball = Item("ball")
+            .name("rubber ball")
+            .description("A bouncy rubber ball.")
+            .isTakable
             .in(.player)
-        )
 
         let game = MinimalGame(
             player: Player(in: "darkRoom"),
@@ -413,9 +361,7 @@ struct ThrowActionHandlerTests {
         try await engine.execute("throw ball")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > throw ball
             The darkness here is absolute, consuming all light and hope of
@@ -429,13 +375,11 @@ struct ThrowActionHandlerTests {
     @Test("Throw item generally")
     func testThrowItemGenerally() async throws {
         // Given
-        let bottle = Item(
-            id: "bottle",
-            .name("glass bottle"),
-            .description("A fragile glass bottle."),
-            .isTakable,
+        let bottle = Item("bottle")
+            .name("glass bottle")
+            .description("A fragile glass bottle.")
+            .isTakable
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: bottle
@@ -447,9 +391,7 @@ struct ThrowActionHandlerTests {
         try await engine.execute("throw bottle", times: 2)
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > throw bottle
             You throw the glass bottle in a lazy arc. It lands nearby with
@@ -471,21 +413,17 @@ struct ThrowActionHandlerTests {
     @Test("Throw item at character")
     func testThrowItemAtCharacter() async throws {
         // Given
-        let apple = Item(
-            id: "apple",
-            .name("red apple"),
-            .description("A juicy red apple."),
-            .isTakable,
+        let apple = Item("apple")
+            .name("red apple")
+            .description("A juicy red apple.")
+            .isTakable
             .in(.player)
-        )
 
-        let wizard = Item(
-            id: "wizard",
-            .name("old wizard"),
-            .description("A wise old wizard."),
-            .characterSheet(.default),
+        let wizard = Item("wizard")
+            .name("old wizard")
+            .description("A wise old wizard.")
+            .characterSheet(.default)
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: apple, wizard
@@ -497,9 +435,7 @@ struct ThrowActionHandlerTests {
         try await engine.execute("throw apple at wizard", times: 2)
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > throw apple at wizard
             You throw the red apple at the old wizard, who dodges aside
@@ -524,21 +460,17 @@ struct ThrowActionHandlerTests {
     @Test("Throw item at enemy")
     func testThrowItemAtEnemy() async throws {
         // Given
-        let apple = Item(
-            id: "apple",
-            .name("red apple"),
-            .description("A juicy red apple."),
-            .isTakable,
+        let apple = Item("apple")
+            .name("red apple")
+            .description("A juicy red apple.")
+            .isTakable
             .in(.player)
-        )
 
-        let wizard = Item(
-            id: "wizard",
-            .name("old wizard"),
-            .description("A wise old wizard."),
-            .characterSheet(.init(isFighting: true)),
+        let wizard = Item("wizard")
+            .name("old wizard")
+            .description("A wise old wizard.")
+            .characterSheet(.init(isFighting: true))
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: apple, wizard
@@ -550,9 +482,7 @@ struct ThrowActionHandlerTests {
         try await engine.execute("throw apple at wizard", times: 2)
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > throw apple at wizard
             You throw the red apple at the old wizard, but your aim falls
@@ -565,7 +495,7 @@ struct ThrowActionHandlerTests {
             > throw apple at wizard
             You aren't holding the red apple.
 
-            In the tangle, the old wizard drives an elbow home--sudden
+            In the tangle, the old wizard drives an elbow home -- sudden
             pressure that blooms into dull pain. Pain flickers and dies.
             Your body has more important work.
             """
@@ -584,20 +514,16 @@ struct ThrowActionHandlerTests {
     @Test("Throw item at object")
     func testThrowItemAtObject() async throws {
         // Given
-        let dart = Item(
-            id: "dart",
-            .name("sharp dart"),
-            .description("A sharp throwing dart."),
-            .isTakable,
+        let dart = Item("dart")
+            .name("sharp dart")
+            .description("A sharp throwing dart.")
+            .isTakable
             .in(.player)
-        )
 
-        let board = Item(
-            id: "board",
-            .name("dartboard"),
-            .description("A standard dartboard."),
+        let board = Item("board")
+            .name("dartboard")
+            .description("A standard dartboard.")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: dart, board
@@ -609,9 +535,7 @@ struct ThrowActionHandlerTests {
         try await engine.execute("throw dart at board", times: 2)
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > throw dart at board
             You throw the sharp dart at the dartboard. It bounces off and
@@ -635,21 +559,17 @@ struct ThrowActionHandlerTests {
     @Test("Throw item to character")
     func testThrowItemToCharacter() async throws {
         // Given
-        let coin = Item(
-            id: "coin",
-            .name("gold coin"),
-            .description("A shiny gold coin."),
-            .isTakable,
+        let coin = Item("coin")
+            .name("gold coin")
+            .description("A shiny gold coin.")
+            .isTakable
             .in(.player)
-        )
 
-        let merchant = Item(
-            id: "merchant",
-            .name("traveling merchant"),
-            .description("A friendly traveling merchant."),
-            .characterSheet(.default),
+        let merchant = Item("merchant")
+            .name("traveling merchant")
+            .description("A friendly traveling merchant.")
+            .characterSheet(.default)
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: coin, merchant
@@ -661,9 +581,7 @@ struct ThrowActionHandlerTests {
         try await engine.execute("throw coin to merchant", times: 2)
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > throw coin to merchant
             You throw the gold coin to the traveling merchant, who catches
@@ -685,21 +603,17 @@ struct ThrowActionHandlerTests {
     @Test("Throw item to enemy")
     func testThrowItemToEnemy() async throws {
         // Given
-        let coin = Item(
-            id: "coin",
-            .name("gold coin"),
-            .description("A shiny gold coin."),
-            .isTakable,
+        let coin = Item("coin")
+            .name("gold coin")
+            .description("A shiny gold coin.")
+            .isTakable
             .in(.player)
-        )
 
-        let merchant = Item(
-            id: "merchant",
-            .name("traveling merchant"),
-            .description("A friendly traveling merchant."),
-            .characterSheet(.default),
+        let merchant = Item("merchant")
+            .name("traveling merchant")
+            .description("A friendly traveling merchant.")
+            .characterSheet(.default)
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: coin, merchant
@@ -711,9 +625,7 @@ struct ThrowActionHandlerTests {
         try await engine.execute("throw coin to merchant", times: 2)
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > throw coin to merchant
             You throw the gold coin to the traveling merchant, who catches
@@ -735,20 +647,16 @@ struct ThrowActionHandlerTests {
     @Test("Throw item to object")
     func testThrowItemToObject() async throws {
         // Given
-        let ball = Item(
-            id: "ball",
-            .name("tennis ball"),
-            .description("A bright yellow tennis ball."),
-            .isTakable,
+        let ball = Item("ball")
+            .name("tennis ball")
+            .description("A bright yellow tennis ball.")
+            .isTakable
             .in(.player)
-        )
 
-        let basket = Item(
-            id: "basket",
-            .name("wicker basket"),
-            .description("A large wicker basket."),
+        let basket = Item("basket")
+            .name("wicker basket")
+            .description("A large wicker basket.")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: ball, basket
@@ -760,9 +668,7 @@ struct ThrowActionHandlerTests {
         try await engine.execute("throw ball to basket", times: 2)
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > throw ball to basket
             You throw the tennis ball toward the wicker basket, but
@@ -787,21 +693,17 @@ struct ThrowActionHandlerTests {
     @Test("Throw multiple items")
     func testThrowMultipleItems() async throws {
         // Given
-        let ball1 = Item(
-            id: "ball1",
-            .name("red ball"),
-            .description("A red rubber ball."),
-            .isTakable,
+        let ball1 = Item("ball1")
+            .name("red ball")
+            .description("A red rubber ball.")
+            .isTakable
             .in(.player)
-        )
 
-        let ball2 = Item(
-            id: "ball2",
-            .name("blue ball"),
-            .description("A blue rubber ball."),
-            .isTakable,
+        let ball2 = Item("ball2")
+            .name("blue ball")
+            .description("A blue rubber ball.")
+            .isTakable
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: ball1, ball2
@@ -816,9 +718,7 @@ struct ThrowActionHandlerTests {
         )
 
         // Then - verify first ball was thrown
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > throw red ball
             You throw the red ball in a lazy arc. It lands nearby with

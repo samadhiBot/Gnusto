@@ -28,11 +28,9 @@ struct PlayerProxyTests {
     @Test("PlayerProxy location access")
     func testPlayerLocationAccess() async throws {
         // Given
-        let otherRoom = Location(
-            id: "otherRoom",
-            .name("Other Room"),
+        let otherRoom = Location("otherRoom")
+            .name("Other Room")
             .inherentlyLit
-        )
 
         let game = MinimalGame(locations: otherRoom)
 
@@ -85,21 +83,17 @@ struct PlayerProxyTests {
     @Test("PlayerProxy inventory with items")
     func testInventoryWithItems() async throws {
         // Given
-        let book = Item(
-            id: "book",
-            .name("leather book"),
-            .size(2),
-            .isTakable,
+        let book = Item("book")
+            .name("leather book")
+            .size(2)
+            .isTakable
             .in(.player)
-        )
 
-        let coin = Item(
-            id: "coin",
-            .name("gold coin"),
-            .size(1),
-            .isTakable,
+        let coin = Item("coin")
+            .name("gold coin")
+            .size(1)
+            .isTakable
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: book, coin
@@ -124,39 +118,31 @@ struct PlayerProxyTests {
     @Test("PlayerProxy inventory with containers")
     func testInventoryWithContainers() async throws {
         // Given
-        let bag = Item(
-            id: "bag",
-            .name("leather bag"),
-            .isContainer,
-            .isOpen,
-            .size(1),
-            .isTakable,
+        let bag = Item("bag")
+            .name("leather bag")
+            .isContainer
+            .isOpen
+            .size(1)
+            .isTakable
             .in(.player)
-        )
 
-        let coin = Item(
-            id: "coin",
-            .name("gold coin"),
-            .size(1),
-            .isTakable,
+        let coin = Item("coin")
+            .name("gold coin")
+            .size(1)
+            .isTakable
             .in(.item("bag"))
-        )
 
-        let gem = Item(
-            id: "gem",
-            .name("ruby gem"),
-            .size(1),
-            .isTakable,
+        let gem = Item("gem")
+            .name("ruby gem")
+            .size(1)
+            .isTakable
             .in(.item("bag"))
-        )
 
-        let sword = Item(
-            id: "sword",
-            .name("steel sword"),
-            .size(3),
-            .isTakable,
+        let sword = Item("sword")
+            .name("steel sword")
+            .size(3)
+            .isTakable
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: bag, coin, gem, sword
@@ -191,21 +177,17 @@ struct PlayerProxyTests {
     @Test("PlayerProxy carrying capacity basic check")
     func testCarryingCapacityBasicCheck() async throws {
         // Given
-        let lightItem = Item(
-            id: "feather",
-            .name("light feather"),
-            .size(1),
-            .isTakable,
+        let lightItem = Item("feather")
+            .name("light feather")
+            .size(1)
+            .isTakable
             .in(.startRoom)
-        )
 
-        let heavyItem = Item(
-            id: "boulder",
-            .name("heavy boulder"),
-            .size(101),
-            .isTakable,
+        let heavyItem = Item("boulder")
+            .name("heavy boulder")
+            .size(101)
+            .isTakable
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: lightItem, heavyItem
@@ -226,29 +208,23 @@ struct PlayerProxyTests {
     @Test("PlayerProxy carrying capacity with existing inventory")
     func testCarryingCapacityWithExistingInventory() async throws {
         // Given
-        let existingItem = Item(
-            id: "existing",
-            .name("existing item"),
-            .size(90),
-            .isTakable,
+        let existingItem = Item("existing")
+            .name("existing item")
+            .size(90)
+            .isTakable
             .in(.player)
-        )
 
-        let newLightItem = Item(
-            id: "light",
-            .name("light item"),
-            .size(9),
-            .isTakable,
+        let newLightItem = Item("light")
+            .name("light item")
+            .size(9)
+            .isTakable
             .in(.startRoom)
-        )
 
-        let newHeavyItem = Item(
-            id: "heavy",
-            .name("heavy item"),
-            .size(11),
-            .isTakable,
+        let newHeavyItem = Item("heavy")
+            .name("heavy item")
+            .size(11)
+            .isTakable
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: existingItem, newLightItem, newHeavyItem
@@ -272,41 +248,33 @@ struct PlayerProxyTests {
     @Test("PlayerProxy carrying capacity with nested containers")
     func testCarryingCapacityWithNestedContainers() async throws {
         // Given
-        let bag = Item(
-            id: "bag",
-            .name("leather bag"),
-            .isContainer,
-            .isOpen,
-            .size(1),
-            .isTakable,
+        let bag = Item("bag")
+            .name("leather bag")
+            .isContainer
+            .isOpen
+            .size(1)
+            .isTakable
             .in(.player)
-        )
 
-        let box = Item(
-            id: "box",
-            .name("small box"),
-            .isContainer,
-            .isOpen,
-            .size(2),
-            .isTakable,
+        let box = Item("box")
+            .name("small box")
+            .isContainer
+            .isOpen
+            .size(2)
+            .isTakable
             .in(.item("bag"))
-        )
 
-        let coin = Item(
-            id: "coin",
-            .name("gold coin"),
-            .size(1),
-            .isTakable,
+        let coin = Item("coin")
+            .name("gold coin")
+            .size(1)
+            .isTakable
             .in(.item("box"))
-        )
 
-        let newItem = Item(
-            id: "newItem",
-            .name("new item"),
-            .size(3),
-            .isTakable,
+        let newItem = Item("newItem")
+            .name("new item")
+            .size(3)
+            .isTakable
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: bag, box, coin, newItem
@@ -327,29 +295,23 @@ struct PlayerProxyTests {
     @Test("PlayerProxy carrying capacity edge cases")
     func testCarryingCapacityEdgeCases() async throws {
         // Given
-        let exactFitItem = Item(
-            id: "exactFit",
-            .name("exact fit item"),
-            .size(100),
-            .isTakable,
+        let exactFitItem = Item("exactFit")
+            .name("exact fit item")
+            .size(100)
+            .isTakable
             .in(.startRoom)
-        )
 
-        let oneOverItem = Item(
-            id: "oneOver",
-            .name("one over item"),
-            .size(101),
-            .isTakable,
+        let oneOverItem = Item("oneOver")
+            .name("one over item")
+            .size(101)
+            .isTakable
             .in(.startRoom)
-        )
 
-        let zeroSizeItem = Item(
-            id: "zeroSize",
-            .name("zero size item"),
-            .size(0),
-            .isTakable,
+        let zeroSizeItem = Item("zeroSize")
+            .name("zero size item")
+            .size(0)
+            .isTakable
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: exactFitItem, oneOverItem, zeroSizeItem
@@ -374,13 +336,11 @@ struct PlayerProxyTests {
     @Test("PlayerProxy through game actions")
     func testPlayerProxyThroughGameActions() async throws {
         // Given
-        let book = Item(
-            id: "book",
-            .name("leather book"),
-            .size(2),
-            .isTakable,
+        let book = Item("book")
+            .name("leather book")
+            .size(2)
+            .isTakable
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: book
@@ -401,9 +361,7 @@ struct PlayerProxyTests {
         #expect(await bookProxy.playerIsHolding == true)
 
         // Verify game output
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > take book
             Taken.
@@ -414,23 +372,15 @@ struct PlayerProxyTests {
     @Test("PlayerProxy moves counter")
     func testPlayerMovesCounter() async throws {
         // Given
-        let room1 = Location(
-            id: "room1",
-            .name("First Room"),
-            .inherentlyLit,
-            .exits(
-                .north("room2")
-            )
-        )
+        let room1 = Location("room1")
+            .name("First Room")
+            .inherentlyLit
+            .north("room2")
 
-        let room2 = Location(
-            id: "room2",
-            .name("Second Room"),
-            .inherentlyLit,
-            .exits(
-                .south("room1")
-            )
-        )
+        let room2 = Location("room2")
+            .name("Second Room")
+            .inherentlyLit
+            .south("room1")
 
         let game = MinimalGame(
             player: Player(in: "room1"),
@@ -473,23 +423,15 @@ struct PlayerProxyTests {
     @Test("PlayerProxy location changes")
     func testPlayerLocationChanges() async throws {
         // Given
-        let room1 = Location(
-            id: "room1",
-            .name("First Room"),
-            .inherentlyLit,
-            .exits(
-                .east("room2")
-            )
-        )
+        let room1 = Location("room1")
+            .name("First Room")
+            .inherentlyLit
+            .east("room2")
 
-        let room2 = Location(
-            id: "room2",
-            .name("Second Room"),
-            .inherentlyLit,
-            .exits(
-                .west("room1")
-            )
-        )
+        let room2 = Location("room2")
+            .name("Second Room")
+            .inherentlyLit
+            .west("room1")
 
         let game = MinimalGame(
             player: Player(in: "room1"),

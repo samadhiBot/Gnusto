@@ -9,21 +9,17 @@ struct GameStateTests {
     // MARK: - Test Data Setup
 
     private func createTestItem(id: ItemID) -> Item {
-        Item(
-            id: id,
-            .name("Test Item"),
-            .description("A test item for testing purposes."),
+        Item(id)
+            .name("Test Item")
+            .description("A test item for testing purposes.")
             .in(.nowhere)
-        )
     }
 
     private func createTestLocation(id: LocationID) -> Location {
-        Location(
-            id: id,
-            .name("Test Room"),
-            .description("A test room for testing purposes."),
+        Location(id)
+            .name("Test Room")
+            .description("A test room for testing purposes.")
             .inherentlyLit
-        )
     }
 
     private func createBasicGameState() -> GameState {
@@ -111,11 +107,10 @@ struct GameStateTests {
         #expect(state1 == state2)
 
         // Create a different state
-        let differentItem = Item(
-            id: "differentItem",
-            .name("Different Item"),
+        let differentItem = Item("differentItem")
+            .name("Different Item")
             .in(.nowhere)
-        )
+
         let state3 = GameState(
             locations: [createTestLocation(id: .startRoom)],
             items: [differentItem],
@@ -321,37 +316,29 @@ struct GameStateTests {
     @Test("GameState Complex Scenario")
     func testGameStateComplexScenario() throws {
         // Create a more complex game state
-        let livingRoom = Location(
-            id: "livingRoom",
-            .name("Living Room"),
-            .description("A cozy living room."),
-            .inherentlyLit,
-            .exits(.north("kitchen"))
-        )
-
-        let kitchen = Location(
-            id: "kitchen",
-            .name("Kitchen"),
-            .description("A modern kitchen."),
+        let livingRoom = Location("livingRoom")
+            .name("Living Room")
+            .description("A cozy living room.")
             .inherentlyLit
-        )
+            .exits(.north("kitchen"))
 
-        let lamp = Item(
-            id: "lamp",
-            .name("brass lamp"),
-            .description("A shiny brass lamp."),
-            .isTakable,
-            .isLightSource,
+        let kitchen = Location("kitchen")
+            .name("Kitchen")
+            .description("A modern kitchen.")
+            .inherentlyLit
+
+        let lamp = Item("lamp")
+            .name("brass lamp")
+            .description("A shiny brass lamp.")
+            .isTakable
+            .isLightSource
             .in("livingRoom")
-        )
 
-        let key = Item(
-            id: "key",
-            .name("rusty key"),
-            .description("An old rusty key."),
-            .isTakable,
+        let key = Item("key")
+            .name("rusty key")
+            .description("An old rusty key.")
+            .isTakable
             .in(.player)
-        )
 
         var state = GameState(
             locations: [livingRoom, kitchen],

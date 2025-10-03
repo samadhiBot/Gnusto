@@ -18,9 +18,7 @@ struct CurseActionHandlerTests {
         try await engine.execute("curse")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > curse
             You unleash a cascade of inventive profanity.
@@ -33,11 +31,9 @@ struct CurseActionHandlerTests {
     @Test("Curse works in dark rooms")
     func testCurseWorksInDarkRooms() async throws {
         // Given: Dark room (no light required for cursing)
-        let darkRoom = Location(
-            id: "darkRoom",
-            .name("Dark Room"),
+        let darkRoom = Location("darkRoom")
+            .name("Dark Room")
             .description("A pitch black room.")
-        )
 
         let game = MinimalGame(
             player: Player(in: "darkRoom"),
@@ -50,9 +46,7 @@ struct CurseActionHandlerTests {
         try await engine.execute("curse")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > curse
             You unleash a cascade of inventive profanity.

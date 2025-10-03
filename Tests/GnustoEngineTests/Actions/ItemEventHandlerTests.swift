@@ -9,13 +9,11 @@ struct ItemEventHandlerTests {
     // MARK: - Test Data
 
     private func createTestGame() -> MinimalGame {
-        let testItem = Item(
-            id: "testItem",
-            .name("test item"),
-            .description("A simple test item."),
-            .isTakable,
+        let testItem = Item("testItem")
+            .name("test item")
+            .description("A simple test item.")
+            .isTakable
             .in(.startRoom)
-        )
 
         return MinimalGame(items: testItem)
     }
@@ -131,8 +129,12 @@ struct ItemEventHandlerTests {
         let (engine, mockIO) = await GameEngine.test(blueprint: blueprint)
         try await engine.execute("examine test item")
 
-        let output = await mockIO.flush()
-        #expect(output.contains("Intent matched!"))
+        await mockIO.expect(
+            """
+            > examine test item
+            Intent matched!
+            """
+        )
     }
 
     @Test("beforeTurn with single intent does not match incorrect intent")
@@ -178,8 +180,12 @@ struct ItemEventHandlerTests {
         let (engine, mockIO) = await GameEngine.test(blueprint: blueprint)
         try await engine.execute("take test item")
 
-        let output = await mockIO.flush()
-        #expect(output.contains("One intent matched!"))
+        await mockIO.expect(
+            """
+            > take test item
+            One intent matched!
+            """
+        )
     }
 
     @Test("beforeTurn with multiple intents does not match if none match")
@@ -257,9 +263,7 @@ struct ItemEventHandlerTests {
 
         try await engine.execute("examine test item")
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > examine test item
             This item has a special examination behavior!
@@ -334,19 +338,15 @@ struct ItemEventHandlerTests {
             }
         }
 
-        let item1 = Item(
-            id: "item1",
-            .name("first item"),
-            .isTakable,
+        let item1 = Item("item1")
+            .name("first item")
+            .isTakable
             .in(.startRoom)
-        )
 
-        let item2 = Item(
-            id: "item2",
-            .name("second item"),
-            .isTakable,
+        let item2 = Item("item2")
+            .name("second item")
+            .isTakable
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: item1, item2
@@ -391,9 +391,7 @@ struct ItemEventHandlerTests {
 
         try await engine.execute("take test item")
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > take test item
             This item cannot be taken – it's cursed!
@@ -467,9 +465,7 @@ struct ItemEventHandlerTests {
         let finalFlag = await engine.hasFlag(.isVerboseMode)
         #expect(finalFlag == true)
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > examine test item
             You feel a strange energy emanating from the item...
@@ -493,14 +489,12 @@ struct ItemEventHandlerTests {
             return nil
         }
 
-        let magicOrb = Item(
-            id: "magicOrb",
-            .name("magic orb"),
-            .description("A mysterious orb."),
-            .isDevice,
-            .isTakable,
+        let magicOrb = Item("magicOrb")
+            .name("magic orb")
+            .description("A mysterious orb.")
+            .isDevice
+            .isTakable
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: magicOrb
@@ -516,9 +510,7 @@ struct ItemEventHandlerTests {
         // Test with orb off (default)
         try await engine.execute("examine magic orb")
 
-        let offOutput = await mockIO.flush()
-        expectNoDifference(
-            offOutput,
+        await mockIO.expect(
             """
             > examine magic orb
             The orb lies dormant.
@@ -531,9 +523,7 @@ struct ItemEventHandlerTests {
 
         try await engine.execute("examine magic orb")
 
-        let onOutput = await mockIO.flush()
-        expectNoDifference(
-            onOutput,
+        await mockIO.expect(
             """
             > examine magic orb
             The orb glows with mystical energy!
@@ -621,9 +611,7 @@ struct ItemEventHandlerTests {
 
         try await engine.execute("take test item")
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > take test item
             The item is magically protected from being taken!
@@ -646,14 +634,12 @@ struct ItemEventHandlerTests {
             }
         }
 
-        let glowItem = Item(
-            id: "glowItem",
-            .name("glowing stone"),
-            .description("A mysterious stone."),
-            .isDevice,
-            .isTakable,
+        let glowItem = Item("glowItem")
+            .name("glowing stone")
+            .description("A mysterious stone.")
+            .isDevice
+            .isTakable
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: glowItem
@@ -678,9 +664,7 @@ struct ItemEventHandlerTests {
         let finallyOn = await finalState.hasFlag(.isOn)
         #expect(finallyOn == false)  // Handler doesn't actually change state in simplified version
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > examine glowing stone
             As you examine the item, it begins to glow!
@@ -742,9 +726,7 @@ struct ItemEventHandlerTests {
         let (engine, mockIO) = await GameEngine.test(blueprint: blueprint)
 
         try await engine.execute("examine test item")
-        let examineOutput = await mockIO.flush()
-        expectNoDifference(
-            examineOutput,
+        await mockIO.expect(
             """
             > examine test item
             You examine the item closely.
@@ -752,9 +734,7 @@ struct ItemEventHandlerTests {
         )
 
         try await engine.execute("touch test item")
-        let touchOutput = await mockIO.flush()
-        expectNoDifference(
-            touchOutput,
+        await mockIO.expect(
             """
             > touch test item
             You touch the item gently.
@@ -762,9 +742,7 @@ struct ItemEventHandlerTests {
         )
 
         try await engine.execute("take test item")
-        let takeOutput = await mockIO.flush()
-        expectNoDifference(
-            takeOutput,
+        await mockIO.expect(
             """
             > take test item
             You pick up the item.
@@ -807,9 +785,7 @@ struct ItemEventHandlerTests {
             ["Context handler called for item: .testItem"]
         )
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > examine test item
             Custom examine message from context handler.
@@ -819,21 +795,17 @@ struct ItemEventHandlerTests {
 
     @Test("Bottle handler - throw bottle with water")
     func testBottleThrowWithWater() async throws {
-        let bottle = Item(
-            id: "bottle",
-            .name("glass bottle"),
-            .isTakable,
-            .isContainer,
-            .isOpen,
+        let bottle = Item("bottle")
+            .name("glass bottle")
+            .isTakable
+            .isContainer
+            .isOpen
             .in(.player)
-        )
 
-        let water = Item(
-            id: "water",
-            .name("quantity of water"),
-            .isTakable,
+        let water = Item("water")
+            .name("quantity of water")
+            .isTakable
             .in(.item("bottle"))
-        )
 
         let game = MinimalGame(
             items: bottle, water
@@ -851,9 +823,7 @@ struct ItemEventHandlerTests {
         try await engine.execute("throw bottle")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > throw bottle
             The bottle hits the far wall and shatters. The water spills to
@@ -870,21 +840,17 @@ struct ItemEventHandlerTests {
 
     @Test("Bottle handler - throw empty bottle")
     func testBottleThrowEmpty() async throws {
-        let bottle = Item(
-            id: "bottle",
-            .name("glass bottle"),
-            .isTakable,
-            .isContainer,
-            .isOpen,
+        let bottle = Item("bottle")
+            .name("glass bottle")
+            .isTakable
+            .isContainer
+            .isOpen
             .in(.player)
-        )
 
-        let water = Item(
-            id: "water",
-            .name("quantity of water"),
-            .isTakable,
+        let water = Item("water")
+            .name("quantity of water")
+            .isTakable
             .in(.nowhere)
-        )
 
         let game = MinimalGame(
             items: bottle, water
@@ -904,13 +870,11 @@ struct ItemEventHandlerTests {
         )
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > throw bottle
             The bottle hits the far wall and shatters.
-
+            
             > inventory
             Your hands are as empty as your pockets.
             """
@@ -923,21 +887,17 @@ struct ItemEventHandlerTests {
 
     @Test("Bottle handler - attack bottle with water")
     func testBottleAttackWithWater() async throws {
-        let bottle = Item(
-            id: "bottle",
-            .name("glass bottle"),
-            .isTakable,
-            .isContainer,
-            .isOpen,
+        let bottle = Item("bottle")
+            .name("glass bottle")
+            .isTakable
+            .isContainer
+            .isOpen
             .in(.player)
-        )
 
-        let water = Item(
-            id: "water",
-            .name("quantity of water"),
-            .isTakable,
+        let water = Item("water")
+            .name("quantity of water")
+            .isTakable
             .in(.item("bottle"))
-        )
 
         let game = MinimalGame(
             items: bottle, water
@@ -954,9 +914,7 @@ struct ItemEventHandlerTests {
         try await engine.execute("attack bottle")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > attack bottle
             A brilliant maneuver destroys the bottle. The water spills to
@@ -973,21 +931,17 @@ struct ItemEventHandlerTests {
 
     @Test("Bottle handler - shake open bottle with water")
     func testBottleShakeWithWater() async throws {
-        let bottle = Item(
-            id: "bottle",
-            .name("glass bottle"),
-            .isTakable,
-            .isContainer,
-            .isOpen,
+        let bottle = Item("bottle")
+            .name("glass bottle")
+            .isTakable
+            .isContainer
+            .isOpen
             .in(.player)
-        )
 
-        let water = Item(
-            id: "water",
-            .name("quantity of water"),
-            .isTakable,
+        let water = Item("water")
+            .name("quantity of water")
+            .isTakable
             .in(.item("bottle"))
-        )
 
         let game = MinimalGame(
             items: bottle, water
@@ -1004,9 +958,7 @@ struct ItemEventHandlerTests {
         try await engine.execute("shake bottle")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > shake bottle
             The water spills to the floor and evaporates.
@@ -1022,21 +974,17 @@ struct ItemEventHandlerTests {
 
     @Test("Bottle handler - shake closed bottle with water does nothing special")
     func testBottleShakeClosedWithWater() async throws {
-        let bottle = Item(
-            id: "bottle",
-            .name("glass bottle"),
-            .isTakable,
-            .isContainer,
-            // Note: not open
+        let bottle = Item("bottle")
+            .name("glass bottle")
+            .isTakable
+            .isContainer
+        // Note: not open
             .in(.player)
-        )
 
-        let water = Item(
-            id: "water",
-            .name("quantity of water"),
-            .isTakable,
+        let water = Item("water")
+            .name("quantity of water")
+            .isTakable
             .in(.item("bottle"))
-        )
 
         let game = MinimalGame(
             items: bottle, water
@@ -1053,9 +1001,13 @@ struct ItemEventHandlerTests {
         try await engine.execute("shake bottle")
 
         // Then - should get default shake message since bottle is closed
-        let output = await mockIO.flush()
-        #expect(output.contains("> shake bottle"))
-        #expect(!output.contains("The water spills"))
+        await mockIO.expect(
+            """
+            > shake bottle
+            Your agitation of the glass bottle produces no observable
+            effect.
+            """
+        )
 
         // Both bottle and water should remain unchanged
         let finalBottle = await engine.item("bottle")

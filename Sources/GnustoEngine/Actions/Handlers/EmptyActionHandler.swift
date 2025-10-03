@@ -98,7 +98,7 @@ public struct EmptyActionHandler: ActionHandler {
         }
 
         // Add standard state changes
-        allStateChanges.append(
+        allStateChanges.appendIfPresent(
             await container.setFlag(.isTouched)
         )
 

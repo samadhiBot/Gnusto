@@ -11,12 +11,10 @@ struct ParentProxyTests {
     @Test("ParentProxy creation from ParentEntity")
     func testParentProxyCreationFromParentEntity() async throws {
         // Given
-        let container = Item(
-            id: "container",
-            .name("wooden box"),
-            .isContainer,
+        let container = Item("container")
+            .name("wooden box")
+            .isContainer
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: container
@@ -58,25 +56,19 @@ struct ParentProxyTests {
     @Test("ParentProxy equality comparisons")
     func testParentProxyEquality() async throws {
         // Given
-        let otherRoom = Location(
-            id: "otherRoom",
-            .name("Other Room"),
+        let otherRoom = Location("otherRoom")
+            .name("Other Room")
             .inherentlyLit
-        )
 
-        let container1 = Item(
-            id: "container1",
-            .name("first box"),
-            .isContainer,
+        let container1 = Item("container1")
+            .name("first box")
+            .isContainer
             .in(.startRoom)
-        )
 
-        let container2 = Item(
-            id: "container2",
-            .name("second box"),
-            .isContainer,
+        let container2 = Item("container2")
+            .name("second box")
+            .isContainer
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             locations: otherRoom,
@@ -126,12 +118,10 @@ struct ParentProxyTests {
     @Test("ParentProxy hashing")
     func testParentProxyHashing() async throws {
         // Given
-        let container = Item(
-            id: "container",
-            .name("wooden box"),
-            .isContainer,
+        let container = Item("container")
+            .name("wooden box")
+            .isContainer
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: container
@@ -164,12 +154,10 @@ struct ParentProxyTests {
     @Test("ParentProxy location case")
     func testParentProxyLocationCase() async throws {
         // Given
-        let library = Location(
-            id: "library",
-            .name("Grand Library"),
-            .description("A vast library."),
+        let library = Location("library")
+            .name("Grand Library")
+            .description("A vast library.")
             .inherentlyLit
-        )
 
         let game = MinimalGame(
             player: Player(in: "library"),
@@ -193,13 +181,11 @@ struct ParentProxyTests {
     @Test("ParentProxy item case")
     func testParentProxyItemCase() async throws {
         // Given
-        let container = Item(
-            id: "treasureChest",
-            .name("ornate treasure chest"),
-            .description("A beautifully carved chest."),
-            .isContainer,
+        let container = Item("treasureChest")
+            .name("ornate treasure chest")
+            .description("A beautifully carved chest.")
+            .isContainer
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: container
@@ -267,25 +253,19 @@ struct ParentProxyTests {
     @Test("ParentProxy in item parent relationships")
     func testParentProxyInItemParentRelationships() async throws {
         // Given
-        let bag = Item(
-            id: "bag",
-            .name("leather bag"),
-            .isContainer,
-            .isOpen,
+        let bag = Item("bag")
+            .name("leather bag")
+            .isContainer
+            .isOpen
             .in(.player)
-        )
 
-        let coin = Item(
-            id: "coin",
-            .name("gold coin"),
+        let coin = Item("coin")
+            .name("gold coin")
             .in(.item("bag"))
-        )
 
-        let bookOnFloor = Item(
-            id: "book",
-            .name("old book"),
+        let bookOnFloor = Item("book")
+            .name("old book")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: bag, coin, bookOnFloor
@@ -322,12 +302,10 @@ struct ParentProxyTests {
     @Test("ParentProxy maintains consistency through state changes")
     func testParentProxyConsistencyThroughStateChanges() async throws {
         // Given
-        let coin = Item(
-            id: "coin",
-            .name("gold coin"),
-            .isTakable,
+        let coin = Item("coin")
+            .name("gold coin")
+            .isTakable
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: coin
@@ -356,12 +334,10 @@ struct ParentProxyTests {
     @Test("ParentProxy use cases in collections")
     func testParentProxyInCollections() async throws {
         // Given
-        let bag = Item(
-            id: "bag",
-            .name("leather bag"),
-            .isContainer,
+        let bag = Item("bag")
+            .name("leather bag")
+            .isContainer
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: bag

@@ -11,13 +11,11 @@ struct ExamineActionHandlerTests {
     @Test("EXAMINE DIRECTOBJECT syntax works")
     func testExamineDirectObjectSyntax() async throws {
         // Given
-        let book = Item(
-            id: "book",
-            .name("leather book"),
-            .description("A worn leather-bound book with mysterious symbols."),
-            .isTakable,
+        let book = Item("book")
+            .name("leather book")
+            .description("A worn leather-bound book with mysterious symbols.")
+            .isTakable
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: book
@@ -29,9 +27,7 @@ struct ExamineActionHandlerTests {
         try await engine.execute("examine book")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > examine book
             A worn leather-bound book with mysterious symbols.
@@ -45,13 +41,11 @@ struct ExamineActionHandlerTests {
     @Test("X syntax works")
     func testXSyntax() async throws {
         // Given
-        let gem = Item(
-            id: "gem",
-            .name("sparkling gem"),
-            .description("A beautiful gem that catches the light."),
-            .isTakable,
+        let gem = Item("gem")
+            .name("sparkling gem")
+            .description("A beautiful gem that catches the light.")
+            .isTakable
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: gem
@@ -63,9 +57,7 @@ struct ExamineActionHandlerTests {
         try await engine.execute("x gem")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > x gem
             A beautiful gem that catches the light.
@@ -79,13 +71,11 @@ struct ExamineActionHandlerTests {
     @Test("INSPECT syntax works")
     func testInspectSyntax() async throws {
         // Given
-        let sword = Item(
-            id: "sword",
-            .name("steel sword"),
-            .description("A sharp steel sword with intricate engravings."),
-            .isTakable,
+        let sword = Item("sword")
+            .name("steel sword")
+            .description("A sharp steel sword with intricate engravings.")
+            .isTakable
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: sword
@@ -97,9 +87,7 @@ struct ExamineActionHandlerTests {
         try await engine.execute("inspect sword")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > inspect sword
             A sharp steel sword with intricate engravings.
@@ -110,13 +98,11 @@ struct ExamineActionHandlerTests {
     @Test("Describe syntax works")
     func testDescribeSyntax() async throws {
         // Given
-        let ruby = Item(
-            id: "ruby",
-            .name("sparkling ruby"),
-            .description("A beautiful ruby that catches the light."),
-            .isTakable,
+        let ruby = Item("ruby")
+            .name("sparkling ruby")
+            .description("A beautiful ruby that catches the light.")
+            .isTakable
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: ruby
@@ -128,9 +114,7 @@ struct ExamineActionHandlerTests {
         try await engine.execute("describe the ruby")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > describe the ruby
             A beautiful ruby that catches the light.
@@ -144,12 +128,10 @@ struct ExamineActionHandlerTests {
     @Test("LOOK AT syntax works")
     func testLookAtSyntax() async throws {
         // Given
-        let painting = Item(
-            id: "painting",
-            .name("oil painting"),
-            .description("A masterful oil painting of a distant landscape."),
+        let painting = Item("painting")
+            .name("oil painting")
+            .description("A masterful oil painting of a distant landscape.")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: painting
@@ -161,9 +143,7 @@ struct ExamineActionHandlerTests {
         try await engine.execute("look at painting")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > look at painting
             A masterful oil painting of a distant landscape.
@@ -174,21 +154,17 @@ struct ExamineActionHandlerTests {
     @Test("EXAMINE ALL syntax works")
     func testExamineAllSyntax() async throws {
         // Given
-        let book = Item(
-            id: "book",
-            .name("red book"),
-            .description("A red leather book."),
-            .isTakable,
+        let book = Item("book")
+            .name("red book")
+            .description("A red leather book.")
+            .isTakable
             .in(.startRoom)
-        )
 
-        let candle = Item(
-            id: "candle",
-            .name("wax candle"),
-            .description("A simple wax candle."),
-            .isTakable,
+        let candle = Item("candle")
+            .name("wax candle")
+            .description("A simple wax candle.")
+            .isTakable
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: book, candle
@@ -200,9 +176,7 @@ struct ExamineActionHandlerTests {
         try await engine.execute("examine all")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > examine all
             - Red book: A red leather book.
@@ -223,9 +197,7 @@ struct ExamineActionHandlerTests {
         try await engine.execute("examine")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > examine
             Examine what?
@@ -243,9 +215,7 @@ struct ExamineActionHandlerTests {
         try await engine.execute("examine nonexistent")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > examine nonexistent
             Any such thing lurks beyond your reach.
@@ -256,18 +226,14 @@ struct ExamineActionHandlerTests {
     @Test("Cannot examine item not in scope")
     func testCannotExamineItemNotInScope() async throws {
         // Given
-        let anotherRoom = Location(
-            id: "anotherRoom",
-            .name("Another Room"),
-            .inherentlyLit
-        )
+        let anotherRoom = Location("anotherRoom")
+            .name("Another Room")
+                .inherentlyLit
 
-        let remoteBook = Item(
-            id: "remoteBook",
-            .name("remote book"),
-            .description("A book in another room."),
+        let remoteBook = Item("remoteBook")
+            .name("remote book")
+            .description("A book in another room.")
             .in("anotherRoom")
-        )
 
         let game = MinimalGame(
             locations: anotherRoom,
@@ -280,9 +246,7 @@ struct ExamineActionHandlerTests {
         try await engine.execute("examine book")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > examine book
             Any such thing lurks beyond your reach.
@@ -293,19 +257,15 @@ struct ExamineActionHandlerTests {
     @Test("Requires light to examine items")
     func testRequiresLight() async throws {
         // Given: Dark room with item
-        let darkRoom = Location(
-            id: "darkRoom",
-            .name("Dark Room"),
+        let darkRoom = Location("darkRoom")
+            .name("Dark Room")
             .description("A pitch black room.")
             // Note: No .inherentlyLit property
-        )
 
-        let book = Item(
-            id: "book",
-            .name("leather book"),
-            .description("A worn leather book."),
+        let book = Item("book")
+            .name("leather book")
+            .description("A worn leather book.")
             .in("darkRoom")
-        )
 
         let game = MinimalGame(
             player: Player(in: "darkRoom"),
@@ -319,9 +279,7 @@ struct ExamineActionHandlerTests {
         try await engine.execute("examine book")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > examine book
             The darkness here is absolute, consuming all light and hope of
@@ -342,9 +300,7 @@ struct ExamineActionHandlerTests {
         try await engine.execute("examine me")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > examine me
             As good-looking as ever, which is to say, adequately
@@ -356,14 +312,12 @@ struct ExamineActionHandlerTests {
     @Test("Examine readable item")
     func testExamineReadableItem() async throws {
         // Given
-        let scroll = Item(
-            id: "scroll",
-            .name("ancient scroll"),
-            .description("An ancient parchment scroll."),
-            .isReadable,
-            .readText("The scroll contains mystical runes and arcane symbols."),
+        let scroll = Item("scroll")
+            .name("ancient scroll")
+            .description("An ancient parchment scroll.")
+            .isReadable
+            .readText("The scroll contains mystical runes and arcane symbols.")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: scroll
@@ -378,9 +332,7 @@ struct ExamineActionHandlerTests {
         )
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > examine scroll
             An ancient parchment scroll.
@@ -394,30 +346,24 @@ struct ExamineActionHandlerTests {
     @Test("Examine open container shows contents")
     func testExamineOpenContainerShowsContents() async throws {
         // Given
-        let box = Item(
-            id: "box",
-            .name("wooden box"),
-            .description("A sturdy wooden box."),
-            .isContainer,
-            .isOpen,
+        let box = Item("box")
+            .name("wooden box")
+            .description("A sturdy wooden box.")
+            .isContainer
+            .isOpen
             .in(.startRoom)
-        )
 
-        let gem = Item(
-            id: "gem",
-            .name("ruby gem"),
-            .description("A precious ruby gem."),
-            .isTakable,
+        let gem = Item("gem")
+            .name("ruby gem")
+            .description("A precious ruby gem.")
+            .isTakable
             .in(.item("box"))
-        )
 
-        let coin = Item(
-            id: "coin",
-            .name("gold coin"),
-            .description("A shiny gold coin."),
-            .isTakable,
+        let coin = Item("coin")
+            .name("gold coin")
+            .description("A shiny gold coin.")
+            .isTakable
             .in(.item("box"))
-        )
 
         let game = MinimalGame(
             items: box, gem, coin
@@ -429,9 +375,7 @@ struct ExamineActionHandlerTests {
         try await engine.execute("examine box")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > examine box
             A sturdy wooden box. In the wooden box you can see a gold coin
@@ -443,22 +387,18 @@ struct ExamineActionHandlerTests {
     @Test("Examine closed container shows closed state")
     func testExamineClosedContainerShowsClosedState() async throws {
         // Given
-        let chest = Item(
-            id: "chest",
-            .name("treasure chest"),
-            .description("An ornate treasure chest."),
-            .isContainer,
+        let chest = Item("chest")
+            .name("treasure chest")
+            .description("An ornate treasure chest.")
+            .isContainer
             // Note: No .isOpen flag - container is closed
             .in(.startRoom)
-        )
 
-        let treasure = Item(
-            id: "treasure",
-            .name("golden treasure"),
-            .description("Precious golden treasure."),
-            .isTakable,
+        let treasure = Item("treasure")
+            .name("golden treasure")
+            .description("Precious golden treasure.")
+            .isTakable
             .in(.item("chest"))
-        )
 
         let game = MinimalGame(
             items: chest, treasure
@@ -470,9 +410,7 @@ struct ExamineActionHandlerTests {
         try await engine.execute("examine chest")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > examine chest
             An ornate treasure chest. The treasure chest is closed.
@@ -483,29 +421,23 @@ struct ExamineActionHandlerTests {
     @Test("Examine surface shows items on it")
     func testExamineSurfaceShowsItemsOnIt() async throws {
         // Given
-        let table = Item(
-            id: "table",
-            .name("oak table"),
-            .description("A solid oak table."),
-            .isSurface,
+        let table = Item("table")
+            .name("oak table")
+            .description("A solid oak table.")
+            .isSurface
             .in(.startRoom)
-        )
 
-        let book = Item(
-            id: "book",
-            .name("leather book"),
-            .description("A leather-bound book."),
-            .isTakable,
+        let book = Item("book")
+            .name("leather book")
+            .description("A leather-bound book.")
+            .isTakable
             .in(.item("table"))
-        )
 
-        let candle = Item(
-            id: "candle",
-            .name("wax candle"),
-            .description("A simple wax candle."),
-            .isTakable,
+        let candle = Item("candle")
+            .name("wax candle")
+            .description("A simple wax candle.")
+            .isTakable
             .in(.item("table"))
-        )
 
         let game = MinimalGame(
             items: table, book, candle
@@ -517,9 +449,7 @@ struct ExamineActionHandlerTests {
         try await engine.execute("examine table")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > examine table
             A solid oak table. On the oak table you can see a leather book
@@ -531,14 +461,12 @@ struct ExamineActionHandlerTests {
     @Test("Examine empty container")
     func testExamineEmptyContainer() async throws {
         // Given
-        let bag = Item(
-            id: "bag",
-            .name("leather bag"),
-            .description("A worn leather bag."),
-            .isContainer,
-            .isOpen,
+        let bag = Item("bag")
+            .name("leather bag")
+            .description("A worn leather bag.")
+            .isContainer
+            .isOpen
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: bag
@@ -550,9 +478,7 @@ struct ExamineActionHandlerTests {
         try await engine.execute("examine bag")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > examine bag
             A worn leather bag. The leather bag is empty.
@@ -563,13 +489,11 @@ struct ExamineActionHandlerTests {
     @Test("Examine empty surface")
     func testExamineEmptySurface() async throws {
         // Given
-        let desk = Item(
-            id: "desk",
-            .name("wooden desk"),
-            .description("A simple wooden desk."),
-            .isSurface,
+        let desk = Item("desk")
+            .name("wooden desk")
+            .description("A simple wooden desk.")
+            .isSurface
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: desk
@@ -581,9 +505,7 @@ struct ExamineActionHandlerTests {
         try await engine.execute("examine desk")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > examine desk
             A simple wooden desk.
@@ -594,13 +516,11 @@ struct ExamineActionHandlerTests {
     @Test("Examine door shows door state")
     func testExamineDoorShowsDoorState() async throws {
         // Given
-        let door = Item(
-            id: "door",
-            .name("oak door"),
-            .description("A heavy oak door."),
-            .isOpen,
+        let door = Item("door")
+            .name("oak door")
+            .description("A heavy oak door.")
+            .isOpen
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: door
@@ -612,9 +532,7 @@ struct ExamineActionHandlerTests {
         try await engine.execute("examine door")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > examine door
             A heavy oak door. The oak door is open.
@@ -625,13 +543,11 @@ struct ExamineActionHandlerTests {
     @Test("Updates pronouns to refer to examined item")
     func testUpdatesPronounsToExaminedItem() async throws {
         // Given
-        let book = Item(
-            id: "book",
-            .name("leather book"),
-            .description("A worn leather book."),
-            .isTakable,
+        let book = Item("book")
+            .name("leather book")
+            .description("A worn leather book.")
+            .isTakable
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: book
@@ -646,9 +562,7 @@ struct ExamineActionHandlerTests {
         )
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > examine book
             A worn leather book.
@@ -672,9 +586,7 @@ struct ExamineActionHandlerTests {
         try await engine.execute("examine all")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > examine all
             There is nothing here to examine.
@@ -685,22 +597,18 @@ struct ExamineActionHandlerTests {
     @Test("Examine IN preposition delegates to look inside")
     func testExamineInDelegatesToLookInside() async throws {
         // Given
-        let box = Item(
-            id: "box",
-            .name("wooden box"),
-            .description("A wooden box."),
-            .isContainer,
-            .isOpen,
+        let box = Item("box")
+            .name("wooden box")
+            .description("A wooden box.")
+            .isContainer
+            .isOpen
             .in(.startRoom)
-        )
 
-        let gem = Item(
-            id: "gem",
-            .name("ruby gem"),
-            .description("A precious ruby."),
-            .isTakable,
+        let gem = Item("gem")
+            .name("ruby gem")
+            .description("A precious ruby.")
+            .isTakable
             .in(.item("box"))
-        )
 
         let game = MinimalGame(
             items: box, gem
@@ -712,9 +620,7 @@ struct ExamineActionHandlerTests {
         try await engine.execute("look in box")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > look in box
             In the wooden box you can see a ruby gem.
@@ -725,21 +631,17 @@ struct ExamineActionHandlerTests {
     @Test("Examine ON preposition delegates to look inside")
     func testExamineOnDelegatesToLookInside() async throws {
         // Given
-        let table = Item(
-            id: "table",
-            .name("wooden table"),
-            .description("A wooden table."),
-            .isSurface,
+        let table = Item("table")
+            .name("wooden table")
+            .description("A wooden table.")
+            .isSurface
             .in(.startRoom)
-        )
 
-        let book = Item(
-            id: "book",
-            .name("red book"),
-            .description("A red book."),
-            .isTakable,
+        let book = Item("book")
+            .name("red book")
+            .description("A red book.")
+            .isTakable
             .in(.item("table"))
-        )
 
         let game = MinimalGame(
             items: table, book
@@ -751,9 +653,7 @@ struct ExamineActionHandlerTests {
         try await engine.execute("look on table")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > look on table
             A wooden table. On the wooden table you can see a red book.

@@ -44,14 +44,14 @@ extension GameEngine {
             )
 
             // List visible items
-            await messages.append(
+            await messages.appendIfPresent(
                 listItemsInLocation(location)
             )
 
             // Mark the room as visited now that we've actually described it
             // (following ZIL's TOUCHBIT pattern - only set when room is lit and described)
             if isFirstVisit {
-                await changes.append(
+                await changes.appendIfPresent(
                     location.setFlag(.isVisited)
                 )
             }

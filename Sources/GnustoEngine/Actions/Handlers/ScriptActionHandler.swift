@@ -29,20 +29,28 @@ public struct ScriptActionHandler: ActionHandler {
     public func process(context: ActionContext) async throws -> ActionResult {
         // Check if scripting is already active
         if await context.engine.hasFlag(.isScripting) {
-            let path = try await context.engine.transcriptURL.gnustoPath
+            guard let url = await context.engine.transcriptURL else {
+                throw ActionResponse.feedback(
+                    context.msg.transcriptError("Transcript URL not available")
+                )
+            }
 
             throw ActionResponse.feedback(
-                context.msg.transcriptAlreadyOn(path)
+                context.msg.transcriptAlreadyOn(url.gnustoPath)
             )
         }
 
         // Start recording transcript
         do {
             try await context.engine.startTranscript()
-            let path = try await context.engine.transcriptURL.gnustoPath
+            guard let url = await context.engine.transcriptURL else {
+                throw ActionResponse.feedback(
+                    context.msg.transcriptError("Failed to create transcript URL")
+                )
+            }
 
             return ActionResult(
-                context.msg.transcriptStarted(path),
+                context.msg.transcriptStarted(url.gnustoPath),
                 await context.engine.setFlag(.isScripting)
             )
         } catch {

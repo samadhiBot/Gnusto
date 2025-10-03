@@ -11,23 +11,19 @@ struct TurnBasedCombatTests {
     @Test("Basic attack with character properties")
     func testBasicAttackWithProperties() async throws {
         // Given: A room with a goblin that has weak properties
-        let goblin = Item(
-            id: "goblin",
-            .name("goblin"),
-            .description("A small, weak goblin."),
-            .characterSheet(.weak),  // Weak character properties
+        let goblin = Item("goblin")
+            .name("goblin")
+            .description("A small, weak goblin.")
+            .characterSheet(.weak)  // Weak character properties
             .in(.startRoom)
-        )
 
-        let sword = Item(
-            id: "sword",
-            .name("sword"),
-            .description("A sharp sword."),
-            .isTakable,
-            .isWeapon,
-            .value(5),  // +5 damage bonus
+        let sword = Item("sword")
+            .name("sword")
+            .description("A sharp sword.")
+            .isTakable
+            .isWeapon
+            .value(5)  // +5 damage bonus
             .in(.player)
-        )
 
         let game = MinimalGame(
             player: Player(
@@ -48,9 +44,7 @@ struct TurnBasedCombatTests {
         try await engine.execute("attack goblin with sword")
 
         // Then: Verify combat occurred with proper turn structure
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > attack goblin with sword
             Armed and hungry for violence, you strike with your sword as
@@ -66,13 +60,11 @@ struct TurnBasedCombatTests {
     @Test("Combat without required weapon")
     func testCombatRequiresWeapon() async throws {
         // Given: A knight that requires weapons to fight
-        let knight = Item(
-            id: "knight",
-            .name("knight"),
-            .description("An armored knight."),
-            .characterSheet(.strong),
+        let knight = Item("knight")
+            .name("knight")
+            .description("An armored knight.")
+            .characterSheet(.strong)
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: knight,
@@ -87,9 +79,7 @@ struct TurnBasedCombatTests {
         try await engine.execute("attack knight")
 
         // Then: Attack should be denied
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > attack knight
             No weapons needed as you attack with pure violence while the
@@ -106,16 +96,14 @@ struct TurnBasedCombatTests {
     @Test("Attack with non-weapon item")
     func testAttackWithNonWeapon() async throws {
         // Given: A troll and a non-weapon item
-        let lamp = Item(
-            id: "lamp",
-            .name("lamp"),
-            .description("A brass lamp."),
-            .isTakable,
-            .isDevice,
-            .isLightSource,
+        let lamp = Item("lamp")
+            .name("lamp")
+            .description("A brass lamp.")
+            .isTakable
+            .isDevice
+            .isLightSource
             // Note: NOT marked as .isWeapon
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: Lab.troll, lamp
@@ -127,9 +115,7 @@ struct TurnBasedCombatTests {
         try await engine.execute("attack troll with lamp")
 
         // Then: Attack should note the lamp is ineffective
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > attack troll with lamp
             You drive forward with your lamp seeking its purpose as the
@@ -150,23 +136,19 @@ struct TurnBasedCombatTests {
     @Test("Strong vs weak character combat")
     func testPropertyBasedCombat() async throws {
         // Given: A weak player vs strong enemy
-        let ogre = Item(
-            id: "ogre",
-            .name("ogre"),
-            .description("A massive ogre."),
-            .characterSheet(.strong),  // Strong properties
+        let ogre = Item("ogre")
+            .name("ogre")
+            .description("A massive ogre.")
+            .characterSheet(.strong)  // Strong properties
             .in(.startRoom)
-        )
 
-        let dagger = Item(
-            id: "dagger",
-            .name("dagger"),
-            .description("A small dagger."),
-            .isTakable,
-            .isWeapon,
-            .damage(2),  // Low damage
+        let dagger = Item("dagger")
+            .name("dagger")
+            .description("A small dagger.")
+            .isTakable
+            .isWeapon
+            .damage(2)  // Low damage
             .in(.player)
-        )
 
         let game = MinimalGame(
             player: Player(
@@ -182,9 +164,7 @@ struct TurnBasedCombatTests {
         try await engine.execute("attack ogre")
 
         // Then: Combat should occur (results will vary due to dice rolls)
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > attack ogre
             Armed and hungry for violence, you strike with your dagger as
@@ -205,10 +185,9 @@ struct TurnBasedCombatTests {
     @Test("Enemy that can be pacified through dialogue")
     func testPacifyThroughDialogue() async throws {
         // Given: A bandit that can be pacified
-        let bandit = Item(
-            id: "bandit",
-            .name("bandit"),
-            .description("A rough-looking bandit."),
+        let bandit = Item("bandit")
+            .name("bandit")
+            .description("A rough-looking bandit.")
 
             .characterSheet(
                 .init(
@@ -217,9 +196,8 @@ struct TurnBasedCombatTests {
                     charisma: 8,
                     alignment: .chaoticGood  // Easier to pacify
                 )
-            ),
+            )
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             player: Player(
@@ -244,9 +222,7 @@ struct TurnBasedCombatTests {
         )
 
         // Then: Might surrender (depends on dice roll with high charisma)
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > attack bandit
             No weapons needed as you attack with pure violence while the
@@ -275,13 +251,11 @@ struct TurnBasedCombatTests {
     @Test("Attack non-character object")
     func testAttackNonCharacter() async throws {
         // Given: A regular object (not a character)
-        let statue = Item(
-            id: "statue",
-            .name("statue"),
-            .description("A stone statue."),
+        let statue = Item("statue")
+            .name("statue")
+            .description("A stone statue.")
             // Note: NOT marked as a character (no .characterSheet)
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: statue
@@ -293,9 +267,7 @@ struct TurnBasedCombatTests {
         try await engine.execute("attack statue")
 
         // Then: Should get message about fighting inanimate objects
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > attack statue
             The statue is immune to your hostility.
@@ -306,13 +278,11 @@ struct TurnBasedCombatTests {
     @Test("Combat with already dead enemy")
     func testAttackDeadEnemy() async throws {
         // Given: A dead enemy
-        let corpse = Item(
-            id: "zombie",
-            .name("zombie"),
-            .description("A defeated zombie."),
-            .characterSheet(.init(health: 0, consciousness: .dead)),  // Already dead
+        let corpse = Item("zombie")
+            .name("zombie")
+            .description("A defeated zombie.")
+            .characterSheet(.init(health: 0, consciousness: .dead))  // Already dead
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: corpse
@@ -324,9 +294,7 @@ struct TurnBasedCombatTests {
         try await engine.execute("attack zombie")
 
         // Then: Should indicate it's already dead
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > attack zombie
             No weapons needed as you attack with pure violence while the
@@ -342,23 +310,19 @@ struct TurnBasedCombatTests {
     @Test("Combat state changes are properly applied")
     func testCombatStateChanges() async throws {
         // Given: A simple enemy
-        let rat = Item(
-            id: "rat",
-            .name("rat"),
-            .description("A large rat."),
-            .characterSheet(.weak),  // Very low health
+        let rat = Item("rat")
+            .name("rat")
+            .description("A large rat.")
+            .characterSheet(.weak)  // Very low health
             .in(.startRoom)
-        )
 
-        let sword = Item(
-            id: "sword",
-            .name("sword"),
-            .description("A sharp sword."),
-            .isTakable,
-            .isWeapon,
-            .value(10),  // High damage
+        let sword = Item("sword")
+            .name("sword")
+            .description("A sharp sword.")
+            .isTakable
+            .isWeapon
+            .value(10)  // High damage
             .in(.player)
-        )
 
         let game = MinimalGame(
             player: Player(
@@ -377,9 +341,7 @@ struct TurnBasedCombatTests {
         try await engine.execute("attack rat with sword")
 
         // Then: Check combat occurred
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > attack rat with sword
             Armed and hungry for violence, you strike with your sword as

@@ -11,12 +11,10 @@ struct TasteActionHandlerTests {
     @Test("TASTE DIRECTOBJECT syntax works")
     func testTasteDirectObjectSyntax() async throws {
         // Given
-        let apple = Item(
-            id: "apple",
-            .name("moldy apple"),
-            .description("A withered moldy apple."),
+        let apple = Item("apple")
+            .name("moldy apple")
+            .description("A withered moldy apple.")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: apple
@@ -28,9 +26,7 @@ struct TasteActionHandlerTests {
         try await engine.execute("taste apple")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > taste apple
             The moldy apple tastes remarkably like you'd expect the moldy
@@ -51,9 +47,7 @@ struct TasteActionHandlerTests {
         try await engine.execute("taste")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > taste
             The flavor profile proves disappointingly ordinary.
@@ -64,18 +58,14 @@ struct TasteActionHandlerTests {
     @Test("Cannot taste target not in scope")
     func testCannotTasteTargetNotInScope() async throws {
         // Given
-        let anotherRoom = Location(
-            id: "anotherRoom",
-            .name("Another Room"),
+        let anotherRoom = Location("anotherRoom")
+            .name("Another Room")
             .inherentlyLit
-        )
 
-        let remoteCake = Item(
-            id: "remoteCake",
-            .name("remote cake"),
-            .description("A cake in another room."),
+        let remoteCake = Item("remoteCake")
+            .name("remote cake")
+            .description("A cake in another room.")
             .in("anotherRoom")
-        )
 
         let game = MinimalGame(
             locations: anotherRoom,
@@ -88,9 +78,7 @@ struct TasteActionHandlerTests {
         try await engine.execute("taste cake")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > taste cake
             Any such thing remains frustratingly inaccessible.
@@ -101,18 +89,14 @@ struct TasteActionHandlerTests {
     @Test("Taste works in dark room")
     func testTasteWorksInDarkRoom() async throws {
         // Given: Dark room with an object to taste
-        let darkRoom = Location(
-            id: "darkRoom",
-            .name("Dark Room"),
+        let darkRoom = Location("darkRoom")
+            .name("Dark Room")
             .description("A pitch black room.")
-        )
 
-        let bread = Item(
-            id: "bread",
-            .name("stale bread"),
-            .description("A piece of stale bread."),
+        let bread = Item("bread")
+            .name("stale bread")
+            .description("A piece of stale bread.")
             .in("darkRoom")
-        )
 
         let game = MinimalGame(
             player: Player(in: "darkRoom"),
@@ -126,9 +110,7 @@ struct TasteActionHandlerTests {
         try await engine.execute("taste bread")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > taste bread
             Any such thing remains frustratingly inaccessible.
@@ -141,12 +123,10 @@ struct TasteActionHandlerTests {
     @Test("Taste object in room")
     func testTasteObjectInRoom() async throws {
         // Given
-        let berry = Item(
-            id: "berry",
-            .name("wild berry"),
-            .description("A small wild berry."),
+        let berry = Item("berry")
+            .name("wild berry")
+            .description("A small wild berry.")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: berry
@@ -158,9 +138,7 @@ struct TasteActionHandlerTests {
         try await engine.execute("taste berry")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > taste berry
             The wild berry tastes remarkably like you'd expect the wild
@@ -172,13 +150,11 @@ struct TasteActionHandlerTests {
     @Test("Taste character gives appropriate message")
     func testTasteCharacter() async throws {
         // Given
-        let wizard = Item(
-            id: "wizard",
-            .name("old wizard"),
-            .description("A wise old wizard."),
-            .characterSheet(.wise),
+        let wizard = Item("wizard")
+            .name("old wizard")
+            .description("A wise old wizard.")
+            .characterSheet(.wise)
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: wizard
@@ -194,9 +170,7 @@ struct TasteActionHandlerTests {
         )
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > taste the wizard
             Tasting the old wizard would end your relationship and possibly
@@ -217,15 +191,13 @@ struct TasteActionHandlerTests {
     @Test("Taste enemy gives appropriate message")
     func testTasteEnemy() async throws {
         // Given
-        let necromancer = Item(
-            id: "necromancer",
-            .name("furious necromancer"),
-            .description("An angry old necromancer."),
+        let necromancer = Item("necromancer")
+            .name("furious necromancer")
+            .description("An angry old necromancer.")
             .characterSheet(
-                CharacterSheet(isFighting: true)
-            ),
+                .default.enemy
+            )
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: necromancer
@@ -241,15 +213,13 @@ struct TasteActionHandlerTests {
         )
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > lick the necromancer
             Tasting the furious necromancer ranks among history's worst
             battle strategies.
 
-            No weapons between you--just the furious necromancer's
+            No weapons between you -- just the furious necromancer's
             aggression and your desperation! You collide in a tangle of
             strikes and blocks.
 
@@ -290,9 +260,7 @@ struct TasteActionHandlerTests {
         )
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > taste myself
             You sample your own flavor. The results are predictably salty.
@@ -309,22 +277,18 @@ struct TasteActionHandlerTests {
     @Test("Taste object in open container")
     func testTasteObjectInOpenContainer() async throws {
         // Given
-        let bowl = Item(
-            id: "bowl",
-            .name("fruit bowl"),
-            .description("A bowl filled with fruit."),
-            .isContainer,
-            .isOpenable,
-            .isOpen,
+        let bowl = Item("bowl")
+            .name("fruit bowl")
+            .description("A bowl filled with fruit.")
+            .isContainer
+            .isOpenable
+            .isOpen
             .in(.startRoom)
-        )
 
-        let orange = Item(
-            id: "orange",
-            .name("moldy orange"),
-            .description("A moldy orange."),
+        let orange = Item("orange")
+            .name("moldy orange")
+            .description("A moldy orange.")
             .in(.item("bowl"))
-        )
 
         let game = MinimalGame(
             items: bowl, orange
@@ -340,9 +304,7 @@ struct TasteActionHandlerTests {
         )
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > taste the moldy orange
             The moldy orange tastes remarkably like you'd expect the moldy
@@ -362,19 +324,15 @@ struct TasteActionHandlerTests {
     @Test("Taste sequence of different foods")
     func testTasteSequenceOfDifferentFoods() async throws {
         // Given
-        let cookie = Item(
-            id: "cookie",
-            .name("ancient cookie"),
-            .description("An ancient cookie."),
+        let cookie = Item("cookie")
+            .name("ancient cookie")
+            .description("An ancient cookie.")
             .in(.startRoom)
-        )
 
-        let milk = Item(
-            id: "milk",
-            .name("glass of lumpy milk"),
-            .description("A warm glass of milk."),
+        let milk = Item("milk")
+            .name("glass of lumpy milk")
+            .description("A warm glass of milk.")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: cookie, milk
@@ -389,9 +347,7 @@ struct TasteActionHandlerTests {
         )
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > lick the cookie
             The ancient cookie tastes remarkably like you'd expect the
@@ -407,12 +363,10 @@ struct TasteActionHandlerTests {
     @Test("Different taste syntax variations")
     func testDifferentTasteSyntaxVariations() async throws {
         // Given
-        let slime = Item(
-            id: "slime",
-            .name("bubbling slime"),
-            .description("A scoop of bubbling slime."),
+        let slime = Item("slime")
+            .name("bubbling slime")
+            .description("A scoop of bubbling slime.")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: slime
@@ -427,9 +381,7 @@ struct TasteActionHandlerTests {
         )
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > taste the slime
             The bubbling slime tastes remarkably like you'd expect the
@@ -445,19 +397,15 @@ struct TasteActionHandlerTests {
     @Test("Taste unusual objects")
     func testTasteUnusualObjects() async throws {
         // Given
-        let rock = Item(
-            id: "rock",
-            .name("smooth rock"),
-            .description("A smooth stone."),
+        let rock = Item("rock")
+            .name("smooth rock")
+            .description("A smooth stone.")
             .in(.startRoom)
-        )
 
-        let metal = Item(
-            id: "metal",
-            .name("copper coin"),
-            .description("A tarnished copper coin."),
+        let metal = Item("metal")
+            .name("copper coin")
+            .description("A tarnished copper coin.")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: rock, metal
@@ -472,9 +420,7 @@ struct TasteActionHandlerTests {
         )
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > taste rock
             The smooth rock tastes remarkably like you'd expect the smooth
@@ -490,12 +436,10 @@ struct TasteActionHandlerTests {
     @Test("Multiple taste attempts")
     func testMultipleTasteAttempts() async throws {
         // Given
-        let slop = Item(
-            id: "slop",
-            .name("bowl of slop"),
-            .description("A warm bowl of slop."),
+        let slop = Item("slop")
+            .name("bowl of slop")
+            .description("A warm bowl of slop.")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: slop
@@ -511,9 +455,7 @@ struct TasteActionHandlerTests {
         )
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > taste the slop
             The bowl of slop tastes remarkably like you'd expect the bowl

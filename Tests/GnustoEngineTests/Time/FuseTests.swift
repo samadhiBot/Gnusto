@@ -71,11 +71,9 @@ struct FuseTests {
 
     @Test("Basic fuse scheduling works with typed payloads")
     func testBasicFuseSchedulingWithTypedPayloads() async throws {
-        let testRoom = Location(
-            id: .startRoom,
-            .name("Test Room"),
+        let testRoom = Location(.startRoom)
+            .name("Test Room")
             .inherentlyLit
-        )
 
         let game = MinimalGame(locations: testRoom)
         let (engine, _) = await GameEngine.test(blueprint: game)
@@ -114,11 +112,9 @@ struct FuseTests {
 
     @Test("Scheduled fuse turn countdown preserves payload")
     func testFuseTurnCountdownPreservesPayload() async throws {
-        let testRoom = Location(
-            id: .startRoom,
-            .name("Test Room"),
+        let testRoom = Location(.startRoom)
+            .name("Test Room")
             .inherentlyLit
-        )
 
         let wizard = Lab.wizard
         let game = MinimalGame(locations: testRoom, items: wizard)
@@ -162,11 +158,9 @@ struct FuseTests {
 
     @Test("Multiple fuses with different payloads work independently")
     func testMultipleFusesWithDifferentPayloads() async throws {
-        let testRoom = Location(
-            id: .startRoom,
-            .name("Test Room"),
+        let testRoom = Location(.startRoom)
+            .name("Test Room")
             .inherentlyLit
-        )
 
         let wizard = Lab.wizard
         let game = MinimalGame(locations: testRoom, items: wizard)
@@ -211,11 +205,9 @@ struct FuseTests {
 
     @Test("Convenience constructors create correct payloads")
     func testConvenienceConstructors() async throws {
-        let testRoom = Location(
-            id: .startRoom,
-            .name("Test Room"),
+        let testRoom = Location(.startRoom)
+            .name("Test Room")
             .inherentlyLit
-        )
 
         let wizard = Lab.wizard
         let troll = Lab.troll
@@ -266,11 +258,9 @@ struct FuseTests {
 
     @Test("Custom turns override work with typed payloads")
     func testCustomTurnsOverrideWithTypedPayloads() async throws {
-        let testRoom = Location(
-            id: .startRoom,
-            .name("Test Room"),
+        let testRoom = Location(.startRoom)
+            .name("Test Room")
             .inherentlyLit
-        )
 
         let troll = Lab.troll
         let game = MinimalGame(locations: testRoom, items: troll)
@@ -305,11 +295,9 @@ struct FuseTests {
 
     @Test("Fuse without payload works correctly")
     func testFuseWithoutPayload() async throws {
-        let testRoom = Location(
-            id: .startRoom,
-            .name("Test Room"),
+        let testRoom = Location(.startRoom)
+            .name("Test Room")
             .inherentlyLit
-        )
 
         let game = MinimalGame(locations: testRoom)
         let (engine, _) = await GameEngine.test(blueprint: game)
@@ -369,11 +357,9 @@ struct FuseTests {
             let metadata: [String: String]
         }
 
-        let testRoom = Location(
-            id: .startRoom,
-            .name("Test Room"),
+        let testRoom = Location(.startRoom)
+            .name("Test Room")
             .inherentlyLit
-        )
 
         let game = MinimalGame(locations: testRoom)
         let (engine, _) = await GameEngine.test(blueprint: game)

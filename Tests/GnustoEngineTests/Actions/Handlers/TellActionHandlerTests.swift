@@ -11,13 +11,11 @@ struct TellActionHandlerTests {
     @Test("TELL DIRECTOBJECT syntax works")
     func testTellDirectObjectSyntax() async throws {
         // Given
-        let wizard = Item(
-            id: "wizard",
-            .name("old wizard"),
-            .description("A wise old wizard."),
-            .characterSheet(.wise),
+        let wizard = Item("wizard")
+            .name("old wizard")
+            .description("A wise old wizard.")
+            .characterSheet(.wise)
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: wizard
@@ -29,9 +27,7 @@ struct TellActionHandlerTests {
         try await engine.execute("tell wizard")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > tell wizard
             The old wizard awaits the subject of your discourse.
@@ -45,20 +41,16 @@ struct TellActionHandlerTests {
     @Test("TELL DIRECTOBJECT ABOUT INDIRECTOBJECT syntax works")
     func testTellAboutSyntax() async throws {
         // Given
-        let sage = Item(
-            id: "sage",
-            .name("wise sage"),
-            .description("A knowledgeable sage."),
-            .characterSheet(.default),
+        let sage = Item("sage")
+            .name("wise sage")
+            .description("A knowledgeable sage.")
+            .characterSheet(.default)
             .in(.startRoom)
-        )
 
-        let crystal = Item(
-            id: "crystal",
-            .name("magic crystal"),
-            .description("A glowing crystal."),
+        let crystal = Item("crystal")
+            .name("magic crystal")
+            .description("A glowing crystal.")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: sage, crystal
@@ -70,9 +62,7 @@ struct TellActionHandlerTests {
         try await engine.execute("tell sage about crystal")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > tell sage about crystal
             The wise sage absorbs your words about the magic crystal with
@@ -87,20 +77,16 @@ struct TellActionHandlerTests {
     @Test("SPEAK TO DIRECTOBJECT ABOUT INDIRECTOBJECT syntax works")
     func testSpeakToAboutSyntax() async throws {
         // Given
-        let palaceGuard = Item(
-            id: "guard",
-            .name("palace guard"),
-            .description("A stern palace guard."),
-            .characterSheet(.default),
+        let palaceGuard = Item("guard")
+            .name("palace guard")
+            .description("A stern palace guard.")
+            .characterSheet(.default)
             .in(.startRoom)
-        )
 
-        let key = Item(
-            id: "key",
-            .name("silver key"),
-            .description("A small silver key."),
+        let key = Item("key")
+            .name("silver key")
+            .description("A small silver key.")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: palaceGuard, key
@@ -112,9 +98,7 @@ struct TellActionHandlerTests {
         try await engine.execute("speak to guard about key")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > speak to guard about key
             The palace guard absorbs your words about the silver key with
@@ -126,20 +110,16 @@ struct TellActionHandlerTests {
     @Test("TALK TO DIRECTOBJECT ABOUT INDIRECTOBJECT syntax works")
     func testTalkToAboutSyntax() async throws {
         // Given
-        let merchant = Item(
-            id: "merchant",
-            .name("traveling merchant"),
-            .description("A traveling merchant."),
-            .characterSheet(.default),
+        let merchant = Item("merchant")
+            .name("traveling merchant")
+            .description("A traveling merchant.")
+            .characterSheet(.default)
             .in(.startRoom)
-        )
 
-        let treasure = Item(
-            id: "treasure",
-            .name("ancient treasure"),
-            .description("A chest of ancient treasure."),
+        let treasure = Item("treasure")
+            .name("ancient treasure")
+            .description("A chest of ancient treasure.")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: merchant, treasure
@@ -151,9 +131,7 @@ struct TellActionHandlerTests {
         try await engine.execute("talk to merchant about treasure")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > talk to merchant about treasure
             The traveling merchant absorbs your words about the ancient
@@ -165,20 +143,16 @@ struct TellActionHandlerTests {
     @Test("SAY INDIRECTOBJECT TO DIRECTOBJECT syntax works")
     func testSaySyntax() async throws {
         // Given
-        let priest = Item(
-            id: "priest",
-            .name("village priest"),
-            .description("A kindly village priest."),
-            .characterSheet(.default),
+        let priest = Item("priest")
+            .name("village priest")
+            .description("A kindly village priest.")
+            .characterSheet(.default)
             .in(.startRoom)
-        )
 
-        let blessing = Item(
-            id: "blessing",
-            .name("prayer blessing"),
-            .description("A sacred blessing."),
+        let blessing = Item("blessing")
+            .name("prayer blessing")
+            .description("A sacred blessing.")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: priest, blessing
@@ -190,9 +164,7 @@ struct TellActionHandlerTests {
         try await engine.execute("say blessing to priest")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > say blessing to priest
             The village priest absorbs your words about the prayer blessing
@@ -204,20 +176,16 @@ struct TellActionHandlerTests {
     @Test("INFORM syntax works")
     func testInformSyntax() async throws {
         // Given
-        let scholar = Item(
-            id: "scholar",
-            .name("learned scholar"),
-            .description("A learned scholar."),
-            .characterSheet(.default),
+        let scholar = Item("scholar")
+            .name("learned scholar")
+            .description("A learned scholar.")
+            .characterSheet(.default)
             .in(.startRoom)
-        )
 
-        let book = Item(
-            id: "book",
-            .name("ancient book"),
-            .description("An ancient tome."),
+        let book = Item("book")
+            .name("ancient book")
+            .description("An ancient tome.")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: scholar, book
@@ -229,9 +197,7 @@ struct TellActionHandlerTests {
         try await engine.execute("inform scholar about book")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > inform scholar about book
             The learned scholar absorbs your words about the ancient book
@@ -245,12 +211,10 @@ struct TellActionHandlerTests {
     @Test("Cannot tell without specifying who")
     func testCannotTellWithoutWho() async throws {
         // Given
-        let treasure = Item(
-            id: "treasure",
-            .name("gold treasure"),
-            .description("A pile of gold."),
+        let treasure = Item("treasure")
+            .name("gold treasure")
+            .description("A pile of gold.")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: treasure
@@ -262,9 +226,7 @@ struct TellActionHandlerTests {
         try await engine.execute("tell about treasure")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > tell about treasure
             Your voice trails off, seeking an audience.
@@ -282,9 +244,7 @@ struct TellActionHandlerTests {
         try await engine.execute("tell wizard about magic")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > tell wizard about magic
             Any such thing remains frustratingly inaccessible.
@@ -295,19 +255,15 @@ struct TellActionHandlerTests {
     @Test("Cannot tell character not in scope")
     func testCannotTellCharacterNotInScope() async throws {
         // Given
-        let anotherRoom = Location(
-            id: "anotherRoom",
-            .name("Another Room"),
+        let anotherRoom = Location("anotherRoom")
+            .name("Another Room")
             .inherentlyLit
-        )
 
-        let distantWizard = Item(
-            id: "wizard",
-            .name("distant wizard"),
-            .description("A wizard in another room."),
-            .characterSheet(.default),
+        let distantWizard = Item("wizard")
+            .name("distant wizard")
+            .description("A wizard in another room.")
+            .characterSheet(.default)
             .in("anotherRoom")
-        )
 
         let game = MinimalGame(
             locations: anotherRoom,
@@ -320,9 +276,7 @@ struct TellActionHandlerTests {
         try await engine.execute("tell wizard about magic")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > tell wizard about magic
             Any such thing remains frustratingly inaccessible.
@@ -333,12 +287,10 @@ struct TellActionHandlerTests {
     @Test("Cannot tell self about something")
     func testCannotTellSelf() async throws {
         // Given
-        let crystal = Item(
-            id: "crystal",
-            .name("magic crystal"),
-            .description("A glowing crystal."),
+        let crystal = Item("crystal")
+            .name("magic crystal")
+            .description("A glowing crystal.")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: crystal
@@ -350,9 +302,7 @@ struct TellActionHandlerTests {
         try await engine.execute("tell me about crystal")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > tell me about crystal
             You engage in a spirited internal dialogue about the magic
@@ -364,20 +314,16 @@ struct TellActionHandlerTests {
     @Test("Requires light to tell")
     func testRequiresLight() async throws {
         // Given: Dark room with character
-        let darkRoom = Location(
-            id: "darkRoom",
-            .name("Dark Room"),
+        let darkRoom = Location("darkRoom")
+            .name("Dark Room")
             .description("A pitch black room.")
-            // Note: No .inherentlyLit property
-        )
+        // Note: No .inherentlyLit property
 
-        let wizard = Item(
-            id: "wizard",
-            .name("old wizard"),
-            .description("A wise old wizard."),
-            .characterSheet(.default),
+        let wizard = Item("wizard")
+            .name("old wizard")
+            .description("A wise old wizard.")
+            .characterSheet(.default)
             .in("darkRoom")
-        )
 
         let game = MinimalGame(
             player: Player(in: "darkRoom"),
@@ -391,9 +337,7 @@ struct TellActionHandlerTests {
         try await engine.execute("tell wizard about magic")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > tell wizard about magic
             The darkness here is absolute, consuming all light and hope of
@@ -407,13 +351,11 @@ struct TellActionHandlerTests {
     @Test("Tell character gives variety of responses")
     func testTellCharacterVariety() async throws {
         // Given
-        let wizard = Item(
-            id: "wizard",
-            .name("old wizard"),
-            .description("A wise old wizard."),
-            .characterSheet(.default),
+        let wizard = Item("wizard")
+            .name("old wizard")
+            .description("A wise old wizard.")
+            .characterSheet(.default)
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: wizard
@@ -425,9 +367,7 @@ struct TellActionHandlerTests {
         try await engine.execute("tell wizard")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > tell wizard
             The old wizard awaits the subject of your discourse.
@@ -441,20 +381,16 @@ struct TellActionHandlerTests {
     @Test("Tell character about topic gives variety of responses")
     func testTellCharacterAboutTopicVariety() async throws {
         // Given
-        let sage = Item(
-            id: "sage",
-            .name("wise sage"),
-            .description("A knowledgeable sage."),
-            .characterSheet(.default),
+        let sage = Item("sage")
+            .name("wise sage")
+            .description("A knowledgeable sage.")
+            .characterSheet(.default)
             .in(.startRoom)
-        )
 
-        let crystal = Item(
-            id: "crystal",
-            .name("magic crystal"),
-            .description("A glowing crystal."),
+        let crystal = Item("crystal")
+            .name("magic crystal")
+            .description("A glowing crystal.")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: sage, crystal
@@ -466,9 +402,7 @@ struct TellActionHandlerTests {
         try await engine.execute("tell sage about crystal")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > tell sage about crystal
             The wise sage absorbs your words about the magic crystal with
@@ -490,9 +424,7 @@ struct TellActionHandlerTests {
         try await engine.execute("tell troll")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > tell troll
             The fierce troll awaits the subject of your discourse.
@@ -506,20 +438,16 @@ struct TellActionHandlerTests {
     @Test("Tell enemy about topic gives appropriate responses")
     func testTellEnemyAboutTopic() async throws {
         // Given
-        let orc = Item(
-            id: "orc",
-            .name("fierce orc"),
-            .description("A fierce orc warrior."),
-            .characterSheet(.init(isFighting: true)),
+        let orc = Item("orc")
+            .name("fierce orc")
+            .description("A fierce orc warrior.")
+            .characterSheet(.init(isFighting: true))
             .in(.startRoom)
-        )
 
-        let sword = Item(
-            id: "sword",
-            .name("steel sword"),
-            .description("A sharp steel sword."),
+        let sword = Item("sword")
+            .name("steel sword")
+            .description("A sharp steel sword.")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: orc, sword
@@ -531,16 +459,15 @@ struct TellActionHandlerTests {
         try await engine.execute("tell the orc about my sword", times: 2)
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > tell the orc about my sword
             The fierce orc dismisses your words about the steel sword with
             contemptuous silence.
 
-            No weapons between you--just the warrior's aggression and your
-            desperation! You collide in a tangle of strikes and blocks.
+            No weapons between you -- just the warrior's aggression and
+            your desperation! You collide in a tangle of strikes and
+            blocks.
 
             > tell the orc about my sword
             The subject of the steel sword cannot bridge the chasm between
@@ -558,12 +485,10 @@ struct TellActionHandlerTests {
     @Test("Tell non-character object")
     func testTellObject() async throws {
         // Given
-        let statue = Item(
-            id: "statue",
-            .name("marble statue"),
-            .description("A beautiful marble statue."),
+        let statue = Item("statue")
+            .name("marble statue")
+            .description("A beautiful marble statue.")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: statue
@@ -575,9 +500,7 @@ struct TellActionHandlerTests {
         try await engine.execute("tell statue")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > tell statue
             Your words bounce off the marble statue without effect or
@@ -592,19 +515,15 @@ struct TellActionHandlerTests {
     @Test("Tell object about topic")
     func testTellObjectAboutTopic() async throws {
         // Given
-        let mirror = Item(
-            id: "mirror",
-            .name("silver mirror"),
-            .description("A polished silver mirror."),
+        let mirror = Item("mirror")
+            .name("silver mirror")
+            .description("A polished silver mirror.")
             .in(.startRoom)
-        )
 
-        let secret = Item(
-            id: "secret",
-            .name("dark secret"),
-            .description("A mysterious secret."),
+        let secret = Item("secret")
+            .name("dark secret")
+            .description("A mysterious secret.")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: mirror, secret
@@ -616,9 +535,7 @@ struct TellActionHandlerTests {
         try await engine.execute("tell mirror about secret")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > tell mirror about secret
             Your eloquent exposition on the dark secret is wasted on the
@@ -630,13 +547,11 @@ struct TellActionHandlerTests {
     @Test("Tell about non-existent topic")
     func testTellAboutNonExistentTopic() async throws {
         // Given
-        let wizard = Item(
-            id: "wizard",
-            .name("old wizard"),
-            .description("A wise old wizard."),
-            .characterSheet(.default),
+        let wizard = Item("wizard")
+            .name("old wizard")
+            .description("A wise old wizard.")
+            .characterSheet(.default)
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: wizard
@@ -648,9 +563,7 @@ struct TellActionHandlerTests {
         try await engine.execute("tell wizard about dragons")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > tell wizard about dragons
             The old wizard absorbs your words about the dragons with

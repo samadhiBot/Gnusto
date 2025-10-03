@@ -8,18 +8,14 @@ struct ItemProxyAccessorTests {
     @Test("ItemProxy name and description accessors")
     func testNameAndDescriptionAccessors() async throws {
         // Given
-        let itemWithDescription = Item(
-            id: "book",
-            .name("leather book"),
-            .description("A worn leather-bound tome."),
+        let itemWithDescription = Item("book")
+            .name("leather book")
+            .description("A worn leather-bound tome.")
             .in(.startRoom)
-        )
 
-        let itemWithoutDescription = Item(
-            id: "coin",
-            .name("gold coin"),
+        let itemWithoutDescription = Item("coin")
+            .name("gold coin")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: itemWithDescription, itemWithoutDescription
@@ -39,22 +35,20 @@ struct ItemProxyAccessorTests {
         let coinDescription = await coinProxy.description
         #expect(
             coinDescription
-                == "The gold coin reveals itself to be exactly what it appears--nothing more, nothing less."
+                == "The gold coin reveals itself to be exactly what it appears -- nothing more, nothing less."
         )
     }
 
     @Test("ItemProxy flag checking methods")
     func testFlagCheckingMethods() async throws {
         // Given
-        let container = Item(
-            id: "container",
-            .name("wooden box"),
-            .isContainer,
-            .isOpenable,
-            .isOpen,
-            .isTakable,
+        let container = Item("container")
+            .name("wooden box")
+            .isContainer
+            .isOpenable
+            .isOpen
+            .isTakable
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: container
@@ -82,56 +76,44 @@ struct ItemProxyAccessorTests {
     @Test("ItemProxy boolea property accessors")
     func testBooleanPropertyAccessors() async throws {
         // Given
-        let container = Item(
-            id: "container",
-            .name("wooden box"),
-            .isContainer,
-            .isOpenable,
-            .isOpen,
-            .isTakable,
-            .capacity(10),
+        let container = Item("container")
+            .name("wooden box")
+            .isContainer
+            .isOpenable
+            .isOpen
+            .isTakable
+            .capacity(10)
             .in(.startRoom)
-        )
 
-        let weapon = Item(
-            id: "sword",
-            .name("sharp sword"),
-            .isWeapon,
-            .isTakable,
+        let weapon = Item("sword")
+            .name("sharp sword")
+            .isWeapon
+            .isTakable
             .in(.startRoom)
-        )
 
-        let character = Item(
-            id: "guard",
-            .name("town guard"),
-            .characterSheet(.default),
+        let character = Item("guard")
+            .name("town guard")
+            .characterSheet(.default)
             .in(.startRoom)
-        )
 
-        let fightingCharacter = Item(
-            id: "monster",
-            .name("angry monster"),
+        let fightingCharacter = Item("monster")
+            .name("angry monster")
             .characterSheet(
                 .init(isFighting: true)
-            ),
+            )
             .in(.startRoom)
-        )
 
-        let surface = Item(
-            id: "table",
-            .name("wooden table"),
-            .isSurface,
+        let surface = Item("table")
+            .name("wooden table")
+            .isSurface
             .in(.startRoom)
-        )
 
-        let lightSource = Item(
-            id: "lamp",
-            .name("brass lamp"),
-            .isLightSource,
-            .isDevice,
-            .isOn,
+        let lightSource = Item("lamp")
+            .name("brass lamp")
+            .isLightSource
+            .isDevice
+            .isOn
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: container, weapon, character, fightingCharacter, surface, lightSource
@@ -171,30 +153,24 @@ struct ItemProxyAccessorTests {
     @Test("ItemProxy container and capacity methods")
     func testContainerAndCapacityMethods() async throws {
         // Given
-        let container = Item(
-            id: "container",
-            .name("small box"),
-            .isContainer,
-            .isOpen,
-            .capacity(5),
+        let container = Item("container")
+            .name("small box")
+            .isContainer
+            .isOpen
+            .capacity(5)
             .in(.startRoom)
-        )
 
-        let smallItem = Item(
-            id: "coin",
-            .name("gold coin"),
-            .size(1),
-            .isTakable,
+        let smallItem = Item("coin")
+            .name("gold coin")
+            .size(1)
+            .isTakable
             .in(.item("container"))
-        )
 
-        let largeItem = Item(
-            id: "boulder",
-            .name("heavy boulder"),
-            .size(10),
-            .isTakable,
+        let largeItem = Item("boulder")
+            .name("heavy boulder")
+            .size(10)
+            .isTakable
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: container, smallItem, largeItem
@@ -220,34 +196,26 @@ struct ItemProxyAccessorTests {
     @Test("ItemProxy parent and location methods")
     func testParentAndLocationMethods() async throws {
         // Given
-        let container = Item(
-            id: "container",
-            .name("wooden box"),
-            .isContainer,
-            .isOpen,
+        let container = Item("container")
+            .name("wooden box")
+            .isContainer
+            .isOpen
             .in(.startRoom)
-        )
 
-        let itemInRoom = Item(
-            id: "roomItem",
-            .name("room item"),
-            .isTakable,
+        let itemInRoom = Item("roomItem")
+            .name("room item")
+            .isTakable
             .in(.startRoom)
-        )
 
-        let itemInContainer = Item(
-            id: "containerItem",
-            .name("container item"),
-            .isTakable,
+        let itemInContainer = Item("containerItem")
+            .name("container item")
+            .isTakable
             .in(.item("container"))
-        )
 
-        let itemWithPlayer = Item(
-            id: "playerItem",
-            .name("player item"),
-            .isTakable,
+        let itemWithPlayer = Item("playerItem")
+            .name("player item")
+            .isTakable
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: container, itemInRoom, itemInContainer, itemWithPlayer
@@ -283,31 +251,23 @@ struct ItemProxyAccessorTests {
     @Test("ItemProxy article methods")
     func testArticleMethods() async throws {
         // Given
-        let regularItem = Item(
-            id: "book",
-            .name("leather book"),
+        let regularItem = Item("book")
+            .name("leather book")
             .in(.startRoom)
-        )
 
-        let pluralItem = Item(
-            id: "coins",
-            .name("gold coins"),
-            .isPlural,
+        let pluralItem = Item("coins")
+            .name("gold coins")
+            .isPlural
             .in(.startRoom)
-        )
 
-        let noArticleItem = Item(
-            id: "water",
-            .name("water"),
-            .omitArticle,
+        let noArticleItem = Item("water")
+            .name("water")
+            .omitArticle
             .in(.startRoom)
-        )
 
-        let vowelItem = Item(
-            id: "apple",
-            .name("apple"),
+        let vowelItem = Item("apple")
+            .name("apple")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: regularItem, pluralItem, noArticleItem, vowelItem
@@ -336,27 +296,21 @@ struct ItemProxyAccessorTests {
     @Test("ItemProxy response method")
     func testResponseMethod() async throws {
         // Given
-        let object = Item(
-            id: "book",
-            .name("leather book"),
+        let object = Item("book")
+            .name("leather book")
             .in(.startRoom)
-        )
 
-        let character = Item(
-            id: "guard",
-            .name("town guard"),
-            .characterSheet(.default),
+        let character = Item("guard")
+            .name("town guard")
+            .characterSheet(.default)
             .in(.startRoom)
-        )
 
-        let enemy = Item(
-            id: "monster",
-            .name("angry monster"),
+        let enemy = Item("monster")
+            .name("angry monster")
             .characterSheet(
                 .init(isFighting: true)
-            ),
+            )
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: object, character, enemy
@@ -393,13 +347,11 @@ struct ItemProxyAccessorTests {
     @Test("ItemProxy alias")
     func testItemProxyAlias() async throws {
         // Given
-        let item = Item(
-            id: "sword",
-            .name("sharp sword"),
-            .adjectives("sharp", "gleaming", "shining", "steel"),
-            .synonyms("blade", "weapon", "sabre"),
+        let item = Item("sword")
+            .name("sharp sword")
+            .adjectives("sharp", "gleaming", "shining", "steel")
+            .synonyms("blade", "weapon", "sabre")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: item
@@ -431,12 +383,10 @@ struct ItemProxyAccessorTests {
     @Test("ItemProxy alias without adjectives")
     func testItemProxyAliasWithoutAdjectives() async throws {
         // Given
-        let item = Item(
-            id: "sword",
-            .name("sharp sword"),
-            .synonyms("blade", "weapon", "sabre"),
+        let item = Item("sword")
+            .name("sharp sword")
+            .synonyms("blade", "weapon", "sabre")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: item
@@ -468,12 +418,10 @@ struct ItemProxyAccessorTests {
     @Test("ItemProxy alias without synonyms")
     func testItemProxyAliasWithoutSynonyms() async throws {
         // Given
-        let item = Item(
-            id: "sword",
-            .name("sharp sword"),
-            .adjectives("sharp", "gleaming", "shining", "steel"),
+        let item = Item("sword")
+            .name("sharp sword")
+            .adjectives("sharp", "gleaming", "shining", "steel")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: item
@@ -505,23 +453,19 @@ struct ItemProxyAccessorTests {
     @Test("ItemProxy size, health, strength, and value properties")
     func testNumericProperties() async throws {
         // Given
-        let item = Item(
-            id: "artifact",
-            .name("magic artifact"),
-            .size(5),
+        let item = Item("artifact")
+            .name("magic artifact")
+            .size(5)
             .characterSheet(
                 .init(strength: 15, health: 75)
-            ),
-            .value(100),
+            )
+            .value(100)
             .in(.startRoom)
-        )
 
-        let defaultItem = Item(
-            id: "basic",
-            .name("basic item"),
-            .characterSheet(.default),
+        let defaultItem = Item("basic")
+            .name("basic item")
+            .characterSheet(.default)
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: item, defaultItem
@@ -547,33 +491,25 @@ struct ItemProxyAccessorTests {
     @Test("ItemProxy visibility and description flags")
     func testVisibilityAndDescriptionFlags() async throws {
         // Given
-        let visibleItem = Item(
-            id: "visible",
-            .name("visible item"),
+        let visibleItem = Item("visible")
+            .name("visible item")
             .in(.startRoom)
-        )
 
-        let invisibleItem = Item(
-            id: "invisible",
-            .name("invisible item"),
-            .isInvisible,
+        let invisibleItem = Item("invisible")
+            .name("invisible item")
+            .isInvisible
             .in(.startRoom)
-        )
 
-        let omitDescriptionItem = Item(
-            id: "omit",
-            .name("omit item"),
-            .omitDescription,
-            .isTakable,
+        let omitDescriptionItem = Item("omit")
+            .name("omit item")
+            .omitDescription
+            .isTakable
             .in(.startRoom)
-        )
 
-        let touchedItem = Item(
-            id: "touched",
-            .name("touched item"),
-            .isTouched,
+        let touchedItem = Item("touched")
+            .name("touched item")
+            .isTouched
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: visibleItem, invisibleItem, omitDescriptionItem, touchedItem
@@ -602,19 +538,15 @@ struct ItemProxyAccessorTests {
     @Test("ItemProxy door properties")
     func testDoorProperties() async throws {
         // Given
-        let door = Item(
-            id: "door",
-            .name("wooden door"),
-            .isOpenable,
-            .isLockable,
+        let door = Item("door")
+            .name("wooden door")
+            .isOpenable
+            .isLockable
             .in(.startRoom)
-        )
 
-        let regularItem = Item(
-            id: "book",
-            .name("book"),
+        let regularItem = Item("book")
+            .name("book")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: door, regularItem
@@ -633,36 +565,28 @@ struct ItemProxyAccessorTests {
     @Test("ItemProxy character life and death")
     func testCharacterLifeAndDeath() async throws {
         // Given
-        let aliveCharacter = Item(
-            id: "guard",
-            .name("town guard"),
-            .characterSheet(.default),
+        let aliveCharacter = Item("guard")
+            .name("town guard")
+            .characterSheet(.default)
             .in(.startRoom)
-        )
 
-        let deadCharacter = Item(
-            id: "skeleton",
-            .name("ancient skeleton"),
+        let deadCharacter = Item("skeleton")
+            .name("ancient skeleton")
             .characterSheet(
                 .init(consciousness: .dead)
-            ),
+            )
             .in(.startRoom)
-        )
 
-        let hostileEnemy = Item(
-            id: "orc",
-            .name("fierce orc"),
+        let hostileEnemy = Item("orc")
+            .name("fierce orc")
             .characterSheet(
                 .init(isFighting: true)
-            ),
+            )
             .in(.startRoom)
-        )
 
-        let regularItem = Item(
-            id: "rock",
-            .name("rock"),
+        let regularItem = Item("rock")
+            .name("rock")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: aliveCharacter, deadCharacter, hostileEnemy, regularItem
@@ -690,29 +614,23 @@ struct ItemProxyAccessorTests {
     @Test("ItemProxy text content properties")
     func testTextContentProperties() async throws {
         // Given
-        let readableItem = Item(
-            id: "book",
-            .name("magic book"),
-            .description("A leather-bound tome."),
-            .readText("Ancient secrets are revealed within."),
-            .readWhileHeldText("The text glows when held closely."),
-            .shortDescription("A tome"),
-            .firstDescription("You notice an untouched book."),
+        let readableItem = Item("book")
+            .name("magic book")
+            .description("A leather-bound tome.")
+            .readText("Ancient secrets are revealed within.")
+            .readWhileHeldText("The text glows when held closely.")
+            .shortDescription("A tome")
+            .firstDescription("You notice an untouched book.")
             .in(.startRoom)
-        )
 
-        let unreadableItem = Item(
-            id: "rock",
-            .name("smooth rock"),
+        let unreadableItem = Item("rock")
+            .name("smooth rock")
             .in(.startRoom)
-        )
 
-        let touchedItem = Item(
-            id: "scroll",
-            .name("old scroll"),
-            .firstDescription("An ancient scroll lies here."),
+        let touchedItem = Item("scroll")
+            .name("old scroll")
+            .firstDescription("An ancient scroll lies here.")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: readableItem, unreadableItem, touchedItem
@@ -750,66 +668,48 @@ struct ItemProxyAccessorTests {
     @Test("ItemProxy container visibility and contents")
     func testContainerVisibilityAndContents() async throws {
         // Given
-        let openContainer = Item(
-            id: "chest",
-            .name("wooden chest"),
-            .isContainer,
-            .isOpen,
+        let openContainer = Item("chest")
+            .name("wooden chest")
+            .isContainer
+            .isOpen
             .in(.startRoom)
-        )
 
-        let closedContainer = Item(
-            id: "box",
-            .name("metal box"),
-            .isContainer,
+        let closedContainer = Item("box")
+            .name("metal box")
+            .isContainer
             .in(.startRoom)
-        )
 
-        let transparentContainer = Item(
-            id: "jar",
-            .name("glass jar"),
-            .isContainer,
-            .isTransparent,
+        let transparentContainer = Item("jar")
+            .name("glass jar")
+            .isContainer
+            .isTransparent
             .in(.startRoom)
-        )
 
-        let surface = Item(
-            id: "table",
-            .name("wooden table"),
-            .isSurface,
+        let surface = Item("table")
+            .name("wooden table")
+            .isSurface
             .in(.startRoom)
-        )
 
-        let itemInChest = Item(
-            id: "gem",
-            .name("ruby gem"),
+        let itemInChest = Item("gem")
+            .name("ruby gem")
             .in(.item("chest"))
-        )
 
-        let itemInBox = Item(
-            id: "coin",
-            .name("gold coin"),
+        let itemInBox = Item("coin")
+            .name("gold coin")
             .in(.item("box"))
-        )
 
-        let itemInJar = Item(
-            id: "beetle",
-            .name("small beetle"),
+        let itemInJar = Item("beetle")
+            .name("small beetle")
             .in(.item("jar"))
-        )
 
-        let itemOnTable = Item(
-            id: "book",
-            .name("old book"),
+        let itemOnTable = Item("book")
+            .name("old book")
             .in(.item("table"))
-        )
 
-        let hiddenItem = Item(
-            id: "secret",
-            .name("secret item"),
-            .isInvisible,
+        let hiddenItem = Item("secret")
+            .name("secret item")
+            .isInvisible
             .in(.item("chest"))
-        )
 
         let game = MinimalGame(
             items: openContainer, closedContainer, transparentContainer, surface,
@@ -842,26 +742,20 @@ struct ItemProxyAccessorTests {
     @Test("ItemProxy holding and reachability")
     func testHoldingAndReachability() async throws {
         // Given
-        let container = Item(
-            id: "bag",
-            .name("leather bag"),
-            .isContainer,
-            .isOpen,
+        let container = Item("bag")
+            .name("leather bag")
+            .isContainer
+            .isOpen
             .in(.player)
-        )
 
-        let itemInBag = Item(
-            id: "coin",
-            .name("gold coin"),
+        let itemInBag = Item("coin")
+            .name("gold coin")
             .in(.item("bag"))
-        )
 
-        let roomItem = Item(
-            id: "key",
-            .name("brass key"),
-            .isTakable,
+        let roomItem = Item("key")
+            .name("brass key")
+            .isTakable
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: container, itemInBag, roomItem
@@ -886,11 +780,9 @@ struct ItemProxyAccessorTests {
     @Test("ItemProxy possessive and article methods")
     func testPossessiveAndArticleMethods() async throws {
         // Given
-        let item = Item(
-            id: "sword",
-            .name("steel sword"),
+        let item = Item("sword")
+            .name("steel sword")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: item
@@ -907,23 +799,17 @@ struct ItemProxyAccessorTests {
     @Test("ItemProxy array convenience methods")
     func testArrayConvenienceMethods() async throws {
         // Given
-        let book = Item(
-            id: "book",
-            .name("leather book"),
+        let book = Item("book")
+            .name("leather book")
             .in(.startRoom)
-        )
 
-        let coin = Item(
-            id: "coin",
-            .name("gold coin"),
+        let coin = Item("coin")
+            .name("gold coin")
             .in(.startRoom)
-        )
 
-        let gem = Item(
-            id: "gem",
-            .name("sparkling gem"),
+        let gem = Item("gem")
+            .name("sparkling gem")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: book, coin, gem
@@ -960,67 +846,49 @@ struct ItemProxyAccessorTests {
     @Test("ItemProxy array allContents and visibleContents")
     func testArrayContentsAccessors() async throws {
         // Given
-        let openChest = Item(
-            id: "chest",
-            .name("wooden chest"),
-            .isContainer,
-            .isOpen,
+        let openChest = Item("chest")
+            .name("wooden chest")
+            .isContainer
+            .isOpen
             .in(.startRoom)
-        )
 
-        let closedBox = Item(
-            id: "box",
-            .name("metal box"),
-            .isContainer,
+        let closedBox = Item("box")
+            .name("metal box")
+            .isContainer
             .in(.startRoom)
-        )
 
-        let transparentJar = Item(
-            id: "jar",
-            .name("glass jar"),
-            .isContainer,
-            .isTransparent,
+        let transparentJar = Item("jar")
+            .name("glass jar")
+            .isContainer
+            .isTransparent
             .in(.startRoom)
-        )
 
-        let gemInChest = Item(
-            id: "gem",
-            .name("ruby gem"),
+        let gemInChest = Item("gem")
+            .name("ruby gem")
             .in(.item("chest"))
-        )
 
-        let coinInBox = Item(
-            id: "coin",
-            .name("gold coin"),
+        let coinInBox = Item("coin")
+            .name("gold coin")
             .in(.item("box"))
-        )
 
-        let beetleInJar = Item(
-            id: "beetle",
-            .name("small beetle"),
+        let beetleInJar = Item("beetle")
+            .name("small beetle")
             .in(.item("jar"))
-        )
 
-        let nestedContainer = Item(
-            id: "pouch",
-            .name("small pouch"),
-            .isContainer,
-            .isOpen,
+        let nestedContainer = Item("pouch")
+            .name("small pouch")
+            .isContainer
+            .isOpen
             .in(.item("chest"))
-        )
 
-        let ringInPouch = Item(
-            id: "ring",
-            .name("gold ring"),
+        let ringInPouch = Item("ring")
+            .name("gold ring")
             .in(.item("pouch"))
-        )
 
-        let hiddenItem = Item(
-            id: "secret",
-            .name("secret item"),
-            .isInvisible,
+        let hiddenItem = Item("secret")
+            .name("secret item")
+            .isInvisible
             .in(.item("chest"))
-        )
 
         let game = MinimalGame(
             items: openChest, closedBox, transparentJar, gemInChest, coinInBox,
@@ -1052,40 +920,30 @@ struct ItemProxyAccessorTests {
     @Test("ItemProxy array sortedByValue")
     func testArraySortedByValue() async throws {
         // Given
-        let cheapItem = Item(
-            id: "copper",
-            .name("copper coin"),
-            .value(1),
+        let cheapItem = Item("copper")
+            .name("copper coin")
+            .value(1)
             .in(.startRoom)
-        )
 
-        let expensiveItem = Item(
-            id: "diamond",
-            .name("precious diamond"),
-            .value(100),
+        let expensiveItem = Item("diamond")
+            .name("precious diamond")
+            .value(100)
             .in(.startRoom)
-        )
 
-        let mediumItem = Item(
-            id: "silver",
-            .name("silver coin"),
-            .value(10),
+        let mediumItem = Item("silver")
+            .name("silver coin")
+            .value(10)
             .in(.startRoom)
-        )
 
-        let noValueItem = Item(
-            id: "rock",
-            .name("worthless rock"),
+        let noValueItem = Item("rock")
+            .name("worthless rock")
             .in(.startRoom)
-        )
 
-        let tempValueItem = Item(
-            id: "special",
-            .name("special item"),
-            .value(50),
-            .tmpValue(5),
+        let tempValueItem = Item("special")
+            .name("special item")
+            .value(50)
+            .tmpValue(5)
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: cheapItem, expensiveItem, mediumItem, noValueItem, tempValueItem

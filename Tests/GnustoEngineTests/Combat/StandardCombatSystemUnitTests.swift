@@ -11,18 +11,16 @@ struct StandardCombatSystemUnitTests {
 
     /// Creates a minimal test game with combat setup
     private func createTestGame(randomSeed: UInt64 = 71) async -> (GameEngine, MockIOHandler) {
-        let entrance = Location(
-            id: "entrance",
-            .description("Entrance to the combat arena."),
-            .exits(.north(.startRoom)),
+        let entrance = Location("entrance")
+            .description("Entrance to the combat arena.")
+            .north(.startRoom)
             .inherentlyLit
-        )
-        let startRoom = Location(
-            id: .startRoom,
-            .name("Combat Arena"),
-            .description("A circular arena for testing combat."),
+
+        let startRoom = Location(.startRoom)
+            .name("Combat Arena")
+            .description("A circular arena for testing combat.")
             .inherentlyLit
-        )
+
         let game = MinimalGame(
             player: Player(in: .startRoom),
             locations: entrance, startRoom,
@@ -61,7 +59,7 @@ struct StandardCombatSystemUnitTests {
             that shows immediately. The blow lands solidly, drawing blood. He
             feels the sting but remains strong.
 
-            The angry beast hammers back instantly--the blow lands solid,
+            The angry beast hammers back instantly -- the blow lands solid,
             driving air from lungs and thought from mind. The blow lands solidly, drawing blood. You feel the sting but remain strong.
             """
         )
@@ -85,7 +83,7 @@ struct StandardCombatSystemUnitTests {
             that shows immediately. The blow lands solidly, drawing blood. He
             feels the sting but remains strong.
 
-            The angry beast hammers back instantly--the blow lands solid,
+            The angry beast hammers back instantly -- the blow lands solid,
             driving air from lungs and thought from mind. The blow lands solidly, drawing blood. You feel the sting but remain strong.
             """
         )
@@ -408,9 +406,7 @@ struct StandardCombatSystemUnitTests {
             troll.setCharacterAttributes(isFighting: true)
         )
         try await engine.execute("north")
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > north
             --- Combat Arena ---
@@ -444,7 +440,7 @@ struct StandardCombatSystemUnitTests {
                 * * *
 
                 Your eyes crack open to an empty scene. How long were you out? Hours? Minutes?
-                The monster is nowhere to be seen--perhaps called away by urgent matters. Whatever
+                The monster is nowhere to be seen -- perhaps called away by urgent matters. Whatever
                 the reason, this reprieve won't last. Move now or die here.
                 """,
             changes: [
@@ -459,7 +455,7 @@ struct StandardCombatSystemUnitTests {
                     message: """
                         The worst possible timing: the creature comes back to find you still present,
                         apparently fascinated by your surroundings rather than your survival.
-                        He doesn't hesitate--violence resumes immediately.
+                        He doesn't hesitate -- violence resumes immediately.
                         You had your chance to leave.
                         """,
                     turns: 2
@@ -475,12 +471,10 @@ struct StandardCombatSystemUnitTests {
 
     @Test("getEnemyWeapon finds enemy weapon")
     func testGetEnemyWeapon() async throws {
-        let club = Item(
-            id: "club",
-            .name("wooden club"),
-            .isWeapon,
+        let club = Item("club")
+            .name("wooden club")
+            .isWeapon
             .in(.item("troll"))
-        )
 
         let game = MinimalGame(
             player: Player(in: .startRoom),
@@ -717,55 +711,41 @@ struct StandardCombatSystemUnitTests {
     @Test("Combat conditions affect subsequent attacks")
     func testCombatConditionsAffectAttacks() async throws {
         // Given: A combat scenario with staggered enemy
-        let staggeredTroll = Item(
-            id: "staggeredTroll",
-            .name("staggered troll"),
+        let staggeredTroll = Item("staggeredTroll")
+            .name("staggered troll")
             .characterSheet(
-                CharacterSheet(
-                    strength: 16,
-                    constitution: 14,
-                    combatCondition: .offBalance  // -2 AC, -1 attack
-                )
-            ),
+                strength: 16,
+                constitution: 14,
+                combatCondition: .offBalance  // -2 AC, -1 attack
+            )
             .in("combatRoom")
-        )
 
-        let vulnerableTroll = Item(
-            id: "vulnerableTroll",
-            .name("vulnerable troll"),
+        let vulnerableTroll = Item("vulnerableTroll")
+            .name("vulnerable troll")
             .characterSheet(
-                CharacterSheet(
-                    strength: 16,
-                    constitution: 14,
-                    combatCondition: .vulnerable  // -3 AC, no attack penalty
-                )
-            ),
+                strength: 16,
+                constitution: 14,
+                combatCondition: .vulnerable  // -3 AC, no attack penalty
+            )
             .in("combatRoom")
-        )
 
-        let normalTroll = Item(
-            id: "normalTroll",
-            .name("normal troll"),
+        let normalTroll = Item("normalTroll")
+            .name("normal troll")
             .characterSheet(
-                CharacterSheet(
-                    strength: 16,
-                    constitution: 14,
-                    combatCondition: .normal  // No penalties
-                )
-            ),
+                strength: 16,
+                constitution: 14,
+                combatCondition: .normal  // No penalties
+            )
             .in("combatRoom")
-        )
 
         let player = Player(
             in: "combatRoom",
             characterSheet: CharacterSheet(strength: 14, dexterity: 12)
         )
 
-        let testRoom = Location(
-            id: "combatRoom",
-            .name("Combat Room"),
+        let testRoom = Location("combatRoom")
+            .name("Combat Room")
             .inherentlyLit
-        )
 
         let game = MinimalGame(
             player: player,

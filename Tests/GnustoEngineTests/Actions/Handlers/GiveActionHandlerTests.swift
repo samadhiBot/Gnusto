@@ -11,21 +11,17 @@ struct GiveActionHandlerTests {
     @Test("GIVE DIRECTOBJECT TO INDIRECTOBJECT syntax works")
     func testGiveDirectObjectToIndirectObjectSyntax() async throws {
         // Given
-        let coin = Item(
-            id: "coin",
-            .name("gold coin"),
-            .description("A shiny gold coin."),
-            .isTakable,
+        let coin = Item("coin")
+            .name("gold coin")
+            .description("A shiny gold coin.")
+            .isTakable
             .in(.player)
-        )
 
-        let merchant = Item(
-            id: "merchant",
-            .name("traveling merchant"),
-            .description("A traveling merchant."),
-            .characterSheet(.default),
+        let merchant = Item("merchant")
+            .name("traveling merchant")
+            .description("A traveling merchant.")
+            .characterSheet(.default)
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: coin, merchant
@@ -37,9 +33,7 @@ struct GiveActionHandlerTests {
         try await engine.execute("give coin to merchant")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > give coin to merchant
             You give the gold coin to the traveling merchant.
@@ -54,21 +48,17 @@ struct GiveActionHandlerTests {
     @Test("GIVE INDIRECTOBJECT DIRECTOBJECT syntax works")
     func testGiveIndirectObjectDirectObjectSyntax() async throws {
         // Given
-        let scroll = Item(
-            id: "scroll",
-            .name("ancient scroll"),
-            .description("An ancient scroll."),
-            .isTakable,
+        let scroll = Item("scroll")
+            .name("ancient scroll")
+            .description("An ancient scroll.")
+            .isTakable
             .in(.player)
-        )
 
-        let wizard = Item(
-            id: "wizard",
-            .name("old wizard"),
-            .description("A wise old wizard."),
-            .characterSheet(.wise),
+        let wizard = Item("wizard")
+            .name("old wizard")
+            .description("A wise old wizard.")
+            .characterSheet(.wise)
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: scroll, wizard
@@ -80,9 +70,7 @@ struct GiveActionHandlerTests {
         try await engine.execute("give wizard the scroll")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > give wizard the scroll
             You give the ancient scroll to the old wizard.
@@ -96,21 +84,17 @@ struct GiveActionHandlerTests {
     @Test("OFFER syntax works")
     func testOfferSyntax() async throws {
         // Given
-        let flower = Item(
-            id: "flower",
-            .name("red flower"),
-            .description("A beautiful red flower."),
-            .isTakable,
+        let flower = Item("flower")
+            .name("red flower")
+            .description("A beautiful red flower.")
+            .isTakable
             .in(.player)
-        )
 
-        let princess = Item(
-            id: "princess",
-            .name("kind princess"),
-            .description("A kind princess."),
-            .characterSheet(.default),
+        let princess = Item("princess")
+            .name("kind princess")
+            .description("A kind princess.")
+            .characterSheet(.default)
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: flower, princess
@@ -122,9 +106,7 @@ struct GiveActionHandlerTests {
         try await engine.execute("offer flower to princess")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > offer flower to princess
             You give the red flower to the kind princess.
@@ -135,21 +117,17 @@ struct GiveActionHandlerTests {
     @Test("DONATE syntax works")
     func testDonateSyntax() async throws {
         // Given
-        let bread = Item(
-            id: "bread",
-            .name("loaf of bread"),
-            .description("A fresh loaf of bread."),
-            .isTakable,
+        let bread = Item("bread")
+            .name("loaf of bread")
+            .description("A fresh loaf of bread.")
+            .isTakable
             .in(.player)
-        )
 
-        let beggar = Item(
-            id: "beggar",
-            .name("hungry beggar"),
-            .description("A hungry beggar."),
-            .characterSheet(.default),
+        let beggar = Item("beggar")
+            .name("hungry beggar")
+            .description("A hungry beggar.")
+            .characterSheet(.default)
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: bread, beggar
@@ -161,9 +139,7 @@ struct GiveActionHandlerTests {
         try await engine.execute("donate bread to beggar")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > donate bread to beggar
             You give the loaf of bread to the hungry beggar.
@@ -176,13 +152,11 @@ struct GiveActionHandlerTests {
     @Test("Cannot give without specifying what")
     func testCannotGiveWithoutSpecifyingWhat() async throws {
         // Given
-        let castleGuard = Item(
-            id: "castleGuard",
-            .name("castle guard"),
-            .description("A stern castle guard."),
-            .characterSheet(.strong),
+        let castleGuard = Item("castleGuard")
+            .name("castle guard")
+            .description("A stern castle guard.")
+            .characterSheet(.strong)
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: castleGuard
@@ -194,9 +168,7 @@ struct GiveActionHandlerTests {
         try await engine.execute("give")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > give
             Give what to whom?
@@ -207,13 +179,11 @@ struct GiveActionHandlerTests {
     @Test("Cannot give without specifying to whom")
     func testCannotGiveWithoutSpecifyingToWhom() async throws {
         // Given
-        let key = Item(
-            id: "key",
-            .name("brass key"),
-            .description("A brass key."),
-            .isTakable,
+        let key = Item("key")
+            .name("brass key")
+            .description("A brass key.")
+            .isTakable
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: key
@@ -225,9 +195,7 @@ struct GiveActionHandlerTests {
         try await engine.execute("give key")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > give key
             Give what to whom?
@@ -238,21 +206,17 @@ struct GiveActionHandlerTests {
     @Test("Cannot give item not held")
     func testCannotGiveItemNotHeld() async throws {
         // Given
-        let gem = Item(
-            id: "gem",
-            .name("precious gem"),
-            .description("A precious gem."),
-            .isTakable,
+        let gem = Item("gem")
+            .name("precious gem")
+            .description("A precious gem.")
+            .isTakable
             .in(.startRoom)
-        )
 
-        let collector = Item(
-            id: "collector",
-            .name("gem collector"),
-            .description("A gem collector."),
-            .characterSheet(.default),
+        let collector = Item("collector")
+            .name("gem collector")
+            .description("A gem collector.")
+            .characterSheet(.default)
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: gem, collector
@@ -264,9 +228,7 @@ struct GiveActionHandlerTests {
         try await engine.execute("give gem to collector")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > give gem to collector
             You search in vain for the precious gem among your belongings.
@@ -277,20 +239,16 @@ struct GiveActionHandlerTests {
     @Test("Cannot give to non-character")
     func testCannotGiveToNonCharacter() async throws {
         // Given
-        let apple = Item(
-            id: "apple",
-            .name("red apple"),
-            .description("A red apple."),
-            .isTakable,
+        let apple = Item("apple")
+            .name("red apple")
+            .description("A red apple.")
+            .isTakable
             .in(.player)
-        )
 
-        let rock = Item(
-            id: "rock",
-            .name("large rock"),
-            .description("A large boulder."),
+        let rock = Item("rock")
+            .name("large rock")
+            .description("A large boulder.")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: apple, rock
@@ -302,9 +260,7 @@ struct GiveActionHandlerTests {
         try await engine.execute("give apple to rock")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > give apple to rock
             You'll need someone animate to give to.
@@ -315,27 +271,21 @@ struct GiveActionHandlerTests {
     @Test("Cannot give to character not in scope")
     func testCannotGiveToCharacterNotInScope() async throws {
         // Given
-        let anotherRoom = Location(
-            id: "anotherRoom",
-            .name("Another Room"),
+        let anotherRoom = Location("anotherRoom")
+            .name("Another Room")
             .inherentlyLit
-        )
 
-        let ring = Item(
-            id: "ring",
-            .name("silver ring"),
-            .description("A silver ring."),
-            .isTakable,
+        let ring = Item("ring")
+            .name("silver ring")
+            .description("A silver ring.")
+            .isTakable
             .in(.player)
-        )
 
-        let remoteNPC = Item(
-            id: "remoteNPC",
-            .name("distant person"),
-            .description("A person in another room."),
-            .characterSheet(.default),
+        let remoteNPC = Item("remoteNPC")
+            .name("distant person")
+            .description("A person in another room.")
+            .characterSheet(.default)
             .in("anotherRoom")
-        )
 
         let game = MinimalGame(
             locations: anotherRoom,
@@ -348,9 +298,7 @@ struct GiveActionHandlerTests {
         try await engine.execute("give ring to person")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > give ring to person
             You cannot reach any such thing from here.
@@ -361,28 +309,22 @@ struct GiveActionHandlerTests {
     @Test("Requires light to give")
     func testRequiresLight() async throws {
         // Given: Dark room with character
-        let darkRoom = Location(
-            id: "darkRoom",
-            .name("Dark Room"),
+        let darkRoom = Location("darkRoom")
+            .name("Dark Room")
             .description("A pitch black room.")
             // Note: No .inherentlyLit property
-        )
 
-        let coin = Item(
-            id: "coin",
-            .name("gold coin"),
-            .description("A gold coin."),
-            .isTakable,
+        let coin = Item("coin")
+            .name("gold coin")
+            .description("A gold coin.")
+            .isTakable
             .in(.player)
-        )
 
-        let stranger = Item(
-            id: "stranger",
-            .name("mysterious stranger"),
-            .description("A mysterious stranger."),
-            .characterSheet(.default),
+        let stranger = Item("stranger")
+            .name("mysterious stranger")
+            .description("A mysterious stranger.")
+            .characterSheet(.default)
             .in("darkRoom")
-        )
 
         let game = MinimalGame(
             player: Player(in: "darkRoom"),
@@ -396,9 +338,7 @@ struct GiveActionHandlerTests {
         try await engine.execute("give coin to stranger")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > give coin to stranger
             The darkness here is absolute, consuming all light and hope of
@@ -412,21 +352,17 @@ struct GiveActionHandlerTests {
     @Test("Give item successfully transfers ownership")
     func testGiveItemSuccessfullyTransfersOwnership() async throws {
         // Given
-        let book = Item(
-            id: "book",
-            .name("leather book"),
-            .description("A leather-bound book."),
-            .isTakable,
+        let book = Item("book")
+            .name("leather book")
+            .description("A leather-bound book.")
+            .isTakable
             .in(.player)
-        )
 
-        let librarian = Item(
-            id: "librarian",
-            .name("old librarian"),
-            .description("An old librarian."),
-            .characterSheet(.default),
+        let librarian = Item("librarian")
+            .name("old librarian")
+            .description("An old librarian.")
+            .characterSheet(.default)
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: book, librarian
@@ -443,9 +379,7 @@ struct GiveActionHandlerTests {
         #expect(await finalBookState.hasFlag(.isTouched))
 
         // Verify message
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > give book to librarian
             You give the leather book to the old librarian.
@@ -456,31 +390,25 @@ struct GiveActionHandlerTests {
     @Test("Give multiple items to character")
     func testGiveMultipleItemsToCharacter() async throws {
         // Given
-        let coin1 = Item(
-            id: "coin1",
-            .name("silver coin"),
-            .description("A silver coin."),
-            .adjectives("silver"),
-            .isTakable,
+        let coin1 = Item("coin1")
+            .name("silver coin")
+            .description("A silver coin.")
+            .adjectives("silver")
+            .isTakable
             .in(.player)
-        )
 
-        let coin2 = Item(
-            id: "coin2",
-            .name("copper coin"),
-            .description("A copper coin."),
-            .adjectives("copper"),
-            .isTakable,
+        let coin2 = Item("coin2")
+            .name("copper coin")
+            .description("A copper coin.")
+            .adjectives("copper")
+            .isTakable
             .in(.player)
-        )
 
-        let merchant = Item(
-            id: "merchant",
-            .name("coin merchant"),
-            .description("A coin merchant."),
-            .characterSheet(.default),
+        let merchant = Item("merchant")
+            .name("coin merchant")
+            .description("A coin merchant.")
+            .characterSheet(.default)
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: coin1, coin2, merchant
@@ -492,9 +420,7 @@ struct GiveActionHandlerTests {
         try await engine.execute("give silver coin and copper coin to merchant")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > give silver coin and copper coin to merchant
             You give the silver coin and the copper coin to the coin
@@ -512,29 +438,23 @@ struct GiveActionHandlerTests {
     @Test("Give all items to character")
     func testGiveAllItemsToCharacter() async throws {
         // Given
-        let sword = Item(
-            id: "sword",
-            .name("steel sword"),
-            .description("A steel sword."),
-            .isTakable,
+        let sword = Item("sword")
+            .name("steel sword")
+            .description("A steel sword.")
+            .isTakable
             .in(.player)
-        )
 
-        let shield = Item(
-            id: "shield",
-            .name("wooden shield"),
-            .description("A wooden shield."),
-            .isTakable,
+        let shield = Item("shield")
+            .name("wooden shield")
+            .description("A wooden shield.")
+            .isTakable
             .in(.player)
-        )
 
-        let knight = Item(
-            id: "knight",
-            .name("noble knight"),
-            .description("A noble knight."),
-            .characterSheet(.strong),
+        let knight = Item("knight")
+            .name("noble knight")
+            .description("A noble knight.")
+            .characterSheet(.strong)
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: sword, shield, knight
@@ -546,9 +466,7 @@ struct GiveActionHandlerTests {
         try await engine.execute("give all to knight")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > give all to knight
             You give the wooden shield and the steel sword to the noble
@@ -566,13 +484,11 @@ struct GiveActionHandlerTests {
     @Test("Give all when player has nothing")
     func testGiveAllWhenPlayerHasNothing() async throws {
         // Given
-        let sage = Item(
-            id: "sage",
-            .name("wise sage"),
-            .description("A wise sage."),
-            .characterSheet(.default),
+        let sage = Item("sage")
+            .name("wise sage")
+            .description("A wise sage.")
+            .characterSheet(.default)
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: sage
@@ -584,9 +500,7 @@ struct GiveActionHandlerTests {
         try await engine.execute("give all to sage")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > give all to sage
             You carry nothing but your own thoughts.
@@ -597,21 +511,17 @@ struct GiveActionHandlerTests {
     @Test("Give sets touched flag on item")
     func testGiveSetsTouchedFlag() async throws {
         // Given
-        let crystal = Item(
-            id: "crystal",
-            .name("magic crystal"),
-            .description("A magic crystal."),
-            .isTakable,
+        let crystal = Item("crystal")
+            .name("magic crystal")
+            .description("A magic crystal.")
+            .isTakable
             .in(.player)
-        )
 
-        let mage = Item(
-            id: "mage",
-            .name("ancient mage"),
-            .description("An ancient mage."),
-            .characterSheet(.default),
+        let mage = Item("mage")
+            .name("ancient mage")
+            .description("An ancient mage.")
+            .characterSheet(.default)
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: crystal, mage
@@ -628,9 +538,7 @@ struct GiveActionHandlerTests {
         #expect(await finalCrystalState.parent == .item(mage.proxy(engine)))
 
         // Verify message
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > give crystal to mage
             You give the magic crystal to the ancient mage.
@@ -641,37 +549,29 @@ struct GiveActionHandlerTests {
     @Test("Give different items to different characters")
     func testGiveDifferentItemsToDifferentCharacters() async throws {
         // Given
-        let food = Item(
-            id: "food",
-            .name("fresh food"),
-            .description("Fresh food."),
-            .isTakable,
+        let food = Item("food")
+            .name("fresh food")
+            .description("Fresh food.")
+            .isTakable
             .in(.player)
-        )
 
-        let money = Item(
-            id: "money",
-            .name("bag of money"),
-            .description("A bag of money."),
-            .isTakable,
+        let money = Item("money")
+            .name("bag of money")
+            .description("A bag of money.")
+            .isTakable
             .in(.player)
-        )
 
-        let chef = Item(
-            id: "chef",
-            .name("busy chef"),
-            .description("A busy chef."),
-            .characterSheet(.default),
+        let chef = Item("chef")
+            .name("busy chef")
+            .description("A busy chef.")
+            .characterSheet(.default)
             .in(.startRoom)
-        )
 
-        let banker = Item(
-            id: "banker",
-            .name("bank clerk"),
-            .description("A bank clerk."),
-            .characterSheet(.default),
+        let banker = Item("banker")
+            .name("bank clerk")
+            .description("A bank clerk.")
+            .characterSheet(.default)
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: food, money, chef, banker
@@ -683,9 +583,7 @@ struct GiveActionHandlerTests {
         try await engine.execute("give food to chef")
 
         // Then
-        let output1 = await mockIO.flush()
-        expectNoDifference(
-            output1,
+        await mockIO.expect(
             """
             > give food to chef
             You give the fresh food to the busy chef.
@@ -696,9 +594,7 @@ struct GiveActionHandlerTests {
         try await engine.execute("give money to banker")
 
         // Then
-        let output2 = await mockIO.flush()
-        expectNoDifference(
-            output2,
+        await mockIO.expect(
             """
             > give money to banker
             You give the bag of money to the bank clerk.

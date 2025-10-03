@@ -10,14 +10,12 @@ struct DigActionHandlerTests {
 
     @Test("DIG syntax works")
     func testDigSyntax() async throws {
-        let shovel = Item(
-            id: "shovel",
-            .name("shovel"),
-            .description("A sturdy shovel."),
-            .isTakable,
-            .isTool,
+        let shovel = Item("shovel")
+            .name("shovel")
+            .description("A sturdy shovel.")
+            .isTakable
+            .isTool
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: shovel
@@ -27,9 +25,7 @@ struct DigActionHandlerTests {
 
         try await engine.execute("dig")
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > dig
             The ground here resists your archaeological ambitions.
@@ -39,12 +35,10 @@ struct DigActionHandlerTests {
 
     @Test("DIG OBJECT syntax works")
     func testDigObjectSyntax() async throws {
-        let mound = Item(
-            id: "mound",
-            .name("dirt mound"),
-            .description("A small mound of dirt."),
+        let mound = Item("mound")
+            .name("dirt mound")
+            .description("A small mound of dirt.")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: mound
@@ -54,9 +48,7 @@ struct DigActionHandlerTests {
 
         try await engine.execute("dig mound")
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > dig mound
             The ground here resists your archaeological ambitions.
@@ -66,12 +58,10 @@ struct DigActionHandlerTests {
 
     @Test("DIG IN OBJECT syntax works")
     func testDigInObjectSyntax() async throws {
-        let sand = Item(
-            id: "sand",
-            .name("sand pile"),
-            .description("A small pile of sand."),
+        let sand = Item("sand")
+            .name("sand pile")
+            .description("A small pile of sand.")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: sand
@@ -81,9 +71,7 @@ struct DigActionHandlerTests {
 
         try await engine.execute("dig in the sand")
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > dig in the sand
             The ground here resists your archaeological ambitions.
@@ -93,21 +81,17 @@ struct DigActionHandlerTests {
 
     @Test("DIG OBJECT WITH TOOL syntax works")
     func testDigObjectWithToolSyntax() async throws {
-        let mound = Item(
-            id: "mound",
-            .name("dirt mound"),
-            .description("A small mound of dirt."),
+        let mound = Item("mound")
+            .name("dirt mound")
+            .description("A small mound of dirt.")
             .in(.startRoom)
-        )
 
-        let shovel = Item(
-            id: "shovel",
-            .name("shovel"),
-            .description("A sturdy shovel."),
-            .isTakable,
-            .isTool,
+        let shovel = Item("shovel")
+            .name("shovel")
+            .description("A sturdy shovel.")
+            .isTakable
+            .isTool
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: mound, shovel
@@ -117,9 +101,7 @@ struct DigActionHandlerTests {
 
         try await engine.execute("dig mound with shovel")
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > dig mound with shovel
             The ground here resists your archaeological ambitions.
@@ -129,14 +111,12 @@ struct DigActionHandlerTests {
 
     @Test("DIG WITH TOOL syntax works")
     func testDigWithToolSyntax() async throws {
-        let shovel = Item(
-            id: "shovel",
-            .name("shovel"),
-            .description("A sturdy shovel."),
-            .isTakable,
-            .isTool,
+        let shovel = Item("shovel")
+            .name("shovel")
+            .description("A sturdy shovel.")
+            .isTakable
+            .isTool
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: shovel
@@ -146,9 +126,7 @@ struct DigActionHandlerTests {
 
         try await engine.execute("dig with shovel")
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > dig with shovel
             The ground here resists your archaeological ambitions.
@@ -158,14 +136,12 @@ struct DigActionHandlerTests {
 
     @Test("EXCAVATE syntax works")
     func testExcavateSyntax() async throws {
-        let shovel = Item(
-            id: "shovel",
-            .name("shovel"),
-            .description("A sturdy shovel."),
-            .isTakable,
-            .isTool,
+        let shovel = Item("shovel")
+            .name("shovel")
+            .description("A sturdy shovel.")
+            .isTakable
+            .isTool
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: shovel
@@ -175,9 +151,7 @@ struct DigActionHandlerTests {
 
         try await engine.execute("excavate with shovel")
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > excavate with shovel
             The ground here resists your archaeological ambitions.
@@ -189,11 +163,9 @@ struct DigActionHandlerTests {
 
     @Test("Requires light to dig")
     func testRequiresLight() async throws {
-        let darkRoom = Location(
-            id: "darkRoom",
-            .name("Dark Room"),
+        let darkRoom = Location("darkRoom")
+            .name("Dark Room")
             .description("A pitch black room.")
-        )
 
         let game = MinimalGame(
             player: Player(in: "darkRoom"),
@@ -204,9 +176,7 @@ struct DigActionHandlerTests {
 
         try await engine.execute("dig")
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > dig
             The darkness here is absolute, consuming all light and hope of
@@ -217,18 +187,14 @@ struct DigActionHandlerTests {
 
     @Test("Cannot dig item not in scope")
     func testCannotDigItemNotInScope() async throws {
-        let otherRoom = Location(
-            id: "otherRoom",
-            .name("Other Room"),
+        let otherRoom = Location("otherRoom")
+            .name("Other Room")
             .inherentlyLit
-        )
 
-        let mound = Item(
-            id: "mound",
-            .name("dirt mound"),
-            .description("A small mound of dirt."),
+        let mound = Item("mound")
+            .name("dirt mound")
+            .description("A small mound of dirt.")
             .in("otherRoom")
-        )
 
         let game = MinimalGame(
             locations: otherRoom,
@@ -239,9 +205,7 @@ struct DigActionHandlerTests {
 
         try await engine.execute("dig mound")
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > dig mound
             Any such thing lurks beyond your reach.
@@ -251,21 +215,17 @@ struct DigActionHandlerTests {
 
     @Test("Cannot dig with tool not held")
     func testCannotDigWithToolNotHeld() async throws {
-        let mound = Item(
-            id: "mound",
-            .name("dirt mound"),
-            .description("A small mound of dirt."),
+        let mound = Item("mound")
+            .name("dirt mound")
+            .description("A small mound of dirt.")
             .in(.startRoom)
-        )
 
-        let shovel = Item(
-            id: "shovel",
-            .name("shovel"),
-            .description("A sturdy shovel."),
-            .isTakable,
-            .isTool,
+        let shovel = Item("shovel")
+            .name("shovel")
+            .description("A sturdy shovel.")
+            .isTakable
+            .isTool
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: mound, shovel
@@ -275,9 +235,7 @@ struct DigActionHandlerTests {
 
         try await engine.execute("dig mound with shovel")
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > dig mound with shovel
             You aren't holding the shovel.
@@ -287,13 +245,11 @@ struct DigActionHandlerTests {
 
     @Test("Cannot dig takable items")
     func testCannotDigTakableItems() async throws {
-        let coin = Item(
-            id: "coin",
-            .name("gold coin"),
-            .description("A shiny gold coin."),
-            .isTakable,
+        let coin = Item("coin")
+            .name("gold coin")
+            .description("A shiny gold coin.")
+            .isTakable
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: coin
@@ -303,9 +259,7 @@ struct DigActionHandlerTests {
 
         try await engine.execute("dig coin")
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > dig coin
             The ground here resists your archaeological ambitions.
@@ -317,12 +271,10 @@ struct DigActionHandlerTests {
 
     @Test("Dig item with no tool and no tools in inventory")
     func testDigItemWithNoToolAndNoTools() async throws {
-        let mound = Item(
-            id: "mound",
-            .name("dirt mound"),
-            .description("A small mound of dirt."),
+        let mound = Item("mound")
+            .name("dirt mound")
+            .description("A small mound of dirt.")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: mound
@@ -332,9 +284,7 @@ struct DigActionHandlerTests {
 
         try await engine.execute("dig mound")
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > dig mound
             The ground here resists your archaeological ambitions.
@@ -348,21 +298,17 @@ struct DigActionHandlerTests {
 
     @Test("Dig item with no tool but tools in inventory")
     func testDigItemWithNoToolButToolsInInventory() async throws {
-        let mound = Item(
-            id: "mound",
-            .name("dirt mound"),
-            .description("A small mound of dirt."),
+        let mound = Item("mound")
+            .name("dirt mound")
+            .description("A small mound of dirt.")
             .in(.startRoom)
-        )
 
-        let shovel = Item(
-            id: "shovel",
-            .name("shovel"),
-            .description("A sturdy shovel."),
-            .isTakable,
-            .isTool,
+        let shovel = Item("shovel")
+            .name("shovel")
+            .description("A sturdy shovel.")
+            .isTakable
+            .isTool
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: mound, shovel
@@ -372,9 +318,7 @@ struct DigActionHandlerTests {
 
         try await engine.execute("dig mound")
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > dig mound
             The ground here resists your archaeological ambitions.
@@ -388,21 +332,17 @@ struct DigActionHandlerTests {
 
     @Test("Dig item with tool")
     func testDigItemWithTool() async throws {
-        let mound = Item(
-            id: "mound",
-            .name("dirt mound"),
-            .description("A small mound of dirt."),
+        let mound = Item("mound")
+            .name("dirt mound")
+            .description("A small mound of dirt.")
             .in(.startRoom)
-        )
 
-        let shovel = Item(
-            id: "shovel",
-            .name("shovel"),
-            .description("A sturdy shovel."),
-            .isTakable,
-            .isTool,
+        let shovel = Item("shovel")
+            .name("shovel")
+            .description("A sturdy shovel.")
+            .isTakable
+            .isTool
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: mound, shovel
@@ -412,9 +352,7 @@ struct DigActionHandlerTests {
 
         try await engine.execute("dig mound with shovel")
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > dig mound with shovel
             The ground here resists your archaeological ambitions.
@@ -435,9 +373,7 @@ struct DigActionHandlerTests {
 
         try await engine.execute("dig ground")
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > dig ground
             The ground here resists your archaeological ambitions.
@@ -447,12 +383,10 @@ struct DigActionHandlerTests {
 
     @Test("Cannot dig with universal object as tool")
     func testCannotDigWithUniversalAsTool() async throws {
-        let mound = Item(
-            id: "mound",
-            .name("dirt mound"),
-            .description("A small mound of dirt."),
+        let mound = Item("mound")
+            .name("dirt mound")
+            .description("A small mound of dirt.")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: mound
@@ -462,9 +396,7 @@ struct DigActionHandlerTests {
 
         try await engine.execute("dig mound with ground")
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > dig mound with ground
             You can't dig the dirt mound with that.
@@ -479,9 +411,7 @@ struct DigActionHandlerTests {
 
         try await engine.execute("dig ceiling")
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > dig ceiling
             That defies the fundamental laws of digging.
@@ -493,21 +423,17 @@ struct DigActionHandlerTests {
 
     @Test("Digging item sets touched flag and updates pronouns")
     func testDiggingItemSetsStateChanges() async throws {
-        let mound = Item(
-            id: "mound",
-            .name("dirt mound"),
-            .description("A small mound of dirt."),
+        let mound = Item("mound")
+            .name("dirt mound")
+            .description("A small mound of dirt.")
             .in(.startRoom)
-        )
 
-        let shovel = Item(
-            id: "shovel",
-            .name("shovel"),
-            .description("A sturdy shovel."),
-            .isTakable,
-            .isTool,
+        let shovel = Item("shovel")
+            .name("shovel")
+            .description("A sturdy shovel.")
+            .isTakable
+            .isTool
             .in(.player)
-        )
 
         let game = MinimalGame(
             items: mound, shovel
@@ -521,9 +447,7 @@ struct DigActionHandlerTests {
             "examine it"
         )
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > dig mound with shovel
             The ground here resists your archaeological ambitions.
@@ -547,9 +471,7 @@ struct DigActionHandlerTests {
 
         try await engine.execute("dig")
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > dig
             The ground here resists your archaeological ambitions.
@@ -581,9 +503,7 @@ struct DigActionHandlerTests {
         try await engine.execute("dig the ground")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > dig the ground
             The ground here resists your archaeological ambitions.

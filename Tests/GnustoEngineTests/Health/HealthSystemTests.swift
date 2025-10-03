@@ -49,12 +49,10 @@ struct HealthSystemTests {
 
     @Test("Creatures have default health when not specified")
     func testCreatureDefaultHealth() async throws {
-        let creature = Item(
-            id: "testCreature",
-            .name("test creature"),
-            .in("startRoom"),
-            .characterSheet(.init(health: 50)),
-        )
+        let creature = Item("testCreature")
+            .name("test creature")
+            .in("startRoom")
+            .characterSheet(.init(health: 50))
 
         let (engine, _) = await GameEngine.test(
             blueprint: MinimalGame(
@@ -69,12 +67,10 @@ struct HealthSystemTests {
 
     @Test("Creatures can have custom health values")
     func testCreatureCustomHealth() async throws {
-        let weakCreature = Item(
-            id: "weakCreature",
-            .name("weak creature"),
-            .characterSheet(.init(health: 25)),
+        let weakCreature = Item("weakCreature")
+            .name("weak creature")
+            .characterSheet(.init(health: 25))
             .in(.startRoom)
-        )
 
         let (engine, _) = await GameEngine.test(
             blueprint: MinimalGame(
@@ -89,12 +85,10 @@ struct HealthSystemTests {
 
     @Test("Creature health can be modified through damage and healing")
     func testCreatureHealthModification() async throws {
-        let creature = Item(
-            id: "testCreature",
-            .name("test creature"),
-            .characterSheet(.init(health: 80)),
+        let creature = Item("testCreature")
+            .name("test creature")
+            .characterSheet(.init(health: 80))
             .in(.startRoom)
-        )
 
         let (engine, _) = await GameEngine.test(
             blueprint: MinimalGame(
@@ -133,9 +127,7 @@ struct HealthSystemTests {
 
         try await engine.execute("examine me", times: 3)
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > examine me
             As good-looking as ever, which is to say, adequately
@@ -162,9 +154,7 @@ struct HealthSystemTests {
 
         try await engine.execute("examine me")
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > examine me
             You're nearly pristine, with only the faintest marks to show
@@ -183,9 +173,7 @@ struct HealthSystemTests {
 
         try await engine.execute("examine me")
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > examine me
             You're lightly scuffed up. A few scrapes and bruises mark your
@@ -204,9 +192,7 @@ struct HealthSystemTests {
 
         try await engine.execute("examine me")
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > examine me
             You're somewhat worse for wear. A collection of minor injuries
@@ -225,9 +211,7 @@ struct HealthSystemTests {
 
         try await engine.execute("examine me")
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > examine me
             You're battered but functional. Various cuts and bruises make
@@ -246,9 +230,7 @@ struct HealthSystemTests {
 
         try await engine.execute("examine me")
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > examine me
             You're wounded and weary. Several painful injuries slow your
@@ -268,9 +250,7 @@ struct HealthSystemTests {
 
         try await engine.execute("examine me")
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > examine me
             You're seriously hurt. Deep injuries throb with persistent
@@ -290,9 +270,7 @@ struct HealthSystemTests {
 
         try await engine.execute("examine me")
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > examine me
             You're badly wounded. Pain radiates through your body with
@@ -312,9 +290,7 @@ struct HealthSystemTests {
 
         try await engine.execute("examine me")
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > examine me
             You're in critical condition. Blood seeps from numerous wounds,
@@ -334,9 +310,7 @@ struct HealthSystemTests {
 
         try await engine.execute("examine me")
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > examine me
             You're a breath away from oblivion. Every movement is agony,
@@ -357,9 +331,7 @@ struct HealthSystemTests {
 
         try await engine.execute("examine me")
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > examine me
             Against all logic, you examine your deceased form. The
@@ -383,12 +355,10 @@ struct HealthSystemTests {
 
     @Test("Creatures have default strength when not specified")
     func testCreatureDefaultStrength() async throws {
-        let creature = Item(
-            id: "testCreature",
-            .name("test creature"),
-            .in(.startRoom),
+        let creature = Item("testCreature")
+            .name("test creature")
+            .in(.startRoom)
             .characterSheet(.default)
-        )
 
         let (engine, _) = await GameEngine.test(
             blueprint: MinimalGame(
@@ -403,12 +373,10 @@ struct HealthSystemTests {
 
     @Test("Creatures can have custom strength values")
     func testCreatureCustomStrength() async throws {
-        let strongCreature = Item(
-            id: "strongCreature",
-            .name("strong creature"),
-            .characterSheet(.init(strength: 25)),
+        let strongCreature = Item("strongCreature")
+            .name("strong creature")
+            .characterSheet(.init(strength: 25))
             .in(.startRoom)
-        )
 
         let (engine, _) = await GameEngine.test(
             blueprint: MinimalGame(
@@ -425,12 +393,10 @@ struct HealthSystemTests {
 
     @Test("Health cannot go below zero")
     func testHealthLowerBound() async throws {
-        let creature = Item(
-            id: "testCreature",
-            .name("test creature"),
-            .characterSheet(.init(health: 10)),
+        let creature = Item("testCreature")
+            .name("test creature")
+            .characterSheet(.init(health: 10))
             .in(.startRoom)
-        )
 
         let (engine, _) = await GameEngine.test(
             blueprint: MinimalGame(
@@ -450,12 +416,10 @@ struct HealthSystemTests {
 
     @Test("Health caps at maxHealth for standard healing")
     func testHealthUpperBound() async throws {
-        let creature = Item(
-            id: "testCreature",
-            .name("test creature"),
-            .characterSheet(.init(health: 90)),
+        let creature = Item("testCreature")
+            .name("test creature")
+            .characterSheet(.init(health: 90))
             .in(.startRoom)
-        )
 
         let (engine, _) = await GameEngine.test(
             blueprint: MinimalGame(
@@ -477,20 +441,16 @@ struct HealthSystemTests {
 
     @Test("Combat with healthy participants works")
     func testBasicCombatHealthIntegration() async throws {
-        let sword = Item(
-            id: "sword",
-            .name("sword"),
-            .isWeapon,
-            .isTakable,
+        let sword = Item("sword")
+            .name("sword")
+            .isWeapon
+            .isTakable
             .in(.player)
-        )
 
-        let creature = Item(
-            id: "creature",
-            .name("creature"),
-            .characterSheet(.init(health: 50)),
+        let creature = Item("creature")
+            .name("creature")
+            .characterSheet(.init(health: 50))
             .in(.startRoom)
-        )
 
         let (engine, mockIO) = await GameEngine.test(
             blueprint: MinimalGame(
@@ -501,9 +461,7 @@ struct HealthSystemTests {
         // Execute combat
         try await engine.execute("attack creature")
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > attack creature
             Armed and hungry for violence, you strike with your sword as

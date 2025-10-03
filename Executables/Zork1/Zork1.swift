@@ -63,16 +63,15 @@ extension Item {
     }
 }
 
-extension ItemProperty {
+extension Item {
     /// The `SACREDBIT` is a Zork 1 specific flag whose job was to prevent the Thief from entering
     /// a location or stealing an object.
     ///
     /// In the Gnusto Engine translation it is only used to prevent item theft. For movement
     /// restriction the `.validLocations` property is set on the `.thief` item.
-    static let isSacred = ItemProperty(
-        id: ItemPropertyID(rawValue: "isSacred"),
-        rawValue: true
-    )
+    var isSacred: Self {
+        assigning(.isSacred, to: true)
+    }
 }
 
 extension ItemPropertyID {

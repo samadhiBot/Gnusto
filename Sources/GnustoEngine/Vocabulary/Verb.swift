@@ -717,6 +717,18 @@ extension Verb {
         intents: .move, .push, .take
     )
 
+    /// Nibble or take small bites of something.
+    public static let nibble = Verb(
+        id: "nibble",
+        intents: .eat
+    )
+
+    /// Respond negatively to a question.
+    public static let no = Verb(
+        id: "no",
+        intents: .tell
+    )
+
     /// Offer or present something to someone.
     public static let offer = Verb(
         id: "offer",
@@ -858,10 +870,10 @@ extension Verb {
         intents: .read
     )
 
-    /// Remove something (often clothing or accessories).
+    /// Remove or take something (often clothing or accessories if worn).
     public static let remove = Verb(
         id: "remove",
-        intents: .remove
+        intents: .remove, .take
     )
 
     /// Restart the game from the beginning.
@@ -1289,6 +1301,12 @@ extension Verb {
         intents: .tell
     )
 
+    /// Abbreviation for "examine" - examine something closely for details..
+    public static let x = Verb(  // swiftlint:disable:this identifier_name
+        id: "x",
+        intents: .examine
+    )
+
     /// The classic adventure game magic word (treated as vocal expression).
     public static let xyzzy = Verb(
         id: "xyzzy",
@@ -1301,21 +1319,9 @@ extension Verb {
         intents: .tell
     )
 
-    /// Nibble or take small bites of something.
-    public static let nibble = Verb(
-        id: "nibble",
-        intents: .eat
-    )
-
     /// Respond affirmatively to a question.
     public static let yes = Verb(
         id: "yes",
-        intents: .tell
-    )
-
-    /// Respond negatively to a question.
-    public static let no = Verb(
-        id: "no",
         intents: .tell
     )
 }

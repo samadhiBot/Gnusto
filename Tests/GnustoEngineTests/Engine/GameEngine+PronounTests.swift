@@ -12,12 +12,10 @@ struct GameEnginePronounTests {
 
     @Test("examine command sets 'it' pronoun for single item")
     func testExamineCommandSetsItPronoun() async throws {
-        let testItem = Item(
-            id: "testItem",
-            .name("test item"),
-            .description("A simple test item."),
+        let testItem = Item("testItem")
+            .name("test item")
+            .description("A simple test item.")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(items: testItem)
 
@@ -36,9 +34,7 @@ struct GameEnginePronounTests {
             #expect(Bool(false), "Expected .it pronoun, got \(String(describing: pronoun))")
         }
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > examine test item
             A simple test item.
@@ -48,12 +44,10 @@ struct GameEnginePronounTests {
 
     @Test("take command sets 'it' pronoun for single item")
     func testTakeCommandSetsItPronoun() async throws {
-        let coin = Item(
-            id: "coin",
-            .name("gold coin"),
-            .isTakable,
+        let coin = Item("coin")
+            .name("gold coin")
+            .isTakable
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: coin
@@ -74,9 +68,7 @@ struct GameEnginePronounTests {
             #expect(Bool(false), "Expected .it pronoun, got \(String(describing: pronoun))")
         }
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > take gold coin
             Taken.
@@ -86,19 +78,15 @@ struct GameEnginePronounTests {
 
     @Test("commands with multiple objects set 'them' pronoun")
     func testMultipleObjectsSetThemPronoun() async throws {
-        let coin1 = Item(
-            id: "coin1",
-            .name("copper coin"),
-            .isTakable,
+        let coin1 = Item("coin1")
+            .name("copper coin")
+            .isTakable
             .in(.startRoom)
-        )
 
-        let coin2 = Item(
-            id: "coin2",
-            .name("silver coin"),
-            .isTakable,
+        let coin2 = Item("coin2")
+            .name("silver coin")
+            .isTakable
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: coin1, coin2
@@ -120,9 +108,7 @@ struct GameEnginePronounTests {
             #expect(Bool(false), "Expected .them pronoun, got \(String(describing: pronoun))")
         }
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > take copper coin and silver coin
             You take the copper coin and the silver coin.
@@ -134,15 +120,13 @@ struct GameEnginePronounTests {
 
     @Test("'it' pronoun resolves correctly in subsequent commands")
     func testItPronounResolution() async throws {
-        let lamp = Item(
-            id: "lamp",
-            .name("brass lamp"),
-            .description("A shiny brass lamp."),
-            .isTakable,
-            .isLightSource,
-            .isDevice,
+        let lamp = Item("lamp")
+            .name("brass lamp")
+            .description("A shiny brass lamp.")
+            .isTakable
+            .isLightSource
+            .isDevice
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: lamp
@@ -158,9 +142,7 @@ struct GameEnginePronounTests {
         )
 
         // Then: All commands should work correctly
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > examine brass lamp
             A shiny brass lamp.
@@ -181,19 +163,15 @@ struct GameEnginePronounTests {
 
     @Test("'them' pronoun resolves correctly in subsequent commands")
     func testThemPronounResolution() async throws {
-        let coin1 = Item(
-            id: "coin1",
-            .name("copper coin"),
-            .isTakable,
+        let coin1 = Item("coin1")
+            .name("copper coin")
+            .isTakable
             .in(.startRoom)
-        )
 
-        let coin2 = Item(
-            id: "coin2",
-            .name("silver coin"),
-            .isTakable,
+        let coin2 = Item("coin2")
+            .name("silver coin")
+            .isTakable
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: coin1, coin2
@@ -208,13 +186,11 @@ struct GameEnginePronounTests {
         )
 
         // Then: Both commands should work
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > examine copper coin and silver coin
             - Copper coin: The copper coin reveals itself to be exactly
-              what it appears--nothing more, nothing less.
+              what it appears -- nothing more, nothing less.
             - Silver coin: The silver coin stubbornly remains ordinary
               despite your thorough examination.
 
@@ -234,21 +210,17 @@ struct GameEnginePronounTests {
 
     @Test("new pronoun references overwrite previous ones")
     func testPronounOverwriting() async throws {
-        let lamp = Item(
-            id: "lamp",
-            .name("lamp"),
-            .description("A lamp."),
-            .isTakable,
+        let lamp = Item("lamp")
+            .name("lamp")
+            .description("A lamp.")
+            .isTakable
             .in(.startRoom)
-        )
 
-        let coin = Item(
-            id: "coin",
-            .name("coin"),
-            .description("A coin."),
-            .isTakable,
+        let coin = Item("coin")
+            .name("coin")
+            .description("A coin.")
+            .isTakable
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: lamp, coin
@@ -264,9 +236,7 @@ struct GameEnginePronounTests {
         )  // Should take the coin
 
         // Then: "it" should refer to the most recently examined item
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > examine lamp
             A lamp.
@@ -298,26 +268,20 @@ struct GameEnginePronounTests {
 
     @Test("multiple objects overwrite single object pronouns")
     func testMultipleObjectsOverwriteSingle() async throws {
-        let lamp = Item(
-            id: "lamp",
-            .name("lamp"),
-            .isTakable,
+        let lamp = Item("lamp")
+            .name("lamp")
+            .isTakable
             .in(.startRoom)
-        )
 
-        let coin1 = Item(
-            id: "coin1",
-            .name("copper coin"),
-            .isTakable,
+        let coin1 = Item("coin1")
+            .name("copper coin")
+            .isTakable
             .in(.startRoom)
-        )
 
-        let coin2 = Item(
-            id: "coin2",
-            .name("silver coin"),
-            .isTakable,
+        let coin2 = Item("coin2")
+            .name("silver coin")
+            .isTakable
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: lamp, coin1, coin2
@@ -333,13 +297,11 @@ struct GameEnginePronounTests {
         )
 
         // Then: Commands should work correctly
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > examine lamp
-            The lamp reveals itself to be exactly what it appears--nothing
-            more, nothing less.
+            The lamp reveals itself to be exactly what it appears --
+            nothing more, nothing less.
 
             > examine copper coin and silver coin
             - Copper coin: The copper coin stubbornly remains ordinary
@@ -366,11 +328,9 @@ struct GameEnginePronounTests {
 
     @Test("commands with no direct objects clear pronouns")
     func testCommandsWithNoDirectObjectsClearPronouns() async throws {
-        let testItem = Item(
-            id: "testItem",
-            .name("test item"),
+        let testItem = Item("testItem")
+            .name("test item")
             .in(.startRoom)
-        )
 
         let game = MinimalGame(items: testItem)
 
@@ -389,13 +349,11 @@ struct GameEnginePronounTests {
         let pronounAfterLook = await engine.gameState.pronoun
         #expect(pronounAfterLook == nil)
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > examine test item
-            The test item reveals itself to be exactly what it
-            appears--nothing more, nothing less.
+            The test item reveals itself to be exactly what it appears --
+            nothing more, nothing less.
 
             > look
             --- Laboratory ---
@@ -425,9 +383,7 @@ struct GameEnginePronounTests {
             #expect(Bool(false), "Expected .her pronoun, got \(String(describing: pronoun))")
         }
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > examine princess
             A beautiful princess.
@@ -451,9 +407,7 @@ struct GameEnginePronounTests {
             #expect(Bool(false), "Expected .him pronoun, got \(String(describing: pronoun))")
         }
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > examine knight
             A noble knight.
@@ -463,13 +417,11 @@ struct GameEnginePronounTests {
 
     @Test("neuter character sets 'it' pronoun")
     func testNeuterCharacterSetsItPronoun() async throws {
-        let golem = Item(
-            id: "golem",
-            .name("stone golem"),
-            .description("A massive stone construct."),
-            .characterSheet(.default),
+        let golem = Item("golem")
+            .name("stone golem")
+            .description("A massive stone construct.")
+            .characterSheet(.default)
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: golem
@@ -488,9 +440,7 @@ struct GameEnginePronounTests {
             #expect(Bool(false), "Expected .it pronoun, got \(String(describing: pronoun))")
         }
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > examine stone golem
             A massive stone construct.
@@ -500,13 +450,11 @@ struct GameEnginePronounTests {
 
     @Test("plural character sets 'them' pronoun")
     func testPluralCharacterSetsThemPronoun() async throws {
-        let swarm = Item(
-            id: "swarm",
-            .name("bee swarm"),
-            .description("A buzzing swarm of bees."),
-            .characterSheet(.init(classification: .plural)),
+        let swarm = Item("swarm")
+            .name("bee swarm")
+            .description("A buzzing swarm of bees.")
+            .characterSheet(.init(classification: .plural))
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: swarm
@@ -525,9 +473,7 @@ struct GameEnginePronounTests {
             #expect(Bool(false), "Expected .them pronoun, got \(String(describing: pronoun))")
         }
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > examine bee swarm
             A buzzing swarm of bees.
@@ -537,29 +483,23 @@ struct GameEnginePronounTests {
 
     @Test("character gender pronouns work with mixed item types")
     func testCharacterGenderPronounsWithMixedItemTypes() async throws {
-        let princess = Item(
-            id: "princess",
-            .name("princess"),
-            .description("A beautiful princess."),
-            .characterSheet(.init(classification: .feminine)),
+        let princess = Item("princess")
+            .name("princess")
+            .description("A beautiful princess.")
+            .characterSheet(.init(classification: .feminine))
             .in(.startRoom)
-        )
 
-        let knight = Item(
-            id: "knight",
-            .name("knight"),
-            .description("A noble knight."),
-            .characterSheet(.init(classification: .masculine)),
+        let knight = Item("knight")
+            .name("knight")
+            .description("A noble knight.")
+            .characterSheet(.init(classification: .masculine))
             .in(.startRoom)
-        )
 
-        let lamp = Item(
-            id: "lamp",
-            .name("brass lamp"),
-            .description("A polished brass lamp."),
-            .isTakable,
+        let lamp = Item("lamp")
+            .name("brass lamp")
+            .description("A polished brass lamp.")
+            .isTakable
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: princess, knight, lamp
@@ -580,9 +520,7 @@ struct GameEnginePronounTests {
             #expect(Bool(false), "Expected .it pronoun referring to lamp")
         }
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > examine princess
             A beautiful princess.
@@ -598,14 +536,12 @@ struct GameEnginePronounTests {
 
     @Test("plural item sets 'them' pronoun")
     func testPluralItemSetsThemPronoun() async throws {
-        let grapes = Item(
-            id: "grapes",
-            .name("grapes"),
-            .description("A bunch of purple grapes."),
-            .isPlural,
-            .isTakable,
+        let grapes = Item("grapes")
+            .name("grapes")
+            .description("A bunch of purple grapes.")
+            .isPlural
+            .isTakable
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: grapes
@@ -624,9 +560,7 @@ struct GameEnginePronounTests {
             #expect(Bool(false), "Expected .them pronoun, got \(String(describing: pronoun))")
         }
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > examine grapes
             A bunch of purple grapes.
@@ -638,23 +572,19 @@ struct GameEnginePronounTests {
 
     @Test("pronoun resolution works with containers")
     func testPronounResolutionWithContainers() async throws {
-        let box = Item(
-            id: "box",
-            .name("wooden box"),
-            .description("A sturdy wooden box."),
-            .isContainer,
-            .isOpenable,
-            .isOpen,
+        let box = Item("box")
+            .name("wooden box")
+            .description("A sturdy wooden box.")
+            .isContainer
+            .isOpenable
+            .isOpen
             .in(.startRoom)
-        )
 
-        let gem = Item(
-            id: "gem",
-            .name("red gem"),
-            .description("A brilliant red gem."),
-            .isTakable,
+        let gem = Item("gem")
+            .name("red gem")
+            .description("A brilliant red gem.")
+            .isTakable
             .in(.item("box"))
-        )
 
         let game = MinimalGame(
             items: box, gem
@@ -670,9 +600,7 @@ struct GameEnginePronounTests {
         )  // Should take the gem
 
         // Then: Commands should work correctly
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > examine box
             A sturdy wooden box. In the wooden box you can see a red gem.
@@ -700,14 +628,12 @@ struct GameEnginePronounTests {
 
     @Test("pronoun persistence across multiple command types")
     func testPronounPersistenceAcrossCommandTypes() async throws {
-        let book = Item(
-            id: "book",
-            .name("ancient book"),
-            .description("An old leather-bound book."),
-            .isTakable,
-            .isReadable,
+        let book = Item("book")
+            .name("ancient book")
+            .description("An old leather-bound book.")
+            .isTakable
+            .isReadable
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: book
@@ -721,9 +647,7 @@ struct GameEnginePronounTests {
         try await engine.execute("read it")  // Uses pronoun again
 
         // Then: All commands should work
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > examine ancient book
             An old leather-bound book.
@@ -759,19 +683,15 @@ struct GameEnginePronounTests {
 
     @Test("pronoun system handles disambiguation correctly")
     func testPronounSystemWithDisambiguation() async throws {
-        let redBook = Item(
-            id: "redBook",
-            .name("red book"),
-            .isTakable,
+        let redBook = Item("redBook")
+            .name("red book")
+            .isTakable
             .in(.startRoom)
-        )
 
-        let blueBook = Item(
-            id: "blueBook",
-            .name("blue book"),
-            .isTakable,
+        let blueBook = Item("blueBook")
+            .name("blue book")
+            .isTakable
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: redBook, blueBook
@@ -785,16 +705,14 @@ struct GameEnginePronounTests {
         try await engine.execute("take it")  // Should take the red book
 
         // Then: Disambiguation and pronoun resolution should work
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > examine book
             Which do you mean: the blue book or the red book?
 
             > the red book
-            The red book reveals itself to be exactly what it
-            appears--nothing more, nothing less.
+            The red book reveals itself to be exactly what it appears --
+            nothing more, nothing less.
 
             > take it
             Got it.
@@ -825,9 +743,7 @@ struct GameEnginePronounTests {
         try await engine.execute("take it")
 
         // Then: Should show appropriate error
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > take it
             I don't know what 'it' refers to.
@@ -837,27 +753,21 @@ struct GameEnginePronounTests {
 
     @Test("using pronoun that refers to out-of-scope item")
     func testUsingPronounReferringToOutOfScopeItem() async throws {
-        let room1 = Location(
-            id: "room1",
-            .name("Room 1"),
-            .exits(.east("room2")),
+        let room1 = Location("room1")
+            .name("Room 1")
+            .east("room2")
             .inherentlyLit
-        )
 
-        let room2 = Location(
-            id: "room2",
-            .name("Room 2"),
-            .exits(.west("room1")),
+        let room2 = Location("room2")
+            .name("Room 2")
+            .west("room1")
             .inherentlyLit
-        )
 
-        let item = Item(
-            id: "item",
-            .name("test item"),
-            .description("A test item."),
-            .isTakable,
+        let item = Item("item")
+            .name("test item")
+            .description("A test item.")
+            .isTakable
             .in("room1")
-        )
 
         let game = MinimalGame(
             player: Player(in: "room1"),
@@ -873,9 +783,7 @@ struct GameEnginePronounTests {
         try await engine.execute("take it")  // Try to use pronoun
 
         // Then: Should show appropriate error since item is no longer in scope
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > examine test item
             A test item.
@@ -896,29 +804,23 @@ struct GameEnginePronounTests {
 
     @Test("complex pronoun scenario with multiple command types")
     func testComplexPronounScenario() async throws {
-        let lamp = Item(
-            id: "lamp",
-            .name("brass lamp"),
-            .description("A polished brass lamp."),
-            .isTakable,
-            .isLightSource,
-            .isDevice,
+        let lamp = Item("lamp")
+            .name("brass lamp")
+            .description("A polished brass lamp.")
+            .isTakable
+            .isLightSource
+            .isDevice
             .in(.startRoom)
-        )
 
-        let coin1 = Item(
-            id: "coin1",
-            .name("copper coin"),
-            .isTakable,
+        let coin1 = Item("coin1")
+            .name("copper coin")
+            .isTakable
             .in(.startRoom)
-        )
 
-        let coin2 = Item(
-            id: "coin2",
-            .name("silver coin"),
-            .isTakable,
+        let coin2 = Item("coin2")
+            .name("silver coin")
+            .isTakable
             .in(.startRoom)
-        )
 
         let game = MinimalGame(
             items: lamp, coin1, coin2
@@ -935,9 +837,7 @@ struct GameEnginePronounTests {
         try await engine.execute("examine it")  // Examines lamp
 
         // Then: All commands should work correctly
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > examine lamp
             A polished brass lamp.
@@ -983,13 +883,11 @@ struct GameEnginePronounTests {
 
     @Test("pronoun updates work across game saves and loads")
     func testPronounUpdatesAcrossSaveLoad() async throws {
-        let testItem = Item(
-            id: "testItem",
-            .name("test item"),
-            .description("A simple test item."),
-            .isTakable,
+        let testItem = Item("testItem")
+            .name("test item")
+            .description("A simple test item.")
+            .isTakable
             .in(.startRoom)
-        )
 
         let game = MinimalGame(items: testItem)
 

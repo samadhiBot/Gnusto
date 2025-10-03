@@ -11,20 +11,16 @@ struct GoActionHandlerTests {
     @Test("GO DIRECTION syntax works")
     func testGoDirectionSyntax() async throws {
         // Given
-        let roundRoom = Location(
-            id: "roundRoom",
-            .name("Round Room"),
-            .description("A room for testing."),
-            .inherentlyLit,
-            .exits(.north("northRoom"))
-        )
-
-        let northRoom = Location(
-            id: "northRoom",
-            .name("North Room"),
-            .description("A room to the north."),
+        let roundRoom = Location("roundRoom")
+            .name("Round Room")
+            .description("A room for testing.")
             .inherentlyLit
-        )
+            .north("northRoom")
+
+        let northRoom = Location("northRoom")
+            .name("North Room")
+            .description("A room to the north.")
+            .inherentlyLit
 
         let game = MinimalGame(
             player: Player(in: "roundRoom"),
@@ -37,9 +33,7 @@ struct GoActionHandlerTests {
         try await engine.execute("go north")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > go north
             --- North Room ---
@@ -55,19 +49,15 @@ struct GoActionHandlerTests {
     @Test("WALK DIRECTION syntax works")
     func testWalkDirectionSyntax() async throws {
         // Given
-        let roundRoom = Location(
-            id: "roundRoom",
-            .name("Round Room"),
-            .inherentlyLit,
-            .exits(.south("southRoom"))
-        )
-
-        let southRoom = Location(
-            id: "southRoom",
-            .name("South Room"),
-            .description("A room to the south."),
+        let roundRoom = Location("roundRoom")
+            .name("Round Room")
             .inherentlyLit
-        )
+            .south("southRoom")
+
+        let southRoom = Location("southRoom")
+            .name("South Room")
+            .description("A room to the south.")
+            .inherentlyLit
 
         let game = MinimalGame(
             player: Player(in: "roundRoom"),
@@ -80,9 +70,7 @@ struct GoActionHandlerTests {
         try await engine.execute("walk south")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > walk south
             --- South Room ---
@@ -98,19 +86,15 @@ struct GoActionHandlerTests {
     @Test("RUN DIRECTION syntax works")
     func testRunDirectionSyntax() async throws {
         // Given
-        let roundRoom = Location(
-            id: "roundRoom",
-            .name("Round Room"),
-            .inherentlyLit,
-            .exits(.east("eastRoom"))
-        )
-
-        let eastRoom = Location(
-            id: "eastRoom",
-            .name("East Room"),
-            .description("A room to the east."),
+        let roundRoom = Location("roundRoom")
+            .name("Round Room")
             .inherentlyLit
-        )
+            .east("eastRoom")
+
+        let eastRoom = Location("eastRoom")
+            .name("East Room")
+            .description("A room to the east.")
+            .inherentlyLit
 
         let game = MinimalGame(
             player: Player(in: "roundRoom"),
@@ -123,9 +107,7 @@ struct GoActionHandlerTests {
         try await engine.execute("run east")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > run east
             --- East Room ---
@@ -143,19 +125,15 @@ struct GoActionHandlerTests {
     @Test("NORTH directional command works")
     func testNorthDirectionalCommand() async throws {
         // Given
-        let roundRoom = Location(
-            id: "roundRoom",
-            .name("Round Room"),
-            .inherentlyLit,
-            .exits(.north("northRoom"))
-        )
-
-        let northRoom = Location(
-            id: "northRoom",
-            .name("North Room"),
-            .description("A room to the north."),
+        let roundRoom = Location("roundRoom")
+            .name("Round Room")
             .inherentlyLit
-        )
+            .north("northRoom")
+
+        let northRoom = Location("northRoom")
+            .name("North Room")
+            .description("A room to the north.")
+            .inherentlyLit
 
         let game = MinimalGame(
             player: Player(in: "roundRoom"),
@@ -168,9 +146,7 @@ struct GoActionHandlerTests {
         try await engine.execute("north")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > north
             --- North Room ---
@@ -186,19 +162,15 @@ struct GoActionHandlerTests {
     @Test("N directional abbreviation works")
     func testNDirectionalAbbreviation() async throws {
         // Given
-        let roundRoom = Location(
-            id: "roundRoom",
-            .name("Round Room"),
-            .inherentlyLit,
-            .exits(.north("northRoom"))
-        )
-
-        let northRoom = Location(
-            id: "northRoom",
-            .name("North Room"),
-            .description("A room to the north."),
+        let roundRoom = Location("roundRoom")
+            .name("Round Room")
             .inherentlyLit
-        )
+            .north("northRoom")
+
+        let northRoom = Location("northRoom")
+            .name("North Room")
+            .description("A room to the north.")
+            .inherentlyLit
 
         let game = MinimalGame(
             player: Player(in: "roundRoom"),
@@ -211,9 +183,7 @@ struct GoActionHandlerTests {
         try await engine.execute("n")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > n
             --- North Room ---
@@ -229,50 +199,38 @@ struct GoActionHandlerTests {
     @Test("All cardinal directions work")
     func testAllCardinalDirections() async throws {
         // Given
-        let centerRoom = Location(
-            id: "centerRoom",
-            .name("Center Room"),
-            .description("A room in the center."),
-            .inherentlyLit,
-            .exits(
-                .north("northRoom"),
-                .south("southRoom"),
-                .east("eastRoom"),
-                .west("westRoom")
-            )
-        )
+        let centerRoom = Location("centerRoom")
+            .name("Center Room")
+            .description("A room in the center.")
+            .inherentlyLit
+            .north("northRoom")
+            .south("southRoom")
+            .east("eastRoom")
+            .west("westRoom")
 
-        let northRoom = Location(
-            id: "northRoom",
-            .name("North Room"),
-            .description("A room to the north."),
-            .inherentlyLit,
-            .exits(.south("centerRoom"))
-        )
+        let northRoom = Location("northRoom")
+            .name("North Room")
+            .description("A room to the north.")
+            .inherentlyLit
+            .south("centerRoom")
 
-        let southRoom = Location(
-            id: "southRoom",
-            .name("South Room"),
-            .description("A room to the south."),
-            .inherentlyLit,
-            .exits(.north("centerRoom"))
-        )
+        let southRoom = Location("southRoom")
+            .name("South Room")
+            .description("A room to the south.")
+            .inherentlyLit
+            .north("centerRoom")
 
-        let eastRoom = Location(
-            id: "eastRoom",
-            .name("East Room"),
-            .description("A room to the east."),
-            .inherentlyLit,
-            .exits(.west("centerRoom"))
-        )
+        let eastRoom = Location("eastRoom")
+            .name("East Room")
+            .description("A room to the east.")
+            .inherentlyLit
+            .west("centerRoom")
 
-        let westRoom = Location(
-            id: "westRoom",
-            .name("West Room"),
-            .description("A room to the west."),
-            .inherentlyLit,
-            .exits(.east("centerRoom"))
-        )
+        let westRoom = Location("westRoom")
+            .name("West Room")
+            .description("A room to the west.")
+            .inherentlyLit
+            .east("centerRoom")
 
         let game = MinimalGame(
             player: Player(in: "centerRoom"),
@@ -305,9 +263,7 @@ struct GoActionHandlerTests {
         #expect(playerLocation == "westRoom")
 
         // Clear output
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > north
             --- North Room ---
@@ -348,11 +304,9 @@ struct GoActionHandlerTests {
     @Test("Cannot go without specifying direction")
     func testCannotGoWithoutDirection() async throws {
         // Given
-        let roundRoom = Location(
-            id: "roundRoom",
-            .name("Round Room"),
+        let roundRoom = Location("roundRoom")
+            .name("Round Room")
             .inherentlyLit
-        )
 
         let game = MinimalGame(
             player: Player(in: "roundRoom"),
@@ -365,9 +319,7 @@ struct GoActionHandlerTests {
         try await engine.execute("go")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > go
             The compass awaits your decision.
@@ -378,12 +330,10 @@ struct GoActionHandlerTests {
     @Test("Cannot go in direction with no exit")
     func testCannotGoInDirectionWithNoExit() async throws {
         // Given
-        let roundRoom = Location(
-            id: "roundRoom",
-            .name("Round Room"),
-            .description("A room with no exits."),
+        let roundRoom = Location("roundRoom")
+            .name("Round Room")
+            .description("A room with no exits.")
             .inherentlyLit
-        )
 
         let game = MinimalGame(
             player: Player(in: "roundRoom"),
@@ -396,9 +346,7 @@ struct GoActionHandlerTests {
         try await engine.execute("north")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > north
             That way lies only disappointment.
@@ -409,14 +357,10 @@ struct GoActionHandlerTests {
     @Test("Cannot go through permanently blocked exit")
     func testCannotGoThroughPermanentlyBlockedExit() async throws {
         // Given
-        let roundRoom = Location(
-            id: "roundRoom",
-            .name("Round Room"),
-            .inherentlyLit,
-            .exits(
-                .north(blocked: "The way north is permanently blocked by rubble.")
-            )
-        )
+        let roundRoom = Location("roundRoom")
+            .name("Round Room")
+            .inherentlyLit
+            .north(blocked: "The way north is permanently blocked by rubble.")
 
         let game = MinimalGame(
             player: Player(in: "roundRoom"),
@@ -429,9 +373,7 @@ struct GoActionHandlerTests {
         try await engine.execute("north")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > north
             The way north is permanently blocked by rubble.
@@ -442,20 +384,14 @@ struct GoActionHandlerTests {
     @Test("Cannot go through statically blocked exit")
     func testCannotGoThroughStaticallyBlockedExit() async throws {
         // Given
-        let roundRoom = Location(
-            id: "roundRoom",
-            .name("Round Room"),
-            .inherentlyLit,
-            .exits(
-                .south(blocked: "A magical barrier blocks your way south.")
-            )
-        )
-
-        let southRoom = Location(
-            id: "southRoom",
-            .name("South Room"),
+        let roundRoom = Location("roundRoom")
+            .name("Round Room")
             .inherentlyLit
-        )
+            .south(blocked: "A magical barrier blocks your way south.")
+
+        let southRoom = Location("southRoom")
+            .name("South Room")
+            .inherentlyLit
 
         let game = MinimalGame(
             player: Player(in: "roundRoom"),
@@ -468,9 +404,7 @@ struct GoActionHandlerTests {
         try await engine.execute("south")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > south
             A magical barrier blocks your way south.
@@ -481,27 +415,21 @@ struct GoActionHandlerTests {
     @Test("Cannot go through closed door")
     func testCannotGoThroughClosedDoor() async throws {
         // Given
-        let roundRoom = Location(
-            id: "roundRoom",
-            .name("Round Room"),
-            .inherentlyLit,
-            .exits(.east("eastRoom", via: "door"))
-        )
-
-        let eastRoom = Location(
-            id: "eastRoom",
-            .name("East Room"),
+        let roundRoom = Location("roundRoom")
+            .name("Round Room")
             .inherentlyLit
-        )
+            .east("eastRoom", via: "door")
 
-        let door = Item(
-            id: "door",
-            .name("wooden door"),
-            .description("A sturdy wooden door."),
-            .isOpenable,
+        let eastRoom = Location("eastRoom")
+            .name("East Room")
+            .inherentlyLit
+
+        let door = Item("door")
+            .name("wooden door")
+            .description("A sturdy wooden door.")
+            .isOpenable
             // Note: Not open
             .in("roundRoom")
-        )
 
         let game = MinimalGame(
             player: Player(in: "roundRoom"),
@@ -515,9 +443,7 @@ struct GoActionHandlerTests {
         try await engine.execute("east")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > east
             The wooden door is closed.
@@ -528,29 +454,23 @@ struct GoActionHandlerTests {
     @Test("Cannot go through locked door")
     func testCannotGoThroughLockedDoor() async throws {
         // Given
-        let roundRoom = Location(
-            id: "roundRoom",
-            .name("Round Room"),
-            .inherentlyLit,
-            .exits(.west("westRoom", via: "door"))
-        )
-
-        let westRoom = Location(
-            id: "westRoom",
-            .name("West Room"),
+        let roundRoom = Location("roundRoom")
+            .name("Round Room")
             .inherentlyLit
-        )
+            .west("westRoom", via: "door")
 
-        let door = Item(
-            id: "door",
-            .name("iron door"),
-            .description("A heavy iron door."),
-            .isOpenable,
-            .isLockable,
-            .isOpen,
-            .isLocked,
+        let westRoom = Location("westRoom")
+            .name("West Room")
+            .inherentlyLit
+
+        let door = Item("door")
+            .name("iron door")
+            .description("A heavy iron door.")
+            .isOpenable
+            .isLockable
+            .isOpen
+            .isLocked
             .in("roundRoom")
-        )
 
         let game = MinimalGame(
             player: Player(in: "roundRoom"),
@@ -564,9 +484,7 @@ struct GoActionHandlerTests {
         try await engine.execute("west")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > west
             The iron door is locked.
@@ -577,28 +495,22 @@ struct GoActionHandlerTests {
     @Test("Can go through open unlocked door")
     func testCanGoThroughOpenUnlockedDoor() async throws {
         // Given
-        let roundRoom = Location(
-            id: "roundRoom",
-            .name("Round Room"),
-            .inherentlyLit,
-            .exits(.north("northRoom", via: "door"))
-        )
-
-        let northRoom = Location(
-            id: "northRoom",
-            .name("North Room"),
-            .description("A room beyond the door."),
+        let roundRoom = Location("roundRoom")
+            .name("Round Room")
             .inherentlyLit
-        )
+            .north("northRoom", via: "door")
 
-        let door = Item(
-            id: "door",
-            .name("oak door"),
-            .description("A polished oak door."),
-            .isOpenable,
-            .isOpen,
+        let northRoom = Location("northRoom")
+            .name("North Room")
+            .description("A room beyond the door.")
+            .inherentlyLit
+
+        let door = Item("door")
+            .name("oak door")
+            .description("A polished oak door.")
+            .isOpenable
+            .isOpen
             .in("roundRoom")
-        )
 
         let game = MinimalGame(
             player: Player(in: "roundRoom"),
@@ -612,9 +524,7 @@ struct GoActionHandlerTests {
         try await engine.execute("north")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > north
             --- North Room ---
@@ -630,27 +540,21 @@ struct GoActionHandlerTests {
     @Test("Can go through non-door exit object")
     func testCanGoThroughNonDoorExitObject() async throws {
         // Given
-        let roundRoom = Location(
-            id: "roundRoom",
-            .name("Round Room"),
-            .inherentlyLit,
-            .exits(.up("upperRoom", via: "stairs"))
-        )
-
-        let upperRoom = Location(
-            id: "upperRoom",
-            .name("Upper Room"),
-            .description("A room upstairs."),
+        let roundRoom = Location("roundRoom")
+            .name("Round Room")
             .inherentlyLit
-        )
+            .up("upperRoom", via: "stairs")
 
-        let stairs = Item(
-            id: "stairs",
-            .name("wooden stairs"),
-            .description("A set of wooden stairs leading up."),
+        let upperRoom = Location("upperRoom")
+            .name("Upper Room")
+            .description("A room upstairs.")
+            .inherentlyLit
+
+        let stairs = Item("stairs")
+            .name("wooden stairs")
+            .description("A set of wooden stairs leading up.")
             // Note: Not a door, so doesn't need to be open
             .in("roundRoom")
-        )
 
         let game = MinimalGame(
             player: Player(in: "roundRoom"),
@@ -664,9 +568,7 @@ struct GoActionHandlerTests {
         try await engine.execute("up")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > up
             --- Upper Room ---
@@ -684,19 +586,15 @@ struct GoActionHandlerTests {
     @Test("Movement updates player location")
     func testMovementUpdatesPlayerLocation() async throws {
         // Given
-        let startRoom = Location(
-            id: "startRoom",
-            .name("Start Room"),
-            .inherentlyLit,
-            .exits(.north("endRoom"))
-        )
-
-        let endRoom = Location(
-            id: "endRoom",
-            .name("End Room"),
-            .description("The destination room."),
+        let startRoom = Location("startRoom")
+            .name("Start Room")
             .inherentlyLit
-        )
+            .north("endRoom")
+
+        let endRoom = Location("endRoom")
+            .name("End Room")
+            .description("The destination room.")
+            .inherentlyLit
 
         let game = MinimalGame(
             player: Player(in: "startRoom"),
@@ -716,9 +614,7 @@ struct GoActionHandlerTests {
         playerLocation = await engine.player.location.id
         #expect(playerLocation == "endRoom")
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > north
             --- End Room ---
@@ -731,20 +627,16 @@ struct GoActionHandlerTests {
     @Test("Movement works in dark rooms")
     func testMovementWorksInDarkRooms() async throws {
         // Given: Dark starting room
-        let darkRoom = Location(
-            id: "darkRoom",
-            .name("Dark Room"),
-            .description("A pitch black room."),
-            .exits(.south("litRoom"))
-            // Note: No .inherentlyLit property
-        )
+        let darkRoom = Location("darkRoom")
+            .name("Dark Room")
+            .description("A pitch black room.")
+            .south("litRoom")
+        // Note: No .inherentlyLit property
 
-        let litRoom = Location(
-            id: "litRoom",
-            .name("Lit Room"),
-            .description("A well-lit room."),
+        let litRoom = Location("litRoom")
+            .name("Lit Room")
+            .description("A well-lit room.")
             .inherentlyLit
-        )
 
         let game = MinimalGame(
             player: Player(in: "darkRoom"),
@@ -757,9 +649,7 @@ struct GoActionHandlerTests {
         try await engine.execute("south")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > south
             --- Lit Room ---
@@ -775,20 +665,16 @@ struct GoActionHandlerTests {
     @Test("Movement from lit to dark room shows darkness")
     func testMovementFromLitToDarkRoomShowsDarkness() async throws {
         // Given
-        let litRoom = Location(
-            id: "litRoom",
-            .name("Lit Room"),
-            .description("A well-lit room."),
-            .inherentlyLit,
-            .exits(.north("darkRoom"))
-        )
+        let litRoom = Location("litRoom")
+            .name("Lit Room")
+            .description("A well-lit room.")
+            .inherentlyLit
+            .north("darkRoom")
 
-        let darkRoom = Location(
-            id: "darkRoom",
-            .name("Dark Room"),
+        let darkRoom = Location("darkRoom")
+            .name("Dark Room")
             .description("A pitch black room.")
-            // Note: No .inherentlyLit property
-        )
+        // Note: No .inherentlyLit property
 
         let game = MinimalGame(
             player: Player(in: "litRoom"),
@@ -801,9 +687,7 @@ struct GoActionHandlerTests {
         try await engine.execute("north")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > north
             Darkness rushes in like a living thing.
@@ -820,29 +704,23 @@ struct GoActionHandlerTests {
     @Test("Movement with light source illuminates destination")
     func testMovementWithLightSourceIlluminatesDestination() async throws {
         // Given
-        let litRoom = Location(
-            id: "litRoom",
-            .name("Lit Room"),
-            .inherentlyLit,
-            .exits(.north("darkRoom"))
-        )
+        let litRoom = Location("litRoom")
+            .name("Lit Room")
+            .inherentlyLit
+            .north("darkRoom")
 
-        let darkRoom = Location(
-            id: "darkRoom",
-            .name("Dark Room"),
+        let darkRoom = Location("darkRoom")
+            .name("Dark Room")
             .description("A room that needs artificial light.")
-            // Note: No .inherentlyLit property
-        )
+        // Note: No .inherentlyLit property
 
-        let torch = Item(
-            id: "torch",
-            .name("burning torch"),
-            .description("A torch with a bright flame."),
-            .isLightSource,
-            .isDevice,
-            .isTakable,
+        let torch = Item("torch")
+            .name("burning torch")
+            .description("A torch with a bright flame.")
+            .isLightSource
+            .isDevice
+            .isTakable
             .in(.player)
-        )
 
         let game = MinimalGame(
             player: Player(in: "litRoom"),
@@ -861,9 +739,7 @@ struct GoActionHandlerTests {
         try await engine.execute("north")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > north
             --- Dark Room ---
@@ -879,21 +755,17 @@ struct GoActionHandlerTests {
     @Test("Roundtrip movement works")
     func testRoundtripMovementWorks() async throws {
         // Given
-        let roomA = Location(
-            id: "roomA",
-            .name("Room A"),
-            .description("The first room."),
-            .inherentlyLit,
-            .exits(.east("roomB"))
-        )
+        let roomA = Location("roomA")
+            .name("Room A")
+            .description("The first room.")
+            .inherentlyLit
+            .east("roomB")
 
-        let roomB = Location(
-            id: "roomB",
-            .name("Room B"),
-            .description("The second room."),
-            .inherentlyLit,
-            .exits(.west("roomA"))
-        )
+        let roomB = Location("roomB")
+            .name("Room B")
+            .description("The second room.")
+            .inherentlyLit
+            .west("roomA")
 
         let game = MinimalGame(
             player: Player(in: "roomA"),
@@ -911,9 +783,7 @@ struct GoActionHandlerTests {
         playerLocation = await engine.player.location.id
         #expect(playerLocation == "roomA")
 
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > east
             --- Room B ---

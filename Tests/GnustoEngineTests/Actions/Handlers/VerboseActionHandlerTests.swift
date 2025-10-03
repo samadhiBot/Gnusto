@@ -18,9 +18,7 @@ struct VerboseActionHandlerTests {
         try await engine.execute("verbose")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > verbose
             Maximum verbosity. Full location descriptions will be shown
@@ -46,9 +44,7 @@ struct VerboseActionHandlerTests {
         try await engine.execute("verbose")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > verbose
             Maximum verbosity. Full location descriptions will be shown
@@ -84,11 +80,9 @@ struct VerboseActionHandlerTests {
     @Test("Verbose works in dark rooms")
     func testVerboseWorksInDarkRooms() async throws {
         // Given: Dark room (no light required for verbose command)
-        let darkRoom = Location(
-            id: "darkRoom",
-            .name("Dark Room"),
+        let darkRoom = Location("darkRoom")
+            .name("Dark Room")
             .description("A pitch black room.")
-        )
 
         let game = MinimalGame(
             player: Player(in: "darkRoom"),
@@ -101,9 +95,7 @@ struct VerboseActionHandlerTests {
         try await engine.execute("verbose")
 
         // Then
-        let output = await mockIO.flush()
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > verbose
             Maximum verbosity. Full location descriptions will be shown
