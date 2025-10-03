@@ -262,16 +262,20 @@ struct GameEngineSaveLoadTests {
 
         // When: Starting a transcript
         try await engine.startTranscript()
-        let transcriptURL = try await engine.transcriptURL
+        let transcriptURL = await engine.transcriptURL
 
-        // Then: Transcript file should be created in test directory
-        #expect(FileManager.default.fileExists(atPath: transcriptURL.path()))
-        #expect(transcriptURL.pathExtension == "md")
-        #expect(transcriptURL.lastPathComponent.hasPrefix("transcript-"))
+        // Then: Transcript URL should be set
+        #expect(transcriptURL != nil)
+        guard let url = transcriptURL else { return }
+
+        // And: Transcript file should be created in test directory
+        #expect(FileManager.default.fileExists(atPath: url.path()))
+        #expect(url.pathExtension == "md")
+        #expect(url.lastPathComponent.hasPrefix("transcript-"))
 
         // And: Should be in the game directory
         let gameDir = try testHandler.gnustoDirectory(for: engine.abbreviatedTitle)
-        #expect(transcriptURL.deletingLastPathComponent() == gameDir)
+        #expect(url.deletingLastPathComponent() == gameDir)
 
         // Cleanup
         try testHandler.cleanup()

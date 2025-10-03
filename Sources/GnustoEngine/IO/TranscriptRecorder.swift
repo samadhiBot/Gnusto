@@ -8,6 +8,7 @@ public final class TranscriptRecorder: Sendable {
     /// The URL where the transcript file is written.
     public let transcriptURL: URL
 
+    /// The file handle used for writing transcript data.
     private let fileHandle: FileHandle
 
     /// Internal logger for engine messages, warnings, and errors.

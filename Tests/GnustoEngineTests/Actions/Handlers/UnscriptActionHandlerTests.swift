@@ -14,10 +14,9 @@ struct UnscriptActionHandlerTests {
         let game = MinimalGame()
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        // Set up: scripting is active
-        try await engine.apply(
-            engine.setFlag(.isScripting)
-        )
+        // Set up: start a transcript first
+        try await engine.execute("script")
+        _ = await mockIO.flush()  // Clear the first output
 
         // When
         try await engine.execute("unscript")
@@ -52,10 +51,9 @@ struct UnscriptActionHandlerTests {
 
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        // Set up: scripting is active
-        try await engine.apply(
-            engine.setFlag(.isScripting)
-        )
+        // Set up: start a transcript first
+        try await engine.execute("script")
+        _ = await mockIO.flush()  // Clear the first output
 
         // When: UNSCRIPT should work even in darkness
         try await engine.execute("unscript")
@@ -110,12 +108,15 @@ struct UnscriptActionHandlerTests {
 
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        // Set up complex game state including scripting
+        // Set up complex game state
         try await engine.apply(
-            engine.setFlag(.isScripting),
             await lamp.proxy(engine).setFlag(.isOn),
             engine.player.updateScore(by: 100)
         )
+
+        // Start transcript
+        try await engine.execute("script")
+        _ = await mockIO.flush()  // Clear the first output
 
         // When
         try await engine.execute("unscript")
@@ -141,10 +142,9 @@ struct UnscriptActionHandlerTests {
         let game = MinimalGame()
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        // Set up: scripting is active
-        try await engine.apply(
-            engine.setFlag(.isScripting)
-        )
+        // Set up: start a transcript first
+        try await engine.execute("script")
+        _ = await mockIO.flush()  // Clear the first output
 
         // Verify initial state
         let initialScripting = await engine.hasFlag(.isScripting)
@@ -185,11 +185,14 @@ struct UnscriptActionHandlerTests {
 
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        // Set up initial state including scripting
+        // Set up initial state
         try await engine.apply(
-            engine.setFlag(.isScripting),
             engine.player.updateScore(by: 50)
         )
+
+        // Start transcript
+        try await engine.execute("script")
+        _ = await mockIO.flush()  // Clear the first output
 
         // Record initial state
         let initialBook = await engine.item("book")
@@ -331,10 +334,9 @@ struct UnscriptActionHandlerTests {
         let game = MinimalGame()
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        // Set up: scripting is active
-        try await engine.apply(
-            engine.setFlag(.isScripting)
-        )
+        // Set up: start a transcript first
+        try await engine.execute("script")
+        _ = await mockIO.flush()  // Clear the first output
 
         // Verify initial state
         let initialScripting = await engine.hasFlag(.isScripting)
@@ -402,10 +404,9 @@ struct UnscriptActionHandlerTests {
 
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        // Set up: scripting is active
-        try await engine.apply(
-            engine.setFlag(.isScripting)
-        )
+        // Set up: start a transcript first
+        try await engine.execute("script")
+        _ = await mockIO.flush()  // Clear the first output
 
         // When: Perform other actions and then unscript
         try await engine.execute("take coin")

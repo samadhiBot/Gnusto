@@ -74,12 +74,11 @@ struct ScriptActionHandlerTests {
         let game = MinimalGame()
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        // Set up: scripting is already active
-        try await engine.apply(
-            engine.setFlag(.isScripting)
-        )
+        // Set up: start a transcript first
+        try await engine.execute("script")
+        _ = await mockIO.flush()  // Clear the first output
 
-        // When
+        // When: Try to start script again
         try await engine.execute("script")
 
         // Then
