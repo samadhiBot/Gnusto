@@ -60,12 +60,12 @@ public struct WearActionHandler: ActionHandler {
                 }
 
                 // Set .isWorn flag
-                await allStateChanges.append(
+                await allStateChanges.appendIfPresent(
                     item.setFlag(.isWorn)
                 )
 
                 // Set .isTouched flag if not already set
-                await allStateChanges.append(
+                await allStateChanges.appendIfPresent(
                     item.setFlag(.isTouched)
                 )
 

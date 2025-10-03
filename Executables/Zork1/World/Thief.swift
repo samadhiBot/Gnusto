@@ -428,7 +428,7 @@ extension Thief {
 
                     // Special handling for the egg - open it when deposited
                     if itemId == .egg {
-                        changes.append(
+                        changes.appendIfPresent(
                             await item.setFlag(.isOpen)
                         )
                     }

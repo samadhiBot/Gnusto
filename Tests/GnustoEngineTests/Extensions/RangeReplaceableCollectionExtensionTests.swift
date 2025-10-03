@@ -7,42 +7,42 @@ import Testing
 @Suite("RangeReplaceableCollection Extension Tests")
 struct RangeReplaceableCollectionExtensionTests {
 
-    // MARK: - append(_:) Tests
+    // MARK: - appendIfPresent(_:) Tests
 
-    @Test("append adds non-nil optional elements to collection")
+    @Test("appendIfPresent adds non-nil optional elements to collection")
     func testAppendNonNilOptional() {
         var numbers: [Int] = [1, 2, 3]
         let optionalFour: Int? = 4
 
-        numbers.append(optionalFour)
+        numbers.appendIfPresent(optionalFour)
 
         #expect(numbers == [1, 2, 3, 4])
     }
 
-    @Test("append ignores nil optional elements")
+    @Test("appendIfPresent ignores nil optional elements")
     func testAppendNilOptional() {
         var numbers: [Int] = [1, 2, 3]
         let optionalNil: Int? = nil
 
-        numbers.append(optionalNil)
+        numbers.appendIfPresent(optionalNil)
 
         #expect(numbers == [1, 2, 3])
     }
 
-    @Test("append works with empty collections")
+    @Test("appendIfPresent works with empty collections")
     func testAppendToEmptyCollection() {
         var emptyNumbers: [Int] = []
         let optionalOne: Int? = 1
         let optionalNil: Int? = nil
 
-        emptyNumbers.append(optionalOne)
+        emptyNumbers.appendIfPresent(optionalOne)
         #expect(emptyNumbers == [1])
 
-        emptyNumbers.append(optionalNil)
+        emptyNumbers.appendIfPresent(optionalNil)
         #expect(emptyNumbers == [1])
     }
 
-    @Test("append maintains order of elements")
+    @Test("appendIfPresent maintains order of elements")
     func testAppendMaintainsOrder() {
         var numbers: [Int] = [1, 2]
         let optionalThree: Int? = 3
@@ -50,29 +50,29 @@ struct RangeReplaceableCollectionExtensionTests {
         let optionalNil: Int? = nil
         let optionalFive: Int? = 5
 
-        numbers.append(optionalThree)
-        numbers.append(optionalFour)
-        numbers.append(optionalNil)
-        numbers.append(optionalFive)
+        numbers.appendIfPresent(optionalThree)
+        numbers.appendIfPresent(optionalFour)
+        numbers.appendIfPresent(optionalNil)
+        numbers.appendIfPresent(optionalFive)
 
         #expect(numbers == [1, 2, 3, 4, 5])
     }
 
-    @Test("append works with string collections")
+    @Test("appendIfPresent works with string collections")
     func testAppendWithStrings() {
         var words: [String] = ["hello", "world"]
         let optionalExclamation: String? = "!"
         let optionalNil: String? = nil
         let optionalGoodbye: String? = "goodbye"
 
-        words.append(optionalExclamation)
-        words.append(optionalNil)
-        words.append(optionalGoodbye)
+        words.appendIfPresent(optionalExclamation)
+        words.appendIfPresent(optionalNil)
+        words.appendIfPresent(optionalGoodbye)
 
         #expect(words == ["hello", "world", "!", "goodbye"])
     }
 
-    @Test("append works with custom types")
+    @Test("appendIfPresent works with custom types")
     func testAppendWithCustomTypes() {
         struct Person {
             let name: String
@@ -83,30 +83,30 @@ struct RangeReplaceableCollectionExtensionTests {
         let optionalNil: Person? = nil
         let optionalBob: Person? = Person(name: "Bob")
 
-        people.append(optionalAlice)
-        people.append(optionalNil)
-        people.append(optionalBob)
+        people.appendIfPresent(optionalAlice)
+        people.appendIfPresent(optionalNil)
+        people.appendIfPresent(optionalBob)
 
         #expect(people.count == 2)
         #expect(people[0].name == "Alice")
         #expect(people[1].name == "Bob")
     }
 
-    @Test("append multiple nil values in sequence")
+    @Test("appendIfPresent multiple nil values in sequence")
     func testAppendMultipleNilValues() {
         var numbers: [Int] = [1, 2, 3]
         let originalCount = numbers.count
 
         for _ in 0..<10 {
             let optionalNil: Int? = nil
-            numbers.append(optionalNil)
+            numbers.appendIfPresent(optionalNil)
         }
 
         #expect(numbers == [1, 2, 3])
         #expect(numbers.count == originalCount)
     }
 
-    @Test("append with alternating nil and non-nil values")
+    @Test("appendIfPresent with alternating nil and non-nil values")
     func testAppendAlternatingNilAndNonNil() {
         var numbers: [Int] = []
 
@@ -114,42 +114,42 @@ struct RangeReplaceableCollectionExtensionTests {
             let nonNilValue: Int? = i
             let nilValue: Int? = nil
 
-            numbers.append(nonNilValue)
-            numbers.append(nilValue)
+            numbers.appendIfPresent(nonNilValue)
+            numbers.appendIfPresent(nilValue)
         }
 
         #expect(numbers == [1, 2, 3, 4, 5])
     }
 
-    @Test("append works with different RangeReplaceableCollection types")
+    @Test("appendIfPresent works with different RangeReplaceableCollection types")
     func testAppendWithDifferentCollectionTypes() {
         // Test with Array
         var array: [Int] = [1]
         let optionalTwo: Int? = 2
-        array.append(optionalTwo)
+        array.appendIfPresent(optionalTwo)
         #expect(array == [1, 2])
 
         // Test with ContiguousArray
         var contiguousArray = ContiguousArray<String>(["a"])
         let optionalB: String? = "b"
-        contiguousArray.append(optionalB)
+        contiguousArray.appendIfPresent(optionalB)
         #expect(Array(contiguousArray) == ["a", "b"])
 
         // Test with ArraySlice
         var arraySlice = ArraySlice([10, 20])
         let optionalThirty: Int? = 30
-        arraySlice.append(optionalThirty)
+        arraySlice.appendIfPresent(optionalThirty)
         #expect(Array(arraySlice) == [10, 20, 30])
     }
 
-    @Test("append performance with large number of operations")
+    @Test("appendIfPresent performance with large number of operations")
     func testAppendPerformance() {
         var numbers: [Int] = []
 
         // Append 1000 elements, alternating between valid and nil values
         for i in 1...1_000 {
             let value: Int? = i % 2 == 0 ? i : nil
-            numbers.append(value)
+            numbers.appendIfPresent(value)
         }
 
         // Should only contain even numbers from 2 to 1000
@@ -158,7 +158,7 @@ struct RangeReplaceableCollectionExtensionTests {
         #expect(numbers.count == 500)
     }
 
-    @Test("append preserves collection capacity behavior")
+    @Test("appendIfPresent preserves collection capacity behavior")
     func testAppendPreservesCapacityBehavior() {
         var numbers: [Int] = []
         numbers.reserveCapacity(10)
@@ -167,7 +167,7 @@ struct RangeReplaceableCollectionExtensionTests {
         // Append elements within reserved capacity
         for i in 1...5 {
             let optionalValue: Int? = i
-            numbers.append(optionalValue)
+            numbers.appendIfPresent(optionalValue)
         }
 
         // Capacity should not have changed (assuming it was sufficient)
@@ -175,7 +175,7 @@ struct RangeReplaceableCollectionExtensionTests {
         #expect(numbers == [1, 2, 3, 4, 5])
     }
 
-    @Test("append works with optional chaining results")
+    @Test("appendIfPresent works with optional chaining results")
     func testAppendWithOptionalChainingResults() {
         struct Container {
             let value: Int
@@ -192,7 +192,7 @@ struct RangeReplaceableCollectionExtensionTests {
         var values: [Int] = []
 
         for container in containers {
-            values.append(container?.value)
+            values.appendIfPresent(container?.value)
         }
 
         #expect(values == [1, 2, 3])

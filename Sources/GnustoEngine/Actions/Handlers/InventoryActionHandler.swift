@@ -35,7 +35,7 @@ public struct InventoryActionHandler: ActionHandler {
             message = context.msg.youAreEmptyHanded()
         } else {
             let itemList = await inventoryItems.sorted().asyncMap { item in
-                let ifWorn = await item.hasFlag(.isWorn) ? context.msg.worn() : ""
+                let ifWorn = await item.hasFlag(.isWorn) ? " \(context.msg.worn())" : ""
                 return await "- \(item.withIndefiniteArticle.capitalizedFirst)\(ifWorn)"
             }
             message = """

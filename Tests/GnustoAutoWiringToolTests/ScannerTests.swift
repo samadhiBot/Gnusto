@@ -398,7 +398,6 @@ struct ScannerTests {
                 static let room1 = Location(.room1)
                     .name("Room One")
                     .inherentlyLit
-                )
 
                 // Locations - New chained style with labeled parameter
                 static let room2 = Location(id: .room2)
@@ -411,7 +410,9 @@ struct ScannerTests {
                     .inherentlyLit
 
                 // Locations - Unlabeled with full properties
-                static let room4 = Location(.room4, .name("Room Four") .inherentlyLit)
+                static let room4 = Location(.room4)
+                    .name("Room Four")
+                    .inherentlyLit)
 
                 // Items - Labeled parameter
                 static let sword = Item(id: .sword)

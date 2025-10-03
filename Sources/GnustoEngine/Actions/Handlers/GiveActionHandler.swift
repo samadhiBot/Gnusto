@@ -65,7 +65,7 @@ public struct GiveActionHandler: ActionHandler {
                 }
 
                 // Move item to recipient
-                await allStateChanges.append(
+                await allStateChanges.appendIfPresent(
                     gift.move(to: .item(recipient.id)),
                     gift.setFlag(.isTouched)
                 )
@@ -82,7 +82,7 @@ public struct GiveActionHandler: ActionHandler {
 
         // Mark recipient as touched if any items were given
         if givenItems.isNotEmpty {
-            await allStateChanges.append(
+            await allStateChanges.appendIfPresent(
                 recipient.setFlag(.isTouched)
             )
         }

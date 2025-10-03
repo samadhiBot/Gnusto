@@ -156,7 +156,7 @@ public struct TakeActionHandler: ActionHandler {
                 itemStateChanges.append(moveChange)
 
                 // Set .isTouched flag if not already set
-                await itemStateChanges.append(
+                await itemStateChanges.appendIfPresent(
                     item.setFlag(.isTouched)
                 )
 

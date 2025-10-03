@@ -2239,7 +2239,7 @@ open class StandardMessenger: @unchecked Sendable {
     }
 
     open func worn() -> String {
-        " (worn)"
+        "(worn)"
     }
 
     open func wrongKey(_ key: String, lock: String) -> String {
