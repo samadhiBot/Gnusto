@@ -450,7 +450,7 @@ struct TouchActionHandlerTests {
             .name("remote troll")
             .description("A troll in another room.")
             .characterSheet(
-                CharacterSheet(isFighting: true)
+                .default.enemy
             )
             .in("anotherRoom")
 

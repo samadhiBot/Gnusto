@@ -122,6 +122,96 @@ extension Item {
         assigning(.characterSheet, to: .characterSheet(sheet))
     }
 
+    /// Character-specific attributes for NPCs and actors.
+    ///
+    /// - Parameters:
+    ///   - strength: Physical power (default: 10)
+    ///   - dexterity: Agility and reflexes (default: 10)
+    ///   - constitution: Endurance and health (default: 10)
+    ///   - intelligence: Reasoning and memory (default: 10)
+    ///   - wisdom: Awareness and intuition (default: 10)
+    ///   - charisma: Force of personality (default: 10)
+    ///   - bravery: Courage and willpower (default: 10)
+    ///   - perception: Awareness of surroundings (default: 10)
+    ///   - luck: Random fortune (default: 10)
+    ///   - morale: Mental fortitude (default: 10)
+    ///   - accuracy: Ranged precision (default: 10)
+    ///   - intimidation: Ability to frighten (default: 10)
+    ///   - stealth: Ability to hide (default: 10)
+    ///   - level: Character level (default: 1)
+    ///   - classification: Grammatical gender (default: .neuter)
+    ///   - alignment: Moral alignment (default: .trueNeutral)
+    ///   - armorClass: Armor class (computed if nil)
+    ///   - health: Current health (computed if nil)
+    ///   - maxHealth: Maximum health (computed if nil)
+    ///   - consciousness: Level of awareness (default: .awake)
+    ///   - combatCondition: Combat state (default: .normal)
+    ///   - generalCondition: General state (default: .normal)
+    ///   - isFighting: Currently in combat (default: false)
+    ///   - weaponWeaknesses: Weapon vulnerabilities (default: empty)
+    ///   - weaponResistances: Weapon resistances (default: empty)
+    ///   - taunts: Combat taunts (default: empty)
+    /// - Returns: A modified `Item` with the characterSheet property set.
+    public func characterSheet(
+        strength: Int = 10,
+        dexterity: Int = 10,
+        constitution: Int = 10,
+        intelligence: Int = 10,
+        wisdom: Int = 10,
+        charisma: Int = 10,
+        bravery: Int = 10,
+        perception: Int = 10,
+        luck: Int = 10,
+        morale: Int = 10,
+        accuracy: Int = 10,
+        intimidation: Int = 10,
+        stealth: Int = 10,
+        level: Int = 1,
+        classification: Classification = .neuter,
+        alignment: Alignment = .trueNeutral,
+        armorClass: Int? = nil,
+        health: Int? = nil,
+        maxHealth: Int? = nil,
+        consciousness: ConsciousnessLevel = .alert,
+        combatCondition: CombatCondition = .normal,
+        generalCondition: GeneralCondition = .normal,
+        isFighting: Bool = false,
+        weaponWeaknesses: [ItemID: Int] = [:],
+        weaponResistances: [ItemID: Int] = [:],
+        taunts: [String] = []
+    ) -> Self {
+        characterSheet(
+            CharacterSheet(
+                strength: strength,
+                dexterity: dexterity,
+                constitution: constitution,
+                intelligence: intelligence,
+                wisdom: wisdom,
+                charisma: charisma,
+                bravery: bravery,
+                perception: perception,
+                luck: luck,
+                morale: morale,
+                accuracy: accuracy,
+                intimidation: intimidation,
+                stealth: stealth,
+                level: level,
+                classification: classification,
+                alignment: alignment,
+                armorClass: armorClass,
+                health: health,
+                maxHealth: maxHealth,
+                consciousness: consciousness,
+                combatCondition: combatCondition,
+                generalCondition: generalCondition,
+                isFighting: isFighting,
+                weaponWeaknesses: weaponWeaknesses,
+                weaponResistances: weaponResistances,
+                taunts: taunts
+            )
+        )
+    }
+
     /// The carrying capacity of a container item, measured in size units.
     ///
     /// - Parameter capacity: Maximum size units this container can hold.

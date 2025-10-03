@@ -15,7 +15,7 @@ extension ItemProxy {
         get async {
             guard let sheet = await property(.characterSheet)?.toCharacterSheet else {
                 assertionFailure("ItemProxy.characterSheet called on non-character item")
-                return CharacterSheet()
+                return .default
             }
             return sheet
         }

@@ -714,33 +714,27 @@ struct StandardCombatSystemUnitTests {
         let staggeredTroll = Item("staggeredTroll")
             .name("staggered troll")
             .characterSheet(
-                CharacterSheet(
-                    strength: 16,
-                    constitution: 14,
-                    combatCondition: .offBalance  // -2 AC, -1 attack
-                )
+                strength: 16,
+                constitution: 14,
+                combatCondition: .offBalance  // -2 AC, -1 attack
             )
             .in("combatRoom")
 
         let vulnerableTroll = Item("vulnerableTroll")
             .name("vulnerable troll")
             .characterSheet(
-                CharacterSheet(
-                    strength: 16,
-                    constitution: 14,
-                    combatCondition: .vulnerable  // -3 AC, no attack penalty
-                )
+                strength: 16,
+                constitution: 14,
+                combatCondition: .vulnerable  // -3 AC, no attack penalty
             )
             .in("combatRoom")
 
         let normalTroll = Item("normalTroll")
             .name("normal troll")
             .characterSheet(
-                CharacterSheet(
-                    strength: 16,
-                    constitution: 14,
-                    combatCondition: .normal  // No penalties
-                )
+                strength: 16,
+                constitution: 14,
+                combatCondition: .normal  // No penalties
             )
             .in("combatRoom")
 

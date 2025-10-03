@@ -19,9 +19,7 @@ extension RangeReplaceableCollection {
     /// numbers.append(optionalNil)   // numbers remains [1, 2, 3, 4]
     /// ```
     ///
-    /// - Parameter newElement: An optional element to append to the collection.
-    ///   If `nil`, no operation is performed.
-    /// - Complexity: O(1) amortized, over many calls to `append(_:)` on the same collection.
+    /// - Parameter newElements: Optional elements to append to the collection.
     public mutating func append(_ newElements: Element?...) {
         for element in newElements {
             guard let element else { continue }

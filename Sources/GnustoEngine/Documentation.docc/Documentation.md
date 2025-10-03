@@ -76,10 +76,10 @@ If you have Swift 6.2+ installed on your machine, you can get up and running and
 If you're using Linux or Windows and don't have Swift 6.2+ installed, follow the instructions at [swift.org/install](https://www.swift.org/install/linux/), then follow the steps below:
 
 ```bash
-# Run the script from Github:
+# Run the bootstrap script from Github:
 bash <(curl -sSL https://raw.githubusercontent.com/samadhiBot/Gnusto/blob/main/Scripts/bootstrap)
 
-# Or, clone the repo and run the script locally:
+# Or, clone the repo and run the bootstrap script locally:
 git clone https://github.com/samadhiBot/Gnusto.git
 ./Gnusto/Scripts/bootstrap
 ```

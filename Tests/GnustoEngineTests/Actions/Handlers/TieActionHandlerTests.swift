@@ -605,7 +605,7 @@ struct TieActionHandlerTests {
             .name("angry orc")
             .description("An angry orc warrior.")
             .characterSheet(
-                CharacterSheet(isFighting: true)
+                .default.enemy
             )
             .in(.startRoom)
 
@@ -674,7 +674,7 @@ struct TieActionHandlerTests {
             .name("remote troll")
             .description("A troll in another room.")
             .characterSheet(
-                CharacterSheet(isFighting: true)
+                .default.enemy
             )
             .in("anotherRoom")
 

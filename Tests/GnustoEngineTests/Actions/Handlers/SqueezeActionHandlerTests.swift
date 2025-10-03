@@ -261,7 +261,7 @@ struct SqueezeActionHandlerTests {
             .name("furious necromancer")
             .description("An angry old necromancer.")
             .characterSheet(
-                CharacterSheet(isFighting: true)
+                .default.enemy
             )
             .in(.startRoom)
 

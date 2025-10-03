@@ -28,20 +28,18 @@ struct Thief {
             """
         )
         .characterSheet(  // Stronger than the troll
-            CharacterSheet(
-                strength: 14,
-                dexterity: 18,
-                intelligence: 13,
-                charisma: 7,
-                bravery: 9,
-                perception: 16,
-                accuracy: 15,
-                intimidation: 15,
-                stealth: 17,
-                level: 2,
-                classification: .masculine,
-                alignment: .neutralEvil
-            )
+            strength: 14,
+            dexterity: 18,
+            intelligence: 13,
+            charisma: 7,
+            bravery: 9,
+            perception: 16,
+            accuracy: 15,
+            intimidation: 15,
+            stealth: 17,
+            level: 2,
+            classification: .masculine,
+            alignment: .neutralEvil
         )
         .validLocations(
             .cellar, .damRoom, .deepCanyon, .egyptRoom, .gallery, .maze1, .maze2, .maze3, .maze4,

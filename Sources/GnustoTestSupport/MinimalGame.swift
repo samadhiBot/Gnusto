@@ -101,6 +101,7 @@ public struct MinimalGame: GameBlueprint {
     ///   - itemComputers: Dynamic property computers for items.
     ///   - locationComputers: Dynamic property computers for locations.
     ///   - messenger: Custom message provider. If `nil`, creates a seeded `StandardMessenger`.
+    ///   - randomSeed: A random seed to supply to the deterministic random number generators.
     public init(
         player: Player = Player(in: .startRoom),
         locations: Location...,

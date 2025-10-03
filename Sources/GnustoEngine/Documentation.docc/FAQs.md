@@ -6,28 +6,67 @@ Quick answers to common questions about the Gnusto Interactive Fiction Engine.
 
 **Gnusto is a modern, open-source interactive fiction engine that provides a declarative approach to creating parser-based text adventures.**
 
-You write games using an intuitive DSL (domain-specific language) that Gnusto provides—one that's easy to work with, especially with code completion, and doesn't require deep Swift knowledge to be productive. At the same time, because you're writing in Swift, and Gnusto is built as a Swift package, you have the full power and potential of a fast, safe, general-purpose language standing by whenever you need it. The engine emphasizes type safety, testability, and a structured state-change pipeline that prevents common IF programming bugs.
+![Gnusto FAQs](gnusto-faqs.png)
+
+You write games using Gnusto's declarative DSL (domain-specific language), which is both intuitive and easy to work with, especially with code completion.
+
+At the same time, because Gnusto-based games are written in Swift, you have the full power and potential of a fast, safe, general-purpose language standing by whenever you need it.
+
+The Gnusto engine emphasizes type safety, testability, and a structured state-change pipeline that prevents common IF programming bugs.
 
 - **Repository**: [github.com/samadhiBot/Gnusto](https://github.com/samadhiBot/Gnusto)
-- **Documentation**: <doc:GnustoEngine> and <doc:GameStructure>
+- **Documentation**: [samadhibot.github.io/Gnusto](https://samadhibot.github.io/Gnusto/documentation/gnustoengine/)
 - **License**: MIT (open source, commercial-friendly)
+
+## Can I see it in action?
+
+**Yes! You can try out Gnusto with just a few terminal commands.**
+
+The following examples assume that you have Swift 6.2 or higher on your machine. If you don't, please follow the instructions at [swift.org/install](https://www.swift.org/install/) before you go on.
+
+### Play the example games
+
+```bash
+# Clone and explore
+git clone https://github.com/samadhiBot/Gnusto.git
+cd Gnusto
+
+# Play the Cloak of Darkness demo
+swift run CloakOfDarkness
+
+# Try the Zork 1 port (work in progress)
+swift run Zork1
+```
+
+### Create a game of your own
+
+```bash
+# Run the bootstrap script from Github:
+bash <(curl -sSL https://raw.githubusercontent.com/samadhiBot/Gnusto/blob/main/Scripts/bootstrap)
+
+# Or, clone the repo and run the bootstrap script locally:
+git clone https://github.com/samadhiBot/Gnusto.git
+./Gnusto/Scripts/bootstrap
+```
 
 ## Why would I choose Gnusto over established systems like Inform 7 or TADS?
 
-**Gnusto offers modern tooling, type safety, and seamless integration with the Apple ecosystem while maintaining respect for IF traditions.**
+**Gnusto takes a different approach: it's built as a Swift library rather than as its own language, offering different trade-offs than established IF systems.**
 
-Key differentiators:
-- **Type Safety**: Compile-time checking prevents many runtime errors common in dynamic languages
-- **Modern IDE Support**: Full autocomplete, refactoring, and debugging in Xcode, VS Code, Zed, Neovim, etc.
-- **Testing Framework**: Built-in support for unit and integration testing your game logic
-- **Native Performance**: Compiled Swift runs efficiently on all platforms
-- **Ecosystem Access**: Leverage the entire Swift package ecosystem for advanced features
+Inform 7, TADS, and other traditional systems are mature, feature-rich, and have served the IF community brilliantly for decades. They offer extensive libraries, robust tooling, and thriving communities. Gnusto doesn't try to replace them -- instead, it explores what becomes possible when you build IF tooling on top of a modern, general-purpose programming language.
 
-That said, Gnusto is still in beta and lacks the maturity, community resources, and extensive libraries of established systems. It's best suited for authors comfortable with programming or those seeking modern development practices.
+This approach means:
+
+- **Full Language Access**: You have all of Swift's capabilities immediately available -- no need to work around language limitations or wait for features to be added
+- **Ecosystem Integration**: Leverage the entire Swift package ecosystem, or embed Gnusto as a component in larger applications
+- **Modern Development Practices**: Native support for testing frameworks, type safety, IDE tooling (Xcode, VS Code, Zed, Neovim, etc.), and debugging
+- **Flexible Architecture**: Gnusto can be a small part of another project, packaged in different ways, or extended through standard Swift patterns
+
+The trade-off is that Gnusto lacks the maturity, community resources, and extensions that established systems provide. It's best suited for authors comfortable with programming who want the flexibility of a general-purpose language, or those interested in integrating IF into other Swift projects.
 
 ## How do I write games in Gnusto?
 
-**You define your game world declaratively using Swift's DSL, then add dynamic behaviors through event handlers.**
+**You define your game world declaratively using Gnusto's declarative DSL, then add dynamic behaviors through event handlers.**
 
 Here's a minimal example:
 
@@ -41,19 +80,16 @@ let foyer = Location(.foyer)
         and gold, with glittering chandeliers overhead. The entrance from
         the street is to the north, and there are doorways south and west.
         """
-    ),
-    .exits(
-        .south(.bar),
-        .west(.cloakroom),
-        .north(
-            blocked: """
-                You've only just arrived, and besides, the weather outside
-                seems to be getting worse.
-                """
-        )
-    ),
+    )
+    .south(.bar)
+    .west(.cloakroom)
+    .north(
+        blocked: """
+            You've only just arrived, and besides, the weather outside
+            seems to be getting worse.
+            """
+    )
     .inherentlyLit
-)
 
 // Define an item
 let cloak = Item(.cloak)
@@ -64,14 +100,12 @@ let cloak = Item(.cloak)
         spattered with raindrops. Its blackness is so deep that it
         almost seems to suck light from the room.
         """
-    ),
+    )
     .adjectives("handsome", "dark", "black", "velvet", "satin")
     .in(.player)
     .isTakable
-    .isWearable,
-    .isWorn,
-)
-
+    .isWearable
+    .isWorn
 
 // Add dynamic behavior
 let cloakHandler = ItemEventHandler(for: .cloak) {
@@ -103,7 +137,7 @@ The Gnusto auto-wiring tool automatically discovers your content and generates t
 
 ## What development tools do I need?
 
-**You need the Swift 6.2 toolchain and a text editor — everything else is included.**
+**You need the Swift 6.2 toolchain and a text editor -- everything else is included.**
 
 - **Required**: [Swift 6.2+](https://www.swift.org/download/)
 - **Recommended IDEs**:
@@ -111,22 +145,6 @@ The Gnusto auto-wiring tool automatically discovers your content and generates t
   - [VS Code](https://code.visualstudio.com/) with Swift extension (all platforms)
   - [Zed](https://zed.dev/) (fast, modern, great Swift support)
 - **Build System**: Swift Package Manager (included with Swift)
-
-## Can I try it without installing anything?
-
-**Yes! You can explore the example games with just a few terminal commands.**
-
-```bash
-# Clone and explore
-git clone https://github.com/samadhiBot/Gnusto.git
-cd Gnusto
-
-# Play the Cloak of Darkness demo
-swift run CloakOfDarkness
-
-# Try the Zork 1 port (work in progress)
-swift run Zork1
-```
 
 ## How capable is the parser?
 
@@ -140,7 +158,7 @@ Built-in capabilities:
 - **Disambiguation** ("which key do you mean, the brass key or the iron key?")
 - **Synonyms and adjectives** (customizable per game)
 
-The parser is extensible — you can add new verbs, modify syntax rules, or customize responses through the ``StandardMessenger`` system.
+The parser is extensible -- you can add new verbs, modify syntax rules, or customize responses through the ``StandardMessenger`` system.
 
 ## Can I import my existing Inform/TADS/Dialog game?
 
@@ -183,20 +201,18 @@ let thief = Item(.thief)
         """
     )
     .characterSheet(
-        CharacterSheet(
-            strength: 14,
-            dexterity: 18,
-            intelligence: 13,
-            charisma: 7,
-            bravery: 9,
-            perception: 16,
-            accuracy: 15,
-            intimidation: 15,
-            stealth: 17,
-            level: 2,
-            classification: .masculine,
-            alignment: .neutralEvil
-        )
+        strength: 14,
+        dexterity: 18,
+        intelligence: 13,
+        charisma: 7,
+        bravery: 9,
+        perception: 16,
+        accuracy: 15,
+        intimidation: 15,
+        stealth: 17,
+        level: 2,
+        classification: .masculine,
+        alignment: .neutralEvil
     )
 ```
 
@@ -215,7 +231,7 @@ This is an area marked for improvement. If your game needs sophisticated combat,
 
 ## How mature is Gnusto?
 
-**Gnusto is in beta — stable enough for creating games but expect occasional API changes.**
+**Gnusto is in beta -- stable enough for creating games but expect occasional API changes.**
 
 Strengths:
 - Core engine is well-tested (80%+ test coverage)
@@ -325,4 +341,4 @@ The auto-wiring plugin needs to run. Try `swift package clean` then rebuild.
 
 ---
 
-*Have a question not covered here? Please [open an issue](https://github.com/samadhiBot/Gnusto/issues) — we'd love to hear from you!*
+*Have a question not covered here? Please [open an issue](https://github.com/samadhiBot/Gnusto/issues) -- we'd love to hear from you!*

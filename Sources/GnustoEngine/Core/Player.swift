@@ -29,7 +29,7 @@ public struct Player: Codable, Hashable, Sendable {
     ///                     Defaults to a human character with neutral alignment.
     public init(
         in currentLocationID: LocationID,
-        characterSheet: CharacterSheet = CharacterSheet()
+        characterSheet: CharacterSheet = .default
     ) {
         self.characterSheet = characterSheet
         self.currentLocationID = currentLocationID

@@ -152,53 +152,6 @@ struct LocationEventHandlerTests {
         #expect(wasTriggered == true)
     }
 
-    @Test("Debug onEnter event - verify movement and handler registration")
-    func testOnEnterDebug() async throws {
-        let enterTrigger = HandlerState()
-
-        let handler = LocationEventHandler { _, event in
-            if case .onEnter = event {
-                await enterTrigger.setCalled(true)
-            }
-            return nil
-        }
-
-        let anotherRoom = Location("anotherRoom")
-            .name("Another Room")
-            .description("Another room.")
-            .inherentlyLit
-            .north(.startRoom)
-        let game = MinimalGame(
-            player: Player(in: "anotherRoom"),
-            locations: anotherRoom,
-            locationEventHandlers: [.startRoom: handler]
-        )
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
-
-        // Verify initial state
-        let initialLocation = await engine.player.location.id
-        #expect(initialLocation == "anotherRoom")
-
-        // Verify blueprint has the handler registered
-        let hasHandler = engine.locationEventHandlers[.startRoom] != nil
-        #expect(hasHandler == true)
-
-        // Move to the room with the handler
-        try await engine.execute("north")
-
-        // Verify movement worked
-        let finalLocation = await engine.player.location.id
-        #expect(finalLocation == .startRoom)
-
-        // Check if handler was triggered
-        let wasTriggered = await enterTrigger.wasCalled()
-        #expect(wasTriggered == true)
-
-        // Print debug info if test fails
-        let output = await mockIO.flush()
-        print("Movement output: \(output)")
-    }
-
     // MARK: - Integration Tests
 
     @Test("LocationEventHandler can override command behavior before turn")
