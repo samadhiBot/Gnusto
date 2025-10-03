@@ -42,12 +42,14 @@ swift run Zork1
 
 ```bash
 # Run the bootstrap script from Github:
-bash <(curl -sSL https://raw.githubusercontent.com/samadhiBot/Gnusto/blob/main/Scripts/bootstrap)
+bash <(curl -sSL https://raw.githubusercontent.com/samadhiBot/Gnusto/refs/heads/main/Scripts/bootstrap)
 
 # Or, clone the repo and run the bootstrap script locally:
 git clone https://github.com/samadhiBot/Gnusto.git
 ./Gnusto/Scripts/bootstrap
 ```
+
+[![asciicast](https://asciinema.org/a/746386.svg)](https://asciinema.org/a/746386)
 
 ## Why would I choose Gnusto over established systems like Inform 7 or TADS?
 

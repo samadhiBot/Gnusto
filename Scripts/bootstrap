@@ -435,17 +435,17 @@ print_usage_instructions() {
     echo "  swift test"
     echo ""
     echo "To customize your game:"
-    echo "  - Edit Sources/$game_name/$game_name.swift to set your names title and introduction"
+    echo "  - Edit Sources/$game_name/$game_name.swift to set a title and introduction"
     echo "  - Edit Sources/$game_name/World to add locations, items, and behaviors"
-    echo "  - Test your world! Add tests in Tests/${game_name}Tests"
+    echo "  - Edit Tests/${game_name}Tests to test and fine-tune your game world"
     echo ""
     echo "Happy coding! 🚀"
 }
 
 # Main script execution
 main() {
-    echo "🎭 Gnusto Game Scaffolding Tool"
-    echo "================================="
+    echo "🎭 Gnusto Game Bootstrap Tool"
+    echo "============================="
     echo ""
 
     # Get game name

@@ -67,8 +67,6 @@ let cloak = Item(.cloak)
 
 ### Automatic
 
-<script src="https://asciinema.org/a/746127.js" id="asciicast-746127" async="true"></script>
-
 The easiest way to get started is by running Gnusto's [bootstrap](https://github.com/samadhiBot/Gnusto/blob/main/Scripts/bootstrap) script. It sets up a new game scaffold that you can run and test on your own machine.
 
 If you have Swift 6.2+ installed on your machine, you can get up and running and start working on a new game in less than a minute.
@@ -77,12 +75,14 @@ If you're using Linux or Windows and don't have Swift 6.2+ installed, follow the
 
 ```bash
 # Run the bootstrap script from Github:
-bash <(curl -sSL https://raw.githubusercontent.com/samadhiBot/Gnusto/blob/main/Scripts/bootstrap)
+bash <(curl -sSL https://raw.githubusercontent.com/samadhiBot/Gnusto/refs/heads/main/Scripts/bootstrap)
 
 # Or, clone the repo and run the bootstrap script locally:
 git clone https://github.com/samadhiBot/Gnusto.git
 ./Gnusto/Scripts/bootstrap
 ```
+
+[![asciicast](https://asciinema.org/a/746386.svg)](https://asciinema.org/a/746386)
 
 ### Manual
 
@@ -201,8 +201,6 @@ Start with _Cloak of Darkness_ to see how a whole game fits together, then explo
 
 ## How to Run the Example Games
 
-<script src="https://asciinema.org/a/743893.js" id="asciicast-743893" async="true"></script>
-
 To run the example games in a terminal, first clone the Gnusto repository and `cd` into the project folder, then `swift run` either `CloakOfDarkness` or `Zork1`.
 
 ```zsh
@@ -220,36 +218,4 @@ Xcode users can select `CloakOfDarkness` or `Zork1` as the active scheme, Run th
 
 For VS Code users, the Debug Console does not support interactive keyboard input, and the Swift debug adapter does not support rerouting to a different terminal. For now, the best option is to run the commands above in the integrated terminal.
 
-## Topics
-
-### Game Development Guides
-- <doc:GameStructure>
-- <doc:GnustoAutoWiringPlugin>
-- <doc:Combat>
-
-### Core Types
-- ``GameBlueprint``
-- ``Item``
-- ``ItemProxy``
-- ``Location``
-- ``LocationProxy``
-
-### Advanced Systems
-- ``ItemEventHandler``
-- ``ItemComputer``
-- ``LocationEventHandler``
-- ``LocationComputer``
-
-### Default Systems
-- ``StandardMessenger``
-- ``StandardCombatSystem``
-
-### Main Types
-- ``GameEngine``
-- ``ActionHandler``
-
-### Further Reading
-- <doc:FAQs>
-- <doc:ActionHandlerGuide>
-
-Ready to start building? Check out the [Cloak of Darkness](https://github.com/samadhiBot/Gnusto/blob/main/Executables/CloakOfDarkness) source code to see these concepts in action!
+[![asciicast](https://asciinema.org/a/743893.svg)](https://asciinema.org/a/743893)

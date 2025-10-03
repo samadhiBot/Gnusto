@@ -1,5 +1,5 @@
 {
-  "originHash" : "524f00c1b4c0525e2b95dd52de3da54c92e62560b4ae661aa71719806b56d6c4",
+  "originHash" : "f958a3d7a330b78210c82c017f3afbbb96ecd5df890dae6881e0faf7701d8f79",
   "pins" : [
     {
       "identity" : "swift-argument-parser",
@@ -60,8 +60,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/swiftlang/swift-markdown",
       "state" : {
-        "revision" : "d8cf111c276ed18cff82d3cad563d2ca5903b982",
-        "version" : "0.7.1"
+        "revision" : "6151fbf2be23b24318cf88617dad5f633820d387",
+        "version" : "0.7.2"
       }
     },
     {
