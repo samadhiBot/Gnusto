@@ -549,7 +549,7 @@ struct GameStateApplyTests {
     func testApplyValidSetCombatStateChange() throws {
         var state = createTestGameState()
 
-        let combatState = CombatState(enemyID: "troll")
+        let combatState = CombatState(enemyID: .nastyTroll)
         let change = StateChange.setCombatState(combatState)
         try state.apply(change)
 
@@ -563,7 +563,7 @@ struct GameStateApplyTests {
         var state = createTestGameState()
 
         let startTrollCombat = StateChange.setCombatState(
-            CombatState(enemyID: "troll")
+            CombatState(enemyID: .nastyTroll)
         )
         try state.apply(startTrollCombat)
 

@@ -2,7 +2,7 @@
 
 # Gnusto: A Modern Interactive Fiction Engine
 
-Gnusto is a flexible and powerful framework for writing [interactive fiction](https://www.perplexity.ai/search/what-is-interactive-fiction-pl-1uYPS4fUSfqGegXJHr1tRA#0) games. Drawing inspiration from the Infocom classics of the 1980s, it provides a modern toolkit that makes building rich, dynamic text adventures easy and enjoyable--allowing you to focus on storytelling and world-building rather than engine mechanics.
+Gnusto is a flexible and powerful framework for writing [interactive fiction](https://en.wikipedia.org/wiki/Interactive_fiction) games. Drawing inspiration from the Infocom classics of the 1980s, it provides a modern toolkit that makes building rich, dynamic text adventures easy and enjoyable--allowing you to focus on storytelling and world-building rather than engine mechanics.
 
 - Gnusto is written in cross-platform Swift, allowing you to deploy your games on Mac, Linux, Windows, iOS, Android and Web.
 - The framework emphasizes ergonomics and developer experience, providing type safety without boilerplate code.
@@ -62,7 +62,7 @@ The first line declares the item and its unique identifier: `.cloak`, and the ne
 
 ``LocationEvent`` and ``ItemEvent`` are event handlers that let you customize how your game responds when the player interacts with specific locations or items. You can intercept actions before they happen, to override default behavior, or after they complete, to add side effects or additional narrative.
 
-The first example watches for interactions that take place in the `.trollRoom`. In this location there is a troll who prevents the player from going through the room's east and west exists. The player must either go back south to the cellar, or find some way to outwit the nasty troll.
+The first example watches for interactions that take place in the `.trollRoom`. In this location there is a troll who prevents the player from going through the room's east and west exits. The player must either go back south to the cellar, or find some way to outwit the nasty troll.
 
 ```swift
 let trollRoomHandler = LocationEventHandler(for: .trollRoom) {

@@ -25,7 +25,7 @@ struct StandardCombatSystemUnitTests {
             player: Player(in: .startRoom),
             locations: entrance, startRoom,
             items: Lab.ironSword, Lab.nastyTroll,
-            combatSystems: ["troll": StandardCombatSystem(versus: .nastyTroll)],
+            combatSystems: [.nastyTroll: StandardCombatSystem(versus: .nastyTroll)],
             randomSeed: randomSeed
         )
 
@@ -303,7 +303,7 @@ struct StandardCombatSystemUnitTests {
 
         let playerSheet = CharacterSheet(constitution: 14)
         let enemySheet = CharacterSheet(constitution: 16)
-        let currentState = CombatState(enemyID: "troll", roundCount: 5)
+        let currentState = CombatState(enemyID: .nastyTroll, roundCount: 5)
 
         let fatigue = try await combatSystem.calculateRoundDurationFatigue(
             playerSheet: playerSheet,
@@ -485,7 +485,7 @@ struct StandardCombatSystemUnitTests {
                 .inherentlyLit
             ),
             items: Lab.nastyTroll, club,
-            combatSystems: ["troll": StandardCombatSystem(versus: .nastyTroll)],
+            combatSystems: [.nastyTroll: StandardCombatSystem(versus: .nastyTroll)],
             randomSeed: 71
         )
 
@@ -493,7 +493,7 @@ struct StandardCombatSystemUnitTests {
 
         // Set up combat state first
         try await engine.apply(
-            engine.setCombatState(to: CombatState(enemyID: "troll", enemyWeaponID: "club"))
+            engine.setCombatState(to: CombatState(enemyID: .nastyTroll, enemyWeaponID: "club"))
         )
 
         let combatSystem = StandardCombatSystem(versus: .nastyTroll)
@@ -809,7 +809,7 @@ struct StandardCombatSystemUnitTests {
             damage: 6
         )
 
-        let messenger = await engine.combatMessenger(for: "troll")
+        let messenger = await engine.combatMessenger(for: .nastyTroll)
 
         let description = await combatSystem.defaultCombatDescription(
             of: hitEvent,
@@ -835,7 +835,7 @@ struct StandardCombatSystemUnitTests {
             enemyWeapon: nil
         )
 
-        let messenger = await engine.combatMessenger(for: "troll")
+        let messenger = await engine.combatMessenger(for: .nastyTroll)
 
         let description = await combatSystem.defaultCombatDescription(
             of: missEvent,
@@ -862,7 +862,7 @@ struct StandardCombatSystemUnitTests {
             damage: 12
         )
 
-        let messenger = await engine.combatMessenger(for: "troll")
+        let messenger = await engine.combatMessenger(for: .nastyTroll)
 
         let description = await combatSystem.defaultCombatDescription(
             of: criticalEvent,

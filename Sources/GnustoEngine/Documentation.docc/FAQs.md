@@ -4,7 +4,7 @@ Quick answers to common questions about the Gnusto Interactive Fiction Engine.
 
 ## What is Gnusto?
 
-**Gnusto is a modern, open-source [interactive fiction](https://www.perplexity.ai/search/what-is-interactive-fiction-pl-1uYPS4fUSfqGegXJHr1tRA#0) engine that provides a declarative syntax for creating text adventures.**
+**Gnusto is a modern, open-source [interactive fiction](https://en.wikipedia.org/wiki/Interactive_fiction) engine that provides a declarative syntax for creating text adventures.**
 
 ![Gnusto FAQs](gnusto-faqs.png)
 
