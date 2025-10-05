@@ -51,7 +51,7 @@ struct SeededRandomNumberGeneratorTests {
     func testThreadSafety() async {
         let generator = SeededRandomNumberGenerator(seed: 100)
         let numThreads = 10
-        let numIterations = 1000
+        let numIterations = 1_000
 
         await withTaskGroup(of: [UInt64].self) { group in
             // Launch multiple concurrent tasks
@@ -140,7 +140,7 @@ struct SeededRandomNumberGeneratorTests {
 
     @Test("Multiple generators with same seed produce same sequence")
     func testMultipleGenerators() {
-        let seed: UInt64 = 12345
+        let seed: UInt64 = 12_345
         let generator1 = SeededRandomNumberGenerator(seed: seed)
         let generator2 = SeededRandomNumberGenerator(seed: seed)
         let generator3 = SeededRandomNumberGenerator(seed: seed)

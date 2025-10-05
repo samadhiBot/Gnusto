@@ -600,7 +600,7 @@ struct BurnActionHandlerTests {
             .in(.player)
 
         let game = MinimalGame(
-            items: Lab.troll, torch
+            items: Lab.nastyTroll, torch
         )
 
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
@@ -621,7 +621,7 @@ struct BurnActionHandlerTests {
 
             A laboratory in which strange experiments are being conducted.
 
-            There is a fierce troll here.
+            There is a nasty troll here.
 
             > burn the troll
             That would be needlessly cruel.
@@ -647,7 +647,7 @@ struct BurnActionHandlerTests {
             """
         )
 
-        let finalTroll = await engine.item("troll")
+        let finalTroll = await engine.item(.nastyTroll)
         #expect(await finalTroll.hasFlag(.isTouched) == true)
     }
 

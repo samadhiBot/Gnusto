@@ -34,7 +34,7 @@ extension Lab {
         .isTakable
         .omitDescription
         .size(25)
-        .in(.item(.troll))
+        .in(.item(.nastyTroll))
 
     /// A bunch of purple grapes for testing plural item handling.
     ///
@@ -256,16 +256,16 @@ extension Lab {
         )
         .in(.startRoom)
 
-    /// A fierce troll that blocks the player's path.
+    /// A nasty troll that blocks the player's path.
     ///
     /// This NPC serves as a classic IF obstacle with multiple synonyms and adjectives.
     /// The troll carries an axe and has taunting behavior. It's transparent and
     /// requires special handling to take, making it ideal for testing complex interactions.
-    public static let troll = Item(.troll)
-        .name("fierce troll")
+    public static let nastyTroll = Item(.nastyTroll)
+        .name("nasty troll")
         .adjectives("angry", "fearsome", "terrible", "grotesque")
         .synonyms("beast", "monster", "creature")
-        .description("A fierce troll blocking your way.")
+        .description("A nasty troll blocking your way.")
         .characterSheet(
             strength: 14,
             dexterity: 8,
@@ -378,6 +378,9 @@ extension ItemID {
     /// The item ID for the merchant.
     public static let merchant = ItemID("merchant")
 
+    /// The item ID for the nasty troll.
+    public static let nastyTroll = ItemID("nastyTroll")
+
     /// The item ID for the pebble.
     public static let pebble = ItemID("pebble")
 
@@ -389,9 +392,6 @@ extension ItemID {
 
     /// The item ID for the torch.
     public static let torch = ItemID("torch")
-
-    /// The item ID for the troll.
-    public static let troll = ItemID("troll")
 
     /// The item ID for the wizard.
     public static let wizard = ItemID("wizard")

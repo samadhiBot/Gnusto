@@ -283,7 +283,10 @@ public struct StandardCombatSystem: CombatSystem {
             }
 
             if case .enemy(let enemy) = attacker {
-                return .playerMissed(enemy: enemy, enemyWeapon: enemyWeapon)
+                return .playerMissed(
+                    enemy: enemy,
+                    enemyWeapon: enemyWeapon
+                )
             }
 
             if case .enemy(let enemy) = defender {
@@ -300,7 +303,10 @@ public struct StandardCombatSystem: CombatSystem {
             // Even "misses" can have tactical effects
             if await engine.randomPercentage(chance: 20) {
                 if case .enemy(let enemy) = attacker {
-                    return .playerStaggers(enemy: enemy, enemyWeapon: enemyWeapon)
+                    return .playerStaggers(
+                        enemy: enemy,
+                        enemyWeapon: enemyWeapon
+                    )
                 }
                 if case .enemy(let enemy) = defender {
                     return .enemyStaggers(
@@ -313,10 +319,17 @@ public struct StandardCombatSystem: CombatSystem {
 
             // Standard block/dodge
             if case .enemy(let enemy) = attacker {
-                return .playerDodged(enemy: enemy, enemyWeapon: enemyWeapon)
+                return .playerDodged(
+                    enemy: enemy,
+                    enemyWeapon: enemyWeapon
+                )
             }
             if case .enemy(let enemy) = defender {
-                return .enemyBlocked(enemy: enemy, playerWeapon: playerWeapon, enemyWeapon: enemyWeapon)
+                return .enemyBlocked(
+                    enemy: enemy,
+                    playerWeapon: playerWeapon,
+                    enemyWeapon: enemyWeapon
+                )
             }
         }
 
@@ -348,10 +361,16 @@ public struct StandardCombatSystem: CombatSystem {
             case 2:  // Stagger - status effect, allow damage
                 if case .enemy(let enemy) = defender {
                     specialEvent = .enemyStaggers(
-                        enemy: enemy, playerWeapon: playerWeapon, enemyWeapon: nil)
+                        enemy: enemy,
+                        playerWeapon: playerWeapon,
+                        enemyWeapon: nil
+                    )
                 }
                 if case .enemy(let enemy) = attacker {
-                    specialEvent = .playerStaggers(enemy: enemy, enemyWeapon: enemyWeapon)
+                    specialEvent = .playerStaggers(
+                        enemy: enemy,
+                        enemyWeapon: enemyWeapon
+                    )
                 }
             case 3:  // Hesitate - status effect, allow damage
                 if case .enemy(let enemy) = defender {
@@ -362,7 +381,10 @@ public struct StandardCombatSystem: CombatSystem {
                     )
                 }
                 if case .enemy(let enemy) = attacker {
-                    specialEvent = .playerHesitates(enemy: enemy, enemyWeapon: enemyWeapon)
+                    specialEvent = .playerHesitates(
+                        enemy: enemy,
+                        enemyWeapon: enemyWeapon
+                    )
                 }
             case 4:  // Vulnerable - status effect, allow damage
                 if case .enemy(let enemy) = defender {
@@ -373,7 +395,10 @@ public struct StandardCombatSystem: CombatSystem {
                     )
                 }
                 if case .enemy(let enemy) = attacker {
-                    specialEvent = .playerVulnerable(enemy: enemy, enemyWeapon: enemyWeapon)
+                    specialEvent = .playerVulnerable(
+                        enemy: enemy,
+                        enemyWeapon: enemyWeapon
+                    )
                 }
             case 5:  // Unconscious - dramatic, no damage
                 let defenderHealth = await defender.health
@@ -382,10 +407,17 @@ public struct StandardCombatSystem: CombatSystem {
                 if defenderHealthPercent <= 25 {
                     if case .enemy(let enemy) = defender {
                         return .enemyUnconscious(
-                            enemy: enemy, playerWeapon: playerWeapon, enemyWeapon: nil)
+                            enemy: enemy,
+                            playerWeapon: playerWeapon,
+                            enemyWeapon: nil
+                        )
                     }
                     if case .enemy(let enemy) = attacker {
-                        return .playerUnconscious(enemy: enemy, enemyWeapon: enemyWeapon, damage: 0)
+                        return .playerUnconscious(
+                            enemy: enemy,
+                            enemyWeapon: enemyWeapon,
+                            damage: 0
+                        )
                     }
                 }
             default:
@@ -650,7 +682,10 @@ public struct StandardCombatSystem: CombatSystem {
             let fatigueBonus = Int(enemyFatigue * 5.0)  // Fatigue makes surrender more likely
             if roll + characterSheet.wisdomModifier + fatigueBonus > 15 {
                 let enemyWeapon = await getEnemyWeapon(from: context.engine)
-                return .enemySurrenders(enemy: enemy, enemyWeapon: enemyWeapon)
+                return .enemySurrenders(
+                    enemy: enemy,
+                    enemyWeapon: enemyWeapon
+                )
             }
         }
 
@@ -660,7 +695,10 @@ public struct StandardCombatSystem: CombatSystem {
             let playerCharisma = await context.player.characterSheet.charismaModifier
             if roll + playerCharisma >= characterSheet.pacifyDC {
                 let enemyWeapon = await getEnemyWeapon(from: context.engine)
-                return .enemyPacified(enemy: enemy, enemyWeapon: enemyWeapon)
+                return .enemyPacified(
+                    enemy: enemy,
+                    enemyWeapon: enemyWeapon
+                )
             }
         }
 
@@ -688,7 +726,10 @@ public struct StandardCombatSystem: CombatSystem {
 
             // Critical miss on natural 1 (both rolls must be 1)
             if roll1 == 1 && roll2 == 1 {
-                return .playerMissed(enemy: enemy, enemyWeapon: enemyWeapon)
+                return .playerMissed(
+                    enemy: enemy,
+                    enemyWeapon: enemyWeapon
+                )
             }
 
             // Check for devastating opportunity attack on distracted player
@@ -698,17 +739,29 @@ public struct StandardCombatSystem: CombatSystem {
                     // Special opportunity attacks on distracted opponents
                     return switch opportunityRoll {
                     case 20:
-                        .playerVulnerable(enemy: enemy, enemyWeapon: enemyWeapon)
+                            .playerVulnerable(
+                                enemy: enemy,
+                                enemyWeapon: enemyWeapon
+                            )
                     case 18...19:
-                        .playerStaggers(enemy: enemy, enemyWeapon: enemyWeapon)
+                            .playerStaggers(
+                                enemy: enemy,
+                                enemyWeapon: enemyWeapon
+                            )
                     default:
-                        .playerHesitates(enemy: enemy, enemyWeapon: enemyWeapon)
+                            .playerHesitates(
+                                enemy: enemy,
+                                enemyWeapon: enemyWeapon
+                            )
                     }
                 }
             }
 
             guard totalAttack >= playerAC || isCritical else {
-                return .playerDodged(enemy: enemy, enemyWeapon: enemyWeapon)
+                return .playerDodged(
+                    enemy: enemy,
+                    enemyWeapon: enemyWeapon
+                )
             }
 
             // Calculate damage with bonus for distracted player and intensity
@@ -729,19 +782,46 @@ public struct StandardCombatSystem: CombatSystem {
 
             return switch category {
             case .fatal:
-                .playerSlain(enemy: enemy, enemyWeapon: enemyWeapon, damage: damage)
+                    .playerSlain(
+                        enemy: enemy,
+                        enemyWeapon: enemyWeapon,
+                        damage: damage
+                    )
             case .critical:
-                .playerCriticallyWounded(enemy: enemy, enemyWeapon: enemyWeapon, damage: damage)
+                    .playerCriticallyWounded(
+                        enemy: enemy,
+                        enemyWeapon: enemyWeapon,
+                        damage: damage
+                    )
             case .grave:
-                .playerGravelyInjured(enemy: enemy, enemyWeapon: enemyWeapon, damage: damage)
+                    .playerGravelyInjured(
+                        enemy: enemy,
+                        enemyWeapon: enemyWeapon,
+                        damage: damage
+                    )
             case .moderate:
-                .playerInjured(enemy: enemy, enemyWeapon: enemyWeapon, damage: damage)
+                    .playerInjured(
+                        enemy: enemy,
+                        enemyWeapon: enemyWeapon,
+                        damage: damage
+                    )
             case .light:
-                .playerLightlyInjured(enemy: enemy, enemyWeapon: enemyWeapon, damage: damage)
+                    .playerLightlyInjured(
+                        enemy: enemy,
+                        enemyWeapon: enemyWeapon,
+                        damage: damage
+                    )
             case .scratch:
-                .playerGrazed(enemy: enemy, enemyWeapon: enemyWeapon, damage: damage)
+                    .playerGrazed(
+                        enemy: enemy,
+                        enemyWeapon: enemyWeapon,
+                        damage: damage
+                    )
             case .none:
-                .playerDodged(enemy: enemy, enemyWeapon: enemyWeapon)
+                    .playerDodged(
+                        enemy: enemy,
+                        enemyWeapon: enemyWeapon
+                    )
             }
         }
 
@@ -819,13 +899,20 @@ public struct StandardCombatSystem: CombatSystem {
             // Check for weapon requirements
             if characterSheet.requiresWeapon == true && weapon == nil {
                 let enemyWeapon = await getEnemyWeapon(from: context.engine)
-                return .unarmedAttackDenied(enemy: enemy, enemyWeapon: enemyWeapon)
+                return .unarmedAttackDenied(
+                    enemy: enemy,
+                    enemyWeapon: enemyWeapon
+                )
             }
 
             // Check if item is actually a weapon
             if let weapon, await !weapon.isWeapon {
                 let enemyWeapon = await getEnemyWeapon(from: context.engine)
-                return .nonWeaponAttack(enemy: enemy, enemyWeapon: enemyWeapon, item: weapon)
+                return .nonWeaponAttack(
+                    enemy: enemy,
+                    enemyWeapon: enemyWeapon,
+                    item: weapon
+                )
             }
 
             // Calculate attack outcome
@@ -848,7 +935,10 @@ public struct StandardCombatSystem: CombatSystem {
             let charismaCheck = await context.player.characterSheet.charismaModifier + roll
             let enemyWeapon = await getEnemyWeapon(from: context.engine)
             return if charismaCheck >= characterSheet.pacifyDC {
-                .enemyPacified(enemy: enemy, enemyWeapon: enemyWeapon)
+                .enemyPacified(
+                    enemy: enemy,
+                    enemyWeapon: enemyWeapon
+                )
             } else {
                 nil
             }
@@ -1438,7 +1528,7 @@ public struct StandardCombatSystem: CombatSystem {
                 return await ActionResult(
                     description,
                     context.engine.endCombat(),
-                    enemy.move(to: .location(destination)),
+                    enemy.move(to: destination),
                 )
             } else {
                 return ActionResult(description)
@@ -1471,7 +1561,7 @@ public struct StandardCombatSystem: CombatSystem {
         case .playerDisarmed(_, let playerWeapon, _, _):
             return await ActionResult(
                 description,
-                playerWeapon.move(to: .location(context.player.player.currentLocationID))
+                playerWeapon.move(to: context.player.player.currentLocationID)
             )
 
         case .playerStaggers, .playerHesitates, .playerVulnerable:

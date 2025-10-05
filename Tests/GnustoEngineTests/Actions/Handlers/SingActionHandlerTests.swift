@@ -85,7 +85,7 @@ struct SingActionHandlerTests {
     func testSingToEnemySyntax() async throws {
         // Given
         let game = MinimalGame(
-            items: Lab.troll
+            items: Lab.nastyTroll
         )
 
         let (engine, mockIO) = await GameEngine.test(blueprint: game)

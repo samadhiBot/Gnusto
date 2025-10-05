@@ -12,7 +12,7 @@ struct AttackActionHandlerTests {
     func testAttackDirectObjectSyntax() async throws {
         // Given
         let game = MinimalGame(
-            items: Lab.troll, Lab.axe
+            items: Lab.nastyTroll, Lab.axe
         )
 
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
@@ -62,7 +62,7 @@ struct AttackActionHandlerTests {
             You throw yourself at the beast despite his nicked axe because
             sometimes fury must answer steel even when flesh cannot win.
 
-            You're too late -- the fierce troll is already deceased.
+            You're too late -- the nasty troll is already deceased.
             """
         )
     }
@@ -340,7 +340,7 @@ struct AttackActionHandlerTests {
             .in(.startRoom)
 
         let game = MinimalGame(
-            items: Lab.troll, sword
+            items: Lab.nastyTroll, sword
         )
 
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
@@ -368,7 +368,7 @@ struct AttackActionHandlerTests {
         let game = MinimalGame(
             player: Player(in: "darkRoom"),
             locations: darkRoom,
-            items: Lab.troll
+            items: Lab.nastyTroll
         )
 
         let (engine, mockIO) = await GameEngine.test(blueprint: game)

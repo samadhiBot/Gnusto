@@ -526,8 +526,8 @@ extension Thief {
                 You evidently frightened the robber, though you didn't hit him.
                 He flees, but the contents of his bag fall on the floor.
                 """,
-                context.item.move(to: .location(playerLocation.id)),
-                largeBag.move(to: .location(playerLocation.id)),
+                context.item.move(to: playerLocation.id),
+                largeBag.move(to: playerLocation.id),
                 thief.remove()
             )
         } else {

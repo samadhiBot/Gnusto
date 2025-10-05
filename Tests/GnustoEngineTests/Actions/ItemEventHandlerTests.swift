@@ -874,7 +874,7 @@ struct ItemEventHandlerTests {
             """
             > throw bottle
             The bottle hits the far wall and shatters.
-            
+
             > inventory
             Your hands are as empty as your pockets.
             """

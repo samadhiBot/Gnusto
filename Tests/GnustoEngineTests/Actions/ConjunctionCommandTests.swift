@@ -141,7 +141,6 @@ struct ConjunctionCommandTests {
             .in(.player)
             .isTakable
 
-
         let (engine, mockIO) = await GameEngine.test(
             blueprint: MinimalGame(items: sword, lantern)
         )
@@ -165,7 +164,6 @@ struct ConjunctionCommandTests {
             .name("sword")
             .in(.player)
             .isTakable
-
 
         let (engine, mockIO) = await GameEngine.test(
             blueprint: MinimalGame(items: sword)
@@ -237,7 +235,6 @@ struct ConjunctionCommandTests {
             .in(.player)
             .isTakable
 
-
         let (engine, mockIO) = await GameEngine.test(
             blueprint: MinimalGame(items: sword, lantern)
         )
@@ -276,7 +273,6 @@ struct ConjunctionCommandTests {
             .name("book")
             .in(.startRoom)
             .isTakable
-
 
         let (engine, mockIO) = await GameEngine.test(
             blueprint: MinimalGame(items: coin, gem, book)

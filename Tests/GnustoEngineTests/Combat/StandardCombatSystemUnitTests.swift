@@ -24,8 +24,8 @@ struct StandardCombatSystemUnitTests {
         let game = MinimalGame(
             player: Player(in: .startRoom),
             locations: entrance, startRoom,
-            items: Lab.ironSword, Lab.troll,
-            combatSystems: ["troll": StandardCombatSystem(versus: "troll")],
+            items: Lab.ironSword, Lab.nastyTroll,
+            combatSystems: ["troll": StandardCombatSystem(versus: .nastyTroll)],
             randomSeed: randomSeed
         )
 
@@ -35,7 +35,7 @@ struct StandardCombatSystemUnitTests {
     func attackContext(for engine: GameEngine) async throws -> ActionContext {
         let command = await Command(
             verb: .attack,
-            directObject: .item(Lab.troll.proxy(engine))
+            directObject: .item(Lab.nastyTroll.proxy(engine))
         )
         return ActionContext(command, engine)
     }
@@ -45,7 +45,7 @@ struct StandardCombatSystemUnitTests {
     @Test("processCombatTurn handles basic attack flow")
     func testProcessCombatTurnBasicAttack() async throws {
         let (engine, _) = await createTestGame()
-        let combatSystem = StandardCombatSystem(versus: "troll")
+        let combatSystem = StandardCombatSystem(versus: .nastyTroll)
         let playerAction = PlayerAction.attack
         let result = try await combatSystem.processCombatTurn(
             playerAction: playerAction,
@@ -69,7 +69,7 @@ struct StandardCombatSystemUnitTests {
     @Test("processCombatTurn handles combat ending scenarios")
     func testProcessCombatTurnCombatEnding() async throws {
         let (engine, _) = await createTestGame()
-        let combatSystem = StandardCombatSystem(versus: "troll")
+        let combatSystem = StandardCombatSystem(versus: .nastyTroll)
         let result = try await combatSystem.processCombatTurn(
             playerAction: .attack,
             in: attackContext(for: engine)
@@ -95,8 +95,8 @@ struct StandardCombatSystemUnitTests {
     @Test("determineEnemyAction returns appropriate enemy response")
     func testDetermineEnemyActionBasic() async throws {
         let (engine, _) = await createTestGame()
-        let combatSystem = StandardCombatSystem(versus: "troll")
-        let troll = await engine.item("troll")
+        let combatSystem = StandardCombatSystem(versus: .nastyTroll)
+        let troll = await engine.item(.nastyTroll)
         let playerAction = PlayerAction.attack
         let enemyEvent = try await combatSystem.determineEnemyAction(
             against: playerAction,
@@ -113,14 +113,14 @@ struct StandardCombatSystemUnitTests {
     @Test("determineEnemyAction handles unconscious enemy")
     func testDetermineEnemyActionUnconsciousEnemy() async throws {
         let (engine, _) = await createTestGame()
-        let troll = await engine.item("troll")
+        let troll = await engine.item(.nastyTroll)
 
         // Make troll unconscious
         try await engine.apply(
             troll.setCharacterAttributes(consciousness: .unconscious)
         )
 
-        let combatSystem = StandardCombatSystem(versus: "troll")
+        let combatSystem = StandardCombatSystem(versus: .nastyTroll)
         let playerAction = PlayerAction.attack
         let enemyEvent = try await combatSystem.determineEnemyAction(
             against: playerAction,
@@ -137,8 +137,8 @@ struct StandardCombatSystemUnitTests {
     @Test("selectTaunt generates appropriate taunt events")
     func testSelectTaunt() async throws {
         let (engine, _) = await createTestGame()
-        let combatSystem = StandardCombatSystem(versus: "troll")
-        let troll = await engine.item("troll")
+        let combatSystem = StandardCombatSystem(versus: .nastyTroll)
+        let troll = await engine.item(.nastyTroll)
         let tauntEvent = await combatSystem.selectTaunt(
             from: troll,
             in: CombatTurn(
@@ -165,8 +165,8 @@ struct StandardCombatSystemUnitTests {
     @Test("playerCombatEvent handles attack action")
     func testPlayerCombatEventAttack() async throws {
         let (engine, _) = await createTestGame()
-        let combatSystem = StandardCombatSystem(versus: "troll")
-        let troll = await engine.item("troll")
+        let combatSystem = StandardCombatSystem(versus: .nastyTroll)
+        let troll = await engine.item(.nastyTroll)
         let sword = await engine.item("sword")
         let playerEvent = try await combatSystem.playerCombatEvent(
             for: .attack,
@@ -188,8 +188,8 @@ struct StandardCombatSystemUnitTests {
     @Test("playerCombatEvent handles flee action")
     func testPlayerCombatEventFlee() async throws {
         let (engine, _) = await createTestGame()
-        let combatSystem = StandardCombatSystem(versus: "troll")
-        let troll = await engine.item("troll")
+        let combatSystem = StandardCombatSystem(versus: .nastyTroll)
+        let troll = await engine.item(.nastyTroll)
         let playerEvent = try await combatSystem.playerCombatEvent(
             for: .flee(direction: .south),
             against: troll,
@@ -204,13 +204,13 @@ struct StandardCombatSystemUnitTests {
     @Test("recalculateCombatState updates state correctly")
     func testRecalculateCombatState() async throws {
         let (engine, _) = await createTestGame()
-        let combatSystem = StandardCombatSystem(versus: "troll")
-        let troll = await engine.item("troll")
+        let combatSystem = StandardCombatSystem(versus: .nastyTroll)
+        let troll = await engine.item(.nastyTroll)
         let sword = await engine.item("sword")
         try await engine.apply(
             engine.setCombatState(
                 to: CombatState(
-                    enemyID: .troll,
+                    enemyID: .nastyTroll,
                     roundCount: 1,
                     playerWeaponID: "sword",
                     combatIntensity: 0.36,
@@ -242,7 +242,7 @@ struct StandardCombatSystemUnitTests {
         expectNoDifference(
             newState,
             CombatState(
-                enemyID: .troll,
+                enemyID: .nastyTroll,
                 roundCount: 2,
                 playerWeaponID: "sword",
                 combatIntensity: 0.72,
@@ -257,7 +257,7 @@ struct StandardCombatSystemUnitTests {
     @Test("calculateAttributeBasedModifiers returns appropriate values")
     func testCalculateAttributeBasedModifiers() async throws {
         let (engine, _) = await createTestGame()
-        let combatSystem = StandardCombatSystem(versus: "troll")
+        let combatSystem = StandardCombatSystem(versus: .nastyTroll)
 
         let playerSheet = CharacterSheet(
             strength: 15,
@@ -274,7 +274,7 @@ struct StandardCombatSystemUnitTests {
         )
 
         let currentState = CombatState(
-            enemyID: .troll,
+            enemyID: .nastyTroll,
             roundCount: 2,
             playerWeaponID: "sword",
             combatIntensity: 0.7,
@@ -299,7 +299,7 @@ struct StandardCombatSystemUnitTests {
     @Test("calculateRoundDurationFatigue computes fatigue correctly")
     func testCalculateRoundDurationFatigue() async throws {
         let (engine, _) = await createTestGame()
-        let combatSystem = StandardCombatSystem(versus: "troll")
+        let combatSystem = StandardCombatSystem(versus: .nastyTroll)
 
         let playerSheet = CharacterSheet(constitution: 14)
         let enemySheet = CharacterSheet(constitution: 16)
@@ -324,8 +324,8 @@ struct StandardCombatSystemUnitTests {
     @Test("generateTurnResult creates appropriate action result")
     func testGenerateTurnResult() async throws {
         let (engine, _) = await createTestGame()
-        let combatSystem = StandardCombatSystem(versus: "troll")
-        let troll = await engine.item("troll")
+        let combatSystem = StandardCombatSystem(versus: .nastyTroll)
+        let troll = await engine.item(.nastyTroll)
         let sword = await engine.item("sword")
 
         let combatTurn = CombatTurn(
@@ -366,8 +366,8 @@ struct StandardCombatSystemUnitTests {
     @Test("generateEventResult creates damage state changes")
     func testGenerateEventResultDamage() async throws {
         let (engine, _) = await createTestGame()
-        let combatSystem = StandardCombatSystem(versus: "troll")
-        let troll = await engine.item("troll")
+        let combatSystem = StandardCombatSystem(versus: .nastyTroll)
+        let troll = await engine.item(.nastyTroll)
         let sword = await engine.item("sword")
 
         let damageEvent = CombatEvent.enemyInjured(
@@ -398,8 +398,8 @@ struct StandardCombatSystemUnitTests {
     @Test("generateEventResult handles player knocked unconscious")
     func testGenerateEventResultKnockout() async throws {
         let (engine, mockIO) = await createTestGame()
-        let combatSystem = StandardCombatSystem(versus: .troll)
-        let troll = await engine.item(.troll)
+        let combatSystem = StandardCombatSystem(versus: .nastyTroll)
+        let troll = await engine.item(.nastyTroll)
 
         try await engine.apply(
             engine.player.move(to: "entrance"),
@@ -413,7 +413,7 @@ struct StandardCombatSystemUnitTests {
 
             A circular arena for testing combat.
 
-            There is a fierce troll here.
+            There is a nasty troll here.
 
             The fearsome beast abandons caution and lunges straight at you!
             Your iron sword suddenly feels less reassuring as the distance
@@ -450,7 +450,7 @@ struct StandardCombatSystemUnitTests {
             ],
             effects: [
                 .startEnemyReturnFuse(
-                    enemyID: .troll,
+                    enemyID: .nastyTroll,
                     to: .startRoom,
                     message: """
                         The worst possible timing: the creature comes back to find you still present,
@@ -459,7 +459,7 @@ struct StandardCombatSystemUnitTests {
                         You had your chance to leave.
                         """,
                     turns: 2
-                )
+                ),
             ]
         )
 
@@ -474,7 +474,7 @@ struct StandardCombatSystemUnitTests {
         let club = Item("club")
             .name("wooden club")
             .isWeapon
-            .in(.item("troll"))
+            .in(.item(.nastyTroll))
 
         let game = MinimalGame(
             player: Player(in: .startRoom),
@@ -484,8 +484,8 @@ struct StandardCombatSystemUnitTests {
                 .description("A circular arena for testing combat."),
                 .inherentlyLit
             ),
-            items: Lab.troll, club,
-            combatSystems: ["troll": StandardCombatSystem(versus: "troll")],
+            items: Lab.nastyTroll, club,
+            combatSystems: ["troll": StandardCombatSystem(versus: .nastyTroll)],
             randomSeed: 71
         )
 
@@ -496,7 +496,7 @@ struct StandardCombatSystemUnitTests {
             engine.setCombatState(to: CombatState(enemyID: "troll", enemyWeaponID: "club"))
         )
 
-        let combatSystem = StandardCombatSystem(versus: "troll")
+        let combatSystem = StandardCombatSystem(versus: .nastyTroll)
         let weapon = await combatSystem.getEnemyWeapon(from: engine)
 
         #expect(weapon?.id == "club")
@@ -505,7 +505,7 @@ struct StandardCombatSystemUnitTests {
     @Test("getEnemyWeapon returns nil when no weapon")
     func testGetEnemyWeaponNoWeapon() async throws {
         let (engine, _) = await createTestGame()
-        let combatSystem = StandardCombatSystem(versus: "troll")
+        let combatSystem = StandardCombatSystem(versus: .nastyTroll)
 
         let weapon = await combatSystem.getEnemyWeapon(from: engine)
 
@@ -517,7 +517,7 @@ struct StandardCombatSystemUnitTests {
     @Test("computeOffenseModifier with weapon")
     func testComputeOffenseModifierWithWeapon() async throws {
         let (engine, _) = await createTestGame()
-        let combatSystem = StandardCombatSystem(versus: "troll")
+        let combatSystem = StandardCombatSystem(versus: .nastyTroll)
 
         let player = await engine.player
         let attacker = Combatant.player(player)
@@ -536,7 +536,7 @@ struct StandardCombatSystemUnitTests {
     @Test("computeOffenseModifier without weapon")
     func testComputeOffenseModifierWithoutWeapon() async throws {
         let (engine, _) = await createTestGame()
-        let combatSystem = StandardCombatSystem(versus: "troll")
+        let combatSystem = StandardCombatSystem(versus: .nastyTroll)
 
         let player = await engine.player
         let attacker = Combatant.player(player)
@@ -556,9 +556,9 @@ struct StandardCombatSystemUnitTests {
     @Test("computeDefenseAdjustment returns valid adjustment")
     func testComputeDefenseAdjustment() async throws {
         let (engine, _) = await createTestGame()
-        let combatSystem = StandardCombatSystem(versus: "troll")
+        let combatSystem = StandardCombatSystem(versus: .nastyTroll)
 
-        let troll = await engine.item("troll")
+        let troll = await engine.item(.nastyTroll)
         let defender = Combatant.enemy(troll)
 
         let adjustment = await combatSystem.computeDefenseAdjustment(
@@ -573,11 +573,11 @@ struct StandardCombatSystemUnitTests {
     @Test("computeDamageAdjustment with critical hit")
     func testComputeDamageAdjustmentCritical() async throws {
         let (engine, _) = await createTestGame()
-        let combatSystem = StandardCombatSystem(versus: "troll")
+        let combatSystem = StandardCombatSystem(versus: .nastyTroll)
 
         let player = await engine.player
         let attacker = Combatant.player(player)
-        let troll = await engine.item("troll")
+        let troll = await engine.item(.nastyTroll)
         let defender = Combatant.enemy(troll)
         let weapon = await engine.item("sword")
         let intensity = 1.5
@@ -597,11 +597,11 @@ struct StandardCombatSystemUnitTests {
     @Test("computeDamageAdjustment normal hit")
     func testComputeDamageAdjustmentNormal() async throws {
         let (engine, _) = await createTestGame()
-        let combatSystem = StandardCombatSystem(versus: "troll")
+        let combatSystem = StandardCombatSystem(versus: .nastyTroll)
 
         let player = await engine.player
         let attacker = Combatant.player(player)
-        let troll = await engine.item("troll")
+        let troll = await engine.item(.nastyTroll)
         let defender = Combatant.enemy(troll)
         let weapon = await engine.item("sword")
         let intensity = 1.0
@@ -623,7 +623,7 @@ struct StandardCombatSystemUnitTests {
     @Test("shouldTriggerSpecialEvent with natural 20 always triggers")
     func testShouldTriggerSpecialEventNatural20() async throws {
         let (engine, _) = await createTestGame()
-        let combatSystem = StandardCombatSystem(versus: "troll")
+        let combatSystem = StandardCombatSystem(versus: .nastyTroll)
 
         let shouldTrigger = await combatSystem.shouldTriggerSpecialEvent(
             attackRoll: 20,
@@ -641,7 +641,7 @@ struct StandardCombatSystemUnitTests {
     @Test("shouldTriggerSpecialEvent is rare with low values")
     func testShouldTriggerSpecialEventRarity() async throws {
         let (engine, _) = await createTestGame()
-        let combatSystem = StandardCombatSystem(versus: "troll")
+        let combatSystem = StandardCombatSystem(versus: .nastyTroll)
 
         // Test multiple times to ensure special events are truly rare
         var triggerCount = 0
@@ -670,7 +670,7 @@ struct StandardCombatSystemUnitTests {
     @Test("shouldTriggerSpecialEvent increases with escalation")
     func testShouldTriggerSpecialEventEscalation() async throws {
         let (engine, _) = await createTestGame()
-        let combatSystem = StandardCombatSystem(versus: "troll")
+        let combatSystem = StandardCombatSystem(versus: .nastyTroll)
 
         var lowEscalationTriggers = 0
         var highEscalationTriggers = 0
@@ -798,8 +798,8 @@ struct StandardCombatSystemUnitTests {
     @Test("defaultCombatDescription generates appropriate descriptions")
     func testDefaultCombatDescription() async throws {
         let (engine, _) = await createTestGame()
-        let combatSystem = StandardCombatSystem(versus: "troll")
-        let troll = await engine.item("troll")
+        let combatSystem = StandardCombatSystem(versus: .nastyTroll)
+        let troll = await engine.item(.nastyTroll)
         let sword = await engine.item("sword")
 
         let hitEvent = CombatEvent.enemyInjured(
@@ -825,8 +825,8 @@ struct StandardCombatSystemUnitTests {
     @Test("defaultCombatDescription handles miss events")
     func testDefaultCombatDescriptionMiss() async throws {
         let (engine, _) = await createTestGame()
-        let combatSystem = StandardCombatSystem(versus: "troll")
-        let troll = await engine.item("troll")
+        let combatSystem = StandardCombatSystem(versus: .nastyTroll)
+        let troll = await engine.item(.nastyTroll)
         let sword = await engine.item("sword")
 
         let missEvent = CombatEvent.enemyMissed(
@@ -851,8 +851,8 @@ struct StandardCombatSystemUnitTests {
     @Test("defaultCombatDescription handles critical hits")
     func testDefaultCombatDescriptionCritical() async throws {
         let (engine, _) = await createTestGame()
-        let combatSystem = StandardCombatSystem(versus: "troll")
-        let troll = await engine.item("troll")
+        let combatSystem = StandardCombatSystem(versus: .nastyTroll)
+        let troll = await engine.item(.nastyTroll)
         let sword = await engine.item("sword")
 
         let criticalEvent = CombatEvent.enemyCriticallyWounded(
@@ -880,7 +880,7 @@ struct StandardCombatSystemUnitTests {
     @Test("functions handle nil parameters gracefully")
     func testNilParameterHandling() async throws {
         let (engine, _) = await createTestGame()
-        let combatSystem = StandardCombatSystem(versus: "troll")
+        let combatSystem = StandardCombatSystem(versus: .nastyTroll)
 
         let player = await engine.player
 
@@ -900,7 +900,7 @@ struct StandardCombatSystemUnitTests {
     @Test("functions handle extreme values")
     func testExtremeValues() async throws {
         let (engine, _) = await createTestGame()
-        let combatSystem = StandardCombatSystem(versus: "troll")
+        let combatSystem = StandardCombatSystem(versus: .nastyTroll)
 
         let player = await engine.player
 

@@ -20,7 +20,7 @@ struct ThiefTests {
         // Give the player a sword and position them in the passage next to the round room.
         try await engine.apply(
             engine.item(.sword).move(to: .player),
-            engine.player.move(to: .location(.ewPassage)),
+            engine.player.move(to: .ewPassage),
         )
 
         // Go east to the Round Room. Entering the Round Room starts the thief daemon.

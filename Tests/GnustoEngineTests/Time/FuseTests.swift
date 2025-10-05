@@ -210,7 +210,7 @@ struct FuseTests {
             .inherentlyLit
 
         let wizard = Lab.wizard
-        let troll = Lab.troll
+        let troll = Lab.nastyTroll
         let game = MinimalGame(locations: testRoom, items: wizard, troll)
         let (engine, _) = await GameEngine.test(blueprint: game)
 
@@ -262,7 +262,7 @@ struct FuseTests {
             .name("Test Room")
             .inherentlyLit
 
-        let troll = Lab.troll
+        let troll = Lab.nastyTroll
         let game = MinimalGame(locations: testRoom, items: troll)
         let (engine, _) = await GameEngine.test(blueprint: game)
 

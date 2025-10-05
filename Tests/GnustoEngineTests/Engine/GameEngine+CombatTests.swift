@@ -164,7 +164,7 @@ struct GameEngineCombatTests {
             .in(.player)
 
         let game = MinimalGame(
-            items: Lab.troll.fighting, axe
+            items: Lab.nastyTroll.fighting, axe
         )
 
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
@@ -179,7 +179,7 @@ struct GameEngineCombatTests {
 
             A laboratory in which strange experiments are being conducted.
 
-            There is a fierce troll here.
+            There is a nasty troll here.
 
             The fearsome beast abandons caution and lunges straight at you!
             Your battle axe suddenly feels less reassuring as the distance
@@ -192,7 +192,7 @@ struct GameEngineCombatTests {
         expectNoDifference(
             combatState,
             CombatState(
-                enemyID: "troll",
+                enemyID: .nastyTroll,
                 roundCount: 0,
                 playerWeaponID: "axe"
             )
