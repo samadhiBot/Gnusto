@@ -90,7 +90,7 @@ struct DanceActionHandlerTests {
 
         // Given
         let game = MinimalGame(
-            items: Lab.troll
+            items: Lab.nastyTroll
         )
 
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
@@ -109,10 +109,10 @@ struct DanceActionHandlerTests {
 
             A laboratory in which strange experiments are being conducted.
 
-            There is a fierce troll here.
+            There is a nasty troll here.
 
             > dance with troll
-            For a fleeting instant, you and the fierce troll find rhythm in
+            For a fleeting instant, you and the nasty troll find rhythm in
             each other's movements.
             """
         )

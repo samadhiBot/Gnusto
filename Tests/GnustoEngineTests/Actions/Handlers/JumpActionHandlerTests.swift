@@ -146,7 +146,7 @@ struct JumpActionHandlerTests {
     func testJumpWithCharacter() async throws {
         // Given
         let game = MinimalGame(
-            items: Lab.troll
+            items: Lab.nastyTroll
         )
 
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
@@ -158,12 +158,12 @@ struct JumpActionHandlerTests {
         await mockIO.expect(
             """
             > jump troll
-            Leaping upon the fierce troll would be an extraordinary breach
+            Leaping upon the nasty troll would be an extraordinary breach
             of personal space.
             """
         )
 
-        let finalState = await engine.item("troll")
+        let finalState = await engine.item(.nastyTroll)
         #expect(await finalState.hasFlag(.isTouched) == true)
     }
 

@@ -72,7 +72,7 @@ struct PushActionHandlerTests {
     func testPushEnemySyntax() async throws {
         // Given
         let game = MinimalGame(
-            items: Lab.troll
+            items: Lab.nastyTroll
         )
 
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
@@ -84,12 +84,12 @@ struct PushActionHandlerTests {
         await mockIO.expect(
             """
             > push the troll
-            Shoving the fierce troll would cross lines better left
+            Shoving the nasty troll would cross lines better left
             uncrossed.
             """
         )
 
-        let finalState = await engine.item("troll")
+        let finalState = await engine.item(.nastyTroll)
         #expect(await finalState.hasFlag(.isTouched) == true)
     }
 

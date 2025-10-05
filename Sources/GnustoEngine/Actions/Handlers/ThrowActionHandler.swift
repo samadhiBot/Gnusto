@@ -47,7 +47,7 @@ public struct ThrowActionHandler: ActionHandler {
             return await ActionResult(
                 context.msg.throwItem(context.command, item: theProjectile),
                 projectile.setFlag(.isTouched),
-                projectile.move(to: .location(location.id))
+                projectile.move(to: location.id)
             )
         }
 
@@ -68,7 +68,7 @@ public struct ThrowActionHandler: ActionHandler {
                     },
                 ),
                 projectile.setFlag(.isTouched),
-                projectile.move(to: .location(context.player.location.id)),
+                projectile.move(to: context.player.location.id),
                 target.setFlag(.isTouched)
             )
 

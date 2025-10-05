@@ -128,7 +128,7 @@ struct KickActionHandlerTests {
     func testKickCharacter() async throws {
         // Given
         let game = MinimalGame(
-            items: Lab.troll
+            items: Lab.nastyTroll
         )
 
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
@@ -140,12 +140,12 @@ struct KickActionHandlerTests {
         await mockIO.expect(
             """
             > kick troll
-            Kicking the fierce troll would irreparably damage your
+            Kicking the nasty troll would irreparably damage your
             relationship, among other things.
             """
         )
 
-        let finalState = await engine.item("troll")
+        let finalState = await engine.item(.nastyTroll)
         #expect(await finalState.hasFlag(.isTouched) == true)
     }
 

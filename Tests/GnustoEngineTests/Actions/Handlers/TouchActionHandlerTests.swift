@@ -367,7 +367,7 @@ struct TouchActionHandlerTests {
     func testTouchEnemy() async throws {
         // Given
         let game = MinimalGame(
-            items: Lab.troll
+            items: Lab.nastyTroll
         )
 
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
@@ -379,11 +379,11 @@ struct TouchActionHandlerTests {
         await mockIO.expect(
             """
             > feel troll
-            The fierce troll has not invited your touch.
+            The nasty troll has not invited your touch.
             """
         )
 
-        let finalTroll = await engine.item("troll")
+        let finalTroll = await engine.item(.nastyTroll)
         let wasTouched = await finalTroll.hasFlag(.isTouched)
         #expect(wasTouched == true)
     }
@@ -517,7 +517,7 @@ struct TouchActionHandlerTests {
         let game = MinimalGame(
             player: Player(in: "darkRoom"),
             locations: darkRoom,
-            items: Lab.troll
+            items: Lab.nastyTroll
         )
 
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
@@ -582,7 +582,7 @@ struct TouchActionHandlerTests {
             .in(.startRoom)
 
         let game = MinimalGame(
-            items: wizard, Lab.troll, statue
+            items: wizard, Lab.nastyTroll, statue
         )
 
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
@@ -601,7 +601,7 @@ struct TouchActionHandlerTests {
             The old wizard has not invited your touch.
 
             > feel troll
-            Physical contact with the fierce troll requires permission not
+            Physical contact with the nasty troll requires permission not
             yet granted.
 
             > touch statue
@@ -611,7 +611,7 @@ struct TouchActionHandlerTests {
         )
 
         let wizardState = await engine.item("wizard")
-        let trollState = await engine.item("troll")
+        let trollState = await engine.item(.nastyTroll)
         let statueState = await engine.item("statue")
 
         let wizardTouched = await wizardState.hasFlag(.isTouched)

@@ -1,17 +1,18 @@
 # Action Handler Development Guide
 
-Action handlers are the core components that process player commands in the Gnusto Interactive Fiction Engine. With 80+ built-in handlers covering everything from basic interactions to combat, conversations, and complex puzzle mechanics, this guide covers the design principles, implementation patterns, and best practices for creating effective action handlers that work with the modern proxy-based architecture.
+Action handlers are the core components that process player commands in the Gnusto Interactive Fiction Engine.
 
 ## Overview
 
 Action handlers translate player intent into game responses and state changes. They follow a careful scoring system that selects the most appropriate handler for each command, ensuring players receive contextually relevant feedback.
 
+With 80+ built-in handlers covering everything from basic interactions to combat, conversations, and complex puzzle mechanics, this guide covers the design principles, implementation patterns, and best practices for creating effective action handlers.
+
 ### Core Responsibilities
 
 - **Parse player commands** using syntax rules and verb matching
-- **Validate prerequisites** (reachability, game state, etc.)
 - **Generate meaningful responses** that keep players engaged
-- **Apply minimal state changes** through the StateChange pipeline
+- **Apply atomic state changes** through the StateChange pipeline
 - **Update pronouns and context** for natural language flow
 
 ## Design Philosophy
@@ -22,17 +23,17 @@ Action handlers should provide plausible responses without over-engineering game
 
 ```swift
 // ✅ Good: Generic, reusable
-if !targetItem.hasFlag(.isTakeable) {
-    throw ActionResponse.itemNotTakable(targetItem.name)
+if !item.hasFlag(.isTakeable) {
+    throw ActionResponse.itemNotTakable(item.withDefiniteArticle)
 }
 
 // ❌ Avoid: Game-specific logic in engine
-if targetItem.hasFlag(.isSponge) && !player.hasFlag(.hasWetHands) {
+if item.hasFlag(.isSponge) && !player.hasFlag(.hasWetHands) {
     throw await ActionResponse.feedback("The sponge is too dry to pick up.")
 }
 
 // ❌ Bad: Name or description based matching
-if targetItem.name.contains("sand") {
+if item.name.contains("sand") {
     throw await ActionResponse.feedback("The sand slips through your fingers.")
 }
 ```
@@ -41,7 +42,7 @@ if targetItem.name.contains("sand") {
 
 ### State Changes Flow Through Pipeline
 
-All game state modifications must use the `StateChange` system. Action handlers return an `ActionResult`, which includes a player-facing message and any changes to the game state.
+All game state modifications must use the ``StateChange`` system. Action handlers return an ``ActionResult``, which includes a player-facing message and any changes to the game state.
 
 ```swift
 // ✅ Correct: Using StateChange pipeline
@@ -56,9 +57,9 @@ public func process(context: ActionContext) async throws -> ActionResult {
 }
 ```
 
-### Use MessageProvider for ActionHandler Responses
+### Use StandardMessenger for Responses
 
-Never hardcode `ActionHandler` response text. Always use the `Messenger` system (via `context.msg` or `engine.messenger`) for consistency and localization:
+Never hardcode ``ActionHandler`` response text. Always use the ``StandardMessenger`` system for consistency and downstream customizability:
 
 ```swift
 // ✅ Good: Using Messenger system
@@ -70,7 +71,7 @@ throw await ActionResponse.feedback(
 throw await ActionResponse.feedback("You can't take that!")
 ```
 
-The `Messenger` system contains default responses for a wide variety of commands. Game developers can subclass `MessageProvider` to replace the default responses as needed to fit their own game's language and tone, and the engine automatically uses their custom messenger throughout all interactions.
+The `StandardMessenger` system contains default responses for a wide variety of commands. Game developers can subclass `StandardMessenger` to replace the default responses as needed to fit their own game's language and tone, and the engine automatically uses their custom messenger throughout all interactions.
 
 ## Action Handler Structure
 
@@ -80,7 +81,7 @@ The `Messenger` system contains default responses for a wide variety of commands
 public struct ExampleActionHandler: ActionHandler {
     public let syntax: [SyntaxRule] = [
         .match(.verb, .directObject),
-        .match(.pick, .up, .directObject)
+        .match(.pick, .up, .directObject),
     ]
 
     public let synonyms: [Verb] = [.take, .get, .grab]

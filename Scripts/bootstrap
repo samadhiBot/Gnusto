@@ -219,7 +219,7 @@ struct CustodialSingularity {
         .name("left-handed screwdriver")
         .description(
             """
-            It's a left-handed screwdriver. It looks it could be useful,
+            It's a left-handed screwdriver. It looks like it could be useful,
             provided you could find a left-handed screw.
             """
         )

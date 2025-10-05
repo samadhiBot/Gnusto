@@ -1,5 +1,7 @@
 # Combat System
 
+Implement turn-based melee combat with customizable mechanics, enemy AI, and dynamic narrative feedback.
+
 ## Overview
 
 The Gnusto combat system provides a flexible, extensible framework for implementing turn-based melee combat in interactive fiction games. It supports both default combat behavior and full customization through combat systems and messengers.

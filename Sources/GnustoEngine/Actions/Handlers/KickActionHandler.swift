@@ -50,7 +50,7 @@ public struct KickActionHandler: ActionHandler {
         if await item.playerIsHolding {
             let locationID = await context.player.location.id
             changes.append(
-                item.move(to: .location(locationID))
+                item.move(to: locationID)
             )
         }
 

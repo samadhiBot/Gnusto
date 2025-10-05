@@ -210,14 +210,14 @@ struct FuseTests {
             .inherentlyLit
 
         let wizard = Lab.wizard
-        let troll = Lab.troll
+        let troll = Lab.nastyTroll
         let game = MinimalGame(locations: testRoom, items: wizard, troll)
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         // Test convenience constructors
         let enemyLocationState = try FuseState.enemyLocation(
             turns: 5,
-            enemyID: ItemID("troll"),
+            enemyID: .nastyTroll,
             locationID: LocationID("startRoom"),
             message: "The troll is awake!"
         )
@@ -244,7 +244,7 @@ struct FuseTests {
         let enemyFuse = gameState.activeFuses[FuseID.enemyWakeUp]
         #expect(enemyFuse?.turns == 5)
         let enemyPayload = enemyFuse?.getPayload(as: FuseState.EnemyLocationPayload.self)
-        #expect(enemyPayload?.enemyID == ItemID("troll"))
+        #expect(enemyPayload?.enemyID == .nastyTroll)
         #expect(enemyPayload?.locationID == LocationID("startRoom"))
         #expect(enemyPayload?.message == "The troll is awake!")
 
@@ -262,14 +262,14 @@ struct FuseTests {
             .name("Test Room")
             .inherentlyLit
 
-        let troll = Lab.troll
+        let troll = Lab.nastyTroll
         let game = MinimalGame(locations: testRoom, items: troll)
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         // Create fuse with custom turns (7 instead of default)
         let fuseState = try FuseState.enemyLocation(
             turns: 7,
-            enemyID: ItemID("troll"),
+            enemyID: .nastyTroll,
             locationID: LocationID("startRoom"),
             message: "The troll awakens!"
         )
@@ -288,7 +288,7 @@ struct FuseTests {
 
         // Verify payload is still correct
         let payload = scheduledFuse?.getPayload(as: FuseState.EnemyLocationPayload.self)
-        #expect(payload?.enemyID == ItemID("troll"))
+        #expect(payload?.enemyID == .nastyTroll)
         #expect(payload?.locationID == LocationID("startRoom"))
         #expect(payload?.message == "The troll awakens!")
     }

@@ -1,0 +1,62 @@
+{
+  "theme": {
+    "border-radius": "16px",
+    "color": {
+      "code-background": {
+        "light": "#ececec",
+        "dark": "#161610"
+      },
+      "code-plain": {
+        "light": "#262623",
+        "dark": "#eeeedd"
+      },
+      "documentation-intro-fill": {
+          "light": "#b9c3cd",
+          "dark": "#2b2a27"
+      },
+      "fill": {
+        "light": "#fafafa",
+        "dark": "#1e1e1e"
+      },
+      "header-text": {
+        "light": "#1e1e1e",
+        "dark": "#faf2de"
+      },
+      "link": {
+        "light": "#63809a",
+        "dark": "#63809a"
+      },
+      "secondary-label": {
+        "light": "#262623",
+        "dark": "#faf2de"
+      },
+      "syntax-characters": {
+        "light": "#5d7927",
+        "dark": "#8faa5b"
+      },
+      "syntax-comment": {
+        "light": "#707f8c",
+        "dark": "#707f8c"
+      },
+      "syntax-keywords": {
+        "light": "#795a90",
+        "dark": "#9f86b2"
+      },
+      "syntax-other-type-names": {
+        "light": "#b17e2f",
+        "dark": "#d0a460"
+      },
+      "syntax-strings": {
+        "light": "#5d7927",
+        "dark": "#8faa5b"
+      },
+      "text": {
+        "light": "#262623",
+        "dark": "#faf2de"
+      }
+    },
+    "typography": {
+      "html-font-mono": "MonoLisa, ui-monospace, SFMono-Regular, \"SF Mono\", Menlo, Consolas, \"Liberation Mono\", monospace"
+    }
+  }
+}

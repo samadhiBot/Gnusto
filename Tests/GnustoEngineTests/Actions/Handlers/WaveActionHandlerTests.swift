@@ -85,7 +85,7 @@ struct WaveActionHandlerTests {
             .in(.player)
 
         let game = MinimalGame(
-            items: wand, Lab.troll
+            items: wand, Lab.nastyTroll
         )
 
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
@@ -96,7 +96,7 @@ struct WaveActionHandlerTests {
             """
             > wave wand at troll
             You flourish the magic wand in the general direction of the
-            fierce troll.
+            nasty troll.
             """
         )
     }

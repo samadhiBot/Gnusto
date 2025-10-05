@@ -264,7 +264,7 @@ struct ThinkActionHandlerTests {
     func testThinkAboutEnemy() async throws {
         // Given
         let game = MinimalGame(
-            items: Lab.troll
+            items: Lab.nastyTroll
         )
 
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
@@ -276,11 +276,11 @@ struct ThinkActionHandlerTests {
         await mockIO.expect(
             """
             > think about troll
-            You think about the fierce troll.
+            You think about the nasty troll.
             """
         )
 
-        let finalState = await engine.item("troll")
+        let finalState = await engine.item(.nastyTroll)
         #expect(await finalState.hasFlag(.isTouched) == true)
     }
 

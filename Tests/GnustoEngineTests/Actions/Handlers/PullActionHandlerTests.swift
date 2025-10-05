@@ -71,7 +71,7 @@ struct PullActionHandlerTests {
     func testPullEnemySyntax() async throws {
         // Given
         let game = MinimalGame(
-            items: Lab.troll
+            items: Lab.nastyTroll
         )
 
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
@@ -83,12 +83,11 @@ struct PullActionHandlerTests {
         await mockIO.expect(
             """
             > pull troll
-            The fierce troll is not a rope to be tugged at your
-            convenience.
+            The nasty troll is not a rope to be tugged at your convenience.
             """
         )
 
-        let finalState = await engine.item("troll")
+        let finalState = await engine.item(.nastyTroll)
         #expect(await finalState.hasFlag(.isTouched) == true)
     }
 

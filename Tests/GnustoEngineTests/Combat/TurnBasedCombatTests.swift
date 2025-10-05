@@ -106,7 +106,7 @@ struct TurnBasedCombatTests {
             .in(.player)
 
         let game = MinimalGame(
-            items: Lab.troll, lamp
+            items: Lab.nastyTroll, lamp
         )
 
         let (engine, mockIO) = await GameEngine.test(blueprint: game)

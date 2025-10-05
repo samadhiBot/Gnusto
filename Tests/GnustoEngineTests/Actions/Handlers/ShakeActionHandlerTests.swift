@@ -157,7 +157,7 @@ struct ShakeActionHandlerTests {
     func testShakeEnemy() async throws {
         // Given
         let game = MinimalGame(
-            items: Lab.troll
+            items: Lab.nastyTroll
         )
 
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
@@ -169,7 +169,7 @@ struct ShakeActionHandlerTests {
         await mockIO.expect(
             """
             > shake the troll
-            Your urge to shake the fierce troll must remain forever
+            Your urge to shake the nasty troll must remain forever
             unfulfilled.
             """
         )

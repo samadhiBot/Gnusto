@@ -3395,6 +3395,7 @@ open class CombatMessenger: StandardMessenger, @unchecked Sendable {
         let itsWeapon = await enemyWeapon?.alias(.withPossessiveAdjective(for: enemy))
         let theEnemy = await enemy.alias(.withDefiniteArticle)
         let theItem = await item.withDefiniteArticle
+        let weapon = await enemyWeapon?.name ?? "weapon"
 
         return switch itsWeapon {
         case .some(let itsWeapon):
@@ -3405,8 +3406,8 @@ open class CombatMessenger: StandardMessenger, @unchecked Sendable {
                 seem more amused than intimidated, raising \(itsWeapon) in response.
                 """,
                 """
-                \(theItem) makes a poor weapon against \(theEnemy.possessive)
-                \(itsWeapon)! This might not end well.
+                \(theItem) makes a poor weapon against \(theEnemy.possessive) \(weapon)!
+                This might not end well.
                 """,
                 """
                 You brandish \(theItem) aggressively! \(theEnemy) almost laughs,

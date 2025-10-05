@@ -415,7 +415,7 @@ struct TellActionHandlerTests {
     func testTellEnemy() async throws {
         // Given
         let game = MinimalGame(
-            items: Lab.troll
+            items: Lab.nastyTroll
         )
 
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
@@ -427,11 +427,11 @@ struct TellActionHandlerTests {
         await mockIO.expect(
             """
             > tell troll
-            The fierce troll awaits the subject of your discourse.
+            The nasty troll awaits the subject of your discourse.
             """
         )
 
-        let finalState = await engine.item("troll")
+        let finalState = await engine.item(.nastyTroll)
         #expect(await finalState.hasFlag(.isTouched) == true)
     }
 

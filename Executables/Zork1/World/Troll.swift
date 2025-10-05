@@ -234,7 +234,7 @@ extension Troll {
 
         if await troll.isHolding(axe.id) {
             await changes.append(contentsOf: [
-                axe.move(to: .location(.trollRoom)),
+                axe.move(to: .trollRoom),
                 axe.clearFlag(.omitDescription),
                 axe.setFlag(.isWeapon),
             ])
@@ -267,7 +267,7 @@ extension Troll {
            axeParent.id == .troll
         {
             await changes.append(contentsOf: [
-                axe.move(to: .location(.trollRoom)),
+                axe.move(to: .trollRoom),
                 axe.clearFlag(.omitDescription),
                 axe.setFlag(.isWeapon),
             ])
@@ -348,12 +348,12 @@ extension Troll {
 
         // Build base message
         let baseMessage =
-        if command.hasIntent(.throw) {
-            "The troll, who is remarkably coordinated, catches \(theItem)"
-        } else {
-            // otherwise intent was .give
-            "The troll, who is not overly proud, graciously accepts the gift"
-        }
+            if command.hasIntent(.throw) {
+                "The troll, who is remarkably coordinated, catches \(theItem)"
+            } else {
+                // otherwise intent was .give
+                "The troll, who is not overly proud, graciously accepts the gift"
+            }
 
         if await item.isWeapon {
             // 20% chance the troll eats the weapon and dies
@@ -377,7 +377,7 @@ extension Troll {
                     Fortunately, the troll has poor control, and \(theItem) falls
                     to the floor. He does not look pleased.
                     """,
-                    item.move(to: .location(.trollRoom))
+                    item.move(to: .trollRoom)
                 )
                 .prepended(by: wakeChange)
             }

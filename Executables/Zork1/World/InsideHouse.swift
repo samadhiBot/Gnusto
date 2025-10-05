@@ -62,7 +62,7 @@ extension InsideHouse {
         .firstDescription("A bottle is sitting on the table.")
         .capacity(4)
         .in(.item(.kitchenTable))
-    // Note: Has action handler BOTTLE-FUNCTION
+        // Note: Has action handler BOTTLE-FUNCTION
 
     static let chimney = Item(.chimney)
         .name("chimney")
@@ -80,7 +80,7 @@ extension InsideHouse {
         .isEdible
         .size(4)
         .in(.item(.sandwichBag))
-    // Note: Has action handler GARLIC-F
+        // Note: Has action handler GARLIC-F
 
     static let kitchenTable = Item(.kitchenTable)
         .name("kitchen table")
@@ -353,7 +353,7 @@ extension InsideHouse {
                 "The lamp has smashed into the floor, and the light has gone out.",
                 context.item.clearFlag(.isOn),
                 context.item.remove(),
-                brokenLamp.move(to: .location(playerLocation.id))
+                brokenLamp.move(to: playerLocation.id)
             )
         }
 

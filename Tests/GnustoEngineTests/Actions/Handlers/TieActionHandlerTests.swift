@@ -382,7 +382,7 @@ struct TieActionHandlerTests {
     func testTieEnemy() async throws {
         // Given
         let game = MinimalGame(
-            items: Lab.troll
+            items: Lab.nastyTroll
         )
 
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
@@ -394,12 +394,12 @@ struct TieActionHandlerTests {
         await mockIO.expect(
             """
             > tie troll
-            Binding the fierce troll would transform you from adventurer to
+            Binding the nasty troll would transform you from adventurer to
             kidnapper.
             """
         )
 
-        let finalTroll = await engine.item("troll")
+        let finalTroll = await engine.item(.nastyTroll)
         #expect(await finalTroll.hasFlag(.isTouched) == true)
     }
 
@@ -554,7 +554,7 @@ struct TieActionHandlerTests {
     func testCannotTieEnemyToItself() async throws {
         // Given
         let game = MinimalGame(
-            items: Lab.troll
+            items: Lab.nastyTroll
         )
 
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
@@ -566,7 +566,7 @@ struct TieActionHandlerTests {
         await mockIO.expect(
             """
             > tie troll to troll
-            You can't tie the fierce troll to itself.
+            You can't tie the nasty troll to itself.
             """
         )
     }
