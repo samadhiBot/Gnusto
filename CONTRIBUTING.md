@@ -6,7 +6,7 @@ Thank you for your interest in contributing to the Gnusto Interactive Fiction En
 
 ## Code of Conduct
 
-**Be curious, be kind.**. We're building a welcoming community where everyone can learn, contribute, and enjoy creating interactive fiction together.
+Please see our [Code of Conduct](.github/CODE_OF_CONDUCT.md) for guidelines on participating in the Gnusto community.
 
 ## Getting Started
 
@@ -41,7 +41,7 @@ Thank you for your interest in contributing to the Gnusto Interactive Fiction En
 - Create an original game
 - Port a classic IF game
 - Create a demo game that adds or demonstrates specific mechanics
-- Contribute to the [Zork 1](https://github.com/samadhiBot/Gnusto/tree/main/Executables/Zork1)) replica
+- Contribute to the [Zork 1](https://github.com/samadhiBot/Gnusto/tree/main/Executables/Zork1) replica
 
 ### 🧪 Testing
 - Add test coverage for untested code
@@ -78,24 +78,24 @@ func testTakeItem() async throws {
         .name("sparkling gem")
         .isTakable
         .in(.startRoom)
-    
+
     let game = MinimalGame(
         player: Player(in: .startRoom),
         locations: Location(id: .startRoom, .inherentlyLit),
         items: testItem
     )
-    
+
     let (engine, mockIO) = await GameEngine.test(blueprint: game)
-    
+
     try await engine.execute("take gem")
-    
+
     await mockIO.expect(
         """
         > take gem
         Taken.
         """
     )
-    
+
     let finalItem = await engine.item("gem")
     #expect(finalItem?.parent == .player)
 }
