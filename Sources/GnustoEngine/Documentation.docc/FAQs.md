@@ -4,7 +4,7 @@ Quick answers to common questions about the Gnusto Interactive Fiction Engine.
 
 ## What is Gnusto?
 
-**Gnusto is a modern, open-source interactive fiction engine that provides a declarative approach to creating parser-based text adventures.**
+**Gnusto is a modern, open-source [interactive fiction](https://www.perplexity.ai/search/what-is-interactive-fiction-pl-1uYPS4fUSfqGegXJHr1tRA#0) engine that provides a declarative syntax for creating text adventures.**
 
 ![Gnusto FAQs](gnusto-faqs.png)
 
@@ -68,7 +68,7 @@ The trade-off is that Gnusto lacks the maturity, community resources, and extens
 
 ## How do I write games in Gnusto?
 
-**You define your game world declaratively using Gnusto's declarative DSL, then add dynamic behaviors through event handlers.**
+**You define your game world using Gnusto's declarative DSL, then add dynamic behaviors through event handlers.**
 
 Here's a minimal example:
 
