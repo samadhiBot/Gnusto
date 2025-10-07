@@ -114,8 +114,8 @@ struct ItemEventHandlerTests {
         // This test is no longer relevant since we removed the deprecated beforeTurn method
         // on ItemEvent. The equivalent functionality is now tested through full integration.
 
-        let handler = ItemEventHandler(for: "testItem") {
-            before(.examine) { _, _ in
+        let handler = ItemEventHandler(for: "testItem") { on in
+            on.before(.examine) { _, _ in
                 ActionResult("Intent matched!")
             }
         }
@@ -141,8 +141,8 @@ struct ItemEventHandlerTests {
     func testWhenBeforeTurnSingleIntentNoMatch() async throws {
         // Test that handlers only respond to their specified intents
 
-        let handler = ItemEventHandler(for: "testItem") {
-            before(.take) { _, _ in
+        let handler = ItemEventHandler(for: "testItem") { on in
+            on.before(.take) { _, _ in
                 ActionResult("Should not be called")
             }
         }
@@ -165,8 +165,8 @@ struct ItemEventHandlerTests {
     func testWhenBeforeTurnMultipleIntents() async throws {
         // Test that handlers can match multiple intents
 
-        let handler = ItemEventHandler(for: "testItem") {
-            before(.examine, .take, .drop) { _, _ in
+        let handler = ItemEventHandler(for: "testItem") { on in
+            on.before(.examine, .take, .drop) { _, _ in
                 ActionResult("One intent matched!")
             }
         }
@@ -192,8 +192,8 @@ struct ItemEventHandlerTests {
     func testWhenBeforeTurnMultipleIntentsNoMatch() async throws {
         // Test that handlers don't match when no intents match
 
-        let handler = ItemEventHandler(for: "testItem") {
-            before(.take, .drop, .open) { _, _ in
+        let handler = ItemEventHandler(for: "testItem") { on in
+            on.before(.take, .drop, .open) { _, _ in
                 ActionResult("Should not be called")
             }
         }
@@ -217,13 +217,13 @@ struct ItemEventHandlerTests {
         // Test that beforeTurn and afterTurn handlers work independently
         let messageCapture = MessageCapture()
 
-        let handler = ItemEventHandler(for: "testItem") {
-            before(.examine) { _, _ in
+        let handler = ItemEventHandler(for: "testItem") { on in
+            on.before(.examine) { _, _ in
                 await messageCapture.addMessage("beforeTurn called")
                 return nil  // Allow default processing
             }
 
-            after { _, _ in
+            on.after { _, _ in
                 await messageCapture.addMessage("afterTurn called")
                 return nil
             }
@@ -247,8 +247,8 @@ struct ItemEventHandlerTests {
 
     @Test("ItemEventHandler can override command behavior before turn")
     func testBeforeTurnOverride() async throws {
-        let handler = ItemEventHandler(for: "testItem") {
-            before(.examine) { _, _ in
+        let handler = ItemEventHandler(for: "testItem") { on in
+            on.before(.examine) { _, _ in
                 ActionResult("This item has a special examination behavior!")
             }
         }
@@ -324,15 +324,15 @@ struct ItemEventHandlerTests {
         let item1Events = MessageCapture()
         let item2Events = MessageCapture()
 
-        let handler1 = ItemEventHandler(for: "item1") {
-            before(.examine) { _, _ in
+        let handler1 = ItemEventHandler(for: "item1") { on in
+            on.before(.examine) { _, _ in
                 await item1Events.addMessage("Item 1 examined")
                 return nil
             }
         }
 
-        let handler2 = ItemEventHandler(for: "item2") {
-            before(.examine) { _, _ in
+        let handler2 = ItemEventHandler(for: "item2") { on in
+            on.before(.examine) { _, _ in
                 await item2Events.addMessage("Item 2 examined")
                 return nil
             }
@@ -375,8 +375,8 @@ struct ItemEventHandlerTests {
 
     @Test("ItemEventHandler beforeTurn can prevent default action")
     func testBeforeTurnPreventsDefault() async throws {
-        let handler = ItemEventHandler(for: "testItem") {
-            before(.take) { _, _ in
+        let handler = ItemEventHandler(for: "testItem") { on in
+            on.before(.take) { _, _ in
                 ActionResult("This item cannot be taken – it's cursed!")
             }
         }
@@ -595,8 +595,8 @@ struct ItemEventHandlerTests {
 
     @Test("ItemEventHandler respects handler return values for flow control")
     func testFlowControl() async throws {
-        let handler = ItemEventHandler(for: "testItem") {
-            before(.take) { _, _ in
+        let handler = ItemEventHandler(for: "testItem") { on in
+            on.before(.take) { _, _ in
                 ActionResult("The item is magically protected from being taken!")
             }
         }
@@ -626,8 +626,8 @@ struct ItemEventHandlerTests {
 
     @Test("ItemEventHandler can modify item properties during events")
     func testItemPropertyModification() async throws {
-        let handler = ItemEventHandler(for: "glowItem") {
-            before(.examine) { _, _ in
+        let handler = ItemEventHandler(for: "glowItem") { on in
+            on.before(.examine) { _, _ in
                 ActionResult(
                     "As you examine the item, it begins to glow!"
                 )
@@ -760,8 +760,8 @@ struct ItemEventHandlerTests {
     func testContextBasedAPI() async throws {
         let messageCapture = MessageCapture()
 
-        let handler = ItemEventHandler(for: "testItem") {
-            before(.examine) { context, _ in
+        let handler = ItemEventHandler(for: "testItem") { on in
+            on.before(.examine) { context, _ in
                 await messageCapture.addMessage(
                     "Context handler called for item: \(context.item.id)")
                 return ActionResult("Custom examine message from context handler.")
@@ -978,7 +978,7 @@ struct ItemEventHandlerTests {
             .name("glass bottle")
             .isTakable
             .isContainer
-        // Note: not open
+            // Note: not open
             .in(.player)
 
         let water = Item("water")
@@ -1018,8 +1018,8 @@ struct ItemEventHandlerTests {
 }
 
 extension ItemEventHandlerTests {
-    static let bottleHandler = ItemEventHandler(for: "bottle") {
-        before(.throw) { context, _ in
+    static let bottleHandler = ItemEventHandler(for: "bottle") { on in
+        on.before(.throw) { context, _ in
             let water = await context.item("water")
             let hasWater = await water.parent == .item(context.item)
 
@@ -1040,7 +1040,7 @@ extension ItemEventHandlerTests {
             }
         }
 
-        before(.attack) { context, _ in
+        on.before(.attack) { context, _ in
             let water = await context.item("water")
             let hasWater = await water.parent == .item(context.item)
 
@@ -1061,7 +1061,7 @@ extension ItemEventHandlerTests {
             }
         }
 
-        before(.push) { context, _ in
+        on.before(.push) { context, _ in
             let water = await context.item("water")
             let hasWater = await water.parent == .item(context.item)
             let isOpen = await context.item.hasFlag(.isOpen)

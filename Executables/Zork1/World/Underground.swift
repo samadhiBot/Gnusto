@@ -140,7 +140,7 @@ extension Underground {
         .omitDescription
         .size(25)
         .in(.item(.troll))
-        // Note: Has action handler AXE-F
+    // Note: Has action handler AXE-F
 
     static let ownersManual = Item(.ownersManual)
         .name("ZORK owner's manual")
@@ -177,7 +177,7 @@ extension Underground {
         .size(15)
         .in(.gallery)
         .value(4)
-        // Note: VALUE 4, TVALUE 6, has action handler PAINTING-FCN
+    // Note: VALUE 4, TVALUE 6, has action handler PAINTING-FCN
 
     static let steepRampItem = Item(.steepRampItem)
         .name("steep metal ramp")
@@ -198,8 +198,8 @@ extension Underground {
     /// This is based on the ZIL `CELLAR-FCN` routine. When the player enters the cellar for the
     /// first time while the trap door is open, the door slams shut and is barred, preventing
     /// an easy return. This is controlled by a custom flag.
-    static let cellarHandler = LocationEventHandler(for: .cellar) {
-        onEnter { context in
+    static let cellarHandler = LocationEventHandler(for: .cellar) { on in
+        on.onEnter { context in
             let isTrapDoorOpen = await context.item(.trapDoor).isOpen
             let isTrapDoorBarred = await context.engine.hasFlag(.trapDoorBarred)
 

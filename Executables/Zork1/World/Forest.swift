@@ -190,8 +190,8 @@ enum Forest {
 // MARK: - Event handlers
 
 extension Forest {
-    static let forestHandler = ItemEventHandler(for: .forest) {
-        before(.listen) { _, _ in
+    static let forestHandler = ItemEventHandler(for: .forest) { on in
+        on.before(.listen) { _, _ in
             // For ZIL FOREST-F functionality:
             ActionResult("The pines and the hemlocks seem to be murmuring.")
         }
@@ -204,7 +204,7 @@ extension Forest {
                 """
                 You are in a clearing, with a forest surrounding you on all sides.
                 A path leads south.
-                """,
+                """
             ]
             if await !grate.hasFlag(.isInvisible) {
                 if await grate.isOpen {
@@ -219,8 +219,8 @@ extension Forest {
         }
     }
 
-    static let northClearingHandler = LocationEventHandler(for: .northClearing) {
-        onEnter { context in
+    static let northClearingHandler = LocationEventHandler(for: .northClearing) { on in
+        on.onEnter { context in
             // ZIL M-ENTER: If grate is not revealed, set it invisible
             let isGrateInvisible = await context.item(.grate).hasFlag(.isInvisible)
             if !isGrateInvisible {
@@ -234,8 +234,8 @@ extension Forest {
         }
     }
 
-    static let pileOfLeavesHandler = ItemEventHandler(for: .pileOfLeaves) {
-        before(.move) { context, _ in
+    static let pileOfLeavesHandler = ItemEventHandler(for: .pileOfLeaves) { on in
+        on.before(.move) { context, _ in
             let grate = await context.item(.grate)
 
             // Check if grate is invisible
@@ -262,8 +262,8 @@ extension Forest {
         }
     }
 
-    static let grateHandler = ItemEventHandler(for: .grate) {
-        before(.examine) { context, _ in
+    static let grateHandler = ItemEventHandler(for: .grate) { on in
+        on.before(.examine) { context, _ in
             if await context.item.hasFlag(.isInvisible) {
                 nil
             } else {
@@ -271,7 +271,7 @@ extension Forest {
             }
         }
 
-        before(.close) { context, _ in
+        on.before(.close) { context, _ in
             if await context.item.hasFlag(.isOpen) {
                 ActionResult(
                     "The grating is closed.",
@@ -282,7 +282,7 @@ extension Forest {
             }
         }
 
-        before(.lock) { context, _ in
+        on.before(.lock) { context, _ in
             let currentLocation = await context.player.location
             return if currentLocation.id == .gratingRoom {
                 ActionResult(
@@ -294,7 +294,7 @@ extension Forest {
             }
         }
 
-        before(.open) { context, command in
+        on.before(.open) { context, command in
             if let indirectObject = command.indirectObject,
                 case .item(let keys) = indirectObject,
                 keys.id == .keys
@@ -343,7 +343,7 @@ extension Forest {
             }
         }
 
-        before(.unlock) { context, command in
+        on.before(.unlock) { context, command in
             guard
                 let indirectObject = command.indirectObject,
                 case .item(let keys) = indirectObject

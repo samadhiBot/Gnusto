@@ -73,8 +73,8 @@ struct Thief {
 
 extension Thief {
     /// Main thief character handler with sophisticated AI behavior
-    static let thiefHandler = ItemEventHandler(for: .thief) {
-        before(.examine) { _, _ in
+    static let thiefHandler = ItemEventHandler(for: .thief) { on in
+        on.before(.examine) { _, _ in
             ActionResult(
                 """
                 The thief is a slippery character with beady eyes that flit back
@@ -85,7 +85,7 @@ extension Thief {
             )
         }
 
-        before(.give) { _, command in
+        on.before(.give) { _, command in
             // Get the item being given from the direct object
             guard case .item(let giftProxy) = command.directObject else {
                 return nil
@@ -93,19 +93,19 @@ extension Thief {
             return await handleGiveToThief(item: giftProxy)
         }
 
-        before(.listen) { _, _ in
+        on.before(.listen) { _, _ in
             ActionResult("The thief says nothing, as you have not been formally introduced.")
         }
 
-        before(.take) { _, _ in
+        on.before(.take) { _, _ in
             ActionResult("Once you got him, what would you do with him?")
         }
 
-        before(.tell) { _, _ in
+        on.before(.tell) { _, _ in
             ActionResult("The thief is a strong, silent type.")
         }
 
-        before(.throw) { context, command in
+        on.before(.throw) { context, command in
             if command.directObject?.itemProxy?.id == .knife {
                 await throwNastyKnifeAtThief(in: context)
             } else {
@@ -116,8 +116,8 @@ extension Thief {
     }
 
     /// Stiletto weapon handler with thief protection
-    static let stilettoHandler = ItemEventHandler(for: .stiletto) {
-        before(.examine) { context, _ in
+    static let stilettoHandler = ItemEventHandler(for: .stiletto) { on in
+        on.before(.examine) { context, _ in
             guard await isThiefHoldingStiletto(context.engine) else { return nil }
             return ActionResult(
                 """
@@ -127,7 +127,7 @@ extension Thief {
             )
         }
 
-        before(.take) { context, _ in
+        on.before(.take) { context, _ in
             // Stiletto is protected while thief is alive and present
             guard await isThiefHoldingStiletto(context.engine) else { return nil }
             return ActionResult(
@@ -140,8 +140,8 @@ extension Thief {
     }
 
     /// Large bag handler with treasure integration
-    static let largeBagHandler = ItemEventHandler(for: .largeBag) {
-        before(.examine) { context, _ in
+    static let largeBagHandler = ItemEventHandler(for: .largeBag) { on in
+        on.before(.examine) { context, _ in
             if await isThiefHoldingLargeBag(context.engine) {
                 return ActionResult(
                     """
@@ -164,7 +164,7 @@ extension Thief {
             }
         }
 
-        before(.take, .open) { context, _ in
+        on.before(.take, .open) { context, _ in
             guard await isThiefHoldingLargeBag(context.engine) else { return nil }
             return ActionResult(
                 """

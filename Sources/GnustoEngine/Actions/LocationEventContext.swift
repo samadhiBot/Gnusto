@@ -6,20 +6,18 @@
 ///
 /// Example usage:
 /// ```swift
-/// static let forestHandler = LocationEventHandler { context in
-///     return await context.event.match {
-///         beforeTurn(verb: .look) { _ in
-///             let timeOfDay = try await context.engine.global(.timeOfDay) ?? "day"
-///             if timeOfDay == "night" && !await context.location.isLit {
-///                 ActionResult("The forest is too dark to see anything.")
-///             } else {
-///                 ActionResult("Sunlight filters through the ancient trees.")
-///             }
+/// static let forestHandler = LocationEventHandler(for: .forest) { on in
+///     on.before(.look) { context, _ in
+///         let timeOfDay = try await context.engine.global(.timeOfDay) ?? "day"
+///         if timeOfDay == "night" && !await context.location.isLit {
+///             ActionResult("The forest is too dark to see anything.")
+///         } else {
+///             ActionResult("Sunlight filters through the ancient trees.")
 ///         }
-///         whenAfterTurn { _ in
-///             // Trigger forest sounds after any action
-///             ActionResult("You hear rustling in the bushes.")
-///         }
+///     }
+///     on.after { context, _ in
+///         // Trigger forest sounds after any action
+///         ActionResult("You hear rustling in the bushes.")
 ///     }
 /// }
 /// ```

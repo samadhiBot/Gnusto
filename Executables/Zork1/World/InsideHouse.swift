@@ -62,7 +62,7 @@ extension InsideHouse {
         .firstDescription("A bottle is sitting on the table.")
         .capacity(4)
         .in(.item(.kitchenTable))
-        // Note: Has action handler BOTTLE-FUNCTION
+    // Note: Has action handler BOTTLE-FUNCTION
 
     static let chimney = Item(.chimney)
         .name("chimney")
@@ -80,7 +80,7 @@ extension InsideHouse {
         .isEdible
         .size(4)
         .in(.item(.sandwichBag))
-        // Note: Has action handler GARLIC-F
+    // Note: Has action handler GARLIC-F
 
     static let kitchenTable = Item(.kitchenTable)
         .name("kitchen table")
@@ -102,7 +102,7 @@ extension InsideHouse {
         .requiresTryTake
         .firstDescription("On a table is a nasty-looking knife.")
         .in(.item(.atticTable))
-        // Note: Has action handler KNIFE-F
+    // Note: Has action handler KNIFE-F
 
     static let lamp = Item(.lamp)
         .name("brass lantern")
@@ -116,7 +116,7 @@ extension InsideHouse {
         .description("There is a brass lantern (battery-powered) here.")
         .size(15)
         .in(.livingRoom)
-        // Note: Has action handler LANTERN
+    // Note: Has action handler LANTERN
 
     static let lunch = Item(.lunch)
         .name("lunch")
@@ -159,7 +159,7 @@ extension InsideHouse {
         .size(10)
         .in(.attic)
         .isSacred
-        // Note: Has action handler ROPE-FUNCTION, SACREDBIT
+    // Note: Has action handler ROPE-FUNCTION, SACREDBIT
 
     static let rug = Item(.rug)
         .name("carpet")
@@ -168,7 +168,7 @@ extension InsideHouse {
         .omitDescription
         .requiresTryTake
         .in(.livingRoom)
-        // Note: Has action handler RUG-FCN
+    // Note: Has action handler RUG-FCN
 
     static let sandwichBag = Item(.sandwichBag)
         .name("brown sack")
@@ -182,7 +182,7 @@ extension InsideHouse {
         .capacity(9)
         .size(9)
         .in(.item(.kitchenTable))
-        // Note: Has action handler SANDWICH-BAG-FCN
+    // Note: Has action handler SANDWICH-BAG-FCN
 
     static let stairs = Item(.stairs)
         .name("stairs")
@@ -201,7 +201,7 @@ extension InsideHouse {
         .firstDescription("Above the trophy case hangs an elvish sword of great antiquity.")
         .size(30)
         .in(.livingRoom)
-        // Note: Has action handler SWORD-FCN, TVALUE 0
+    // Note: Has action handler SWORD-FCN, TVALUE 0
 
     static let trapDoor = Item(.trapDoor)
         .name("trap door")
@@ -210,7 +210,7 @@ extension InsideHouse {
         .omitDescription
         .isInvisible
         .in(.livingRoom)
-        // Note: Has action handler TRAP-DOOR-FCN
+    // Note: Has action handler TRAP-DOOR-FCN
 
     static let trophyCase = Item(.trophyCase)
         .name("trophy case")
@@ -223,7 +223,7 @@ extension InsideHouse {
         .isSearchable
         .capacity(10_000)
         .in(.livingRoom)
-        // Note: Has action handler TROPHY-CASE-FCN
+    // Note: Has action handler TROPHY-CASE-FCN
 
     static let water = Item(.water)
         .name("quantity of water")
@@ -244,7 +244,7 @@ extension InsideHouse {
         .isTransparent
         .readText("The engravings translate to \"This space intentionally left blank.\"")
         .in(.livingRoom)
-        // Note: Has action handler FRONT-DOOR-FCN
+    // Note: Has action handler FRONT-DOOR-FCN
 
     static let brokenLamp = Item(.brokenLamp)
         .name("broken lamp")
@@ -278,8 +278,8 @@ extension InsideHouse {
 // MARK: - Handlers
 
 extension InsideHouse {
-    static let bottleHandler = ItemEventHandler(for: .bottle) {
-        before(.throw) { context, _ in
+    static let bottleHandler = ItemEventHandler(for: .bottle) { on in
+        on.before(.throw) { context, _ in
             let water = await context.item(.water)
             let hasWater = await water.parent == .item(context.item)
 
@@ -300,7 +300,7 @@ extension InsideHouse {
             }
         }
 
-        before(.attack) { context, _ in
+        on.before(.attack) { context, _ in
             let water = await context.item(.water)
             let hasWater = await water.parent == .item(context.item)
 
@@ -321,7 +321,7 @@ extension InsideHouse {
             }
         }
 
-        before(.push) { context, _ in
+        on.before(.push) { context, _ in
             let water = await context.item(.water)
             let hasWater = await water.parent == .item(context.item)
             let isOpen = await context.item.hasFlag(.isOpen)
@@ -344,8 +344,8 @@ extension InsideHouse {
     /// - TURN ON: Lights lamp (unless burned out)
     /// - TURN OFF: Extinguishes lamp (unless burned out)
     /// - EXAMINE: Shows lamp state (burned out, on, or off)
-    static let lampHandler = ItemEventHandler(for: .lamp) {
-        before(.throw) { context, _ in
+    static let lampHandler = ItemEventHandler(for: .lamp) { on in
+        on.before(.throw) { context, _ in
             let playerLocation = await context.player.location
             let brokenLamp = await context.item(.brokenLamp)
 
@@ -357,17 +357,17 @@ extension InsideHouse {
             )
         }
 
-        before(.lightSource) { context, _ in
+        on.before(.lightSource) { context, _ in
             let isBurnedOut = await context.item.hasFlag(.isBurnedOut)
             return isBurnedOut ? ActionResult("A burned-out lamp won't light.") : nil
         }
 
-        before(.extinguish) { context, _ in
+        on.before(.extinguish) { context, _ in
             let isBurnedOut = await context.item.hasFlag(.isBurnedOut)
             return isBurnedOut ? ActionResult("The lamp has already burned out.") : nil
         }
 
-        before(.examine) { context, _ in
+        on.before(.examine) { context, _ in
             let isBurnedOut = await context.item.hasFlag(.isBurnedOut)
             let isOn = await context.item.hasFlag(.isOn)
 
@@ -392,8 +392,8 @@ extension InsideHouse {
     /// - TAKE: Rug is too heavy to carry
     /// - LOOK UNDER: Temporary trap door revelation
     /// - CLIMB ON: Irregularity detection and magic carpet joke
-    static let rugHandler = ItemEventHandler(for: .rug) {
-        before(.take) { context, _ in
+    static let rugHandler = ItemEventHandler(for: .rug) { on in
+        on.before(.take) { context, _ in
             let wasRugMoved = await context.engine.hasFlag(.rugMoved)
             let baseMessage = "The rug is too heavy to lift"
             return if wasRugMoved {
@@ -408,7 +408,7 @@ extension InsideHouse {
             }
         }
 
-        before(.move, .push) { context, _ in
+        on.before(.move, .push) { context, _ in
             let wasRugMoved = await context.engine.hasFlag(.rugMoved)
             if wasRugMoved {
                 return ActionResult(
@@ -433,11 +433,11 @@ extension InsideHouse {
             }
         }
 
-        before(.take) { _, _ in
+        on.before(.take) { _, _ in
             ActionResult("The rug is extremely heavy and cannot be carried.")
         }
 
-        before(.look) { context, _ in
+        on.before(.look) { context, _ in
             let wasRugMoved = await context.engine.hasFlag(.rugMoved)
             let trapDoor = await context.item(.trapDoor)
             let trapDoorOpen = await trapDoor.hasFlag(.isOpen)
@@ -455,7 +455,7 @@ extension InsideHouse {
             }
         }
 
-        before(.climb) { context, _ in
+        on.before(.climb) { context, _ in
             let wasRugMoved = await context.engine.hasFlag(.rugMoved)
             let trapDoor = await context.item(.trapDoor)
             let trapDoorOpen = await trapDoor.hasFlag(.isOpen)
@@ -479,9 +479,9 @@ extension InsideHouse {
     /// - TAKE: Enables the sword glow daemon when taken (equivalent to ENABLE <QUEUE I-SWORD -1>)
     /// - EXAMINE: Shows appropriate glow messages based on current glow state
     /// - Daemon activation: Checks current location and adjacent locations for monsters
-    static let swordHandler = ItemEventHandler(for: .sword) {
+    static let swordHandler = ItemEventHandler(for: .sword) { on in
         // Show glow message based on current glow level (like SWORD-FCN in ZIL)
-        before(.examine) { context, _ in
+        on.before(.examine) { context, _ in
             switch await context.engine.global(.swordGlowLevel) ?? 0 {
             case 1:
                 ActionResult("Your sword is glowing with a faint blue glow.")
@@ -493,14 +493,14 @@ extension InsideHouse {
         }
 
         // Disable sword glow daemon when dropped
-        after(.drop) { _, _ in
+        on.after(.drop) { _, _ in
             try ActionResult(
                 .stopDaemon(.swordDaemon)
             )
         }
 
         // Enable sword glow daemon when taken (like SWORD-FCN in ZIL)
-        after(.take) { _, _ in
+        on.after(.take) { _, _ in
             try ActionResult(
                 .runDaemon(.swordDaemon)
             )
@@ -514,8 +514,8 @@ extension InsideHouse {
     /// - **Living Room**: Allows opening, closing, and looking under the door with custom messages.
     /// - **Cellar**: Prevents opening from below and has special behavior for closing.
     /// - **Raise**: Treats `RAISE` as an alias for `OPEN`.
-    static let trapDoorHandler = ItemEventHandler(for: .trapDoor) {
-        before(.open, .pull) { context, _ in
+    static let trapDoorHandler = ItemEventHandler(for: .trapDoor) { on in
+        on.before(.open, .pull) { context, _ in
             let location = await context.player.location.id
             let isTrapDoorOpen = await context.item.hasFlag(.isOpen)
 
@@ -534,7 +534,7 @@ extension InsideHouse {
             }
         }
 
-        before(.close) { context, _ in
+        on.before(.close) { context, _ in
             let location = await context.player.location.id
             let isTrapDoorOpen = await context.item.hasFlag(.isOpen)
 
@@ -551,8 +551,8 @@ extension InsideHouse {
         }
     }
 
-    static let waterHandler = ItemEventHandler(for: .water) {
-        before(.drink) { context, _ in
+    static let waterHandler = ItemEventHandler(for: .water) { on in
+        on.before(.drink) { context, _ in
             guard await context.item(.bottle).isOpen else {
                 throw ActionResponse.feedback("You'll have to open the glass bottle first.")
             }

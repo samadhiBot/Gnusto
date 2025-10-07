@@ -103,9 +103,9 @@ extension RoundRoom {
         .synonyms("crack")
         .adjectives("narrow")
         .omitDescription
-        // Note: Has action handler CRACK-FCN
+    // Note: Has action handler CRACK-FCN
 
-        // Note: largeBag is now defined in Thief.swift to keep thief-related items together
+    // Note: largeBag is now defined in Thief.swift to keep thief-related items together
 
     static let platinumBar = Item(.platinumBar)
         .name("platinum bar")
@@ -117,13 +117,13 @@ extension RoundRoom {
         .in(.loudRoom)
         .value(10)
         .isSacred
-        // Note: VALUE 10, TVALUE 5, SACREDBIT
+    // Note: VALUE 10, TVALUE 5, SACREDBIT
 }
 
 extension RoundRoom {
     /// Entering the round room starts the thief daemon.
-    static let roundRoomHandler = LocationEventHandler(for: .roundRoom) {
-        onEnter { context in
+    static let roundRoomHandler = LocationEventHandler(for: .roundRoom) { on in
+        on.onEnter { context in
             if await !context.location.hasFlag(.isVisited) {
                 try ActionResult(
                     .runDaemon(.thiefDaemon)

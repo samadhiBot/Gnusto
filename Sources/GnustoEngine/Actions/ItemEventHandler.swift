@@ -38,14 +38,15 @@ public struct ItemEventHandler: Sendable {
     ///
     /// - Parameters:
     ///   - itemID: The ID of the item this handler is for
-    ///   - matchers: A result builder that creates a list of event matchers
+    ///   - matchers: A result builder that creates a list of event matchers, receiving an `ItemEventMatchers`
+    ///               namespace object with `before()` and `after()` methods
     ///
     /// Example usage:
     /// ```swift
     /// var itemEventHandlers: [ItemID: ItemEventHandler] {
     ///     [
-    ///         .lamp: ItemEventHandler(for: .lamp) {
-    ///             before(.turnOn) { context, command in
+    ///         .lamp: ItemEventHandler(for: .lamp) { on in
+    ///             on.before(.turnOn) { context, command in
     ///                 if await context.item.hasFlag(.isBroken) {
     ///                     ActionResult("The lamp is broken.")
     ///                 } else {
@@ -55,7 +56,7 @@ public struct ItemEventHandler: Sendable {
     ///                     )
     ///                 }
     ///             }
-    ///             afterTurn { context, command in
+    ///             on.after { context, command in
     ///                 ActionResult("After turn action.")
     ///             }
     ///         }
@@ -65,13 +66,13 @@ public struct ItemEventHandler: Sendable {
     public init(
         for itemID: ItemID,
         @ItemEventMatcherBuilder _ matchers:
-            @Sendable @escaping () async throws -> [ItemEventMatcher]
+            @Sendable @escaping (ItemEventMatchers) async throws -> [ItemEventMatcher]
     ) {
         self.handle = { engine, event in
             let item = await engine.item(itemID)
             let context = ItemEventContext(event: event, item: item, engine: engine)
 
-            let matcherList = try await matchers()
+            let matcherList = try await matchers(ItemEventMatchers())
             for matcher in matcherList {
                 if let result = try await matcher(context) {
                     return result
@@ -109,8 +110,8 @@ public typealias ItemEventMatcher = (ItemEventContext) async throws -> ActionRes
 ///
 /// This builder allows you to write event handlers in a declarative way:
 /// ```swift
-/// .lamp: ItemEventHandler(for: .lamp) {
-///     before(.turnOn) { context, command in
+/// .lamp: ItemEventHandler(for: .lamp) { on in
+///     on.before(.turnOn) { context, command in
 ///         if await context.item.hasFlag(.isBroken) {
 ///             ActionResult("The lamp is broken.")
 ///         } else {
@@ -120,7 +121,7 @@ public typealias ItemEventMatcher = (ItemEventContext) async throws -> ActionRes
 ///             )
 ///         }
 ///     }
-///     afterTurn { context, command in
+///     on.after { context, command in
 ///         ActionResult("After turn action.")
 ///     }
 /// }
@@ -138,6 +139,26 @@ public struct ItemEventMatcherBuilder {
     public static func buildBlock(_ matchers: ItemEventMatcher...) -> [ItemEventMatcher] {
         Array(matchers)
     }
+}
+
+// MARK: - Item Event Matchers Namespace
+
+/// Namespace struct containing event matching functions for `ItemEventHandler`.
+///
+/// This struct is passed as a parameter to the `ItemEventHandler` result builder closure,
+/// providing `before()` and `after()` methods for declarative event matching without
+/// polluting the global namespace.
+///
+/// Usage:
+/// ```swift
+/// ItemEventHandler(for: .lamp) { on in
+///     on.before(.turnOn) { context, command in ... }
+///     on.after(.turnOn) { context, command in ... }
+/// }
+/// ```
+public struct ItemEventMatchers: Sendable {
+    /// Internal initializer - instances are created automatically by `ItemEventHandler`.
+    init() {}
 }
 
 // MARK: - Item Event Matcher Builder Functions
@@ -197,98 +218,100 @@ public struct ItemEventMatcherBuilder {
  • before() can block actions, after() can only react to them
 */
 
-/// Creates an item event matcher for **beforeTurn** events with any of the specified intents.
-///
-/// **Timing**: Called at the very beginning of command execution, before any action handlers run.
-/// **Scope**: Fires for ALL items that have this handler in the player's current location and inventory.
-/// **Purpose**: Can intercept and potentially override normal command processing.
-/// **Can Block Actions**: Yes - if it returns an `ActionResult`, further command processing stops.
-///
-/// - Parameters:
-///   - intents: The command intents to match against (e.g., `.turnOn`, `.take`, `.examine`).
-///              If no intents specified, matches all commands.
-///   - result: The closure to execute if any intent matches, receiving the context and command
-/// - Returns: An ItemEventMatcher that can be used in the result builder
-///
-/// Example:
-/// ```swift
-/// before(.turnOn) { context, command in
-///     if await context.item.hasFlag(.isBroken) {
-///         ActionResult("The lamp is broken and won't turn on.")
-///     } else {
-///         nil  // Allow normal turn-on processing
-///     }
-/// }
-///
-/// before { context, command in
-///     // React to any command involving this item
-///     if command.verb == .examine {
-///         ActionResult("This item glows mysteriously when examined.")
-///     } else {
-///         nil
-///     }
-/// }
-/// ```
-public func before(
-    _ intents: Intent...,
-    result: @escaping (ItemEventContext, Command) async throws -> ActionResult?
-) -> ItemEventMatcher {
-    { context in
-        guard
-            case .beforeTurn(let command) = context.event,
-            command.matchesIntents(intents)
-        else {
-            return nil
+extension ItemEventMatchers {
+    /// Creates an item event matcher for **beforeTurn** events with any of the specified intents.
+    ///
+    /// **Timing**: Called at the very beginning of command execution, before any action handlers run.
+    /// **Scope**: Fires for ALL items that have this handler in the player's current location and inventory.
+    /// **Purpose**: Can intercept and potentially override normal command processing.
+    /// **Can Block Actions**: Yes - if it returns an `ActionResult`, further command processing stops.
+    ///
+    /// - Parameters:
+    ///   - intents: The command intents to match against (e.g., `.turnOn`, `.take`, `.examine`).
+    ///              If no intents specified, matches all commands.
+    ///   - result: The closure to execute if any intent matches, receiving the context and command
+    /// - Returns: An ItemEventMatcher that can be used in the result builder
+    ///
+    /// Example:
+    /// ```swift
+    /// on.before(.turnOn) { context, command in
+    ///     if await context.item.hasFlag(.isBroken) {
+    ///         ActionResult("The lamp is broken and won't turn on.")
+    ///     } else {
+    ///         nil  // Allow normal turn-on processing
+    ///     }
+    /// }
+    ///
+    /// on.before { context, command in
+    ///     // React to any command involving this item
+    ///     if command.verb == .examine {
+    ///         ActionResult("This item glows mysteriously when examined.")
+    ///     } else {
+    ///         nil
+    ///     }
+    /// }
+    /// ```
+    public func before(
+        _ intents: Intent...,
+        result: @escaping (ItemEventContext, Command) async throws -> ActionResult?
+    ) -> ItemEventMatcher {
+        { context in
+            guard
+                case .beforeTurn(let command) = context.event,
+                command.matchesIntents(intents)
+            else {
+                return nil
+            }
+            return try await result(context, command)
         }
-        return try await result(context, command)
     }
-}
 
-/// Creates an item event matcher for **afterTurn** events with any of the specified intents.
-///
-/// **Timing**: Called after the main action handler has completed successfully.
-/// **Scope**: Fires only for items directly involved in the command (direct/indirect objects).
-/// **Purpose**: React to what just happened or perform follow-up effects specific to this item.
-/// **Can Block Actions**: No - the main action already happened, this is just for follow-up effects.
-///
-/// - Parameters:
-///   - intents: The command intents to match against (e.g., `.turnOn`, `.take`, `.examine`).
-///              If no intents specified, matches all commands involving this item.
-///   - result: The closure to execute for matching afterTurn events, receiving the context and command
-/// - Returns: An ItemEventMatcher that can be used in the result builder
-///
-/// Example:
-/// ```swift
-/// after(.turnOn) { context, command in
-///     // Lamp-specific reaction after being turned on
-///     ActionResult("The lamp hums quietly and casts dancing shadows.")
-/// }
-///
-/// after(.take) { context, command in
-///     // Item-specific reaction after being taken
-///     if await context.item.hasFlag(.isCursed) {
-///         ActionResult("As you pick it up, the cursed amulet grows cold.")
-///     } else {
-///         nil
-///     }
-/// }
-///
-/// after { context, command in
-///     // React to any command that directly involved this item
-///     ActionResult("The magical item pulses with energy after being touched.")
-/// }
-/// ```
-public func after(
-    _ intents: Intent...,
-    result: @escaping (ItemEventContext, Command) async throws -> ActionResult?
-) -> ItemEventMatcher {
-    { context in
-        guard
-            case .afterTurn(let command) = context.event,
-            command.matchesIntents(intents)
-        else {
-            return nil
+    /// Creates an item event matcher for **afterTurn** events with any of the specified intents.
+    ///
+    /// **Timing**: Called after the main action handler has completed successfully.
+    /// **Scope**: Fires only for items directly involved in the command (direct/indirect objects).
+    /// **Purpose**: React to what just happened or perform follow-up effects specific to this item.
+    /// **Can Block Actions**: No - the main action already happened, this is just for follow-up effects.
+    ///
+    /// - Parameters:
+    ///   - intents: The command intents to match against (e.g., `.turnOn`, `.take`, `.examine`).
+    ///              If no intents specified, matches all commands involving this item.
+    ///   - result: The closure to execute for matching afterTurn events, receiving the context and command
+    /// - Returns: An ItemEventMatcher that can be used in the result builder
+    ///
+    /// Example:
+    /// ```swift
+    /// on.after(.turnOn) { context, command in
+    ///     // Lamp-specific reaction after being turned on
+    ///     ActionResult("The lamp hums quietly and casts dancing shadows.")
+    /// }
+    ///
+    /// on.after(.take) { context, command in
+    ///     // Item-specific reaction after being taken
+    ///     if await context.item.hasFlag(.isCursed) {
+    ///         ActionResult("As you pick it up, the cursed amulet grows cold.")
+    ///     } else {
+    ///         nil
+    ///     }
+    /// }
+    ///
+    /// on.after { context, command in
+    ///     // React to any command that directly involved this item
+    ///     ActionResult("The magical item pulses with energy after being touched.")
+    /// }
+    /// ```
+    public func after(
+        _ intents: Intent...,
+        result: @escaping (ItemEventContext, Command) async throws -> ActionResult?
+    ) -> ItemEventMatcher {
+        { context in
+            guard
+                case .afterTurn(let command) = context.event,
+                command.matchesIntents(intents)
+            else {
+                return nil
+            }
+            return try await result(context, command)
         }
-        return try await result(context, command)
     }
 }

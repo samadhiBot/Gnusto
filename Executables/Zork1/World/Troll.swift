@@ -76,29 +76,29 @@ enum Troll {
 
     // MARK: - Event Handlers
 
-    static let trollHandler = ItemEventHandler(for: .troll) {
-        before(.tell) { _, _ in
+    static let trollHandler = ItemEventHandler(for: .troll) { on in
+        on.before(.tell) { _, _ in
             ActionResult("The troll isn't much of a conversationalist.")
         }
 
-        //        before(.examine) { context, command in
+        //        on.before(.examine) { context, command in
         //            let description = await context.item.description
         //            return ActionResult(description)
         //        }
 
-        before(.attack) { context, _ in
+        on.before(.attack) { context, _ in
             // Wake the troll first if unconscious
             await wakeTroll(engine: context.engine)
         }
 
-        before(.give, .throw) { context, command in
+        on.before(.give, .throw) { context, command in
             await handleTrollGiveOrThrow(
                 engine: context.engine,
                 command: command
             )
         }
 
-        before(.take, .move) { context, _ in
+        on.before(.take, .move) { context, _ in
             await ActionResult(
                 """
                 The troll spits in your face, grunting "Better luck next time"
@@ -109,7 +109,7 @@ enum Troll {
             )
         }
 
-        before(.mung, .pull, .push) { context, command in
+        on.before(.mung, .pull, .push) { context, command in
             // Non-attack mung verbs include `rip`, `break`, etc.
             if !command.hasIntent(.attack) {
                 return await ActionResult(
@@ -121,7 +121,7 @@ enum Troll {
             return nil
         }
 
-        before(.listen) { context, _ in
+        on.before(.listen) { context, _ in
             if await context.item.isAwake {
                 return ActionResult(
                     """
@@ -133,7 +133,7 @@ enum Troll {
             return nil
         }
 
-        before(.ask, .tell) { context, _ in
+        on.before(.ask, .tell) { context, _ in
             if await !context.item.isAwake {
                 return ActionResult("Unfortunately, the troll can't hear you.")
             }
@@ -141,15 +141,15 @@ enum Troll {
         }
     }
 
-    static let trollRoomHandler = LocationEventHandler(for: .trollRoom) {
-        beforeTurn(.move) { context, command in
+    static let trollRoomHandler = LocationEventHandler(for: .trollRoom) { on in
+        on.before(.move) { context, command in
             let troll = await context.item(.troll)
 
             // Troll blocks the way if here in the room, alive, and conscious
             if await context.location.items.contains(troll),
-               await troll.isAwake,
-               let direction = command.direction,
-               [.east, .west].contains(direction)
+                await troll.isAwake,
+                let direction = command.direction,
+                [.east, .west].contains(direction)
             {
                 return ActionResult("The troll fends you off with a menacing gesture.")
             }
@@ -173,9 +173,9 @@ enum Troll {
 
         // Check if axe is in the troll room and troll should pick it up
         if case .location(let axeLocationProxy) = await axe.parent,
-           axeLocationProxy.id == LocationID.trollRoom,
-           case .location(let trollLocationProxy) = await troll.parent,
-           trollLocationProxy.id == LocationID.trollRoom
+            axeLocationProxy.id == LocationID.trollRoom,
+            case .location(let trollLocationProxy) = await troll.parent,
+            trollLocationProxy.id == LocationID.trollRoom
         {
             // 75-90% chance (using 80% as middle ground)
             let shouldPickUp = await engine.randomPercentage(chance: 80)
@@ -259,12 +259,12 @@ extension Troll {
             troll.setCharacterAttributes(
                 consciousness: .unconscious,
                 isFighting: false
-            ),
+            )
         ]
 
         // If troll had axe, drop it and restore weapon properties
         if case .item(let axeParent) = await axe.parent,
-           axeParent.id == .troll
+            axeParent.id == .troll
         {
             await changes.append(contentsOf: [
                 axe.move(to: .trollRoom),
@@ -296,12 +296,12 @@ extension Troll {
             troll.setCharacterAttributes(
                 consciousness: .unconscious,
                 isFighting: false
-            ),
+            )
         ]
 
         // Check if axe is available to pick up
         if case .location(let axeLocationProxy) = await axe.parent,
-           axeLocationProxy.id == LocationID.trollRoom
+            axeLocationProxy.id == LocationID.trollRoom
         {
             await changes.append(contentsOf: [
                 axe.setFlag(.omitDescription),
