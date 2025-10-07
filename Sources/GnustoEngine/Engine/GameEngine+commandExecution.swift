@@ -8,14 +8,14 @@ extension GameEngine {
     /// Executes a parsed game command, orchestrating calls to event handlers and action handlers.
     ///
     /// This is a central method in processing player actions. It performs the following sequence:
-    /// 1. **Item `beforeTurn` Events**: For every item in the player's current location or
-    ///    inventory that has an `ItemEventHandler` registered for `.beforeTurn`,
+    /// 1. **Item `before` Events**: For every item in the player's current location or
+    ///    inventory that has an `ItemEventHandler` registered for `.before`,
     ///    executes that handler. If any handler returns `true` (indicating it fully handled
     ///    the command or turn) or sets `shouldQuit`, further processing of the command stops.
-    /// 2. **Location `beforeTurn` Events**: If the player's current location has a
-    ///    `LocationEventHandler` registered for `.beforeTurn`, executes it. If it returns `true`
+    /// 2. **Location `before` Events**: If the player's current location has a
+    ///    `LocationEventHandler` registered for `.before`, executes it. If it returns `true`
     ///    or sets `shouldQuit`, further processing stops.
-    /// 3. **Main Action Handling**: If the command was not fully handled by `beforeTurn` events:
+    /// 3. **Main Action Handling**: If the command was not fully handled by `before` events:
     ///    a. Retrieves the appropriate `ActionHandler` for the command's verb from the
     ///       engine's `actionHandlers` registry.
     ///    b. If a handler is found:
@@ -28,8 +28,8 @@ extension GameEngine {
     ///        v. Calls the handler's `postProcess(context:result:)` method for any final actions.
     ///       vi. Processes any `SideEffect`s from the `ActionResult`.
     ///    c. If no `ActionHandler` is found for the verb, reports an `ActionResponse.verbUnknown` error.
-    /// 4. **Item `afterTurn` Events**: Similar to `beforeTurn`, executes `.afterTurn` item event handlers.
-    /// 5. **Location `afterTurn` Events**: Similar to `beforeTurn`, executes `.afterTurn` location event handlers.
+    /// 4. **Item `after` Events**: Similar to `before`, executes `.after` item event handlers.
+    /// 5. **Location `after` Events**: Similar to `before`, executes `.after` location event handlers.
     /// 6. **Movement and Lighting Detection**: For movement commands (`.go`, `.climb`) and lighting commands
     ///    (`.turnOn`, `.turnOff`), detects location changes or lighting state changes and automatically
     ///    describes the current location with appropriate transition messages.
@@ -48,10 +48,10 @@ extension GameEngine {
         let locationBeforeCommand = await player.location
         let wasLitBeforeCommand = await locationBeforeCommand.isLit
 
-        // --- Room BeforeTurn Hook ---
+        // --- Room before Hook ---
         if let locationHandler = locationEventHandlers[locationBeforeCommand.id] {
             do {
-                if let result = try await locationHandler.handle(self, .beforeTurn(command)) {
+                if let result = try await locationHandler.handle(self, .before(command)) {
                     // Room handler returned a result, process it
                     let shouldYield = try await processEventResult(result)
                     if !shouldYield {
@@ -61,7 +61,7 @@ extension GameEngine {
                 }
             } catch {
                 // Log error and potentially halt turn?
-                logWarning("Error in room beforeTurn handler: \(error)")
+                logWarning("Error in room before handler: \(error)")
                 // Decide if this error should block the turn. For now, let's continue.
             }
             // Check if handler quit the game
@@ -91,7 +91,7 @@ extension GameEngine {
                 }
 
                 do {
-                    if let result = try await itemHandler.handle(self, .beforeTurn(command)) {
+                    if let result = try await itemHandler.handle(self, .before(command)) {
                         // Object handler returned a result, process it
                         let shouldYield = try await processEventResult(result)
                         if !shouldYield {
@@ -121,7 +121,7 @@ extension GameEngine {
             await itemProxy.hasSameLocationAsPlayer
         {
             do {
-                if let result = try await itemHandler.handle(self, .beforeTurn(command)) {
+                if let result = try await itemHandler.handle(self, .before(command)) {
                     // Object handler returned a result, process it
                     let shouldYield = try await processEventResult(result)
                     if !shouldYield {
@@ -239,9 +239,9 @@ extension GameEngine {
         // Update pronoun based on the command's direct objects
         try await updatePronounForCommand(command)
 
-        // --- Item AfterTurn Hooks ---
+        // --- Item after Hooks ---
 
-        // 1. Check Direct Objects AfterTurn Handlers
+        // 1. Check Direct Objects after Handlers
         if command.directObjects.isNotEmpty {
             for directObjectRef in command.directObjects {
                 guard
@@ -257,7 +257,7 @@ extension GameEngine {
                 }
 
                 do {
-                    if let result = try await itemHandler.handle(self, .afterTurn(command)) {
+                    if let result = try await itemHandler.handle(self, .after(command)) {
                         let shouldYield = try await processEventResult(result)
                         if !shouldYield {
                             return true
@@ -265,20 +265,20 @@ extension GameEngine {
                         // If yielding, continue with normal processing
                     }
                 } catch {
-                    logWarning("Error in direct object afterTurn handler: \(error)")
+                    logWarning("Error in direct object after handler: \(error)")
                 }
 
                 if shouldQuit { return true }
             }
         }
 
-        // 2. Check Indirect Object AfterTurn Handler
+        // 2. Check Indirect Object after Handler
         if case .item(let itemProxy) = command.indirectObject,
             let itemHandler = itemEventHandlers[itemProxy.id],
             await itemProxy.hasSameLocationAsPlayer
         {
             do {
-                if let result = try await itemHandler.handle(self, .afterTurn(command)) {
+                if let result = try await itemHandler.handle(self, .after(command)) {
                     let shouldYield = try await processEventResult(result)
                     if !shouldYield {
                         return true
@@ -286,16 +286,16 @@ extension GameEngine {
                     // If yielding, continue with normal processing
                 }
             } catch {
-                logWarning("Error in indirect object afterTurn handler: \(error)")
+                logWarning("Error in indirect object after handler: \(error)")
             }
             if shouldQuit { return true }
         }
 
-        // --- Room AfterTurn Hook ---
+        // --- Room after Hook ---
         if let locationHandler = locationEventHandlers[locationBeforeCommand.id] {
             do {
                 // Call handler, ignore return value, use correct enum case syntax
-                if let result = try await locationHandler.handle(self, .afterTurn(command)) {
+                if let result = try await locationHandler.handle(self, .after(command)) {
                     let shouldYield = try await processEventResult(result)
                     if !shouldYield {
                         return true
@@ -303,7 +303,7 @@ extension GameEngine {
                     // If yielding, continue with normal processing
                 }
             } catch {
-                logWarning("Error in room afterTurn handler: \(error)")
+                logWarning("Error in room after handler: \(error)")
             }
             // Check if handler quit the game
             if shouldQuit { return true }
@@ -513,13 +513,13 @@ extension GameEngine {
         var forceFullDescription = false
         let playerLocationID = await player.location.id
 
-        // Handle .onEnter event for new location
+        // Handle .enter event for new location
         if locationBeforeCommand != playerLocationID {
-            // Trigger .onEnter event for the new location
+            // Trigger .enter event for the new location
             if let locationHandler = locationEventHandlers[playerLocationID] {
-                if let result = try await locationHandler.handle(self, .onEnter) {
+                if let result = try await locationHandler.handle(self, .enter) {
                     _ = try await processEventResult(result)
-                    // onEnter events don't affect command processing flow
+                    // enter events don't affect command processing flow
                 }
                 // Check if handler quit the game
                 if shouldQuit { return }

@@ -55,12 +55,12 @@ struct LocationEventHandlerTests {
 
     // MARK: - LocationEvent Tests
 
-    @Test("LocationEvent.beforeTurn contains the correct command")
-    func testBeforeTurnEvent() async throws {
+    @Test("LocationEvent.before contains the correct command")
+    func testbeforeEvent() async throws {
         let commandCapture = CommandCapture()
 
         let handler = LocationEventHandler { _, event in
-            if case .beforeTurn(let command) = event {
+            if case .before(let command) = event {
                 await commandCapture.setCommand(command)
             }
             return nil
@@ -78,18 +78,18 @@ struct LocationEventHandlerTests {
         #expect(capturedCommand?.verb.intents.contains(.examine) == true)
     }
 
-    @Test("LocationEvent.afterTurn contains the correct command")
-    func testAfterTurnEvent() async throws {
+    @Test("LocationEvent.after contains the correct command")
+    func testAfterEvent() async throws {
         let eventCapture = EventCapture()
 
         let handler = LocationEventHandler { _, event in
             switch event {
-            case .beforeTurn:
+            case .before:
                 await eventCapture.setEventType("before")
-            case .afterTurn(let command):
+            case .after(let command):
                 await eventCapture.setEventType("after")
                 await eventCapture.setCommand(command)
-            case .onEnter:
+            case .enter:
                 await eventCapture.setEventType("enter")
             }
             return nil
@@ -110,12 +110,12 @@ struct LocationEventHandlerTests {
         #expect(capturedCommand?.verb.intents.contains(.examine) == true)
     }
 
-    @Test("LocationEvent.onEnter triggers when entering a location")
-    func testOnEnterEvent() async throws {
+    @Test("LocationEvent.enter triggers when entering a location")
+    func testenterEvent() async throws {
         let enterTrigger = HandlerState()
 
         let handler = LocationEventHandler { _, event in
-            if case .onEnter = event {
+            if case .enter = event {
                 await enterTrigger.setCalled(true)
             }
             return nil
@@ -155,7 +155,7 @@ struct LocationEventHandlerTests {
     // MARK: - Integration Tests
 
     @Test("LocationEventHandler can override command behavior before turn")
-    func testBeforeTurnOverride() async throws {
+    func testbeforeOverride() async throws {
         let handler = LocationEventHandler(for: .startRoom) { on in
             on.before(.examine) { _, _ in
                 ActionResult("Custom look behavior!")
@@ -178,12 +178,12 @@ struct LocationEventHandlerTests {
     }
 
     @Test("LocationEventHandler can run after turn processing")
-    func testAfterTurnProcessing() async throws {
-        let afterTurnState = HandlerState()
+    func testAfterProcessing() async throws {
+        let afterState = HandlerState()
 
         let handler = LocationEventHandler { _, event in
-            if case .afterTurn = event {
-                await afterTurnState.setCalled(true)
+            if case .after = event {
+                await afterState.setCalled(true)
             }
             return nil
         }
@@ -195,16 +195,16 @@ struct LocationEventHandlerTests {
 
         try await engine.execute("look")
 
-        let wasCalled = await afterTurnState.wasCalled()
+        let wasCalled = await afterState.wasCalled()
         #expect(wasCalled == true)
     }
 
-    @Test("LocationEventHandler handles onEnter when moving to location")
-    func testOnEnterIntegration() async throws {
+    @Test("LocationEventHandler handles enter when moving to location")
+    func testenterIntegration() async throws {
         let messageCapture = MessageCapture()
 
         let handler = LocationEventHandler { _, event in
-            if case .onEnter = event {
+            if case .enter = event {
                 await messageCapture.addMessage("Entered the test room!")
                 return nil  // Don't override the default behavior
             }
@@ -291,14 +291,14 @@ struct LocationEventHandlerTests {
         let room2Events = MessageCapture()
 
         let handler1 = LocationEventHandler { _, event in
-            if case .onEnter = event {
+            if case .enter = event {
                 await room1Events.addMessage("Room 1 entered")
             }
             return nil
         }
 
         let handler2 = LocationEventHandler { _, event in
-            if case .onEnter = event {
+            if case .enter = event {
                 await room2Events.addMessage("Room 2 entered")
             }
             return nil
@@ -347,8 +347,8 @@ struct LocationEventHandlerTests {
             ])
     }
 
-    @Test("LocationEventHandler beforeTurn can prevent default action")
-    func testBeforeTurnPreventsDefault() async throws {
+    @Test("LocationEventHandler before can prevent default action")
+    func testbeforePreventsDefault() async throws {
         let handler = LocationEventHandler(for: .startRoom) { on in
             on.before(.examine) { _, _ in
                 ActionResult("You are not allowed to look here!")
@@ -376,7 +376,7 @@ struct LocationEventHandlerTests {
         let intentCapture = IntentCapture()
 
         let handler = LocationEventHandler { _, event in
-            if case .beforeTurn(let command) = event {
+            if case .before(let command) = event {
                 for intent in [Intent.take, .drop, .examine] {
                     if command.verb.intents.contains(intent) {
                         await intentCapture.addIntent(intent)
@@ -405,12 +405,12 @@ struct LocationEventHandlerTests {
         #expect(matchedIntents.contains(.take))
     }
 
-    @Test("LocationEventHandler onEnter triggers only when entering, not when already in location")
-    func testOnEnterTriggersOnlyOnEntry() async throws {
+    @Test("LocationEventHandler enter triggers only when entering, not when already in location")
+    func testenterTriggersOnlyOnEntry() async throws {
         let enterCounter = Counter()
 
         let handler = LocationEventHandler { _, event in
-            if case .onEnter = event {
+            if case .enter = event {
                 await enterCounter.increment()
             }
             return nil
@@ -456,7 +456,7 @@ struct LocationEventHandlerTests {
             "north"
         )
 
-        // Should still be 1 - onEnter doesn't trigger for actions within the room
+        // Should still be 1 - enter doesn't trigger for actions within the room
         let finalCount = await enterCounter.value()
         #expect(finalCount == 1)
 
@@ -492,7 +492,7 @@ struct LocationEventHandlerTests {
     @Test("LocationEventHandler can access and modify game state")
     func testGameStateAccess() async throws {
         let handler = LocationEventHandler { engine, event in
-            if case .beforeTurn(let command) = event, command.verb.intents.contains(.examine) {
+            if case .before(let command) = event, command.verb.intents.contains(.examine) {
                 // Set a custom flag when player tries to look
                 let stateChange = await engine.setFlag(.isVerboseMode)
                 return ActionResult(

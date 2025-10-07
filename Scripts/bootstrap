@@ -227,7 +227,7 @@ struct CustodialSingularity {
         .in(.broomCloset)
 
     let broomClosetHandler = LocationEventHandler(for: .broomCloset) {
-        beforeTurn(.move) { context, command in
+        before(.move) { context, command in
             ActionResult(
                 context.msg.oneOf(
                     "You stride purposefully into a shelf.",

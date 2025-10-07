@@ -77,7 +77,7 @@ public protocol GameBlueprint: Sendable {
     ///
     /// This dictionary allows you to define custom logic that runs when certain
     /// events happen to specific items. The key is an `ItemID` and the value is
-    /// an `ItemEventHandler`. Events include `beforeTurn` and `afterTurn`.
+    /// an `ItemEventHandler`. Events include `before` and `after`.
     ///
     /// The default implementation provides an empty dictionary.
     var itemEventHandlers: [ItemID: ItemEventHandler] { get }
@@ -86,7 +86,7 @@ public protocol GameBlueprint: Sendable {
     ///
     /// This dictionary allows you to define custom logic that runs when certain
     /// events happen within specific locations. The key is a `LocationID` and the value is
-    /// a `LocationEventHandler`. Events include `beforeTurn`, `afterTurn`, and `onEnter`.
+    /// a `LocationEventHandler`. Events include `before`, `after`, and `enter`.
     ///
     /// The default implementation provides an empty dictionary.
     var locationEventHandlers: [LocationID: LocationEventHandler] { get }

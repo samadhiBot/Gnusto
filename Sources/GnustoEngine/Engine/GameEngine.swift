@@ -118,15 +118,15 @@ public actor GameEngine {
         #endif
     }
 
-    /// Custom event handlers for specific items, triggered by events like `beforeTurn`
-    /// or `afterTurn`. These are provided by the `GameBlueprint` and are processed by the
+    /// Custom event handlers for specific items, triggered by events like `before`
+    /// or `after`. These are provided by the `GameBlueprint` and are processed by the
     /// engine during the `execute(command:)` phase.
     nonisolated var itemEventHandlers: [ItemID: ItemEventHandler] {
         gameBlueprint.itemEventHandlers
     }
 
-    /// Custom event handlers for specific locations, triggered by events like `onEnter`,
-    /// `beforeTurn`, or `afterTurn`. These are provided by the `GameBlueprint` and are processed
+    /// Custom event handlers for specific locations, triggered by events like `enter`,
+    /// `before`, or `after`. These are provided by the `GameBlueprint` and are processed
     /// by the engine, for example, during `applyPlayerMove(to:)` or `execute(command:)`.
     nonisolated var locationEventHandlers: [LocationID: LocationEventHandler] {
         gameBlueprint.locationEventHandlers

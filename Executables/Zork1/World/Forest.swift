@@ -204,7 +204,7 @@ extension Forest {
                 """
                 You are in a clearing, with a forest surrounding you on all sides.
                 A path leads south.
-                """
+                """,
             ]
             if await !grate.hasFlag(.isInvisible) {
                 if await grate.isOpen {
@@ -220,7 +220,7 @@ extension Forest {
     }
 
     static let northClearingHandler = LocationEventHandler(for: .northClearing) { on in
-        on.onEnter { context in
+        on.enter { context in
             // ZIL M-ENTER: If grate is not revealed, set it invisible
             let isGrateInvisible = await context.item(.grate).hasFlag(.isInvisible)
             if !isGrateInvisible {

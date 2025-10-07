@@ -41,7 +41,7 @@ public struct LocationEventHandler: Sendable {
     /// - Parameters:
     ///   - locationID: The ID of the location this handler is for
     ///   - matchers: A result builder that creates a list of event matchers, receiving a `LocationEventMatchers`
-    ///               namespace object with `before()`, `after()`, and `onEnter()` methods
+    ///               namespace object with `before()`, `after()`, and `enter()` methods
     ///
     /// Example usage:
     /// ```swift
@@ -55,7 +55,7 @@ public struct LocationEventHandler: Sendable {
     ///                     nil
     ///                 }
     ///             }
-    ///             on.onEnter { context in
+    ///             on.enter { context in
     ///                 ActionResult("You feel a chill as you enter.")
     ///             }
     ///         }
@@ -93,7 +93,7 @@ public enum LocationEvent: Sendable {
     ///
     /// The associated `Command` is the one the player entered.
     /// This allows the location to react to the outcome of the turn or perform cleanup actions.
-    case afterTurn(Command)
+    case after(Command)
 
     /// Triggered before the game engine processes the player's command for the current turn,
     /// while the player is in a location that has this event handler.
@@ -101,12 +101,12 @@ public enum LocationEvent: Sendable {
     /// The associated `Command` is the one the player has just entered.
     /// Your handler can inspect this command and potentially return an `ActionResult` to
     /// preempt or alter the default command processing.
-    case beforeTurn(Command)
+    case before(Command)
 
     /// Triggered when the player successfully enters the location that has this event handler.
     /// This typically occurs after any "look" action or movement that results in the player
     /// arriving in this location.
-    case onEnter
+    case enter
 }
 
 // MARK: - Event Matching Result Builder
@@ -126,7 +126,7 @@ public typealias LocationEventMatcher = (LocationEventContext) async throws -> A
 ///             nil
 ///         }
 ///     }
-///     on.onEnter { context in
+///     on.enter { context in
 ///         ActionResult("You feel a chill as you enter.")
 ///     }
 /// }
@@ -140,7 +140,7 @@ public struct LocationEventMatcherBuilder {
     /// by the location event handler.
     ///
     /// - Parameter matchers: A variadic list of `LocationEventMatcher` functions created by
-    ///   functions like `beforeTurn()`, `afterTurn()`, and `onEnter()`
+    ///   functions like `before()`, `after()`, and `enter()`
     /// - Returns: An array containing all the provided matchers
     public static func buildBlock(_ matchers: LocationEventMatcher...) -> [LocationEventMatcher] {
         Array(matchers)
@@ -152,7 +152,7 @@ public struct LocationEventMatcherBuilder {
 /// Namespace struct containing event matching functions for `LocationEventHandler`.
 ///
 /// This struct is passed as a parameter to the `LocationEventHandler` result builder closure,
-/// providing `before()`, `after()`, and `onEnter()` methods for declarative event matching
+/// providing `before()`, `after()`, and `enter()` methods for declarative event matching
 /// without polluting the global namespace.
 ///
 /// Usage:
@@ -160,13 +160,10 @@ public struct LocationEventMatcherBuilder {
 /// LocationEventHandler(for: .bar) { on in
 ///     on.before(.move) { context, command in ... }
 ///     on.after { context, command in ... }
-///     on.onEnter { context in ... }
+///     on.enter { context in ... }
 /// }
 /// ```
-public struct LocationEventMatchers: Sendable {
-    /// Internal initializer - instances are created automatically by `LocationEventHandler`.
-    init() {}
-}
+public struct LocationEventMatchers: Sendable {}
 
 // MARK: - Location Event Matcher Builder Functions
 
@@ -203,18 +200,18 @@ public struct LocationEventMatchers: Sendable {
                                                │
                                                ▼
  ┌─────────────────────────────────────────────────────────────────┐
- │ 4. onEnter() - Called ONLY when player moves to new location    │
+ │ 4. enter() - Called ONLY when player moves to new location      │
  │    • Fires during movement detection phase                      │
  │    • One-time location arrival events                           │
  │    • Example: Trap triggers, NPC greets player                  │
  └─────────────────────────────────────────────────────────────────┘
 
- Note: onEnter() only fires for location changes, not every turn.
+ Note: enter() only fires for location changes, not every turn.
        before() and after() fire every turn while in the location.
 */
 
 extension LocationEventMatchers {
-    /// Creates a location event matcher for **beforeTurn** events with any of the specified intents.
+    /// Creates a location event matcher for **before** events with any of the specified intents.
     ///
     /// **Timing**: Called at the very beginning of command execution, before any action handlers run.
     /// **Purpose**: Can intercept and potentially override normal command processing.
@@ -241,7 +238,7 @@ extension LocationEventMatchers {
     ) -> LocationEventMatcher {
         { context in
             guard
-                case .beforeTurn(let command) = context.event,
+                case .before(let command) = context.event,
                 command.matchesIntents(intents)
             else {
                 return nil
@@ -250,7 +247,7 @@ extension LocationEventMatchers {
         }
     }
 
-    /// Creates a location event matcher for **afterTurn** events with any of the specified intents.
+    /// Creates a location event matcher for **after** events with any of the specified intents.
     ///
     /// **Timing**: Called after the main action handler has completed successfully.
     /// **Purpose**: React to what just happened or perform cleanup/ambient actions.
@@ -259,7 +256,7 @@ extension LocationEventMatchers {
     /// - Parameters:
     ///   - intents: The command intents to match against (e.g., `.move`, `.take`, `.examine`).
     ///              If no intents specified, matches all commands.
-    ///   - result: The closure to execute for matching afterTurn events, receiving the context and command
+    ///   - result: The closure to execute for matching after events, receiving the context and command
     /// - Returns: A LocationEventMatcher that can be used in the result builder
     ///
     /// Example:
@@ -280,7 +277,7 @@ extension LocationEventMatchers {
     ) -> LocationEventMatcher {
         { context in
             guard
-                case .afterTurn(let command) = context.event,
+                case .after(let command) = context.event,
                 command.matchesIntents(intents)
             else {
                 return nil
@@ -289,7 +286,7 @@ extension LocationEventMatchers {
         }
     }
 
-    /// Creates a location event matcher for **onEnter** events.
+    /// Creates a location event matcher for **enter** events.
     ///
     /// **Timing**: Called only when the player moves into this location (not every turn).
     /// **Purpose**: Handle one-time events that occur when arriving at a location.
@@ -298,13 +295,13 @@ extension LocationEventMatchers {
     /// This is the only location event that truly relates to "entering" - it fires during the
     /// movement detection phase after successful location changes.
     ///
-    /// - Parameter result: The closure to execute for onEnter events, receiving only the context
+    /// - Parameter result: The closure to execute for enter events, receiving only the context
     ///                    (no command, since this isn't tied to a specific player command)
     /// - Returns: A LocationEventMatcher that can be used in the result builder
     ///
     /// Example:
     /// ```swift
-    /// on.onEnter { context in
+    /// on.enter { context in
     ///     // One-time trap that triggers when first entering
     ///     if !await context.engine.hasFlag(.cellarTrapTriggered) {
     ///         return ActionResult(
@@ -316,16 +313,16 @@ extension LocationEventMatchers {
     ///     return nil
     /// }
     ///
-    /// on.onEnter { context in
+    /// on.enter { context in
     ///     // NPC greeting when entering their domain
     ///     ActionResult("The wizard looks up from his spellbook and nods at you.")
     /// }
     /// ```
-    public func onEnter(
+    public func enter(
         result: @escaping (LocationEventContext) async throws -> ActionResult?
     ) -> LocationEventMatcher {
         { context in
-            if case .onEnter = context.event {
+            if case .enter = context.event {
                 try await result(context)
             } else {
                 nil

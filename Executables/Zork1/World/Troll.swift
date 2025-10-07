@@ -259,7 +259,7 @@ extension Troll {
             troll.setCharacterAttributes(
                 consciousness: .unconscious,
                 isFighting: false
-            )
+            ),
         ]
 
         // If troll had axe, drop it and restore weapon properties
@@ -296,7 +296,7 @@ extension Troll {
             troll.setCharacterAttributes(
                 consciousness: .unconscious,
                 isFighting: false
-            )
+            ),
         ]
 
         // Check if axe is available to pick up

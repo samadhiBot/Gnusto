@@ -90,7 +90,7 @@ public enum ItemEvent: Sendable {
     ///
     /// The associated `Command` is the one the player entered.
     /// This allows the item to react to the outcome of the turn or perform cleanup actions.
-    case afterTurn(Command)
+    case after(Command)
 
     /// Triggered before the game engine processes the player's command for the current turn,
     /// specifically in the context of an item that has this event handler.
@@ -98,7 +98,7 @@ public enum ItemEvent: Sendable {
     /// The associated `Command` is the one the player has just entered.
     /// Your handler can inspect this command and potentially return an `ActionResult` to
     /// preempt or alter the default command processing for this item.
-    case beforeTurn(Command)
+    case before(Command)
 }
 
 // MARK: - Event Matching Result Builder
@@ -156,10 +156,7 @@ public struct ItemEventMatcherBuilder {
 ///     on.after(.turnOn) { context, command in ... }
 /// }
 /// ```
-public struct ItemEventMatchers: Sendable {
-    /// Internal initializer - instances are created automatically by `ItemEventHandler`.
-    init() {}
-}
+public struct ItemEventMatchers: Sendable {}
 
 // MARK: - Item Event Matcher Builder Functions
 
@@ -182,8 +179,8 @@ public struct ItemEventMatchers: Sendable {
                                            │
                                            ▼
  ┌─────────────────────────────────────────────────────────────────┐
- │ 2. Location beforeTurn Events                                   │
- │    • Current location's beforeTurn handler                      │
+ │ 2. Location before Events                                       │
+ │    • Current location's before handler                          │
  │    • Can also block command processing                          │
  └─────────────────────────────────────────┬───────────────────────┘
                                            │
@@ -207,8 +204,8 @@ public struct ItemEventMatchers: Sendable {
                                            │
                                            ▼
  ┌─────────────────────────────────────────────────────────────────┐
- │ 5. Location afterTurn Events                                    │
- │    • Current location's afterTurn handler                       │
+ │ 5. Location after Events                                        │
+ │    • Current location's after handler                           │
  │    • Additional location-based reactions                        │
  └─────────────────────────────────────────────────────────────────┘
 
@@ -219,7 +216,7 @@ public struct ItemEventMatchers: Sendable {
 */
 
 extension ItemEventMatchers {
-    /// Creates an item event matcher for **beforeTurn** events with any of the specified intents.
+    /// Creates an item event matcher for **before** events with any of the specified intents.
     ///
     /// **Timing**: Called at the very beginning of command execution, before any action handlers run.
     /// **Scope**: Fires for ALL items that have this handler in the player's current location and inventory.
@@ -257,7 +254,7 @@ extension ItemEventMatchers {
     ) -> ItemEventMatcher {
         { context in
             guard
-                case .beforeTurn(let command) = context.event,
+                case .before(let command) = context.event,
                 command.matchesIntents(intents)
             else {
                 return nil
@@ -266,7 +263,7 @@ extension ItemEventMatchers {
         }
     }
 
-    /// Creates an item event matcher for **afterTurn** events with any of the specified intents.
+    /// Creates an item event matcher for **after** events with any of the specified intents.
     ///
     /// **Timing**: Called after the main action handler has completed successfully.
     /// **Scope**: Fires only for items directly involved in the command (direct/indirect objects).
@@ -276,7 +273,7 @@ extension ItemEventMatchers {
     /// - Parameters:
     ///   - intents: The command intents to match against (e.g., `.turnOn`, `.take`, `.examine`).
     ///              If no intents specified, matches all commands involving this item.
-    ///   - result: The closure to execute for matching afterTurn events, receiving the context and command
+    ///   - result: The closure to execute for matching after events, receiving the context and command
     /// - Returns: An ItemEventMatcher that can be used in the result builder
     ///
     /// Example:
@@ -306,7 +303,7 @@ extension ItemEventMatchers {
     ) -> ItemEventMatcher {
         { context in
             guard
-                case .afterTurn(let command) = context.event,
+                case .after(let command) = context.event,
                 command.matchesIntents(intents)
             else {
                 return nil

@@ -179,7 +179,7 @@ Create rooms that respond to their environment:
 ```swift
 let barHandler = LocationEventHandler(for: .bar) {
     // First: if location is lit, yield to normal processing
-    beforeTurn { context, _ in
+    before { context, _ in
         if await context.location.isLit {
             return ActionResult.yield
         }
@@ -187,7 +187,7 @@ let barHandler = LocationEventHandler(for: .bar) {
     }
 
     // Second: handle north movement in dark
-    beforeTurn(.move) { context, command in
+    before(.move) { context, command in
         if command.direction == .north {
             return ActionResult.yield
         } else {
@@ -199,12 +199,12 @@ let barHandler = LocationEventHandler(for: .bar) {
     }
 
     // Third: handle meta commands in dark
-    beforeTurn(.meta) { _, _ in
+    before(.meta) { _, _ in
         return ActionResult.yield
     }
 
     // Fourth: catch-all for other commands in dark
-    beforeTurn { context, _ in
+    before { context, _ in
         return ActionResult(
             "In the dark? You could easily disturb something!",
             await context.engine.adjustGlobal(.barMessageDisturbances, by: 1)

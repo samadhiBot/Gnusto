@@ -194,7 +194,7 @@ struct DrinkActionHandlerTests {
         let darkRoom = Location("darkRoom")
             .name("Dark Room")
             .description("A pitch black room.")
-            // Note: No .inherentlyLit property
+        // Note: No .inherentlyLit property
 
         let water = Item("water")
             .name("glass of water")
@@ -268,7 +268,7 @@ struct DrinkActionHandlerTests {
             .in(.player)
 
         let elixirHandler = ItemEventHandler { engine, event -> ActionResult? in
-            guard case .beforeTurn(let command) = event, command.verb == .drink else {
+            guard case .before(let command) = event, command.verb == .drink else {
                 return nil
             }
             return ActionResult(

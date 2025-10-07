@@ -199,7 +199,7 @@ extension Underground {
     /// first time while the trap door is open, the door slams shut and is barred, preventing
     /// an easy return. This is controlled by a custom flag.
     static let cellarHandler = LocationEventHandler(for: .cellar) { on in
-        on.onEnter { context in
+        on.enter { context in
             let isTrapDoorOpen = await context.item(.trapDoor).isOpen
             let isTrapDoorBarred = await context.engine.hasFlag(.trapDoorBarred)
 

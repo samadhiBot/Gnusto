@@ -66,7 +66,7 @@ The first example watches for interactions that take place in the `.trollRoom`. 
 
 ```swift
 let trollRoomHandler = LocationEventHandler(for: .trollRoom) {
-    beforeTurn(.move) { context, command in
+    before(.move) { context, command in
         if let direction = command.direction, [.east, .west].contains(direction) {
             throw ActionResponse.feedback(
                 "The troll fends you off with a menacing gesture."

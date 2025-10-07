@@ -48,12 +48,12 @@ struct ItemEventHandlerTests {
 
     // MARK: - ItemEvent Tests
 
-    @Test("ItemEvent.beforeTurn contains the correct command")
-    func testBeforeTurnEvent() async throws {
+    @Test("ItemEvent.before contains the correct command")
+    func testbeforeEvent() async throws {
         let commandCapture = CommandCapture()
 
         let handler = ItemEventHandler { _, event in
-            if case .beforeTurn(let command) = event {
+            if case .before(let command) = event {
                 await commandCapture.setCommand(command)
             }
             return nil
@@ -74,15 +74,15 @@ struct ItemEventHandlerTests {
         #expect(capturedCommand?.verb.intents.contains(.examine) == true)
     }
 
-    @Test("ItemEvent.afterTurn contains the correct command")
-    func testAfterTurnEvent() async throws {
+    @Test("ItemEvent.after contains the correct command")
+    func testAfterEvent() async throws {
         let eventCapture = EventCapture()
 
         let handler = ItemEventHandler { _, event in
             switch event {
-            case .beforeTurn:
+            case .before:
                 await eventCapture.setEventType("before")
-            case .afterTurn(let command):
+            case .after(let command):
                 await eventCapture.setEventType("after")
                 await eventCapture.setCommand(command)
             }
@@ -109,9 +109,9 @@ struct ItemEventHandlerTests {
 
     // MARK: - Helper Method Tests
 
-    @Test("beforeTurn with single intent matches correctly")
-    func testWhenBeforeTurnSingleIntent() async throws {
-        // This test is no longer relevant since we removed the deprecated beforeTurn method
+    @Test("before with single intent matches correctly")
+    func testWhenbeforeSingleIntent() async throws {
+        // This test is no longer relevant since we removed the deprecated before method
         // on ItemEvent. The equivalent functionality is now tested through full integration.
 
         let handler = ItemEventHandler(for: "testItem") { on in
@@ -137,8 +137,8 @@ struct ItemEventHandlerTests {
         )
     }
 
-    @Test("beforeTurn with single intent does not match incorrect intent")
-    func testWhenBeforeTurnSingleIntentNoMatch() async throws {
+    @Test("before with single intent does not match incorrect intent")
+    func testWhenbeforeSingleIntentNoMatch() async throws {
         // Test that handlers only respond to their specified intents
 
         let handler = ItemEventHandler(for: "testItem") { on in
@@ -161,8 +161,8 @@ struct ItemEventHandlerTests {
         #expect(output.contains("A simple test item."))  // Default examine behavior
     }
 
-    @Test("beforeTurn with multiple intents matches any of them")
-    func testWhenBeforeTurnMultipleIntents() async throws {
+    @Test("before with multiple intents matches any of them")
+    func testWhenbeforeMultipleIntents() async throws {
         // Test that handlers can match multiple intents
 
         let handler = ItemEventHandler(for: "testItem") { on in
@@ -188,8 +188,8 @@ struct ItemEventHandlerTests {
         )
     }
 
-    @Test("beforeTurn with multiple intents does not match if none match")
-    func testWhenBeforeTurnMultipleIntentsNoMatch() async throws {
+    @Test("before with multiple intents does not match if none match")
+    func testWhenbeforeMultipleIntentsNoMatch() async throws {
         // Test that handlers don't match when no intents match
 
         let handler = ItemEventHandler(for: "testItem") { on in
@@ -212,19 +212,19 @@ struct ItemEventHandlerTests {
         #expect(output.contains("A simple test item."))  // Default examine behavior
     }
 
-    @Test("beforeTurn does not match afterTurn events")
-    func testWhenBeforeTurnDoesNotMatchAfterTurn() async throws {
-        // Test that beforeTurn and afterTurn handlers work independently
+    @Test("before does not match after events")
+    func testWhenbeforeDoesNotMatchAfter() async throws {
+        // Test that before and after handlers work independently
         let messageCapture = MessageCapture()
 
         let handler = ItemEventHandler(for: "testItem") { on in
             on.before(.examine) { _, _ in
-                await messageCapture.addMessage("beforeTurn called")
+                await messageCapture.addMessage("before called")
                 return nil  // Allow default processing
             }
 
             on.after { _, _ in
-                await messageCapture.addMessage("afterTurn called")
+                await messageCapture.addMessage("after called")
                 return nil
             }
         }
@@ -239,14 +239,14 @@ struct ItemEventHandlerTests {
         try await engine.execute("examine test item")
 
         let messages = await messageCapture.getMessages()
-        #expect(messages.contains("beforeTurn called"))
-        #expect(messages.contains("afterTurn called"))
+        #expect(messages.contains("before called"))
+        #expect(messages.contains("after called"))
     }
 
     // MARK: - Integration Tests
 
     @Test("ItemEventHandler can override command behavior before turn")
-    func testBeforeTurnOverride() async throws {
+    func testbeforeOverride() async throws {
         let handler = ItemEventHandler(for: "testItem") { on in
             on.before(.examine) { _, _ in
                 ActionResult("This item has a special examination behavior!")
@@ -272,12 +272,12 @@ struct ItemEventHandlerTests {
     }
 
     @Test("ItemEventHandler can run after turn processing")
-    func testAfterTurnProcessing() async throws {
-        let afterTurnState = HandlerState()
+    func testAfterProcessing() async throws {
+        let afterState = HandlerState()
 
         let handler = ItemEventHandler { _, event in
-            if case .afterTurn = event {
-                await afterTurnState.setCalled(true)
+            if case .after = event {
+                await afterState.setCalled(true)
             }
             return nil
         }
@@ -292,7 +292,7 @@ struct ItemEventHandlerTests {
 
         try await engine.execute("examine test item")
 
-        let wasCalled = await afterTurnState.wasCalled()
+        let wasCalled = await afterState.wasCalled()
         #expect(wasCalled == true)
     }
 
@@ -373,8 +373,8 @@ struct ItemEventHandlerTests {
         #expect(item2Messages[0] == "Item 2 examined")
     }
 
-    @Test("ItemEventHandler beforeTurn can prevent default action")
-    func testBeforeTurnPreventsDefault() async throws {
+    @Test("ItemEventHandler before can prevent default action")
+    func testbeforePreventsDefault() async throws {
         let handler = ItemEventHandler(for: "testItem") { on in
             on.before(.take) { _, _ in
                 ActionResult("This item cannot be taken – it's cursed!")
@@ -409,7 +409,7 @@ struct ItemEventHandlerTests {
         let intentCapture = IntentCapture()
 
         let handler = ItemEventHandler { _, event in
-            if case .beforeTurn(let command) = event {
+            if case .before(let command) = event {
                 for intent in [Intent.take, .drop, .examine] {
                     if command.verb.intents.contains(intent) {
                         await intentCapture.addIntent(intent)
@@ -436,7 +436,7 @@ struct ItemEventHandlerTests {
     @Test("ItemEventHandler can access and modify game state")
     func testGameStateAccess() async throws {
         let handler = ItemEventHandler { engine, event in
-            if case .beforeTurn(let command) = event, command.verb.intents.contains(.examine) {
+            if case .before(let command) = event, command.verb.intents.contains(.examine) {
                 // Set a custom flag when player examines this item
                 let stateChange = await engine.setFlag(.isVerboseMode)
                 return ActionResult(
@@ -476,7 +476,7 @@ struct ItemEventHandlerTests {
     @Test("ItemEventHandler can be conditionally triggered based on item state")
     func testConditionalTriggering() async throws {
         let handler = ItemEventHandler { engine, event in
-            if case .beforeTurn(let command) = event, command.verb.intents.contains(.examine) {
+            if case .before(let command) = event, command.verb.intents.contains(.examine) {
                 let item = await engine.item("magicOrb")
                 let isActive = await item.hasFlag(.isOn)
 
@@ -531,12 +531,12 @@ struct ItemEventHandlerTests {
         )
     }
 
-    @Test("ItemEventHandler afterTurn receives correct command context")
-    func testAfterTurnCommandContext() async throws {
+    @Test("ItemEventHandler after receives correct command context")
+    func testAfterCommandContext() async throws {
         let verbCapture = VerbCapture()
 
         let handler = ItemEventHandler { _, event in
-            if case .afterTurn(let command) = event {
+            if case .after(let command) = event {
                 let verbName = command.verb.rawValue
                 await verbCapture.addVerb(verbName)
             }
@@ -568,10 +568,10 @@ struct ItemEventHandlerTests {
 
         let handler = ItemEventHandler { _, event in
             switch event {
-            case .beforeTurn(let command):
+            case .before(let command):
                 await eventSequence.addEvent("Before: \(command.verb.rawValue)")
                 return nil  // Allow default processing
-            case .afterTurn(let command):
+            case .after(let command):
                 await eventSequence.addEvent("After: \(command.verb.rawValue)")
                 return nil
             }
@@ -699,7 +699,7 @@ struct ItemEventHandlerTests {
         let verbCapture = VerbCapture()
 
         let handler = ItemEventHandler { _, event in
-            if case .beforeTurn(let command) = event {
+            if case .before(let command) = event {
                 let verbName = command.verb.rawValue
                 await verbCapture.addVerb(verbName)
 
