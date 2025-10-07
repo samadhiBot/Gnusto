@@ -172,14 +172,14 @@ struct OutsideHouse {
 
     // MARK: - Event handlers
 
-    let boardsHandler = ItemEventHandler(for: .boards) { on in
-        on.before(.take) { _, _ in
+    let boardsHandler = ItemEventHandler(for: .boards) { when in
+        when.before(.take) { _, _ in
             ActionResult("The boards are securely fastened.")
         }
     }
 
-    let kitchenWindowHandler = ItemEventHandler(for: .kitchenWindow) { on in
-        on.before(.open) { context, _ in
+    let kitchenWindowHandler = ItemEventHandler(for: .kitchenWindow) { when in
+        when.before(.open) { context, _ in
             if await context.item.hasFlag(.isOpen) {
                 return ActionResult("Too late for that, the window is already open.")
             } else {
@@ -190,7 +190,7 @@ struct OutsideHouse {
             }
         }
 
-        on.before(.look) { context, command in
+        when.before(.look) { context, command in
             guard command.preposition == Preposition("through") else { return nil }
             let currentLocation = await context.player.location.id
             if currentLocation == .kitchen {
@@ -201,8 +201,8 @@ struct OutsideHouse {
         }
     }
 
-    let mailboxHandler = ItemEventHandler(for: .mailbox) { on in
-        on.before(.take) { _, _ in
+    let mailboxHandler = ItemEventHandler(for: .mailbox) { when in
+        when.before(.take) { _, _ in
             ActionResult("It is securely anchored.")
         }
     }
@@ -210,7 +210,7 @@ struct OutsideHouse {
     //    let westOfHouseHandler = LocationEventHandler(for: .westOfHouse) {
     //        <#code#>
     //    }
-    let whiteHouseHandler = ItemEventHandler(for: .whiteHouse) { on in
+    let whiteHouseHandler = ItemEventHandler(for: .whiteHouse) { when in
         //        before(.find) { context, command in
         //            let currentLocation = await context.player.location.id
         //
@@ -237,7 +237,7 @@ struct OutsideHouse {
         //            }
         //        }
 
-        on.before(.examine, .look) { context, _ in
+        when.before(.examine, .look) { context, _ in
             let currentLocation = await context.player.location.id
             return
                 if [.eastOfHouse, .westOfHouse, .northOfHouse, .southOfHouse].contains(
@@ -255,7 +255,7 @@ struct OutsideHouse {
             }
         }
 
-        on.before(.open) { context, _ in
+        when.before(.open) { context, _ in
             let currentLocation = await context.player.location.id
             let atHouseLocations: Set<LocationID> = [
                 .eastOfHouse, .westOfHouse, .northOfHouse, .southOfHouse,
@@ -281,7 +281,7 @@ struct OutsideHouse {
             }
         }
 
-        on.before(.burn) { context, _ in
+        when.before(.burn) { context, _ in
             let currentLocation = await context.player.location.id
             let atHouseLocations: Set<LocationID> = [
                 .eastOfHouse, .westOfHouse, .northOfHouse, .southOfHouse,

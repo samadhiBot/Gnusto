@@ -226,8 +226,8 @@ struct CustodialSingularity {
         .isTakable
         .in(.broomCloset)
 
-    let broomClosetHandler = LocationEventHandler(for: .broomCloset) {
-        before(.move) { context, command in
+    let broomClosetHandler = LocationEventHandler(for: .broomCloset) { when in
+        when.before(.move) { context, command in
             ActionResult(
                 context.msg.oneOf(
                     "You stride purposefully into a shelf.",

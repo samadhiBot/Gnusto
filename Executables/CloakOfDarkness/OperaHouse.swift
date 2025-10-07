@@ -88,9 +88,9 @@ struct OperaHouse {
 
     // MARK: - Location event handlers
 
-    let barHandler = LocationEventHandler(for: .bar) { on in
+    let barHandler = LocationEventHandler(for: .bar) { when in
         // First: if location is lit, yield to normal processing
-        on.before { context, _ in
+        when.before { context, _ in
             if await context.location.isLit {
                 return ActionResult.yield
             }
@@ -98,7 +98,7 @@ struct OperaHouse {
         }
 
         // Second: handle north movement in dark
-        on.before(.move) { context, command in
+        when.before(.move) { context, command in
             if command.direction == .north {
                 return ActionResult.yield
             } else {
@@ -110,12 +110,12 @@ struct OperaHouse {
         }
 
         // Third: handle meta commands in dark
-        on.before(.meta) { _, _ in
+        when.before(.meta) { _, _ in
             ActionResult.yield
         }
 
         // Fourth: catch-all for other commands in dark
-        on.before { context, _ in
+        when.before { context, _ in
             ActionResult(
                 "In the dark? You could easily disturb something!",
                 await context.engine.adjustGlobal(.barMessageDisturbances, by: 1)
@@ -125,8 +125,8 @@ struct OperaHouse {
 
     // MARK: - Item event handlers
 
-    let cloakHandler = ItemEventHandler(for: .cloak) { on in
-        on.before(.drop, .insert) { context, _ in
+    let cloakHandler = ItemEventHandler(for: .cloak) { when in
+        when.before(.drop, .insert) { context, _ in
             guard await context.player.location == .cloakroom else {
                 throw ActionResponse.feedback(
                     "This isn't the best place to leave a smart cloak lying around."
@@ -135,7 +135,7 @@ struct OperaHouse {
             return nil
         }
 
-        on.after { context, command in
+        when.after { context, command in
             guard await context.player.location == .cloakroom else {
                 return nil
             }
@@ -160,8 +160,8 @@ struct OperaHouse {
         }
     }
 
-    let hookHandler = ItemEventHandler(for: .hook) { on in
-        on.before(.examine) { context, _ in
+    let hookHandler = ItemEventHandler(for: .hook) { when in
+        when.before(.examine) { context, _ in
             let hookDetail =
                 if await context.item.isHolding(.cloak) {
                     "with a cloak hanging on it"
@@ -172,8 +172,8 @@ struct OperaHouse {
         }
     }
 
-    let messageHandler = ItemEventHandler(for: .message) { on in
-        on.before(.examine, .read) { context, _ in
+    let messageHandler = ItemEventHandler(for: .message) { when in
+        when.before(.examine, .read) { context, _ in
             guard await context.player.location == .bar else {
                 return .yield
             }

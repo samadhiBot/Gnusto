@@ -156,8 +156,8 @@ struct LocationEventHandlerTests {
 
     @Test("LocationEventHandler can override command behavior before turn")
     func testbeforeOverride() async throws {
-        let handler = LocationEventHandler(for: .startRoom) { on in
-            on.before(.examine) { _, _ in
+        let handler = LocationEventHandler(for: .startRoom) { when in
+            when.before(.examine) { _, _ in
                 ActionResult("Custom look behavior!")
             }
         }
@@ -349,8 +349,8 @@ struct LocationEventHandlerTests {
 
     @Test("LocationEventHandler before can prevent default action")
     func testbeforePreventsDefault() async throws {
-        let handler = LocationEventHandler(for: .startRoom) { on in
-            on.before(.examine) { _, _ in
+        let handler = LocationEventHandler(for: .startRoom) { when in
+            when.before(.examine) { _, _ in
                 ActionResult("You are not allowed to look here!")
             }
         }
@@ -531,8 +531,8 @@ struct LocationEventHandlerTests {
     func testContextBasedAPI() async throws {
         let messageCapture = MessageCapture()
 
-        let handler = LocationEventHandler(for: .startRoom) { on in
-            on.before(.examine) { context, _ in
+        let handler = LocationEventHandler(for: .startRoom) { when in
+            when.before(.examine) { context, _ in
                 await messageCapture.addMessage(
                     "Context handler called for location: \(context.location.id)")
                 return ActionResult("Custom look message from context handler.")
@@ -565,9 +565,9 @@ struct LocationEventHandlerTests {
 
     @Test("LocationEventHandler ActionResult.yield allows normal processing to continue")
     func testYieldFunctionality() async throws {
-        let handler = LocationEventHandler(for: .startRoom) { on in
+        let handler = LocationEventHandler(for: .startRoom) { when in
             // First matcher: yield if room is lit
-            on.before { context, _ in
+            when.before { context, _ in
                 let isLit = await context.location.hasFlag(.isLit)
                 let isInherentlyLit = await context.location.hasFlag(.inherentlyLit)
                 if isLit || isInherentlyLit {
@@ -577,12 +577,12 @@ struct LocationEventHandlerTests {
             }
 
             // Second matcher: block movement in dark
-            on.before(.move) { _, _ in
+            when.before(.move) { _, _ in
                 ActionResult("You stumble in the darkness!")
             }
 
             // Third matcher: block other actions in dark
-            on.before { _, _ in
+            when.before { _, _ in
                 ActionResult("Too dark to do that!")
             }
         }

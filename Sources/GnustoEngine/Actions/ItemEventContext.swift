@@ -6,8 +6,8 @@
 ///
 /// Example usage:
 /// ```swift
-/// static let lampHandler = ItemEventHandler(for: .lamp) { on in
-///     on.before(.turnOn) { context, command in
+/// static let lampHandler = ItemEventHandler(for: .lamp) { when in
+///     when.before(.turnOn) { context, command in
 ///         if await context.item.hasFlag(.isBroken) {
 ///             ActionResult("The lamp is broken and won't turn on.")
 ///         } else {

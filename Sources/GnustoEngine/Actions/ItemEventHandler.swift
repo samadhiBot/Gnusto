@@ -45,8 +45,8 @@ public struct ItemEventHandler: Sendable {
     /// ```swift
     /// var itemEventHandlers: [ItemID: ItemEventHandler] {
     ///     [
-    ///         .lamp: ItemEventHandler(for: .lamp) { on in
-    ///             on.before(.turnOn) { context, command in
+    ///         .lamp: ItemEventHandler(for: .lamp) { when in
+    ///             when.before(.turnOn) { context, command in
     ///                 if await context.item.hasFlag(.isBroken) {
     ///                     ActionResult("The lamp is broken.")
     ///                 } else {
@@ -56,7 +56,7 @@ public struct ItemEventHandler: Sendable {
     ///                     )
     ///                 }
     ///             }
-    ///             on.after { context, command in
+    ///             when.after { context, command in
     ///                 ActionResult("After turn action.")
     ///             }
     ///         }
@@ -110,8 +110,8 @@ public typealias ItemEventMatcher = (ItemEventContext) async throws -> ActionRes
 ///
 /// This builder allows you to write event handlers in a declarative way:
 /// ```swift
-/// .lamp: ItemEventHandler(for: .lamp) { on in
-///     on.before(.turnOn) { context, command in
+/// .lamp: ItemEventHandler(for: .lamp) { when in
+///     when.before(.turnOn) { context, command in
 ///         if await context.item.hasFlag(.isBroken) {
 ///             ActionResult("The lamp is broken.")
 ///         } else {
@@ -121,7 +121,7 @@ public typealias ItemEventMatcher = (ItemEventContext) async throws -> ActionRes
 ///             )
 ///         }
 ///     }
-///     on.after { context, command in
+///     when.after { context, command in
 ///         ActionResult("After turn action.")
 ///     }
 /// }
@@ -151,9 +151,9 @@ public struct ItemEventMatcherBuilder {
 ///
 /// Usage:
 /// ```swift
-/// ItemEventHandler(for: .lamp) { on in
-///     on.before(.turnOn) { context, command in ... }
-///     on.after(.turnOn) { context, command in ... }
+/// ItemEventHandler(for: .lamp) { when in
+///     when.before(.turnOn) { context, command in ... }
+///     when.after(.turnOn) { context, command in ... }
 /// }
 /// ```
 public struct ItemEventMatchers: Sendable {}
@@ -231,7 +231,7 @@ extension ItemEventMatchers {
     ///
     /// Example:
     /// ```swift
-    /// on.before(.turnOn) { context, command in
+    /// when.before(.turnOn) { context, command in
     ///     if await context.item.hasFlag(.isBroken) {
     ///         ActionResult("The lamp is broken and won't turn on.")
     ///     } else {
@@ -239,7 +239,7 @@ extension ItemEventMatchers {
     ///     }
     /// }
     ///
-    /// on.before { context, command in
+    /// when.before { context, command in
     ///     // React to any command involving this item
     ///     if command.verb == .examine {
     ///         ActionResult("This item glows mysteriously when examined.")
@@ -278,12 +278,12 @@ extension ItemEventMatchers {
     ///
     /// Example:
     /// ```swift
-    /// on.after(.turnOn) { context, command in
+    /// when.after(.turnOn) { context, command in
     ///     // Lamp-specific reaction after being turned on
     ///     ActionResult("The lamp hums quietly and casts dancing shadows.")
     /// }
     ///
-    /// on.after(.take) { context, command in
+    /// when.after(.take) { context, command in
     ///     // Item-specific reaction after being taken
     ///     if await context.item.hasFlag(.isCursed) {
     ///         ActionResult("As you pick it up, the cursed amulet grows cold.")
@@ -292,7 +292,7 @@ extension ItemEventMatchers {
     ///     }
     /// }
     ///
-    /// on.after { context, command in
+    /// when.after { context, command in
     ///     // React to any command that directly involved this item
     ///     ActionResult("The magical item pulses with energy after being touched.")
     /// }

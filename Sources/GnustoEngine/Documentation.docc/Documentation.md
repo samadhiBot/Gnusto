@@ -2,25 +2,60 @@
 
 ## A Modern Interactive Fiction Engine
 
-![Gnusto Interactive Fiction Engine](gnusto-heading.png)
+![Gnusto Interactive Fiction Engine Hero Graphic](gnusto-heading.png)
 
-### Welcome to the Gnusto Interactive Fiction Engine!
-
-Gnusto is a flexible and powerful framework for writing [interactive fiction](https://en.wikipedia.org/wiki/Interactive_fiction) games. Drawing inspiration from the Infocom classics of the 1980s, it provides a modern toolkit that makes building rich, dynamic text adventures easy and enjoyable--allowing you to focus on storytelling and world-building rather than engine mechanics.
+Gnusto is a [Swift](https://www.swift.org/) framework for writing [interactive fiction](https://en.wikipedia.org/wiki/Interactive_fiction) games. Drawing inspiration from the Infocom classics of the 1980s, it provides a modern toolkit for building old school text adventures. Gnusto handles state management, allowing you to focus on storytelling and world-building.
 
 - Gnusto is written in cross-platform Swift, allowing you to deploy your games on Mac, Linux, Windows, iOS, Android and Web.
-- The framework emphasizes ergonomics and developer experience, providing type safety without boilerplate code.
-- Built with extensibility in mind, you can customize and extend Gnusto to fit your creative vision.
+- It provides a declarative syntax to define places and things in the game world.
+- Gnusto offers type safety, eliminating many potential errors at compile time.
+- It's easy to customize and extend to fit your creative vision.
+- Gnusto's state change pipeline provides safe state management, avoiding most race conditions and state conflicts.
 
-At its core, Gnusto uses a state change pipeline that ensures safe state management, eliminating many of the bugs that can plague interactive fiction engines. Whether you're creating your first text adventure or building a complex, multi-layered world, Gnusto provides the foundation you need, while staying out of your way.
+Gnusto strives to be as intuitive as possible: someone new to Swift should be able to write their first text adventures with Gnusto.
+
+It also strives to be extensible and customizable: someone experienced in Swift and/or interactive fiction writing should have rock solid foundation that doesn't get in their way.
+
+## Getting Started
+
+The following instructions assume that you have Bash and Swift 6.2+ installed on your Mac, Linux or Windows machine. You can check these with the following commands:
+
+```bash
+# Verify that Bash is available
+bash —version
+
+# Verify that Swift 6.2+ is available
+swift -v
+```
+
+If you're using Windows, please use [WSL](https://learn.microsoft.com/en-us/windows/wsl/) or [git bash emulation](https://gitforwindows.org/) for bash access, or use the manual setup instructions below.
+
+Swift 6.2 is a requirement, so if you don't have it locally, please follow the installation instructions at [swift.org](https://www.swift.org/install/), and then continue with the steps below.
+
+### Bootstrap
+
+Gnusto's [bootstrap](https://github.com/samadhiBot/Gnusto/blob/main/Scripts/bootstrap) script provides the easiest way to get started. It sets up a new game scaffold on your machine. If you'd rather set up Gnusto by hand, there are manual setup instructions below.
+
+```bash
+# Run the bootstrap script from Github:
+bash <(curl -sSL https://raw.githubusercontent.com/samadhiBot/Gnusto/refs/heads/main/Scripts/bootstrap)
+```
+
+[![asciicast](https://asciinema.org/a/746386.svg)](https://asciinema.org/a/746386)
+
+When the `bootstrap` script is done, it tries to open your new game in [Xcode](https://apps.apple.com/us/app/xcode/id497799835) or [VS Code](https://code.visualstudio.com/download).
+
+Before you continue, please find and open the file called `CustodialSingularity.swift`. This file contains a location, and item, and an event, which are described in the next section.
 
 ## Building Your First Game
 
-Creating a game with Gnusto begins with three main concepts: locations, items, and events. In each case, Gnusto provides a declarative syntax for defining your world. Simply declare a location or item, and begin adding the details you care about, in any order you like.
+Gnusto's basic building blocks are locations, items, and events.
 
 ### Locations: Places in Your World
 
-A ``Location`` represents any place the player can visit -- a room, forest clearing, or spaceship bridge. Here's a simple example:
+A ``Location`` represents any place the player can visit — a room, a forest clearing, a spaceship bridge. Gnusto provides a declarative syntax that starts with a unique identifier, and includes any properties you want to define, in any order you like.
+
+Here's a simple example:
 
 ```swift
 let westOfHouse = Location(.westOfHouse)
@@ -37,11 +72,13 @@ let westOfHouse = Location(.westOfHouse)
     .inherentlyLit
 ```
 
-The first line declares the location and its unique identifier: `.westOfHouse`. The next lines give it a player-facing name and description, followed by the places you can go from here -- or specifically cannot go, in the case of walking east. The final line gives the location light, so you don't need a lantern to see here.
+The first line declares the location and its unique identifier: `.westOfHouse`. Note that this strongly-typed identifier doesn't exist until the first time you build the project.
+
+The next lines give it a player-facing name and description, followed by the places you can go from here — or specifically cannot go, in the case of walking east. The final line gives the location light, so you don't need your lantern to see here.
 
 ### Items: Objects and Characters
 
-An ``Item`` can be anything the player interacts with -- objects, characters, even abstract concepts:
+An ``Item`` can be anything the player interacts with — objects, characters, even abstract concepts:
 
 ```swift
 let cloak = Item(.cloak)
@@ -98,7 +135,7 @@ In addition to providing player-facing messages, event handlers can also trigger
 
 ## Gnusto's Key Features
 
-- **Declarative Syntax**: Define your world with fluent, chainable builders that let you focus on what matters—your game's story and mechanics
+- **Declarative Syntax**: Define places and things with fluent, chainable builders
 - **Type Safety**: Strongly-typed IDs and Swift 6 strict concurrency prevent common bugs at compile time
 - **State Change Pipeline**: All mutations flow through a safe, structured pipeline that eliminates state management bugs
 - **Natural Language Parser**: Handles synonyms, adjectives, pronouns, multiple objects, and complex commands like "put the brass lamp in the trophy case"
@@ -111,37 +148,12 @@ In addition to providing player-facing messages, event handlers can also trigger
 - **Automatic Setup**: The `GnustoAutoWiringPlugin` discovers your content and generates all ID constants and wiring code
 - **Test-Driven**: Built for testability with Swift Testing integration and 80-90% coverage standards
 
-## Getting Started
 
-If you already have Swift 6.2+ installed on your machine, getting started with Gnusto is only a command away.
+## Manual Setup
 
-```bash
-# Verify that Swift 6.2+ is available
-swift -v
-```
+To add Gnusto manually to an existing Swift package, follow these steps:
 
-If you need to install Swift 6.2 locally, follow the instructions at [swift.org](https://www.swift.org/install/), and then continue with the steps below.
-
-### Option 1: Automatic
-
-The easiest way to get started is by running Gnusto's [bootstrap](https://github.com/samadhiBot/Gnusto/blob/main/Scripts/bootstrap) script. It sets up a new game scaffold on your own machine.
-
-```bash
-# Run the bootstrap script from Github:
-bash <(curl -sSL https://raw.githubusercontent.com/samadhiBot/Gnusto/refs/heads/main/Scripts/bootstrap)
-
-# Or, clone the repo and run the bootstrap script locally:
-git clone https://github.com/samadhiBot/Gnusto.git
-./Gnusto/Scripts/bootstrap
-```
-
-[![asciicast](https://asciinema.org/a/746386.svg)](https://asciinema.org/a/746386)
-
-### Option 2: Manual
-
-If you'd rather put things together manually, setting up Gnusto is still easy. Follow these steps to get started:
-
-1. **Add Gnusto to your Swift package** and include the ``GnustoAutoWiringPlugin``
+1. **Add Gnusto to your Swift package** and include the `GnustoAutoWiringPlugin`
     ```swift
     // Package.swift
     dependencies: [
@@ -195,8 +207,8 @@ If you'd rather put things together manually, setting up Gnusto is still easy. F
 4. **Add dynamic behavior** using ``ItemEventHandler`` and ``LocationEventHandler``, ``Daemon`` and ``Fuse``
     ```swift
     extension Troll {
-        static let trollHandler = ItemEventHandler(for: .troll) {
-            before(.tell) { context, command in
+        static let trollHandler = ItemEventHandler(for: .troll) { when in
+            when.before(.tell) { context, command in
                 ActionResult("The troll isn't much of a conversationalist.")
             }
         }
@@ -275,26 +287,12 @@ For VS Code users, the Debug Console does not support interactive keyboard input
 
 ## Where to Go from Here
 
-Now that you understand the basics of Gnusto, here are some resources to help you dive deeper:
+[Game Structure and Dynamic Behavior](https://samadhibot.github.io/Gnusto/documentation/gnustoengine/gamestructure) goes deeper into locations, items and event handlers. It also introduces property computers, daemons and fuses.
 
-### Game Structure and Dynamic Behavior
+[Frequently Asked Questions](https://samadhibot.github.io/Gnusto/documentation/gnustoengine/faqs) needs no explanation.
 
-Learn how to organize your game world effectively and bring it to life with dynamic proxies, event handlers, and time-based behaviors. This guide covers the architecture that powers sophisticated interactive fiction.
-
-**Read more**: [Game Structure and Dynamic Behavior](https://samadhibot.github.io/Gnusto/documentation/gnustoengine/gamestructure)
-
-### Frequently Asked Questions
-
-Quick answers to common questions about platforms, tooling, development workflow, and how Gnusto compares to other IF systems.
-
-**Read more**: [Frequently Asked Questions](https://samadhibot.github.io/Gnusto/documentation/gnustoengine/faqs)
+If you have a question that hasn't been addressed, or run into a problem while using Gnusto, please open an issue at [Gnusto/issues](https://github.com/samadhiBot/Gnusto/issues). We'll strive to provide timely responses.
 
 ### Contributing to Gnusto
 
-We'd love to have you contribute to Gnusto! Whether you're interested in creating games with the engine or helping improve the engine itself, you're welcome here.
-
-If you're a **game developer**, we invite you to take Gnusto for a spin and see how it feels. Try building something small first, then let us know about any rough edges you encounter. We welcome bug reports, feature requests, documentation improvements, and any other contributions that help make interactive fiction development more accessible.
-
-For **engine developers**, we follow modern Swift development practices with comprehensive testing and clear documentation. Check out our development standards and feel free to jump in with fixes, new features, or improvements to existing systems.
-
-**Read more**: [Contributing to Gnusto](https://github.com/samadhiBot/Gnusto/blob/main/CONTRIBUTING.md)
+Contributions are welcome. Please see [Contributing to Gnusto](https://github.com/samadhiBot/Gnusto/blob/main/CONTRIBUTING.md) for details.

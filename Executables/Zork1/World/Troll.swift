@@ -76,29 +76,29 @@ enum Troll {
 
     // MARK: - Event Handlers
 
-    static let trollHandler = ItemEventHandler(for: .troll) { on in
-        on.before(.tell) { _, _ in
+    static let trollHandler = ItemEventHandler(for: .troll) { when in
+        when.before(.tell) { _, _ in
             ActionResult("The troll isn't much of a conversationalist.")
         }
 
-        //        on.before(.examine) { context, command in
+        //        when.before(.examine) { context, command in
         //            let description = await context.item.description
         //            return ActionResult(description)
         //        }
 
-        on.before(.attack) { context, _ in
+        when.before(.attack) { context, _ in
             // Wake the troll first if unconscious
             await wakeTroll(engine: context.engine)
         }
 
-        on.before(.give, .throw) { context, command in
+        when.before(.give, .throw) { context, command in
             await handleTrollGiveOrThrow(
                 engine: context.engine,
                 command: command
             )
         }
 
-        on.before(.take, .move) { context, _ in
+        when.before(.take, .move) { context, _ in
             await ActionResult(
                 """
                 The troll spits in your face, grunting "Better luck next time"
@@ -109,7 +109,7 @@ enum Troll {
             )
         }
 
-        on.before(.mung, .pull, .push) { context, command in
+        when.before(.mung, .pull, .push) { context, command in
             // Non-attack mung verbs include `rip`, `break`, etc.
             if !command.hasIntent(.attack) {
                 return await ActionResult(
@@ -121,7 +121,7 @@ enum Troll {
             return nil
         }
 
-        on.before(.listen) { context, _ in
+        when.before(.listen) { context, _ in
             if await context.item.isAwake {
                 return ActionResult(
                     """
@@ -133,7 +133,7 @@ enum Troll {
             return nil
         }
 
-        on.before(.ask, .tell) { context, _ in
+        when.before(.ask, .tell) { context, _ in
             if await !context.item.isAwake {
                 return ActionResult("Unfortunately, the troll can't hear you.")
             }
@@ -141,8 +141,8 @@ enum Troll {
         }
     }
 
-    static let trollRoomHandler = LocationEventHandler(for: .trollRoom) { on in
-        on.before(.move) { context, command in
+    static let trollRoomHandler = LocationEventHandler(for: .trollRoom) { when in
+        when.before(.move) { context, command in
             let troll = await context.item(.troll)
 
             // Troll blocks the way if here in the room, alive, and conscious

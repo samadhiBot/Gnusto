@@ -278,8 +278,8 @@ extension InsideHouse {
 // MARK: - Handlers
 
 extension InsideHouse {
-    static let bottleHandler = ItemEventHandler(for: .bottle) { on in
-        on.before(.throw) { context, _ in
+    static let bottleHandler = ItemEventHandler(for: .bottle) { when in
+        when.before(.throw) { context, _ in
             let water = await context.item(.water)
             let hasWater = await water.parent == .item(context.item)
 
@@ -300,7 +300,7 @@ extension InsideHouse {
             }
         }
 
-        on.before(.attack) { context, _ in
+        when.before(.attack) { context, _ in
             let water = await context.item(.water)
             let hasWater = await water.parent == .item(context.item)
 
@@ -321,7 +321,7 @@ extension InsideHouse {
             }
         }
 
-        on.before(.push) { context, _ in
+        when.before(.push) { context, _ in
             let water = await context.item(.water)
             let hasWater = await water.parent == .item(context.item)
             let isOpen = await context.item.hasFlag(.isOpen)
@@ -344,8 +344,8 @@ extension InsideHouse {
     /// - TURN ON: Lights lamp (unless burned out)
     /// - TURN OFF: Extinguishes lamp (unless burned out)
     /// - EXAMINE: Shows lamp state (burned out, on, or off)
-    static let lampHandler = ItemEventHandler(for: .lamp) { on in
-        on.before(.throw) { context, _ in
+    static let lampHandler = ItemEventHandler(for: .lamp) { when in
+        when.before(.throw) { context, _ in
             let playerLocation = await context.player.location
             let brokenLamp = await context.item(.brokenLamp)
 
@@ -357,17 +357,17 @@ extension InsideHouse {
             )
         }
 
-        on.before(.lightSource) { context, _ in
+        when.before(.lightSource) { context, _ in
             let isBurnedOut = await context.item.hasFlag(.isBurnedOut)
             return isBurnedOut ? ActionResult("A burned-out lamp won't light.") : nil
         }
 
-        on.before(.extinguish) { context, _ in
+        when.before(.extinguish) { context, _ in
             let isBurnedOut = await context.item.hasFlag(.isBurnedOut)
             return isBurnedOut ? ActionResult("The lamp has already burned out.") : nil
         }
 
-        on.before(.examine) { context, _ in
+        when.before(.examine) { context, _ in
             let isBurnedOut = await context.item.hasFlag(.isBurnedOut)
             let isOn = await context.item.hasFlag(.isOn)
 
@@ -392,8 +392,8 @@ extension InsideHouse {
     /// - TAKE: Rug is too heavy to carry
     /// - LOOK UNDER: Temporary trap door revelation
     /// - CLIMB ON: Irregularity detection and magic carpet joke
-    static let rugHandler = ItemEventHandler(for: .rug) { on in
-        on.before(.take) { context, _ in
+    static let rugHandler = ItemEventHandler(for: .rug) { when in
+        when.before(.take) { context, _ in
             let wasRugMoved = await context.engine.hasFlag(.rugMoved)
             let baseMessage = "The rug is too heavy to lift"
             return if wasRugMoved {
@@ -408,7 +408,7 @@ extension InsideHouse {
             }
         }
 
-        on.before(.move, .push) { context, _ in
+        when.before(.move, .push) { context, _ in
             let wasRugMoved = await context.engine.hasFlag(.rugMoved)
             if wasRugMoved {
                 return ActionResult(
@@ -433,11 +433,11 @@ extension InsideHouse {
             }
         }
 
-        on.before(.take) { _, _ in
+        when.before(.take) { _, _ in
             ActionResult("The rug is extremely heavy and cannot be carried.")
         }
 
-        on.before(.look) { context, _ in
+        when.before(.look) { context, _ in
             let wasRugMoved = await context.engine.hasFlag(.rugMoved)
             let trapDoor = await context.item(.trapDoor)
             let trapDoorOpen = await trapDoor.hasFlag(.isOpen)
@@ -455,7 +455,7 @@ extension InsideHouse {
             }
         }
 
-        on.before(.climb) { context, _ in
+        when.before(.climb) { context, _ in
             let wasRugMoved = await context.engine.hasFlag(.rugMoved)
             let trapDoor = await context.item(.trapDoor)
             let trapDoorOpen = await trapDoor.hasFlag(.isOpen)
@@ -479,9 +479,9 @@ extension InsideHouse {
     /// - TAKE: Enables the sword glow daemon when taken (equivalent to ENABLE <QUEUE I-SWORD -1>)
     /// - EXAMINE: Shows appropriate glow messages based on current glow state
     /// - Daemon activation: Checks current location and adjacent locations for monsters
-    static let swordHandler = ItemEventHandler(for: .sword) { on in
+    static let swordHandler = ItemEventHandler(for: .sword) { when in
         // Show glow message based on current glow level (like SWORD-FCN in ZIL)
-        on.before(.examine) { context, _ in
+        when.before(.examine) { context, _ in
             switch await context.engine.global(.swordGlowLevel) ?? 0 {
             case 1:
                 ActionResult("Your sword is glowing with a faint blue glow.")
@@ -493,14 +493,14 @@ extension InsideHouse {
         }
 
         // Disable sword glow daemon when dropped
-        on.after(.drop) { _, _ in
+        when.after(.drop) { _, _ in
             try ActionResult(
                 .stopDaemon(.swordDaemon)
             )
         }
 
         // Enable sword glow daemon when taken (like SWORD-FCN in ZIL)
-        on.after(.take) { _, _ in
+        when.after(.take) { _, _ in
             try ActionResult(
                 .runDaemon(.swordDaemon)
             )
@@ -514,8 +514,8 @@ extension InsideHouse {
     /// - **Living Room**: Allows opening, closing, and looking under the door with custom messages.
     /// - **Cellar**: Prevents opening from below and has special behavior for closing.
     /// - **Raise**: Treats `RAISE` as an alias for `OPEN`.
-    static let trapDoorHandler = ItemEventHandler(for: .trapDoor) { on in
-        on.before(.open, .pull) { context, _ in
+    static let trapDoorHandler = ItemEventHandler(for: .trapDoor) { when in
+        when.before(.open, .pull) { context, _ in
             let location = await context.player.location.id
             let isTrapDoorOpen = await context.item.hasFlag(.isOpen)
 
@@ -534,7 +534,7 @@ extension InsideHouse {
             }
         }
 
-        on.before(.close) { context, _ in
+        when.before(.close) { context, _ in
             let location = await context.player.location.id
             let isTrapDoorOpen = await context.item.hasFlag(.isOpen)
 
@@ -551,8 +551,8 @@ extension InsideHouse {
         }
     }
 
-    static let waterHandler = ItemEventHandler(for: .water) { on in
-        on.before(.drink) { context, _ in
+    static let waterHandler = ItemEventHandler(for: .water) { when in
+        when.before(.drink) { context, _ in
             guard await context.item(.bottle).isOpen else {
                 throw ActionResponse.feedback("You'll have to open the glass bottle first.")
             }

@@ -122,8 +122,8 @@ extension RoundRoom {
 
 extension RoundRoom {
     /// Entering the round room starts the thief daemon.
-    static let roundRoomHandler = LocationEventHandler(for: .roundRoom) { on in
-        on.enter { context in
+    static let roundRoomHandler = LocationEventHandler(for: .roundRoom) { when in
+        when.enter { context in
             if await !context.location.hasFlag(.isVisited) {
                 try ActionResult(
                     .runDaemon(.thiefDaemon)

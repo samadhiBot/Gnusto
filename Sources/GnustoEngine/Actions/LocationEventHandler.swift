@@ -47,15 +47,15 @@ public struct LocationEventHandler: Sendable {
     /// ```swift
     /// var locationEventHandlers: [LocationID: LocationEventHandler] {
     ///     [
-    ///         .bar: LocationEventHandler(for: .bar) { on in
-    ///             on.before(.move) { context, command in
+    ///         .bar: LocationEventHandler(for: .bar) { when in
+    ///             when.before(.move) { context, command in
     ///                 if !await context.location.isLit {
     ///                     ActionResult("Blundering around in the dark isn't a good idea!")
     ///                 } else {
     ///                     nil
     ///                 }
     ///             }
-    ///             on.enter { context in
+    ///             when.enter { context in
     ///                 ActionResult("You feel a chill as you enter.")
     ///             }
     ///         }
@@ -118,15 +118,15 @@ public typealias LocationEventMatcher = (LocationEventContext) async throws -> A
 ///
 /// This builder allows you to write location event handlers in a declarative way:
 /// ```swift
-/// .bar: LocationEventHandler(for: .bar) { on in
-///     on.before(.move) { context, command in
+/// .bar: LocationEventHandler(for: .bar) { when in
+///     when.before(.move) { context, command in
 ///         if !await context.location.isLit {
 ///             ActionResult("Blundering around in the dark isn't a good idea!")
 ///         } else {
 ///             nil
 ///         }
 ///     }
-///     on.enter { context in
+///     when.enter { context in
 ///         ActionResult("You feel a chill as you enter.")
 ///     }
 /// }
@@ -157,10 +157,10 @@ public struct LocationEventMatcherBuilder {
 ///
 /// Usage:
 /// ```swift
-/// LocationEventHandler(for: .bar) { on in
-///     on.before(.move) { context, command in ... }
-///     on.after { context, command in ... }
-///     on.enter { context in ... }
+/// LocationEventHandler(for: .bar) { when in
+///     when.before(.move) { context, command in ... }
+///     when.after { context, command in ... }
+///     when.enter { context in ... }
 /// }
 /// ```
 public struct LocationEventMatchers: Sendable {}
@@ -224,7 +224,7 @@ extension LocationEventMatchers {
     ///
     /// Example:
     /// ```swift
-    /// on.before(.move) { context, command in
+    /// when.before(.move) { context, command in
     ///     if !await context.location.isLit {
     ///         ActionResult("Blundering around in the dark isn't a good idea!")
     ///     } else {
@@ -261,12 +261,12 @@ extension LocationEventMatchers {
     ///
     /// Example:
     /// ```swift
-    /// on.after { context, command in
+    /// when.after { context, command in
     ///     // Ambient sounds after any action in this forest location
     ///     ActionResult("You hear rustling in the distant bushes.")
     /// }
     ///
-    /// on.after(.take) { context, command in
+    /// when.after(.take) { context, command in
     ///     // Specific reaction to taking items in this location
     ///     ActionResult("The shopkeeper eyes you suspiciously.")
     /// }
@@ -301,7 +301,7 @@ extension LocationEventMatchers {
     ///
     /// Example:
     /// ```swift
-    /// on.enter { context in
+    /// when.enter { context in
     ///     // One-time trap that triggers when first entering
     ///     if !await context.engine.hasFlag(.cellarTrapTriggered) {
     ///         return ActionResult(
@@ -313,7 +313,7 @@ extension LocationEventMatchers {
     ///     return nil
     /// }
     ///
-    /// on.enter { context in
+    /// when.enter { context in
     ///     // NPC greeting when entering their domain
     ///     ActionResult("The wizard looks up from his spellbook and nods at you.")
     /// }

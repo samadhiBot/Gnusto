@@ -198,8 +198,8 @@ extension Underground {
     /// This is based on the ZIL `CELLAR-FCN` routine. When the player enters the cellar for the
     /// first time while the trap door is open, the door slams shut and is barred, preventing
     /// an easy return. This is controlled by a custom flag.
-    static let cellarHandler = LocationEventHandler(for: .cellar) { on in
-        on.enter { context in
+    static let cellarHandler = LocationEventHandler(for: .cellar) { when in
+        when.enter { context in
             let isTrapDoorOpen = await context.item(.trapDoor).isOpen
             let isTrapDoorBarred = await context.engine.hasFlag(.trapDoorBarred)
 
