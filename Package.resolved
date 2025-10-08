@@ -49,7 +49,7 @@
     {
       "identity" : "swift-log",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/apple/swift-log.git",
+      "location" : "https://github.com/apple/swift-log",
       "state" : {
         "revision" : "ce592ae52f982c847a4efc0dd881cc9eb32d29f2",
         "version" : "1.6.4"
@@ -76,7 +76,7 @@
     {
       "identity" : "swiftlintplugins",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/SimplyDanny/SwiftLintPlugins",
+      "location" : "https://github.com/simplydanny/swiftlintplugins",
       "state" : {
         "revision" : "6166499ede0efe43c3809f101d2c3cd409e2b77a",
         "version" : "0.61.0"
@@ -87,8 +87,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/pointfreeco/xctest-dynamic-overlay",
       "state" : {
-        "revision" : "b2ed9eabefe56202ee4939dd9fc46b6241c88317",
-        "version" : "1.6.1"
+        "revision" : "4c27acf5394b645b70d8ba19dc249c0472d5f618",
+        "version" : "1.7.0"
       }
     }
   ],

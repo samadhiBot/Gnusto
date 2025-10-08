@@ -86,6 +86,27 @@ The GnustoAutoWiringPlugin automatically discovers game content patterns and gen
 - Wires up ItemEventHandlers and LocationEventHandlers
 - Creates GameBlueprint implementations
 
+#### Middleware Architecture
+Gnusto uses a **middleware pipeline** for optional, composable features:
+- **CombatMiddleware**: Melee combat system (optional)
+- **Custom Middleware**: Dialogue, crafting, weather, quests, etc.
+- Middleware intercepts game loop at strategic points (before/after turn, before/after command)
+- Configured in `GameBlueprint.middleware`
+- See `MIDDLEWARE.md` for complete documentation
+
+Example:
+```swift
+var middleware: [any GameMiddleware] {
+    [
+        CombatMiddleware(
+            combatSystems: combatSystems,
+            combatMessengers: combatMessengers,
+            defaultCombatMessenger: defaultCombatMessenger
+        )
+    ]
+}
+```
+
 #### Event-Driven Architecture
 - **ItemEventHandler**: Custom behavior for specific items
 - **LocationEventHandler**: Custom behavior for specific locations

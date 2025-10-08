@@ -30,28 +30,6 @@ public struct ActionContext: Sendable {
 }
 
 extension ActionContext {
-    /// Convenience accessor for combat messaging.
-    ///
-    /// Provides access to the appropriate combat messenger for the current combat context.
-    /// This automatically selects the correct combat messenger based on the current enemy,
-    /// allowing for character-specific combat descriptions and responses. Falls back to the
-    /// default combat messenger if no enemy-specific messenger is configured or if not
-    /// currently in combat.
-    ///
-    /// Example:
-    /// ```swift
-    /// let hitMessage = await context.combatMsg.attackHit(damage: 5)
-    /// let missMessage = await context.combatMsg.attackMiss()
-    /// ```
-    public var combatMsg: CombatMessenger {
-        get async {
-            if let combatState = await engine.combatState {
-                return await engine.combatMessenger(for: combatState.enemyID)
-            }
-            return engine.defaultCombatMessenger
-        }
-    }
-
     /// Checks if the command contains one of the specified prepositions.
     ///
     /// This method is commonly used in action handlers to branch logic based on

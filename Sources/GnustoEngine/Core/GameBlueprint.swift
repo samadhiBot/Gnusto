@@ -113,6 +113,34 @@ public protocol GameBlueprint: Sendable {
     /// The default implementation provides an empty dictionary.
     var combatSystems: [ItemID: any CombatSystem] { get }
 
+    /// Middleware components that extend game loop functionality.
+    ///
+    /// Middleware provides a way to add optional, composable features to your game
+    /// such as combat systems, dialogue trees, crafting, weather effects, or any
+    /// other game mechanics that should be separate from the core engine.
+    ///
+    /// Middleware is executed in priority order (highest first) at various points
+    /// in the game loop, allowing it to observe, modify, or short-circuit normal
+    /// processing.
+    ///
+    /// Example:
+    /// ```swift
+    /// var middleware: [any GameMiddleware] {
+    ///     [
+    ///         CombatMiddleware(
+    ///             combatSystems: combatSystems,
+    ///             combatMessengers: combatMessengers,
+    ///             defaultCombatMessenger: defaultCombatMessenger
+    ///         ),
+    ///         DialogueMiddleware(dialogueTrees: dialogueTrees),
+    ///         WeatherMiddleware()
+    ///     ]
+    /// }
+    /// ```
+    ///
+    /// The default implementation provides an empty array.
+    var middleware: [any GameMiddleware] { get }
+
     /// Combat messengers for specific characters or global combat messaging.
     ///
     /// This dictionary allows you to define custom combat messaging for specific characters
@@ -296,6 +324,11 @@ extension GameBlueprint {
     /// Default implementation provides no character-specific combat messengers.
     public var combatMessengers: [ItemID: CombatMessenger] {
         [:]
+    }
+
+    /// Default implementation provides no middleware.
+    public var middleware: [any GameMiddleware] {
+        []
     }
 
     /// Default implementation creates a standard combat messenger with the blueprint's RNG.

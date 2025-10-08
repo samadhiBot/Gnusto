@@ -64,22 +64,33 @@ extension GameEngine {
     /// Processes a single turn of the game, including player input, parsing, command execution, and clock ticks.
     ///
     /// This method orchestrates the core sequence of events within a single game turn:
-    /// 1. Prompts the player for input via the `IOHandler`.
+    /// 1. Executes `beforeTurn` middleware hooks
+    /// 2. Prompts the player for input via the `IOHandler`.
     ///    If input is `nil` (e.g., EOF) or explicitly "quit", `shouldQuit` is set, and the turn ends.
-    /// 2. Parses the player's input string into a structured `Command` using the `parser`.
-    /// 3. If parsing is successful:
+    /// 3. Parses the player's input string into a structured `Command` using the `parser`.
+    /// 4. Executes `beforeCommandExecution` middleware hooks (can modify or skip command)
+    /// 5. If parsing is successful:
     ///    a. If the command is to quit or `shouldQuit` is set, the turn ends.
     ///    b. Calls `execute(command:)` to process the command through event and action handlers.
-    ///    c. If the command was a movement command (`.go`) to an unvisited room, or a command
-    ///       that changed the light state (e.g., `.turnOn`, `.turnOff` a light source), it then
-    ///       calls `describeCurrentLocation()`.
-    /// 4. Advances game time by calling `tickClock()`, which processes active fuses and daemons.
-    ///    If `tickClock()` sets `shouldQuit` (e.g., a fuse ends the game), the turn ends.
-    /// 5. If parsing fails, reports the `ParseError` to the player via `report(parseError:)`.
+    /// 6. Executes `afterCommandExecution` middleware hooks (can add side effects)
+    /// 7. Checks for player death
+    /// 8. Executes `beforeTimeAdvancement` middleware hooks
+    /// 9. Advances game time by calling `tickClock()`, which processes active fuses and daemons.
+    /// 10. Executes `afterTurn` middleware hooks
     ///
     /// Errors during turn processing are logged.
     func processTurn(_ testInput: String? = nil) async throws {
         if shouldQuit || shouldRestart { return }
+
+        // BEFORE TURN MIDDLEWARE HOOK
+        let beforeTurnResult = try await executeBeforeTurnMiddleware()
+        if case .handled(let result) = beforeTurnResult {
+            if let result {
+                try await processActionResult(result)
+            }
+            // Middleware handled the entire turn
+            return
+        }
 
         // 1. Get Player Input (or enqueued test input)
         let input: String
@@ -143,99 +154,98 @@ extension GameEngine {
 
         // 5. Execute Command or Handle Error
         var shouldConsumeTurn = true  // Default to consuming turn
+        var commandResult: ActionResult?
+
         switch parseResult {
         case .success(let command):
             // Allow quit command to be processed by QuitActionHandler
             // Only exit early if shouldQuit is already set
             if shouldQuit { return }
 
-            shouldConsumeTurn = try await execute(command: command)
+            // BEFORE COMMAND MIDDLEWARE HOOK
+            let middlewareResult = try await executeBeforeCommandMiddleware(command: command)
 
-            // When in combat mode, get and process the enemy response
-            if isInCombat {
-                let combatResult = try await getCombatResult(for: command)
-                try await processActionResult(combatResult)
+            switch middlewareResult {
+            case .continue(let finalCommand):
+                // Execute command normally
+                shouldConsumeTurn = try await execute(command: finalCommand)
+
+                // Capture the result for middleware
+                // Note: execute() currently returns Bool, not ActionResult
+                // The result is processed internally, so we create an empty result
+                commandResult = ActionResult(message: nil, changes: [], effects: [])
+
+            case .skip(let result):
+                // Middleware handled the command (e.g., combat turn)
+                if let result {
+                    try await processActionResult(result)
+                    commandResult = result
+                }
+                // Turn is consumed when middleware handles it
+                shouldConsumeTurn = true
             }
 
         case .failure(let error):
             await report(parseError: error, originalInput: input)
             // Parse errors consume turns (traditional IF behavior)
             shouldConsumeTurn = true
+            commandResult = ActionResult(message: nil, changes: [], effects: [])  // Empty result for middleware
         }
 
-        // 6. Check for hostile characters after player's action (if turn was consumed)
-        if shouldConsumeTurn && !shouldQuit && !shouldRestart && !isInCombat {
-            let currentLocation = await player.location
-            let locationItems = await currentLocation.items
-
-            for creature in locationItems where await creature.isHostileEnemy {
-                // Hostile character present - initiate combat
-                try await processActionResult(
-                    enemyAttacks(
-                        enemy: creature,
-                        playerWeapon: player.preferredWeapon
-                    )
+        // AFTER COMMAND MIDDLEWARE HOOK
+        // This is where combat checks for hostiles, achievements track progress, etc.
+        if let result = commandResult, shouldConsumeTurn {
+            // Get the actual command or create a dummy one for parse errors
+            let actualCommand: Command
+            if case .success(let cmd) = parseResult {
+                actualCommand = cmd
+            } else {
+                // Parse error - create minimal command for middleware
+                actualCommand = Command(
+                    verb: .examine,  // Use a valid verb
+                    directObject: nil,
+                    indirectObject: nil,
+                    direction: nil,
+                    rawInput: input
                 )
-                // Combat mode is now active, break out of loop
-                break
             }
-        }
 
-        // 7. Check for player death
-        if await isPlayerDead {
-            try await handlePlayerDeath()
-            return
-        }
-
-        // 8. Timed events happen AFTER the player's action is complete (or failed).
-        if !shouldQuit && !shouldRestart && shouldConsumeTurn {
-            try await tickClock()
-        }
-    }
-
-    func processCombatTurn(
-        with input: String,
-        state combatState: CombatState,
-        messageQueue messages: [String]
-    ) async throws {
-        // Parse the player's combat command
-        let parseResult = try await parser.parse(
-            input: input,
-            vocabulary: vocabulary,
-            engine: self
-        )
-
-        switch parseResult {
-        case .success(let command):
-            if shouldQuit { return }
-
-            // Process the complete combat turn (player action + enemy response)
-            try await processActionResult(
-                try await getCombatResult(for: command)
+            let finalResult = try await executeAfterCommandMiddleware(
+                command: actualCommand,
+                result: result
             )
 
-        case .failure(let error):
-            // Parse errors consume turns (traditional IF behavior)
-            // In combat, the CombatSystem handles turn advancement internally
-            await report(parseError: error, originalInput: input)
+            // Process any additional effects from middleware
+            // Compare by checking if there are any changes
+            if !finalResult.changes.isEmpty || !finalResult.effects.isEmpty {
+                try await processActionResult(finalResult)
+            }
         }
 
-        // Check for player death after combat turn
+        // 6. Check for player death
         if await isPlayerDead {
             try await handlePlayerDeath()
             return
         }
 
-        // Process timed events (daemons/fuses continue even during combat)
-        if !shouldQuit && !shouldRestart {
-            do {
+        // BEFORE TIME ADVANCEMENT MIDDLEWARE HOOK
+        if shouldConsumeTurn && !shouldQuit && !shouldRestart {
+            let timeResult = try await executeBeforeTimeAdvancementMiddleware()
+            if case .handled(let result) = timeResult {
+                if let result {
+                    try await processActionResult(result)
+                }
+                // Skip time advancement
+            } else {
+                // 7. Timed events happen AFTER the player's action is complete
                 try await tickClock()
-            } catch {
-                logError("Error processing timed events during combat: \(error)")
             }
         }
 
-        return
+        // AFTER TURN MIDDLEWARE HOOK
+        if !shouldQuit && !shouldRestart {
+            try await executeAfterTurnMiddleware()
+        }
     }
 
     /// Displays the status line (e.g., current location, score, and turn count)
@@ -326,5 +336,20 @@ extension GameEngine {
 
         // Reset the conversation manager
         await conversationManager.clearQuestion()
+
+        // Reset middleware state (clear caches, etc.)
+        self.standardCombatSystemCache = [:]
+    }
+}
+
+// MARK: - ParseResult Extension
+
+extension Result where Success == Command, Failure == ParseError {
+    /// Returns the successful command, or nil if the result is a failure.
+    var success: Command? {
+        if case .success(let command) = self {
+            return command
+        }
+        return nil
     }
 }

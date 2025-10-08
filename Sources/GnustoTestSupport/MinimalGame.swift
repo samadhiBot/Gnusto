@@ -76,6 +76,9 @@ public struct MinimalGame: GameBlueprint {
     /// Dynamic property computers for locations that need runtime-calculated values.
     public var locationComputers: [LocationID: LocationComputer]
 
+    /// Middleware components that extend game loop functionality.
+    public var middleware: [any GameMiddleware]
+
     /// The message provider for all player-facing text, seeded for deterministic output.
     public var messenger: StandardMessenger
 
@@ -100,6 +103,7 @@ public struct MinimalGame: GameBlueprint {
     ///   - daemons: Recurring timed events.
     ///   - itemComputers: Dynamic property computers for items.
     ///   - locationComputers: Dynamic property computers for locations.
+    ///   - middleware: Middleware components. Defaults to `[CombatMiddleware()]`.
     ///   - messenger: Custom message provider. If `nil`, creates a seeded `StandardMessenger`.
     ///   - randomSeed: A random seed to supply to the deterministic random number generators.
     public init(
@@ -114,6 +118,7 @@ public struct MinimalGame: GameBlueprint {
         daemons: [DaemonID: Daemon] = [:],
         itemComputers: [ItemID: ItemComputer] = [:],
         locationComputers: [LocationID: LocationComputer] = [:],
+        middleware: [any GameMiddleware]? = nil,
         messenger: StandardMessenger? = nil,
         randomSeed: UInt64 = 71
     ) {
@@ -135,6 +140,18 @@ public struct MinimalGame: GameBlueprint {
         self.locationComputers = locationComputers
         self.messenger = messenger ?? StandardMessenger(randomNumberGenerator: messengerRng)
         self.randomNumberGenerator = gameEngineRng
+
+        // Default to combat middleware if not specified
+        self.middleware =
+            middleware ?? [
+                CombatMiddleware(
+                    combatSystems: combatSystems,
+                    combatMessengers: [:],
+                    defaultCombatMessenger: CombatMessenger(
+                        randomNumberGenerator: SeededRandomNumberGenerator(seed: randomSeed)
+                    )
+                )
+            ]
     }
 }
 

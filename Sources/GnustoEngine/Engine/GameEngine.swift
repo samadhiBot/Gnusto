@@ -162,6 +162,10 @@ public actor GameEngine {
     /// could lead to different RNG call patterns and non-deterministic behavior.
     var standardCombatSystemCache: [ItemID: StandardCombatSystem] = [:]
 
+    /// Registered middleware components that can intercept and modify game loop execution.
+    /// Middleware is registered via the `GameBlueprint` and executed in priority order.
+    var middleware: [any GameMiddleware] = []
+
     /// Internal logger for engine messages, warnings, and errors.
     let logger = Logger(label: "com.samadhibot.Gnusto.GameEngine")
 
@@ -221,6 +225,9 @@ public actor GameEngine {
         self.gameState = initialGameState
         self.messenger = gameBlueprint.messenger
         self.vocabulary = initialVocabulary
+
+        // Register middleware from blueprint
+        self.middleware = blueprint.middleware
     }
 }
 
