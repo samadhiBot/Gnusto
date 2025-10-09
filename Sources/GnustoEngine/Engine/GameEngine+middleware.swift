@@ -4,29 +4,30 @@ import Foundation
 
 extension GameEngine {
     /// Returns middleware sorted by priority (highest first).
-    var sortedMiddleware: [any GameMiddleware] {
+    var sortedMiddleware: [any GnustoMiddleware] {
         middleware.sorted { $0.priority > $1.priority }
     }
 
-    /// Registers middleware with the engine.
+    /// Retrieves middleware of a specific type, if present.
     ///
-    /// Middleware is typically registered during engine initialization from the
-    /// game blueprint. Middleware components are executed in priority order
-    /// (highest priority first) at various points in the game loop.
+    /// This method allows game-specific code (such as event handlers and daemons)
+    /// to access middleware instances when needed. The engine provides generic
+    /// access without knowing about specific middleware types.
     ///
-    /// - Parameter middleware: The middleware component to register
-    func registerMiddleware(_ middleware: any GameMiddleware) {
-        self.middleware.append(middleware)
-    }
-
-    /// Removes all middleware with the specified state key.
+    /// ## Example Usage
     ///
-    /// This is useful for dynamically disabling middleware features during gameplay,
-    /// though in most cases middleware should be configured statically via the blueprint.
+    /// ```swift
+    /// // In an event handler
+    /// guard let combat = await context.middleware(CombatMiddleware.self) else {
+    ///     return nil  // Combat middleware not present
+    /// }
+    /// return try await combat.enemyAttacks(enemy: troll, engine: context.engine)
+    /// ```
     ///
-    /// - Parameter stateKey: The state key of the middleware to remove
-    func removeMiddleware(withStateKey stateKey: String) {
-        middleware.removeAll { $0.stateKey == stateKey }
+    /// - Parameter type: The type of middleware to retrieve
+    /// - Returns: The middleware instance if present, or `nil` if not registered
+    nonisolated public func middleware<T: GnustoMiddleware>(_ type: T.Type) -> T? {
+        middleware.first { $0 is T } as? T
     }
 
     // MARK: - Middleware Execution Hooks
@@ -38,7 +39,7 @@ extension GameEngine {
     /// and the turn is considered handled.
     ///
     /// - Returns: `.continue` if normal turn processing should proceed, or
-    ///           `.handled` if middleware has handled the entire turn
+    ///            `.handled` if middleware has handled the entire turn
     func executeBeforeTurnMiddleware() async throws -> MiddlewareResult {
         let context = MiddlewareContext(engine: self)
         for mw in sortedMiddleware {
@@ -57,7 +58,7 @@ extension GameEngine {
     ///
     /// - Parameter command: The parsed command about to be executed
     /// - Returns: `.continue` with the (possibly modified) command to execute, or
-    ///           `.skip` if middleware has handled the command
+    ///            `.skip` if middleware has handled the command
     func executeBeforeCommandMiddleware(
         command: Command
     ) async throws -> CommandMiddlewareResult {
@@ -133,6 +134,22 @@ extension GameEngine {
         let context = MiddlewareContext(engine: self)
         for mw in sortedMiddleware {
             try await mw.afterTurn(context: context)
+        }
+    }
+
+    /// Executes the `onParseError` hook for all registered middleware.
+    ///
+    /// This is called when a parse error occurs, allowing middleware to observe
+    /// or respond to invalid player input. This is separate from command execution
+    /// hooks because there is no valid command to process.
+    ///
+    /// - Parameters:
+    ///   - error: The parse error that occurred
+    ///   - rawInput: The original player input that failed to parse
+    func executeOnParseError(error: ParseError, rawInput: String) async throws {
+        let context = MiddlewareContext(engine: self)
+        for mw in sortedMiddleware {
+            try await mw.onParseError(error: error, rawInput: rawInput, context: context)
         }
     }
 

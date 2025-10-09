@@ -1,4 +1,3 @@
-import CustomDump
 import GnustoEngine
 import GnustoTestSupport
 import Testing
@@ -12,9 +11,7 @@ struct Zork1TrollCombatTests {
 
     init() async {
         (engine, mockIO) = await GameEngine.test(
-            blueprint: Zork1(
-                rng: SeededRandomNumberGenerator()
-            )
+            blueprint: Zork1()
         )
     }
 
@@ -133,46 +130,24 @@ struct Zork1TrollCombatTests {
         await mockIO.expect(
             """
             > attack the troll with my sword
-            Your blood sings as your sword cuts toward the nasty troll who
-            barely gets his bloody ax into position before impact.
-
-            The troll uses his bloody ax to expertly block and nullify your
-            sword, leaving you open.
-
-            Suddenly the troll slips past your guard. His ax opens a wound
-            that will mark you, and your blood flows out steady and sure.
-            You absorb the hit, feeling flesh tear but knowing you can
-            endure.
+            No more waiting as you attack with your sword raised and the
+            troll responds with his ax, two weapons now committed to
+            drawing blood.
 
             > attack the troll with my sword
-            Your glamdring bites into the troll despite his bloody ax,
-            opening flesh that will need attention. The wound is real but
-            manageable.
+            The nasty troll drops his guard completely! He's exposed and
+            unable to defend against what comes next.
 
-            Suddenly the troll slips past your guard. His axe opens a wound
-            that will mark you, and your blood flows out steady and sure.
-            The strike hurts, but your body absorbs it. You remain
-            dangerous.
+            The troll swings his bloody ax in response but you weave away,
+            leaving the weapon to bite empty air.
 
             > attack the troll with my sword
-            You drive your elvish blade through the nasty troll's guard,
-            slicing through skin and drawing a line of fire across his
-            body. The wound stings sharply. He can take more, but not
-            forever.
+            Your strike with your orcrist beats aside his ax, tearing
+            through clothing and skin alike. He absorbs the hit, flesh
+            suffering but endurance holding.
 
-            The troll retaliates with finality as his axe finds the last
-            soft place in you and opens it to let the life pour out.
-
-            ****  You have died  ****
-
-            Death, that most permanent of inconveniences, has claimed you.
-            Yet in these tales, even death offers second chances.
-
-            You scored 0 out of a possible 350 points, in 2 moves.
-
-            Would you like to RESTART, RESTORE a saved game, or QUIT?
-
-            >
+            The troll counters viciously with his axe but rage makes the
+            strike wild, missing you entirely.
             """
         )
     }

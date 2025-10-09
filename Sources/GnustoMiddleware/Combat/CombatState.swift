@@ -1,4 +1,5 @@
 import Foundation
+import GnustoEngine
 
 /// Represents the current state of an active combat encounter in the interactive fiction engine.
 ///
@@ -227,7 +228,7 @@ public struct CombatState: Codable, Equatable, Sendable, Hashable {
     ///
     /// - Important: Always use this method rather than directly accessing items by ID
     ///   to ensure proper proxy behavior and computed value resolution.
-    func enemy(with engine: GameEngine) async -> ItemProxy {
+    public func enemy(with engine: GameEngine) async -> ItemProxy {
         await Item(id: enemyID).proxy(engine)
     }
 
@@ -253,7 +254,7 @@ public struct CombatState: Codable, Equatable, Sendable, Hashable {
     ///
     /// - Note: This method only returns `nil` if `playerWeaponID` is `nil`. If a weapon
     ///   ID is stored but the weapon cannot be found, this method will throw an error.
-    func playerWeapon(with engine: GameEngine) async -> ItemProxy? {
+    public func playerWeapon(with engine: GameEngine) async -> ItemProxy? {
         guard let playerWeaponID else { return nil }
         return await Item(id: playerWeaponID).proxy(engine)
     }
@@ -277,7 +278,7 @@ public struct CombatState: Codable, Equatable, Sendable, Hashable {
     ///     // Enemy uses natural weapons (claws, fists, etc.)
     /// }
     /// ```
-    func enemyWeapon(with engine: GameEngine) async -> ItemProxy? {
+    public func enemyWeapon(with engine: GameEngine) async -> ItemProxy? {
         guard let enemyWeaponID else { return nil }
         return await Item(id: enemyWeaponID).proxy(engine)
     }
@@ -314,7 +315,7 @@ public struct CombatState: Codable, Equatable, Sendable, Hashable {
     ///     newEnemyWeapon: nil
     /// )
     /// ```
-    func nextRound(
+    public func nextRound(
         intensityDelta: Double = 0.05,
         playerFatigueDelta: Double = 0.03,
         enemyFatigueDelta: Double = 0.03,
@@ -341,7 +342,7 @@ public struct CombatState: Codable, Equatable, Sendable, Hashable {
     /// - More visceral combat descriptions
     ///
     /// - Returns: `true` if combat intensity is above the high-intensity threshold
-    var isHighIntensity: Bool {
+    public var isHighIntensity: Bool {
         combatIntensity > 0.7
     }
 
@@ -354,7 +355,7 @@ public struct CombatState: Codable, Equatable, Sendable, Hashable {
     /// - Player prompts to retreat
     ///
     /// - Returns: `true` if either player or enemy fatigue exceeds the threshold
-    var isHighFatigue: Bool {
+    public var isHighFatigue: Bool {
         playerFatigue > 0.6 || enemyFatigue > 0.6
     }
 
@@ -367,7 +368,7 @@ public struct CombatState: Codable, Equatable, Sendable, Hashable {
     /// - Whether to suggest combat resolution
     ///
     /// - Returns: A value from 0.0 to 1.0 representing total combat escalation
-    var escalationLevel: Double {
+    public var escalationLevel: Double {
         let intensityWeight = 0.7
         let fatigueWeight = 0.3
         let maxFatigue = max(playerFatigue, enemyFatigue)

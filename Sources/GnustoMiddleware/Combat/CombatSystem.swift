@@ -1,4 +1,5 @@
 import Foundation
+import GnustoEngine
 
 /// A protocol defining turn-based combat behavior for enemies in the game.
 ///

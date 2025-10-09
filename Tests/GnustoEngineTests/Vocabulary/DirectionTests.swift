@@ -1,4 +1,3 @@
-import CustomDump
 import Foundation
 import GnustoTestSupport
 import Testing
@@ -69,7 +68,7 @@ struct DirectionTests {
 
     @Test("Sort order is stable and consistent")
     func testSortOrder() throws {
-        var generator = SeededRandomNumberGenerator(seed: 42)
+        var generator = SeededRNG(seed: 42)
         let directions = Direction.allCases.shuffled(using: &generator)
         let sorted = directions.sorted()
 
@@ -79,7 +78,7 @@ struct DirectionTests {
             .up, .down, .inside, .outside,
         ]
 
-        expectNoDifference(sorted, expectedOrder)
+        #expect(sorted == expectedOrder)
     }
 
     @Test("Comparable operations work correctly")
@@ -214,7 +213,7 @@ struct DirectionTests {
         #expect(!cardinalDirections.contains(.up))
 
         let sortedCardinals = cardinalDirections.sorted()
-        expectNoDifference(sortedCardinals, [.north, .east, .south, .west])
+        #expect(sortedCardinals == [.north, .east, .south, .west])
 
         let directionSet: Set<Direction> = [.north, .south, .north, .east]
         #expect(directionSet.count == 3)  // .north should only appear once

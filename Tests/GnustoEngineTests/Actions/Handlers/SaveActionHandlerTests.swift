@@ -1,4 +1,3 @@
-import CustomDump
 import GnustoEngine
 import GnustoTestSupport
 import Testing
@@ -252,10 +251,7 @@ struct SaveActionHandlerTests {
         let result = try await handler.process(context: ActionContext(command, engine))
 
         // Then
-        expectNoDifference(
-            result.message,
-            "Game saved."
-        )
+        #expect(result.message == "Game saved.")
         #expect(result.changes.isEmpty)
     }
 

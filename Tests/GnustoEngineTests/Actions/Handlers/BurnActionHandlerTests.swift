@@ -1,4 +1,3 @@
-import CustomDump
 import GnustoEngine
 import GnustoTestSupport
 import Testing
@@ -627,23 +626,11 @@ struct BurnActionHandlerTests {
             That would be needlessly cruel.
 
             > attack the troll
-            You drive forward with your flaming torch seeking its purpose
-            as the fearsome beast meets you barehanded, flesh against steel
-            in the oldest gamble.
-
-            Your flaming torch swings wide, and the fearsome creature
-            avoids your poorly aimed strike with ease.
-
-            The angry beast counters with a force that shatters your guard,
-            leaving you exposed to whatever violence comes next.
+            Attacking the nasty troll would complicate matters
+            considerably.
 
             > burn the troll
-            Your flaming torch inflicts a light wound on the creature, more
-            sting than damage. He registers the wound with annoyance.
-
-            The monster's answer is swift and punishing -- knuckles meet
-            flesh with the sound of meat hitting stone. The blow lands
-            solidly, drawing blood. You feel the sting but remain strong.
+            That would be needlessly cruel.
             """
         )
 
@@ -706,12 +693,12 @@ struct BurnActionHandlerTests {
     func testSyntaxRules() async throws {
         let handler = BurnActionHandler()
 
-        expectNoDifference(
-            handler.syntax,
-            [
+        #expect(
+            handler.syntax == [
                 .match(.verb, .directObject),
                 .match(.verb, .directObject, .with, .indirectObject),
-            ])
+            ]
+        )
     }
 
     @Test("Handler is registered in engine")

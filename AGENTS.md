@@ -160,7 +160,7 @@ func testSomething() async throws {
 ### Critical Testing Rules
 - **ALWAYS test through the full engine pipeline** using `engine.execute("command")`
 - **NEVER test action handlers in isolation** - this bypasses the parser and misses integration bugs
-- ALWAYS test exact mockIO output with `expectNoDifference(expected, actual)`
+- ALWAYS test exact mockIO output with `mockIO.expect(expected)` (preferred) or `expectNoDifference(expected, actual)`
 - NEVER rely on `output.contains("expected")`
 
 ### Game Output Diffs

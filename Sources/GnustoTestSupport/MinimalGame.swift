@@ -1,4 +1,5 @@
 import GnustoEngine
+import GnustoMiddleware
 
 /// A minimal game implementation designed for unit testing interactive fiction games.
 ///
@@ -55,9 +56,6 @@ public struct MinimalGame: GameBlueprint {
     /// Custom action handlers for specialized game mechanics.
     public var customActionHandlers: [ActionHandler]
 
-    /// Combat systems mapped by item ID for items that can engage in combat.
-    public var combatSystems: [ItemID: any CombatSystem]
-
     /// Event handlers for specific items to customize their behavior.
     public var itemEventHandlers: [ItemID: ItemEventHandler]
 
@@ -77,93 +75,72 @@ public struct MinimalGame: GameBlueprint {
     public var locationComputers: [LocationID: LocationComputer]
 
     /// Middleware components that extend game loop functionality.
-    public var middleware: [any GameMiddleware]
+    public var middleware: [any GnustoMiddleware]
 
     /// The message provider for all player-facing text, seeded for deterministic output.
     public var messenger: StandardMessenger
-
-    public let randomNumberGenerator: any RandomNumberGenerator & Sendable
 
     /// Creates a minimal game with the specified components and sensible defaults.
     ///
     /// Any omitted components will be automatically provided with functional defaults:
     /// - If no starting room exists, creates a "Void" location
     /// - If no starting item exists, creates a "pebble" item
-    /// - If no messenger is provided, creates one with the specified random seed
+    /// - If no messenger is provided, creates one automatically
     ///
     /// - Parameters:
     ///   - player: The player character. Defaults to starting in "startRoom".
     ///   - locations: Variadic list of locations to include in the game world.
     ///   - items: Variadic list of items to include in the game world.
     ///   - customActionHandlers: Custom action handlers for specialized game mechanics.
-    ///   - combatSystems: Combat systems mapped by item ID.
     ///   - itemEventHandlers: Event handlers for specific items.
     ///   - locationEventHandlers: Event handlers for specific locations.
     ///   - fuses: Timed events that fire once.
     ///   - daemons: Recurring timed events.
     ///   - itemComputers: Dynamic property computers for items.
     ///   - locationComputers: Dynamic property computers for locations.
-    ///   - middleware: Middleware components. Defaults to `[CombatMiddleware()]`.
+    ///   - middleware: Middleware components.
     ///   - messenger: Custom message provider. If `nil`, creates a seeded `StandardMessenger`.
-    ///   - randomSeed: A random seed to supply to the deterministic random number generators.
     public init(
         player: Player = Player(in: .startRoom),
         locations: Location...,
         items: Item...,
         customActionHandlers: [ActionHandler] = [],
-        combatSystems: [ItemID: any CombatSystem] = [:],
         itemEventHandlers: [ItemID: ItemEventHandler] = [:],
         locationEventHandlers: [LocationID: LocationEventHandler] = [:],
         fuses: [FuseID: Fuse] = [:],
         daemons: [DaemonID: Daemon] = [:],
         itemComputers: [ItemID: ItemComputer] = [:],
         locationComputers: [LocationID: LocationComputer] = [:],
-        middleware: [any GameMiddleware]? = nil,
-        messenger: StandardMessenger? = nil,
-        randomSeed: UInt64 = 71
+        middleware: [any GnustoMiddleware] = [],
+        messenger: StandardMessenger? = nil
     ) {
-        // Create separate random number generators to avoid interference between
-        // GameEngine and StandardMessenger random number consumption
-        let gameEngineRng = SeededRandomNumberGenerator(seed: randomSeed)
-        let messengerRng = SeededRandomNumberGenerator(seed: randomSeed)
-
         self.player = player
-        self.items = items  // Self.allItems(from: items)
-        self.locations = Self.allLocations(from: locations)
+        self.items = items
+        self.locations = locations
         self.customActionHandlers = customActionHandlers
-        self.combatSystems = combatSystems
         self.itemEventHandlers = itemEventHandlers
         self.locationEventHandlers = locationEventHandlers
         self.fuses = fuses
         self.daemons = daemons
         self.itemComputers = itemComputers
         self.locationComputers = locationComputers
-        self.messenger = messenger ?? StandardMessenger(randomNumberGenerator: messengerRng)
-        self.randomNumberGenerator = gameEngineRng
+        self.middleware = middleware
+        self.messenger = messenger ?? StandardMessenger()
 
-        // Default to combat middleware if not specified
-        self.middleware =
-            middleware ?? [
-                CombatMiddleware(
-                    combatSystems: combatSystems,
-                    combatMessengers: [:],
-                    defaultCombatMessenger: CombatMessenger(
-                        randomNumberGenerator: SeededRandomNumberGenerator(seed: randomSeed)
-                    )
-                )
-            ]
+        if !locations.contains(where: { $0.id == .startRoom }) {
+            self.locations.append(Lab.laboratory)
+        }
     }
 }
 
-// MARK: - Default Component Generation
-
-extension MinimalGame {
-    /// Ensures the game has essential locations, adding defaults if necessary.
-    private static func allLocations(from locations: [Location]) -> [Location] {
-        var allLocations = locations
-        if !allLocations.contains(where: { $0.id == .startRoom }) {
-            allLocations.append(Lab.laboratory)
-        }
-        return allLocations
+extension CombatMiddleware {
+    /// Returns a mock `CombatMiddleware` instance for use in unit tests.
+    ///
+    /// The mock middleware uses a default `CombatMessenger` for deterministic output.
+    /// This is useful for testing combat interactions without requiring full game setup.
+    public static var mock: CombatMiddleware {
+        CombatMiddleware(
+            defaultCombatMessenger: CombatMessenger()
+        )
     }
 }

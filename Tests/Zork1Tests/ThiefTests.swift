@@ -12,9 +12,7 @@ struct ThiefTests {
 
     init() async throws {
         (engine, mockIO) = await GameEngine.test(
-            blueprint: Zork1(
-                rng: SeededRandomNumberGenerator()
-            )
+            blueprint: Zork1()
         )
 
         // Give the player a sword and position them in the passage next to the round room.
@@ -118,16 +116,16 @@ struct ThiefTests {
             Several of them have unfortunately been blocked by cave-ins.
 
             > look at the floor
-            The floor stubbornly remains ordinary despite your thorough
-            examination.
-
-            > look at the ceiling
-            The ceiling stubbornly remains ordinary despite your thorough
-            examination.
+            The floor reveals itself to be exactly what it appears --
+            nothing more, nothing less.
 
             Someone carrying a large bag is casually leaning against one of
             the walls here. He does not speak, but it is clear from his
             aspect that the bag will be taken only over his dead body.
+
+            > look at the ceiling
+            The ceiling stubbornly remains ordinary despite your thorough
+            examination.
 
             > examine the man
             The thief is a slippery character with beady eyes that flit
@@ -135,6 +133,8 @@ struct ThiefTests {
             arrogance, a large bag over his shoulder and a vicious
             stiletto, whose blade is aimed menacingly in your direction.
             I'd watch out if I were you.
+
+            The thief, finding nothing of value, left disgusted.
             """
         )
     }
@@ -170,21 +170,23 @@ struct ThiefTests {
             - A sword
 
             > look at the floor
-            The floor stubbornly remains ordinary despite your thorough
-            examination.
-
-            > look at the ceiling
-            The ceiling stubbornly remains ordinary despite your thorough
-            examination.
+            The floor reveals itself to be exactly what it appears --
+            nothing more, nothing less.
 
             Someone carrying a large bag is casually leaning against one of
             the walls here. He does not speak, but it is clear from his
             aspect that the bag will be taken only over his dead body.
 
+            > look at the ceiling
+            The ceiling stubbornly remains ordinary despite your thorough
+            examination.
+
             > give the sceptre to the thief
             The thief examines the sceptre with obvious delight and
             carefully places it in his bag, giving you a grudging nod of
             acknowledgment.
+
+            The thief, finding nothing of value, left disgusted.
             """
         )
 
@@ -223,19 +225,21 @@ struct ThiefTests {
             Several of them have unfortunately been blocked by cave-ins.
 
             > wait
-            The universe's clock ticks inexorably forward.
-
-            > wait
-            The universe's clock ticks inexorably forward.
+            Time flows onward, indifferent to your concerns.
 
             Someone carrying a large bag is casually leaning against one of
             the walls here. He does not speak, but it is clear from his
             aspect that the bag will be taken only over his dead body.
 
+            > wait
+            The universe's clock ticks inexorably forward.
+
             > give garlic to thief
             The thief examines the clove of garlic briefly, then shakes his
             head with obvious disdain. "I only deal in quality
             merchandise," he mutters.
+
+            The thief, finding nothing of value, left disgusted.
             """
         )
 
@@ -269,47 +273,49 @@ struct ThiefTests {
             Several of them have unfortunately been blocked by cave-ins.
 
             > wait
-            The universe's clock ticks inexorably forward.
-
-            > wait
-            The universe's clock ticks inexorably forward.
+            Time flows onward, indifferent to your concerns.
 
             Someone carrying a large bag is casually leaning against one of
             the walls here. He does not speak, but it is clear from his
             aspect that the bag will be taken only over his dead body.
 
+            > wait
+            The universe's clock ticks inexorably forward.
+
             > attack the thief
-            You explode into motion with your blade hunting flesh as the
-            person meets your charge with his stiletto, the dance of death
-            begun.
-
-            The impact sends the man reeling! He clutches his knife
-            desperately while fighting to stay upright.
-
-            Then his deadly blade bites back hard, wielded with desperate
-            fury. The weapon tears rather than cuts, leaving wounds with
-            ragged, weeping edges. You reel from the unexpected wound. The
-            reality of violence arrives.
-
-            The thief strikes like a snake! The resulting wound is serious.
+            No more waiting as you attack with your orcrist raised and the
+            robber responds with his stiletto, two weapons now committed to
+            drawing blood.
 
             > stab the thief with my sword
-            The man blocks and turns your elvish orcrist aside with his
-            knife, denying your strike completely.
+            Your parry goes wrong -- your sword jolts loose and clatters
+            away while the man advances with his stiletto, death in his
+            eyes.
 
-            The robber retaliates with finality as his deadly stiletto
-            finds the last soft place in you and opens it to let the life
-            pour out.
+            A long, theatrical slash. You catch it on your elvish sword,
+            but the thief twists his knife, and your glamdring goes flying.
 
-            The thief comes in from the side, feints, and inserts the blade
-            into your ribs.
+            The response is measured and brutal. His knife tears through
+            fabric and flesh, painting both red. First blood to them. The
+            wound is real but manageable.
+
+            > slay the thief
+            The suspicious person grips his sharp blade confidently. You'll
+            need more than courage to fight him unarmed.
+
+            The robber ends the exchange with his blade buried deep, and
+            you understand with perfect clarity that you will not rise
+            again.
+
+            The thief bows formally, raises his stiletto, and with a wry
+            grin, ends the battle and your life.
 
             ****  You have died  ****
 
             Death, that most permanent of inconveniences, has claimed you.
             Yet in these tales, even death offers second chances.
 
-            You scored 0 out of a possible 350 points, in 4 moves.
+            You scored 0 out of a possible 350 points, in 5 moves.
 
             Would you like to RESTART, RESTORE a saved game, or QUIT?
 
@@ -339,17 +345,19 @@ struct ThiefTests {
             Several of them have unfortunately been blocked by cave-ins.
 
             > wait
-            The universe's clock ticks inexorably forward.
-
-            > wait
-            The universe's clock ticks inexorably forward.
+            Time flows onward, indifferent to your concerns.
 
             Someone carrying a large bag is casually leaning against one of
             the walls here. He does not speak, but it is clear from his
             aspect that the bag will be taken only over his dead body.
 
+            > wait
+            The universe's clock ticks inexorably forward.
+
             > tell thief about treasure
             The thief is a strong, silent type.
+
+            The thief, finding nothing of value, left disgusted.
             """
         )
     }
@@ -375,17 +383,19 @@ struct ThiefTests {
             Several of them have unfortunately been blocked by cave-ins.
 
             > wait
-            The universe's clock ticks inexorably forward.
-
-            > wait
-            The universe's clock ticks inexorably forward.
+            Time flows onward, indifferent to your concerns.
 
             Someone carrying a large bag is casually leaning against one of
             the walls here. He does not speak, but it is clear from his
             aspect that the bag will be taken only over his dead body.
 
+            > wait
+            The universe's clock ticks inexorably forward.
+
             > take thief
             Once you got him, what would you do with him?
+
+            The thief, finding nothing of value, left disgusted.
             """
         )
     }
@@ -411,18 +421,20 @@ struct ThiefTests {
             Several of them have unfortunately been blocked by cave-ins.
 
             > wait
-            The universe's clock ticks inexorably forward.
-
-            > wait
-            The universe's clock ticks inexorably forward.
+            Time flows onward, indifferent to your concerns.
 
             Someone carrying a large bag is casually leaning against one of
             the walls here. He does not speak, but it is clear from his
             aspect that the bag will be taken only over his dead body.
 
+            > wait
+            The universe's clock ticks inexorably forward.
+
             > examine stiletto
             It's a vicious-looking stiletto with a razor-sharp blade. The
             thief grips it expertly, clearly experienced in its use.
+
+            The thief, finding nothing of value, left disgusted.
             """
         )
     }
@@ -448,19 +460,21 @@ struct ThiefTests {
             Several of them have unfortunately been blocked by cave-ins.
 
             > wait
-            The universe's clock ticks inexorably forward.
-
-            > wait
-            The universe's clock ticks inexorably forward.
+            Time flows onward, indifferent to your concerns.
 
             Someone carrying a large bag is casually leaning against one of
             the walls here. He does not speak, but it is clear from his
             aspect that the bag will be taken only over his dead body.
 
+            > wait
+            The universe's clock ticks inexorably forward.
+
             > look inside the bag
             The thief's large bag bulges with what are obviously stolen
             goods. He watches you carefully, ready to defend his ill-gotten
             gains.
+
+            The thief, finding nothing of value, left disgusted.
             """
         )
     }
@@ -486,18 +500,20 @@ struct ThiefTests {
             Several of them have unfortunately been blocked by cave-ins.
 
             > wait
-            The universe's clock ticks inexorably forward.
-
-            > wait
-            The universe's clock ticks inexorably forward.
+            Time flows onward, indifferent to your concerns.
 
             Someone carrying a large bag is casually leaning against one of
             the walls here. He does not speak, but it is clear from his
             aspect that the bag will be taken only over his dead body.
 
+            > wait
+            The universe's clock ticks inexorably forward.
+
             > take stiletto
             The thief is armed and dangerous. You'd have to defeat him
             first before attempting to take his stiletto.
+
+            The thief, finding nothing of value, left disgusted.
             """
         )
 
@@ -545,7 +561,7 @@ struct ThiefTests {
             - A sword
 
             > talk to the thief
-            You cannot reach any such thing from here.
+            Any such thing remains frustratingly inaccessible.
 
             Someone carrying a large bag is casually leaning against one of
             the walls here. He does not speak, but it is clear from his
@@ -556,26 +572,21 @@ struct ThiefTests {
             first before attempting to take his stiletto.
 
             > wait
-            Moments slip away like sand through fingers.
+            The universe's clock ticks inexorably forward.
 
-            The holder of the large bag just left, looking disgusted.
-            Fortunately, he took nothing.
-
-            > wait
-            Moments slip away like sand through fingers.
+            The thief just left, still carrying his large bag. You may not
+            have noticed that he robbed you blind first.
 
             > wait
             The universe's clock ticks inexorably forward.
 
-            Someone carrying a large bag is casually leaning against one of
-            the walls here. He does not speak, but it is clear from his
-            aspect that the bag will be taken only over his dead body.
+            > wait
+            The universe's clock ticks inexorably forward.
 
             > wait
             Moments slip away like sand through fingers.
 
-            The thief just left, still carrying his large bag. You may not
-            have noticed that he robbed you blind first.
+            The thief, finding nothing of value, left disgusted.
 
             > inventory
             You are carrying:
@@ -602,11 +613,11 @@ struct ThiefTests {
         expectNoDifference(
             thiefLocations,
             [
-                ".nowhere",
                 ".location(.roundRoom)",
                 ".nowhere",
                 ".location(.roundRoom)",
                 ".nowhere",
+                ".location(.roundRoom)"
             ]
         )
     }
@@ -625,7 +636,6 @@ struct ThiefTests {
         try await engine.execute(
             """
             wait
-            wait
             stab the thief with my sword
             slay the thief
             look
@@ -642,32 +652,20 @@ struct ThiefTests {
             Several of them have unfortunately been blocked by cave-ins.
 
             > wait
-            The universe's clock ticks inexorably forward.
-
-            > wait
-            The universe's clock ticks inexorably forward.
+            Time flows onward, indifferent to your concerns.
 
             Someone carrying a large bag is casually leaning against one of
             the walls here. He does not speak, but it is clear from his
             aspect that the bag will be taken only over his dead body.
 
             > stab the thief with my sword
-            You explode into motion with your blade hunting flesh as the
-            person meets your charge with his stiletto, the dance of death
-            begun.
-
-            The impact sends the man reeling! He clutches his knife
-            desperately while fighting to stay upright.
-
-            Suddenly the shady robber slips past your guard. His blade
-            opens a wound that will mark you, and your blood flows out
-            steady and sure. First blood to them. The wound is real but
-            manageable.
+            No more waiting as you attack with your blade raised and the
+            thief responds with his knife, two weapons now committed to
+            drawing blood.
 
             > slay the thief
-            Your armed advantage proves decisive -- your antique glamdring
-            ends it! The robber crumples, having fought barehanded and
-            lost.
+            You strike true with your ancient orcrist! The seedy man drops
+            without a sound, weaponless to the end.
 
             Almost as soon as the thief breathes his last breath, a cloud
             of sinister black fog envelops him, and when the fog lifts, the
@@ -679,24 +677,16 @@ struct ThiefTests {
             This is a circular stone room with passages in all directions.
             Several of them have unfortunately been blocked by cave-ins.
 
-            You can see a huge diamond and a beautiful jeweled scarab here.
+            There are a huge diamond and a beautiful jeweled scarab here.
             """
         )
 
-        // When - check if possessions are handled
-        let bagLocation = await engine.item(.largeBag).parent
-
-        // Then - bag should be accessible after thief is gone
-        switch bagLocation {
-        case .location(let location):
-            #expect(location == .roundRoom)  // Should drop in current location
-        case .nowhere:
-            // Bag might be removed with thief - that's also valid
-            break
-        default:
-            // Bag shouldn't still be "held" by removed thief
-            #expect(Bool(false), "Bag should either be dropped or removed when thief dies")
-        }
+        #expect(
+            await engine.item(.thief).isDead
+        )
+        #expect(
+            await engine.item(.largeBag).location?.id == .roundRoom
+        )
     }
 
     @Test("Treasure scoring integration")

@@ -1,4 +1,3 @@
-import CustomDump
 import GnustoEngine
 import GnustoTestSupport
 import Testing
@@ -219,26 +218,13 @@ struct TasteActionHandlerTests {
             Tasting the furious necromancer ranks among history's worst
             battle strategies.
 
-            No weapons between you -- just the furious necromancer's
-            aggression and your desperation! You collide in a tangle of
-            strikes and blocks.
-
             > taste the necromancer
             That's a level of intimacy the furious necromancer would answer
             with sharp steel.
 
-            In the exchange, the furious necromancer lands clean. The world
-            lurches as your body absorbs punishment it won't soon forget.
-            You absorb the hit, feeling flesh tear but knowing you can
-            endure.
-
             > lick the necromancer
             That's a level of intimacy the furious necromancer would answer
             with sharp steel.
-
-            The counterblow comes wild and desperate, the furious
-            necromancer hammering through your guard to bruise rather than
-            break. The strike lands but doesn't slow you. Not yet.
             """
         )
 

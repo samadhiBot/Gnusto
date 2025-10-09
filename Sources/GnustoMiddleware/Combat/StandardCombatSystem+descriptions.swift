@@ -1,4 +1,5 @@
 import Foundation
+import GnustoEngine
 
 extension StandardCombatSystem {
     /// Generates a human-readable description of a combat event using the provided messenger.
@@ -169,38 +170,43 @@ extension StandardCombatSystem {
                 enemyWeapon: enemyWeapon
             )
 
-        case let .playerCriticallyWounded(enemy, enemyWeapon, damage):
+        case let .playerCriticallyWounded(enemy, enemyWeapon, player, damage):
             await messenger.playerCriticallyWounded(
                 enemy: enemy,
                 enemyWeapon: enemyWeapon,
+                player: player,
                 damage: damage
             )
 
-        case let .playerGravelyInjured(enemy, enemyWeapon, damage):
+        case let .playerGravelyInjured(enemy, enemyWeapon, player, damage):
             await messenger.playerGravelyInjured(
                 enemy: enemy,
                 enemyWeapon: enemyWeapon,
+                player: player,
                 damage: damage
             )
 
-        case let .playerInjured(enemy, enemyWeapon, damage):
+        case let .playerInjured(enemy, enemyWeapon, player, damage):
             await messenger.playerInjured(
                 enemy: enemy,
                 enemyWeapon: enemyWeapon,
+                player: player,
                 damage: damage
             )
 
-        case let .playerLightlyInjured(enemy, enemyWeapon, damage):
+        case let .playerLightlyInjured(enemy, enemyWeapon, player, damage):
             await messenger.playerLightlyInjured(
                 enemy: enemy,
                 enemyWeapon: enemyWeapon,
+                player: player,
                 damage: damage
             )
 
-        case let .playerGrazed(enemy, enemyWeapon, damage):
+        case let .playerGrazed(enemy, enemyWeapon, player, damage):
             await messenger.playerGrazed(
                 enemy: enemy,
                 enemyWeapon: enemyWeapon,
+                player: player,
                 damage: damage
             )
 

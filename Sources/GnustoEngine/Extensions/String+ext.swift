@@ -33,7 +33,7 @@ extension String {
     /// - `"hello world"` → `"Hello world"`
     /// - `"iOS development"` → `"IOS development"`
     /// - `""` → `""`
-    var capitalizedFirst: String {
+    public var capitalizedFirst: String {
         guard let firstCharacter = first else {
             return self
         }
@@ -86,7 +86,7 @@ extension String {
     /// - `"cat"` → `"cat's"`
     /// - `"cats"` → `"cats'"`
     /// - `"James"` → `"James'"`
-    var possessive: String {
+    public var possessive: String {
         hasSuffix("s") ? "\(self)'" : "\(self)'s"
     }
 

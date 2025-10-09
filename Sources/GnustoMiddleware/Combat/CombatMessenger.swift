@@ -1,4 +1,4 @@
-import Foundation
+import GnustoEngine
 
 // swiftlint:disable line_length
 
@@ -2516,11 +2516,12 @@ open class CombatMessenger: StandardMessenger, @unchecked Sendable {
     open func playerCriticallyWounded(
         enemy: ItemProxy,
         enemyWeapon: ItemProxy?,
+        player: PlayerProxy,
         damage: Int
     ) async -> String {
         let theEnemy = await enemy.alias(.withDefiniteArticle)
         let itsWeapon = await enemyWeapon?.alias(.withPossessiveAdjective(for: enemy))
-        let playerHealth = await enemy.engine.player.characterSheet.healthCondition
+        let playerHealth = await player.characterSheet.healthCondition
 
         // Assess the player's overall condition after critical damage
         let conditionReport =
@@ -2630,11 +2631,12 @@ open class CombatMessenger: StandardMessenger, @unchecked Sendable {
     open func playerGravelyInjured(
         enemy: ItemProxy,
         enemyWeapon: ItemProxy?,
+        player: PlayerProxy,
         damage: Int
     ) async -> String {
         let theEnemy = await enemy.alias(.withDefiniteArticle)
         let itsWeapon = await enemyWeapon?.alias(.withPossessiveAdjective(for: enemy))
-        let playerHealth = await enemy.engine.player.characterSheet.healthCondition
+        let playerHealth = await player.characterSheet.healthCondition
 
         // Assess the player's overall condition after grave damage
         let conditionReport =
@@ -2733,11 +2735,12 @@ open class CombatMessenger: StandardMessenger, @unchecked Sendable {
     open func playerInjured(
         enemy: ItemProxy,
         enemyWeapon: ItemProxy?,
+        player: PlayerProxy,
         damage: Int
     ) async -> String {
         let theEnemy = await enemy.alias(.withDefiniteArticle)
         let itsWeapon = await enemyWeapon?.alias(.withPossessiveAdjective(for: enemy))
-        let playerHealth = await enemy.engine.player.characterSheet.healthCondition
+        let playerHealth = await player.characterSheet.healthCondition
 
         // Assess the player's overall condition
         let conditionReport =
@@ -2835,11 +2838,12 @@ open class CombatMessenger: StandardMessenger, @unchecked Sendable {
     open func playerLightlyInjured(
         enemy: ItemProxy,
         enemyWeapon: ItemProxy?,
+        player: PlayerProxy,
         damage: Int
     ) async -> String {
         let theEnemy = await enemy.alias(.withDefiniteArticle)
         let itsWeapon = await enemyWeapon?.alias(.withPossessiveAdjective(for: enemy))
-        let playerHealth = await enemy.engine.player.characterSheet.healthCondition
+        let playerHealth = await player.characterSheet.healthCondition
 
         // Assess the player's overall condition
         let conditionReport =
@@ -2908,11 +2912,12 @@ open class CombatMessenger: StandardMessenger, @unchecked Sendable {
     open func playerGrazed(
         enemy: ItemProxy,
         enemyWeapon: ItemProxy?,
+        player: PlayerProxy,
         damage: Int
     ) async -> String {
         let theEnemy = await enemy.alias(.withDefiniteArticle)
         let itsWeapon = await enemyWeapon?.alias(.withPossessiveAdjective(for: enemy))
-        let playerHealth = await enemy.engine.player.characterSheet.healthCondition
+        let playerHealth = await player.characterSheet.healthCondition
 
         // Assess the player's overall condition after a graze
         let conditionReport =

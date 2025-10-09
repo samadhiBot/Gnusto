@@ -146,17 +146,6 @@ struct StateChangeEnumTests {
 
     // MARK: - Edge Cases
 
-    @Test("StateChange with nil combat state")
-    func testSetCombatStateWithNil() {
-        let change = StateChange.setCombatState(nil)
-
-        if case .setCombatState(let state) = change {
-            #expect(state == nil)
-        } else {
-            Issue.record("Expected setCombatState case")
-        }
-    }
-
     @Test("StateChange.clearGlobalState creation")
     func testClearGlobalStateCreation() {
         let change = StateChange.clearGlobalState(id: "score")

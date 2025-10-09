@@ -1,4 +1,3 @@
-import CustomDump
 import GnustoEngine
 import GnustoTestSupport
 import Testing
@@ -789,9 +788,8 @@ struct TakeActionHandlerTests {
         let basketProxy = await basket.proxy(engine)
         let jugProxy = await jug.proxy(engine)
 
-        expectNoDifference(
-            result,
-            .success(
+        #expect(
+            result == .success(
                 Command(
                     verb: .get,
                     directObjects: [

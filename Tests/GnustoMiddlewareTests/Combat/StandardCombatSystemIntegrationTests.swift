@@ -1,7 +1,8 @@
-import CustomDump
 import GnustoEngine
 import GnustoTestSupport
 import Testing
+
+@testable import GnustoMiddleware
 
 @Suite("Standard Combat System Tests")
 struct StandardCombatSystemIntegrationTests {
@@ -22,16 +23,17 @@ struct StandardCombatSystemIntegrationTests {
         let goblin = Item("goblin")
             .name("goblin warrior")
             .characterSheet(
-                .init(
-                    armorClass: 12,
-                    health: 36,
-                    maxHealth: 30,
-                    isFighting: true
-                )
+                armorClass: 12,
+                health: 36,
+                maxHealth: 30,
+                isFighting: true
             )
             .in(.startRoom)
 
-        let game = MinimalGame(items: goblin, sword)
+        let game = MinimalGame(
+            items: goblin, sword,
+            middleware: [CombatMiddleware.mock]
+        )
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // When: Player attacks enemy
@@ -45,17 +47,18 @@ struct StandardCombatSystemIntegrationTests {
             as the goblin warrior can only dodge and weave against the
             advantage of sharpened metal.
 
-            Your blow with your steel sword catches the goblin warrior
-            cleanly, tearing flesh and drawing crimson. It absorbs the hit,
+            Your steel sword finds the goblin warrior exposed, carving a
+            solid wound that draws a grunt of pain. It absorbs the hit,
             flesh suffering but endurance holding.
 
-            The goblin warrior's counter-punch goes wide, rage making the
-            strike clumsy and predictable.
+            In the tangle, the goblin warrior drives an elbow home --
+            sudden pressure that blooms into dull pain. The cut registers
+            dimly. Blood, but not enough to matter.
             """
         )
 
         // Combat state should be established
-        let combatState = await engine.combatState
+        let combatState = await CombatMiddleware.combatState(in: engine)
         #expect(combatState != nil)
         #expect(combatState?.enemyID == "goblin")
 
@@ -78,17 +81,16 @@ struct StandardCombatSystemIntegrationTests {
         let weakGoblin = Item("goblin")
             .name("weak goblin")
             .characterSheet(
-                .init(
-                    armorClass: 5,
-                    health: 1,
-                    maxHealth: 1,
-                    isFighting: true
-                )
+                armorClass: 5,
+                health: 1,
+                maxHealth: 1,
+                isFighting: true
             )
             .in(.startRoom)
 
         let game = MinimalGame(
-            items: weakGoblin, powerfulSword
+            items: weakGoblin, powerfulSword,
+            middleware: [CombatMiddleware.mock]
         )
 
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
@@ -104,8 +106,8 @@ struct StandardCombatSystemIntegrationTests {
             sword as the weak goblin can only dodge and weave against the
             advantage of sharpened metal.
 
-            Your legendary sword finds its mark at last! The weak goblin
-            staggers once, then falls forever silent.
+            The final thrust of your legendary sword is devastating! The
+            weak goblin collapses, unable to defend without a weapon.
 
             > attack goblin with sword
             You press forward with your legendary sword leading the way
@@ -117,7 +119,7 @@ struct StandardCombatSystemIntegrationTests {
         )
 
         // Combat state should be cleared
-        let combatState = await engine.combatState
+        let combatState = await CombatMiddleware.combatState(in: engine)
         #expect(combatState == nil)
 
         // Goblin should be dead
@@ -136,7 +138,10 @@ struct StandardCombatSystemIntegrationTests {
             .damage(25)
             .in(.player)
 
-        let game = MinimalGame(items: Lab.castleGuard, variableSword)
+        let game = MinimalGame(
+            items: Lab.castleGuard, variableSword,
+            middleware: [CombatMiddleware.mock]
+        )
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // When: Player attacks multiple times to see different damage categories
@@ -146,44 +151,46 @@ struct StandardCombatSystemIntegrationTests {
         await mockIO.expect(
             """
             > attack the guard
-            You drive forward with your variable sword seeking its purpose
-            as the drunken brute meets you barehanded, flesh against steel
-            in the oldest gamble.
+            Armed and hungry for violence, you strike with your variable
+            sword as the drunken brute can only dodge and weave against the
+            advantage of sharpened metal.
 
-            Your variable sword swings wide, and the drunken bully avoids
-            your poorly aimed strike with ease.
+            Your variable sword finds the drunken bully exposed, carving a
+            serious wound that will need tending -- if there's time. He
+            reels from the unexpected wound. The reality of violence
+            arrives.
 
-            The bitter brute counters with a force that shatters your
-            guard, leaving you exposed to whatever violence comes next.
-
-            > attack the guard
-            Your variable sword inflicts a light wound on the bully, more
-            sting than damage. He registers the wound with annoyance.
-
-            The guard answers with raw violence, a clubbing strike that
-            finds you but lacks the angle to truly hurt. The wound is
-            trivial against your battle fury.
+            In the exchange, the bitter brute lands clean. The world
+            lurches as your body absorbs punishment it won't soon forget.
+            You absorb the hit, feeling flesh tear but knowing you can
+            endure.
 
             > attack the guard
-            Your variable sword finds the surly brute exposed, carving a
-            solid wound that draws a grunt of pain. He grunts from the
-            impact but maintains stance.
+            Your variable sword clips the bully's unguarded flesh, leaving
+            a shallow cut. He registers the wound with annoyance.
 
-            The counterblow comes wild and desperate, the guard hammering
-            through your guard to bruise rather than break. The strike
-            lands but doesn't slow you. Not yet.
+            In the exchange, the brute lands clean. The world lurches as
+            your body absorbs punishment it won't soon forget. You grunt
+            from the impact but maintain your stance.
 
-            > attack the guard
-            A disastrous miss -- your variable sword cuts through empty air
-            and the brute effortlessly evades your mistimed attack.
-
-            The brute surges back instantly, fist cracking against your
-            ribs -- more warning than wound. The wound is light but
-            unwelcome, your body protesting the accumulation.
+            "Submit to my authority!", cries the castle guard.
 
             > attack the guard
-            Your variable sword finds its mark at last! The brute staggers
-            once, then falls forever silent.
+            The final thrust of your variable sword is devastating! The
+            guard collapses, unable to defend without a weapon.
+
+            > attack the guard
+            Your variable sword cuts through air toward the brute who has
+            no steel to answer yours, only the speed of desperation.
+
+            Death has already claimed the castle guard.
+
+            > attack the guard
+            Armed and hungry for violence, you strike with your variable
+            sword as the surly bully can only dodge and weave against the
+            advantage of sharpened metal.
+
+            The castle guard is beyond such concerns now, being dead.
             """
         )
 
@@ -206,17 +213,16 @@ struct StandardCombatSystemIntegrationTests {
         let enemy = Item("enemy")
             .name("test enemy")
             .characterSheet(
-                .init(
-                    armorClass: 1,  // Always hit
-                    health: 100,
-                    maxHealth: 100,
-                    isFighting: true
-                )
+                armorClass: 1,  // Always hit
+                health: 100,
+                maxHealth: 100,
+                isFighting: true
             )
             .in(.startRoom)
 
         let game = MinimalGame(
-            items: enemy, sword
+            items: enemy, sword,
+            middleware: [CombatMiddleware.mock]
         )
 
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
@@ -232,29 +238,39 @@ struct StandardCombatSystemIntegrationTests {
             as the test enemy can only dodge and weave against the
             advantage of sharpened metal.
 
-            Your blow with your sharp sword catches the test enemy cleanly,
-            tearing flesh and drawing crimson. It absorbs the hit, flesh
-            suffering but endurance holding.
+            Your sharp sword finds the test enemy exposed, carving a
+            serious wound that will need tending -- if there's time. It
+            reels from the unexpected wound. The reality of violence
+            arrives.
 
-            The test enemy's counter-punch goes wide, rage making the
-            strike clumsy and predictable.
-
-            > attack enemy
-            You strike the test enemy with your sharp sword, tearing
-            through skin and muscle. Blood wells immediately, dark and
-            thick. From confident to cautious in one blow. Blood runs
-            freely down its body.
-
-            The test enemy swings in retaliation but you slip the attack,
-            flowing around the violence like water around stone.
+            In the tangle, the test enemy drives an elbow home -- sudden
+            pressure that blooms into dull pain. The cut registers dimly.
+            Blood, but not enough to matter.
 
             > attack enemy
-            Your armed advantage proves decisive -- your sharp sword ends
-            it! The test enemy crumples, having fought barehanded and lost.
+            Your sharp sword finds the test enemy exposed, carving a
+            serious wound that will need tending -- if there's time. It
+            looks down at the wound in disbelief. The pain hasn't fully
+            registered yet.
+
+            In the tangle, the test enemy drives an elbow home -- sudden
+            pressure that blooms into dull pain. You feel it connect,
+            adding to the bruises but not breaking your rhythm.
+
+            > attack enemy
+            The final thrust of your sharp sword is devastating! The test
+            enemy collapses, unable to defend without a weapon.
 
             > attack enemy
             Your sharp sword cuts through air toward the test enemy who has
             no steel to answer yours, only the speed of desperation.
+
+            Death has already claimed the test enemy.
+
+            > attack enemy
+            Armed and hungry for violence, you strike with your sharp sword
+            as the test enemy can only dodge and weave against the
+            advantage of sharpened metal.
 
             The test enemy is beyond such concerns now, being dead.
 
@@ -266,15 +282,15 @@ struct StandardCombatSystemIntegrationTests {
             Death has already claimed the test enemy.
 
             > attack enemy
-            Your sharp sword cuts through air toward the test enemy who has
-            no steel to answer yours, only the speed of desperation.
+            You drive forward with your sharp sword seeking its purpose as
+            the test enemy meets you barehanded, flesh against steel in the
+            oldest gamble.
 
             The test enemy is beyond such concerns now, being dead.
 
             > attack enemy
-            You drive forward with your sharp sword seeking its purpose as
-            the test enemy meets you barehanded, flesh against steel in the
-            oldest gamble.
+            Your sharp sword cuts through air toward the test enemy who has
+            no steel to answer yours, only the speed of desperation.
 
             The test enemy is beyond such concerns now, being dead.
 
@@ -286,18 +302,10 @@ struct StandardCombatSystemIntegrationTests {
             You're too late -- the test enemy is already deceased.
 
             > attack enemy
-            You press forward with your sharp sword leading the way toward
-            flesh while the test enemy backs away, unarmed but still
-            dangerous as any cornered thing.
+            You advance with your sharp sword ready to taste blood while
+            the test enemy has nothing but rage to meet steel.
 
             The test enemy is beyond such concerns now, being dead.
-
-            > attack enemy
-            Armed and hungry for violence, you strike with your sharp sword
-            as the test enemy can only dodge and weave against the
-            advantage of sharpened metal.
-
-            The test enemy is already dead.
             """
         )
 
@@ -321,13 +329,11 @@ struct StandardCombatSystemIntegrationTests {
         let brutalEnemy = Item("giant")
             .name("stone giant")
             .characterSheet(
-                .init(
-                    strength: 20,  // Very high strength for massive damage
-                    armorClass: 15,
-                    health: 80,
-                    maxHealth: 80,
-                    isFighting: true
-                )
+                strength: 20,  // Very high strength for massive damage
+                armorClass: 15,
+                health: 80,
+                maxHealth: 80,
+                isFighting: true
             )
             .in(.startRoom)
 
@@ -341,7 +347,8 @@ struct StandardCombatSystemIntegrationTests {
                     maxHealth: 20
                 )
             ),
-            items: brutalEnemy, devastatingWeapon
+            items: brutalEnemy, devastatingWeapon,
+            middleware: [CombatMiddleware.mock]
         )
 
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
@@ -357,7 +364,7 @@ struct StandardCombatSystemIntegrationTests {
         #expect(output.contains("stone giant"))
 
         // Combat should have ended (either from death or unconsciousness)
-        let combatState = await engine.combatState
+        let combatState = await CombatMiddleware.combatState(in: engine)
         #expect(combatState == nil)
 
         // Player should be unconscious, dead, or severely wounded
@@ -389,7 +396,10 @@ struct StandardCombatSystemIntegrationTests {
             .characterSheet(.strong)
             .in(.startRoom)
 
-        let game = MinimalGame(items: toughEnemy, sword)
+        let game = MinimalGame(
+            items: toughEnemy, sword,
+            middleware: [CombatMiddleware.mock]
+        )
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // When: Engage in extended combat
@@ -402,33 +412,28 @@ struct StandardCombatSystemIntegrationTests {
             sword as the tough enemy can only dodge and weave against the
             advantage of sharpened metal.
 
-            Your strike with your training sword grazes the tough enemy,
-            drawing minimal blood. It registers the wound with annoyance.
+            Your training sword clips the tough enemy's unguarded flesh,
+            leaving a shallow cut. It registers the wound with annoyance.
 
-            The tough enemy's counter-punch goes wide, rage making the
-            strike clumsy and predictable.
-
-            > attack enemy
-            You strike the tough enemy with your training sword, opening a
-            wound that bleeds steadily. The wound is real but manageable.
-
-            In the exchange, the tough enemy lands clean. The world lurches
-            as your body absorbs punishment it won't soon forget. You
-            absorb the hit, feeling flesh tear but knowing you can endure.
+            Then the tough enemy recovers and strikes true. Your jaw takes
+            the full force. Blood and fragments of teeth spray the air. You
+            reel from the unexpected wound. The reality of violence
+            arrives.
 
             > attack enemy
-            Your training sword swings wide, and the tough enemy avoids
-            your poorly aimed strike with ease.
+            Your training sword finds the tough enemy exposed, carving a
+            solid wound that draws a grunt of pain. It absorbs the hit,
+            flesh suffering but endurance holding.
 
-            The tough enemy finishes you with nothing but flesh and bone,
-            proving that the oldest weapons still kill just as dead.
+            The tough enemy delivers death with bare hands, crushing you
+            windpipe with the indifference of stone.
 
             ****  You have died  ****
 
             Death, that most permanent of inconveniences, has claimed you.
             Yet in these tales, even death offers second chances.
 
-            You scored 0 out of a possible 10 points, in 2 moves.
+            You scored 0 out of a possible 10 points, in 1 moves.
 
             Would you like to RESTART, RESTORE a saved game, or QUIT?
 
@@ -437,7 +442,7 @@ struct StandardCombatSystemIntegrationTests {
         )
 
         // Then: Combat should have ended when player became unconscious
-        let finalState = await engine.combatState
+        let finalState = await CombatMiddleware.combatState(in: engine)
         #expect(finalState == nil)
 
         // Player should be unconscious
@@ -459,14 +464,12 @@ struct StandardCombatSystemIntegrationTests {
         let resilientEnemy = Item("warrior")
             .name("veteran warrior")
             .characterSheet(
-                .init(
-                    strength: 8,  // Low strength for low damage
-                    constitution: 16,  // High constitution for endurance
-                    armorClass: 11,  // Lower AC for more hits
-                    health: 200,  // Very high health
-                    maxHealth: 200,
-                    isFighting: true
-                )
+                strength: 8,  // Low strength for low damage
+                constitution: 16,  // High constitution for endurance
+                armorClass: 11,  // Lower AC for more hits
+                health: 200,  // Very high health
+                maxHealth: 200,
+                isFighting: true
             )
             .in(.startRoom)
 
@@ -480,7 +483,8 @@ struct StandardCombatSystemIntegrationTests {
                     maxHealth: 100
                 )
             ),
-            items: resilientEnemy, sword
+            items: resilientEnemy, sword,
+            middleware: [CombatMiddleware.mock]
         )
 
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
@@ -496,7 +500,7 @@ struct StandardCombatSystemIntegrationTests {
         #expect(output.contains("veteran warrior"))
 
         // Check that combat state exists and has progressed
-        let finalState = await engine.combatState
+        let finalState = await CombatMiddleware.combatState(in: engine)
         if let finalState {
             // Verify combat has escalated beyond initial values
             #expect(finalState.roundCount >= 3)  // Multiple rounds occurred
@@ -538,17 +542,16 @@ struct StandardCombatSystemIntegrationTests {
         let enemy = Item("enemy")
             .name("skilled enemy")
             .characterSheet(
-                .init(
-                    armorClass: 12,
-                    health: 60,
-                    maxHealth: 60,
-                    isFighting: true
-                )
+                armorClass: 12,
+                health: 60,
+                maxHealth: 60,
+                isFighting: true
             )
             .in(.startRoom)
 
         let game = MinimalGame(
-            items: enemy, sword
+            items: enemy, sword,
+            middleware: [CombatMiddleware.mock]
         )
 
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
@@ -560,36 +563,34 @@ struct StandardCombatSystemIntegrationTests {
         await mockIO.expect(
             """
             > attack enemy
-            Your masterwork sword cuts through air toward the skilled enemy
-            who has no steel to answer yours, only the speed of
-            desperation.
+            Armed and hungry for violence, you strike with your masterwork
+            sword as the skilled enemy can only dodge and weave against the
+            advantage of sharpened metal.
 
-            Your masterwork sword bites deep into the skilled enemy,
-            inflicting damage that shows immediately. The blow lands
-            solidly, drawing blood. It feels the sting but remains strong.
+            Your masterwork sword finds the skilled enemy exposed, carving
+            a solid wound that draws a grunt of pain. It absorbs the hit,
+            flesh suffering but endurance holding.
 
-            In the exchange, the skilled enemy lands clean. The world
-            lurches as your body absorbs punishment it won't soon forget.
-            You absorb the hit, feeling flesh tear but knowing you can
-            endure.
+            The skilled enemy strikes back but fury has made it blind, the
+            attack failing to find flesh.
 
             > attack enemy
-            You strike true with your masterwork sword! The skilled enemy
-            drops without a sound, weaponless to the end.
-
-            > attack enemy
-            Your masterwork sword cuts through air toward the skilled enemy
-            who has no steel to answer yours, only the speed of
-            desperation.
-
-            You're too late -- the skilled enemy is already deceased.
+            The final thrust of your masterwork sword is devastating! The
+            skilled enemy collapses, unable to defend without a weapon.
 
             > attack enemy
             You drive forward with your masterwork sword seeking its
             purpose as the skilled enemy meets you barehanded, flesh
             against steel in the oldest gamble.
 
-            You're too late -- the skilled enemy is already deceased.
+            Death has already claimed the skilled enemy.
+
+            > attack enemy
+            You press forward with your masterwork sword leading the way
+            toward flesh while the skilled enemy backs away, unarmed but
+            still dangerous as any cornered thing.
+
+            The skilled enemy is beyond such concerns now, being dead.
 
             > attack enemy
             You press forward with your masterwork sword leading the way
@@ -599,18 +600,18 @@ struct StandardCombatSystemIntegrationTests {
             Death has already claimed the skilled enemy.
 
             > attack enemy
-            You drive forward with your masterwork sword seeking its
-            purpose as the skilled enemy meets you barehanded, flesh
-            against steel in the oldest gamble.
+            Your masterwork sword cuts through air toward the skilled enemy
+            who has no steel to answer yours, only the speed of
+            desperation.
 
             The skilled enemy is beyond such concerns now, being dead.
 
             > attack enemy
-            You drive forward with your masterwork sword seeking its
-            purpose as the skilled enemy meets you barehanded, flesh
-            against steel in the oldest gamble.
+            Your masterwork sword cuts through air toward the skilled enemy
+            who has no steel to answer yours, only the speed of
+            desperation.
 
-            The skilled enemy has already departed this mortal coil.
+            The skilled enemy is beyond such concerns now, being dead.
             """
         )
 
@@ -637,20 +638,19 @@ struct StandardCombatSystemIntegrationTests {
         let cowardlyBandit = Item("bandit")
             .name("cowardly bandit")
             .characterSheet(
-                .init(
-                    strength: 8,
-                    bravery: 6,  // Low bravery
-                    armorClass: 10,
-                    health: 20,
-                    maxHealth: 20,
-                    isFighting: true
-                )
+                strength: 8,
+                bravery: 6,  // Low bravery
+                armorClass: 10,
+                health: 20,
+                maxHealth: 20,
+                isFighting: true
             )
             .in(.startRoom)
 
         let game = MinimalGame(
             locations: testRoomWithExit, northRoom,
-            items: cowardlyBandit
+            items: cowardlyBandit,
+            middleware: [CombatMiddleware.mock]
         )
 
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
@@ -672,8 +672,8 @@ struct StandardCombatSystemIntegrationTests {
             cowardly bandit braces for the inevitable collision of flesh
             and bone.
 
-            The last blow is yours! The cowardly bandit staggers back, eyes
-            going vacant, before falling motionless.
+            Your bare hands deliver death! The cowardly bandit crumples
+            without ceremony, the fight conclusively ended.
 
             > attack bandit
             You close the distance fast with fists ready as the cowardly
@@ -683,9 +683,9 @@ struct StandardCombatSystemIntegrationTests {
             Death has already claimed the cowardly bandit.
 
             > attack bandit
-            You close the distance fast with fists ready as the cowardly
-            bandit mirrors your stance, both of you committed to finding
-            out who breaks first.
+            You attack with nothing but will and bone as the cowardly
+            bandit meets your charge head-on, no weapons, no rules, no
+            mercy.
 
             The cowardly bandit is beyond such concerns now, being dead.
             """
@@ -698,16 +698,14 @@ struct StandardCombatSystemIntegrationTests {
         let intelligentEnemy = Item("scholar")
             .name("scholar warrior")
             .characterSheet(
-                .init(
-                    strength: 10,
-                    intelligence: 16,  // High intelligence
-                    wisdom: 14,
-                    bravery: 8,  // Low bravery
-                    armorClass: 11,
-                    health: 25,
-                    maxHealth: 25,
-                    isFighting: true
-                )
+                strength: 10,
+                intelligence: 16,  // High intelligence
+                wisdom: 14,
+                bravery: 8,  // Low bravery
+                armorClass: 11,
+                health: 25,
+                maxHealth: 25,
+                isFighting: true
             )
             .in(.startRoom)
 
@@ -720,7 +718,8 @@ struct StandardCombatSystemIntegrationTests {
             .in(.player)
 
         let game = MinimalGame(
-            items: intelligentEnemy, powerfulSword
+            items: intelligentEnemy, powerfulSword,
+            middleware: [CombatMiddleware.mock]
         )
 
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
@@ -742,8 +741,8 @@ struct StandardCombatSystemIntegrationTests {
             intimidating sword as the scholar warrior can only dodge and
             weave against the advantage of sharpened metal.
 
-            Your intimidating sword finds its mark at last! The scholar
-            warrior staggers once, then falls forever silent.
+            The final thrust of your intimidating sword is devastating! The
+            scholar warrior collapses, unable to defend without a weapon.
 
             > attack scholar
             You press forward with your intimidating sword leading the way
@@ -763,14 +762,12 @@ struct StandardCombatSystemIntegrationTests {
         let confusedGuard = Item("guard")
             .name("confused guard")
             .characterSheet(
-                .init(
-                    intelligence: 12,
-                    wisdom: 10,
-                    armorClass: 14,
-                    health: 30,
-                    maxHealth: 30,
-                    isFighting: true
-                )
+                intelligence: 12,
+                wisdom: 10,
+                armorClass: 14,
+                health: 30,
+                maxHealth: 30,
+                isFighting: true
             )
             .in(.startRoom)
 
@@ -781,7 +778,8 @@ struct StandardCombatSystemIntegrationTests {
                     charisma: 16  // High charisma for better pacification chances
                 )
             ),
-            items: confusedGuard
+            items: confusedGuard,
+            middleware: [CombatMiddleware.mock]
         )
 
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
@@ -796,11 +794,8 @@ struct StandardCombatSystemIntegrationTests {
         await mockIO.expect(
             """
             > talk to guard
-            The confused guard responds to your overture with hostile
-            silence.
-
-            The fight leaves the confused guard entirely. It stand passive
-            now, all hostility forgotten.
+            The confused guard's aggressive stance melts away. Though still
+            watchful, it clearlys want no more violence.
             """
         )
 
@@ -818,17 +813,16 @@ struct StandardCombatSystemIntegrationTests {
         let armoredKnight = Item("knight")
             .name("armored knight")
             .characterSheet(
-                .init(
-                    armorClass: 18,
-                    health: 50,
-                    maxHealth: 50,
-                    isFighting: true
-                )
+                armorClass: 18,
+                health: 50,
+                maxHealth: 50,
+                isFighting: true
             )
             .in(.startRoom)
 
         let game = MinimalGame(
-            items: armoredKnight
+            items: armoredKnight,
+            middleware: [CombatMiddleware.mock]
         )
 
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
@@ -858,13 +852,11 @@ struct StandardCombatSystemIntegrationTests {
         let aggressiveEnemy = Item("warrior")
             .name("fierce warrior")
             .characterSheet(
-                .init(
-                    strength: 14,
-                    armorClass: 12,
-                    health: 40,
-                    maxHealth: 40,
-                    isFighting: true
-                )
+                strength: 14,
+                armorClass: 12,
+                health: 40,
+                maxHealth: 40,
+                isFighting: true
             )
             .in(.startRoom)
 
@@ -877,7 +869,8 @@ struct StandardCombatSystemIntegrationTests {
             .in(.startRoom)
 
         let game = MinimalGame(
-            items: aggressiveEnemy, sword
+            items: aggressiveEnemy, sword,
+            middleware: [CombatMiddleware.mock]
         )
 
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
@@ -893,11 +886,9 @@ struct StandardCombatSystemIntegrationTests {
         await mockIO.expect(
             """
             > take sword
-            Got it.
-
-            The fierce warrior surges back instantly, fist cracking against
-            your ribs -- more warning than wound. The wound is trivial
-            against your battle fury.
+            The fierce warrior pivots and strikes true -- impact ripples
+            through muscle and bone, stealing balance and breath together.
+            The wound stings sharply. You can take more, but not forever.
             """
         )
 
@@ -915,12 +906,10 @@ struct StandardCombatSystemIntegrationTests {
         let specialEnemy = Item("dragon")
             .name("ancient dragon")
             .characterSheet(
-                .init(
-                    armorClass: 20,
-                    health: 100,
-                    maxHealth: 100,
-                    isFighting: true
-                )
+                armorClass: 20,
+                health: 100,
+                maxHealth: 100,
+                isFighting: true
             )
             .in(.startRoom)
 
@@ -937,7 +926,8 @@ struct StandardCombatSystemIntegrationTests {
         }
 
         let game = MinimalGame(
-            items: specialEnemy
+            items: specialEnemy,
+            middleware: [CombatMiddleware.mock]
         )
 
         let (_, _) = await GameEngine.test(blueprint: game)
@@ -956,17 +946,16 @@ struct StandardCombatSystemIntegrationTests {
         let deadEnemy = Item("corpse")
             .name("dead bandit")
             .characterSheet(
-                .init(
-                    health: 0,
-                    maxHealth: 20,
-                    consciousness: .dead,
-                    isFighting: false
-                )
+                health: 0,
+                maxHealth: 20,
+                consciousness: .dead,
+                isFighting: false
             )
             .in(.startRoom)
 
         let game = MinimalGame(
-            items: deadEnemy
+            items: deadEnemy,
+            middleware: [CombatMiddleware.mock]
         )
 
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
@@ -978,8 +967,8 @@ struct StandardCombatSystemIntegrationTests {
         await mockIO.expect(
             """
             > attack corpse
-            Barehanded, you commit to the assault as the corpse accepts the
-            challenge with equal violence promised.
+            No weapons needed as you attack with pure violence while the
+            corpse braces for the inevitable collision of flesh and bone.
 
             The dead bandit is beyond such concerns now, being dead.
             """
@@ -992,17 +981,16 @@ struct StandardCombatSystemIntegrationTests {
         let enemy = Item("bandit")
             .name("highway bandit")
             .characterSheet(
-                .init(
-                    armorClass: 11,
-                    health: 25,
-                    maxHealth: 25,
-                    isFighting: true
-                )
+                armorClass: 11,
+                health: 25,
+                maxHealth: 25,
+                isFighting: true
             )
             .in(.startRoom)
 
         let game = MinimalGame(
-            items: enemy
+            items: enemy,
+            middleware: [CombatMiddleware.mock]
         )
 
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
@@ -1034,17 +1022,16 @@ struct StandardCombatSystemIntegrationTests {
         let enemy = Item("thug")
             .name("street thug")
             .characterSheet(
-                .init(
-                    armorClass: 10,
-                    health: 20,
-                    maxHealth: 20,
-                    isFighting: true
-                )
+                armorClass: 10,
+                health: 20,
+                maxHealth: 20,
+                isFighting: true
             )
             .in(.startRoom)
 
         let game = MinimalGame(
-            items: enemy, book
+            items: enemy, book,
+            middleware: [CombatMiddleware.mock]
         )
 
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
@@ -1060,13 +1047,12 @@ struct StandardCombatSystemIntegrationTests {
             as the street thug can only dodge and weave against the
             advantage of sharpened metal.
 
-            You swing the heavy book at the street thug with desperate
-            creativity! It prepare to defend against your improvised
-            assault.
+            Brandishing the heavy book, you advance on the street thug!
+            It's unconventional, but might just work.
 
-            The street thug crashes forward in response, the impact jarring
-            but glancing as you roll with it. Pain flickers and dies. Your
-            body has more important work.
+            The street thug answers with raw violence, a clubbing strike
+            that finds you but lacks the angle to truly hurt. Pain flickers
+            and dies. Your body has more important work.
             """
         )
     }

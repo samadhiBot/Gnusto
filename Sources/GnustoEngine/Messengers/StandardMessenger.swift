@@ -18,16 +18,10 @@ open class StandardMessenger: @unchecked Sendable {
     let logger = Logger(label: "com.samadhibot.Gnusto.StandardMessenger")
 
     /// A random number generator used for response randomization.
-    ///
-    /// For testing purposes, a deterministic random number generator can specified when
-    /// initializing the StandardMessenger. By default the SystemRandomNumberGenerator is used.
-    private var randomNumberGenerator: RandomNumberGenerator
+    private var rng = UnifiedRNG()
 
-    public init(
-        randomNumberGenerator: RandomNumberGenerator = SystemRandomNumberGenerator()
-    ) {
-        self.randomNumberGenerator = randomNumberGenerator
-    }
+    /// Creates a new StandardMessenger or subclass.
+    public init() {}
 
     open func allCommandNothingHere() -> String {
         oneOf(
@@ -129,6 +123,16 @@ open class StandardMessenger: @unchecked Sendable {
 
     open func askWhom() -> String {
         output("Ask whom?")
+    }
+
+    open func attackCharacter(_ character: String) -> String {
+        oneOf(
+            "Let's hope it doesn't come to that.",
+            "Violence against \(character) seems unwarranted.",
+            "Attacking \(character) would complicate matters considerably.",
+            "\(character) has done nothing to deserve your hostility.",
+            "Starting a fight with \(character) would be counterproductive to your goals."
+        )
     }
 
     open func attackNonCharacter(_ object: String) -> String {
@@ -1818,7 +1822,6 @@ open class StandardMessenger: @unchecked Sendable {
         return oneOf(
             "There \(isAre) \(listWithDefiniteArticles) here.",
             "You can see \(listWithDefiniteArticles) here.",
-            "Present in this location \(isAre) \(listWithDefiniteArticles)."
         )
     }
 
@@ -2475,7 +2478,7 @@ open class StandardMessenger: @unchecked Sendable {
         capitalize: Bool = true,
         function: String = #function
     ) -> String {
-        let index = Int(randomNumberGenerator.next(upperBound: UInt32(responses.count)))
+        let index = Int(rng.next(upperBound: UInt32(responses.count)))
         return output(
             capitalize ? responses[index].capitalizedSentences : responses[index],
             logLevel,

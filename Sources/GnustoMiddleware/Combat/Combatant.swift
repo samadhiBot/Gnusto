@@ -1,4 +1,5 @@
 import Foundation
+import GnustoEngine
 
 /// Represents a participant in combat, either an enemy or a player.
 public enum Combatant: Sendable {

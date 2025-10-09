@@ -1,4 +1,5 @@
 import Foundation
+import GnustoEngine
 
 /// Types of actions the player can take during combat.
 public enum PlayerAction: Equatable, Sendable {

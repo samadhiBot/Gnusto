@@ -1,4 +1,3 @@
-import CustomDump
 import GnustoEngine
 import GnustoTestSupport
 import Testing
@@ -200,10 +199,6 @@ struct SmellActionHandlerTests {
             > smell the necromancer
             You detect nothing unusual about the furious necromancer's
             scent.
-
-            No weapons between you -- just the furious necromancer's
-            aggression and your desperation! You collide in a tangle of
-            strikes and blocks.
             """
         )
 

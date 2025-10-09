@@ -1,4 +1,3 @@
-import CustomDump
 import Foundation
 import GnustoTestSupport
 import Testing
@@ -406,10 +405,7 @@ struct ErrorHandlingIntegrationTests {
         )
 
         // Then: Should parse or reject gracefully
-        let output = await mockIO.flush()
-        // At least one look command should work
-        expectNoDifference(
-            output,
+        await mockIO.expect(
             """
             > look.
             --- Laboratory ---

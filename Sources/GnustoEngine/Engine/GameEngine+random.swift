@@ -9,7 +9,7 @@ extension GameEngine {
     ///
     /// - Returns: A random Double between 0.0 and 1.0 (inclusive of 0.0, exclusive of 1.0).
     public func randomDouble() -> Double {
-        Double.random(in: 0.0..<1.0, using: &randomNumberGenerator)
+        Double.random(in: 0.0..<1.0, using: &rng)
     }
 
     /// Returns a random element from the given collection.
@@ -38,7 +38,7 @@ extension GameEngine {
     /// - Parameter range: The range to generate a random number within.
     /// - Returns: A random integer within the specified range.
     public func randomInt(in range: ClosedRange<Int>) -> Int {
-        Int.random(in: range, using: &randomNumberGenerator)
+        Int.random(in: range, using: &rng)
     }
 
     /// Generates a random Boolean value based on the specified percentage chance.
@@ -52,7 +52,7 @@ extension GameEngine {
     /// - Precondition: chance must be between 0 and 100 (inclusive).
     public func randomPercentage(chance: Int) -> Bool {
         assert(chance >= 0 && chance <= 100, "Chance must be between 0 and 100")
-        return Int.random(in: 0...100, using: &randomNumberGenerator) <= chance
+        return Int.random(in: 0...100, using: &rng) <= chance
     }
 
     /// Rolls a 10-sided die and checks if it meets or exceeds the threshold.

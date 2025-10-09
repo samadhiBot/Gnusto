@@ -1,4 +1,3 @@
-import CustomDump
 import GnustoEngine
 import GnustoTestSupport
 import Testing
@@ -780,10 +779,7 @@ struct ItemEventHandlerTests {
         try await engine.execute("examine test item")
 
         let messages = await messageCapture.getMessages()
-        expectNoDifference(
-            messages,
-            ["Context handler called for item: .testItem"]
-        )
+        #expect(messages == ["Context handler called for item: .testItem"])
 
         await mockIO.expect(
             """
@@ -1178,7 +1174,6 @@ private struct TestGameBlueprint: GameBlueprint {
     let itemEventHandlers: [ItemID: ItemEventHandler]
     let locationEventHandlers: [LocationID: LocationEventHandler]
     let messenger: StandardMessenger
-    let randomNumberGenerator: any RandomNumberGenerator & Sendable
 
     init(
         baseGame: MinimalGame,
@@ -1188,10 +1183,7 @@ private struct TestGameBlueprint: GameBlueprint {
         self.baseGame = baseGame
         self.itemEventHandlers = itemEventHandlers
         self.locationEventHandlers = locationEventHandlers
-        self.randomNumberGenerator = SeededRandomNumberGenerator()
-        self.messenger = StandardMessenger(
-            randomNumberGenerator: SeededRandomNumberGenerator()
-        )
+        self.messenger = StandardMessenger()
     }
 
     var title: String { baseGame.title }

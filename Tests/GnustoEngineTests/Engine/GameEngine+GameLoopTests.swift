@@ -1,4 +1,3 @@
-import CustomDump
 import GnustoTestSupport
 import Testing
 
@@ -394,7 +393,7 @@ struct GameEngineGameLoopTests {
 
             A laboratory in which strange experiments are being conducted.
 
-            Present in this location is a gold coin.
+            You can see a gold coin here.
 
             > examine coin
             A shiny gold coin.

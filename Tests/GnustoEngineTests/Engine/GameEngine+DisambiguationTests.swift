@@ -1,4 +1,3 @@
-import CustomDump
 import GnustoTestSupport
 import Testing
 

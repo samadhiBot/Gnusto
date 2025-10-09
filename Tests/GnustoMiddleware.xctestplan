@@ -1,0 +1,25 @@
+{
+  "configurations" : [
+    {
+      "id" : "DE8A4FBC-9B38-4C88-BF73-1A578929C824",
+      "name" : "Test Scheme Action",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "codeCoverage" : false,
+    "performanceAntipatternCheckerEnabled" : true
+  },
+  "testTargets" : [
+    {
+      "target" : {
+        "containerPath" : "container:",
+        "identifier" : "GnustoMiddlewareTests",
+        "name" : "GnustoMiddlewareTests"
+      }
+    }
+  ],
+  "version" : 1
+}

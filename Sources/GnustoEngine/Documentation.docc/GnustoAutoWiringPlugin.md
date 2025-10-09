@@ -161,13 +161,13 @@ extension Zork1 {
 Include the plugin in your `Package.swift`:
 
 ```swift
-// swift-tools-version: 6.1
+// swift-tools-version: 6.2
 import PackageDescription
 
 let package = Package(
     name: "MyGame",
     dependencies: [
-        .package(url: "https://github.com/samadhiBot/Gnusto", from: "0.1.0"),
+        .package(url: "https://github.com/samadhiBot/Gnusto", from: "0.2.0"),
     ],
     targets: [
         .executableTarget(

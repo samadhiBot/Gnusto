@@ -32,25 +32,6 @@ extension GameEngine {
         }
     }
 
-    /// Creates a `StateChange` to update the global combat state to `nil`, thus ending combat.
-    ///
-    /// - Returns: A `StateChange` object representing the combat state update.
-    public func endCombat() -> StateChange {
-        setCombatState(to: nil)
-    }
-
-    /// Creates a `StateChange` to update the global combat state.
-    ///
-    /// This factory method creates a `StateChange` that sets the current combat state,
-    /// which tracks ongoing combat encounters including participants, intensity, fatigue,
-    /// and other combat-related metrics. Setting to `nil` clears the combat state.
-    ///
-    /// - Parameter combatState: The new `CombatState` to set, or `nil` to clear combat state.
-    /// - Returns: A `StateChange` object representing the combat state update.
-    public func setCombatState(to combatState: CombatState?) -> StateChange {
-        StateChange.setCombatState(combatState)
-    }
-
     /// Creates a `StateChange` to set a global flag.
     ///
     /// - Parameter globalID: The `GlobalID` of the flag to set.

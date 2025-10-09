@@ -10,9 +10,7 @@ struct OutsideHouseTests {
 
     init() async {
         (engine, mockIO) = await GameEngine.test(
-            blueprint: Zork1(
-                rng: SeededRandomNumberGenerator()
-            )
+            blueprint: Zork1()
         )
     }
 
@@ -166,7 +164,7 @@ struct OutsideHouseTests {
             You are facing the south side of a white house. There is no
             door here, and all the windows are boarded.
 
-            Present in this location is a boarded window.
+            You can see a boarded window here.
 
             > remove the boards
             The boards are securely fastened.

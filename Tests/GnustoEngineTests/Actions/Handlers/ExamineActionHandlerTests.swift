@@ -1,4 +1,3 @@
-import CustomDump
 import GnustoEngine
 import GnustoTestSupport
 import Testing
@@ -666,10 +665,7 @@ struct ExamineActionHandlerTests {
     @Test("Handler exposes correct Verbs")
     func testVerbs() async throws {
         let handler = ExamineActionHandler()
-        expectNoDifference(
-            handler.synonyms,
-            [.examine, "x", .inspect, .describe, .look, "l"]
-        )
+        #expect(handler.synonyms == [.examine, "x", .inspect, .describe, .look, "l"])
     }
 
     @Test("Handler requires light")

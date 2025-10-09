@@ -11,9 +11,7 @@ struct MessengerTests {
 
     @Test("StandardMessenger provides standard IF responses")
     func testStandardMessenger() async throws {
-        let messenger = StandardMessenger(
-            randomNumberGenerator: SeededRandomNumberGenerator()
-        )
+        let messenger = StandardMessenger()
 
         // Test basic messages
         expectNoDifference(
@@ -46,9 +44,7 @@ struct MessengerTests {
 
     @Test("Custom messenger can override specific methods")
     func testCustomMessenger() async throws {
-        let messenger = TestHorrorMessenger(
-            randomNumberGenerator: SeededRandomNumberGenerator()
-        )
+        let messenger = TestHorrorMessenger()
 
         // Test overridden methods
         expectNoDifference(
@@ -73,9 +69,7 @@ struct MessengerTests {
 
     @Test("Protocol extension provides complete message coverage")
     func testProtocolExtensionCompleteness() async throws {
-        let messenger = StandardMessenger(
-            randomNumberGenerator: SeededRandomNumberGenerator()
-        )
+        let messenger = StandardMessenger()
 
         // Test a sampling of different message categories to ensure
         // protocol extensions provide reasonable defaults

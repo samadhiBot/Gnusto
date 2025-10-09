@@ -41,7 +41,7 @@ extension Direction: Comparable {
     }
 }
 
-// MARK: - CustomDumpStringConvertible conformance
+// MARK: - CustomStringConvertible conformance
 
 extension Direction: CustomStringConvertible {
     public var description: String {

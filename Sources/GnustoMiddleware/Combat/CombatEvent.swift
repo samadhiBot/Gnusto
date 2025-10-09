@@ -1,4 +1,5 @@
 import Foundation
+import GnustoEngine
 import Logging
 
 /// Represents specific combat events with detailed outcome information.
@@ -173,6 +174,7 @@ public enum CombatEvent: Equatable, Sendable {
     case playerCriticallyWounded(
         enemy: ItemProxy,
         enemyWeapon: ItemProxy?,
+        player: PlayerProxy,
         damage: Int
     )
 
@@ -202,6 +204,7 @@ public enum CombatEvent: Equatable, Sendable {
     case playerGravelyInjured(
         enemy: ItemProxy,
         enemyWeapon: ItemProxy?,
+        player: PlayerProxy,
         damage: Int
     )
 
@@ -209,6 +212,7 @@ public enum CombatEvent: Equatable, Sendable {
     case playerGrazed(
         enemy: ItemProxy,
         enemyWeapon: ItemProxy?,
+        player: PlayerProxy,
         damage: Int
     )
 
@@ -222,6 +226,7 @@ public enum CombatEvent: Equatable, Sendable {
     case playerInjured(
         enemy: ItemProxy,
         enemyWeapon: ItemProxy?,
+        player: PlayerProxy,
         damage: Int
     )
 
@@ -229,6 +234,7 @@ public enum CombatEvent: Equatable, Sendable {
     case playerLightlyInjured(
         enemy: ItemProxy,
         enemyWeapon: ItemProxy?,
+        player: PlayerProxy,
         damage: Int
     )
 
@@ -351,15 +357,15 @@ extension CombatEvent {
             .enemyVulnerable(let enemy, _, _),
             .nonWeaponAttack(let enemy, _, _),
             .playerAttacks(let enemy, _, _),
-            .playerCriticallyWounded(let enemy, _, _),
+            .playerCriticallyWounded(let enemy, _, _, _),
             .playerDisarmed(let enemy, _, _, _),
             .playerDistracted(let enemy, _, _),
             .playerDodged(let enemy, _),
-            .playerGravelyInjured(let enemy, _, _),
-            .playerGrazed(let enemy, _, _),
+            .playerGravelyInjured(let enemy, _, _, _),
+            .playerGrazed(let enemy, _, _, _),
             .playerHesitates(let enemy, _),
-            .playerInjured(let enemy, _, _),
-            .playerLightlyInjured(let enemy, _, _),
+            .playerInjured(let enemy, _, _, _),
+            .playerLightlyInjured(let enemy, _, _, _),
             .playerMissed(let enemy, _),
             .playerSlain(let enemy, _, _),
             .playerStaggers(let enemy, _),

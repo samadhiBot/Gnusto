@@ -1,4 +1,3 @@
-import CustomDump
 import GnustoEngine
 import GnustoTestSupport
 import Testing
@@ -415,7 +414,7 @@ struct LookInsideActionHandlerTests {
     @Test("Handler exposes correct Verbs")
     func testVerbs() async throws {
         let handler = LookInsideActionHandler()
-        expectNoDifference(handler.synonyms, [.look, .peek, .peer])
+        #expect(handler.synonyms == [.look, .peek, .peer])
     }
 
     @Test("Handler requires light")

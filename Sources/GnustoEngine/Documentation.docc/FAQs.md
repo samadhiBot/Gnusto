@@ -53,6 +53,9 @@ git clone https://github.com/samadhiBot/Gnusto.git
 
 ## Why would I choose Gnusto over established systems like Inform 7 or TADS?
 
+You wouldn't.
+
+Long answer: 
 **Gnusto takes a different approach: it's built as a Swift library rather than as its own language, offering different trade-offs than established IF systems.**
 
 Inform 7, TADS, and other traditional systems are mature, feature-rich, and have served the IF community brilliantly for decades. They offer extensive libraries, robust tooling, and thriving communities. Gnusto doesn't try to replace them -- instead, it explores what becomes possible when you build IF tooling on top of a modern, general-purpose programming language.

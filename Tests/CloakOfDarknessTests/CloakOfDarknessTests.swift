@@ -1,8 +1,8 @@
-import CloakOfDarkness
-import CustomDump
 import GnustoEngine
 import GnustoTestSupport
 import Testing
+
+@testable import CloakOfDarkness
 
 struct CloakOfDarknessWalkthroughTests {
     let engine: GameEngine
@@ -10,9 +10,7 @@ struct CloakOfDarknessWalkthroughTests {
 
     init() async {
         (engine, mockIO) = await GameEngine.test(
-            blueprint: CloakOfDarkness(
-                rng: SeededRandomNumberGenerator()
-            )
+            blueprint: CloakOfDarkness()
         )
     }
 

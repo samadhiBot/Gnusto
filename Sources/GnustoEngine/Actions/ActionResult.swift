@@ -145,7 +145,7 @@ extension Array where Element == ActionResult? {
     /// - Concatenating all side effects from all results
     ///
     /// - Returns: A single `ActionResult` containing the merged content of all non-nil results.
-    func merged() -> ActionResult {
+    public func merged() -> ActionResult {
         let combinedMessage = compactMap(\.?.message).joined(separator: .paragraph)
         return ActionResult(
             message: combinedMessage.isEmpty ? nil : combinedMessage,

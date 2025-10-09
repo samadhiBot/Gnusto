@@ -29,10 +29,6 @@ public enum StateValue: Codable, Sendable, Hashable {
     /// Character combat condition (normal, off-balance, vulnerable, etc.).
     case combatCondition(CombatCondition)
 
-    /// Represents the current combat state, containing information about an active
-    /// combat encounter including participants, turn order, and combat-specific state.
-    case combatState(CombatState?)
-
     /// Character consciousness level (awake, asleep, unconscious, etc.).
     case consciousness(ConsciousnessLevel)
 
@@ -182,12 +178,6 @@ extension StateValue {
     public var toEntityReferenceSet: Set<EntityReference>? {
         underlyingValue as? Set<EntityReference>
     }
-
-    /// Returns the `StateValue` underlying value as a `CombatState`, or `nil` if the type
-    /// does not match.
-    public var toCombatState: CombatState? {
-        underlyingValue as? CombatState
-    }
 }
 
 // MARK: - Convenience initializers
@@ -214,7 +204,6 @@ extension StateValue {
         case .combatCondition(let value): value
         case .generalCondition(let value): value
         case .alignment(let value): value
-        case .combatState(let value): value as Any
         case .entityReferenceSet(let value): value as Any
         case .exits(let value): value
         case .int(let value): value
@@ -329,12 +318,6 @@ extension StateValue: CustomDumpStringConvertible {
             string.multiline()
         case .stringSet(let stringSet):
             "[\(stringSet.map { "'\($0)'" }.sorted().joined(separator: ", "))]"
-        case .combatState(let state):
-            if let state {
-                "CombatState(enemy: \(state.enemyID), round: \(state.roundCount))"
-            } else {
-                "CombatState(nil)"
-            }
         }
     }
 }

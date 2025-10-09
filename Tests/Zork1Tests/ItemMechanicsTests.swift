@@ -10,9 +10,7 @@ struct ItemMechanicsTests {
 
     init() async {
         (engine, mockIO) = await GameEngine.test(
-            blueprint: Zork1(
-                rng: SeededRandomNumberGenerator()
-            )
+            blueprint: Zork1()
         )
     }
 

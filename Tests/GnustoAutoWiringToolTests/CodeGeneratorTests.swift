@@ -200,12 +200,6 @@ struct CodeGeneratorTests {
                     ]
                 }
 
-                public var combatSystems: [ItemID: any CombatSystem] {
-                    [
-                        .thief: Forest.thiefCombatSystem,
-                    ]
-                }
-
             }
 
             """

@@ -18,6 +18,7 @@ struct GameBlueprintTests {
         let maximumScore = 100
         let player = Player(in: "startRoom")
         var items = [Item]()
+        let messenger = StandardMessenger()
     }
 
     /// Complete GameBlueprint implementation with all properties customized
@@ -93,7 +94,7 @@ struct GameBlueprintTests {
             },
         ]
 
-        let messenger = TestMessenger()
+        let messenger: StandardMessenger = TestMessenger()
     }
 
     // MARK: - Basic Implementation Tests

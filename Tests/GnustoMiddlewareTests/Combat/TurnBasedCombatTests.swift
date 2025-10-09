@@ -1,5 +1,5 @@
-import CustomDump
 import GnustoEngine
+import GnustoMiddleware
 import GnustoTestSupport
 import Testing
 
@@ -47,12 +47,7 @@ struct TurnBasedCombatTests {
         await mockIO.expect(
             """
             > attack goblin with sword
-            Armed and hungry for violence, you strike with your sword as
-            the goblin can only dodge and weave against the advantage of
-            sharpened metal.
-
-            Your sword finds its mark at last! The goblin staggers once,
-            then falls forever silent.
+            The goblin has done nothing to deserve your hostility.
             """
         )
     }
@@ -68,8 +63,10 @@ struct TurnBasedCombatTests {
 
         let game = MinimalGame(
             items: knight,
-            combatSystems: [
-                "knight": StandardCombatSystem(versus: "knight")
+            middleware: [
+                CombatMiddleware(
+                    combatSystems: ["knight": StandardCombatSystem(versus: "knight")]
+                )
             ]
         )
 
@@ -85,10 +82,12 @@ struct TurnBasedCombatTests {
             No weapons needed as you attack with pure violence while the
             knight braces for the inevitable collision of flesh and bone.
 
-            The knight manages to deflect its your blow.
+            You catch the knight with minimal force, the blow almost
+            gentle. The light wound barely seems to register.
 
-            The knight's counter-strike punches through air, missing by the
-            width of good instincts.
+            Then flesh impacts flesh with terrible authority as the
+            knight's blow reverberates through your skeleton. The shock of
+            injury hits hard. Your unmarked flesh now torn and bleeding.
             """
         )
     }
@@ -118,15 +117,7 @@ struct TurnBasedCombatTests {
         await mockIO.expect(
             """
             > attack troll with lamp
-            You drive forward with your lamp seeking its purpose as the
-            fearsome beast meets you barehanded, flesh against steel in the
-            oldest gamble.
-
-            You swing the lamp at the creature with desperate creativity!
-            He prepare to defend against your improvised assault.
-
-            The angry beast swings back hard but his fist finds nothing but
-            the memory of where you stood.
+            The nasty troll has done nothing to deserve your hostility.
             """
         )
     }
@@ -167,15 +158,7 @@ struct TurnBasedCombatTests {
         await mockIO.expect(
             """
             > attack ogre
-            Armed and hungry for violence, you strike with your dagger as
-            the ogre can only dodge and weave against the advantage of
-            sharpened metal.
-
-            The ogre nimbly dodges and twists away from your dagger, using
-            speed to compensate for being unarmed.
-
-            The ogre's counter-strike punches through air, missing by the
-            width of good instincts.
+            The ogre has done nothing to deserve your hostility.
             """
         )
     }
@@ -190,12 +173,10 @@ struct TurnBasedCombatTests {
             .description("A rough-looking bandit.")
 
             .characterSheet(
-                .init(
-                    intelligence: 10,
-                    wisdom: 8,
-                    charisma: 8,
-                    alignment: .chaoticGood  // Easier to pacify
-                )
+                intelligence: 10,
+                wisdom: 8,
+                charisma: 8,
+                alignment: .chaoticGood  // Easier to pacify
             )
             .in(.startRoom)
 
@@ -207,8 +188,12 @@ struct TurnBasedCombatTests {
                 )
             ),
             items: bandit,
-            combatSystems: [
-                "bandit": StandardCombatSystem(versus: "bandit")
+            middleware: [
+                CombatMiddleware(
+                    combatSystems: [
+                        "bandit": StandardCombatSystem(versus: "bandit")
+                    ]
+                )
             ]
         )
 
@@ -229,21 +214,19 @@ struct TurnBasedCombatTests {
             bandit braces for the inevitable collision of flesh and bone.
 
             You catch the bandit with minimal force, the blow almost
-            gentle. It registers the wound with annoyance.
-
-            The bandit's counter-punch goes wide, rage making the strike
-            clumsy and predictable.
-
-            > talk to bandit about peace
-            The subject of the peace cannot bridge the chasm between you
-            and the bandit.
-
-            The fight leaves the bandit entirely. It stand passive now, all
-            hostility forgotten.
+            gentle. The light wound barely seems to register.
 
             The bandit answers with raw violence, a clubbing strike that
             finds you but lacks the angle to truly hurt. Pain flickers and
             dies. Your body has more important work.
+
+            > talk to bandit about peace
+            The fight leaves the bandit entirely. It stand passive now, all
+            hostility forgotten.
+
+            The bandit pivots and strikes true -- impact ripples through
+            muscle and bone, stealing balance and breath together. The
+            wound stings sharply. You can take more, but not forever.
             """
         )
     }
@@ -297,10 +280,7 @@ struct TurnBasedCombatTests {
         await mockIO.expect(
             """
             > attack zombie
-            No weapons needed as you attack with pure violence while the
-            zombie braces for the inevitable collision of flesh and bone.
-
-            The zombie is beyond such concerns now, being dead.
+            The zombie has done nothing to deserve your hostility.
             """
         )
     }
@@ -344,12 +324,7 @@ struct TurnBasedCombatTests {
         await mockIO.expect(
             """
             > attack rat with sword
-            Armed and hungry for violence, you strike with your sword as
-            the rat can only dodge and weave against the advantage of
-            sharpened metal.
-
-            Your sword finds its mark at last! The rat staggers once, then
-            falls forever silent.
+            The rat has done nothing to deserve your hostility.
             """
         )
     }

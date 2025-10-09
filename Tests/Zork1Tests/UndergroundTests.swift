@@ -1,4 +1,3 @@
-import CustomDump
 import GnustoEngine
 import GnustoTestSupport
 import Testing
@@ -11,9 +10,7 @@ struct UndergroundTests {
 
     init() async throws {
         (engine, mockIO) = await GameEngine.test(
-            blueprint: Zork1(
-                rng: SeededRandomNumberGenerator()
-            )
+            blueprint: Zork1()
         )
 
         // Give the player a sword and lantern, and position them in the cellar
@@ -128,35 +125,23 @@ struct UndergroundTests {
             The troll laughs at your puny gesture.
 
             > hit the troll with the lantern
-            Your blood sings as your light cuts toward the troll who barely
-            gets his ax into position before impact.
-
-            The brass lantern makes a poor weapon against the troll's
-            bloody axe! This might not end well.
-
-            The pathetic troll turns your momentum against you, his bloody
-            axe catching flesh in passing, painting a line of fire. The cut
-            registers dimly. Blood, but not enough to matter.
+            No more waiting as you attack with your lamp raised and the
+            troll responds with his ax, two weapons now committed to
+            drawing blood.
 
             > head west
-            The troll fends you off with a menacing gesture.
-
-            The troll whips his bloody axe across in answer -- steel
-            whispers against skin, leaving a thin signature of pain. The
-            strike lands but doesn't slow you. Not yet.
+            The troll counters with his axe with such violence that you
+            flinch, in a moment of weakness he immediately exploits.
 
             > go south
-            --- Cellar ---
-
-            Your sword is glowing with a faint blue glow.
+            The pathetic troll turns your momentum against you, his bloody
+            axe catching flesh in passing, painting a line of fire. Pain
+            flickers and dies. Your body has more important work.
 
             > walk west
-            --- Bottom of Ramp ---
-
-            You are at the bottom of a steep metal ramp. The ramp leads up
-            to the west, but it is too steep and smooth to climb.
-
-            Your sword is no longer glowing.
+            The nasty troll turns your momentum against you, his bloody axe
+            catching flesh in passing, painting a line of fire. A flash of
+            pain, quickly suppressed. You've taken worse.
             """
         )
     }

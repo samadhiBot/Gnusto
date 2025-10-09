@@ -189,16 +189,16 @@ public struct $game_name: GameBlueprint {
 
     public let player = Player(in: .broomCloset)
 
-    // Declaring messenger and randomNumberGenerator allows you to inject
-    // a deterministic random number generator for use in tests.
     public let messenger: StandardMessenger
-    public let randomNumberGenerator: any RandomNumberGenerator & Sendable
+
+    public let rng: SendableRNG
 
     public init(
-        rng: RandomNumberGenerator & Sendable = SystemRandomNumberGenerator()
+        rng: SendableRNG = SystemRandomNumberGenerator(),
+        messengerRNG: SendableRNG = SystemRandomNumberGenerator()
     ) {
-        self.randomNumberGenerator = rng
-        self.messenger = StandardMessenger(randomNumberGenerator: rng)
+        self.rng = rng
+        self.messenger = StandardMessenger(rng: messengerRNG)
     }
 
     // Note: All game content registration (items, locations, handlers, etc.)
@@ -259,9 +259,7 @@ struct ${game_name}Tests {
 
     init() async {
         (engine, mockIO) = await GameEngine.test(
-            blueprint: $game_name(
-                rng: SeededRandomNumberGenerator()
-            )
+            blueprint: $game_name()
         )
     }
 

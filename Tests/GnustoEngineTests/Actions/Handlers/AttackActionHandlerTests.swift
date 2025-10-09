@@ -1,4 +1,3 @@
-import CustomDump
 import GnustoEngine
 import GnustoTestSupport
 import Testing
@@ -24,45 +23,22 @@ struct AttackActionHandlerTests {
         await mockIO.expect(
             """
             > attack the troll
-            With nothing but rage you rush the fearsome beast as his
-            gruesome ax gleams cold and ready for the blood you're
-            offering.
-
-            The angry beast's defenses crumble! He stands exposed, unable
-            to protect himself.
-
-            The angry monster strikes back with his axe but you've already
-            moved, a ghost that steel cannot touch.
+            The nasty troll has done nothing to deserve your hostility.
 
             > attack the troll
-            Your blow bypasses his gruesome axe and lands true, the force
-            driving breath from the beast's lungs. The wound is real but
-            manageable.
-
-            The grotesque monster whips his axe across in answer -- steel
-            whispers against skin, leaving a thin signature of pain. The
-            cut registers dimly. Blood, but not enough to matter.
-
-            The troll says something, probably uncomplimentary, in his
-            guttural tongue.
+            Starting a fight with the nasty troll would be
+            counterproductive to your goals.
 
             > attack the troll
-            You slip inside the reach of his bloody axe and drive your
-            knuckles hard into the angry monster's body. You see the ripple
-            of pain, but his body absorbs it. He remains dangerous.
-
-            The beast's counter with his axe misses completely, the weapon
-            whistling through empty space.
+            Starting a fight with the nasty troll would be
+            counterproductive to your goals.
 
             > attack the troll
-            You land the decisive hit! The fearsome beast wavers for a
-            heartbeat, then collapses into permanent silence.
+            Attacking the nasty troll would complicate matters
+            considerably.
 
             > attack the troll
-            You throw yourself at the beast despite his nicked axe because
-            sometimes fury must answer steel even when flesh cannot win.
-
-            You're too late -- the nasty troll is already deceased.
+            The nasty troll has done nothing to deserve your hostility.
             """
         )
     }
@@ -98,34 +74,15 @@ struct AttackActionHandlerTests {
         await mockIO.expect(
             """
             > attack dragon with sword
-            You drive forward with your steel sword seeking its purpose as
-            the fierce creature meets you barehanded, flesh against steel
-            in the oldest gamble.
-
-            Your steel sword swings wide, and the wyrm avoids your poorly
-            aimed strike with ease.
-
-            The awesome creature counters with a force that shatters your
-            guard, leaving you exposed to whatever violence comes next.
+            The red dragon has done nothing to deserve your hostility.
 
             > attack dragon with sword
-            Direct hit with your steel sword! The creature sways
-            dangerously, unable to mount any defense while fighting to stay
-            upright.
-
-            The wyrm's lightning-fast counter strikes your wrist, causing
-            your steel sword to drop from shocked fingers.
+            Starting a fight with the red dragon would be counterproductive
+            to your goals.
 
             > attack dragon with sword
-            You aren't holding the steel sword.
-
-            Your steel sword finds the fierce wyrm exposed, carving a solid
-            wound that draws a grunt of pain. The wound is real but
-            manageable.
-
-            Then the wyrm's strike hammers home with the sound of a mallet
-            on meat. Something structural fails inside you. First blood
-            draws a gasp. You touch the wound, fingers coming away red.
+            Starting a fight with the red dragon would be counterproductive
+            to your goals.
             """
         )
     }
@@ -152,35 +109,15 @@ struct AttackActionHandlerTests {
         await mockIO.expect(
             """
             > fight the orc
-            You close the distance fast with fists ready as the angry
-            warrior mirrors your stance, both of you committed to finding
-            out who breaks first.
-
-            Your punch connects lightly, leaving perhaps a small bruise. It
-            registers the wound with annoyance.
-
-            Then the angry warrior's strike hammers home with the sound of
-            a mallet on meat. Something structural fails inside you. First
-            blood draws a gasp. You touch the wound, fingers coming away
-            red.
+            The angry orc has done nothing to deserve your hostility.
 
             > fight the orc
-            Your strike sends the warrior stumbling sideways! It sways
-            precariously, barely maintaining its footing.
+            Starting a fight with the angry orc would be counterproductive
+            to your goals.
 
-            The warrior finishes you with nothing but flesh and bone,
-            proving that the oldest weapons still kill just as dead.
-
-            ****  You have died  ****
-
-            The curtain falls on this particular act of your existence. But
-            all good stories deserve another telling...
-
-            You scored 0 out of a possible 10 points, in 1 moves.
-
-            Would you like to RESTART, RESTORE a saved game, or QUIT?
-
-            >
+            > fight the orc
+            Starting a fight with the angry orc would be counterproductive
+            to your goals.
             """
         )
     }
@@ -207,25 +144,15 @@ struct AttackActionHandlerTests {
         await mockIO.expect(
             """
             > hit the goblin
-            No weapons needed as you attack with pure violence while the
-            sneaky goblin braces for the inevitable collision of flesh and
-            bone.
-
-            You catch the sneaky goblin with minimal force, the blow almost
-            gentle. It registers the wound with annoyance.
-
-            The sneaky goblin's counter-punch goes wide, rage making the
-            strike clumsy and predictable.
+            The sneaky goblin has done nothing to deserve your hostility.
 
             > hit the goblin
-            Your final strike lands with devastating force! The sneaky
-            goblin drops to its knees, then pitches forward into death.
+            Starting a fight with the sneaky goblin would be
+            counterproductive to your goals.
 
             > hit the goblin
-            You charge with fists raised as the sneaky goblin meets you
-            halfway in what will be brutal and personal.
-
-            You're too late -- the sneaky goblin is already deceased.
+            Starting a fight with the sneaky goblin would be
+            counterproductive to your goals.
             """
         )
     }
@@ -249,30 +176,15 @@ struct AttackActionHandlerTests {
         await mockIO.expect(
             """
             > kill the giant spider
-            No weapons needed as you attack with pure violence while the
-            giant spider braces for the inevitable collision of flesh and
-            bone.
-
-            You catch the giant spider with minimal force, the blow almost
-            gentle. It registers the wound with annoyance.
-
-            The giant spider's counter-punch goes wide, rage making the
-            strike clumsy and predictable.
+            The giant spider has done nothing to deserve your hostility.
 
             > kill the giant spider
-            You drive your bare hands into the giant spider, feeling the
-            satisfying thud of impact. The wound is real but manageable.
-
-            The giant spider swings in retaliation but you slip the attack,
-            flowing around the violence like water around stone.
+            Starting a fight with the giant spider would be
+            counterproductive to your goals.
 
             > kill the giant spider
-            Your bare-handed assault leaves the giant spider momentarily
-            stunned. Blood seeps from the new wound.
-
-            The giant spider crashes forward in response, the impact
-            jarring but glancing as you roll with it. The cut registers
-            dimly. Blood, but not enough to matter.
+            Starting a fight with the giant spider would be
+            counterproductive to your goals.
             """
         )
     }
@@ -352,7 +264,7 @@ struct AttackActionHandlerTests {
         await mockIO.expect(
             """
             > attack troll with sword
-            You aren't holding the steel sword.
+            The nasty troll has done nothing to deserve your hostility.
             """
         )
     }
@@ -441,15 +353,7 @@ struct AttackActionHandlerTests {
         await mockIO.expect(
             """
             > attack the dragon
-            You attack with nothing but will and bone as the fierce
-            creature meets your charge head-on, no weapons, no rules, no
-            mercy.
-
-            Your attack misses! Empty space is all you encounter while the
-            wyrm watches with amusement.
-
-            The awesome creature counters with a force that shatters your
-            guard, leaving you exposed to whatever violence comes next.
+            The red dragon has done nothing to deserve your hostility.
             """
         )
     }
@@ -482,16 +386,8 @@ struct AttackActionHandlerTests {
         await mockIO.expect(
             """
             > attack the bandit with a stick
-            Your wooden stick cuts through air toward the dangerous bandit
-            who has no steel to answer yours, only the speed of
-            desperation.
-
-            You attack with the wooden stick! The dangerous bandit dodges,
-            more puzzled than threatened by your choice of weapon.
-
-            In the tangle, the dangerous bandit drives an elbow home --
-            sudden pressure that blooms into dull pain. The cut registers
-            dimly. Blood, but not enough to matter.
+            The dangerous bandit has done nothing to deserve your
+            hostility.
             """
         )
     }
@@ -525,33 +421,15 @@ struct AttackActionHandlerTests {
         await mockIO.expect(
             """
             > attack the monster with my dagger
-            Armed and hungry for violence, you strike with your sharp
-            dagger as the evil monster can only dodge and weave against the
-            advantage of sharpened metal.
-
-            The evil monster nimbly dodges and twists away from your sharp
-            dagger, using speed to compensate for being unarmed.
-
-            The evil monster's counter-strike punches through air, missing
-            by the width of good instincts.
+            The evil monster has done nothing to deserve your hostility.
 
             > attack the monster with my dagger
-            You nick the evil monster with your sharp dagger, the weapon
-            barely breaking skin. It notes the minor damage and dismisses
-            it.
-
-            In the tangle, the evil monster drives an elbow home -- sudden
-            pressure that blooms into dull pain. The cut registers dimly.
-            Blood, but not enough to matter.
+            Starting a fight with the evil monster would be
+            counterproductive to your goals.
 
             > attack the monster with my dagger
-            Your sharp dagger swings wide, and the evil monster avoids your
-            poorly aimed strike with ease.
-
-            The evil monster pivots and strikes true -- impact ripples
-            through muscle and bone, stealing balance and breath together.
-            You absorb the hit, feeling flesh tear but knowing you can
-            endure.
+            Starting a fight with the evil monster would be
+            counterproductive to your goals.
             """
         )
     }
@@ -594,16 +472,9 @@ struct AttackActionHandlerTests {
 
             There is an evil monster here.
 
-            Despite having no weapon, the evil monster charges with
-            terrifying resolve! You grip your sharp dagger tighter, knowing
-            you'd better use this advantage.
-
             > attack the monster with my dagger
-            Your strike with your sharp dagger grazes the evil monster,
-            drawing minimal blood. It registers the wound with annoyance.
-
-            The evil monster's counter-punch goes wide, rage making the
-            strike clumsy and predictable.
+            Attacking the evil monster would complicate matters
+            considerably.
             """
         )
     }
@@ -637,33 +508,15 @@ struct AttackActionHandlerTests {
         await mockIO.expect(
             """
             > stab the monster
-            Armed and hungry for violence, you strike with your sharp
-            dagger as the evil monster can only dodge and weave against the
-            advantage of sharpened metal.
-
-            The evil monster nimbly dodges and twists away from your sharp
-            dagger, using speed to compensate for being unarmed.
-
-            The evil monster's counter-strike punches through air, missing
-            by the width of good instincts.
+            The evil monster has done nothing to deserve your hostility.
 
             > stab the monster
-            You nick the evil monster with your sharp dagger, the weapon
-            barely breaking skin. It notes the minor damage and dismisses
-            it.
-
-            In the tangle, the evil monster drives an elbow home -- sudden
-            pressure that blooms into dull pain. The cut registers dimly.
-            Blood, but not enough to matter.
+            Starting a fight with the evil monster would be
+            counterproductive to your goals.
 
             > stab the monster
-            Your sharp dagger swings wide, and the evil monster avoids your
-            poorly aimed strike with ease.
-
-            The evil monster pivots and strikes true -- impact ripples
-            through muscle and bone, stealing balance and breath together.
-            You absorb the hit, feeling flesh tear but knowing you can
-            endure.
+            Starting a fight with the evil monster would be
+            counterproductive to your goals.
             """
         )
     }
@@ -673,12 +526,12 @@ struct AttackActionHandlerTests {
     @Test("Handler exposes correct Verbs")
     func testVerbs() async throws {
         let handler = AttackActionHandler()
-        expectNoDifference(
-            handler.synonyms,
-            [
+        #expect(
+            handler.synonyms == [
                 .attack, .break, .destroy, .fight, .hit, .kill, .rip,
                 .ruin, .shatter, .slay, .smash, .stab, .tear,
-            ])
+            ]
+        )
     }
 
     @Test("Handler requires light")

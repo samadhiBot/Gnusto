@@ -1,38 +1,44 @@
 import GnustoEngine
+import GnustoMiddleware
 
 /// A faithful recreation of _Zork 1: The Great Underground Empire_ using the Gnusto Interactive
 /// Fiction Engine.
 ///
 /// This implementation follows the original ZIL source code to recreate the authentic player
 /// experience while utilizing modern Swift architecture and the Gnusto engine's capabilities.
-public struct Zork1: GameBlueprint {
-    public let title = "Zork I: The Great Underground Empire"
+struct Zork1: GameBlueprint {
+    let title = "Zork I: The Great Underground Empire"
 
-    public let abbreviatedTitle = "Zork1"
+    let abbreviatedTitle = "Zork1"
 
-    public let introduction = """
+    let introduction = """
         ZORK I: The Great Underground Empire
         Copyright (c) 1981, 1982, 1983 Infocom, Inc. All rights reserved.
         ZORK is a registered trademark of Infocom, Inc.
         Revision 88 / Serial number 840726
         """
 
-    public let release = "88"
+    let release = "88"
 
-    public let maximumScore = 350
+    let maximumScore = 350
 
-    public let player = Player(in: .westOfHouse)
+    let player = Player(in: .westOfHouse)
 
-    // Declaring messenger and randomNumberGenerator allows you to inject
-    // a deterministic random number generator for use in tests.
-    public let messenger: StandardMessenger
-    public let randomNumberGenerator: any RandomNumberGenerator & Sendable
+    let messenger: StandardMessenger = ZorkMessenger()
 
-    public init(
-        rng: RandomNumberGenerator & Sendable = SystemRandomNumberGenerator()
-    ) {
-        self.randomNumberGenerator = rng
-        self.messenger = ZorkMessenger(randomNumberGenerator: rng)
+    let combatMiddleware = CombatMiddleware(
+        combatSystems: [.thief: Thief.thiefCombatSystem()],
+        defaultCombatMessenger: CombatMessenger()
+    )
+
+    // Combat middleware with custom combat systems.
+    var middleware: [any GnustoMiddleware] {
+        [combatMiddleware]
+    }
+
+    // Combat middleware provides action handlers
+    var customActionHandlers: [ActionHandler] {
+        combatMiddleware.actionHandlers
     }
 
     // Note: All game content registration (items, locations, handlers, etc.)

@@ -1,4 +1,3 @@
-import CustomDump
 import GnustoTestSupport
 import Testing
 
@@ -541,42 +540,6 @@ struct GameStateApplyTests {
         #expect(state.activeDaemons["testDaemon"] == nil)
         #expect(state.changeHistory.count == 1)
         #expect(state.changeHistory.first == change)
-    }
-
-    // MARK: - Combat State Tests
-
-    @Test("Apply valid set combat state change")
-    func testApplyValidSetCombatStateChange() throws {
-        var state = createTestGameState()
-
-        let combatState = CombatState(enemyID: .nastyTroll)
-        let change = StateChange.setCombatState(combatState)
-        try state.apply(change)
-
-        #expect(state.globalState[.combatState] == .combatState(combatState))
-        #expect(state.changeHistory.count == 1)
-        #expect(state.changeHistory.first == change)
-    }
-
-    @Test("Apply valid clear combat state change")
-    func testApplyValidClearCombatStateChange() throws {
-        var state = createTestGameState()
-
-        let startTrollCombat = StateChange.setCombatState(
-            CombatState(enemyID: .nastyTroll)
-        )
-        try state.apply(startTrollCombat)
-
-        let change = StateChange.setCombatState(nil)
-        try state.apply(change)
-
-        #expect(state.globalState[.combatState] == nil)
-        expectNoDifference(
-            state.changeHistory,
-            [
-                startTrollCombat,
-                .setCombatState(nil),
-            ])
     }
 
     // MARK: - Change History Tests

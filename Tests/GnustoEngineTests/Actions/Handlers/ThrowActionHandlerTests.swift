@@ -1,4 +1,3 @@
-import CustomDump
 import GnustoEngine
 import GnustoTestSupport
 import Testing
@@ -488,16 +487,8 @@ struct ThrowActionHandlerTests {
             You throw the red apple at the old wizard, but your aim falls
             short. The the red apple tumbles uselessly to the ground.
 
-            In a moment of raw violence, the old wizard comes at you with
-            nothing but fury! You raise your fists, knowing this will hurt
-            regardless of who wins.
-
             > throw apple at wizard
             You aren't holding the red apple.
-
-            In the tangle, the old wizard drives an elbow home -- sudden
-            pressure that blooms into dull pain. Pain flickers and dies.
-            Your body has more important work.
             """
         )
 

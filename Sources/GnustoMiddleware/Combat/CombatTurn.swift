@@ -1,4 +1,5 @@
 import Foundation
+import GnustoEngine
 
 /// Represents a complete turn of combat including both player and enemy combat events.
 public struct CombatTurn: Sendable {

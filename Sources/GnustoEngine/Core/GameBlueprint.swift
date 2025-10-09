@@ -91,28 +91,6 @@ public protocol GameBlueprint: Sendable {
     /// The default implementation provides an empty dictionary.
     var locationEventHandlers: [LocationID: LocationEventHandler] { get }
 
-    /// Combat systems for specific characters.
-    ///
-    /// This dictionary allows you to define custom combat behavior for specific characters
-    /// in your game. The key is an `ItemID` (representing a character) and the value is
-    /// a `CombatSystem` that defines how combat with that character works.
-    ///
-    /// Characters without registered combat systems will use the default combat system
-    /// with standard parameters.
-    ///
-    /// Example:
-    /// ```swift
-    /// var combatSystems: [ItemID: any CombatSystem] {
-    ///     [
-    ///         .troll: TrollCombatSystem(),
-    ///         .dragon: DragonCombatSystem(breathWeapon: .fire)
-    ///     ]
-    /// }
-    /// ```
-    ///
-    /// The default implementation provides an empty dictionary.
-    var combatSystems: [ItemID: any CombatSystem] { get }
-
     /// Middleware components that extend game loop functionality.
     ///
     /// Middleware provides a way to add optional, composable features to your game
@@ -127,11 +105,6 @@ public protocol GameBlueprint: Sendable {
     /// ```swift
     /// var middleware: [any GameMiddleware] {
     ///     [
-    ///         CombatMiddleware(
-    ///             combatSystems: combatSystems,
-    ///             combatMessengers: combatMessengers,
-    ///             defaultCombatMessenger: defaultCombatMessenger
-    ///         ),
     ///         DialogueMiddleware(dialogueTrees: dialogueTrees),
     ///         WeatherMiddleware()
     ///     ]
@@ -139,44 +112,7 @@ public protocol GameBlueprint: Sendable {
     /// ```
     ///
     /// The default implementation provides an empty array.
-    var middleware: [any GameMiddleware] { get }
-
-    /// Combat messengers for specific characters or global combat messaging.
-    ///
-    /// This dictionary allows you to define custom combat messaging for specific characters
-    /// in your game. The key is an `ItemID` (representing a character) and the value is
-    /// a `CombatMessenger` that provides custom combat event descriptions.
-    ///
-    /// Characters without registered combat messengers will use the default combat messenger.
-    /// You can also provide a default combat messenger by implementing `defaultCombatMessenger`.
-    ///
-    /// Example:
-    /// ```swift
-    /// var combatMessengers: [ItemID: CombatMessenger] {
-    ///     [
-    ///         .troll: TrollCombatMessenger(),
-    ///         .dragon: DragonCombatMessenger()
-    ///     ]
-    /// }
-    /// ```
-    ///
-    /// The default implementation provides an empty dictionary.
-    var combatMessengers: [ItemID: CombatMessenger] { get }
-
-    /// The default combat messenger used when no character-specific messenger is configured.
-    ///
-    /// This provides the base combat messaging system for all combat encounters unless
-    /// overridden by a character-specific messenger in `combatMessengers`.
-    ///
-    /// Example:
-    /// ```swift
-    /// var defaultCombatMessenger: CombatMessenger {
-    ///     CustomCombatMessenger(randomNumberGenerator: randomNumberGenerator)
-    /// }
-    /// ```
-    ///
-    /// The default implementation creates a standard `CombatMessenger`.
-    var defaultCombatMessenger: CombatMessenger { get }
+    var middleware: [any GnustoMiddleware] { get }
 
     /// Definitions for timed events (fuses) that trigger after a set number of turns.
     ///
@@ -260,37 +196,7 @@ public protocol GameBlueprint: Sendable {
     ///
     /// If not specified, the engine will use the built-in `MessageProvider` with traditional
     /// English interactive fiction responses.
-    ///
-    /// **Testing Note**: Custom `MessageProvider` subclasses should accept a
-    /// `RandomNumberGenerator` parameter in their initializer to support deterministic
-    /// testing via `withSeededRNG()`. The default implementation automatically uses
-    /// the blueprint's `randomNumberGenerator`.
-    ///
-    /// Example:
-    /// ```swift
-    /// var messenger: StandardMessenger {
-    ///     // Custom messenger for a horror-themed game
-    ///     HorrorMessenger(randomNumberGenerator: randomNumberGenerator)
-    /// }
-    /// ```
     var messenger: StandardMessenger { get }
-
-    /// The random number generator used throughout the game for various randomization needs.
-    ///
-    /// This generator is used by the `Messenger` for selecting random responses,
-    /// and can be used by custom game logic for probabilistic events, NPC behaviors,
-    /// and other randomized mechanics.
-    ///
-    /// For testing purposes, provide a `SeededRandomNumberGenerator` to ensure
-    /// consistent, reproducible results across test runs.
-    ///
-    /// Example:
-    /// ```swift
-    /// var randomNumberGenerator: any RandomNumberGenerator {
-    ///     SeededRandomNumberGenerator(seed: 12345)
-    /// }
-    /// ```
-    var randomNumberGenerator: any RandomNumberGenerator & Sendable { get }
 }
 
 // MARK: - Default implementations
@@ -316,24 +222,9 @@ extension GameBlueprint {
         [:]
     }
 
-    /// Default implementation provides no custom combat systems.
-    public var combatSystems: [ItemID: any CombatSystem] {
-        [:]
-    }
-
-    /// Default implementation provides no character-specific combat messengers.
-    public var combatMessengers: [ItemID: CombatMessenger] {
-        [:]
-    }
-
     /// Default implementation provides no middleware.
-    public var middleware: [any GameMiddleware] {
+    public var middleware: [any GnustoMiddleware] {
         []
-    }
-
-    /// Default implementation creates a standard combat messenger with the blueprint's RNG.
-    public var defaultCombatMessenger: CombatMessenger {
-        CombatMessenger(randomNumberGenerator: randomNumberGenerator)
     }
 
     /// Default implementation provides no timed fuses.
@@ -354,15 +245,5 @@ extension GameBlueprint {
     /// Default implementation provides no custom location computers.
     public var locationComputers: [LocationID: LocationComputer] {
         [:]
-    }
-
-    /// Default implementation uses the system's random number generator.
-    public var randomNumberGenerator: any RandomNumberGenerator & Sendable {
-        SystemRandomNumberGenerator()
-    }
-
-    /// Default implementation creates a standard messenger with default English text.
-    public var messenger: StandardMessenger {
-        StandardMessenger()
     }
 }

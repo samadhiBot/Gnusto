@@ -30,10 +30,10 @@ def parse_new_heredoc_content(diff)
     inner = lines[1..-2] || []
     inner.map do |l|
         # Check original line with indentation to distinguish diff markers from markdown
-        if l =~ /^\s{3,}\+/
+        if l =~ /^\s{2,}\+/
             # Lines with + should be removed (return nil)
             nil
-        elsif l =~ /^\s{3,}\u2212/
+        elsif l =~ /^\s{2,}\u2212/
             # Remove the diff marker and indentation, keep the content
             # Find the position after the minus sign and any following space
             if l =~ /^(\s+)\u2212\s?(.*)$/
@@ -240,6 +240,7 @@ def find_test_failures(output)
     # Step 1: Find all test failure lines
     test_failure_lines = []
     output.lines.each_with_index do |line, idx|
+        # Pattern 1: "recorded an issue at" (Swift Testing standard format)
         if line.include?('recorded an issue at') && line.include?('.swift:')
             # Extract test name, file, and line number
             if line =~ /Test\s+"([^"]+)".*?at\s+([^:]+\.swift):(\d+):/
@@ -247,6 +248,26 @@ def find_test_failures(output)
                     test_name: $1,
                     file: $2,
                     line: $3.to_i,
+                    line_index: idx
+                }
+            end
+        # Pattern 2: "A failure was recorded" (CustomDump format)
+        elsif line.include?('A failure was recorded') && line.include?('.swift:')
+            # Look back to find the test name from previous lines
+            test_name = nil
+            (idx - 1).downto([idx - 10, 0].max) do |prev_idx|
+                if output.lines[prev_idx] =~ /Test\s+"([^"]+)"/
+                    test_name = $1
+                    break
+                end
+            end
+
+            # Extract file and line number
+            if line =~ %r{([^/\s]+\.swift):(\d+):}
+                test_failure_lines << {
+                    test_name: test_name || "unknown test",
+                    file: $1,
+                    line: $2.to_i,
                     line_index: idx
                 }
             end

@@ -1,4 +1,3 @@
-import CustomDump
 import GnustoEngine
 import GnustoTestSupport
 import Testing
@@ -59,7 +58,7 @@ struct LaughActionHandlerTests {
     @Test("Handler exposes correct Verbs")
     func testVerbs() async throws {
         let handler = LaughActionHandler()
-        expectNoDifference(handler.synonyms, [.laugh, .chuckle, .giggle, .snicker, .chortle])
+        #expect(handler.synonyms == [.laugh, .chuckle, .giggle, .snicker, .chortle])
     }
 
     @Test("Handler does not require light")

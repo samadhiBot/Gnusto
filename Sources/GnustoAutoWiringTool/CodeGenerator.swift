@@ -357,8 +357,22 @@ struct CodeGenerator {
                     extensionLines.append("")
                 }
 
-                // Generate combatSystems property
-                if !gameData.combatSystems.isEmpty {
+                // Note: Combat systems are now registered via CombatMiddleware in the middleware array
+                // The combatSystems property has been removed from GameBlueprint
+                //
+                // To use combat systems, define them in your middleware array like this:
+                // public var middleware: [any GnustoMiddleware] {
+                //     [
+                //         CombatMiddleware(
+                //             combatSystems: [
+                //                 .enemy: EnemyArea.enemyCombatSystem
+                //             ]
+                //         )
+                //     ]
+                // }
+
+                // Skipping combatSystems generation as it's no longer part of GameBlueprint
+                if false, !gameData.combatSystems.isEmpty {
                     extensionLines.append(
                         "    public var combatSystems: [ItemID: any CombatSystem] {")
 

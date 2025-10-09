@@ -18,7 +18,7 @@ public enum ParentEntity: Hashable, Codable, Sendable {
     case player
 }
 
-// MARK: - CustomDumpStringConvertible conformance
+// MARK: - CustomStringConvertible conformance
 
 extension ParentEntity: CustomStringConvertible {
     public var description: String {

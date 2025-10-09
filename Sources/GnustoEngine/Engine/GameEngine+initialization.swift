@@ -14,7 +14,7 @@ extension GameEngine {
     ///
     /// - Parameter blueprint: The game blueprint containing all static game definitions
     /// - Returns: A tuple containing the initial game state and vocabulary
-    internal static func buildInitialGameState(
+    static func buildInitialGameState(
         from blueprint: GameBlueprint
     ) async -> (GameState, Vocabulary) {
         // Combine custom and default action handlers to extract all verb definitions
@@ -109,7 +109,7 @@ extension GameEngine {
     ///
     /// - Parameter handlers: The action handlers to extract verbs from
     /// - Returns: A tuple containing all discovered verbs and verb-to-syntax mappings
-    internal static func extractVerbDefinitions(
+    static func extractVerbDefinitions(
         from handlers: [ActionHandler]
     ) -> ([Verb], [Verb: [SyntaxRule]]) {
         var verbs: [Verb] = []

@@ -1,4 +1,3 @@
-import CustomDump
 import GnustoEngine
 import GnustoTestSupport
 import Testing
@@ -1074,11 +1073,9 @@ struct PutOnActionHandlerTests {
     @Test("Handler uses correct syntax")
     func testSyntaxRules() async throws {
         let handler = PutOnActionHandler()
-        expectNoDifference(
-            handler.syntax,
-            [
-                .match(.verb, .directObject),
-                .match(.verb, .directObject, .on, .indirectObject),
-            ])
+        #expect(handler.syntax == [
+            .match(.verb, .directObject),
+            .match(.verb, .directObject, .on, .indirectObject),
+        ])
     }
 }

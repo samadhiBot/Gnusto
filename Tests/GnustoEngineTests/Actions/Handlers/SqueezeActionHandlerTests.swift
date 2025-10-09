@@ -1,4 +1,3 @@
-import CustomDump
 import GnustoEngine
 import GnustoTestSupport
 import Testing
@@ -280,10 +279,6 @@ struct SqueezeActionHandlerTests {
             > squeeze the necromancer
             Aggression is one thing; squeezing the furious necromancer is
             quite another.
-
-            No weapons between you -- just the furious necromancer's
-            aggression and your desperation! You collide in a tangle of
-            strikes and blocks.
             """
         )
 
@@ -358,7 +353,7 @@ struct SqueezeActionHandlerTests {
     @Test("Handler exposes correct Verbs")
     func testVerbs() async throws {
         let handler = SqueezeActionHandler()
-        expectNoDifference(handler.synonyms, [.squeeze, .compress, .hug])
+        #expect(handler.synonyms == [.squeeze, .compress, .hug])
     }
 
     @Test("Handler requires light")

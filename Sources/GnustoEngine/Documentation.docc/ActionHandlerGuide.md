@@ -1,12 +1,12 @@
 # Action Handler Development Guide
 
-Action handlers are the core components that process player commands in the Gnusto Interactive Fiction Engine.
+Action handlers process player commands in the Gnusto Interactive Fiction Engine.
 
 ## Overview
 
-Action handlers translate player intent into game responses and state changes. They follow a careful scoring system that selects the most appropriate handler for each command, ensuring players receive contextually relevant feedback.
+Action handlers translate player intent into response messages and state changes. They use a scoring system that attempts to select the most appropriate handler for each command, ensuring players receive contextually relevant feedback.
 
-With 80+ built-in handlers covering everything from basic interactions to combat, conversations, and complex puzzle mechanics, this guide covers the design principles, implementation patterns, and best practices for creating effective action handlers.
+This guide covers the design principles, implementation patterns, and best practices for creating effective action handlers.
 
 ### Core Responsibilities
 

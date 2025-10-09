@@ -12,6 +12,10 @@ let package = Package(
             name: "GnustoEngine",
             targets: ["GnustoEngine"]
         ),
+        .library(
+            name: "GnustoMiddleware",
+            targets: ["GnustoMiddleware"]
+        ),
         .executable(
             name: "CloakOfDarkness",
             targets: ["CloakOfDarkness"]
@@ -57,6 +61,15 @@ let package = Package(
                 .plugin(name: "SwiftLintBuildToolPlugin", package: "SwiftLintPlugins")
             ]
         ),
+        .target(
+            name: "GnustoMiddleware",
+            dependencies: [
+                "GnustoEngine"
+            ],
+            plugins: [
+                .plugin(name: "SwiftLintBuildToolPlugin", package: "SwiftLintPlugins")
+            ]
+        ),
         .executableTarget(
             name: "CloakOfDarkness",
             dependencies: ["GnustoEngine"],
@@ -68,7 +81,10 @@ let package = Package(
         ),
         .executableTarget(
             name: "Zork1",
-            dependencies: ["GnustoEngine"],
+            dependencies: [
+                "GnustoEngine",
+                "GnustoMiddleware",
+            ],
             path: "Executables/Zork1",
             exclude: ["README.md"],
             plugins: [
@@ -94,7 +110,8 @@ let package = Package(
         .target(
             name: "GnustoTestSupport",
             dependencies: [
-                "GnustoEngine"
+                "GnustoEngine",
+                "GnustoMiddleware",
             ],
             plugins: [
                 .plugin(name: "SwiftLintBuildToolPlugin", package: "SwiftLintPlugins")
@@ -112,7 +129,13 @@ let package = Package(
             dependencies: [
                 "GnustoEngine",
                 "GnustoTestSupport",
-//                .product(name: "CustomDump", package: "swift-custom-dump"),
+            ],
+        ),
+        .testTarget(
+            name: "GnustoMiddlewareTests",
+            dependencies: [
+                "GnustoMiddleware",
+                "GnustoTestSupport",
             ],
         ),
         .testTarget(
@@ -120,7 +143,6 @@ let package = Package(
             dependencies: [
                 "GnustoEngine",
                 "GnustoAutoWiringTool",
-//                .product(name: "CustomDump", package: "swift-custom-dump"),
             ]
         ),
         .testTarget(

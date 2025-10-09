@@ -1,4 +1,3 @@
-import CustomDump
 import GnustoEngine
 import GnustoTestSupport
 import Testing
@@ -464,15 +463,7 @@ struct HealthSystemTests {
         await mockIO.expect(
             """
             > attack creature
-            Armed and hungry for violence, you strike with your sword as
-            the creature can only dodge and weave against the advantage of
-            sharpened metal.
-
-            Your strike with your sword grazes the creature, drawing
-            minimal blood. It registers the wound with annoyance.
-
-            The creature's counter-punch goes wide, rage making the strike
-            clumsy and predictable.
+            The creature has done nothing to deserve your hostility.
             """
         )
 

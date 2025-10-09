@@ -129,17 +129,15 @@ extension GameEngine {
                 return
 
             } else {
-                // No question response generated - clear the question and continue with normal processing
+                // No question response generated - clear the question
+                // and continue with normal processing
                 await conversationManager.clearQuestion()
             }
         }
 
         // 3. Check for disambiguation responses when no pending question but recent disambiguation
         if let disambiguationContext = lastDisambiguationContext,
-            await tryHandleDisambiguationResponse(
-                input: input,
-                context: disambiguationContext
-            )
+            await tryHandleDisambiguationResponse(input: input, context: disambiguationContext)
         {
             // Disambiguation response was handled, skip normal command processing
             return
@@ -154,7 +152,6 @@ extension GameEngine {
 
         // 5. Execute Command or Handle Error
         var shouldConsumeTurn = true  // Default to consuming turn
-        var commandResult: ActionResult?
 
         switch parseResult {
         case .success(let command):
@@ -170,56 +167,53 @@ extension GameEngine {
                 // Execute command normally
                 shouldConsumeTurn = try await execute(command: finalCommand)
 
-                // Capture the result for middleware
-                // Note: execute() currently returns Bool, not ActionResult
-                // The result is processed internally, so we create an empty result
-                commandResult = ActionResult(message: nil, changes: [], effects: [])
+                // AFTER COMMAND MIDDLEWARE HOOK
+                // Note: execute() processes the result internally, so we pass an empty result
+                // that represents "command was executed successfully"
+                // TODO: Refactor execute() to return ActionResult instead of Bool
+                let emptyResult = ActionResult(message: nil, changes: [], effects: [])
+                let finalResult = try await executeAfterCommandMiddleware(
+                    command: finalCommand,
+                    result: emptyResult
+                )
+
+                // Process any additional effects from middleware
+                // Always process, even if empty - processActionResult handles that gracefully
+                try await processActionResult(finalResult)
 
             case .skip(let result):
                 // Middleware handled the command (e.g., combat turn)
                 if let result {
                     try await processActionResult(result)
-                    commandResult = result
                 }
+
+                // AFTER COMMAND MIDDLEWARE HOOK
+                // Always call afterCommand when we have a valid command, even if skipped
+                let skipResult = result ?? ActionResult(message: nil, changes: [], effects: [])
+                let finalResult = try await executeAfterCommandMiddleware(
+                    command: command,
+                    result: skipResult
+                )
+
+                // Process any additional effects from afterCommand middleware
+                // Only process if middleware added something new
+                if finalResult != skipResult {
+                    try await processActionResult(finalResult)
+                }
+
                 // Turn is consumed when middleware handles it
                 shouldConsumeTurn = true
             }
 
         case .failure(let error):
             await report(parseError: error, originalInput: input)
+
+            // ON PARSE ERROR MIDDLEWARE HOOK
+            // Give middleware a chance to observe/respond to parse errors
+            try await executeOnParseError(error: error, rawInput: input)
+
             // Parse errors consume turns (traditional IF behavior)
             shouldConsumeTurn = true
-            commandResult = ActionResult(message: nil, changes: [], effects: [])  // Empty result for middleware
-        }
-
-        // AFTER COMMAND MIDDLEWARE HOOK
-        // This is where combat checks for hostiles, achievements track progress, etc.
-        if let result = commandResult, shouldConsumeTurn {
-            // Get the actual command or create a dummy one for parse errors
-            let actualCommand: Command
-            if case .success(let cmd) = parseResult {
-                actualCommand = cmd
-            } else {
-                // Parse error - create minimal command for middleware
-                actualCommand = Command(
-                    verb: .examine,  // Use a valid verb
-                    directObject: nil,
-                    indirectObject: nil,
-                    direction: nil,
-                    rawInput: input
-                )
-            }
-
-            let finalResult = try await executeAfterCommandMiddleware(
-                command: actualCommand,
-                result: result
-            )
-
-            // Process any additional effects from middleware
-            // Compare by checking if there are any changes
-            if !finalResult.changes.isEmpty || !finalResult.effects.isEmpty {
-                try await processActionResult(finalResult)
-            }
         }
 
         // 6. Check for player death
@@ -337,8 +331,7 @@ extension GameEngine {
         // Reset the conversation manager
         await conversationManager.clearQuestion()
 
-        // Reset middleware state (clear caches, etc.)
-        self.standardCombatSystemCache = [:]
+        // Reset middleware state (if needed)
     }
 }
 

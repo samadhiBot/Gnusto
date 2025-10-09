@@ -92,6 +92,26 @@ extension ActionContext {
         engine.messenger
     }
 
+    /// Retrieves middleware of a specific type, if present.
+    ///
+    /// This allows game-specific action handlers to access middleware instances when needed.
+    /// Returns `nil` if the requested middleware is not registered in the game.
+    ///
+    /// ## Example Usage
+    ///
+    /// ```swift
+    /// guard let combat = await context.middleware(CombatMiddleware.self) else {
+    ///     return nil  // Combat middleware not present
+    /// }
+    /// return try await combat.enemyAttacks(enemy: troll, engine: context.engine)
+    /// ```
+    ///
+    /// - Parameter type: The type of middleware to retrieve
+    /// - Returns: The middleware instance if present, or `nil` if not registered
+    public func middleware<T: GnustoMiddleware>(_ type: T.Type) -> T? {
+        engine.middleware(type)
+    }
+
     /// Convenience accessor for the player proxy.
     ///
     /// Provides direct access to the current player state through a PlayerProxy,

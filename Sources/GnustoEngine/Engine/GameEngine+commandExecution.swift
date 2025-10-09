@@ -191,19 +191,38 @@ extension GameEngine {
             } else {
                 // --- Execute Handler ---
                 do {
-                    // Use the unified process method (handles both validation and execution)
-                    let result = try await actionHandler.process(
-                        context: ActionContext(command, self)
-                    )
+                    let actionContext = ActionContext(command, self)
+
+                    // Give middleware a chance to intercept/override action handling
+                    var result: ActionResult?
+                    for middleware in middleware {
+                        if let interceptedResult = try await middleware.interceptAction(
+                            handler: actionHandler,
+                            context: actionContext
+                        ) {
+                            result = interceptedResult
+                            break
+                        }
+                    }
+
+                    // If no middleware intercepted, use default handler behavior
+                    if result == nil {
+                        result = try await actionHandler.process(context: actionContext)
+                    }
+
+                    guard let finalResult = result else {
+                        // Should never happen, but handle gracefully
+                        return true
+                    }
 
                     // Process the result (apply changes, print message)
-                    try await processActionResult(result)
+                    try await processActionResult(finalResult)
 
                     // Call postProcess (even if default is empty)
                     try await actionHandler.postProcess(
                         command: command,
                         engine: self,
-                        result: result
+                        result: finalResult
                     )
 
                 } catch let actionResponse as ActionResponse {
@@ -622,7 +641,7 @@ extension GameEngine {
     ///
     /// - Parameter changes: Array of optional `StateChange` objects to apply
     /// - Throws: Re-throws any errors from `gameState.apply()` calls
-    func applyActionResultChanges(_ changes: [StateChange?]) throws {
+    public func applyActionResultChanges(_ changes: [StateChange?]) throws {
         for change in changes {
             switch change {
             case .none:

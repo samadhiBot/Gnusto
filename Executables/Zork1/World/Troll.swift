@@ -1,4 +1,5 @@
 import GnustoEngine
+import GnustoMiddleware
 
 enum Troll {
     static let troll = Item(.troll)
@@ -181,7 +182,20 @@ enum Troll {
             let shouldPickUp = await engine.randomPercentage(chance: 80)
 
             if shouldPickUp {
-                return await ActionResult(
+                // Get combat middleware to initiate attack
+                guard let combat = engine.middleware(CombatMiddleware.self) else {
+                    return await ActionResult(
+                        """
+                        The troll, angered and humiliated, recovers his weapon. He appears to have
+                        an axe to grind with you.
+                        """,
+                        axe.setFlag(.omitDescription),
+                        axe.clearFlag(.isWeapon),
+                        axe.move(to: .item(.troll))
+                    )
+                }
+
+                return try await ActionResult(
                     """
                     The troll, angered and humiliated, recovers his weapon. He appears to have
                     an axe to grind with you.
@@ -191,7 +205,7 @@ enum Troll {
                     axe.move(to: .item(.troll))
                 )
                 .appending(
-                    engine.enemyAttacks(enemy: troll)
+                    await combat.enemyAttacks(enemy: troll, engine: engine)
                 )
             }
         }
@@ -266,11 +280,13 @@ extension Troll {
         if case .item(let axeParent) = await axe.parent,
             axeParent.id == .troll
         {
-            await changes.append(contentsOf: [
-                axe.move(to: .trollRoom),
-                axe.clearFlag(.omitDescription),
-                axe.setFlag(.isWeapon),
-            ])
+            await changes.append(
+                contentsOf: [
+                    axe.move(to: .trollRoom),
+                    axe.clearFlag(.omitDescription),
+                    axe.setFlag(.isWeapon),
+                ]
+            )
         }
 
         return ActionResult(

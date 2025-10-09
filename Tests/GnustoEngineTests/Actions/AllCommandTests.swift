@@ -1,4 +1,3 @@
-import CustomDump
 import GnustoEngine
 import GnustoTestSupport
 import Testing
@@ -218,7 +217,7 @@ struct AllCommandTests {
             guard case .item(let item) = entityReference else { return nil }
             return item.id
         }
-        expectNoDifference(pronounIDs, [coin.id, lamp.id, key.id])
+        #expect(pronounIDs == [coin.id, lamp.id, key.id])
     }
 
     @Test("DROP ALL with no held items")

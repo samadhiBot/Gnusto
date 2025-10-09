@@ -1,4 +1,3 @@
-import CustomDump
 import GnustoEngine
 import GnustoTestSupport
 import Testing
@@ -289,12 +288,12 @@ struct LocationProxyTests {
 
         // When/Then
         let exits = await proxy.exits
-        expectNoDifference(
-            exits,
-            [
+        #expect(
+            exits == [
                 .north("room2"),
                 .south("room3"),
-            ])
+            ]
+        )
     }
 
     @Test("LocationProxy local globals")

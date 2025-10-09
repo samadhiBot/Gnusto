@@ -1,4 +1,3 @@
-import CustomDump
 import GnustoEngine
 import GnustoTestSupport
 import Testing
@@ -550,7 +549,7 @@ struct TurnOnActionHandlerTests {
     func testVerbs() async throws {
         let handler = TurnOnActionHandler()
         // TurnOnActionHandler uses syntax rules, not verbs array
-        expectNoDifference(handler.synonyms, [.switch, .turn])
+        #expect(handler.synonyms == [.switch, .turn])
     }
 
     @Test("Handler does not require light in some cases")
@@ -562,9 +561,8 @@ struct TurnOnActionHandlerTests {
     @Test("Handler syntax rules are correct")
     func testSyntaxRules() async throws {
         let handler = TurnOnActionHandler()
-        expectNoDifference(
-            handler.syntax,
-            [
+        #expect(
+            handler.syntax == [
                 .match(.verb, .directObject, .on),
                 .match(.verb, .on, .directObject),
             ]

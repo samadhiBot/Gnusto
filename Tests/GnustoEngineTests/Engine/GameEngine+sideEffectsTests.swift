@@ -1,4 +1,3 @@
-import CustomDump
 import Foundation
 import GnustoTestSupport
 import Testing
@@ -332,7 +331,7 @@ struct GameEngineSideEffectsTests {
         try await engine.processActionResult(actionResult)
 
         let output = await mockIO.flush()
-        expectNoDifference(output, "The bomb timer starts ticking...")
+        #expect(output == "The bomb timer starts ticking...")
 
         // Verify side effects were processed
         let finalState = await engine.gameState

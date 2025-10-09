@@ -82,7 +82,7 @@ public actor GameEngine {
     ///
     /// For testing purposes, you can provide a custom implementation that returns
     /// predetermined values to ensure consistent test results.
-    public var randomNumberGenerator: any RandomNumberGenerator
+    public var rng: any RandomNumberGenerator
 
     /// Handles filesystem operations for save files, transcripts, and other game data.
     ///
@@ -132,39 +132,16 @@ public actor GameEngine {
         gameBlueprint.locationEventHandlers
     }
 
-    /// Combat systems for specific characters, providing custom combat behavior.
-    /// These are provided by the `GameBlueprint` and are used by the `AttackActionHandler`
-    /// to handle combat encounters with different character types.
-    nonisolated var combatSystems: [ItemID: any CombatSystem] {
-        gameBlueprint.combatSystems
-    }
-
-    /// Combat messengers for specific characters, providing custom combat messaging.
-    /// These are provided by the `GameBlueprint` and are used by combat systems
-    /// to generate narrative descriptions for combat events.
-    nonisolated var combatMessengers: [ItemID: CombatMessenger] {
-        gameBlueprint.combatMessengers
-    }
-
-    /// The default combat messenger used when no character-specific messenger is configured.
-    nonisolated var defaultCombatMessenger: CombatMessenger {
-        gameBlueprint.defaultCombatMessenger
-    }
-
     /// Stores the last command that encountered disambiguation for retry with clarification
     var lastDisambiguationContext: LastDisambiguationContext?
 
     /// Stores the last disambiguation options for matching against user responses
     var lastDisambiguationOptions: [String]?
 
-    /// Cache for dynamically created StandardCombatSystem instances to ensure consistency
-    /// across combat turns. This prevents creating new instances for each turn, which
-    /// could lead to different RNG call patterns and non-deterministic behavior.
-    var standardCombatSystemCache: [ItemID: StandardCombatSystem] = [:]
-
     /// Registered middleware components that can intercept and modify game loop execution.
     /// Middleware is registered via the `GameBlueprint` and executed in priority order.
-    var middleware: [any GameMiddleware] = []
+    /// This is immutable after initialization, making it safe to access from any context.
+    nonisolated(unsafe) var middleware: [any GnustoMiddleware] = []
 
     /// Internal logger for engine messages, warnings, and errors.
     let logger = Logger(label: "com.samadhibot.Gnusto.GameEngine")
@@ -172,15 +149,15 @@ public actor GameEngine {
     /// Internal flag to control the main game loop's continuation.
     /// Game developers can call `requestQuit()` to set this flag to `true`,
     /// causing the game to end after the current turn completes.
-    var shouldQuit: Bool = false
+    public var shouldQuit: Bool = false
 
     /// Internal flag to control game restart.
     /// Game developers can call `requestRestart()` to set this flag to `true`,
     /// causing the game to restart after the current turn completes.
-    var shouldRestart: Bool = false
+    public var shouldRestart: Bool = false
 
     /// Blueprint data for game restart and computed properties
-    let gameBlueprint: GameBlueprint
+    public let gameBlueprint: GameBlueprint
 
     // MARK: - Initialization
 
@@ -202,7 +179,7 @@ public actor GameEngine {
     ) async {
         // Store blueprint and basic configuration
         self.gameBlueprint = blueprint
-        self.randomNumberGenerator = blueprint.randomNumberGenerator
+        self.rng = UnifiedRNG()
         self.parser = parser
         self.ioHandler = ioHandler
         self.filesystemHandler = filesystemHandler

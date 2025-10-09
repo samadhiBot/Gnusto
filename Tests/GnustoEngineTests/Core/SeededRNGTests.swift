@@ -4,13 +4,13 @@ import Testing
 @testable import GnustoEngine
 @testable import GnustoTestSupport
 
-@Suite("SeededRandomNumberGenerator Tests")
-struct SeededRandomNumberGeneratorTests {
+@Suite("SeededRNG Tests")
+struct SeededRNGTests {
 
     @Test("Generator produces deterministic sequence with same seed")
     func testDeterministicSequence() {
-        let generator1 = SeededRandomNumberGenerator(seed: 42)
-        let generator2 = SeededRandomNumberGenerator(seed: 42)
+        let generator1 = SeededRNG(seed: 42)
+        let generator2 = SeededRNG(seed: 42)
 
         // Generate several numbers and verify they match
         for _ in 0..<10 {
@@ -22,8 +22,8 @@ struct SeededRandomNumberGeneratorTests {
 
     @Test("Generator produces different sequence with different seeds")
     func testDifferentSeeds() {
-        let generator1 = SeededRandomNumberGenerator(seed: 42)
-        let generator2 = SeededRandomNumberGenerator(seed: 123)
+        let generator1 = SeededRNG(seed: 42)
+        let generator2 = SeededRNG(seed: 123)
 
         let value1 = generator1.next()
         let value2 = generator2.next()
@@ -33,7 +33,7 @@ struct SeededRandomNumberGeneratorTests {
 
     @Test("Generator produces expected sequence for default seed")
     func testDefaultSeedSequence() {
-        let generator = SeededRandomNumberGenerator()
+        let generator = SeededRNG()
 
         // Test first few values with default seed (71)
         let expected: [UInt64] = [
@@ -49,7 +49,7 @@ struct SeededRandomNumberGeneratorTests {
 
     @Test("Thread safety - concurrent access does not crash")
     func testThreadSafety() async {
-        let generator = SeededRandomNumberGenerator(seed: 100)
+        let generator = SeededRNG(seed: 100)
         let numThreads = 10
         let numIterations = 1_000
 
@@ -87,11 +87,11 @@ struct SeededRandomNumberGeneratorTests {
         let seed: UInt64 = 42
 
         // Generate reference sequence single-threaded
-        let referenceGenerator = SeededRandomNumberGenerator(seed: seed)
+        let referenceGenerator = SeededRNG(seed: seed)
         let referenceSequence = (0..<100).map { _ in referenceGenerator.next() }
 
         // Generate test sequence using async tasks but in sequential order
-        let testGenerator = SeededRandomNumberGenerator(seed: seed)
+        let testGenerator = SeededRNG(seed: seed)
         var testSequence: [UInt64] = []
 
         for _ in 0..<100 {
@@ -111,9 +111,9 @@ struct SeededRandomNumberGeneratorTests {
         }
     }
 
-    @Test("Generator implements RandomNumberGenerator correctly")
+    @Test("Generator implements SendableRNG correctly")
     func testRandomNumberGeneratorConformance() {
-        let generator = SeededRandomNumberGenerator(seed: 999)
+        let generator = SeededRNG(seed: 999)
 
         // Test that we can use it as a RandomNumberGenerator
         var mutableGenerator = generator
@@ -129,7 +129,7 @@ struct SeededRandomNumberGeneratorTests {
 
     @Test("Generator state advances correctly")
     func testStateProgression() {
-        let generator = SeededRandomNumberGenerator(seed: 1)
+        let generator = SeededRNG(seed: 1)
 
         let values = (0..<5).map { _ in generator.next() }
 
@@ -141,9 +141,9 @@ struct SeededRandomNumberGeneratorTests {
     @Test("Multiple generators with same seed produce same sequence")
     func testMultipleGenerators() {
         let seed: UInt64 = 12_345
-        let generator1 = SeededRandomNumberGenerator(seed: seed)
-        let generator2 = SeededRandomNumberGenerator(seed: seed)
-        let generator3 = SeededRandomNumberGenerator(seed: seed)
+        let generator1 = SeededRNG(seed: seed)
+        let generator2 = SeededRNG(seed: seed)
+        let generator3 = SeededRNG(seed: seed)
 
         for _ in 0..<50 {
             let value1 = generator1.next()

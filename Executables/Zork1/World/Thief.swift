@@ -1,4 +1,5 @@
 import GnustoEngine
+import GnustoMiddleware
 
 /*
  TODO: update eventHandler processing in auto-wiring tool now that the item id is specified
@@ -107,7 +108,7 @@ extension Thief {
 
         when.before(.throw) { context, command in
             if command.directObject?.itemProxy?.id == .knife {
-                await throwNastyKnifeAtThief(in: context)
+                try await throwNastyKnifeAtThief(in: context)
             } else {
                 nil
             }
@@ -278,120 +279,125 @@ extension Thief {
 // MARK: - Combat System
 
 extension Thief {
-    static let thiefCombatSystem = StandardCombatSystem(
-        versus: .thief
-    ) { event, context async throws -> ActionResult? in
-        switch event {
+    static func thiefCombatSystem(
+        combatMessenger: CombatMessenger = CombatMessenger()
+    ) -> StandardCombatSystem {
+        StandardCombatSystem(
+            versus: .thief,
+            combatMessenger: combatMessenger
+        ) { event, context async throws -> ActionResult? in
+            switch event {
 
-        case .playerSlain:
-            await ActionResult(
-                context.combatMsg.oneOf(
-                    "The thief, forgetting his essentially genteel upbringing, cuts your throat.",
-                    "The thief, a pragmatist, dispatches you as a threat to his livelihood.",
-                    "Finishing you off, the thief inserts his blade into your heart.",
-                    "The thief comes in from the side, feints, and inserts the blade into your ribs.",
-                    """
-                    The thief bows formally, raises his stiletto,
-                    and with a wry grin, ends the battle and your life.
-                    """
+            case .playerSlain:
+                ActionResult(
+                    context.combatMsg.oneOf(
+                        "The thief, forgetting his essentially genteel upbringing, cuts your throat.",
+                        "The thief, a pragmatist, dispatches you as a threat to his livelihood.",
+                        "Finishing you off, the thief inserts his blade into your heart.",
+                        "The thief comes in from the side, feints, and inserts the blade into your ribs.",
+                        """
+                        The thief bows formally, raises his stiletto,
+                        and with a wry grin, ends the battle and your life.
+                        """
+                    )
                 )
-            )
 
-        case .playerUnconscious:
-            await ActionResult(
-                context.combatMsg.oneOf(
+            case .playerUnconscious:
+                ActionResult(
+                    context.combatMsg.oneOf(
                     """
                     Shifting in the midst of a thrust, the thief knocks you unconscious
                     with the haft of his stiletto.
                     """,
                     "The thief knocks you out."
+                    )
                 )
-            )
 
-        case .playerDisarmed(_, let playerWeapon, _, _):
-            await playerDisarmedResult(playerWeapon, context)
+            case .playerDisarmed(_, let playerWeapon, _, _):
+                await playerDisarmedResult(playerWeapon, context)
 
-        case .playerCriticallyWounded:
-            await ActionResult(
-                context.combatMsg.oneOf(
-                    "The butt of his stiletto cracks you on the skull, and you stagger back.",
-                    """
-                    The thief rams the haft of his blade into your stomach,
-                    leaving you out of breath.
-                    """,
-                    "The thief attacks, and you fall back desperately."
+            case .playerCriticallyWounded:
+                ActionResult(
+                    context.combatMsg.oneOf(
+                        "The butt of his stiletto cracks you on the skull, and you stagger back.",
+                        """
+                        The thief rams the haft of his blade into your stomach,
+                        leaving you out of breath.
+                        """,
+                        "The thief attacks, and you fall back desperately."
+                    )
                 )
-            )
 
-        case .playerGravelyInjured:
-            await ActionResult(
-                context.combatMsg.oneOf(
-                    "The thief strikes like a snake! The resulting wound is serious.",
-                    "The thief stabs a deep cut in your upper arm.",
-                    "The stiletto touches your forehead, and the blood obscures your vision.",
-                    "The thief strikes at your wrist, and suddenly your grip is slippery with blood."
+            case .playerGravelyInjured:
+                ActionResult(
+                    context.combatMsg.oneOf(
+                        "The thief strikes like a snake! The resulting wound is serious.",
+                        "The thief stabs a deep cut in your upper arm.",
+                        "The stiletto touches your forehead, and the blood obscures your vision.",
+                        "The thief strikes at your wrist, and suddenly your grip is slippery with blood."
+                    )
                 )
-            )
 
-        case .playerLightlyInjured:
-            await ActionResult(
-                context.combatMsg.oneOf(
-                    "A quick thrust pinks your left arm, and blood starts to trickle down.",
-                    "The thief draws blood, raking his stiletto across your arm.",
-                    "The stiletto flashes faster than you can follow, and blood wells from your leg.",
-                    "The thief slowly approaches, strikes like a snake, and leaves you wounded."
+            case .playerLightlyInjured:
+                ActionResult(
+                    context.combatMsg.oneOf(
+                        "A quick thrust pinks your left arm, and blood starts to trickle down.",
+                        "The thief draws blood, raking his stiletto across your arm.",
+                        "The stiletto flashes faster than you can follow, and blood wells from your leg.",
+                        "The thief slowly approaches, strikes like a snake, and leaves you wounded."
+                    )
                 )
-            )
 
-        case .playerMissed:
-            await ActionResult(
-                context.combatMsg.oneOf(
-                    "The thief stabs nonchalantly with his stiletto and misses.",
-                    "You dodge as the thief comes in low."
+            case .playerMissed:
+                ActionResult(
+                    context.combatMsg.oneOf(
+                        "The thief stabs nonchalantly with his stiletto and misses.",
+                        "You dodge as the thief comes in low."
+                    )
                 )
-            )
 
-        case .playerDodged:
-            await ActionResult(
-                context.combatMsg.oneOf(
-                    "You parry a lightning thrust, and the thief salutes you with a grim nod.",
-                    "The thief tries to sneak past your guard, but you twist away."
+            case .playerDodged:
+                ActionResult(
+                    context.combatMsg.oneOf(
+                        "You parry a lightning thrust, and the thief salutes you with a grim nod.",
+                        "The thief tries to sneak past your guard, but you twist away."
+                    )
                 )
-            )
 
-        case .enemyFlees:
-            await ActionResult(
-                context.combatMsg.output(
+            case .enemyFlees:
+                ActionResult(
+                    context.combatMsg.output(
                     """
                     Your opponent, determining discretion to be the better part of
                     valor, decides to terminate this little contretemps. With a rueful
                     nod of his head, he steps backward into the gloom and disappears.
                     """
+                    )
                 )
-            )
 
-        case .enemySpecialAction:
-            await ActionResult(
-                context.combatMsg.oneOf(
+            case .enemySpecialAction:
+                ActionResult(
+                    context.combatMsg.oneOf(
                     """
                     The thief, a man of superior breeding, pauses for a moment
                     to consider the propriety of finishing you off.
                     """,
                     "The thief amuses himself by searching your pockets.",
                     "The thief entertains himself by rifling your pack."
+                    )
                 )
-            )
 
-        case .enemySlain(let enemy, _, _, let damage):
-            await thiefSlainResult(context, enemy, damage)
+            case .enemySlain(let enemy, _, _, let damage):
+                await thiefSlainResult(context, enemy, damage)
 
-        default:
-            nil
+            default:
+                nil
+            }
         }
     }
 
     static func thiefSlainResult(
-        _ context: ActionContext,
+        _ context: CombatEventContext,
         _ enemy: ItemProxy,
         _ damage: Int
     ) async -> ActionResult? {
@@ -455,11 +461,11 @@ extension Thief {
 
     static func playerDisarmedResult(
         _ playerWeapon: ItemProxy,
-        _ context: ActionContext
+        _ context: CombatEventContext
     ) async -> ActionResult? {
         let weapon = await playerWeapon.alias(.withPossessiveAdjective)
         let weaponAlt = await playerWeapon.alias(.withPossessiveAdjective)
-        return await ActionResult(
+        return ActionResult(
             context.combatMsg.oneOf(
                 """
                 A long, theatrical slash. You catch it on \(weapon),
@@ -511,7 +517,7 @@ extension Thief {
 
     static func throwNastyKnifeAtThief(
         in context: ItemEventContext
-    ) async -> ActionResult? {
+    ) async throws -> ActionResult? {
         let nastyKnife = await context.item(.knife)
 
         guard await context.player.isHolding(nastyKnife.id) else { return nil }
@@ -531,7 +537,18 @@ extension Thief {
                 thief.remove()
             )
         } else {
-            return ActionResult(
+            // Get combat middleware to initiate attack
+            guard let combat = context.middleware(CombatMiddleware.self) else {
+                return ActionResult(
+                    """
+                    You missed. The thief makes no attempt to take the knife, though it
+                    would be a fine addition to the collection in his bag. He does seem
+                    angered by your attempt.
+                    """
+                )
+            }
+
+            return try await ActionResult(
                 """
                 You missed. The thief makes no attempt to take the knife, though it
                 would be a fine addition to the collection in his bag. He does seem
@@ -539,7 +556,7 @@ extension Thief {
                 """
             )
             .appending(
-                await context.engine.enemyAttacks(enemy: thief)
+                combat.enemyAttacks(enemy: thief, engine: context.engine)
             )
         }
     }

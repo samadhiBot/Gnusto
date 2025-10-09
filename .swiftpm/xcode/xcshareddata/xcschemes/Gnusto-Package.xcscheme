@@ -105,6 +105,34 @@
                ReferencedContainer = "container:">
             </BuildableReference>
          </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "Middleware"
+               BuildableName = "Middleware"
+               BlueprintName = "Middleware"
+               ReferencedContainer = "container:">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "GnustoMiddleware"
+               BuildableName = "GnustoMiddleware"
+               BlueprintName = "GnustoMiddleware"
+               ReferencedContainer = "container:">
+            </BuildableReference>
+         </BuildActionEntry>
       </BuildActionEntries>
    </BuildAction>
    <TestAction
@@ -181,6 +209,26 @@
                BlueprintIdentifier = "FrobozzMagicDemoKitTests"
                BuildableName = "FrobozzMagicDemoKitTests"
                BlueprintName = "FrobozzMagicDemoKitTests"
+               ReferencedContainer = "container:">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "MiddlewareTests"
+               BuildableName = "MiddlewareTests"
+               BlueprintName = "MiddlewareTests"
+               ReferencedContainer = "container:">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "GnustoMiddlewareTests"
+               BuildableName = "GnustoMiddlewareTests"
+               BlueprintName = "GnustoMiddlewareTests"
                ReferencedContainer = "container:">
             </BuildableReference>
          </TestableReference>

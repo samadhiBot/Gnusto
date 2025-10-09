@@ -1,4 +1,5 @@
 import Foundation
+import GnustoEngine
 import Logging
 
 /// Default implementation of turn-based melee combat system with D&D-style mechanics.
@@ -13,12 +14,16 @@ public struct StandardCombatSystem: CombatSystem {
     /// The identifier of the enemy this combat system applies to.
     public let enemyID: ItemID
 
+    /// The combat messenger used for generating combat messages.
+    public let combatMessenger: CombatMessenger
+
     /// Private logger for combat system messages, warnings, and errors.
     private let logger = Logger(label: "com.samadhibot.Gnusto.StandardCombatSystem")
 
     /// A closure that provides custom combat event handling with complete control over messages
     /// and state changes.
-    public let eventHandler: @Sendable (CombatEvent, ActionContext) async throws -> ActionResult?
+    public let eventHandler:
+        @Sendable (CombatEvent, CombatEventContext) async throws -> ActionResult?
 
     /// Creates a default combat system for the specified enemy.
     ///
@@ -29,16 +34,19 @@ public struct StandardCombatSystem: CombatSystem {
     ///
     /// - Parameters:
     ///   - enemyID: The identifier of the enemy this system applies to
+    ///   - combatMessenger: The combat messenger for generating messages
     ///   - eventHandler: Optional closure for custom combat event handling
     public init(
         versus enemyID: ItemID,
+        combatMessenger: CombatMessenger = CombatMessenger(),
         eventHandler:
             @escaping @Sendable (
                 CombatEvent,
-                ActionContext
+                CombatEventContext
             ) async throws -> ActionResult? = { _, _ in nil }
     ) {
         self.enemyID = enemyID
+        self.combatMessenger = combatMessenger
         self.eventHandler = eventHandler
     }
 
@@ -55,9 +63,9 @@ public struct StandardCombatSystem: CombatSystem {
         let enemy = await context.item(enemyID)
 
         guard await enemy.isAlive else {
-            return await ActionResult(
+            return try await ActionResult(
                 context.msg.alreadyDead(enemy.withDefiniteArticle),
-                context.engine.endCombat()
+                CombatMiddleware.endCombat()
             )
         }
 
@@ -68,8 +76,8 @@ public struct StandardCombatSystem: CombatSystem {
             enemyLocationID == playerLocationID
         else {
             // Enemy and player are in different locations - end combat
-            return await ActionResult(
-                context.engine.endCombat()
+            return try ActionResult(
+                CombatMiddleware.endCombat()
             )
         }
 
@@ -103,7 +111,7 @@ public struct StandardCombatSystem: CombatSystem {
         )
 
         // Occasionally add a random enemy taunt
-        if let enemyTaunt = await selectTaunt(from: enemy, in: combatTurn) {
+        if let enemyTaunt = await selectTaunt(from: enemy, in: combatTurn, context: context) {
             combatTurn.addEvent(enemyTaunt)
         }
 
@@ -119,7 +127,9 @@ public struct StandardCombatSystem: CombatSystem {
         // Add combat state update to the result only if combat continues
         let combinedChanges: [StateChange]
         if let updatedCombatState {
-            let combatStateChange = await context.engine.setCombatState(to: updatedCombatState)
+            let combatStateChange = try CombatMiddleware.setCombatState(
+                to: updatedCombatState
+            )
             combinedChanges = result.changes + [combatStateChange]
         } else {
             combinedChanges = result.changes
@@ -165,7 +175,7 @@ public struct StandardCombatSystem: CombatSystem {
         let engine = context.engine
 
         // Get current combat state for intensity and fatigue calculations
-        let combatState = await engine.combatState
+        let combatState = await self.combatState(from: engine)
         let intensity = combatState?.combatIntensity ?? 0.1
         let attackerFatigue =
             switch attacker {
@@ -235,7 +245,7 @@ public struct StandardCombatSystem: CombatSystem {
             default: "Hit!"
             }
 
-        logger.debug(
+        logger.info(
             """
             \n🎲 \(attacker.description.capitalizedFirst.possessive) attack roll:
             ------------------------------------
@@ -506,7 +516,7 @@ public struct StandardCombatSystem: CombatSystem {
             currentHealth: await defender.health
         )
 
-        logger.debug(
+        logger.info(
             """
             \n🎲 \(attacker.description.capitalizedFirst.possessive) damage roll:
             ------------------------------------
@@ -516,6 +526,8 @@ public struct StandardCombatSystem: CombatSystem {
             new health:   \(defenderHealth - damage)\n
             """
         )
+
+        let player = await engine.player
 
         // Return appropriate event based on who is attacking
         return switch (attacker, defender) {
@@ -531,30 +543,35 @@ public struct StandardCombatSystem: CombatSystem {
                 .playerCriticallyWounded(
                     enemy: enemy,
                     enemyWeapon: enemyWeapon,
+                    player: player,
                     damage: damage
                 )
             case .grave:
                 .playerGravelyInjured(
                     enemy: enemy,
                     enemyWeapon: enemyWeapon,
+                    player: player,
                     damage: damage
                 )
             case .moderate:
                 .playerInjured(
                     enemy: enemy,
                     enemyWeapon: enemyWeapon,
+                    player: player,
                     damage: damage
                 )
             case .light:
                 .playerLightlyInjured(
                     enemy: enemy,
                     enemyWeapon: enemyWeapon,
+                    player: player,
                     damage: damage
                 )
             case .scratch:
                 .playerGrazed(
                     enemy: enemy,
                     enemyWeapon: enemyWeapon,
+                    player: player,
                     damage: damage
                 )
             case .none:
@@ -650,7 +667,7 @@ public struct StandardCombatSystem: CombatSystem {
 
         // Calculate current health percentage and get combat state
         let healthPercent = 100 * characterSheet.health / characterSheet.maxHealth
-        let combatState = await context.engine.combatState
+        let combatState = await self.combatState(from: context.engine)
         let enemyFatigue = combatState?.enemyFatigue ?? 0.0
         let intensity = combatState?.combatIntensity ?? 0.1
 
@@ -739,20 +756,20 @@ public struct StandardCombatSystem: CombatSystem {
                     // Special opportunity attacks on distracted opponents
                     return switch opportunityRoll {
                     case 20:
-                            .playerVulnerable(
-                                enemy: enemy,
-                                enemyWeapon: enemyWeapon
-                            )
+                        .playerVulnerable(
+                            enemy: enemy,
+                            enemyWeapon: enemyWeapon
+                        )
                     case 18...19:
-                            .playerStaggers(
-                                enemy: enemy,
-                                enemyWeapon: enemyWeapon
-                            )
+                        .playerStaggers(
+                            enemy: enemy,
+                            enemyWeapon: enemyWeapon
+                        )
                     default:
-                            .playerHesitates(
-                                enemy: enemy,
-                                enemyWeapon: enemyWeapon
-                            )
+                        .playerHesitates(
+                            enemy: enemy,
+                            enemyWeapon: enemyWeapon
+                        )
                     }
                 }
             }
@@ -780,48 +797,55 @@ public struct StandardCombatSystem: CombatSystem {
                 currentHealth: await context.player.health
             )
 
+            let player = await context.player
+
             return switch category {
             case .fatal:
-                    .playerSlain(
-                        enemy: enemy,
-                        enemyWeapon: enemyWeapon,
-                        damage: damage
-                    )
+                .playerSlain(
+                    enemy: enemy,
+                    enemyWeapon: enemyWeapon,
+                    damage: damage
+                )
             case .critical:
-                    .playerCriticallyWounded(
-                        enemy: enemy,
-                        enemyWeapon: enemyWeapon,
-                        damage: damage
-                    )
+                .playerCriticallyWounded(
+                    enemy: enemy,
+                    enemyWeapon: enemyWeapon,
+                    player: player,
+                    damage: damage
+                )
             case .grave:
-                    .playerGravelyInjured(
-                        enemy: enemy,
-                        enemyWeapon: enemyWeapon,
-                        damage: damage
-                    )
+                .playerGravelyInjured(
+                    enemy: enemy,
+                    enemyWeapon: enemyWeapon,
+                    player: player,
+                    damage: damage
+                )
             case .moderate:
-                    .playerInjured(
-                        enemy: enemy,
-                        enemyWeapon: enemyWeapon,
-                        damage: damage
-                    )
+                .playerInjured(
+                    enemy: enemy,
+                    enemyWeapon: enemyWeapon,
+                    player: player,
+                    damage: damage
+                )
             case .light:
-                    .playerLightlyInjured(
-                        enemy: enemy,
-                        enemyWeapon: enemyWeapon,
-                        damage: damage
-                    )
+                .playerLightlyInjured(
+                    enemy: enemy,
+                    enemyWeapon: enemyWeapon,
+                    player: player,
+                    damage: damage
+                )
             case .scratch:
-                    .playerGrazed(
-                        enemy: enemy,
-                        enemyWeapon: enemyWeapon,
-                        damage: damage
-                    )
+                .playerGrazed(
+                    enemy: enemy,
+                    enemyWeapon: enemyWeapon,
+                    player: player,
+                    damage: damage
+                )
             case .none:
-                    .playerDodged(
-                        enemy: enemy,
-                        enemyWeapon: enemyWeapon
-                    )
+                .playerDodged(
+                    enemy: enemy,
+                    enemyWeapon: enemyWeapon
+                )
             }
         }
 
@@ -844,15 +868,17 @@ public struct StandardCombatSystem: CombatSystem {
     func selectTaunt(
         from enemy: ItemProxy,
         in combatTurn: CombatTurn,
+        context: ActionContext,
         tauntRoll: Int = 13
     ) async -> CombatEvent? {
-        guard await enemy.engine.rollD20(rollsAtLeast: tauntRoll) else {
+        let engine = context.engine
+        guard await engine.rollD20(rollsAtLeast: tauntRoll) else {
             return nil
         }
         let enemyTauntChance = combatTurn.enemyEvent?.chanceToProvokeEnemyTaunt ?? 0
         let playerTauntChance = combatTurn.playerEvent?.chanceToProvokeEnemyTaunt ?? 0
-        if await enemy.engine.randomDouble() < max(enemyTauntChance, playerTauntChance),
-            let taunt = await enemy.engine.randomElement(in: enemy.characterSheet.taunts)
+        if await engine.randomDouble() < max(enemyTauntChance, playerTauntChance),
+            let taunt = await engine.randomElement(in: enemy.characterSheet.taunts)
         {
             return .enemyTaunts(enemy: enemy, message: taunt)
         }
@@ -1000,7 +1026,7 @@ public struct StandardCombatSystem: CombatSystem {
         after turn: CombatTurn,
         in context: ActionContext
     ) async -> CombatState? {
-        guard let currentState = await context.engine.combatState else {
+        guard let currentState = await combatState(from: context.engine) else {
             // Create initial combat state if none exists
             return CombatState(
                 enemyID: enemyID,
@@ -1293,12 +1319,19 @@ public struct StandardCombatSystem: CombatSystem {
     ///   - context: Action context for accessing messaging and game state
     /// - Returns: An ActionResult with combined messages and state changes
     /// - Throws: Errors from message generation or state change creation
+    /// - Returns: A merged ActionResult containing all event outcomes.
     func generateTurnResult(
         _ turn: CombatTurn,
         in context: ActionContext
     ) async throws -> ActionResult {
-        try await turn.allEvents.asyncMap {
-            try await generateEventResult(for: $0, in: context)
+        // Create combat event context for event generation
+        let combatContext = CombatEventContext(
+            from: context,
+            combatMessenger: combatMessenger
+        )
+
+        return try await turn.allEvents.asyncMap {
+            try await generateEventResult(for: $0, in: combatContext)
         }
         .merged()
     }
@@ -1320,7 +1353,7 @@ public struct StandardCombatSystem: CombatSystem {
     /// - Throws: Errors from state change creation or attribute access
     func generateEventResult(
         for event: CombatEvent,
-        in context: ActionContext
+        in context: CombatEventContext
     ) async throws -> ActionResult {
         // Check for custom event handling first
         if let customResult = try await eventHandler(event, context) {
@@ -1332,7 +1365,8 @@ public struct StandardCombatSystem: CombatSystem {
 
             case .append:
                 // Append custom content after default content
-                let defaultResult = try await generateDefaultEventResult(for: event, in: context)
+                let defaultResult = try await generateDefaultEventResult(
+                    for: event, in: context)
                 let combinedMessage: String? = {
                     switch (defaultResult.message, customResult.message) {
                     case (let defaultMsg?, let customMsg?):
@@ -1354,7 +1388,8 @@ public struct StandardCombatSystem: CombatSystem {
 
             case .prepend:
                 // Prepend custom content before default content
-                let defaultResult = try await generateDefaultEventResult(for: event, in: context)
+                let defaultResult = try await generateDefaultEventResult(
+                    for: event, in: context)
                 let combinedMessage: String? = {
                     switch (customResult.message, defaultResult.message) {
                     case (let customMsg?, let defaultMsg?):
@@ -1392,12 +1427,20 @@ public struct StandardCombatSystem: CombatSystem {
         return try await generateDefaultEventResult(for: event, in: context)
     }
 
+    // MARK: - Helper Methods
+
+    /// Gets the current combat state from the game engine.
+    private func combatState(from engine: GameEngine) async -> CombatState? {
+        await engine.gameState.globalState[.combatMiddlewareState]?.toCodable(as: CombatState.self)
+    }
+
     /// Generates the default combat event result with standard messaging and changes.
     func generateDefaultEventResult(
         for event: CombatEvent,
-        in context: ActionContext
+        in context: CombatEventContext
     ) async throws -> ActionResult {
-        let description = await defaultCombatDescription(of: event, via: context.combatMsg)
+        let combatMsg = context.combatMsg
+        let description = await defaultCombatDescription(of: event, via: combatMsg)
 
         switch event {
 
@@ -1411,10 +1454,10 @@ public struct StandardCombatSystem: CombatSystem {
         // Enemy damage events
 
         case .enemySlain(let enemy, _, _, let damage):
-            return await ActionResult(
+            return try await ActionResult(
                 description,
                 enemy.takeDamage(damage),
-                context.engine.endCombat(),
+                CombatMiddleware.endCombat(),
                 enemy.setCharacterAttributes(
                     consciousness: .dead,
                     isFighting: false
@@ -1426,13 +1469,13 @@ public struct StandardCombatSystem: CombatSystem {
                 message: description,
                 changes: [
                     enemy.setCharacterAttributes(consciousness: .unconscious),
-                    context.engine.endCombat(),
+                    CombatMiddleware.endCombat(),
                 ],
                 effects: [
                     .startEnemyWakeUpFuse(
                         enemyID: enemy.id,
                         locationID: await context.player.location.id,
-                        message: context.combatMsg.enemyWakes(enemy: enemy),
+                        message: combatMsg.enemyWakes(enemy: enemy),
                         turns: context.engine.randomInt(in: 3...6)
                     ),
                 ]
@@ -1454,7 +1497,7 @@ public struct StandardCombatSystem: CombatSystem {
         // Player damage events
 
         case .playerSlain(let enemy, _, let damage):
-            return await ActionResult(
+            return try await ActionResult(
                 description,
                 context.player.takeDamage(damage),
                 context.player.setCharacterAttributes(
@@ -1462,7 +1505,7 @@ public struct StandardCombatSystem: CombatSystem {
                     isFighting: false
                 ),
                 enemy.setCharacterAttributes(isFighting: false),
-                context.engine.endCombat()
+                CombatMiddleware.endCombat()
             )
 
         case .playerUnconscious(let enemy, _, let damage):
@@ -1470,24 +1513,24 @@ public struct StandardCombatSystem: CombatSystem {
                 message: description,
                 changes: [
                     context.player.takeDamage(damage),
-                    context.engine.endCombat(),
+                    CombatMiddleware.endCombat(),
                     enemy.remove(),
                 ],
                 effects: [
                     .startEnemyReturnFuse(
                         enemyID: enemy.id,
                         to: await context.player.location.id,
-                        message: context.combatMsg.enemyReturns(enemy: enemy),
+                        message: combatMsg.enemyReturns(enemy: enemy),
                         turns: context.engine.randomInt(in: 2...4)
                     ),
                 ]
             )
 
-        case .playerCriticallyWounded(_, _, let damage),
-            .playerGravelyInjured(_, _, let damage),
-            .playerInjured(_, _, let damage),
-            .playerLightlyInjured(_, _, let damage),
-            .playerGrazed(_, _, let damage):
+        case .playerCriticallyWounded(_, _, _, let damage),
+            .playerGravelyInjured(_, _, _, let damage),
+            .playerInjured(_, _, _, let damage),
+            .playerLightlyInjured(_, _, _, let damage),
+            .playerGrazed(_, _, _, let damage):
             return await ActionResult(
                 description,
                 context.player.takeDamage(damage)
@@ -1525,9 +1568,9 @@ public struct StandardCombatSystem: CombatSystem {
 
         case .enemyFlees(let enemy, _, _, let destination):
             if let destination {
-                return await ActionResult(
+                return try ActionResult(
                     description,
-                    context.engine.endCombat(),
+                    CombatMiddleware.endCombat(),
                     enemy.move(to: destination),
                 )
             } else {
@@ -1535,9 +1578,9 @@ public struct StandardCombatSystem: CombatSystem {
             }
 
         case .enemyPacified(let enemy, _):
-            return await ActionResult(
+            return try await ActionResult(
                 description,
-                context.engine.endCombat(),
+                CombatMiddleware.endCombat(),
                 enemy.setCharacterAttributes(isFighting: false),
             )
 
@@ -1545,9 +1588,9 @@ public struct StandardCombatSystem: CombatSystem {
             var sheet = await enemy.characterSheet
             sheet.isFighting = false
             sheet.combatCondition = .surrendered
-            return await ActionResult(
+            return try await ActionResult(
                 description,
-                context.engine.endCombat(),
+                CombatMiddleware.endCombat(),
                 enemy.setCharacterAttributes(
                     combatCondition: .surrendered,
                     isFighting: false
@@ -1559,9 +1602,10 @@ public struct StandardCombatSystem: CombatSystem {
             return ActionResult(description)
 
         case .playerDisarmed(_, let playerWeapon, _, _):
-            return await ActionResult(
+            let playerLocation = await context.player.location
+            return ActionResult(
                 description,
-                playerWeapon.move(to: context.player.player.currentLocationID)
+                playerWeapon.move(to: playerLocation.id)
             )
 
         case .playerStaggers, .playerHesitates, .playerVulnerable:
@@ -1581,7 +1625,7 @@ public struct StandardCombatSystem: CombatSystem {
     /// - Parameter engine: The game engine to access combat state and create proxies
     /// - Returns: The enemy's weapon as an ItemProxy, or nil if no weapon or no combat
     func getEnemyWeapon(from engine: GameEngine) async -> ItemProxy? {
-        guard let combatState = await engine.combatState else { return nil }
+        guard let combatState = await self.combatState(from: engine) else { return nil }
         return await combatState.enemyWeapon(with: engine)
     }
 

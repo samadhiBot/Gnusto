@@ -3,6 +3,7 @@ import GnustoTestSupport
 import Testing
 
 @testable import GnustoEngine
+@testable import GnustoMiddleware
 
 @Suite("GameEngine Combat Tests")
 struct GameEngineCombatTests {
@@ -11,10 +12,12 @@ struct GameEngineCombatTests {
 
     @Test("isInCombat returns false when no combat state exists")
     func testIsInCombatFalseWhenNoCombat() async throws {
-        let game = MinimalGame()
+        let game = MinimalGame(
+            middleware: [CombatMiddleware.mock]
+        )
         let (engine, _) = await GameEngine.test(blueprint: game)
 
-        #expect(await engine.isInCombat == false)
+        #expect(await CombatMiddleware.isInCombat(in: engine) == false)
     }
 
     @Test("isInCombat returns true when combat state exists")
@@ -25,7 +28,8 @@ struct GameEngineCombatTests {
             .in(.startRoom)
 
         let game = MinimalGame(
-            items: enemy
+            items: enemy,
+            middleware: [CombatMiddleware.mock]
         )
 
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
@@ -39,15 +43,16 @@ struct GameEngineCombatTests {
             No weapons needed as you attack with pure violence while the
             goblin braces for the inevitable collision of flesh and bone.
 
-            You catch the goblin with minimal force, the blow almost
-            gentle. It registers the wound with annoyance.
+            Your strike grazes the goblin, more push than punch. It
+            registers the wound with annoyance.
 
-            The goblin's counter-punch goes wide, rage making the strike
-            clumsy and predictable.
+            In the tangle, the goblin drives an elbow home -- sudden
+            pressure that blooms into dull pain. The cut registers dimly.
+            Blood, but not enough to matter.
             """
         )
 
-        #expect(await engine.isInCombat == true)
+        #expect(await CombatMiddleware.isInCombat(in: engine) == true)
     }
 
     @Test("combatState returns nil when no combat exists")
@@ -55,7 +60,7 @@ struct GameEngineCombatTests {
         let game = MinimalGame()
         let (engine, _) = await GameEngine.test(blueprint: game)
 
-        #expect(await engine.combatState == nil)
+        #expect(await CombatMiddleware.combatState(in: engine) == nil)
     }
 
     @Test("combatState returns combat state when in combat")
@@ -71,7 +76,8 @@ struct GameEngineCombatTests {
             .in(.player)
 
         let game = MinimalGame(
-            items: enemy, weapon
+            items: enemy, weapon,
+            middleware: [CombatMiddleware.mock]
         )
 
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
@@ -86,16 +92,16 @@ struct GameEngineCombatTests {
             the orc can only dodge and weave against the advantage of
             sharpened metal.
 
-            You swing the sword at the orc with desperate creativity! It
-            prepare to defend against your improvised assault.
+            Brandishing the sword, you advance on the orc! It's
+            unconventional, but might just work.
 
-            The orc crashes forward in response, the impact jarring but
-            glancing as you roll with it. Pain flickers and dies. Your body
-            has more important work.
+            The orc answers with raw violence, a clubbing strike that finds
+            you but lacks the angle to truly hurt. Pain flickers and dies.
+            Your body has more important work.
             """
         )
 
-        let combatState = await engine.combatState
+        let combatState = await CombatMiddleware.combatState(in: engine)
         let expected = CombatState(
             enemyID: "orc",
             roundCount: 1,
@@ -117,7 +123,8 @@ struct GameEngineCombatTests {
             .in(.startRoom)
 
         let game = MinimalGame(
-            items: dragon
+            items: dragon,
+            middleware: [CombatMiddleware.mock]
         )
 
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
@@ -141,7 +148,7 @@ struct GameEngineCombatTests {
         )
 
         // Then: Combat state should be created
-        let combatState = await engine.combatState
+        let combatState = await CombatMiddleware.combatState(in: engine)
         expectNoDifference(
             combatState,
             CombatState(
@@ -164,7 +171,8 @@ struct GameEngineCombatTests {
             .in(.player)
 
         let game = MinimalGame(
-            items: Lab.nastyTroll.fighting, axe
+            items: Lab.nastyTroll.fighting, axe,
+            middleware: [CombatMiddleware.mock]
         )
 
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
@@ -181,14 +189,14 @@ struct GameEngineCombatTests {
 
             There is a nasty troll here.
 
-            The fearsome beast abandons caution and lunges straight at you!
-            Your battle axe suddenly feels less reassuring as the distance
-            vanishes.
+            Despite having no weapon, the fearsome beast charges with
+            terrifying resolve! You grip your battle axe tighter, knowing
+            you'd better use this advantage.
             """
         )
 
         // Then: Combat state should be created
-        let combatState = await engine.combatState
+        let combatState = await CombatMiddleware.combatState(in: engine)
         expectNoDifference(
             combatState,
             CombatState(
@@ -209,7 +217,8 @@ struct GameEngineCombatTests {
             .in(.startRoom)
 
         let game = MinimalGame(
-            items: skeleton
+            items: skeleton,
+            middleware: [CombatMiddleware.mock]
         )
 
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
@@ -224,22 +233,23 @@ struct GameEngineCombatTests {
             skeleton warrior braces for the inevitable collision of flesh
             and bone.
 
-            You catch the skeleton warrior with minimal force, the blow
-            almost gentle. It registers the wound with annoyance.
+            Your strike grazes the skeleton warrior, more push than punch.
+            It registers the wound with annoyance.
 
-            The skeleton warrior's counter-punch goes wide, rage making the
-            strike clumsy and predictable.
+            In the tangle, the skeleton warrior drives an elbow home --
+            sudden pressure that blooms into dull pain. The cut registers
+            dimly. Blood, but not enough to matter.
             """
         )
 
         // Then: Combat state should be created
-        let combatState = await engine.combatState
+        let combatState = await CombatMiddleware.combatState(in: engine)
         let expectedSkeleton = CombatState(
             enemyID: "skeleton",
             roundCount: 1,
             playerWeaponID: nil,
-            combatIntensity: 0.23,
-            playerFatigue: 0.14,
+            combatIntensity: 0.33999999999999997,
+            playerFatigue: 0.18,
             enemyFatigue: 0.18
         )
         expectNoDifference(combatState, expectedSkeleton)
@@ -262,7 +272,8 @@ struct GameEngineCombatTests {
             .in(.player)
 
         let game = MinimalGame(
-            items: zombie, mace
+            items: zombie, mace,
+            middleware: [CombatMiddleware.mock]
         )
 
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
@@ -277,18 +288,17 @@ struct GameEngineCombatTests {
             as the shambling zombie can only dodge and weave against the
             advantage of sharpened metal.
 
-            You swing the iron mace at the shambling zombie with desperate
-            creativity! It prepare to defend against your improvised
-            assault.
+            Brandishing the iron mace, you advance on the shambling zombie!
+            It's unconventional, but might just work.
 
-            The shambling zombie crashes forward in response, the impact
-            jarring but glancing as you roll with it. Pain flickers and
-            dies. Your body has more important work.
+            The shambling zombie answers with raw violence, a clubbing
+            strike that finds you but lacks the angle to truly hurt. Pain
+            flickers and dies. Your body has more important work.
             """
         )
 
         // Then: Combat state should be created
-        let combatState = await engine.combatState
+        let combatState = await CombatMiddleware.combatState(in: engine)
         let expectedZombie = CombatState(
             enemyID: "zombie",
             roundCount: 1,
@@ -310,7 +320,8 @@ struct GameEngineCombatTests {
             .in(.startRoom)
 
         let game = MinimalGame(
-            items: goblin
+            items: goblin,
+            middleware: [CombatMiddleware.mock]
         )
 
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
@@ -324,141 +335,15 @@ struct GameEngineCombatTests {
             No weapons needed as you attack with pure violence while the
             goblin braces for the inevitable collision of flesh and bone.
 
-            You catch the goblin with minimal force, the blow almost
-            gentle. It registers the wound with annoyance.
+            Your strike grazes the goblin, more push than punch. It
+            registers the wound with annoyance.
 
-            The goblin's counter-punch goes wide, rage making the strike
-            clumsy and predictable.
+            In the tangle, the goblin drives an elbow home -- sudden
+            pressure that blooms into dull pain. The cut registers dimly.
+            Blood, but not enough to matter.
             """
         )
     }
-
-    // MARK: - Get Player Action Tests
-
-    @Test("getPlayerAction converts attack intents to attack action")
-    func testGetPlayerActionAttackIntents() async throws {
-        let game = MinimalGame()
-        let (engine, _) = await GameEngine.test(blueprint: game)
-
-        let combatState = CombatState(enemyID: "enemy", roundCount: 1)
-
-        let attackVerbs: [Verb] = [.attack, .burn, .cut, .eat]
-
-        for verb in attackVerbs {
-            let command = Command(verb: verb)
-            let action = await engine.getPlayerAction(
-                for: command,
-                in: combatState
-            )
-            #expect(action == .attack)
-        }
-    }
-
-    @Test("getPlayerAction converts ask/tell intents to talk action")
-    func testGetPlayerActionTalkIntents() async throws {
-        let game = MinimalGame()
-        let (engine, _) = await GameEngine.test(blueprint: game)
-
-        let combatState = CombatState(enemyID: "enemy", roundCount: 1)
-
-        // Test ask without topic
-        let command = Command(verb: .ask)
-        let askAction = await engine.getPlayerAction(for: command, in: combatState)
-        if case .talk(let topic) = askAction {
-            #expect(topic == nil)
-        } else {
-            #expect(Bool(false), "Ask should map to .talk action")
-        }
-
-        // Test tell - since we can't easily create indirectObject, test basic tell
-        let tellCommand = Command(verb: .tell)
-        let tellAction = await engine.getPlayerAction(for: tellCommand, in: combatState)
-        if case .talk(let topic) = tellAction {
-            #expect(topic == nil)
-        } else {
-            #expect(Bool(false), "Tell should map to .talk action")
-        }
-    }
-
-    @Test("getPlayerAction converts move intent to flee action")
-    func testGetPlayerActionMoveIntent() async throws {
-        let game = MinimalGame()
-        let (engine, _) = await GameEngine.test(blueprint: game)
-
-        let combatState = CombatState(enemyID: "enemy", roundCount: 1)
-
-        let moveCommand = Command(verb: .move, direction: .north)
-        let action = await engine.getPlayerAction(for: moveCommand, in: combatState)
-
-        if case .flee(let direction) = action {
-            #expect(direction == .north)
-        } else {
-            #expect(Bool(false), "Move should map to .flee action")
-        }
-    }
-
-    //    @Test("getPlayerAction converts defend intent to defend action")
-    //    func testGetPlayerActionDefendIntent() async throws {
-    //        let game = MinimalGame()
-    //        let (engine, _) = await GameEngine.test(blueprint: game)
-    //
-    //        let combatState = CombatState(enemyID: "enemy", roundCount: 1)
-    //
-    //        let defendCommand = Command(verb: .block)  // Using block as defensive verb
-    //        let action = await engine.getPlayerAction(for: defendCommand, in: combatState)
-    //        switch action {
-    //        case .defend:
-    //            // Expected case
-    //            break
-    //        default:
-    //            #expect(Bool(false), "Block command should map to .defend action but got \(action)")
-    //        }
-    //    }
-
-    @Test("getPlayerAction converts give intent with item to useItem action")
-    func testGetPlayerActionGiveIntentWithItem() async throws {
-        let potion = Item("potion")
-            .name("health potion")
-            .isTakable
-            .in(.player)
-
-        let game = MinimalGame(
-            items: potion
-        )
-
-        let (engine, _) = await GameEngine.test(blueprint: game)
-
-        let combatState = CombatState(enemyID: "enemy", roundCount: 1)
-        let potionProxy = await engine.item("potion")
-
-        let giveCommand = Command(verb: .give, directObject: .item(potionProxy))
-        let action = await engine.getPlayerAction(for: giveCommand, in: combatState)
-
-        if case .useItem(let item) = action {
-            #expect(item.id == "potion")
-        } else {
-            #expect(Bool(false), "Give with item should map to .useItem action")
-        }
-    }
-
-    @Test("getPlayerAction defaults to other action for unrecognized intents")
-    func testGetPlayerActionDefaultsToOther() async throws {
-        let game = MinimalGame()
-        let (engine, _) = await GameEngine.test(blueprint: game)
-
-        let combatState = CombatState(enemyID: "enemy", roundCount: 1)
-
-        let unknownCommand = Command(verb: .look)
-        let action = await engine.getPlayerAction(for: unknownCommand, in: combatState)
-        switch action {
-        case .other:
-            // Expected case
-            break
-        default:
-            #expect(Bool(false), "Look command should map to .other action but got \(action)")
-        }
-    }
-
     // MARK: - Should End Combat Tests
 
     @Test("shouldEndCombat returns true when enemy is dead")
@@ -469,13 +354,14 @@ struct GameEngineCombatTests {
             .in(.startRoom)
 
         let game = MinimalGame(
-            items: deadEnemy
+            items: deadEnemy,
+            middleware: [CombatMiddleware.mock]
         )
 
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         let enemyProxy = await engine.item("deadEnemy")
-        let shouldEnd = await engine.shouldEndCombat(enemy: enemyProxy)
+        let shouldEnd = await CombatMiddleware.shouldEndCombat(enemy: enemyProxy, engine: engine)
         #expect(shouldEnd == true)
     }
 
@@ -487,13 +373,14 @@ struct GameEngineCombatTests {
             .in(.startRoom)
 
         let game = MinimalGame(
-            items: unconsciousEnemy
+            items: unconsciousEnemy,
+            middleware: [CombatMiddleware.mock]
         )
 
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         let enemyProxy = await engine.item("unconsciousEnemy")
-        let shouldEnd = await engine.shouldEndCombat(enemy: enemyProxy)
+        let shouldEnd = await CombatMiddleware.shouldEndCombat(enemy: enemyProxy, engine: engine)
         #expect(shouldEnd == true)
     }
 
@@ -504,7 +391,10 @@ struct GameEngineCombatTests {
             .characterSheet(.default)
             .in(.startRoom)
 
-        let game = MinimalGame(items: enemy)
+        let game = MinimalGame(
+            items: enemy,
+            middleware: [CombatMiddleware.mock]
+        )
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         // Set player as dead
@@ -513,7 +403,7 @@ struct GameEngineCombatTests {
         )
 
         let enemyProxy = await engine.item("enemy")
-        let shouldEnd = await engine.shouldEndCombat(enemy: enemyProxy)
+        let shouldEnd = await CombatMiddleware.shouldEndCombat(enemy: enemyProxy, engine: engine)
         #expect(shouldEnd == true)
     }
 
@@ -531,13 +421,14 @@ struct GameEngineCombatTests {
 
         let game = MinimalGame(
             player: deadPlayer,
-            items: enemy
+            items: enemy,
+            middleware: [CombatMiddleware.mock]
         )
 
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         let enemyProxy = await engine.item("enemy")
-        let shouldEnd = await engine.shouldEndCombat(enemy: enemyProxy)
+        let shouldEnd = await CombatMiddleware.shouldEndCombat(enemy: enemyProxy, engine: engine)
         #expect(shouldEnd == true)
     }
 
@@ -549,13 +440,14 @@ struct GameEngineCombatTests {
             .in(.startRoom)
 
         let game = MinimalGame(
-            items: weakEnemy
+            items: weakEnemy,
+            middleware: [CombatMiddleware.mock]
         )
 
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         let enemyProxy = await engine.item("weakEnemy")
-        let shouldEnd = await engine.shouldEndCombat(enemy: enemyProxy)
+        let shouldEnd = await CombatMiddleware.shouldEndCombat(enemy: enemyProxy, engine: engine)
         #expect(shouldEnd == true)
     }
 
@@ -573,13 +465,14 @@ struct GameEngineCombatTests {
 
         let game = MinimalGame(
             player: healthyPlayer,
-            items: healthyEnemy
+            items: healthyEnemy,
+            middleware: [CombatMiddleware.mock]
         )
 
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         let enemyProxy = await engine.item("healthyEnemy")
-        let shouldEnd = await engine.shouldEndCombat(enemy: enemyProxy)
+        let shouldEnd = await CombatMiddleware.shouldEndCombat(enemy: enemyProxy, engine: engine)
         #expect(shouldEnd == false)
     }
 
@@ -590,18 +483,19 @@ struct GameEngineCombatTests {
         let rat = Item("rat")
             .name("giant rat")
             .characterSheet(
-                .init(health: 13)
+                health: 13
             )
             .in(.startRoom)
 
         let game = MinimalGame(
-            items: rat
+            items: rat,
+            middleware: [CombatMiddleware.mock]
         )
 
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // When: Initiate combat
-        try await engine.execute("kill the rat")
+        try await engine.execute("kill the rat", times: 2)
 
         await mockIO.expect(
             """
@@ -610,24 +504,21 @@ struct GameEngineCombatTests {
             giant rat braces for the inevitable collision of flesh and
             bone.
 
-            You catch the giant rat with minimal force, the blow almost
-            gentle. It registers the wound with annoyance.
+            Your strike grazes the giant rat, more push than punch. It
+            registers the wound with annoyance.
 
-            The giant rat's counter-punch goes wide, rage making the strike
-            clumsy and predictable.
+            In the tangle, the giant rat drives an elbow home -- sudden
+            pressure that blooms into dull pain. The cut registers dimly.
+            Blood, but not enough to matter.
             """
         )
 
         // 2. Process combat turn that ends combat
-        let command = Command(verb: .attack)
-        let combatResult = try await engine.getCombatResult(for: command)
-
-        // Process the result to apply state changes
-        try await engine.processActionResult(combatResult)
+        try await engine.execute("attack")
 
         // 3. Combat should now be ended
-        #expect(await engine.isInCombat == false)
-        #expect(await engine.combatState == nil)
+        #expect(await CombatMiddleware.isInCombat(in: engine) == false)
+        #expect(await CombatMiddleware.combatState(in: engine) == nil)
     }
 
     @Test("combat state persists across multiple turns")
@@ -643,7 +534,8 @@ struct GameEngineCombatTests {
             .in(.player)
 
         let game = MinimalGame(
-            items: ogre, club
+            items: ogre, club,
+            middleware: [CombatMiddleware.mock]
         )
 
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
@@ -658,28 +550,26 @@ struct GameEngineCombatTests {
             as the fierce ogre can only dodge and weave against the
             advantage of sharpened metal.
 
-            You swing the wooden club at the fierce ogre with desperate
-            creativity! It prepare to defend against your improvised
-            assault.
+            Brandishing the wooden club, you advance on the fierce ogre!
+            It's unconventional, but might just work.
 
-            The fierce ogre crashes forward in response, the impact jarring
-            but glancing as you roll with it. Pain flickers and dies. Your
-            body has more important work.
+            The fierce ogre answers with raw violence, a clubbing strike
+            that finds you but lacks the angle to truly hurt. Pain flickers
+            and dies. Your body has more important work.
             """
         )
 
-        let initialCombatState = await engine.combatState
+        let initialCombatState = await CombatMiddleware.combatState(in: engine)
         #expect(initialCombatState?.enemyID == "ogre")
         #expect(initialCombatState?.playerWeaponID == "club")
 
         // Process multiple combat turns
         for _ in 1...3 {
-            let command = Command(verb: .attack)
-            _ = try await engine.getCombatResult(for: command)
+            try await engine.execute("attack")
 
             // Combat state should persist
-            #expect(await engine.isInCombat == true)
-            let currentState = await engine.combatState
+            #expect(await CombatMiddleware.isInCombat(in: engine) == true)
+            let currentState = await CombatMiddleware.combatState(in: engine)
             #expect(currentState?.enemyID == "ogre")
             #expect(currentState?.playerWeaponID == "club")
         }
@@ -709,7 +599,8 @@ struct GameEngineCombatTests {
             .in(.player)
 
         let game = MinimalGame(
-            items: wolf, bear, sword, bow
+            items: wolf, bear, sword, bow,
+            middleware: [CombatMiddleware.mock]
         )
 
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
@@ -728,31 +619,30 @@ struct GameEngineCombatTests {
             as the dire wolf can only dodge and weave against the advantage
             of sharpened metal.
 
-            Your strike with your steel sword grazes the dire wolf, drawing
-            minimal blood. It registers the wound with annoyance.
+            Your steel sword finds the dire wolf exposed, carving a solid
+            wound that draws a grunt of pain. It absorbs the hit, flesh
+            suffering but endurance holding.
 
-            The dire wolf's counter-punch goes wide, rage making the strike
-            clumsy and predictable.
+            In the tangle, the dire wolf drives an elbow home -- sudden
+            pressure that blooms into dull pain. The cut registers dimly.
+            Blood, but not enough to matter.
 
             > kill the bear
-            You're currently engaged with the dire wolf -- focus!
+            Your steel sword finds the dire wolf exposed, carving a solid
+            wound that draws a grunt of pain. It absorbs the hit, flesh
+            suffering but endurance holding.
 
-            You strike the dire wolf with your steel sword, opening a wound
-            that bleeds steadily. The wound is real but manageable.
-
-            The dire wolf swings in retaliation but you slip the attack,
-            flowing around the violence like water around stone.
+            In the tangle, the dire wolf drives an elbow home -- sudden
+            pressure that blooms into dull pain. You feel it connect,
+            adding to the bruises but not breaking your rhythm.
 
             > kill the bear with the bow
-            In case you hadn't noticed, the dire wolf is already trying to
-            kill you!
+            Brandishing the longbow, you advance on the dire wolf! It's
+            unconventional, but might just work.
 
-            You attack with the longbow! The dire wolf dodges, more puzzled
-            than threatened by your choice of weapon.
-
-            The dire wolf's answer is swift and punishing -- knuckles meet
-            flesh with the sound of meat hitting stone. You absorb the hit,
-            feeling flesh tear but knowing you can endure.
+            The counterblow comes wild and desperate, the dire wolf
+            hammering through your guard to bruise rather than break. You
+            feel the hit, another note in the symphony of damage.
             """
         )
     }

@@ -1,4 +1,3 @@
-import CustomDump
 import Foundation
 import GnustoTestSupport
 import Testing
@@ -283,7 +282,7 @@ struct EntityIDTests {
                 return false
             }
 
-            expectNoDifference(message, "EntityID expected to be DaemonID, got: .player")
+            #expect(message == "EntityID expected to be DaemonID, got: .player")
             return true
         }
 
@@ -294,7 +293,7 @@ struct EntityIDTests {
                 return false
             }
 
-            expectNoDifference(message, "EntityID expected to be FuseID, got: .player")
+            #expect(message == "EntityID expected to be FuseID, got: .player")
             return true
         }
 
@@ -305,7 +304,7 @@ struct EntityIDTests {
                 return false
             }
 
-            expectNoDifference(message, "EntityID expected to be ItemID, got: .player")
+            #expect(message == "EntityID expected to be ItemID, got: .player")
             return true
         }
 
@@ -316,7 +315,7 @@ struct EntityIDTests {
                 return false
             }
 
-            expectNoDifference(message, "EntityID expected to be LocationID, got: .player")
+            #expect(message == "EntityID expected to be LocationID, got: .player")
             return true
         }
     }

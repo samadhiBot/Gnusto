@@ -282,13 +282,6 @@ extension GameState {
         case .clearGlobalState(let globalID):
             globalState.removeValue(forKey: globalID)
 
-        case .setCombatState(let combatState):
-            if let combatState {
-                globalState[.combatState] = .combatState(combatState)
-            } else {
-                globalState.removeValue(forKey: .combatState)
-            }
-
         // MARK: - Timed Events (Fuses & Daemons)
 
         case .addActiveDaemon(let daemonID, let daemonState):

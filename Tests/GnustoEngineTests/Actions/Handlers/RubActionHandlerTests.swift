@@ -1,4 +1,3 @@
-import CustomDump
 import GnustoEngine
 import GnustoTestSupport
 import Testing
@@ -310,10 +309,6 @@ struct RubActionHandlerTests {
             """
             > rub the necromancer
             That would be quite inappropriate.
-
-            No weapons between you -- just the furious necromancer's
-            aggression and your desperation! You collide in a tangle of
-            strikes and blocks.
             """
         )
 
@@ -393,7 +388,7 @@ struct RubActionHandlerTests {
     @Test("Handler exposes correct Verbs")
     func testVerbs() async throws {
         let handler = RubActionHandler()
-        expectNoDifference(handler.synonyms, [.rub, .polish, .clean, .massage])
+        #expect(handler.synonyms == [.rub, .polish, .clean, .massage])
     }
 
     @Test("Handler requires light")

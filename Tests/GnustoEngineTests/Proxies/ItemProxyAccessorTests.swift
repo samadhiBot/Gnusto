@@ -99,7 +99,7 @@ struct ItemProxyAccessorTests {
         let fightingCharacter = Item("monster")
             .name("angry monster")
             .characterSheet(
-                .init(isFighting: true)
+                isFighting: true
             )
             .in(.startRoom)
 
@@ -308,7 +308,7 @@ struct ItemProxyAccessorTests {
         let enemy = Item("monster")
             .name("angry monster")
             .characterSheet(
-                .init(isFighting: true)
+                isFighting: true
             )
             .in(.startRoom)
 
@@ -457,7 +457,8 @@ struct ItemProxyAccessorTests {
             .name("magic artifact")
             .size(5)
             .characterSheet(
-                .init(strength: 15, health: 75)
+                strength: 15,
+                health: 75
             )
             .value(100)
             .in(.startRoom)
@@ -573,14 +574,14 @@ struct ItemProxyAccessorTests {
         let deadCharacter = Item("skeleton")
             .name("ancient skeleton")
             .characterSheet(
-                .init(consciousness: .dead)
+                consciousness: .dead
             )
             .in(.startRoom)
 
         let hostileEnemy = Item("orc")
             .name("fierce orc")
             .characterSheet(
-                .init(isFighting: true)
+                isFighting: true
             )
             .in(.startRoom)
 

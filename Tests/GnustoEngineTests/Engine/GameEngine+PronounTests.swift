@@ -1,4 +1,3 @@
-import CustomDump
 import Foundation
 import GnustoTestSupport
 import Testing
@@ -360,7 +359,7 @@ struct GameEnginePronounTests {
 
             A laboratory in which strange experiments are being conducted.
 
-            Present in this location is a test item.
+            You can see a test item here.
             """
         )
     }

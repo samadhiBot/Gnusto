@@ -45,9 +45,6 @@ public enum StateChange: Codable, Equatable, Sendable {
     /// Requests the GameEngine to restart the game.
     case requestGameRestart
 
-    /// Updates the current combat state.
-    case setCombatState(CombatState?)
-
     /// Sets a global boolean flag to `true`.
     case setFlag(GlobalID)
 

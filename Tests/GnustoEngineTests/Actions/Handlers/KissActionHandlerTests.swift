@@ -1,4 +1,3 @@
-import CustomDump
 import GnustoEngine
 import GnustoTestSupport
 import Testing
@@ -201,9 +200,6 @@ struct KissActionHandlerTests {
             > kiss troll
             That's an unusual combat strategy, and the angry troll seems
             unlikely to reciprocate.
-
-            No weapons between you -- just the enemy's aggression and your
-            desperation! You collide in a tangle of strikes and blocks.
             """
         )
 
@@ -371,25 +367,13 @@ struct KissActionHandlerTests {
             The moment for kissing the traveling merchant has neither
             arrived nor been invited.
 
-            In a moment of raw violence, the terrible dragon comes at you
-            with nothing but fury! You raise your fists, knowing this will
-            hurt regardless of who wins.
-
             > kiss dragon
             That's an unusual combat strategy, and the terrible dragon
             seems unlikely to reciprocate.
 
-            In the tangle, the terrible dragon drives an elbow home --
-            sudden pressure that blooms into dull pain. Pain flickers and
-            dies. Your body has more important work.
-
             > kiss fairy
             The moment for kissing the woodland fairy has neither arrived
             nor been invited.
-
-            The terrible dragon's answer is swift and punishing -- knuckles
-            meet flesh with the sound of meat hitting stone. You grunt from
-            the impact but maintain your stance.
             """
         )
 
