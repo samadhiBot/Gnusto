@@ -329,14 +329,33 @@ public struct CombatMiddleware: GnustoMiddleware {
             engine: context.engine
         )
 
+        // Only set isFighting flag if enemy is still alive after the combat turn
+        // (combat might end immediately with a one-shot kill)
+        var additionalChanges: [StateChange?] = [
+            await target.setFlag(.isTouched)
+        ]
+
+        // Check if combat ended (indicated by combat state being cleared)
+        let combatEnded = firstTurn.changes.contains { change in
+            if case .clearGlobalState(let id) = change, id == .combatMiddlewareState {
+                return true
+            }
+            return false
+        }
+
+        // Only mark as fighting if combat continues
+        if !combatEnded {
+            additionalChanges.insert(
+                await target.setCharacterAttributes(isFighting: true),
+                at: 0
+            )
+        }
+
         // Combine intro message with first combat turn, including enemy state changes
         return ActionResult(
             message: [introMessage, firstTurn.message].compactMap { $0 }.joined(
                 separator: .paragraph),
-            changes: firstTurn.changes + [
-                await target.setCharacterAttributes(isFighting: true),
-                await target.setFlag(.isTouched),
-            ],
+            changes: firstTurn.changes + additionalChanges,
             effects: firstTurn.effects
         )
     }
@@ -457,20 +476,12 @@ public struct CombatMiddleware: GnustoMiddleware {
         try await engine.applyActionResultChanges([tempStateChange])
 
         // Process the complete combat turn through the system
-        let result = try await combatSystem.processCombatTurn(
+        // The combat system handles combat ending logic internally by returning
+        // CombatMiddleware.endCombat() in state changes when appropriate
+        return try await combatSystem.processCombatTurn(
             playerAction: playerAction,
             in: ActionContext(command, engine)
         )
-
-        // Check if combat should end
-        let enemy = await engine.item(combatState.enemyID)
-        if await Self.shouldEndCombat(enemy: enemy, engine: engine) {
-            return try result.appending(
-                endCombat(engine: engine)
-            )
-        }
-
-        return result
     }
 
     /// Initiates combat when an enemy attacks the player.

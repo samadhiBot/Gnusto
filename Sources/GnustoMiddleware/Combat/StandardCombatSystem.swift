@@ -143,7 +143,7 @@ public struct StandardCombatSystem: CombatSystem {
         )
     }
 
-    // MARK: - Enhanced Combat Calculations
+    // MARK: - Combat Calculations
 
     /// Calculates the outcome of an attack between two combatants using action-packed mechanics.
     ///
@@ -172,10 +172,8 @@ public struct StandardCombatSystem: CombatSystem {
         weapon playerWeapon: ItemProxy?,
         in context: ActionContext
     ) async -> CombatEvent {
-        let engine = context.engine
-
         // Get current combat state for intensity and fatigue calculations
-        let combatState = await self.combatState(from: engine)
+        let combatState = await self.combatState(from: context.engine)
         let intensity = combatState?.combatIntensity ?? 0.1
         let attackerFatigue =
             switch attacker {
@@ -184,10 +182,10 @@ public struct StandardCombatSystem: CombatSystem {
             }
 
         // Get enemy weapon if available
-        let enemyWeapon = await getEnemyWeapon(from: engine)
+        let enemyWeapon = await getEnemyWeapon(from: context.engine)
 
         // Roll d20 for attack with dynamic combat intensity bonus
-        let attackRoll = await engine.randomInt(in: 1...20)
+        let attackRoll = await context.engine.rollD20()
         let attackBonus = await attacker.characterSheet.attackBonus
         let weaponBonus = await playerWeapon?.value ?? 0
         let intensityBonus = Int(3.0 + (intensity * 5.0))  // 3-8 bonus based on intensity
@@ -220,6 +218,7 @@ public struct StandardCombatSystem: CombatSystem {
 
         // Special combat events: use contextual helper
         let escalation = combatState?.escalationLevel ?? 0.1
+
         let marginOfHitCandidate =
             await attacker.characterSheet.attackBonus
             - (await defender.characterSheet.effectiveArmorClass)
@@ -227,6 +226,7 @@ public struct StandardCombatSystem: CombatSystem {
             + intensityBonus
             - fatiguePenalty
             + attackRoll
+
         let triggerSpecialEvent = await shouldTriggerSpecialEvent(
             attackRoll: attackRoll,
             marginOfHit: marginOfHitCandidate,
@@ -234,10 +234,10 @@ public struct StandardCombatSystem: CombatSystem {
             intensity: intensity,
             attacker: await attacker.characterSheet,
             defender: await defender.characterSheet,
-            engine: engine
+            engine: context.engine
         )
 
-        let result =
+        let logResult =
             switch true {
             case attackRoll == 1: "Critical Miss!"
             case attackRoll == 20: "Critical Hit!"
@@ -260,14 +260,14 @@ public struct StandardCombatSystem: CombatSystem {
             defenderAC:      \(defenderAC)
             escalation:      \(String(format: "%.1f", escalation))
             specialEvent:    \(triggerSpecialEvent)
-            result:          \(result)\n
+            result:          \(logResult)\n
             """
         )
 
         // Critical miss on natural 1 - but even misses can have consequences
         if attackRoll == 1 {
             // 30% chance of special fumble effect
-            if await engine.randomPercentage(chance: 30) {
+            if await context.engine.randomPercentage(chance: 30) {
                 // Enemy fumbled and drops their weapon
                 if case .enemy(let enemy) = attacker, let enemyWeapon {
                     return .enemyDisarmed(
@@ -311,7 +311,7 @@ public struct StandardCombatSystem: CombatSystem {
         // Hit if total attack >= AC (now more likely due to intensity bonus)
         if totalAttack < defenderAC && !isCritical {
             // Even "misses" can have tactical effects
-            if await engine.randomPercentage(chance: 20) {
+            if await context.engine.randomPercentage(chance: 20) {
                 if case .enemy(let enemy) = attacker {
                     return .playerStaggers(
                         enemy: enemy,
@@ -346,7 +346,7 @@ public struct StandardCombatSystem: CombatSystem {
         // Store special event for potential use alongside damage
         var specialEvent: CombatEvent?
         if triggerSpecialEvent {
-            let eventType = await engine.randomInt(in: 1...6)
+            let eventType = await context.engine.randomInt(in: 1...6)
 
             switch eventType {
             case 1:  // Disarm - dramatic, no damage
@@ -445,7 +445,7 @@ public struct StandardCombatSystem: CombatSystem {
 
         // Calculate base damage with intensity and fatigue modifiers
         let weaponDamage = await playerWeapon?.weaponDamage ?? 8  // Increased from 4
-        let baseDamage = await engine.randomInt(in: 2...weaponDamage)  // Minimum 2 damage
+        let baseDamage = await context.engine.randomInt(in: 2...weaponDamage)  // Minimum 2 damage
         let attackerBonus = await attacker.characterSheet.damageBonus
         let intensityDamageBonus = Int(intensity * 4.0)  // 0-4 bonus damage from intensity
         let fatigueDamagePenalty = Int(attackerFatigue * 2.0)  // 0-2 damage reduction from fatigue
@@ -527,7 +527,7 @@ public struct StandardCombatSystem: CombatSystem {
             """
         )
 
-        let player = await engine.player
+        let player = await context.engine.player
 
         // Return appropriate event based on who is attacking
         return switch (attacker, defender) {
@@ -695,7 +695,7 @@ public struct StandardCombatSystem: CombatSystem {
         // Smart enemies might surrender when outmatched, especially when fatigued
         let surrenderThreshold = enemyFatigue > 0.5 ? 35 : 25  // Higher threshold when fatigued
         if healthPercent <= surrenderThreshold && characterSheet.intelligence > 14 {
-            let roll = await context.engine.randomInt(in: 1...20)
+            let roll = await context.engine.rollD20()
             let fatigueBonus = Int(enemyFatigue * 5.0)  // Fatigue makes surrender more likely
             if roll + characterSheet.wisdomModifier + fatigueBonus > 15 {
                 let enemyWeapon = await getEnemyWeapon(from: context.engine)
@@ -708,7 +708,7 @@ public struct StandardCombatSystem: CombatSystem {
 
         // Handle pacification attempts
         if case .talk = playerAction, characterSheet.canBePacified == true {
-            let roll = await context.engine.randomInt(in: 1...20)
+            let roll = await context.engine.rollD20()
             let playerCharisma = await context.player.characterSheet.charismaModifier
             if roll + playerCharisma >= characterSheet.pacifyDC {
                 let enemyWeapon = await getEnemyWeapon(from: context.engine)
@@ -723,8 +723,8 @@ public struct StandardCombatSystem: CombatSystem {
         guard case .attack = playerAction else {
             // Player is distracted - enemy gets buffed attack with advantage
             // Roll twice and take the better result
-            let roll1 = await context.engine.randomInt(in: 1...20)
-            let roll2 = await context.engine.randomInt(in: 1...20)
+            let roll1 = await context.engine.rollD20()
+            let roll2 = await context.engine.rollD20()
             let bestRoll = max(roll1, roll2)
 
             // Calculate attack with advantage, considering enemy fatigue
@@ -751,7 +751,7 @@ public struct StandardCombatSystem: CombatSystem {
 
             // Check for devastating opportunity attack on distracted player
             if bestRoll >= 15 || isCritical {
-                let opportunityRoll = await context.engine.randomInt(in: 1...20)
+                let opportunityRoll = await context.engine.rollD20()
                 if opportunityRoll >= 14 {
                     // Special opportunity attacks on distracted opponents
                     return switch opportunityRoll {
@@ -954,7 +954,7 @@ public struct StandardCombatSystem: CombatSystem {
             guard characterSheet.canBePacified == true && topic != nil else {
                 return nil
             }
-            let roll = await context.engine.randomInt(in: 1...20)
+            let roll = await context.engine.rollD20()
             /*
              TODO: We should also factor in enemy intelligence/wisdom and percentage current health
              */
@@ -1459,6 +1459,7 @@ public struct StandardCombatSystem: CombatSystem {
                 enemy.takeDamage(damage),
                 CombatMiddleware.endCombat(),
                 enemy.setCharacterAttributes(
+                    health: 0,
                     consciousness: .dead,
                     isFighting: false
                 )
@@ -1501,6 +1502,7 @@ public struct StandardCombatSystem: CombatSystem {
                 description,
                 context.player.takeDamage(damage),
                 context.player.setCharacterAttributes(
+                    health: 0,
                     consciousness: .dead,
                     isFighting: false
                 ),
@@ -1773,8 +1775,9 @@ public struct StandardCombatSystem: CombatSystem {
 
     /// Determines whether a special event should trigger based on combat context.
     ///
-    /// Factors include: natural roll, margin of hit, escalation, intensity, attacker and defender luck,
-    /// and defender current health percent. The threshold is conservative so specials remain exciting.
+    /// Factors include: natural roll, margin of hit, escalation, intensity, attacker and defender
+    /// luck, and defender current health percent. The threshold is conservative so specials remain
+    /// exciting.
     func shouldTriggerSpecialEvent(  // swiftlint:disable:this function_parameter_count
         attackRoll: Int,
         marginOfHit: Int,
@@ -1788,11 +1791,11 @@ public struct StandardCombatSystem: CombatSystem {
 
         // Base threshold starts very high to keep special events RARE
         var threshold: Double = 25.0
-        threshold -= escalation * 3.0  // 0..3 easier with escalation (reduced from 8.0)
-        threshold -= intensity * 1.5  // 0..1.5 easier with intensity (reduced from 4.0)
-        threshold -= Double(max(0, marginOfHit)) * 0.3  // strong hits slightly more likely (reduced from 0.8)
+        threshold -= escalation * 3.0  // 0..3 easier with escalation
+        threshold -= intensity * 1.5  // 0..1.5 easier with intensity
+        threshold -= Double(max(0, marginOfHit)) * 0.3  // strong hits slightly more likely
 
-        // Luck influences (much reduced)
+        // Luck influences
         if let attacker { threshold -= Double(attacker.luckModifier) * 0.2 }
         if let defender { threshold += Double(defender.luckModifier) * 0.1 }
 
@@ -1802,7 +1805,7 @@ public struct StandardCombatSystem: CombatSystem {
         // Clamp threshold to maintain rarity - most special events require 18+ on d20
         threshold = max(15.0, min(25.0, threshold))
 
-        let roll = await engine.randomInt(in: 1...20)
+        let roll = await engine.rollD20()
         return Double(roll) >= threshold
     }
 }

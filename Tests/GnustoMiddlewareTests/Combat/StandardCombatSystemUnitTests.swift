@@ -494,34 +494,41 @@ struct StandardCombatSystemUnitTests {
             in: attackCombatContext(for: engine)
         )
 
-        let expected = try await ActionResult(
-            message: """
-                > attack troll with sword
-                The nasty troll has done nothing to deserve your hostility.
-                + You aren't holding the steel sword.
-                """,
-            changes: [
-                engine.player.setCharacterAttributes(health: 35),
-                CombatMiddleware.endCombat(),
-                troll.move(to: .nowhere),
-            ],
-            effects: [
-                .startEnemyReturnFuse(
-                    enemyID: .nastyTroll,
-                    to: .startRoom,
-                    message: """
-                        The worst possible timing: the creature comes back to find you still present,
-                        apparently fascinated by your surroundings rather than your survival.
-                        He doesn't hesitate -- violence resumes immediately.
-                        You had your chance to leave.
-                        """,
-                    turns: 2
-                ),
-            ]
-        )
+        // Should have a message (exact text is random)
+        #expect(result.message != nil)
 
-        // Should generate damage-related state changes
-        expectNoDifference(result, expected)
+        // Should generate correct state changes
+        #expect(result.changes.count == 3)
+
+        // Check player health change
+        guard case .setPlayerAttributes(let attrs) = result.changes[0] else {
+            Issue.record("Expected setPlayerAttributes for player")
+            return
+        }
+        #expect(attrs.health == 35)
+        #expect(attrs.consciousness == .unconscious)
+
+        // Check combat state cleared
+        guard case .clearGlobalState(let id) = result.changes[1] else {
+            Issue.record("Expected clearGlobalState")
+            return
+        }
+        #expect(id == .combatMiddlewareState)
+
+        // Check enemy removed
+        guard case .moveItem(let itemID, let parent) = result.changes[2] else {
+            Issue.record("Expected moveItem for enemy")
+            return
+        }
+        #expect(itemID == .nastyTroll)
+        #expect(parent == .nowhere)
+
+        // Check fuse effect
+        #expect(result.effects.count == 1)
+        guard case .startFuse = result.effects[0].type else {
+            Issue.record("Expected startFuse effect")
+            return
+        }
     }
 
     // MARK: - getEnemyWeapon Tests

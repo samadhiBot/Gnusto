@@ -305,11 +305,11 @@ extension Thief {
             case .playerUnconscious:
                 ActionResult(
                     context.combatMsg.oneOf(
-                    """
-                    Shifting in the midst of a thrust, the thief knocks you unconscious
-                    with the haft of his stiletto.
-                    """,
-                    "The thief knocks you out."
+                        """
+                        Shifting in the midst of a thrust, the thief knocks you unconscious
+                        with the haft of his stiletto.
+                        """,
+                        "The thief knocks you out."
                     )
                 )
 
@@ -367,23 +367,23 @@ extension Thief {
             case .enemyFlees:
                 ActionResult(
                     context.combatMsg.output(
-                    """
-                    Your opponent, determining discretion to be the better part of
-                    valor, decides to terminate this little contretemps. With a rueful
-                    nod of his head, he steps backward into the gloom and disappears.
-                    """
+                        """
+                        Your opponent, determining discretion to be the better part of
+                        valor, decides to terminate this little contretemps. With a rueful
+                        nod of his head, he steps backward into the gloom and disappears.
+                        """
                     )
                 )
 
             case .enemySpecialAction:
                 ActionResult(
                     context.combatMsg.oneOf(
-                    """
-                    The thief, a man of superior breeding, pauses for a moment
-                    to consider the propriety of finishing you off.
-                    """,
-                    "The thief amuses himself by searching your pockets.",
-                    "The thief entertains himself by rifling your pack."
+                        """
+                        The thief, a man of superior breeding, pauses for a moment
+                        to consider the propriety of finishing you off.
+                        """,
+                        "The thief amuses himself by searching your pockets.",
+                        "The thief entertains himself by rifling your pack."
                     )
                 )
 
@@ -402,9 +402,9 @@ extension Thief {
         _ damage: Int
     ) async -> ActionResult? {
         let currentLocation = await context.player.location
-        let thief = await context.engine.item(.thief)
-        let largeBag = await context.engine.item(.largeBag)
-        let stiletto = await context.engine.item(.stiletto)
+        let thief = await context.item(.thief)
+        let largeBag = await context.item(.largeBag)
+        let stiletto = await context.item(.stiletto)
 
         var changes: [StateChange] = [
             thief.remove()

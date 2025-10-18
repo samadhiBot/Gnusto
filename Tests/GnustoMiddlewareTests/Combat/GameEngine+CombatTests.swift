@@ -483,7 +483,7 @@ struct GameEngineCombatTests {
         let rat = Item("rat")
             .name("giant rat")
             .characterSheet(
-                health: 13
+                health: 12
             )
             .in(.startRoom)
 
@@ -495,7 +495,7 @@ struct GameEngineCombatTests {
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // When: Initiate combat
-        try await engine.execute("kill the rat", times: 2)
+        try await engine.execute("kill the rat")
 
         await mockIO.expect(
             """
@@ -504,19 +504,15 @@ struct GameEngineCombatTests {
             giant rat braces for the inevitable collision of flesh and
             bone.
 
-            Your strike grazes the giant rat, more push than punch. It
-            registers the wound with annoyance.
-
-            In the tangle, the giant rat drives an elbow home -- sudden
-            pressure that blooms into dull pain. The cut registers dimly.
-            Blood, but not enough to matter.
+            Your bare hands deliver death! The giant rat crumples without
+            ceremony, the fight conclusively ended.
             """
         )
 
-        // 2. Process combat turn that ends combat
-        try await engine.execute("attack")
+        #expect(await engine.item("rat").health == 0)
+        #expect(await engine.item("rat").isDead)
 
-        // 3. Combat should now be ended
+        // Then: Combat should now be ended
         #expect(await CombatMiddleware.isInCombat(in: engine) == false)
         #expect(await CombatMiddleware.combatState(in: engine) == nil)
     }
