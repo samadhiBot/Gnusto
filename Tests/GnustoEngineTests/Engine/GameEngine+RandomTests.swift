@@ -384,7 +384,7 @@ struct GameEngineRandomTests {
         // Test threshold 1 (should always succeed since die shows 1-10)
         var successes = 0
         for _ in 0..<100 {
-            if await engine.rollD10(rollsAtLeast: 1) {
+            if await engine.rollD10(isAtLeast: 1) {
                 successes += 1
             }
         }
@@ -393,7 +393,7 @@ struct GameEngineRandomTests {
         // Test threshold 11 (should never succeed since die shows 1-10)
         successes = 0
         for _ in 0..<100 {
-            if await engine.rollD10(rollsAtLeast: 11) {
+            if await engine.rollD10(isAtLeast: 11) {
                 successes += 1
             }
         }
@@ -408,7 +408,7 @@ struct GameEngineRandomTests {
         var results = [Bool]()
 
         for _ in 0..<15 {
-            let result = await engine.rollD10(rollsAtLeast: 5)
+            let result = await engine.rollD10(isAtLeast: 5)
             results.append(result)
         }
 
@@ -429,7 +429,7 @@ struct GameEngineRandomTests {
         // Test threshold 5 (should succeed roughly 60% of time: rolls 5,6,7,8,9,10)
         var successes = 0
         for _ in 0..<1_000 {
-            if await engine.rollD10(rollsAtLeast: 5) {
+            if await engine.rollD10(isAtLeast: 5) {
                 successes += 1
             }
         }
@@ -450,7 +450,7 @@ struct GameEngineRandomTests {
         // Test threshold 1 (should always succeed since die shows 1-20)
         var successes = 0
         for _ in 0..<100 {
-            if await engine.rollD20(rollsAtLeast: 1) {
+            if await engine.rollD20(isAtLeast: 1) {
                 successes += 1
             }
         }
@@ -459,7 +459,7 @@ struct GameEngineRandomTests {
         // Test threshold 21 (should never succeed since die shows 1-20)
         successes = 0
         for _ in 0..<100 {
-            if await engine.rollD20(rollsAtLeast: 21) {
+            if await engine.rollD20(isAtLeast: 21) {
                 successes += 1
             }
         }
@@ -474,7 +474,7 @@ struct GameEngineRandomTests {
         var results = [Bool]()
 
         for _ in 0..<15 {
-            let result = await engine.rollD20(rollsAtLeast: 10)
+            let result = await engine.rollD20(isAtLeast: 10)
             results.append(result)
         }
 
@@ -495,7 +495,7 @@ struct GameEngineRandomTests {
         // Test threshold 11 (should succeed roughly 50% of time: rolls 11-20)
         var successes = 0
         for _ in 0..<1_000 {
-            if await engine.rollD20(rollsAtLeast: 11) {
+            if await engine.rollD20(isAtLeast: 11) {
                 successes += 1
             }
         }
@@ -518,15 +518,15 @@ struct GameEngineRandomTests {
         let percentage1 = await engine.randomPercentage(chance: 10)
         let element1 = await engine.randomElement(in: ["X", "Y", "Z"])
         let int1 = await engine.randomInt(in: 1...100)
-        let d10_1 = await engine.rollD10(rollsAtLeast: 5)
-        let d20_1 = await engine.rollD20(rollsAtLeast: 15)
+        let d10_1 = await engine.rollD10(isAtLeast: 5)
+        let d20_1 = await engine.rollD20(isAtLeast: 15)
 
         let double2 = await engine.randomDouble()
         let percentage2 = await engine.randomPercentage(chance: 99)
         let element2 = await engine.randomElement(in: ["X", "Y", "Z"])
         let int2 = await engine.randomInt(in: 1...100)
-        let d10_2 = await engine.rollD10(rollsAtLeast: 5)
-        let d20_2 = await engine.rollD20(rollsAtLeast: 15)
+        let d10_2 = await engine.rollD10(isAtLeast: 5)
+        let d20_2 = await engine.rollD20(isAtLeast: 15)
 
         // Values should be valid
         #expect(double1 >= 0.0 && double1 < 1.0)

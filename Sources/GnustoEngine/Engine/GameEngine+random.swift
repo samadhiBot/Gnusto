@@ -55,6 +55,11 @@ extension GameEngine {
         return Int.random(in: 0...100, using: &rng) <= chance
     }
 
+    /// Rolls a 10-sided die.
+    ///
+    /// This method simulates rolling a D10, returning a random integer between 1 and 10 (inclusive).
+    ///
+    /// - Returns: A random integer between 1 and 10.
     public func rollD10() -> Int {
         randomInt(in: 1...10)
     }
@@ -66,10 +71,15 @@ extension GameEngine {
     ///
     /// - Parameter threshold: The minimum value needed for success (1-10).
     /// - Returns: True if the roll meets or exceeds the threshold, false otherwise.
-    public func rollD10(rollsAtLeast threshold: Int) -> Bool {
-        randomInt(in: 1...10) >= threshold
+    public func rollD10(isAtLeast threshold: Int) -> Bool {
+        rollD10() >= threshold
     }
 
+    /// Rolls a 20-sided die.
+    ///
+    /// This method simulates rolling a D20, returning a random integer between 1 and 20 (inclusive).
+    ///
+    /// - Returns: A random integer between 1 and 20.
     public func rollD20() -> Int {
         randomInt(in: 1...20)
     }
@@ -81,7 +91,7 @@ extension GameEngine {
     ///
     /// - Parameter threshold: The minimum value needed for success (1-20).
     /// - Returns: True if the roll meets or exceeds the threshold, false otherwise.
-    public func rollD20(rollsAtLeast threshold: Int) -> Bool {
-        randomInt(in: 1...20) >= threshold
+    public func rollD20(isAtLeast threshold: Int) -> Bool {
+        rollD20() >= threshold
     }
 }

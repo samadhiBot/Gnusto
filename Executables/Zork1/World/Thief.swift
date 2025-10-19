@@ -516,7 +516,7 @@ extension Thief {
         let largeBag = await context.item(.largeBag)
         let playerLocation = await context.player.location
 
-        if await context.engine.rollD10(rollsAtLeast: 10) {
+        if await context.engine.rollD10(isAtLeast: 10) {
             return ActionResult(
                 """
                 You evidently frightened the robber, though you didn't hit him.

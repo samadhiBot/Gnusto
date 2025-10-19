@@ -617,7 +617,7 @@ struct ThiefTests {
                 ".nowhere",
                 ".location(.roundRoom)",
                 ".nowhere",
-                ".location(.roundRoom)"
+                ".location(.roundRoom)",
             ]
         )
     }

@@ -6,6 +6,7 @@ import Logging
 
 /// Categorizes damage amounts for narrative purposes based on the ratio of damage to max health.
 public enum DamageCategory: Equatable, Sendable {
+    // swiftlint:disable sorted_enum_cases
     /// Damage that kills or incapacitates the target (100% or more of max health).
     case fatal
 
@@ -26,6 +27,7 @@ public enum DamageCategory: Equatable, Sendable {
 
     /// No damage dealt (0 damage).
     case none
+    // swiftlint:enable sorted_enum_cases
 
     /// Creates a damage category from damage amount and target's max health.
     ///
@@ -124,19 +126,19 @@ public enum CombatEvent: Equatable, Sendable {
     /// Player's attack is blocked, dodged, or made ineffective by armor.
     case enemyBlocked(CombatEventPayload)
 
-    /// Player injures the enemy.
-    ///
-    /// This consolidated event replaces enemyCriticallyWounded, enemyGravelyInjured,
-    /// enemyInjured, enemyLightlyInjured, enemyGrazed, and enemySlain.
-    /// Use the payload's damageCategory to determine severity.
-    case enemyInjured(CombatEventPayload)
-
     /// Enemy drop their weapon, either disarmed by the player, or by fumbling on a critical miss
     /// and dropping their weapon.
     case enemyDisarmed(CombatEventPayload, wasFumble: Bool)
 
     /// Enemy flees from combat.
     case enemyFlees(CombatEventPayload, direction: Direction?, destination: LocationID?)
+
+    /// Player injures the enemy.
+    ///
+    /// This consolidated event replaces enemyCriticallyWounded, enemyGravelyInjured,
+    /// enemyInjured, enemyLightlyInjured, enemyGrazed, and enemySlain.
+    /// Use the payload's damageCategory to determine severity.
+    case enemyInjured(CombatEventPayload)
 
     /// Player's attack is a critical miss.
     case enemyMissed(CombatEventPayload)
@@ -159,19 +161,19 @@ public enum CombatEvent: Equatable, Sendable {
     /// Player attacks an enemy.
     case playerAttacks(CombatEventPayload)
 
-    /// Enemy injures the player.
-    ///
-    /// This consolidated event replaces playerCriticallyWounded, playerGravelyInjured,
-    /// playerInjured, playerLightlyInjured, playerGrazed, and playerSlain.
-    /// Use the payload's damageCategory to determine severity.
-    case playerInjured(CombatEventPayload)
-
     /// Player drop their weapon, either disarmed by the enemy, or by fumbling on a critical miss
     /// and dropping their weapon.
     case playerDisarmed(CombatEventPayload, wasFumble: Bool)
 
     /// Enemy's attack is blocked, dodged, or made ineffective by armor.
     case playerDodged(CombatEventPayload)
+
+    /// Enemy injures the player.
+    ///
+    /// This consolidated event replaces playerCriticallyWounded, playerGravelyInjured,
+    /// playerInjured, playerLightlyInjured, playerGrazed, and playerSlain.
+    /// Use the payload's damageCategory to determine severity.
+    case playerInjured(CombatEventPayload)
 
     /// Enemy's attack is a critical miss.
     case playerMissed(CombatEventPayload)

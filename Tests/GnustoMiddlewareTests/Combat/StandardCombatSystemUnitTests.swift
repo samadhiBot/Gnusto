@@ -34,7 +34,7 @@ struct StandardCombatSystemUnitTests {
             middleware: [
                 CombatMiddleware(
                     combatSystems: [.nastyTroll: StandardCombatSystem(versus: .nastyTroll)]
-                )
+                ),
             ]
         )
 
@@ -219,7 +219,6 @@ struct StandardCombatSystemUnitTests {
             combatMessenger: testMessenger
         )
         let troll = await engine.item(.nastyTroll)
-        let sword = await engine.item("sword")
         let playerEvent = try await combatSystem.playerCombatEvent(
             for: .attack,
             against: troll,
@@ -276,7 +275,7 @@ struct StandardCombatSystemUnitTests {
             )
         )
 
-        let combatTurn = await CombatTurn(
+        let combatTurn = CombatTurn(
             playerEvent: .enemyInjured(
                 CombatEventPayload(
                     enemy: troll,
@@ -588,7 +587,7 @@ struct StandardCombatSystemUnitTests {
             middleware: [
                 CombatMiddleware(
                     combatSystems: [.nastyTroll: StandardCombatSystem(versus: .nastyTroll)]
-                )
+                ),
             ]
         )
 

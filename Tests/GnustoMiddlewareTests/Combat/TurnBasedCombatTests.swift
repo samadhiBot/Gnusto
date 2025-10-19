@@ -66,7 +66,7 @@ struct TurnBasedCombatTests {
             middleware: [
                 CombatMiddleware(
                     combatSystems: ["knight": StandardCombatSystem(versus: "knight")]
-                )
+                ),
             ]
         )
 
@@ -193,7 +193,7 @@ struct TurnBasedCombatTests {
                     combatSystems: [
                         "bandit": StandardCombatSystem(versus: "bandit")
                     ]
-                )
+                ),
             ]
         )
 

@@ -833,7 +833,7 @@ public struct StandardCombatSystem: CombatSystem {
         tauntRoll: Int = 13
     ) async -> CombatEvent? {
         let engine = context.engine
-        guard await engine.rollD20(rollsAtLeast: tauntRoll) else {
+        guard await engine.rollD20(isAtLeast: tauntRoll) else {
             return nil
         }
         let enemyTauntChance = combatTurn.enemyEvent?.chanceToProvokeEnemyTaunt ?? 0
@@ -1511,7 +1511,7 @@ public struct StandardCombatSystem: CombatSystem {
                         locationID: await context.player.location.id,
                         message: combatMsg.enemyWakes(enemy: payload.enemy),
                         turns: context.engine.randomInt(in: 3...6)
-                    )
+                    ),
                 ]
             )
 
@@ -1568,7 +1568,7 @@ public struct StandardCombatSystem: CombatSystem {
                         to: await context.player.location.id,
                         message: combatMsg.enemyReturns(enemy: payload.enemy),
                         turns: context.engine.randomInt(in: 2...4)
-                    )
+                    ),
                 ]
             )
 
