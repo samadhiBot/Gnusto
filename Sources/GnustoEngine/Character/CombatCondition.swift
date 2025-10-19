@@ -11,6 +11,13 @@ public enum CombatCondition: String, Codable, Sendable, Hashable, CaseIterable {
     /// or continue fighting with reduced effectiveness using improvised weapons or fists.
     case disarmed
 
+    /// Distracted by a non-combat action or event.
+    ///
+    /// The character's attention is divided, making them vulnerable to attacks
+    /// and less effective at defending. This condition typically applies when
+    /// attempting actions like examining items or reading during combat.
+    case distracted
+
     /// Fighting normally with no special conditions.
     case normal
 
@@ -25,6 +32,13 @@ public enum CombatCondition: String, Codable, Sendable, Hashable, CaseIterable {
     /// The character will not initiate attacks and may flee or cooperate.
     /// Combat may end or continue with the surrendered character as a non-combatant.
     case surrendered
+
+    /// Taunting or intimidating the opponent instead of attacking.
+    ///
+    /// The character is engaging in psychological warfare, mocking or threatening
+    /// their opponent. This can demoralize enemies but leaves the taunter open to
+    /// counter-attacks.
+    case taunting
 
     /// Hesitant and uncertain about what to do next.
     ///
@@ -50,6 +64,8 @@ extension CombatCondition {
         case .uncertain: -1
         case .vulnerable: -3
         case .disarmed: 0  // AC not affected by weapon loss
+        case .distracted: -3  // Not paying attention to defense
+        case .taunting: -1  // Focused on intimidation, not defense
         case .surrendered: -5  // Not actively defending
         }
     }
@@ -62,20 +78,26 @@ extension CombatCondition {
         case .uncertain: -2
         case .vulnerable: 0  // Vulnerable to attacks, not bad at making them
         case .disarmed: -4  // Fighting without proper weapon
+        case .distracted: -4  // Not focused on combat
+        case .taunting: 0  // Can still attack after taunting
         case .surrendered: -999  // Not attacking
         }
     }
 
     /// Whether the character will actively participate in combat.
     public var willFight: Bool {
-        self != .surrendered
+        switch self {
+        case .surrendered: false
+        case .taunting: false  // Taunting instead of fighting this turn
+        default: true
+        }
     }
 
     /// Whether this condition makes the character easier to hit.
     public var isDefensivelyImpaired: Bool {
         switch self {
         case .normal: false
-        case .offBalance, .uncertain, .vulnerable, .surrendered: true
+        case .offBalance, .uncertain, .vulnerable, .distracted, .taunting, .surrendered: true
         case .disarmed: false
         }
     }
@@ -84,8 +106,8 @@ extension CombatCondition {
     public var isOffensivelyImpaired: Bool {
         switch self {
         case .normal: false
-        case .offBalance, .uncertain, .disarmed, .surrendered: true
-        case .vulnerable: false
+        case .offBalance, .uncertain, .disarmed, .distracted, .surrendered: true
+        case .vulnerable, .taunting: false
         }
     }
 }

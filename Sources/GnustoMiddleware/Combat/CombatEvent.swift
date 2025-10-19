@@ -2,330 +2,188 @@ import Foundation
 import GnustoEngine
 import Logging
 
+// MARK: - Damage Categories
+
+/// Categorizes damage amounts for narrative purposes based on the ratio of damage to max health.
+public enum DamageCategory: Equatable, Sendable {
+    /// Damage that kills or incapacitates the target (100% or more of max health).
+    case fatal
+
+    /// Severe damage that significantly impairs combat ability (50-99% of max health).
+    case critical
+
+    /// Serious damage that notably affects performance (30-49% of max health).
+    case grave
+
+    /// Noticeable damage with moderate impact (15-29% of max health).
+    case moderate
+
+    /// Minor damage with limited effect (5-14% of max health).
+    case light
+
+    /// Superficial damage with minimal impact (1-4% of max health).
+    case scratch
+
+    /// No damage dealt (0 damage).
+    case none
+
+    /// Creates a damage category from damage amount and target's max health.
+    ///
+    /// - Parameters:
+    ///   - damage: Amount of damage dealt
+    ///   - currentHealth: Target's current health before damage
+    ///   - maxHealth: Target's maximum health
+    public init(damage: Int, currentHealth: Int, maxHealth: Int) {
+        guard maxHealth > 0 else {
+            self = damage > 0 ? .fatal : .none
+            return
+        }
+
+        // Fatal if damage kills the target
+        if damage >= currentHealth {
+            self = .fatal
+            return
+        }
+
+        // Calculate percentage of max health
+        let damagePercent = (damage * 100) / maxHealth
+
+        switch damagePercent {
+        case 50...: self = .critical
+        case 30..<50: self = .grave
+        case 15..<30: self = .moderate
+        case 5..<15: self = .light
+        case 1..<5: self = .scratch
+        default: self = .none
+        }
+    }
+}
+
+// MARK: - Combat Event Payload
+
+/// Common payload for combat events containing shared combat context.
+///
+/// This structure consolidates the data commonly needed across combat events,
+/// reducing redundancy and making it easier to pass damage, conditions, and
+/// combat participants through the system.
+public struct CombatEventPayload: Equatable, Sendable {
+    /// The enemy involved in the combat event.
+    public let enemy: ItemProxy
+
+    /// The player proxy, if needed for the event.
+    public let player: PlayerProxy?
+
+    /// The weapon the player is using, if any.
+    public let playerWeapon: ItemProxy?
+
+    /// The weapon the enemy is using, if any.
+    public let enemyWeapon: ItemProxy?
+
+    /// Amount of damage dealt in this event.
+    public let damage: Int
+
+    /// Category of damage for narrative purposes.
+    public let damageCategory: DamageCategory
+
+    /// Optional combat condition applied by this event.
+    public let combatCondition: CombatCondition?
+
+    /// Creates a combat event payload.
+    public init(
+        enemy: ItemProxy,
+        player: PlayerProxy? = nil,
+        playerWeapon: ItemProxy? = nil,
+        enemyWeapon: ItemProxy? = nil,
+        damage: Int = 0,
+        damageCategory: DamageCategory = .none,
+        combatCondition: CombatCondition? = nil
+    ) {
+        self.enemy = enemy
+        self.player = player
+        self.playerWeapon = playerWeapon
+        self.enemyWeapon = enemyWeapon
+        self.damage = damage
+        self.damageCategory = damageCategory
+        self.combatCondition = combatCondition
+    }
+}
+
+// MARK: - Combat Event
+
 /// Represents specific combat events with detailed outcome information.
 ///
 /// Each event captures both what happened mechanically (damage, status changes)
 /// and provides context for generating appropriate narrative messages.
 public enum CombatEvent: Equatable, Sendable {
     /// Combat is interrupted by external event.
-    case combatInterrupted(
-        reason: String
-    )
+    case combatInterrupted(reason: String)
 
     /// An enemy attacks the player.
-    case enemyAttacks(
-        enemy: ItemProxy,
-        playerWeapon: ItemProxy?,
-        enemyWeapon: ItemProxy?
-    )
+    case enemyAttacks(CombatEventPayload)
 
     /// Player's attack is blocked, dodged, or made ineffective by armor.
-    case enemyBlocked(
-        enemy: ItemProxy,
-        playerWeapon: ItemProxy?,
-        enemyWeapon: ItemProxy?
-    )
+    case enemyBlocked(CombatEventPayload)
 
-    /// Player deals critical damage to enemy.
-    case enemyCriticallyWounded(
-        enemy: ItemProxy,
-        playerWeapon: ItemProxy?,
-        enemyWeapon: ItemProxy?,
-        damage: Int
-    )
+    /// Player injures the enemy.
+    ///
+    /// This consolidated event replaces enemyCriticallyWounded, enemyGravelyInjured,
+    /// enemyInjured, enemyLightlyInjured, enemyGrazed, and enemySlain.
+    /// Use the payload's damageCategory to determine severity.
+    case enemyInjured(CombatEventPayload)
 
     /// Enemy drop their weapon, either disarmed by the player, or by fumbling on a critical miss
     /// and dropping their weapon.
-    case enemyDisarmed(
-        enemy: ItemProxy,
-        playerWeapon: ItemProxy?,
-        enemyWeapon: ItemProxy,
-        wasFumble: Bool
-    )
+    case enemyDisarmed(CombatEventPayload, wasFumble: Bool)
 
     /// Enemy flees from combat.
-    case enemyFlees(
-        enemy: ItemProxy,
-        enemyWeapon: ItemProxy?,
-        direction: Direction?,
-        destination: LocationID?
-    )
-
-    /// Player deals significant damage to enemy.
-    case enemyGravelyInjured(
-        enemy: ItemProxy,
-        playerWeapon: ItemProxy?,
-        enemyWeapon: ItemProxy?,
-        damage: Int
-    )
-
-    /// Player barely damages enemy.
-    case enemyGrazed(
-        enemy: ItemProxy,
-        playerWeapon: ItemProxy?,
-        enemyWeapon: ItemProxy?,
-        damage: Int
-    )
-
-    /// Player's attack causes enemy to hesitate, creating an opening for follow-up actions.
-    case enemyHesitates(
-        enemy: ItemProxy,
-        playerWeapon: ItemProxy?,
-        enemyWeapon: ItemProxy?
-    )
-
-    /// Player deals moderate damage to enemy.
-    case enemyInjured(
-        enemy: ItemProxy,
-        playerWeapon: ItemProxy?,
-        enemyWeapon: ItemProxy?,
-        damage: Int
-    )
-
-    /// Player deals light damage to enemy.
-    case enemyLightlyInjured(
-        enemy: ItemProxy,
-        playerWeapon: ItemProxy?,
-        enemyWeapon: ItemProxy?,
-        damage: Int
-    )
+    case enemyFlees(CombatEventPayload, direction: Direction?, destination: LocationID?)
 
     /// Player's attack is a critical miss.
-    case enemyMissed(
-        enemy: ItemProxy,
-        playerWeapon: ItemProxy?,
-        enemyWeapon: ItemProxy?
-    )
+    case enemyMissed(CombatEventPayload)
 
     /// Enemy is pacified and stops fighting.
-    case enemyPacified(
-        enemy: ItemProxy,
-        enemyWeapon: ItemProxy?
-    )
-
-    /// Player kills the enemy outright.
-    case enemySlain(
-        enemy: ItemProxy,
-        playerWeapon: ItemProxy?,
-        enemyWeapon: ItemProxy?,
-        damage: Int
-    )
-
-    /// Enemy performs a special ability or action.
-    case enemySpecialAction(
-        enemy: ItemProxy,
-        enemyWeapon: ItemProxy?,
-        message: String
-    )
-
-    /// Player's attack causes enemy to stagger, reducing their combat effectiveness.
-    case enemyStaggers(
-        enemy: ItemProxy,
-        playerWeapon: ItemProxy?,
-        enemyWeapon: ItemProxy?
-    )
+    case enemyPacified(CombatEventPayload)
 
     /// Enemy surrenders.
-    case enemySurrenders(
-        enemy: ItemProxy,
-        enemyWeapon: ItemProxy?
-    )
-
-    /// Enemy taunts or intimidates instead of attacking.
-    case enemyTaunts(
-        enemy: ItemProxy,
-        message: String
-    )
+    case enemySurrenders(CombatEventPayload)
 
     /// Player knocks enemy unconscious.
-    case enemyUnconscious(
-        enemy: ItemProxy,
-        playerWeapon: ItemProxy?,
-        enemyWeapon: ItemProxy?
-    )
-
-    /// Player's attack leaves enemy vulnerable to subsequent attacks.
-    case enemyVulnerable(
-        enemy: ItemProxy,
-        playerWeapon: ItemProxy?,
-        enemyWeapon: ItemProxy?
-    )
+    case enemyUnconscious(CombatEventPayload)
 
     /// Error processing combat event outcome.
-    case error(
-        message: String
-    )
+    case error(message: String)
 
     /// Player attempts to attack with non-weapon item.
-    case nonWeaponAttack(
-        enemy: ItemProxy,
-        enemyWeapon: ItemProxy?,
-        item: ItemProxy
-    )
+    case nonWeaponAttack(CombatEventPayload)
 
-    /// The player attacks an enemy.
-    case playerAttacks(
-        enemy: ItemProxy,
-        playerWeapon: ItemProxy?,
-        enemyWeapon: ItemProxy?
-    )
+    /// Player attacks an enemy.
+    case playerAttacks(CombatEventPayload)
 
-    /// Enemy deals critical damage to player.
-    case playerCriticallyWounded(
-        enemy: ItemProxy,
-        enemyWeapon: ItemProxy?,
-        player: PlayerProxy,
-        damage: Int
-    )
+    /// Enemy injures the player.
+    ///
+    /// This consolidated event replaces playerCriticallyWounded, playerGravelyInjured,
+    /// playerInjured, playerLightlyInjured, playerGrazed, and playerSlain.
+    /// Use the payload's damageCategory to determine severity.
+    case playerInjured(CombatEventPayload)
 
     /// Player drop their weapon, either disarmed by the enemy, or by fumbling on a critical miss
     /// and dropping their weapon.
-    case playerDisarmed(
-        enemy: ItemProxy,
-        playerWeapon: ItemProxy,
-        enemyWeapon: ItemProxy?,
-        wasFumble: Bool
-    )
-
-    /// Player is distracted by non-combat action, allowing enemy free attack.
-    case playerDistracted(
-        enemy: ItemProxy,
-        enemyWeapon: ItemProxy?,
-        command: Command
-    )
+    case playerDisarmed(CombatEventPayload, wasFumble: Bool)
 
     /// Enemy's attack is blocked, dodged, or made ineffective by armor.
-    case playerDodged(
-        enemy: ItemProxy,
-        enemyWeapon: ItemProxy?
-    )
-
-    /// Enemy deals significant damage to player.
-    case playerGravelyInjured(
-        enemy: ItemProxy,
-        enemyWeapon: ItemProxy?,
-        player: PlayerProxy,
-        damage: Int
-    )
-
-    /// Enemy barely damages player.
-    case playerGrazed(
-        enemy: ItemProxy,
-        enemyWeapon: ItemProxy?,
-        player: PlayerProxy,
-        damage: Int
-    )
-
-    /// Enemy's attack causes player to hesitate, creating an opening for follow-up actions.
-    case playerHesitates(
-        enemy: ItemProxy,
-        enemyWeapon: ItemProxy?
-    )
-
-    /// Enemy deals moderate damage to player.
-    case playerInjured(
-        enemy: ItemProxy,
-        enemyWeapon: ItemProxy?,
-        player: PlayerProxy,
-        damage: Int
-    )
-
-    /// Enemy deals light damage to player.
-    case playerLightlyInjured(
-        enemy: ItemProxy,
-        enemyWeapon: ItemProxy?,
-        player: PlayerProxy,
-        damage: Int
-    )
+    case playerDodged(CombatEventPayload)
 
     /// Enemy's attack is a critical miss.
-    case playerMissed(
-        enemy: ItemProxy,
-        enemyWeapon: ItemProxy?
-    )
-
-    /// Enemy kills the player.
-    case playerSlain(
-        enemy: ItemProxy,
-        enemyWeapon: ItemProxy?,
-        damage: Int
-    )
-
-    /// Enemy's attack causes player to stagger, reducing their combat effectiveness.
-    case playerStaggers(
-        enemy: ItemProxy,
-        enemyWeapon: ItemProxy?
-    )
+    case playerMissed(CombatEventPayload)
 
     /// Enemy knocks player unconscious.
-    case playerUnconscious(
-        enemy: ItemProxy,
-        enemyWeapon: ItemProxy?,
-        damage: Int
-    )
-
-    /// Enemy's attack leaves player vulnerable to subsequent attacks.
-    case playerVulnerable(
-        enemy: ItemProxy,
-        enemyWeapon: ItemProxy?
-    )
+    case playerUnconscious(CombatEventPayload)
 
     /// Stalemate - neither side can harm the other.
-    case stalemate(
-        enemy: ItemProxy,
-        enemyWeapon: ItemProxy?
-    )
+    case stalemate(CombatEventPayload)
 
     /// Player attempts to attack without required weapon.
-    case unarmedAttackDenied(
-        enemy: ItemProxy,
-        enemyWeapon: ItemProxy?
-    )
-
-}
-
-// MARK: - Damage Categories
-
-extension CombatEvent {
-    /// Categorizes damage amounts for narrative purposes.
-    public enum DamageCategory {
-        /// Damage that kills or incapacitates the target (100+ damage or fatal blow).
-        case fatal
-
-        /// Severe damage that significantly impairs combat ability (50-99 damage).
-        case critical
-
-        /// Serious damage that notably affects performance (30-49 damage).
-        case grave
-
-        /// Noticeable damage with moderate impact (15-29 damage).
-        case moderate
-
-        /// Minor damage with limited effect (5-14 damage).
-        case light
-
-        /// Superficial damage with minimal impact (1-4 damage).
-        case scratch
-
-        /// No damage dealt (0 damage).
-        case none
-
-        /// Creates a damage category from a numeric value.
-        public init(damage: Int, currentHealth: Int) {
-            if damage >= currentHealth {
-                self = .fatal
-            } else {
-                switch damage {
-                case 50...: self = .critical
-                case 30...49: self = .grave
-                case 15...29: self = .moderate
-                case 5...14: self = .light
-                case 1...4: self = .scratch
-                default: self = .none
-                }
-            }
-        }
-    }
+    case unarmedAttackDenied(CombatEventPayload)
 }
 
 // MARK: - Helpers
@@ -336,41 +194,23 @@ extension CombatEvent {
     /// - Returns: The enemy involved in the combat event, or `nil` for non-enemy events.
     public var enemy: ItemProxy? {
         switch self {
-        case .enemyAttacks(let enemy, _, _),
-            .enemyBlocked(let enemy, _, _),
-            .enemyCriticallyWounded(let enemy, _, _, _),
-            .enemyDisarmed(let enemy, _, _, _),
+        case .enemyInjured(let payload),
+            .playerInjured(let payload),
+            .enemyAttacks(let payload),
+            .playerAttacks(let payload),
+            .enemyBlocked(let payload),
+            .enemyMissed(let payload),
+            .playerDodged(let payload),
+            .playerMissed(let payload):
+            payload.enemy
+        case .enemyDisarmed(let enemy, _, _, _),
             .enemyFlees(let enemy, _, _, _),
-            .enemyGravelyInjured(let enemy, _, _, _),
-            .enemyGrazed(let enemy, _, _, _),
-            .enemyHesitates(let enemy, _, _),
-            .enemyInjured(let enemy, _, _, _),
-            .enemyLightlyInjured(let enemy, _, _, _),
-            .enemyMissed(let enemy, _, _),
             .enemyPacified(let enemy, _),
-            .enemySlain(let enemy, _, _, _),
-            .enemySpecialAction(let enemy, _, _),
-            .enemyStaggers(let enemy, _, _),
             .enemySurrenders(let enemy, _),
-            .enemyTaunts(let enemy, _),
             .enemyUnconscious(let enemy, _, _),
-            .enemyVulnerable(let enemy, _, _),
             .nonWeaponAttack(let enemy, _, _),
-            .playerAttacks(let enemy, _, _),
-            .playerCriticallyWounded(let enemy, _, _, _),
             .playerDisarmed(let enemy, _, _, _),
-            .playerDistracted(let enemy, _, _),
-            .playerDodged(let enemy, _),
-            .playerGravelyInjured(let enemy, _, _, _),
-            .playerGrazed(let enemy, _, _, _),
-            .playerHesitates(let enemy, _),
-            .playerInjured(let enemy, _, _, _),
-            .playerLightlyInjured(let enemy, _, _, _),
-            .playerMissed(let enemy, _),
-            .playerSlain(let enemy, _, _),
-            .playerStaggers(let enemy, _),
             .playerUnconscious(let enemy, _, _),
-            .playerVulnerable(let enemy, _),
             .stalemate(let enemy, _),
             .unarmedAttackDenied(let enemy, _):
             enemy
@@ -384,7 +224,9 @@ extension CombatEvent {
     /// - Returns: `true` if the event prevents the opponent from attacking back.
     public var incapacitatesOpponent: Bool {
         switch self {
-        case .enemySlain, .enemyUnconscious, .enemyFlees, .enemySurrenders:
+        case .enemyInjured(let payload):
+            payload.damageCategory == .fatal
+        case .enemyUnconscious, .enemyFlees, .enemySurrenders:
             true
         default:
             false
@@ -396,22 +238,23 @@ extension CombatEvent {
     /// - Returns: A value from 0.0 to 1.0 representing the likelihood of provoking a taunt.
     public var chanceToProvokeEnemyTaunt: Double {
         switch self {
-        case .enemyGrazed: 0.3
-        case .enemyMissed: 0.7
-        case .enemyBlocked: 0.5
-        case .playerSlain: 0.9
+        case .enemyInjured(let payload):
+            switch payload.damageCategory {
+            case .scratch: 0.3
+            default: 0
+            }
+        case .enemyMissed, .enemyBlocked: 0.6
+        case .playerInjured(let payload):
+            switch payload.damageCategory {
+            case .fatal: 0.9
+            case .critical: 0.7
+            case .grave: 0.6
+            case .moderate: 0.5
+            case .light: 0.4
+            case .scratch, .none: 0.3
+            }
         case .playerUnconscious: 0.8
-        case .playerCriticallyWounded,
-            .playerDisarmed,
-            .playerVulnerable:
-            0.7
-        case .playerGravelyInjured,
-            .playerStaggers,
-            .playerHesitates:
-            0.6
-        case .playerInjured: 0.5
-        case .playerLightlyInjured: 0.4
-        case .playerDistracted: 0.3
+        case .playerDisarmed: 0.7
         default: 0
         }
     }
