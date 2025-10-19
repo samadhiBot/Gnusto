@@ -18,273 +18,266 @@ extension StandardCombatSystem {
         via messenger: CombatMessenger
     ) async -> String {
         switch event {
-        case let .enemyAttacks(enemy, playerWeapon, enemyWeapon):
+        case .enemyAttacks(let payload):
             await messenger.enemyAttacks(
-                enemy: enemy,
-                playerWeapon: playerWeapon,
-                enemyWeapon: enemyWeapon
+                enemy: payload.enemy,
+                playerWeapon: payload.playerWeapon,
+                enemyWeapon: payload.enemyWeapon
             )
 
-        case let .playerAttacks(enemy, playerWeapon, enemyWeapon):
+        case .playerAttacks(let payload):
             await messenger.playerAttacks(
-                enemy: enemy,
-                playerWeapon: playerWeapon,
-                enemyWeapon: enemyWeapon
+                enemy: payload.enemy,
+                playerWeapon: payload.playerWeapon,
+                enemyWeapon: payload.enemyWeapon
             )
 
-        case let .enemySlain(enemy, playerWeapon, enemyWeapon, damage):
-            await messenger.enemySlain(
-                enemy: enemy,
-                playerWeapon: playerWeapon,
-                enemyWeapon: enemyWeapon,
-                damage: damage
-            )
+        case .enemyInjured(let payload):
+            switch payload.damageCategory {
+            case .fatal:
+                await messenger.enemySlain(
+                    enemy: payload.enemy,
+                    playerWeapon: payload.playerWeapon,
+                    enemyWeapon: payload.enemyWeapon,
+                    damage: payload.damage
+                )
+            case .critical:
+                await messenger.enemyCriticallyWounded(
+                    enemy: payload.enemy,
+                    playerWeapon: payload.playerWeapon,
+                    enemyWeapon: payload.enemyWeapon,
+                    damage: payload.damage
+                )
+            case .grave:
+                await messenger.enemyGravelyInjured(
+                    enemy: payload.enemy,
+                    playerWeapon: payload.playerWeapon,
+                    enemyWeapon: payload.enemyWeapon,
+                    damage: payload.damage
+                )
+            case .moderate:
+                await messenger.enemyInjured(
+                    enemy: payload.enemy,
+                    playerWeapon: payload.playerWeapon,
+                    enemyWeapon: payload.enemyWeapon,
+                    damage: payload.damage
+                )
+            case .light:
+                await messenger.enemyLightlyInjured(
+                    enemy: payload.enemy,
+                    playerWeapon: payload.playerWeapon,
+                    enemyWeapon: payload.enemyWeapon,
+                    damage: payload.damage
+                )
+            case .scratch:
+                await messenger.enemyGrazed(
+                    enemy: payload.enemy,
+                    playerWeapon: payload.playerWeapon,
+                    enemyWeapon: payload.enemyWeapon,
+                    damage: payload.damage
+                )
+            case .none:
+                // Handle special conditions or default message
+                if let condition = payload.combatCondition {
+                    switch condition {
+                    case .offBalance:
+                        await messenger.enemyStaggers(
+                            enemy: payload.enemy,
+                            playerWeapon: payload.playerWeapon,
+                            enemyWeapon: payload.enemyWeapon
+                        )
+                    case .uncertain:
+                        await messenger.enemyHesitates(
+                            enemy: payload.enemy,
+                            playerWeapon: payload.playerWeapon,
+                            enemyWeapon: payload.enemyWeapon
+                        )
+                    case .vulnerable:
+                        await messenger.enemyVulnerable(
+                            enemy: payload.enemy,
+                            playerWeapon: payload.playerWeapon,
+                            enemyWeapon: payload.enemyWeapon
+                        )
+                    default:
+                        ""
+                    }
+                } else {
+                    ""
+                }
+            }
 
-        case let .enemyUnconscious(enemy, playerWeapon, enemyWeapon):
+        case .enemyUnconscious(let payload):
             await messenger.enemyUnconscious(
-                enemy: enemy,
-                playerWeapon: playerWeapon,
-                enemyWeapon: enemyWeapon
+                enemy: payload.enemy,
+                playerWeapon: payload.playerWeapon,
+                enemyWeapon: payload.enemyWeapon
             )
 
-        case let .enemyDisarmed(enemy, playerWeapon, enemyWeapon, wasFumble):
+        case .enemyDisarmed(let payload, let wasFumble):
             await messenger.enemyDisarmed(
-                enemy: enemy,
-                playerWeapon: playerWeapon,
-                enemyWeapon: enemyWeapon,
+                enemy: payload.enemy,
+                playerWeapon: payload.playerWeapon,
+                enemyWeapon: payload.enemyWeapon!,  // Safe: disarming requires a weapon
                 wasFumble: wasFumble
             )
 
-        case let .enemyStaggers(enemy, playerWeapon, enemyWeapon):
-            await messenger.enemyStaggers(
-                enemy: enemy,
-                playerWeapon: playerWeapon,
-                enemyWeapon: enemyWeapon
-            )
-
-        case let .enemyHesitates(enemy, playerWeapon, enemyWeapon):
-            await messenger.enemyHesitates(
-                enemy: enemy,
-                playerWeapon: playerWeapon,
-                enemyWeapon: enemyWeapon,
-            )
-
-        case let .enemyVulnerable(enemy, playerWeapon, enemyWeapon):
-            await messenger.enemyVulnerable(
-                enemy: enemy,
-                playerWeapon: playerWeapon,
-                enemyWeapon: enemyWeapon,
-            )
-
-        case let .enemyCriticallyWounded(enemy, playerWeapon, enemyWeapon, damage):
-            await messenger.enemyCriticallyWounded(
-                enemy: enemy,
-                playerWeapon: playerWeapon,
-                enemyWeapon: enemyWeapon,
-                damage: damage
-            )
-
-        case let .enemyGravelyInjured(enemy, playerWeapon, enemyWeapon, damage):
-            await messenger.enemyGravelyInjured(
-                enemy: enemy,
-                playerWeapon: playerWeapon,
-                enemyWeapon: enemyWeapon,
-                damage: damage
-            )
-
-        case let .enemyInjured(enemy, playerWeapon, enemyWeapon, damage):
-            await messenger.enemyInjured(
-                enemy: enemy,
-                playerWeapon: playerWeapon,
-                enemyWeapon: enemyWeapon,
-                damage: damage
-            )
-
-        case let .enemyLightlyInjured(enemy, playerWeapon, enemyWeapon, damage):
-            await messenger.enemyLightlyInjured(
-                enemy: enemy,
-                playerWeapon: playerWeapon,
-                enemyWeapon: enemyWeapon,
-                damage: damage
-            )
-
-        case let .enemyGrazed(enemy, playerWeapon, enemyWeapon, damage):
-            await messenger.enemyGrazed(
-                enemy: enemy,
-                playerWeapon: playerWeapon,
-                enemyWeapon: enemyWeapon,
-                damage: damage
-            )
-
-        case let .enemyMissed(enemy, playerWeapon, enemyWeapon):
+        case .enemyMissed(let payload):
             await messenger.enemyMissed(
-                enemy: enemy,
-                playerWeapon: playerWeapon,
-                enemyWeapon: enemyWeapon
+                enemy: payload.enemy,
+                playerWeapon: payload.playerWeapon,
+                enemyWeapon: payload.enemyWeapon
             )
 
-        case let .enemyBlocked(enemy, playerWeapon, enemyWeapon):
+        case .enemyBlocked(let payload):
             await messenger.enemyBlocked(
-                enemy: enemy,
-                playerWeapon: playerWeapon,
-                enemyWeapon: enemyWeapon
+                enemy: payload.enemy,
+                playerWeapon: payload.playerWeapon,
+                enemyWeapon: payload.enemyWeapon
             )
 
-        case let .playerSlain(enemy, enemyWeapon, damage):
-            await messenger.playerSlain(
-                enemy: enemy,
-                enemyWeapon: enemyWeapon,
-                damage: damage
-            )
+        case .playerInjured(let payload):
+            switch payload.damageCategory {
+            case .fatal:
+                await messenger.playerSlain(
+                    enemy: payload.enemy,
+                    enemyWeapon: payload.enemyWeapon,
+                    damage: payload.damage
+                )
+            case .critical:
+                await messenger.playerCriticallyWounded(
+                    enemy: payload.enemy,
+                    enemyWeapon: payload.enemyWeapon,
+                    player: payload.player!,  // Safe: player injuries require a player
+                    damage: payload.damage
+                )
+            case .grave:
+                await messenger.playerGravelyInjured(
+                    enemy: payload.enemy,
+                    enemyWeapon: payload.enemyWeapon,
+                    player: payload.player!,  // Safe: player injuries require a player
+                    damage: payload.damage
+                )
+            case .moderate:
+                await messenger.playerInjured(
+                    enemy: payload.enemy,
+                    enemyWeapon: payload.enemyWeapon,
+                    player: payload.player!,  // Safe: player injuries require a player
+                    damage: payload.damage
+                )
+            case .light:
+                await messenger.playerLightlyInjured(
+                    enemy: payload.enemy,
+                    enemyWeapon: payload.enemyWeapon,
+                    player: payload.player!,  // Safe: player injuries require a player
+                    damage: payload.damage
+                )
+            case .scratch:
+                await messenger.playerGrazed(
+                    enemy: payload.enemy,
+                    enemyWeapon: payload.enemyWeapon,
+                    player: payload.player!,  // Safe: player injuries require a player
+                    damage: payload.damage
+                )
+            case .none:
+                // Handle special conditions or default message
+                if let condition = payload.combatCondition {
+                    switch condition {
+                    case .offBalance:
+                        await messenger.playerStaggers(
+                            enemy: payload.enemy,
+                            enemyWeapon: payload.enemyWeapon
+                        )
+                    case .uncertain:
+                        await messenger.playerHesitates(
+                            enemy: payload.enemy,
+                            enemyWeapon: payload.enemyWeapon
+                        )
+                    case .vulnerable:
+                        await messenger.playerVulnerable(
+                            enemy: payload.enemy,
+                            enemyWeapon: payload.enemyWeapon
+                        )
+                    case .taunting:
+                        // Enemy taunts - use a default message or expand messenger API
+                        ""
+                    default:
+                        ""
+                    }
+                } else {
+                    ""
+                }
+            }
 
-        case let .playerUnconscious(enemy, enemyWeapon, damage):
+        case .playerUnconscious(let payload):
             await messenger.playerUnconscious(
-                enemy: enemy,
-                enemyWeapon: enemyWeapon,
-                damage: damage
+                enemy: payload.enemy,
+                enemyWeapon: payload.enemyWeapon,
+                damage: payload.damage
             )
 
-        case let .playerDisarmed(enemy, playerWeapon, enemyWeapon, wasFumble):
+        case .playerDisarmed(let payload, let wasFumble):
             await messenger.playerDisarmed(
-                enemy: enemy,
-                playerWeapon: playerWeapon,
-                enemyWeapon: enemyWeapon,
+                enemy: payload.enemy,
+                playerWeapon: payload.playerWeapon!,  // Safe: disarming requires a weapon
+                enemyWeapon: payload.enemyWeapon,
                 wasFumble: wasFumble
             )
 
-        case let .playerStaggers(enemy, enemyWeapon):
-            await messenger.playerStaggers(
-                enemy: enemy,
-                enemyWeapon: enemyWeapon
-            )
-
-        case let .playerHesitates(enemy, enemyWeapon):
-            await messenger.playerHesitates(
-                enemy: enemy,
-                enemyWeapon: enemyWeapon
-            )
-
-        case let .playerVulnerable(enemy, enemyWeapon):
-            await messenger.playerVulnerable(
-                enemy: enemy,
-                enemyWeapon: enemyWeapon
-            )
-
-        case let .playerCriticallyWounded(enemy, enemyWeapon, player, damage):
-            await messenger.playerCriticallyWounded(
-                enemy: enemy,
-                enemyWeapon: enemyWeapon,
-                player: player,
-                damage: damage
-            )
-
-        case let .playerGravelyInjured(enemy, enemyWeapon, player, damage):
-            await messenger.playerGravelyInjured(
-                enemy: enemy,
-                enemyWeapon: enemyWeapon,
-                player: player,
-                damage: damage
-            )
-
-        case let .playerInjured(enemy, enemyWeapon, player, damage):
-            await messenger.playerInjured(
-                enemy: enemy,
-                enemyWeapon: enemyWeapon,
-                player: player,
-                damage: damage
-            )
-
-        case let .playerLightlyInjured(enemy, enemyWeapon, player, damage):
-            await messenger.playerLightlyInjured(
-                enemy: enemy,
-                enemyWeapon: enemyWeapon,
-                player: player,
-                damage: damage
-            )
-
-        case let .playerGrazed(enemy, enemyWeapon, player, damage):
-            await messenger.playerGrazed(
-                enemy: enemy,
-                enemyWeapon: enemyWeapon,
-                player: player,
-                damage: damage
-            )
-
-        case let .playerMissed(enemy, enemyWeapon):
+        case .playerMissed(let payload):
             await messenger.playerMissed(
-                enemy: enemy,
-                enemyWeapon: enemyWeapon
+                enemy: payload.enemy,
+                enemyWeapon: payload.enemyWeapon
             )
 
-        case let .playerDodged(enemy, enemyWeapon):
+        case .playerDodged(let payload):
             await messenger.playerDodged(
-                enemy: enemy,
-                enemyWeapon: enemyWeapon
+                enemy: payload.enemy,
+                enemyWeapon: payload.enemyWeapon
             )
 
-        case let .enemyFlees(enemy, enemyWeapon, direction, destination):
+        case .enemyFlees(let payload, let direction, let destination):
             await messenger.enemyFlees(
-                enemy: enemy,
-                enemyWeapon: enemyWeapon,
+                enemy: payload.enemy,
+                enemyWeapon: payload.enemyWeapon,
                 direction: direction,
                 destination: destination
             )
 
-        case let .enemyPacified(enemy, enemyWeapon):
+        case .enemyPacified(let payload):
             await messenger.enemyPacified(
-                enemy: enemy,
-                enemyWeapon: enemyWeapon
+                enemy: payload.enemy,
+                enemyWeapon: payload.enemyWeapon
             )
 
-        case let .enemySurrenders(enemy, enemyWeapon):
+        case .enemySurrenders(let payload):
             await messenger.enemySurrenders(
-                enemy: enemy,
-                enemyWeapon: enemyWeapon
+                enemy: payload.enemy,
+                enemyWeapon: payload.enemyWeapon
             )
 
-        case let .enemyTaunts(enemy, message):
-            await messenger.enemyTaunts(
-                enemy: enemy,
-                message: message
-            )
-
-        case let .enemySpecialAction(enemy, enemyWeapon, message):
-            await messenger.enemySpecialAction(
-                enemy: enemy,
-                enemyWeapon: enemyWeapon,
-                message: message
-            )
-
-        case let .unarmedAttackDenied(enemy, enemyWeapon):
+        case .unarmedAttackDenied(let payload):
             await messenger.unarmedAttackDenied(
-                enemy: enemy,
-                enemyWeapon: enemyWeapon
+                enemy: payload.enemy,
+                enemyWeapon: payload.enemyWeapon
             )
 
-        case let .nonWeaponAttack(enemy, enemyWeapon, item):
+        case .nonWeaponAttack(let payload):
             await messenger.nonWeaponAttack(
-                enemy: enemy,
-                enemyWeapon: enemyWeapon,
-                item: item
+                enemy: payload.enemy,
+                enemyWeapon: payload.enemyWeapon,
+                item: payload.playerWeapon!  // Safe: non-weapon attack requires an item
             )
 
-        case let .playerDistracted(enemy, enemyWeapon, command):
-            await messenger.playerDistracted(
-                enemy: enemy,
-                enemyWeapon: enemyWeapon,
-                command: command
+        case .stalemate(let payload):
+            await messenger.stalemate(
+                enemy: payload.enemy,
+                enemyWeapon: payload.enemyWeapon
             )
 
-        case let .combatInterrupted(reason):
+        case .combatInterrupted(let reason):
             await messenger.combatInterrupted(reason: reason)
 
-        case let .stalemate(enemy, enemyWeapon):
-            await messenger.stalemate(
-                enemy: enemy,
-                enemyWeapon: enemyWeapon
-            )
-
-        case let .error(errorMessage):
+        case .error(let errorMessage):
             errorMessage
         }
     }

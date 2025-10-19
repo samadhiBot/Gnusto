@@ -271,9 +271,12 @@ public struct StandardCombatSystem: CombatSystem {
                 // Enemy fumbled and drops their weapon
                 if case .enemy(let enemy) = attacker, let enemyWeapon {
                     return .enemyDisarmed(
-                        enemy: enemy,
-                        playerWeapon: playerWeapon,
-                        enemyWeapon: enemyWeapon,
+                        CombatEventPayload(
+                            enemy: enemy,
+                            player: await context.engine.player,
+                            playerWeapon: playerWeapon,
+                            enemyWeapon: enemyWeapon
+                        ),
                         wasFumble: true
                     )
                 }
@@ -284,9 +287,12 @@ public struct StandardCombatSystem: CombatSystem {
                     let enemyWeapon
                 {
                     return .playerDisarmed(
-                        enemy: enemy,
-                        playerWeapon: playerWeapon,
-                        enemyWeapon: enemyWeapon,
+                        CombatEventPayload(
+                            enemy: enemy,
+                            player: await context.engine.player,
+                            playerWeapon: playerWeapon,
+                            enemyWeapon: enemyWeapon
+                        ),
                         wasFumble: true
                     )
                 }
@@ -384,9 +390,12 @@ public struct StandardCombatSystem: CombatSystem {
             case 1:  // Disarm - dramatic, no damage
                 if case .enemy(let enemy) = defender, let playerWeapon, let enemyWeapon {
                     return .enemyDisarmed(
-                        enemy: enemy,
-                        playerWeapon: playerWeapon,
-                        enemyWeapon: enemyWeapon,
+                        CombatEventPayload(
+                            enemy: enemy,
+                            player: await context.engine.player,
+                            playerWeapon: playerWeapon,
+                            enemyWeapon: enemyWeapon
+                        ),
                         wasFumble: false
                     )
                 }
@@ -394,9 +403,12 @@ public struct StandardCombatSystem: CombatSystem {
                     let defenderWeapon = await defender.preferredWeapon
                 {
                     return .playerDisarmed(
-                        enemy: enemy,
-                        playerWeapon: defenderWeapon,
-                        enemyWeapon: enemyWeapon,
+                        CombatEventPayload(
+                            enemy: enemy,
+                            player: await context.engine.player,
+                            playerWeapon: defenderWeapon,
+                            enemyWeapon: enemyWeapon
+                        ),
                         wasFumble: false
                     )
                 }
@@ -413,16 +425,22 @@ public struct StandardCombatSystem: CombatSystem {
                 if defenderHealthPercent <= 25 {
                     if case .enemy(let enemy) = defender {
                         return .enemyUnconscious(
-                            enemy: enemy,
-                            playerWeapon: playerWeapon,
-                            enemyWeapon: nil
+                            CombatEventPayload(
+                                enemy: enemy,
+                                player: await context.engine.player,
+                                playerWeapon: playerWeapon,
+                                enemyWeapon: nil
+                            )
                         )
                     }
                     if case .enemy(let enemy) = attacker {
                         return .playerUnconscious(
-                            enemy: enemy,
-                            enemyWeapon: enemyWeapon,
-                            damage: 0
+                            CombatEventPayload(
+                                enemy: enemy,
+                                player: await context.engine.player,
+                                playerWeapon: nil,
+                                enemyWeapon: enemyWeapon
+                            )
                         )
                     }
                 }
@@ -625,9 +643,14 @@ public struct StandardCombatSystem: CombatSystem {
                 }
                 if let flightExit = await context.engine.randomElement(in: validExits) {
                     let enemyWeapon = await getEnemyWeapon(from: context.engine)
+                    let playerWeapon = await context.player.preferredWeapon
                     return .enemyFlees(
-                        enemy: enemy,
-                        enemyWeapon: enemyWeapon,
+                        CombatEventPayload(
+                            enemy: enemy,
+                            player: await context.engine.player,
+                            playerWeapon: playerWeapon,
+                            enemyWeapon: enemyWeapon
+                        ),
                         direction: flightExit.direction,
                         destination: flightExit.destinationID
                     )
@@ -642,9 +665,14 @@ public struct StandardCombatSystem: CombatSystem {
             let fatigueBonus = Int(enemyFatigue * 5.0)  // Fatigue makes surrender more likely
             if roll + characterSheet.wisdomModifier + fatigueBonus > 15 {
                 let enemyWeapon = await getEnemyWeapon(from: context.engine)
+                let playerWeapon = await context.player.preferredWeapon
                 return .enemySurrenders(
-                    enemy: enemy,
-                    enemyWeapon: enemyWeapon
+                    CombatEventPayload(
+                        enemy: enemy,
+                        player: await context.engine.player,
+                        playerWeapon: playerWeapon,
+                        enemyWeapon: enemyWeapon
+                    )
                 )
             }
         }
@@ -655,9 +683,14 @@ public struct StandardCombatSystem: CombatSystem {
             let playerCharisma = await context.player.characterSheet.charismaModifier
             if roll + playerCharisma >= characterSheet.pacifyDC {
                 let enemyWeapon = await getEnemyWeapon(from: context.engine)
+                let playerWeapon = await context.player.preferredWeapon
                 return .enemyPacified(
-                    enemy: enemy,
-                    enemyWeapon: enemyWeapon
+                    CombatEventPayload(
+                        enemy: enemy,
+                        player: await context.engine.player,
+                        playerWeapon: playerWeapon,
+                        enemyWeapon: enemyWeapon
+                    )
                 )
             }
         }
@@ -817,7 +850,7 @@ public struct StandardCombatSystem: CombatSystem {
                     enemyWeapon: enemyWeapon,
                     damage: 0,
                     damageCategory: .none,
-                    combatCondition: .taunting
+                    combatCondition: Optional.some(.taunting)
                 )
             )
         }
@@ -865,8 +898,12 @@ public struct StandardCombatSystem: CombatSystem {
             if characterSheet.requiresWeapon == true && weapon == nil {
                 let enemyWeapon = await getEnemyWeapon(from: context.engine)
                 return .unarmedAttackDenied(
-                    enemy: enemy,
-                    enemyWeapon: enemyWeapon
+                    CombatEventPayload(
+                        enemy: enemy,
+                        player: await context.engine.player,
+                        playerWeapon: nil,
+                        enemyWeapon: enemyWeapon
+                    )
                 )
             }
 
@@ -874,9 +911,12 @@ public struct StandardCombatSystem: CombatSystem {
             if let weapon, await !weapon.isWeapon {
                 let enemyWeapon = await getEnemyWeapon(from: context.engine)
                 return .nonWeaponAttack(
-                    enemy: enemy,
-                    enemyWeapon: enemyWeapon,
-                    item: weapon
+                    CombatEventPayload(
+                        enemy: enemy,
+                        player: await context.engine.player,
+                        playerWeapon: weapon,
+                        enemyWeapon: enemyWeapon
+                    )
                 )
             }
 
@@ -899,10 +939,15 @@ public struct StandardCombatSystem: CombatSystem {
              */
             let charismaCheck = await context.player.characterSheet.charismaModifier + roll
             let enemyWeapon = await getEnemyWeapon(from: context.engine)
+            let playerWeapon = await context.player.preferredWeapon
             return if charismaCheck >= characterSheet.pacifyDC {
                 .enemyPacified(
-                    enemy: enemy,
-                    enemyWeapon: enemyWeapon
+                    CombatEventPayload(
+                        enemy: enemy,
+                        player: await context.engine.player,
+                        playerWeapon: playerWeapon,
+                        enemyWeapon: enemyWeapon
+                    )
                 )
             } else {
                 nil
@@ -1453,18 +1498,18 @@ public struct StandardCombatSystem: CombatSystem {
                 enemy.takeDamage(damage)
             )
 
-        case .enemyUnconscious(let enemy, _, _):
+        case .enemyUnconscious(let payload):
             return try await ActionResult(
                 message: description,
                 changes: [
-                    enemy.setCharacterAttributes(consciousness: .unconscious),
+                    payload.enemy.setCharacterAttributes(consciousness: .unconscious),
                     CombatMiddleware.endCombat(),
                 ],
                 effects: [
                     .startEnemyWakeUpFuse(
-                        enemyID: enemy.id,
+                        enemyID: payload.enemy.id,
                         locationID: await context.player.location.id,
-                        message: combatMsg.enemyWakes(enemy: enemy),
+                        message: combatMsg.enemyWakes(enemy: payload.enemy),
                         turns: context.engine.randomInt(in: 3...6)
                     )
                 ]
@@ -1508,19 +1553,20 @@ public struct StandardCombatSystem: CombatSystem {
                 context.player.takeDamage(damage)
             )
 
-        case .playerUnconscious(let enemy, _, let damage):
+        case .playerUnconscious(let payload):
             return try await ActionResult(
                 message: description,
                 changes: [
-                    context.player.takeDamage(damage),
+                    context.player.setCharacterAttributes(consciousness: .unconscious),
+                    context.player.takeDamage(payload.damage),
                     CombatMiddleware.endCombat(),
-                    enemy.remove(),
+                    payload.enemy.remove(),
                 ],
                 effects: [
                     .startEnemyReturnFuse(
-                        enemyID: enemy.id,
+                        enemyID: payload.enemy.id,
                         to: await context.player.location.id,
-                        message: combatMsg.enemyReturns(enemy: enemy),
+                        message: combatMsg.enemyReturns(enemy: payload.enemy),
                         turns: context.engine.randomInt(in: 2...4)
                     )
                 ]
@@ -1528,49 +1574,47 @@ public struct StandardCombatSystem: CombatSystem {
 
         // Special outcomes
 
-        case .enemyDisarmed(let enemy, _, let enemyWeapon, _):
+        case .enemyDisarmed(let payload, _):
             return await ActionResult(
                 description,
-                enemy.setCharacterAttributes(combatCondition: .disarmed),
-                enemyWeapon.move(to: context.player.location.id),
+                payload.enemy.setCharacterAttributes(combatCondition: .disarmed),
+                payload.enemyWeapon?.move(to: context.player.location.id)
             )
 
-        case .enemyFlees(let enemy, _, _, let destination):
+        case .enemyFlees(let payload, _, let destination):
             if let destination {
                 return try ActionResult(
                     description,
                     CombatMiddleware.endCombat(),
-                    enemy.move(to: destination),
+                    payload.enemy.move(to: destination)
                 )
             } else {
                 return ActionResult(description)
             }
 
-        case .enemyPacified(let enemy, _):
+        case .enemyPacified(let payload):
             return try await ActionResult(
                 description,
                 CombatMiddleware.endCombat(),
-                enemy.setCharacterAttributes(isFighting: false),
+                payload.enemy.setCharacterAttributes(isFighting: false)
             )
 
-        case .enemySurrenders(let enemy, _):
-            var sheet = await enemy.characterSheet
-            sheet.isFighting = false
-            sheet.combatCondition = .surrendered
+        case .enemySurrenders(let payload):
             return try await ActionResult(
                 description,
                 CombatMiddleware.endCombat(),
-                enemy.setCharacterAttributes(
+                payload.enemy.setCharacterAttributes(
                     combatCondition: .surrendered,
                     isFighting: false
-                ),
+                )
             )
 
-        case .playerDisarmed(_, let playerWeapon, _, _):
+        case .playerDisarmed(let payload, _):
             let playerLocation = await context.player.location
-            return ActionResult(
+            return await ActionResult(
                 description,
-                playerWeapon.move(to: playerLocation.id)
+                context.player.setCharacterAttributes(combatCondition: .disarmed),
+                payload.playerWeapon?.move(to: playerLocation.id)
             )
 
         case .unarmedAttackDenied, .nonWeaponAttack, .combatInterrupted,

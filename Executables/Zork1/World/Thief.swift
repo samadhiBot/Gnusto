@@ -288,19 +288,53 @@ extension Thief {
         ) { event, context async throws -> ActionResult? in
             switch event {
 
-            case .playerSlain:
-                ActionResult(
-                    context.combatMsg.oneOf(
-                        "The thief, forgetting his essentially genteel upbringing, cuts your throat.",
-                        "The thief, a pragmatist, dispatches you as a threat to his livelihood.",
-                        "Finishing you off, the thief inserts his blade into your heart.",
-                        "The thief comes in from the side, feints, and inserts the blade into your ribs.",
-                        """
-                        The thief bows formally, raises his stiletto,
-                        and with a wry grin, ends the battle and your life.
-                        """
+            case .playerInjured(let payload):
+                switch payload.damageCategory {
+                case .fatal:
+                    ActionResult(
+                        context.combatMsg.oneOf(
+                            "The thief, forgetting his essentially genteel upbringing, cuts your throat.",
+                            "The thief, a pragmatist, dispatches you as a threat to his livelihood.",
+                            "Finishing you off, the thief inserts his blade into your heart.",
+                            "The thief comes in from the side, feints, and inserts the blade into your ribs.",
+                            """
+                            The thief bows formally, raises his stiletto,
+                            and with a wry grin, ends the battle and your life.
+                            """
+                        )
                     )
-                )
+                case .critical:
+                    ActionResult(
+                        context.combatMsg.oneOf(
+                            "The butt of his stiletto cracks you on the skull, and you stagger back.",
+                            """
+                            The thief rams the haft of his blade into your stomach,
+                            leaving you out of breath.
+                            """,
+                            "The thief attacks, and you fall back desperately."
+                        )
+                    )
+                case .grave:
+                    ActionResult(
+                        context.combatMsg.oneOf(
+                            "The thief strikes like a snake! The resulting wound is serious.",
+                            "The thief stabs a deep cut in your upper arm.",
+                            "The stiletto touches your forehead, and the blood obscures your vision.",
+                            "The thief strikes at your wrist, and suddenly your grip is slippery with blood."
+                        )
+                    )
+                case .light:
+                    ActionResult(
+                        context.combatMsg.oneOf(
+                            "A quick thrust pinks your left arm, and blood starts to trickle down.",
+                            "The thief draws blood, raking his stiletto across your arm.",
+                            "The stiletto flashes faster than you can follow, and blood wells from your leg.",
+                            "The thief slowly approaches, strikes like a snake, and leaves you wounded."
+                        )
+                    )
+                default:
+                    nil
+                }
 
             case .playerUnconscious:
                 ActionResult(
@@ -313,40 +347,8 @@ extension Thief {
                     )
                 )
 
-            case .playerDisarmed(_, let playerWeapon, _, _):
-                await playerDisarmedResult(playerWeapon, context)
-
-            case .playerCriticallyWounded:
-                ActionResult(
-                    context.combatMsg.oneOf(
-                        "The butt of his stiletto cracks you on the skull, and you stagger back.",
-                        """
-                        The thief rams the haft of his blade into your stomach,
-                        leaving you out of breath.
-                        """,
-                        "The thief attacks, and you fall back desperately."
-                    )
-                )
-
-            case .playerGravelyInjured:
-                ActionResult(
-                    context.combatMsg.oneOf(
-                        "The thief strikes like a snake! The resulting wound is serious.",
-                        "The thief stabs a deep cut in your upper arm.",
-                        "The stiletto touches your forehead, and the blood obscures your vision.",
-                        "The thief strikes at your wrist, and suddenly your grip is slippery with blood."
-                    )
-                )
-
-            case .playerLightlyInjured:
-                ActionResult(
-                    context.combatMsg.oneOf(
-                        "A quick thrust pinks your left arm, and blood starts to trickle down.",
-                        "The thief draws blood, raking his stiletto across your arm.",
-                        "The stiletto flashes faster than you can follow, and blood wells from your leg.",
-                        "The thief slowly approaches, strikes like a snake, and leaves you wounded."
-                    )
-                )
+            case .playerDisarmed(let payload, _):
+                await playerDisarmedResult(payload.playerWeapon!, context)
 
             case .playerMissed:
                 ActionResult(
@@ -375,20 +377,8 @@ extension Thief {
                     )
                 )
 
-            case .enemySpecialAction:
-                ActionResult(
-                    context.combatMsg.oneOf(
-                        """
-                        The thief, a man of superior breeding, pauses for a moment
-                        to consider the propriety of finishing you off.
-                        """,
-                        "The thief amuses himself by searching your pockets.",
-                        "The thief entertains himself by rifling your pack."
-                    )
-                )
-
-            case .enemySlain(let enemy, _, _, let damage):
-                await thiefSlainResult(context, enemy, damage)
+            case .enemyInjured(let payload) where payload.damageCategory == .fatal:
+                await thiefSlainResult(context, payload.enemy, payload.damage)
 
             default:
                 nil

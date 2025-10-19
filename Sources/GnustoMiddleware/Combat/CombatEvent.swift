@@ -201,19 +201,18 @@ extension CombatEvent {
             .enemyBlocked(let payload),
             .enemyMissed(let payload),
             .playerDodged(let payload),
-            .playerMissed(let payload):
+            .playerMissed(let payload),
+            .enemyDisarmed(let payload, _),
+            .enemyFlees(let payload, _, _),
+            .enemyPacified(let payload),
+            .enemySurrenders(let payload),
+            .enemyUnconscious(let payload),
+            .nonWeaponAttack(let payload),
+            .playerDisarmed(let payload, _),
+            .playerUnconscious(let payload),
+            .stalemate(let payload),
+            .unarmedAttackDenied(let payload):
             payload.enemy
-        case .enemyDisarmed(let enemy, _, _, _),
-            .enemyFlees(let enemy, _, _, _),
-            .enemyPacified(let enemy, _),
-            .enemySurrenders(let enemy, _),
-            .enemyUnconscious(let enemy, _, _),
-            .nonWeaponAttack(let enemy, _, _),
-            .playerDisarmed(let enemy, _, _, _),
-            .playerUnconscious(let enemy, _, _),
-            .stalemate(let enemy, _),
-            .unarmedAttackDenied(let enemy, _):
-            enemy
         case .combatInterrupted, .error:
             nil
         }
